@@ -1,26 +1,26 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-**Edition 0.69 constructs the two automorphic seeds and puts their arithmetic points on the prescribed Hida ideals.** Given the unitary modularity-ideal theorem, the argument now gives both upper-field automorphy statements and weight-zero finiteness on the original linked frame. The exceptional two-block normalization needed in patching is also proved. [Reading guide](../RH_reconstruction_progress_v0_69.md) · [Short TeX reader](../RH_new_proofs_v0_69.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_69.tex)
+**Edition 0.70 proves both Taylor–Wiles bounds needed for a chain of marked arithmetic points and returns the polarized representation to the original CM field.** The patching argument covers every full-block chain. At a two-block point it identifies which local construction is still needed. The descent argument preserves the strict local bounds, including at eligible places over the coefficient prime. [Reading guide](../RH_reconstruction_progress_v0_70.md) · [Short TeX reader](../RH_new_proofs_v0_70.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_70.tex)
 
-**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The partial human reconstruction contains 4,006 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_69.json) · [Remaining contracts](../continuation_v69/obligations.json)
+**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The partial human reconstruction contains 4,038 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_70.json) · [Remaining contracts](../continuation_v70/obligations.json)
 
 ## Read and verify
 
 | Argument | Source |
 | --- | --- |
-| The two seed representations and their local conditions | [Constructing the seeds](../continuation_v69/seeds.tex) |
-| The two auxiliary runs on one frame | [Coefficient field and realizations](../continuation_v69/setup.tex) · [Arithmetic points on the ideals](../continuation_v69/point.tex) |
-| Exceptional patching and the result on the linked field | [Normalizing both blocks](../continuation_v69/patching.tex) · [Linked-field conclusion](../continuation_v69/linked.tex) |
-| Earlier editions | [0.68](../RH_reconstruction_progress_v0_68.md) · [0.67](../RH_reconstruction_progress_v0_67.md) · [0.66](../RH_reconstruction_progress_v0_66.md) |
+| Simultaneous detection and both arithmetic bounds | [Choosing the primes](../continuation_v70/choice.tex) · [First-order bound](../continuation_v70/bounds.tex) · [Obstruction bound](../continuation_v70/obstruction.tex) |
+| General chains and the remaining two-block local input | [Prime containment](../continuation_v70/raw.tex) |
+| Descent and the marked conclusion | [Polarized solvable descent](../continuation_v70/descent.tex) · [Marked theorem](../continuation_v70/return.tex) |
+| Earlier editions | [0.69](../RH_reconstruction_progress_v0_69.md) · [0.68](../RH_reconstruction_progress_v0_68.md) · [0.67](../RH_reconstruction_progress_v0_67.md) |
 
 From the repository root, initialize the original source and verify the claim excerpts.
 
 ~~~sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v69/verify.py --formal-git formal_source
+python3 continuation_v70/verify.py --formal-git formal_source
 ~~~
 
-Run `pdflatex RH_new_proofs_v0_69.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
+Run `pdflatex RH_new_proofs_v0_70.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
 
 ## Reproduce the portable v0.58 files
 
