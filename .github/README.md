@@ -1,26 +1,26 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-**Edition 0.70 proves both Taylor–Wiles bounds needed for a chain of marked arithmetic points and returns the polarized representation to the original CM field.** The patching argument covers every full-block chain. At a two-block point it identifies which local construction is still needed. The descent argument preserves the strict local bounds, including at eligible places over the coefficient prime. [Reading guide](../RH_reconstruction_progress_v0_70.md) · [Short TeX reader](../RH_new_proofs_v0_70.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_70.tex)
+**Edition 0.71 completes the patching argument at points with two residual blocks.** The prime-containment tests now hold along arbitrary finite chains. The human-readable marked theorem consequently follows from the original Hida ideal construction. The remaining premise and the parts already supplied are identified in the reading guide. [Reading guide](../RH_reconstruction_progress_v0_71.md) · [Short TeX reader](../RH_new_proofs_v0_71.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_71.tex)
 
-**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The partial human reconstruction contains 4,038 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_70.json) · [Remaining contracts](../continuation_v70/obligations.json)
+**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The partial human reconstruction contains 4,064 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_71.json) · [Remaining contracts](../continuation_v71/obligations.json)
 
 ## Read and verify
 
 | Argument | Source |
 | --- | --- |
-| Simultaneous detection and both arithmetic bounds | [Choosing the primes](../continuation_v70/choice.tex) · [First-order bound](../continuation_v70/bounds.tex) · [Obstruction bound](../continuation_v70/obstruction.tex) |
-| General chains and the remaining two-block local input | [Prime containment](../continuation_v70/raw.tex) |
-| Descent and the marked conclusion | [Polarized solvable descent](../continuation_v70/descent.tex) · [Marked theorem](../continuation_v70/return.tex) |
-| Earlier editions | [0.69](../RH_reconstruction_progress_v0_69.md) · [0.68](../RH_reconstruction_progress_v0_68.md) · [0.67](../RH_reconstruction_progress_v0_67.md) |
+| The two-block patching calculation | [Selmer limits](../continuation_v71/limits.tex) · [Universal matrices](../continuation_v71/urep.tex) · [Equations](../continuation_v71/presentation.tex) |
+| The arithmetic inputs | [Cohomology of the host and patching](../continuation_v71/cohom.tex) · [Three Hida inputs](../continuation_v71/hida.tex) |
+| The remaining premise of the marked theorem | [Prime tests and marked conclusion](../continuation_v71/assembly.tex) |
+| Earlier editions | [0.70](../RH_reconstruction_progress_v0_70.md) · [0.69](../RH_reconstruction_progress_v0_69.md) · [0.68](../RH_reconstruction_progress_v0_68.md) |
 
 From the repository root, initialize the original source and verify the claim excerpts.
 
 ~~~sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v70/verify.py --formal-git formal_source
+python3 continuation_v71/verify.py --formal-git formal_source
 ~~~
 
-Run `pdflatex RH_new_proofs_v0_70.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
+Run `pdflatex RH_new_proofs_v0_71.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
 
 ## Reproduce the portable v0.58 files
 
