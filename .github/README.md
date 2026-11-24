@@ -1,26 +1,25 @@
 # Human reconstruction of RH and Dirichlet GRH
 
-Read the **[new chapters in edition 0.59 (PDF)](../RH_new_proofs_v0_59.pdf)** or start with the [mathematical reading guide](../RH_reconstruction_progress_v0_59.md). The [cumulative TeX manuscript](../RH_readable_reconstruction_v0_59.tex) includes the new chapters and the full earlier edition. The project develops a human-readable account of the pinned Alpöge–Claude Lean source.
+Edition 0.60 proves the weight −2 Selmer vanishing theorem on the rank-three frame used by the counting argument. This closes one whole obligation shared by RH and unrestricted Dirichlet GRH. The new chapters also carry the period expansion to concrete spectral data for a family under the stated selector and frame hypotheses. [New chapters (PDF)](../RH_new_proofs_v0_60.pdf) · [Mathematical reading guide](../RH_reconstruction_progress_v0_60.md) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_60.tex)
 
-Edition 0.59 adds the period Gram expansion on tied arithmetic data, the integral Cartier normal form and its two flag applications, the local Herr class maps, and the rank-three sharpness theorem. The checkpoint contains **3,783 claims and 24 open whole obligations**. Seventeen obligations are shared by RH and Dirichlet GRH. Seven more are specific to unrestricted Dirichlet GRH. [Current checkpoint](../CURRENT_CHECKPOINT_v0_59.json) · [Claim index](../continuation_v59/claims.json)
+The checkpoint contains **3,801 claims and 23 open whole obligations**. Sixteen are shared by RH and Dirichlet GRH. Seven more concern unrestricted Dirichlet GRH. [Current checkpoint](../CURRENT_CHECKPOINT_v0_60.json) · [Whole obligations and their statements](../continuation_v60/obligations.json) · [New claim index](../continuation_v60/claims.json)
 
-| To continue this argument | Next construction |
+| Argument | Where to read or continue |
 | --- | --- |
-| [Automorphic periods](../period_range_v59/next_source_handoff.txt) | Choose compatible full data and comparison isometries throughout the family, then apply the diagonal and distinct-word estimates. |
-| [Cartier rows](../cartier_v59/next_source_handoff.txt) | Join the odd, character and monomial blocks on the same geometric row data. |
-| [Local Galois cohomology](../wach_v59/next_source_handoff.txt) | Construct crystalline evaluation and prove the quantitative comparison on the same Wach lattice. |
-| [Rank-three deformation spaces](../exceptional_v59/next_source_handoff.txt) | Construct the rank-three corner ideal from rank-two support, then supply the seed for propagation. |
+| Vanishing on the rank-three host | [The Dirichlet pair](../host_xpp_v60/input.tex) feeds [the proof on the chosen frame](../host_xpp_v60/main.tex). |
+| Automorphic periods | [Arithmetic terms](../arf_v60/main.tex) and [the spectral family](../spectral_v60/main.tex) lead to [the numerical frame bound on a common family window](../spectral_v60/next_source_handoff.txt). |
+| Cartier rows, local Galois cohomology and rank-three deformation spaces | The [edition 0.59 guide](../RH_reconstruction_progress_v0_59.md) describes the completed results and their next source endpoints. |
 
-## Work from a checkout
+## Verify or typeset this edition
 
-From the repository root, fetch the formal source and check the edition against its pinned source ranges.
+From the repository root, initialize the pinned source and check the new claims, source excerpts, review hashes and obligation register.
 
 ```sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v59/verify.py
+python3 continuation_v60/verify.py --formal-git formal_source
 ```
 
-The formal source commit is `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`. Source paths in chapter handoffs are relative to that submodule. To typeset only the new chapters locally, run `pdflatex RH_new_proofs_v0_59.tex` twice at the repository root with the packages in its preamble installed. The historical v0.57 manuscript and its v0.58 handoff remain available for earlier claims and the full dependency register. [Pinned formal source](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Historical reading guide](../README.md) · [Dependency audit](../RH_dependency_audit_v0_57.txt)
+Run `pdflatex RH_new_proofs_v0_60.tex` twice for the new chapters. The original proof is pinned at `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`. The historical dependency audit gives the definitions and prior evidence for the selected graph. [Pinned formal source](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Historical reading guide](../README.md) · [Historical dependency audit](../RH_dependency_audit_v0_57.txt)
 
 ## Reproduce the portable v0.58 files
 
