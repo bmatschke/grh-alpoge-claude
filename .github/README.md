@@ -1,26 +1,26 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-**Edition 0.66 constructs the Case III seed.** The proof chooses a single auxiliary prime and residual representation before any later tower is given. It supplies compatible integral lifts with the required automorphic weights and both root entries. [Guide to the proof](../RH_reconstruction_progress_v0_66.md) · [Short reader in TeX](../RH_new_proofs_v0_66.tex) · [Cumulative manuscript in TeX](../RH_readable_reconstruction_v0_66.tex)
+**Edition 0.67 proves the rank-three component propagation theorem.** It covers the ordinary and exceptional primes of the same matrix space and returns one finite-weight ideal for the off-triangular locus. This advances the finiteness side of the shared marked theorem. [Reading guide](../RH_reconstruction_progress_v0_67.md) · [Short TeX reader](../RH_new_proofs_v0_67.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_67.tex)
 
-**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The partial reconstruction has 3,940 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_66.json) · [Remaining contracts](../continuation_v66/obligations.json) · [New claim ledger](../continuation_v66/claims.json)
+**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. Edition 0.66 closed the separate Case III seed obligation. The partial reconstruction contains 3,958 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_67.json) · [Remaining contracts](../continuation_v67/obligations.json) · [Case III seed](../RH_reconstruction_progress_v0_66.md)
 
 ## Read and verify
 
 | Argument | Source |
 | --- | --- |
-| Rational Eisenstein congruence and marked lattice | [Classical eigenform](../continuation_v66/eisenstein.tex) · [Integral lattice](../continuation_v66/ranktwo.tex) |
-| Dihedral factor and rank-four transfer | [Hecke character](../continuation_v66/dihedral.tex) · [Automorphic induction](../continuation_v66/transfer.tex) |
-| Seed on all later towers | [Final assembly](../continuation_v66/assembly.tex) |
-| Earlier proofs | [0.65](../RH_reconstruction_progress_v0_65.md) · [0.64](../RH_reconstruction_progress_v0_64.md) · [0.63](../RH_reconstruction_progress_v0_63.md) |
+| Exceptional rank-three primes | [The outer rank-two block](../continuation_v67/corner.tex) |
+| Ordinary primes and propagation | [Two connecting polynomial curves](../continuation_v67/geometry.tex) · [The seed and the component theorem](../continuation_v67/regular.tex) |
+| Arithmetic finite points | [Weight and point transfer](../continuation_v67/weights.tex) |
+| Earlier editions | [0.66](../RH_reconstruction_progress_v0_66.md) · [0.65](../RH_reconstruction_progress_v0_65.md) · [0.64](../RH_reconstruction_progress_v0_64.md) |
 
 From the repository root, initialize the original source and verify the claim excerpts.
 
 ~~~sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v66/verify.py --formal-git formal_source
+python3 continuation_v67/verify.py --formal-git formal_source
 ~~~
 
-Run `pdflatex RH_new_proofs_v0_66.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
+Run `pdflatex RH_new_proofs_v0_67.tex` twice for the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
 
 ## Reproduce the portable v0.58 files
 

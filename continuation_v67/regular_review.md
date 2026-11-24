@@ -1,0 +1,15 @@
+# Independent review of U67I1–U67I5
+
+Reviewed manuscript SHA-256 `7117af5db1ad945129c8505a8169652a914090b1ba05eeba4b2cfe58898893ad`. Reviewed provenance SHA-256 `ae1d3b5b3342b7644e82e003b16e0264f1f476f4e82f90572145d0aea9bca862`. All 32 source intervals in 15 files were checked against the pinned Lean commit `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`.
+
+1. The surviving adjacent entry has degree exactly ±1. Taking an opposite-degree entry gives a nonvanishing balanced product and makes both entries units in the localization. The direct grading identifies the localized ring with a Laurent polynomial algebra over its degree-zero localization even before passing to a prime. Extension and contraction there gives a prime over the given smaller coefficient prime, retaining both signs, a surviving odd entry and exactly one degree of transcendence.
+
+2. ACC22 finds a single closed core point above this homogeneous prime before the choice of the original local chart. The converse statement of ACC5 realizes its full transcendence degree in every chart. ALC17 controls type I under the same contraction. In particular the seed incidence has quotient dimension 3d+2 and allows strict containment between the input coefficient prime and the contraction of the original type-I prime.
+
+3. I checked the dimension cut against the five fields of the native Nice predicate. REX9 makes the lower ideal the whole chart ring and cuts down the upper triangular locus to dimension strictly below 3d. The remaining coincidence loci over the marked ideal satisfy the ACC15 bound at off-triangular primes. All forbidden quotients are therefore small enough to apply ACC17, with threshold 3d and input dimension at least 3d+1. The resulting prime contains the uniformizer and hence the residue characteristic, is one-dimensional and avoids both triangularity and coincidence on every specified subgroup.
+
+4. Both bigness and frame regularity are assumed for local propagation. The sharp ideal and the finite-weight exceptional support ideal are in their respective different rings. The use of the latter to produce a nice exceptional point over a thick prime only requires exceptional support and monotonicity of contraction. The chain from REX10 and the two exact modularity hypotheses give every condition of ACP14, including the length-zero exceptional case.
+
+5. The global verification uses density off the exceptional ideal, maximal core incidence, homogeneity and existence of core specializations for relevant components, flat chart comparison, the seeded good component, and the rank-three local propagation at common core points. It recovers both original conclusions of PropagationTheoremGL3 with C67E5 and ACP18. The chart/seed inputs retain the common frame and separate ideals in ranks two and three. Realization of these inputs in the marked arithmetic problem remains a separate requirement.
+
+The five implications are approved at the stated hypotheses. This review addressed the F.Big hypothesis scope before binding the final manuscript.
