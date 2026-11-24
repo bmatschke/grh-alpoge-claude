@@ -1,26 +1,26 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-**Edition 0.67 proves the rank-three component propagation theorem.** It covers the ordinary and exceptional primes of the same matrix space and returns one finite-weight ideal for the off-triangular locus. This advances the finiteness side of the shared marked theorem. [Reading guide](../RH_reconstruction_progress_v0_67.md) · [Short TeX reader](../RH_new_proofs_v0_67.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_67.tex)
+**Edition 0.68 proves the original two-rank arithmetic reduction.** Two determinant ideals on the same frame, each satisfying the source's modularity conditions, give both good-point assertions and rank-three finite-point control. The new chapters also give the upper-field automorphy conclusion from two arithmetic runs with distinct auxiliary places. [Reading guide](../RH_reconstruction_progress_v0_68.md) · [Short TeX reader](../RH_new_proofs_v0_68.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_68.tex)
 
-**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. Edition 0.66 closed the separate Case III seed obligation. The partial reconstruction contains 3,958 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_67.json) · [Remaining contracts](../continuation_v67/obligations.json) · [Case III seed](../RH_reconstruction_progress_v0_66.md)
+**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The separate Case III seed was closed in edition 0.66. The partial human reconstruction contains 3,980 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_68.json) · [Remaining contracts](../continuation_v68/obligations.json) · [Proof of the Case III seed](../RH_reconstruction_progress_v0_66.md)
 
 ## Read and verify
 
 | Argument | Source |
 | --- | --- |
-| Exceptional rank-three primes | [The outer rank-two block](../continuation_v67/corner.tex) |
-| Ordinary primes and propagation | [Two connecting polynomial curves](../continuation_v67/geometry.tex) · [The seed and the component theorem](../continuation_v67/regular.tex) |
-| Arithmetic finite points | [Weight and point transfer](../continuation_v67/weights.tex) |
-| Earlier editions | [0.66](../RH_reconstruction_progress_v0_66.md) · [0.65](../RH_reconstruction_progress_v0_65.md) · [0.64](../RH_reconstruction_progress_v0_64.md) |
+| From determinant rings to matrix entries | [Comparison maps in both ranks](../continuation_v68/comparison.tex) |
+| From points to primes on the right space | [Local prime conditions](../continuation_v68/primes.tex) · [Specializing the seed](../continuation_v68/seed.tex) |
+| Applying the two ideals on the marked frame | [Arithmetic assembly and two runs](../continuation_v68/linked.tex) |
+| Earlier editions | [0.67](../RH_reconstruction_progress_v0_67.md) · [0.66](../RH_reconstruction_progress_v0_66.md) · [0.65](../RH_reconstruction_progress_v0_65.md) |
 
-From the repository root, initialize the original source and verify the claim excerpts.
+From the repository root, initialize the original source and verify the new claim excerpts.
 
 ~~~sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v67/verify.py --formal-git formal_source
+python3 continuation_v68/verify.py --formal-git formal_source
 ~~~
 
-Run `pdflatex RH_new_proofs_v0_67.tex` twice for the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
+Run `pdflatex RH_new_proofs_v0_68.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
 
 ## Reproduce the portable v0.58 files
 

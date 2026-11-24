@@ -1,0 +1,15 @@
+# Independent review of the marked specialization and component seed
+
+The reviewed manuscript has SHA-256 `9fff457bab0b37bba1b62f43388e3bd7fe3443f7b3c32afe333e71e558535d4d`. The source manifest has SHA-256 `31602913615481e630354884db674269f127f7db80c1dbf46f1453f37f5c977c`. I checked the six statements against their pinned definitions and proofs, including the 60 listed source intervals across 16 files.
+
+S68D1 uses the specialization only for its determinant and irreducibility. The Gram determinant transfers full matrix span from the given point to the generic field through the same minimal prime. The cited determinant realization is valid in arbitrary characteristic over an algebraically closed field. Chenevier states it as Theorem A and proves it as Theorem 2.12. The law can be identified on the group algebra by its characteristic coefficients on group elements, as in the pinned `DGext`.
+
+In S68D2 the group quotient is obtained from all four kernel conditions of the twist link. The inertia power first puts the element into the kernel of each residual character, which permits the trace test. The characteristic polynomial of the untwisted matrix then has geometric sum coprime to it modulo the maximal ideal. This deals with matrices over the generic field whose entries need not belong to the local coefficient domain.
+
+For S68D3 I checked the two-by-two alternating adjoint formula. Adding a matrix to its alternating adjoint gives its trace times the identity. Transferring this identity by traces to the normalized specialization makes each off-diagonal entry twice the corresponding original entry, hence zero in the odd characteristic setting. This proves symmetric sign in rank two. The ordered characters are constructed from the universal pair. S68D4 diagonalizes the specific marked difference with the residue-selected square root. Its eigenline differences are units with only 2 inverted, which also covers residue characteristic three.
+
+For S68D5 I checked both two-edge cycles and both possible three-edge cycles in rank three. The interpolation projectors reduce to the indicated residual projectors, so traces of cycles with an off-diagonal factor have zero residue. Multiplication by one nonzero entry in the reversed position identifies each entry span with an ideal of the coefficient domain. Artin–Rees therefore gives continuity in the required entry-span topology. Together with the diagonal and character identities these are the five premises of APD9–10, which gives the actual entry-algebra and coefficient-algebra maps.
+
+S68D6 compares the full determinant and all character values, first over the entry subring and then through the injection into the generic field. Uniqueness of the ordinary pair gives the identity with the original quotient map. It yields the surjectivity required to identify the seed dimension even for an arbitrary comparison satisfying `IsPhi`. The seed prime and its contraction satisfy all fields of `SeedIn`. The arithmetic passage at the end continues to specify its external hypotheses.
+
+Review result: S68D1–6 supply the native `CurveSpecializationHypothesis` for each stated setup.
