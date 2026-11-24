@@ -1,0 +1,9 @@
+# Independent review of VLT1–VLT3
+
+Reviewed component SHA-256 `0fb5b48b4adf36b549987b27a93471d622fd63f7e83fe5cdeb48217582402c17`. Reviewed source map SHA-256 `fbe26c4787fddfc5ac209b47ced41124a3a84c4627a0b1363fa48fc56cfa7a30`. All its source ranges and Git blobs were independently checked against the formal pin.
+
+VLT1 recovers the strict Selmer module on the actual unramified quotient. The given outside inertia generators act trivially on the original coefficients, so local coboundaries vanish pointwise there. Descent and inflation preserve the distinguished full decomposition-group conditions after transporting between extensions of a rational valuation. The all-inertia condition is accounted for both inside and outside the ramified set.
+
+VLT2 compares the actual finite-level local conditions. Away from the exceptional set, the prime-to-residue-characteristic torsion part of the coefficient character is detected faithfully on reduction. At its members, the local element with invertible character difference forces a primitive representing the local cocycle to lie in the torsion subgroup after adjustment. The dyadic valuation calculation and the conductor comparison also apply in residue characteristic three. This gives inclusion into the image of the finite-level Selmer module, which suffices for the asserted length inequality.
+
+VLT3 uses compactness to kill any one class by a power of the prime and bounded integral lengths to prove stabilization of the ascending torsion filtration. This establishes finite length before performing the real normalization. Its positive divisor is the valuation of the residue characteristic in the original DVR. The endpoint agrees with HostSha:131–134 for arbitrary input V, on a supplied HostData and IsHostFrame, independently of XData. No trace estimate or conclusion of CountV enters this comparison.
