@@ -1,27 +1,26 @@
 # Human reconstruction of RH and Dirichlet GRH
 
-Edition 0.64 constructs a single Frobenius element whose trace separates every eligible rank-three point of a Case V host from its base point. The Case III chapters construct a tame tower at a prescribed label and four polynomial families connecting the restricted lattice to a seed under the source hypotheses. The marked-point chapter proves the two irreducibility upgrades and describes the remaining automorphy input. [Mathematical reading guide](../RH_reconstruction_progress_v0_64.md) · [New chapters in TeX](../RH_new_proofs_v0_64.tex) · [Cumulative manuscript in TeX](../RH_readable_reconstruction_v0_64.tex)
+Edition 0.65 proves that the potential modularity ideal vanishes on every rank-four component through a good residual point as soon as it vanishes on one, at the original bound $d\ge 30(C+1)^2$. The new chapters also reduce the integral seed construction to three arithmetic inputs and establish the local ordinary comparison at the marked rank-three host. [Read the mathematical guide](../RH_reconstruction_progress_v0_65.md) · [New chapters in TeX](../RH_new_proofs_v0_65.tex) · [Cumulative manuscript in TeX](../RH_readable_reconstruction_v0_65.tex)
 
-The manuscript has **3,886 indexed claims and 14 open whole obligations**. Twelve are common to RH and Dirichlet GRH. Two additional obligations concern unrestricted Dirichlet GRH. [Current checkpoint](../CURRENT_CHECKPOINT_v0_64.json) · [All remaining source statements](../continuation_v64/obligations.json) · [New claim ledger](../continuation_v64/claims.json)
+**Thirteen whole obligations remain**, twelve shared by RH and unrestricted Dirichlet GRH and one additional integral seed for unrestricted Dirichlet GRH. The reconstruction remains incomplete. [Current checkpoint](../CURRENT_CHECKPOINT_v0_65.json) · [All remaining contracts](../continuation_v65/obligations.json) · [New claim ledger](../continuation_v65/claims.json)
 
-| Argument | Chapters |
+## Read and verify
+
+| Argument | Source |
 | --- | --- |
-| Case V trace bound | [Host points, an inert prime and the valuation estimate](../hostnumber_v64/main.tex) |
-| Case V marked theorem | [Open subgroups, the cyclotomic kernel and the joint arithmetic end](../markedaut_v64/main.tex) |
-| Case III initial tower | [The four characters, local constraints and prescribed label](../tensortower_v64/main.tex) |
-| Case III seeded reduction | [Cup modifications, restriction and four polynomial links](../rankchain_v64/main.tex) |
-| Earlier connected arguments | [Host vanishing](../RH_reconstruction_progress_v0_63.md) and [the rank-three count and Case III automorphy](../RH_reconstruction_progress_v0_62.md) |
+| Rank-four component propagation | [Two symplectic planes](../continuation_v65/planes.tex) · [Dimension bounds and propagation](../continuation_v65/component.tex) |
+| Integral tensor seed | [Conditional seed theorem](../continuation_v65/seedassembly.tex) · [Source inputs still needed](../RH_reconstruction_progress_v0_65.md) |
+| Marked theorem used by both routes | [Local comparison and remaining global hypotheses](../continuation_v65/marked.tex) |
+| Earlier proofs | [0.64](../RH_reconstruction_progress_v0_64.md) · [0.63](../RH_reconstruction_progress_v0_63.md) · [0.62](../RH_reconstruction_progress_v0_62.md) |
 
-## Verify or typeset the manuscript
-
-From the repository root, the following commands initialize the pinned formal source and check the new source excerpts, proof dependencies, reviews and obligation register.
+From the repository root, initialize the formal source to verify the original excerpts.
 
 ~~~sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v64/verify.py --formal-git formal_source
+python3 continuation_v65/verify.py --formal-git formal_source
 ~~~
 
-Run `pdflatex RH_new_proofs_v0_64.tex` twice to typeset the four new chapters. [Pinned formal source](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier reading guide](../README.md) · [Dependency audit at v0.57](../RH_dependency_audit_v0_57.txt)
+Run `pdflatex RH_new_proofs_v0_65.tex` twice for the new reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
 
 ## Reproduce the portable v0.58 files
 
