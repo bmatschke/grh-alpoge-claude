@@ -1,0 +1,10 @@
+# Independent review of the finite overlap bound
+
+Reviewed manuscript SHA-256 `632f228f2e35a307ef1a1e64233e888d9ec4b353549f6d4ad2b9e6519cbb918d`. Checked the original self-dual lattices, finite level representatives, vacuum projection, orbit count and exponent range against the pinned formal source.
+
+- F74N1 counts each lattice via its intersection and dual intersection lattice. The equal-index argument uses self-duality in both directions and remains valid for the integral alternating pairing. In rank zero the only possible lattice is the zero lattice.
+- For F74N2 the ideals and source and target lattices identify the two finite reductions at every prime over the half-level ideal, with its full prime powers. Chinese remainder on the numerator for the intersection of the two lattices supplies a single set of representatives. The marked residual frame is a basis, so distinct group elements give distinct residues. The denominator shift is doubled in the vacuum lattice. The final text checks the stronger even pairing that kills the central phase in the Heisenberg product.
+- The lattice vacuum uses the same semicharacter on the intersection. Orthogonality of distinct translates follows from self-duality of the starting lattice, and the signed average has squared norm equal to the reciprocal of the index. In the off-diagonal case equality of eigencharacters on the intersection forces the representative difference into the sum of the tensor lattices. Reducing at the half-level ideal recovers the same residual group element. The surviving group factors have absolute value one since this is a character of the finite group. This establishes the stated upper bound and the exact diagonal in the original measure.
+- In F74N3 the exponent after counting is at most minus two, even at equality in the original degree bound. The Basel tail is strictly below 0.65. The Neumann norm inequality follows on the original covariant space once its stability holds, and the chapter explicitly retains the independent level-system duties.
+
+The cited constructor and the original normalized test-vector formula agree with the three claimed results.

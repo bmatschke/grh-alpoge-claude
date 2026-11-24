@@ -1,0 +1,10 @@
+# Independent review of B74R1–B74R4
+
+Reviewed manuscript SHA-256 `9fa21e46b41c0886d07cefd52bf14e903385965071a7759f677504886716d780`. Checked against the pinned formal sources and the existing BTH7–BTH12, SLR4–SLR8 and DEX8 arguments.
+
+- B74R1 uses the equality of dependent packages in the original BTw record, including its last RealTB field. The application of BWit.ax to switch from the selected argument is legitimate.
+- B74R2 has the exact order of the LiftTestB quantifiers. The separating tests are over the twisted complex target. Both coefficient assertions land in the image of the base-vertex embedding, which is the embedding required by BTH8 and BTH11. ExAt and the weak characterization supply the stored maps on this same datum.
+- B74R3 agrees with primRows3 and primRows3_data. The lower Hecke eigensystem uses the lift operators supplied by the primitive package. The rational and complex dimension inequalities and sum comparison also cover zero-dimensional parts. The rational-matrix step is available directly from the primitive base-level construction via its base_lift_test and other fields. The final text uses the invertible minor of the tests on the principal frame to solve for the coordinates over the embedded field. It no longer requires the later square.
+- B74R4 uses phase one, the base-tuple equality and Used0, the original normalized projection and inclusion, and the same target jW. The full-target separating tests, finite extensions and identifying maps are exactly the hypotheses of the existing BTH12 comparison. Built and linkOf give dependent equalities of the original bundle, so transport keeps the selection fixed. The threshold above the family bound is uniform in both the admissible index and lift. Row.of_sel accepts exactly the stated specialization to the constantly true row condition. Constructing such a selector still requires linked-bundle existence.
+
+The chapter proves the selected-row implication conditional on an original linked witness, and it records the upstream existence requirement explicitly.
