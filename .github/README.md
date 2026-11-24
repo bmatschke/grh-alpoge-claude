@@ -1,22 +1,23 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-**Edition 0.72 closes two whole arithmetic obligations.** One Hida ideal supplies the marked theorem. On the original datum with unramified coefficients, a common marked element gives finiteness, rank-three automorphy, and the classical newform for every allowed rank-two corner. [Reading guide](../RH_reconstruction_progress_v0_72.md) · [Short TeX reader](../RH_new_proofs_v0_72.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_72.tex)
-
-**Ten whole obligations remain**, shared by RH and unrestricted Dirichlet GRH. The partial human reconstruction contains 4,113 indexed claims. The arithmetic window and host are now supplied on both selected routes. [Current checkpoint](../CURRENT_CHECKPOINT_v0_72.json) · [Remaining contracts](../continuation_v72/obligations.json)
+**Ten whole obligations remain in the human reconstruction**, shared by RH and unrestricted Dirichlet GRH. Edition 0.72 closed the marked theorem and unramified-coefficient automorphy. Edition 0.73 continues the theta argument on the prescribed coefficient field. It constructs the higher moduli scheme on the original lower model, supplies the pinned class sum, recovers a theta kernel at any finite point of the definite group, and proves the support required on a supplied weighted point. [Current reading guide](../RH_reconstruction_progress_v0_73.md) · [New TeX chapters](../RH_new_proofs_v0_73.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_73.tex)
 
 ## Read and verify
 
-| Argument | Source |
+| Question | Source |
 | --- | --- |
-| Arithmetic inputs for the Hida ideal | [Local representations](../continuation_v72/local.tex) · [Crystalline comparison](../continuation_v72/crystal.tex) · [CM](../continuation_v72/cm.tex) · [Automorphy](../continuation_v72/aut.tex) · [Host hypotheses](../continuation_v72/outer.tex) |
-| The marked theorem and Case V | [Hida ideal and marked conclusion](../continuation_v72/assembly.tex) |
-| Unramified coefficients and the two hosts | [Common datum](../continuation_v72/datum.tex) · [Rank-two newform](../continuation_v72/corner.tex) · [Joint conclusion](../continuation_v72/return.tex) |
-| Reproducibility | [Claim ledger](../continuation_v72/claims.json) · [Verification](../continuation_v72/validation.json) · [Previous edition](../RH_reconstruction_progress_v0_71.md) |
+| How does the original level acquire an upper marking? | [Higher moduli and its fibers](../continuation_v73/cover.tex) · [Framed lifts and level data](../continuation_v73/level.tex) |
+| How does the higher character descend to the required coefficient field? | [Determinant and character section](../continuation_v73/tests.tex) |
+| Which geometric section represents the class sum? | [Existence, uniqueness and cusp condition](../continuation_v73/compare.tex) |
+| How can an integrated lift recover one given kernel value? | [Finite double-coset calculation and descent](../continuation_v73/kernel.tex) |
+| Which vector supplies the support of the selected reading? | [A rational column at the distinguished place](../continuation_v73/reading.tex) |
+| Where are the two most recent whole closures? | [Arithmetic proof and reading guide, edition 0.72](../RH_reconstruction_progress_v0_72.md) |
+| Which obligations are still open? | [Checkpoint](../CURRENT_CHECKPOINT_v0_73.json) · [Original contracts](../continuation_v73/obligations.json) · [Validation](../continuation_v73/validation.json) |
 
 ~~~sh
-python3 continuation_v72/verify.py --formal-git formal_source
-pdflatex RH_new_proofs_v0_72.tex
-pdflatex RH_new_proofs_v0_72.tex
+python3 continuation_v73/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_73.tex
+pdflatex RH_new_proofs_v0_73.tex
 ~~~
 
 ## Reproduce the portable v0.58 files
