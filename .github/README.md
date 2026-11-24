@@ -1,28 +1,26 @@
 # Human reconstruction of RH and Dirichlet GRH
 
-This repository develops a detailed mathematical account of the Alpöge–Claude formal proof of RH and unrestricted Dirichlet GRH. The [v0.57 manuscript](../RH_readable_reconstruction_v0_57.tex) contains the partial reconstruction. The [v0.58 continuation guide](../RH_START_HERE_v0_58.txt) identifies the next missing arguments. The mathematical checkpoint records 3,746 claims and 24 open obligations, of which 17 are shared by RH and GRH and seven are additional obligations for unrestricted Dirichlet GRH. [Checkpoint and obligation IDs](../CURRENT_CHECKPOINT_v0_58.json)
+Read the **[new chapters in edition 0.59 (PDF)](../RH_new_proofs_v0_59.pdf)** or start with the [mathematical reading guide](../RH_reconstruction_progress_v0_59.md). The [cumulative TeX manuscript](../RH_readable_reconstruction_v0_59.tex) includes the new chapters and the full earlier edition. The project develops a human-readable account of the pinned Alpöge–Claude Lean source.
 
-## Continue from a Git checkout
+Edition 0.59 adds the period Gram expansion on tied arithmetic data, the integral Cartier normal form and its two flag applications, the local Herr class maps, and the rank-three sharpness theorem. The checkpoint contains **3,783 claims and 24 open whole obligations**. Seventeen obligations are shared by RH and Dirichlet GRH. Seven more are specific to unrestricted Dirichlet GRH. [Current checkpoint](../CURRENT_CHECKPOINT_v0_59.json) · [Claim index](../continuation_v59/claims.json)
 
-The reconstruction files are already expanded in a clone. From the repository root, fetch the original Lean source at the commit used for the reconstruction.
+| To continue this argument | Next construction |
+| --- | --- |
+| [Automorphic periods](../period_range_v59/next_source_handoff.txt) | Choose compatible full data and comparison isometries throughout the family, then apply the diagonal and distinct-word estimates. |
+| [Cartier rows](../cartier_v59/next_source_handoff.txt) | Join the odd, character and monomial blocks on the same geometric row data. |
+| [Local Galois cohomology](../wach_v59/next_source_handoff.txt) | Construct crystalline evaluation and prove the quantitative comparison on the same Wach lattice. |
+| [Rank-three deformation spaces](../exceptional_v59/next_source_handoff.txt) | Construct the rank-three corner ideal from rank-two support, then supply the seed for propagation. |
+
+## Work from a checkout
+
+From the repository root, fetch the formal source and check the edition against its pinned source ranges.
 
 ```sh
 git submodule update --init --depth=1 -- formal_source
-git -C formal_source rev-parse HEAD
+python3 continuation_v59/verify.py
 ```
 
-The expected commit is `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`. Paths beginning with `src/` in the handoff are relative to `formal_source/`. You can also browse the [pinned source on GitHub](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4).
-
-Start with the [progress report](../RH_reconstruction_progress_v0_57.txt), then read the [source index for the next tasks](../continuation_v58/next_tasks_source_index.txt). For each task, the index identifies the original Lean statement and the human proof to build on.
-
-| Next construction | Existing chapter |
-| --- | --- |
-| Construct the local Wach data, then the Herr class maps and quantitative comparison. | [Faithful étale constructions](../faithful_etale_v57/next_source_handoff.txt) |
-| Prove the rank-three exceptional presentation and follow it through the corner and propagation arguments. | [Arithmetic connectedness](../arithmetic_connectedness_v57/next_source_handoff.txt) |
-| Construct the Cartier normal form required by the determinant-window theorem. | [Determinant jets](../determinant_jet_v57/next_source_handoff.txt) |
-| Identify the Hilbert convolution with its scalar representative to obtain the `InHHC` range equation, then assemble the analytic identities on the same data. | [Period Gram expansion](../period_gram_v57/next_source_handoff.txt) |
-
-For a new chat, use the [continuation prompt](../RH_NEW_CHAT_PROMPT_v0_58.txt) and specify that the project is a Git checkout. Use the submodule command above in place of the ZIP extraction instructions. The [v0.57 reading guide](../README.md) and [dependency audit](../RH_dependency_audit_v0_57.txt) give the mathematical statements and remaining hypotheses.
+The formal source commit is `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`. Source paths in chapter handoffs are relative to that submodule. To typeset only the new chapters locally, run `pdflatex RH_new_proofs_v0_59.tex` twice at the repository root with the packages in its preamble installed. The historical v0.57 manuscript and its v0.58 handoff remain available for earlier claims and the full dependency register. [Pinned formal source](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Historical reading guide](../README.md) · [Dependency audit](../RH_dependency_audit_v0_57.txt)
 
 ## Reproduce the portable v0.58 files
 

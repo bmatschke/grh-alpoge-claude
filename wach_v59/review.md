@@ -1,0 +1,13 @@
+# Independent mathematical review of LWR1–LWR5
+
+Reviewed against the accepted source at `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`, especially the `WGam`, `WSer`, `WIo`, `IoW`, and `WCl` contracts in `src/Development/AbelianVarietyTheory/Definitions/NonGaloisDescent/ExistsOfLayers.lean` and the corresponding four constructor calls in `ExistsLocalWachFunctor.lean`.
+
+- **LWR1.** The compact character image, full finite torsion, minimization tie rule, special odd-prime rule, embedding permutation and trivial integral line give the group record. The minimum exists on the discrete integral valuation spectrum since the candidate of infinite order gives a finite value.
+- **LWR2.** Checked the right-to-left letter shift, the image of the parameter, both group and Frobenius rescalings, truncation at each coefficient, the junk argument rule, and injection, saturation and density in the completed Laurent ring. Evaluation at a point of positive constant-term valuation is defined by convergent translation followed by a zero-constant formal substitution.
+- **LWR3.** The proof applies to arbitrary supplied group and series records. The revised passage on the unramified field explains why the specific Frobenius acts on each prime-to-prime-characteristic root by its prime power. The period axiom gives equality in residue and separability of the root gives equality in the field. This matches `EqTeichmullerOfFrobenius.lean` lines 401–411. The Teichmüller constant law, transformed-parameter separation, and the use of saturation before extension to the Laurent coefficient ring were checked.
+- **LWR4.** Checked both additive coordinates and the dyadic subgroup lacking minus one. In that case a nontrivial sign is exactly the nontrivial character of the compact rank-one logarithm group to the group of order two, so minimizers have generating logarithm.
+- **LWR5.** In the semidirect-product argument the closed cyclic subgroup is compact because it is a closed subset of the indicated compact set. Its kernel over zero has identically zero first coordinate by iterative extraction of powers there and separation of the integral lattice. Subtracting the Witt coboundary gives the required signs on the two fibers. The change of lift is an integral coboundary. The full and restricted maps compare for the same pair under the original equality of distinguished elements. The dyadic implication in the full defining law is preserved.
+
+**Result.** Pass at the five stated scopes. Neither the remaining crystalline comparison nor a whole global denominator obligation is concluded from these constructions.
+
+Reviewed proof SHA-256: `f75d08bf5aa480864afb79b83600ec7c92e0f1347fa258cdf4bec3bd5bc90fd1`.
