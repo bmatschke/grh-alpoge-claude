@@ -1,21 +1,21 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.78 constructs the Wach functor and its comparison at every prime under the original Bhatt–Scholze integral hypothesis. It obtains the common denominator setup throughout the specified family and proves nine of the fifteen fields on one chosen hub, including all five numerical bounds, the bounds on its exact exceptional set, and all eight uniform parameter inequalities. On the theta side the edition supplies the seed's two Hecke readings, both fourth-stage ambient lattices and divisors, and the agreement of the two localized eta formulas under explicit hypotheses. **Ten whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_78.md) · [New proofs in PDF](../RH_new_proofs_v0_78.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_78.tex)
+Edition 0.79 proves two more denominator estimates on the same family hub. A prime-power annihilator on the original twisted lattice supplies the coarse bound at 7200. Local jump and inertia comparisons at the two type primes give the weighted type-prime bound. This brings the family conclusion to **11 of 15 fields** under the original family hypotheses. **Ten whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_79.md) · [New proofs in PDF](../RH_new_proofs_v0_79.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_79.tex)
 
 ## Read and verify
 
 | Question | Source |
 | --- | --- |
-| What does the denominator argument now give on one family member? | [Uniform family setup](../continuation_v78/family.tex) · [Nine fields on the same hub](../continuation_v78/assembly.tex) |
-| Where does its local comparison come from? | [Wach lattices, Laurent coefficients and the original comparison](../continuation_v78/local.tex) |
-| How are the theta operators and the local index read? | [Hecke operators on the chosen rows](../continuation_v78/hecke.tex) · [Eta and the fitted reader](../continuation_v78/reading.tex) |
-| Which fourth-stage data are now constructed? | [Ambient lattices and both divisor passes](../continuation_v78/producer.tex) |
-| What remains open? | [Original whole contracts](../continuation_v78/obligations.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_78.json) · [Verification](../continuation_v78/validation.json) |
+| What kills the split-column invariants? | [Chosen lattice and jumps](../continuation_v79/split.tex) · [Wach heights](../continuation_v79/heights.tex) · [Annihilator](../continuation_v79/annihilator.tex) |
+| Which results hold on one family hub? | [Coarse error](../continuation_v79/assembly.tex) · [Type-prime witnesses](../continuation_v79/typewitness.tex) · [Eleven fields together](../continuation_v79/type.tex) |
+| How far does the large-prime count go? | [Position tables and global congruence count](../continuation_v79/large.tex) · [Integral decomposition](../continuation_v79/decomposition.tex) · [Descent of local conditions](../continuation_v79/descent.tex) |
+| What is known at $q,d$? | [Local fields and Hodge jumps](../continuation_v79/ramified.tex) |
+| What remains open? | [Reading guide](../RH_reconstruction_progress_v0_79.md#where-to-resume) · [Whole contracts](../continuation_v79/obligations.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_79.json) · [Verification](../continuation_v79/validation.json) |
 
 ~~~sh
-python3 continuation_v78/verify.py --formal-git formal_source
-pdflatex RH_new_proofs_v0_78.tex
-pdflatex RH_new_proofs_v0_78.tex
+python3 continuation_v79/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_79.tex
+pdflatex RH_new_proofs_v0_79.tex
 ~~~
 
 ## Reproduce the portable v0.58 files
