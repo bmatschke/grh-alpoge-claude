@@ -1,0 +1,12 @@
+# Independent review of M72S1–M72S4
+
+- **M72S1.** Checked the distinction between the four-part rank-general literature record, the parent Hida hypothesis, and the five added fields. The parent cohomology, finite/Gelfand–Kirillov/admissibility, descending and ascending base-change, Galois attachment and newform clauses use the appropriate suppliers. The two directions of unitary transfer are supplied separately. In the CM entry Grothendieck's general nilpotent crystalline theorem really does include the arbitrary base and crystalline Hodge filtration used in the pinned definitions.
+- **M72S2.** HIA2 states the full implication from the original H-prime hypothesis to HidaUAlt. Its quantifiers place the ideal on the given setup before the arithmetic test. The nonzero-module case uses the kernel of the actual Hecke action; the unit ideal with vanishing module is the allowed zero case. HIA1 and the auxiliary-level system attach their conclusions to this same ideal. A71M1 supplies both point tests on the selected ideal. With the cohomology and local reciprocity inputs in the statement this supplies ModUAlt for the applications of L69D3.
+- **M72S3.** A71M2 closes the Gaussian marked theorem conditional on precisely the Hida supplier from M72S2. D70W5 gives the required local witness bounds downstairs for the stronger output on that particular host, while the restricted finite assertion is independent of choices made in subsequent entry tests. The passage to the quotient mark preserves the two conclusions for all universal pairs, as required by ThmS6_s.
+- **M72S4.** HVJ1 uses the host cohomological and rigidity suppliers at one original frame. HVJ2 uses the common separating Frobenius element and the polynomial bound on the same finite family. The Case V split is guarded by the weak inequality and includes its boundary, and the exponent precedes the varying character/host data as required. Since the integer product on the right has base at least two, absorption of the leading factor two preserves the original polynomial shape.
+
+These are valid assemblies relative to the classical field-level theorems and prior mathematical proofs invoked here. No further independent Hida, Gaussian marking or Case V premise appears in these assemblies.
+
+Final TeX SHA-256: `992ba0564f34d1febfbdf62081a2507172e1ac7b8ec6769cea3596da4b6a0d35`.
+
+Original Lean source: `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`.

@@ -1,26 +1,23 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-**Edition 0.71 completes the patching argument at points with two residual blocks.** The prime-containment tests now hold along arbitrary finite chains. The human-readable marked theorem consequently follows from the original Hida ideal construction. The remaining premise and the parts already supplied are identified in the reading guide. [Reading guide](../RH_reconstruction_progress_v0_71.md) · [Short TeX reader](../RH_new_proofs_v0_71.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_71.tex)
+**Edition 0.72 closes two whole arithmetic obligations.** One Hida ideal supplies the marked theorem. On the original datum with unramified coefficients, a common marked element gives finiteness, rank-three automorphy, and the classical newform for every allowed rank-two corner. [Reading guide](../RH_reconstruction_progress_v0_72.md) · [Short TeX reader](../RH_new_proofs_v0_72.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_72.tex)
 
-**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The partial human reconstruction contains 4,064 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_71.json) · [Remaining contracts](../continuation_v71/obligations.json)
+**Ten whole obligations remain**, shared by RH and unrestricted Dirichlet GRH. The partial human reconstruction contains 4,113 indexed claims. The arithmetic window and host are now supplied on both selected routes. [Current checkpoint](../CURRENT_CHECKPOINT_v0_72.json) · [Remaining contracts](../continuation_v72/obligations.json)
 
 ## Read and verify
 
 | Argument | Source |
 | --- | --- |
-| The two-block patching calculation | [Selmer limits](../continuation_v71/limits.tex) · [Universal matrices](../continuation_v71/urep.tex) · [Equations](../continuation_v71/presentation.tex) |
-| The arithmetic inputs | [Cohomology of the host and patching](../continuation_v71/cohom.tex) · [Three Hida inputs](../continuation_v71/hida.tex) |
-| The remaining premise of the marked theorem | [Prime tests and marked conclusion](../continuation_v71/assembly.tex) |
-| Earlier editions | [0.70](../RH_reconstruction_progress_v0_70.md) · [0.69](../RH_reconstruction_progress_v0_69.md) · [0.68](../RH_reconstruction_progress_v0_68.md) |
-
-From the repository root, initialize the original source and verify the claim excerpts.
+| Arithmetic inputs for the Hida ideal | [Local representations](../continuation_v72/local.tex) · [Crystalline comparison](../continuation_v72/crystal.tex) · [CM](../continuation_v72/cm.tex) · [Automorphy](../continuation_v72/aut.tex) · [Host hypotheses](../continuation_v72/outer.tex) |
+| The marked theorem and Case V | [Hida ideal and marked conclusion](../continuation_v72/assembly.tex) |
+| Unramified coefficients and the two hosts | [Common datum](../continuation_v72/datum.tex) · [Rank-two newform](../continuation_v72/corner.tex) · [Joint conclusion](../continuation_v72/return.tex) |
+| Reproducibility | [Claim ledger](../continuation_v72/claims.json) · [Verification](../continuation_v72/validation.json) · [Previous edition](../RH_reconstruction_progress_v0_71.md) |
 
 ~~~sh
-git submodule update --init --depth=1 -- formal_source
-python3 continuation_v71/verify.py --formal-git formal_source
+python3 continuation_v72/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_72.tex
+pdflatex RH_new_proofs_v0_72.tex
 ~~~
-
-Run `pdflatex RH_new_proofs_v0_71.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
 
 ## Reproduce the portable v0.58 files
 

@@ -1,0 +1,17 @@
+# Independent review of the marked datum and its rank-three endpoint
+
+E72G1 and E72G2 match the original FinEnd and AutEnd3 fields in RatTorsionFree.lean:29–44, conditional on the previously supplied cohomological and automorphy results named in the text. I checked the source statements and the mathematical argument. This review does not constitute a Lean recompilation.
+
+- AFE15 takes the actual Dat and the specified valuation, gives the modulus $ℓ N|\operatorname{disc}(K)|$, and fixes all of $L,g_1,Φ,C_0$ together with the seed. AFE17 supplies the marking fields for that element. The embedded quadratic field lies in the cyclotomic extension of conductor its absolute discriminant, so inertia at a valuation where the modulus is a unit acts trivially on that field. L69D3 gives both ranks on the resulting fixed link. AFE21 takes the finite index subgroup before any test coefficient ring or test element.
+- AutEnd3 subsequently universally quantifies over a fresh algebra structure of the quadratic field on the common closure. Normality identifies its image with the original embedded quadratic field; the two embeddings can differ by conjugation but have the same pointwise stabilizer. The link identity places this subfield inside the fixed embedded $L$, giving a compatible tower for the chosen embedding. The `AutEnd3` irreducibility assumption applies to $G_L$, an open subgroup of the rational group inside that stabilizer. Integrality of the coefficient inclusion gives the local map needed in AFE19, and its matrix and inertia comparison hold on the specified link.
+- For an even element, conjugation by the normalized odd complex conjugation sends its matrix to $J(R^t)^{-1}J$. Thus the same $J$ gives multiplier $ε^{-2}$ after the inverse cyclotomic twist. On geometric Frobenius the multiplier is $q^2$. Dividing twice by the rank-three Satake normalization $q$ yields the inverse of the untwisted Satake multiset at the conjugate place. The comparison uses a cofinite conjugation-stable set of places. The pairing calculation, the irreducibility retained in every cyclic step, and the strong multiplicity one conclusion establish conjugate self-duality for this particular attachment.
+
+# Rank three on the actual quadratic datum
+
+E72G1 uses the original datum's discriminant rather than the Gaussian-host modulus. The link is chosen before the two ordinary test rings, and FinEnd chooses the fixed subgroup of the selected field before selecting a test ring or element. The coefficient comparison and descent to the original test-ring quantifiers come from L69D3.
+
+E72G2 uses the image of the specified quadratic field, which is independent of the second embedding into the algebraic closure. The subgroup test is at G_L, which is open in G_Q and contained in the actual sign kernel. The extension L/K is abelian by restriction from L/Q. The normalized conjugation is inverse transpose, so twisting by the inverse cyclotomic character gives the pairing exponent −2, exactly 1−3. Cohomological normalization uses geometric Frobenius as in D70W1 and D70W2. The conclusion of the original AutEnd3 is the cofinite automorphic attachment in Af.IsAutCsd. The stronger witness constraints are used only through the available upstairs specialization, not imposed on the original datum downstairs.
+
+Final TeX SHA-256: `e0fb17c4a447c8abd9f79eb81b3d4bafea9e0d21e03a03ff8a199482d8b9f4a0`.
+
+Original Lean source: `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`.
