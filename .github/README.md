@@ -1,26 +1,26 @@
-# Human reconstruction of RH and Dirichlet GRH
+# Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.65 proves that the potential modularity ideal vanishes on every rank-four component through a good residual point as soon as it vanishes on one, at the original bound $d\ge 30(C+1)^2$. The new chapters also reduce the integral seed construction to three arithmetic inputs and establish the local ordinary comparison at the marked rank-three host. [Read the mathematical guide](../RH_reconstruction_progress_v0_65.md) · [New chapters in TeX](../RH_new_proofs_v0_65.tex) · [Cumulative manuscript in TeX](../RH_readable_reconstruction_v0_65.tex)
+**Edition 0.66 constructs the Case III seed.** The proof chooses a single auxiliary prime and residual representation before any later tower is given. It supplies compatible integral lifts with the required automorphic weights and both root entries. [Guide to the proof](../RH_reconstruction_progress_v0_66.md) · [Short reader in TeX](../RH_new_proofs_v0_66.tex) · [Cumulative manuscript in TeX](../RH_readable_reconstruction_v0_66.tex)
 
-**Thirteen whole obligations remain**, twelve shared by RH and unrestricted Dirichlet GRH and one additional integral seed for unrestricted Dirichlet GRH. The reconstruction remains incomplete. [Current checkpoint](../CURRENT_CHECKPOINT_v0_65.json) · [All remaining contracts](../continuation_v65/obligations.json) · [New claim ledger](../continuation_v65/claims.json)
+**Twelve whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. The partial reconstruction has 3,940 indexed claims. [Current checkpoint](../CURRENT_CHECKPOINT_v0_66.json) · [Remaining contracts](../continuation_v66/obligations.json) · [New claim ledger](../continuation_v66/claims.json)
 
 ## Read and verify
 
 | Argument | Source |
 | --- | --- |
-| Rank-four component propagation | [Two symplectic planes](../continuation_v65/planes.tex) · [Dimension bounds and propagation](../continuation_v65/component.tex) |
-| Integral tensor seed | [Conditional seed theorem](../continuation_v65/seedassembly.tex) · [Source inputs still needed](../RH_reconstruction_progress_v0_65.md) |
-| Marked theorem used by both routes | [Local comparison and remaining global hypotheses](../continuation_v65/marked.tex) |
-| Earlier proofs | [0.64](../RH_reconstruction_progress_v0_64.md) · [0.63](../RH_reconstruction_progress_v0_63.md) · [0.62](../RH_reconstruction_progress_v0_62.md) |
+| Rational Eisenstein congruence and marked lattice | [Classical eigenform](../continuation_v66/eisenstein.tex) · [Integral lattice](../continuation_v66/ranktwo.tex) |
+| Dihedral factor and rank-four transfer | [Hecke character](../continuation_v66/dihedral.tex) · [Automorphic induction](../continuation_v66/transfer.tex) |
+| Seed on all later towers | [Final assembly](../continuation_v66/assembly.tex) |
+| Earlier proofs | [0.65](../RH_reconstruction_progress_v0_65.md) · [0.64](../RH_reconstruction_progress_v0_64.md) · [0.63](../RH_reconstruction_progress_v0_63.md) |
 
-From the repository root, initialize the formal source to verify the original excerpts.
+From the repository root, initialize the original source and verify the claim excerpts.
 
 ~~~sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v65/verify.py --formal-git formal_source
+python3 continuation_v66/verify.py --formal-git formal_source
 ~~~
 
-Run `pdflatex RH_new_proofs_v0_65.tex` twice for the new reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
+Run `pdflatex RH_new_proofs_v0_66.tex` twice to build the short reader. [Original source pin](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier project overview](../README.md)
 
 ## Reproduce the portable v0.58 files
 
