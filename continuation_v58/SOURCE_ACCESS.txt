@@ -1,0 +1,157 @@
+OFFLINE SOURCE ACCESS — CONTINUATION PACKAGE v0.58
+24 November 2026
+
+Purpose and baseline
+
+This package uses the latest delivered v0.57 reconstruction as its
+immutable primary baseline. The continuation documents and restoration
+helpers add no mathematical claims. The mathematical edition remains
+v0.57: 3,746 numbered claims and 24 whole open obligations.
+
+The complete tracked project source for the accepted original formal
+proof is bundled here. Reading it does not require the old conversation's
+scratch directories, a GitHub checkout, a network connection or a Lean
+build. The accepted original Git identifiers are:
+
+  commit 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+  tree   02cfa4b3810fc22f6d43b317409071f380a5f1b4
+
+Restore the continuation files and source
+
+From the root of the extracted v0.58 outer ZIP, run:
+
+  python3 continuation_v58/unpack_reconstruction.py
+  python3 continuation_v58/restore_source.py --destination formal_source
+
+The first helper restores every member of the delivered v0.57 archive
+from its solid-compressed reconstruction snapshot. Already-present
+byte-identical reading files are accepted; conflicts are refused. This
+recovers the original root layout without dropping historical proofs,
+source excerpts, reviews, metadata or continuation tools.
+
+The second helper restores the original accepted project source in
+formal_source and reconstructs its exact shallow Git snapshot. The
+destination must be new or empty. It will not merge into an existing
+checkout or overwrite unrelated files. Its parent directory must exist.
+The default, when --destination is omitted, is formal_source beside
+continuation_v58, regardless of the current working directory.
+
+Requirements are Python 3.10 or later with the standard lzma module,
+Git with SHA-1 object-format support (Git 2.29 or later), and a POSIX
+filesystem supporting safe directory-descriptor operations. Use Linux,
+or a suitable POSIX environment. Allow several gigabytes of free space
+and hundreds of thousands of filesystem entries for the working tree
+and Git objects. The source contains 175,192 tracked regular files,
+totalling 1,030,545,459 bytes before filesystem/Git overhead. All have
+the original Git mode 100644. The helper copies no owner IDs or source
+timestamps; these are not part of the Git tree.
+
+To select another new/empty destination:
+
+  python3 continuation_v58/restore_source.py --destination /absolute/new/path
+
+An interrupted or failed restore retains its partial destination for
+inspection. The helper will refuse to overwrite that nonempty directory
+on a retry. Choose another new/empty directory; do not run it against an
+existing source checkout. Do not modify the destination while restoring.
+
+What is verified
+
+The source bundle is in continuation_v58/source/:
+
+  source_bundle.json   SHA-256 hashes, byte counts and accepted identifiers
+  formal_source.tar.xz Complete accepted tracked project snapshot
+  tree_manifest.json  Every original path, Git mode, type, blob ID and size
+  accepted_commit.raw Exact original Git commit bytes
+
+restore_source.py reads source/source_bundle.json by default. An explicit
+--bundle PATH can select a relocated copy, with its three artifacts beside
+that metadata file. All three artifact SHA-256 hashes and byte counts are
+checked before destination creation. The raw commit's Git SHA-1 must be
+the hard-coded accepted pin and its tree must be the accepted tree above.
+
+Extraction is streamed and does not use tar extractall. Only listed
+regular files and their expected parent directories are accepted. Unsafe
+paths, links, sparse files, special permission bits, duplicates and
+unlisted members are refused. Every file's byte count, executable mode
+and Git blob SHA-1 are checked; every listed file must appear exactly
+once. Files are created exclusively through directory descriptors without
+following symlinks. Nothing is written outside the chosen destination.
+
+The helper then initializes a fresh Git repository, disables global and
+system Git configuration and attributes for the restore commands, and
+sets local options/attributes to prevent newline, encoding, ident or
+clean-filter transformations. It stages all tracked files, including
+ignored ones, and checks that git write-tree gives the exact original
+tree. It writes the supplied ORIGINAL raw commit with git hash-object,
+checks its accepted hash, marks that commit as the shallow boundary, and
+sets branch accepted-source and HEAD to that same original commit.
+
+No replacement commit is manufactured and no missing parent is invented.
+The original parent hash remains in the original commit object; earlier
+history is simply not included in this shallow snapshot. The final HEAD,
+tree, shallow status and clean index/working tree are checked. Success
+prints one concise JSON object to stdout; phase/progress messages go to
+stderr and can be hidden with --quiet. There is no network operation,
+Lean installation, dependency fetch or proof replay in this helper.
+
+Read and inspect the source
+
+For example, from the extracted package root:
+
+  git -C formal_source rev-parse HEAD
+  git -C formal_source rev-parse 'HEAD^{tree}'
+  git -C formal_source show 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4:lake-manifest.json
+
+The src/... paths in the handoffs are now formal_source/src/... on disk.
+Use rg to locate declarations and read the surrounding producer bodies.
+For example:
+
+  rg -n 'InHHC|inHH' formal_source/src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts
+
+The restored repository supports the ordinary git rev-parse and git show
+operations used by preserved source verifiers. A verifier's historical
+absolute scratch path is not a portable source location: use its source
+root option where available or a separate runner directed at this tree.
+Do not edit frozen proofs or source hashes to accommodate an old path.
+This exact original source snapshot is distinct from the human proof
+chapters and their smaller, range-indexed source snapshots.
+
+Third-party dependency scope
+
+The bundle contains every file TRACKED BY THE ORIGINAL PROJECT COMMIT.
+It is not a preinstalled Lean build environment or a recursive clone of
+all external packages. The original lake-manifest.json and lean-toolchain
+are included unchanged and state the dependency versions. In particular,
+the original toolchain is leanprover/lean4:v4.33.1, and the manifest pins:
+
+  mathlib
+    0df444a360eaa60ab8c11dca51a86af692955474
+  plausible
+    b7eb3304aeae834b12dda98993a37f6a41f6f0bb
+  LeanSearchClient
+    5f4d51b81cbd3f6b32b156bfad9056621a040404
+  importGraph
+    16f02aa7642864af59f1ff0e384a015994db9118
+  proofwidgets
+    4be2e3d5087eeb272cf5a8853b8f9dd025ef5957
+  aesop
+    3448c0bcc5ce01b2d1546e483ec3620e32df3d0e
+  Qq
+    92c15be17b7caf78c2ad767ec40f89052d908d81
+  batteries
+    4488d40d070b9700d4d5a6aa342f0d40c31b2a2d
+  Cli
+    6130a47896ce867c6a4a55373441e59e565bad0f
+
+Their URLs and remaining Lake settings are in that same original
+manifest. A component may already contain a separately pinned supporting
+source excerpt, such as the Mathlib fundamental-domain definition used
+in PGR. Those excerpts do not constitute all of Mathlib. If a new human
+argument needs an external theorem's exact source or published statement,
+locate the existing snapshot or obtain that specific pinned source and
+record its provenance. Do not substitute an unpinned current version.
+
+The accepted formal proof remains the premise of this project. The next
+task is the detailed human reconstruction described in START_HERE.txt
+and the v0.57 roadmap, not rebuilding the formal dependency environment.
