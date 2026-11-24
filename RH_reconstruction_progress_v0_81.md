@@ -28,18 +28,33 @@ Here $r$ is the rank of the noncharacter block, $t$ counts the character blocks,
 
 At the eligible unramified primes, the integral character calculation also holds at the exponent already stored on the hub. The extra issue here is that the Tate-dual character can have nonzero torsion invariants. They form a finite cyclic module. If $d_w=[K:\mathbf Q_p]$, the rational contribution to the local cohomology modulo its finite part has corank $d_w$. The cyclic contribution adds at most one generator. Hence the subgroup killed by $p^a$ has normalized length at most $(d_w+1)a$, including at $a=c_B$. This proves the character condition $\mathrm{admTB}$ on both middle-range branches. [Jump window, exact exponent and cyclic obstruction](continuation_v81/mid.tex)
 
+## Lifting at the split primes
+
+For the split middle-range primes the hub prescribes a single exponent $e_S$ for the column representations and the Tate-twisted duals on the conjugate rows. Put $h=\lfloor b+S_c+\eta+t+2\rfloor$. Working on the unramified base field gives the smaller bound
+
+$$
+ 25h/p+3\ \le\ e_S
+ =\left\lceil 23\left(2+2h/p+\log_p(2h+1)\right)\right\rceil .
+$$
+
+The saving comes from dividing the cyclotomic difference by an integral parameter $v$ with $v(\zeta-1)=-p$ at each primitive root. On the piece of degree $-j$ at a pole, the resulting operator has eigenvalue $(1-u^{-j})/p$, where $u$ is the cyclotomic value of the generator. A nonzero degree now costs $v_p(j)$. The integral correction therefore fits the prescribed exponent even when $h$ is much larger than $p$. On a row conjugate to column $u$, the resulting normalized cokernel length is at most $d_um e_S+r c_0(i,u)$, the precise row bound used by the split declaration. Here $d_u$ is the local degree. [Split lifting proof](continuation_v81/splitlift.tex) · [Conjugate row bound and global comparison](continuation_v81/splitrows.tex)
+
+At small split primes, two character values at a point can coincide modulo $p$. Perturbing the character corner away from the chosen point separates the roots in characteristic zero and preserves the point evaluation. Passing from the resulting block cocycles to global cohomology costs at most $2(r+t-1)v_\delta(i)$ in normalized length. The same character calculation at a single place uses at most $d_u n_V$ possible jumps. Combining a column with its conjugate row shows that their two character costs fit within the allowance already assigned to the row. This leaves only the joint image of the rank classes at the columns to bound. [Projectors and the global comparison](continuation_v81/splitrows.tex) · [Paired character estimate](continuation_v81/splitcomp.tex)
+
 ## Where to resume
 
 | Open field | What remains |
 | --- | --- |
-| `mid` | Bound the actual middle-range rank rows and complete the split and inert alternatives. The guard includes eligible exceptional primes above the usual threshold. In the inert case row B requires the saving $(p-1)^{-(j+1)}$ for clustered Frobenius words. Rows C and D distinguish whether every letter is thick. Earlier work gives the coarse bound and split-column estimates. [Middle-range starting point](continuation_v81/mid.tex) · [Local row hypotheses](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/AdmissibleAtInert.lean) · [Earlier table and split columns](RH_reconstruction_progress_v0_79.md#where-to-resume) |
+| `mid` | Bound the simultaneous image of the global rank classes at the split columns. At the inert primes, prove the sharp rank estimates for rows B, C and D. The guard includes eligible exceptional primes above the usual threshold. In the inert case row B requires the saving $(p-1)^{-(j+1)}$ for clustered Frobenius words. Rows C and D distinguish whether every letter is thick. Earlier work gives the coarse bound and split-column estimates. [Middle-range starting point](continuation_v81/mid.tex) · [Local row hypotheses](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/AdmissibleAtInert.lean) · [Earlier table and split columns](RH_reconstruction_progress_v0_79.md#where-to-resume) |
 | `two` | Prove the bounds at 2 and 3 and the odd small-prime correction, with one family cutoff. The separate parameter inequalities for small primes already hold. [Original small-prime conclusion and reductions](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/NonGaloisDescent/BoundAtTwoThreeFamily.lean#L50-L77) |
+
+The original split-column comparison uses the dimension of a local finite-cohomology space on each point of the ordered-root cover. [Integral lifts](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/AdmissibleDesigns/FiniteClassesLocalEq.lean#L461-L533) · [Dimension of the local space](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/AdmissibleDesigns/CohomZeroEquivContinuous.lean#L464-L582) · [Column calculation](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/AdmissibleDesigns/ColLx.lean#L32-L69)
 
 The complete global denominator contract also requires the original family construction and the bound on its actual $\eta$-sum. The other nine open contracts are recorded individually in the ledger. [Checkpoint](CURRENT_CHECKPOINT_v0_81.json) · [Obligation ledger](continuation_v81/obligations.json) · [Earlier handoff on theta selections and readings](RH_reconstruction_progress_v0_78.md#next-source-obligations)
 
 ## Verification
 
-The edition adds 56 proof blocks, bringing the inventory to 4,533. Their 409 cited ranges are in 130 distinct files of the pinned Lean source. The verifier checks the cited bytes, manuscript blocks and declared dependencies, compares all open contracts with the preceding commit, and checks the supplement digest. These are provenance and consistency checks on a human reconstruction. This edition involved no new Lean build. [Claim records](continuation_v81/claims.json) · [Validation](continuation_v81/validation.json) · [Previous edition](RH_reconstruction_progress_v0_80.md)
+The edition adds 66 proof blocks, bringing the inventory to 4,543. Their 485 cited ranges are in 147 distinct files of the pinned Lean source. The verifier checks the cited bytes, manuscript blocks and declared dependencies, compares all open contracts with the preceding commit, and checks the supplement digest. These are provenance and consistency checks on a human reconstruction. This edition involved no new Lean build. [Claim records](continuation_v81/claims.json) · [Validation](continuation_v81/validation.json) · [Previous edition](RH_reconstruction_progress_v0_80.md)
 
 ~~~sh
 python3 continuation_v81/verify.py --formal-git formal_source

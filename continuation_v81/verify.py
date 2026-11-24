@@ -60,6 +60,9 @@ def verify_endpoints(core, claims):
         ("U81L", 2, "lifting"),
         ("J81H", 2, "assembly"),
         ("M81B", 3, "mid"),
+        ("L81S", 4, "splitlift"),
+        ("G81S", 4, "splitrows"),
+        ("C81S", 2, "splitcomp"),
     )
     expected = {f"{prefix}{i}": f"continuation_v81/{chapter}.tex"
                 for prefix, count, chapter in chapters for i in range(1, count + 1)}
@@ -69,6 +72,9 @@ def verify_endpoints(core, claims):
         "J81H2": {"K81C6", "W81T6", "I81G6", "D81S2", "A81R11", "B81L5", "P81F5", "P81F6",
                   "V81P3", "V81P4", "X81M3", "U81L2", "J78H2", "J80H2"},
         "M81B3": {"M81B1", "M81B2", "K81C6"},
+        "L81S4": {"L81S1", "L81S2", "L81S3", "A81R8", "A81R9", "B81L2", "B81L5"},
+        "G81S4": {"G81S1", "G81S2", "G81S3", "L81S4", "I81G4", "M81B3", "G79E12"},
+        "C81S2": {"C81S1", "G81S4", "G81S2", "L81S4", "M81B2", "M81B3"},
     }
     covered = set()
     for point, required in endpoints.items():

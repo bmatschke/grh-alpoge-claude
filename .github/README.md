@@ -9,6 +9,7 @@ Edition 0.81 proves the denominator estimate at both distinguished ramified prim
 | How are the contributions of the character lines controlled? | [Integral torsion](../continuation_v81/torsion.tex) · [Kernel cocycles](../continuation_v81/kernel.tex) · [Global index](../continuation_v81/index.tex) |
 | Why does the local rank estimate cover both primes? | [Local row calculation](../continuation_v81/row.tex) · [Pure-sign branches](../continuation_v81/slot.tex) · [Mixed-sign branches](../continuation_v81/mixed.tex) |
 | How do the local estimates yield one family inequality? | [Uniform lifting](../continuation_v81/lifting.tex) · [Ramified-prime conclusion](../continuation_v81/assembly.tex) |
+| What is settled at the split middle-range primes? | [Integral lifts on columns and dual rows](../continuation_v81/splitlift.tex) · [Row lengths and the remaining column contribution](../continuation_v81/splitrows.tex) |
 | What remains? | [Middle range and small primes](../RH_reconstruction_progress_v0_81.md#where-to-resume) · [Open contracts](../continuation_v81/obligations.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_81.json) · [Validation](../continuation_v81/validation.json) |
 
 ~~~sh
