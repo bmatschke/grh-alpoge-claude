@@ -1,22 +1,22 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.74 proves that one normalization compares the adelic theta lift with its geometric class sum at every pinned tuple. It also proves the real Gaussian reproducing integral and the finite lattice bound used to span the base cusp space. **Ten whole obligations remain** in the human reconstruction, all shared by RH and unrestricted Dirichlet GRH. [Current reading guide](../RH_reconstruction_progress_v0_74.md) · [New TeX manuscript](../RH_new_proofs_v0_74.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_74.tex)
+Edition 0.75 proves the stable-range definite Siegel–Weil identity for the original admitted families. The proof counts split-prime neighbors and bounds the theta–Eisenstein difference uniformly over all twists and periods. It yields the differentiated arithmetic kernel for a supplied level system with the specified doubling laws. Edition 0.74 supplies the real reproducing integral and one normalization for the adelic and geometric theta lifts. **Ten whole obligations remain** in the human reconstruction, shared by RH and unrestricted Dirichlet GRH. [Current reading guide](../RH_reconstruction_progress_v0_75.md) · [New TeX manuscript](../RH_new_proofs_v0_75.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_75.tex)
 
 ## Read and verify
 
 | Question | Source |
 | --- | --- |
-| Why does one normalization work over all the given coefficient records? | [The marked cover](../continuation_v74/dictionary.tex) · [The point comparison](../continuation_v74/point.tex) |
-| Which short theta readings already lie in the class-sum span? | [Residues and split moves](../continuation_v74/span.tex) · [Point-kernel comparison](../continuation_v74/join.tex) · [Changing the vacuum](../continuation_v74/vacuum.tex) |
-| Why does the analytic kernel reproduce a form? | [Finite overlap estimate](../continuation_v74/norm.tex) · [Real reproducing integral](../continuation_v74/reproduce.tex) |
-| What remains of the doubled arithmetic identity? | [Isotropic orbits, coefficients and derivatives](../continuation_v74/orbit.tex) |
-| Which base assertions hold on a single linked bundle? | [Readings, rational tests, rows and rank](../continuation_v74/bundle.tex) |
-| Which obligations remain open? | [Original contracts](../continuation_v74/obligations.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_74.json) · [Verification](../continuation_v74/validation.json) |
+| Why are the two weighted series equal? | [Contraction at a split prime](../continuation_v75/definite.tex) · [Full Hecke calculation](../continuation_v75/hecke.tex) · [Induction and kernel](../continuation_v75/identity.tex) |
+| What allows the infinite series, boundary limits and uniform bound? | [Absolute convergence](../continuation_v75/convergence.tex) · [Boundary limits](../continuation_v75/boundary.tex) · [Invariant norm](../continuation_v75/bounds.tex) |
+| How does the argument preserve the finite tests? | [Finite Weil action from Poisson summation](../continuation_v75/weil.tex) · [Level and locality under Weil transport](../continuation_v75/admission.tex) |
+| Why does an equality at zero suffice after differentiation? | [Invariant derivatives and the heat equations](../continuation_v75/heat.tex) |
+| Where are the point comparison and the reproducing integral? | [Edition 0.74](../RH_reconstruction_progress_v0_74.md) |
+| What is still open? | [Original contracts](../continuation_v75/obligations.json) · [Current checkpoint](../CURRENT_CHECKPOINT_v0_75.json) · [Verification](../continuation_v75/validation.json) |
 
 ~~~sh
-python3 continuation_v74/verify.py --formal-git formal_source
-pdflatex RH_new_proofs_v0_74.tex
-pdflatex RH_new_proofs_v0_74.tex
+python3 continuation_v75/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_75.tex
+pdflatex RH_new_proofs_v0_75.tex
 ~~~
 
 ## Reproduce the portable v0.58 files
