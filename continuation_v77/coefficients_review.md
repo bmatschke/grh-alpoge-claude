@@ -1,0 +1,11 @@
+# The field of the base character values
+
+Reviewed TeX SHA-256 `a77de60be5fa9daf28ad7855bb3e4793432fcfa49d2c8501d5d7d7fde7cd6d8c`.
+
+**K77F1.** The local-field and product-formula arguments agree with `HeckeCharacterFiniteIdeleValueMemField.lean:26–91`. Continuity into a neighborhood containing no nontrivial subgroup gives local unit kernels of the required depths. Taking a multiplicative neighborhood of the given local input works equally at negative valuation. The correction factor off the approximation set uses unramified uniformizer values raised to integral, possibly negative powers. The archimedean hypothesis is used only on a global element.
+
+**K77F2.** An idele and its inverse integral almost everywhere together imply local-unit components away from a finite set. The restricted product argument uses the global continuity and the infinite part one, as in `HeckeCharacterFiniteIdeleValueMemField.lean:93–126`. In the source presentation, `ChrEq` is an equality on local factors obtained from global elements and place idempotents. The use of finite local approximations and of the assembled product formula in `ExistsIndexBoundCoreOverExactSmallField.lean:22–33` respects this restriction.
+
+**K77F3.** `ExistsIndexBoundCoreOverExactSmallField.lean:39–85` proves the integral inclusion and the reverse inclusion using surjectivity of the integral equivalence. The distinguished embedding identifies the core coefficient field with its image on fractions. On assembled stages the separate equality `mem_FO_assembled_iff` identifies that field with the specified small-field image. Injectivity proves equality of the embedded subfields inside the host. The TeX retains the prerequisite of a lawful pinned core.
+
+**K77F4.** The even infinity exponent, the sign-square formula and the quantifier order over the level character all agree with `ExistsIndexBoundCoreOverExactSmallField.lean:86–105`. The corrected text uses the host field being Galois over the rationals to put every complex embedding and its conjugate in the distinguished image. `ExistsParameterConditions.lean:85–111` proves this field inclusion. A priori containing only one embedded copy of an arbitrary number field would not suffice. The two marked primes and the core field are independent of individual ideles.

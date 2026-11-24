@@ -1,0 +1,7 @@
+# Independent review of the conjugate characters and adapted core
+
+Reviewed TeX SHA-256 `ab144e26d011d5cdcbb050257b9d7f99f7ee4ee490eaf7c3b818d55145ef8636`.
+
+**C77T1.** I compared the archimedean relabeling, small-field finite values and conjugation law with ExistsConjugateReferenceCharactersGoodEmbeddings. The potentially nontrivial point is the absolute value after a non-distinguished embedding. A finite idele raised to the class number is the finite part of a principal idele times an integral unit, whose character value has bounded finite order. Raising once more to that exponent and using the real-idele and principal-idele laws identifies the embedded power with a product of unit archimedean angles. This yields the required unit circle value before multiplying the two characters. Local constancy of the finite character follows from its open unit kernel.
+
+**C77T2.** The character replacement in ExistsCoreLawsForReplacedHeckeCharacters.lean:65 onward uses unit determinant multipliers and leaves the reference algebraic data in place. Equality of moduli transfers the squared-norm laws for the fixed dictionary. The subsequent dictionary/frame replacement has an additional domain-measure comparison, explicitly retained in the passage. ExistsCoreCompatibleAdelicDataCharacters.lean:24 onward supplies precisely TieIn and the lawful replaced core given the volume tie, original two law systems, algebra tie, level pin, ValKs and FrameKs. This is a conditional construction on an already lawful core, with the specified model extremal vector.

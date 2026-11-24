@@ -1,0 +1,9 @@
+# Independent review of selection on the prescribed division lattice
+
+Reviewed TeX SHA-256 `6217b00e2a045c6f067c50a123a278be0cfd0b68aa26e5d5b637d77cd142d29a`.
+
+**Transport (S77C1–S77C2).** I checked the substitutions in RowsPassToMovedDivisionLatticesHeights and the four slot witnesses in PositionStageMovesGeometric. The same moved row carries the ordinary and lift readings. Its row identity, moved geometric component and row-packet equality are all present before the character, spectral and object comparisons are made. The strengthened extension adds the fixed condition on the context, base, frame and twists, which survives a change of division module and height.
+
+**Exact point (S77C3).** WitnessesPassAlongSetDivision and ExistsIsEOfHeq give the kernel and witness for arbitrary division changes, followed by the specific substitution with the prime lattice and height of the size point. The manuscript retains equality in the dependent sum of the datum and its object, as required to transfer bundle data. It also retains the independent entanglement condition, which cannot be recovered just by matching the two ambient objects. The argument assumes the core was already presented as good.
+
+**Reciprocity and size (S77C4–S77C5).** ZetaUniformOfExtension, LevExOfOver and EtaSizeRecursion use the five-prime equality on the context host and the additional image term for the level on the extension. The modeled point has the level equality following division substitution. The analytic conditions for the zeta comparison and the reciprocity and ray-field hypotheses for the pinned datum are displayed. EtaSizeRecursion uses an eventual implication quantified over prescribed witnesses, their reciprocity data and the size bound. The text uses it only after fixing one point and reciprocity datum, transports the full dependent triple, and keeps the starting existence assumption visible. No new bound on the context enters.
