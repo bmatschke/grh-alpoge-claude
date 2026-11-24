@@ -1,21 +1,21 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.79 proves two more denominator estimates on the same family hub. A prime-power annihilator on the original twisted lattice supplies the coarse bound at 7200. Local jump and inertia comparisons at the two type primes give the weighted type-prime bound. This brings the family conclusion to **11 of 15 fields** under the original family hypotheses. **Ten whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_79.md) · [New proofs in PDF](../RH_new_proofs_v0_79.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_79.tex)
+Edition 0.80 proves the large-prime denominator estimate under the original family hypotheses. The proof verifies each local condition on the actual cut generators and obtains the family bound with zero additional local error. **Twelve of the fifteen denominator family fields** now hold on one hub. Ten whole obligations remain, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_80.md) · [New proofs in PDF](../RH_new_proofs_v0_80.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_80.tex)
 
 ## Read and verify
 
 | Question | Source |
 | --- | --- |
-| What kills the split-column invariants? | [Chosen lattice and jumps](../continuation_v79/split.tex) · [Wach heights](../continuation_v79/heights.tex) · [Annihilator](../continuation_v79/annihilator.tex) |
-| Which results hold on one family hub? | [Coarse error](../continuation_v79/assembly.tex) · [Type-prime witnesses](../continuation_v79/typewitness.tex) · [Eleven fields together](../continuation_v79/type.tex) |
-| How far does the large-prime count go? | [Position tables and global congruence count](../continuation_v79/large.tex) · [Integral decomposition](../continuation_v79/decomposition.tex) · [Descent of local conditions](../continuation_v79/descent.tex) |
-| What is known at $q,d$? | [Local fields and Hodge jumps](../continuation_v79/ramified.tex) |
-| What remains open? | [Reading guide](../RH_reconstruction_progress_v0_79.md#where-to-resume) · [Whole contracts](../continuation_v79/obligations.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_79.json) · [Verification](../continuation_v79/validation.json) |
+| Which local representations enter the count? | [Shifted crystalline data](../continuation_v80/shift.tex) · [Integral Wach calculation](../continuation_v80/wach.tex) |
+| How are the finite-coefficient classes determined? | [Residual presentation](../continuation_v80/res.tex) · [Model construction](../continuation_v80/model.tex) · [Local cohomology](../continuation_v80/top.tex) |
+| How does this give the estimate on the original hub? | [Cut cocycles](../continuation_v80/cut.tex) · [Family assembly](../continuation_v80/assembly.tex) |
+| What remains at the ramified primes? | [Row windows, common exponent and character cohomology](../continuation_v80/ramified.tex) |
+| What remains in the full proof? | [Reading guide](../RH_reconstruction_progress_v0_80.md#where-to-resume) · [Open contracts](../continuation_v80/obligations.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_80.json) · [Verification](../continuation_v80/validation.json) |
 
 ~~~sh
-python3 continuation_v79/verify.py --formal-git formal_source
-pdflatex RH_new_proofs_v0_79.tex
-pdflatex RH_new_proofs_v0_79.tex
+python3 continuation_v80/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_80.tex
+pdflatex RH_new_proofs_v0_80.tex
 ~~~
 
 ## Reproduce the portable v0.58 files
