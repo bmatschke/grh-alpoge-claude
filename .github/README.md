@@ -1,27 +1,27 @@
 # Human reconstruction of RH and Dirichlet GRH
 
-Edition 0.63 proves the host vanishing theorem used by the rank-three count. It supplies an integral matrix coboundary after a nonzero multiplier for every nonpositive weight on every permitted host frame. Edition 0.62 supplies the finite count and normalized length comparison, as well as the two Case III implications for unrestricted Dirichlet GRH. [Mathematical reading guide](../RH_reconstruction_progress_v0_63.md) · [New chapters in TeX](../RH_new_proofs_v0_63.tex) · [Cumulative manuscript in TeX](../RH_readable_reconstruction_v0_63.tex)
+Edition 0.64 constructs a single Frobenius element whose trace separates every eligible rank-three point of a Case V host from its base point. The Case III chapters construct a tame tower at a prescribed label and four polynomial families connecting the restricted lattice to a seed under the source hypotheses. The marked-point chapter proves the two irreducibility upgrades and describes the remaining automorphy input. [Mathematical reading guide](../RH_reconstruction_progress_v0_64.md) · [New chapters in TeX](../RH_new_proofs_v0_64.tex) · [Cumulative manuscript in TeX](../RH_readable_reconstruction_v0_64.tex)
 
-The reconstruction contains **3,865 indexed claims and 17 remaining whole obligations**. Thirteen are shared by RH and Dirichlet GRH. Four more concern unrestricted Dirichlet GRH. [Current checkpoint](../CURRENT_CHECKPOINT_v0_63.json) · [Original statements of the remaining obligations](../continuation_v63/obligations.json) · [New claims and source ranges](../continuation_v63/claims.json)
+The manuscript has **3,886 indexed claims and 14 open whole obligations**. Twelve are common to RH and Dirichlet GRH. Two additional obligations concern unrestricted Dirichlet GRH. [Current checkpoint](../CURRENT_CHECKPOINT_v0_64.json) · [All remaining source statements](../continuation_v64/obligations.json) · [New claim ledger](../continuation_v64/claims.json)
 
-| Argument | Where to read |
+| Argument | Chapters |
 | --- | --- |
-| Host vanishing | [Negative weights](../hostvan_v63/negative.tex) and [zero weight and matrix assembly](../hostvan_v63/assembly.tex) |
-| Case III residual chains and automorphy | [Transport between components and the common embedding](../caseiii_v62/main.tex) |
-| Case V deformation ring and counting | [Marked ring](../marked_v62/main.tex), [Selmer coordinates](../countcoord_v62/main.tex), [shape classification](../shape_v62/main.tex) and [the type-I and length arguments](../hostjoin_v62/main.tex) |
-| Spectral comparison of distinct words | [Prime and dimension ratios and the selected size estimates](../offdiag_v62/main.tex) |
-| Previous editions | [Case III and the Case V count](../RH_reconstruction_progress_v0_62.md) and [finite descent of the rank-four chain](../RH_reconstruction_progress_v0_61.md) |
+| Case V trace bound | [Host points, an inert prime and the valuation estimate](../hostnumber_v64/main.tex) |
+| Case V marked theorem | [Open subgroups, the cyclotomic kernel and the joint arithmetic end](../markedaut_v64/main.tex) |
+| Case III initial tower | [The four characters, local constraints and prescribed label](../tensortower_v64/main.tex) |
+| Case III seeded reduction | [Cup modifications, restriction and four polynomial links](../rankchain_v64/main.tex) |
+| Earlier connected arguments | [Host vanishing](../RH_reconstruction_progress_v0_63.md) and [the rank-three count and Case III automorphy](../RH_reconstruction_progress_v0_62.md) |
 
 ## Verify or typeset the manuscript
 
-From the repository root, initialize the pinned source and check the manuscript proofs, reviewed files, dependencies and register.
+From the repository root, the following commands initialize the pinned formal source and check the new source excerpts, proof dependencies, reviews and obligation register.
 
 ~~~sh
 git submodule update --init --depth=1 -- formal_source
-python3 continuation_v63/verify.py --formal-git formal_source
+python3 continuation_v64/verify.py --formal-git formal_source
 ~~~
 
-Run <code>pdflatex RH_new_proofs_v0_63.tex</code> twice for the new chapters. The original source is pinned at <code>7cbf7a0c32fca1badf05931879a37c3f8a2b03b4</code>. [Pinned formal source](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier reading guide](../README.md) · [Historical dependency audit](../RH_dependency_audit_v0_57.txt)
+Run `pdflatex RH_new_proofs_v0_64.tex` twice to typeset the four new chapters. [Pinned formal source](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) · [Earlier reading guide](../README.md) · [Dependency audit at v0.57](../RH_dependency_audit_v0_57.txt)
 
 ## Reproduce the portable v0.58 files
 
