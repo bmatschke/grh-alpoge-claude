@@ -1,0 +1,305 @@
+ARITHMETIC COLUMN AND LEVEL CONSTRUCTORS — EXPANDED PROOF REPORT
+Version 0.15; claims AC1-AC10
+Pinned source commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+
+OUTCOME AND EXACT SCOPE
+The two constructor targets retained by RF10 are now proved under their full
+literal input hypotheses:
+  AC7: GlobalTheory.EX.OB.chGood_of_host.
+  AC10: GlobalTheory.EX.OB.exists_levCh_of_levelPrime.
+The proof goes through the actual numerical column formulas, the finite
+root-of-unity correction, the norm product over the host CM type, and all
+fields of the PreCh, ChOK and LevCh records. It does not merely assert that
+these records can be assembled.
+
+The original arithmetic host and its HostGood predicates remain input data.
+In particular HostGood contains real character and thin-prime information,
+a good top set, two prescribed large primes, norm generators, and congruence
+conditions. AC7 does not prove HostGood exists. Prescribed integer weights
+satisfying WinOK and an injective Boolean code of the specified cardinality
+are also inputs of that literal theorem. AC10 retains precisely the analytic
+LevelPrime proposition, positive du and Dstar, and the logarithmic lower
+window provided by the recursive construction. No RecExP, Lay, LedOK, global
+forms, positive pairing or spectral assertion is proved by these constructors.
+
+No Lean elaboration/kernel replay or PDF compilation was performed. The source
+ledger is rebuilt from pinned Git blobs and verifies full-file and exact
+inclusive-range hashes. This is mathematical reconstruction, not a claim to
+have run the formal source.
+
+NOTATION AND UNIFORMITY
+R is the actual Ranks record, n=R.n, f=2n, k=R.k, m=R.m, r=k+m-1.
+For s, x=s.x>1 and 0<epsilon=s.eps<1/52. Put
+  L=x^epsilon, b=exp(L), X'=exp(x^(epsilon/3)), a=xb,
+  b'=xb/X', w=b/(nX'), D=ceil_+(x^cD), h=ceil_+(x^ch), h0=2h.
+The scale b must be distinguished from column coordinates b_j. D here is
+an integer cloud spacing; it is neither a D7 record nor an integral Weyl
+module Delta. The old integral Weyl Delta and dual nabla distinction is
+unchanged.
+
+For hc_sizes and exists_hc_family the order is fixed epsilon,cD,ch (and C8
+for the family), followed by one x0, followed by arbitrary s,R,H,top weights,
+reindexing and code. For chGood_of_host it is fixed epsilon,C5,c6,Cb,cD,ch,C,
+then x0, then arbitrary s,R,H,a,b,M,c,u0. For the level constructor it is
+LevelPrime, then epsilon,cs>0,C, then x0, and only then arbitrary cD,ch,s,P,
+q1,a,b,c,du,Ds. In particular its x0 is independent of cD,ch, the words and
+of the prescribed discriminant data. All finite maxima in the proof respect
+these orders.
+
+AC1 — ONE SHIFT CONTROLS EVERY ROOT, NOT ONLY ITS PARITY
+For a number field E let w_E=|mu(E)|. This is Units.torsionOrder E. Finiteness
+can be seen directly: if z has exact order h, the cyclotomic polynomial gives
+phi(h)<=[E:Q], and phi(h)^2>=h/2. Hence h<=2[E:Q]^2. Only finitely many h
+occur, and X^h-1 has at most h roots. A finite subgroup of a field's units is
+cyclic: combining maximal prime-power-order elements produces an element of
+order equal to the group exponent e; all elements are roots of X^e-1, so the
+group order is at most e and hence equal to e. This is the same elementary
+background justified in SZ10.
+
+Given a finite family of embeddings phi_i:E->F, integer weights a_i, and one
+chosen index i0, take a generator zeta of mu(E). The product
+  U=product_i phi_i(zeta)^(a_i)
+has w_E-th power one. Since phi_i0 is injective, phi_i0(zeta) has exact order
+w_E and its powers exhaust every root of X^w_E-1 in F. Select the unique
+q in [0,w_E) whose power equals U^(-1). The modified product with exponents
+  a_i+q*indicator(i=i0)
+is one on zeta and therefore on every power of zeta, which is every root of
+unity of E. No division by a possibly zero root occurs. This proves the
+source ExistsShiftWeightCongruenceLtTorsionOrder theorem and its host wrapper.
+
+AC2 — PROVE THE NORM-ONE FACT USED BY PARALLEL WEIGHTS
+Rather than assume HostDer.norm_mu, prove the stronger elementary statement:
+if d>3 is prime, E contains s with s^2=-d, and 4 divides [E:Q], then every
+root of unity has norm one from E to K=Q(s).
+
+The basis 1,s of K shows that a rational number which is a square in K is
+either a rational square or -d times a rational square. Consequently -1,-2,
+-3 and 2 are not squares in K. For the negative numbers the first case is
+impossible by sign; the second would say c=d*a^2 with 1<=c<=3 and a rational.
+The d-adic exponent of the right side is odd while that of c is zero. For
+2, sign excludes the second case and irrationality of sqrt(2) excludes the
+first.
+
+K has no nontrivial root of odd order. Otherwise an odd prime divisor p of
+that order gives a primitive p-th root whose cyclotomic degree p-1 is at
+most [K:Q]=2. Thus p=3, but a primitive cube root v makes (2v+1)^2=-3.
+
+Now let y have 2-power order. If y^2=1, then y=+/-1 and its E/K norm is one
+because [E:K] is even. Otherwise choose a power i of y with i^2=-1 and put
+K1=K(i), a quadratic extension. The element v=N_{E/K1}(y) has 2-power order.
+If its order exceeded four, a power u would satisfy u^4=-1. Then
+(u-u^3)^2=2. Writing u-u^3=a+b*i shows a*b=0; hence either 2 or -2 would be
+a square in K, impossible. Thus v belongs to {1,-1,i,-i}. Each has norm one
+from K1 to K, so norm transitivity yields N_{E/K}(y)=1. For arbitrary z,
+write a killing exponent as 2^a*o with o odd. Applying this result to z^o
+gives N(z)^o=1, and the odd-root result in K gives N(z)=1.
+
+This follows the separate literal source NormRootOfUnityQuadraticSubfield,
+including the key 2-primary argument. It avoids treating a host-derived norm
+field or a class-number result as the proof. General field norm identities,
+the quadratic basis criterion, and cyclotomic degree are standard algebraic
+background; no analytic existence is invoked.
+
+AC3 — THE ACTUAL HOST CM TYPE IS Gal(E/K)
+The host's raw Galois isomorphism identifies Gal(E/Q) with
+({+/-1} x {+/-1}) x A, where |A|=n. It therefore gives [E:Q]=4n.
+The host has d prime and d=7 mod16, so d>3. AC2 applies without using the
+HostDer.norm_mu field. The host also explicitly states that its second sign
+is the action on sqd. Since sqd is nonzero, an automorphism fixes sqd iff its
+second sign is +1; fixing sqd is equivalent to fixing K=Q(sqd). Thus the
+subgroup Psi in the source is exactly Gal(E/K), not an arbitrary half of the
+archimedean embeddings.
+
+For any finite reindexing eT:T~Psi, the product of sigma_eT(t)(z) is
+N_{E/K}(z). Composing with the given phi0:E->C produces the literal
+embeddings H.emb(eT(t)). AC2 makes their product one on every root z.
+Therefore MU(1), and by taking integer powers MU(c) for every constant
+integer c. Multiplication gives MU(a+c) whenever MU(a). The rational MUQ
+condition is then fulfilled by the explicit integral lift a+c. This proves
+all content of muq_of_parallel and explains why evenness of the total weight
+would not be enough.
+
+AC4 — ALL THIRTEEN HCParam FIELDS
+For D>=1 and h>=(t+3)/2, integers U0,UL,B with 4D(k-2)<=U0, UL<0 and -B<=UL,
+and a Boolean code c_l (0<=l<k-2), define
+  v_i=4D(k-2-i),                         0<=i<k-1;
+  u_0=U0+1/2, u_(k-1)=UL+1/2;
+  u_(l+1)=v_l-1/2-D*indicator(c_l=true);
+  b_j=B+2hj, e_j=B+(2j+1)h,             0<=j<m.
+The four data fields are u,v,b,e. Both strict interlacing proof fields hold:
+v_l-u_(l+1) is 1/2 or D+1/2, and u_(l+1)-v_(l+1) is 4D-1/2 or 3D-1/2.
+The first and last gaps follow from the endpoint inequalities. Since UL>=-B,
+u_last> -b_0, including the strict half-unit slack. Both e_j-b_j and
+b_(j+1)-e_j equal h and meet the lower gap. The remaining four proof fields
+are the integrality of e,v,b and the half-integrality of u. Thus every field
+of the source HCParam record is proved directly. This also reproduces all
+formulas in exists_hcParam_of_code.
+
+AC5 — ACTUAL UNIFORM LARGE-SCALE CONDITIONS
+RF12 gives k<=x^5 and t<=x^401 at a threshold depending only on epsilon.
+Require x>=8. With cD>=0, ceil(x^cD)<=2x^cD, so
+  4kD<=8x^(cD+5)<=x^(cD+6).
+RF11 permits the stronger requirement x^(cD+6) X'<=b. As X'>=1 and a=xb,
+this gives 4kD<=a. Since cD+6>=5, it also gives k<=b/X'=b'/x.
+For ch>=402, h>=x^402>=(t+3)/2. The scale values b',b,w are positive by their
+formulas and n>=1. D>=1. This proves all seven output conditions of hc_sizes.
+No eventual bound depends on a code, host, place, top weight or rank choice
+beyond RankVal.
+
+AC6 — THE SAME FAMILY FOR EVERY WORD AND HEIGHT
+HostVal implies |T2|>=x^(-epsilon)*n>0. The image of T2 under
+s -> ((-1,1),iota(s*a0+u0)) is therefore a nonempty thick set inside Psi.
+The top set uses first sign +1 and is disjoint. Top indexing is unique by
+iota injectivity. After an arbitrary reindexing T~Psi choose one thick
+index tau0. Define raw integer base weights by
+  top tau1(t): bT(t)+floor(b'/x),
+  thick:      ceil(b),
+  thin:       ceil(w).
+Apply AC1 at tau0. The resulting B_tau has MU(B), changes no top or thin
+place, and on every thick place satisfies
+  ceil(b)<=B_tau<ceil(b)+torsionOrder(E).
+The strict upper inequality follows from 0<=q<torsionOrder(E), including
+all unshifted thick places.
+
+Write k=2*kappa. At top t choose U0=aT(t)+kappa-1 and UL=-bT(t)-kappa.
+Off the top set choose U0=4D(k-2)+4kD and UL=-1. The supplied aT>=a and
+bT>=b', together with AC5, ensure the AC4 hypotheses. In particular
+floor(b'/x)>=k>=kappa proves -B<=UL on top places; off the top set B>=1.
+Use the very same endpoint/base functions, D and h for every word. Then
+v,b,e and both endpoints are independent of the word. The only varying
+coordinate is u_(l+1), and it reads the actual Boolean bit with spacing D.
+
+For each height j, e_j=B+(2j+1)h. AC3 applies with the constant integer
+(2j+1)h, so e_j has its required integral MUQ lift. This proves HCVal in
+full, rather than replacing it by parity. The exact top endpoints are
+  u0=aT+(k-1)/2, u_last=-bT-(k-1)/2.
+The non-top endpoints and all ceiling/shift bounds are precisely those in
+HCVal. All conclusions of exists_hc_family are therefore constructed,
+including the five word-compatibility identities.
+
+AC7 — LITERAL chGood_of_host, INCLUDING THE STRONG AUXILIARY CONGRUENCE
+Let HostGood, RankVal, CT2 equality, WinOK, the word count
+M=ceil_+(3 Gamma^2 x^CF), and an injective code Fin(M)->Bool^(k-2) be supplied
+exactly as in the theorem. Put Nc=QS*q*d and C8=C.P.Cpde>=1. Its PairRow
+clause gives log Nc<=2 x^(epsilon/5)(log x)^2. At a threshold with
+2C8(log x)^2<x^(2epsilon/15), every real z<=Nc^C8 is less than X'.
+Thus q0H,pde,pde'<X'. Each g_i>=(kb)^8>=b>=X', so q0H is distinct from both
+g_i. The two other inequalities q0H!=pde,pde' are already explicit HostGood
+clauses.
+
+HostGood states the exact five-prime level set. All members are prime and
+1 modulo Nc: this is HostArith for g_i, reduction of the lcm(15,Nc)
+congruences for the pde primes, and the given q0H congruence for q0H.
+HostVal gives ccK=top; HostGood gives the BB disjointness and norm generators.
+
+The source's small field also needs q0H=1 modulo leastOff(...)*Nc. This is
+not silently assumed from its weaker congruence. By definition q0H is the
+natural infimum of primes p=1 modulo rPrH*Nc which do not divide Norm(ccK).
+Since HostGood says this q0H is prime, its defining set cannot be empty,
+whose natural infimum would be zero. It is a nonempty subset of N, so its
+least element lies in the set and satisfies the stronger congruence.
+Norm(ccK)=1 identifies rPrH with the exact leastOff used in ChOK. This
+conditional argument establishes the interface without importing a new
+analytic existence theorem or treating q0H as an arbitrary small prime.
+
+Set the unipotent translate to R.ofNat(u) for the arbitrary prescribed
+natural u. HostGood and WinOK do not read that field. The thick set does
+change, so the AC6 correction is performed after the replacement. M>0 by
+positivity of its defining real expression; use the base word 0 in Fin M.
+Set hcW(v,tau)=p_(c(v),tau). The five compatibility proofs are from AC6.
+All14 PreCh fields and all16 ChOK fields are covered explicitly in main.tex.
+ChGood has two fields: this ChOK and the retained HostGood for the translated
+host. All labels, top weights, code and cardinality are the prescribed ones.
+This proves chGood_of_host, under precisely its existing inputs.
+
+AC8 — ACTUAL INTEGRAL NORM-FORM EQUIVALENCE
+NormOne(d,M,p) is the assertion of integers A,B with
+  A^2+d B^2=4p, M|B, 2M|(A-2-B).
+With d=3 mod4 let e=(d+1)/4 and omega=(1+sqrt(-d))/2; omega is integral
+because omega^2-omega+e=0. Write B=M*u and A=2+M*u+2M*v. Then
+  pi=1+M(v+u*omega)=(A+B*sqrt(-d))/2
+is in O_E cap K, has pi*bar(pi)=p, and is 1 modulo M O_E. Expansion gives
+  p-1=M[u+2v+M(eu^2+uv+v^2)],
+so the integer prime is also 1 modulo M. This is the exact algebraic
+content consumed by normOne_host.
+
+For the converse take pi=1+M*y, where y is integral and M>0. Since pi is in
+K, so is y. Write y=a+b*sqrt(-d) with rational a,b. Its rational trace and
+norm are integral, so t=2a is integral and d(2b)^2 is integral. If 2b=u/v in
+lowest terms, v^2 divides d; since d is squarefree v=1. Thus 2b=u is an
+integer. The identity t^2+d*u^2=4N(y) forces t,u to have the same parity.
+Set A=2+M*t, B=M*u and take norms; the exact NormOne congruences follow.
+For M=0 both sides force pi=1,p=1 and the solution A=2,B=0 works. Divisors
+M' of M preserve both integer divisibility conditions. This proves the
+source equivalence and its weaker-modulus corollary as well.
+
+AC9 — ALL FIFTEEN LevCh FIELDS AND ITS ENLARGED HOST
+For an actual PreCh P, positive integers du_v, Dstar>0 and Gamma>1, let
+  U_v=(Dstar/du_v)^(1/(f*k))*Gamma^(-2/(f*k)),
+  Mc=Nc*(g0*g1)^2.
+Suppose actual prime solutions T_v,pi_v satisfy membership pi_v in K,
+integrality, pi_v*bar(pi_v)=T_v, pi_v=1 modulo Mc, avoidance of pde,pde',
+and U_v<=T_v<=(1+1/(f*k))*U_v. The only additional needed condition is the
+literal remainder T_v mod Nc=1. Since Nc|Mc, write pi_v=1+Nc*alpha integral.
+Then (T_v-1)/Nc=alpha+bar(alpha)+Nc*alpha*bar(alpha) is a rational algebraic
+integer, hence an integer. Nc>1 makes the remainder exactly one.
+
+The five data fields are T,piT,duStar,Dstar,GamP. The ten proof fields are
+T_prime,T_cond,piT_K,piT_norm,piT_cong,T_ne_pde,duStar_pos,Dstar_pos,
+one_lt_gammaP,T_win. The construction supplies each; no pairwise distinctness
+between T_v values is asserted or required. The three parameter equalities
+are literal. The enlarged host adds the finite image of T to the old level
+set. Congruence 1 mod Nc gives coprimality with QS, and ccK=top gives all
+needed ideal norm coprimalities. This is exactly the source LevCh.host,
+keeping the same field, frame and column data.
+
+AC10 — EXACT LevelPrime QUANTIFIER JOIN
+The analytic LevelPrime input supplies a prime T and NormOne at modulus
+Nc*(g0*g1)^2 in [U,(1+1/(f*k))*U]. Its conditions are RankVal, ModRow,
+1<=g_i<=b^9, U>0 and cs*m*L<=log U. Its threshold is fixed before all ranks,
+hosts and U. The literal ModRow means d prime, d=3 mod4, 100<=d, Nc>0,
+d|Nc and log Nc<=3x^(epsilon/5)(log x)^2.
+
+The host provides the prime and congruence. From m>=2,k>=m+3 one gets
+r>=6, and r+5<=t gives t>=11. Its condition 4tr+1<d gives d>265. The other
+ModRow fields follow from Nc=QS*q*d and the HostVal PairRow, whose coefficient
+2 conductor bound is stronger than the requested coefficient3.
+
+RF11 and RF12 permit x>=2, k<=x^5, x^41<=b and m>=x^(1/4). Then
+2k^8<=2x^40<=x^41<=b, so g_i<=2(kb)^8<=b^9. Also require
+x>=(1/cs)^4 to get cs*m>=1. Since Gamma=exp(CGam*m^5*f*L) with CGam>=1,
+Gamma>1. The imposed logarithmic window gives
+  U_v>=exp(cs*m*L)>=X'.
+ChOK.lev at pde and pde' gives either equality with g_i or a value below X'.
+The former contradicts the host's specified distinctness, so pde,pde'<X'.
+Every chosen T_v>=U_v is therefore different from both.
+
+Apply LevelPrime separately to each v, using its single uniform threshold.
+AC8 constructs integral pi_v with the exact full modulus congruence. AC9
+constructs LevCh, retaining duStar=du,Dstar=Ds,GamP=GamS C s R. A finite
+maximum of thresholds completes the literal endpoint. No threshold depends
+on cD,ch,the word,du or Ds. The arbitrary word family is covered by the
+post-threshold universal quantifier over U, not by an informal maximum over
+unknown windows.
+
+CONSTRUCTOR INTERFACES AFTER THIS COMPONENT
+Completed under exact inputs:
+- exists_hcParam_of_code and hc_sizes;
+- exists_hc_family with all MUQ, top, thin, thick and compatibility clauses;
+- chGood_of_host, for arbitrary prescribed unipotent translate;
+- normOne_host and the integral norm-form equivalence;
+- LevelChoice.exists_levCh and its actual host extension;
+- exists_levCh_of_levelPrime with the same prescribed du,Ds,Gam.
+
+Retained inputs, not proved theorems of this component:
+- actual Host/HostGood, RankVal and Std when required;
+- WinOK for prescribed weights and an injective Boolean code of the literal
+  ceiling cardinality in the chGood theorem;
+- the analytic LevelPrime proposition;
+- positive du and Ds with the literal logarithmic lower window;
+- all simultaneous recursive/global forms, Lay/LedOK and RecExP supply.
+The old RF proofs remain preserved. These AC proofs close two of their
+constructor targets without altering their input boundary or any independent
+RH/GRH branch. Root coordinates the shared frontier to avoid duplicate
+suppliers already discharged by PN and SZ.

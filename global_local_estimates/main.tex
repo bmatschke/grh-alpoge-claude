@@ -1,0 +1,939 @@
+\section{The original late-family setting and the local Hecke estimates}
+\label{sec:global-local-estimates}
+
+\status{This chapter reconstructs the numerical setting and the finite local
+arguments on the original objects.  A supplied family, its original forms,
+and their same-object ties are retained throughout.  The source is the
+pinned commit recorded in the accompanying provenance ledger.}
+
+\paragraph{Objects and conventions.}
+Fix a source member $D$, a word $u$, and write
+$K=D.\mathrm{what}_2.\mathrm{LL}$, $k=D.R.k=N(0)$,
+$m=D.R.m$, $N=N(m)$, $f=D.R.f$, and $p=(D.\mathrm{mem}\,u).A.T$.
+The prime $p$ is the original word prime.  At a coefficient place $w\mid p$,
+write $\mathcal O_w$ for the original DVR and $e_w=v_w(p)$.
+An original level-zero forms record is denoted $\mathcal F$; this avoids
+using $T$ for both that record and the prime.  In the source its type is
+\texttt{Forms0 D u}.  Its maps \texttt{atT}, \texttt{cls0}, \texttt{val0},
+\texttt{lv0}, \texttt{up\_natural\_level\_zero},
+\texttt{down\_natural\_level\_zero}, and \texttt{bw0} are the original
+ones, obtained by projecting the supplied symmetric forms record.
+
+\subsection{A direct size proof for the actual weights}
+
+% BEGIN GLE1
+\paragraph{GLE1: the original parameter windows give a common weight interval.}
+\label{claim:GLE1}
+Let $L:\texttt{SizeData}_2(D)$ and let $P:\texttt{ParameterChoice}'(D,L)$
+be the supplied parameter record.  Put
+\[
+ \begin{gathered}
+ x=L.\mathrm{sc}.x,\quad b=e^{x^\varepsilon},\quad a=xb,
+ \quad X'=e^{x^{\varepsilon/3}},\quad b'=a/X',\\
+ w''=b'/(xn),\quad S=L.\mathrm{Sc},\quad \eta=L.\mathrm{etaSz}.
+ \end{gathered}
+ \tag{GLE.1}
+\]
+Assume $x\ge4$ and $X'\ge x$.  Then, for every original word and every
+embedding, every entry of every original lifted weight with $0\le j\le m$
+satisfies
+\[
+ -2b\le\lambda_{j,\tau}(r)\le2xb.                 \tag{GLE.2}
+\]
+Moreover,
+\[
+ b\ge24x,\qquad b\ge3N,\qquad N\le b/4,
+ \qquad a_{\max}\le2xb,
+ \qquad b_{\mathrm{top},\tau}>0\quad(\tau\in\mathrm{tops}(D)).
+ \tag{GLE.3}
+\]
+
+Here is the complete extraction from the parameter fields.  Since
+$h_0=\eta/m$, the ninth inequality of \texttt{h0\_ge} gives
+$Nm^{11}\le\eta$.  The field \texttt{mteta} gives
+$m(t+1)\eta\le w''$, and \texttt{kS\_le} gives $kS\le w''$.
+The rank laws give $m\ge2$, $k\ge5$, $n\ge1$, $N\ge1$, $t\ge1$;
+\texttt{t\_le\_eta} gives $\eta\ge1$.  Consequently
+\[
+ Nm^{12}\le w'',\qquad 1\le\eta\le w'',\qquad
+ 0<S\le w'',\qquad b'=xnw'',\qquad 0<b'\le b.
+ \tag{GLE.4}
+\]
+The last inequality follows directly from $b'=xb/X'$.
+In particular $w''\ge4096N$, $b'\ge4096xN$, and
+$w''\le b'/x\le b'/4$.  These imply the first three bounds in (GLE.3).
+
+We check the first $k$ entries before the appended blocks.  Write
+$u_r$ for the original half-integral Harish--Chandra entries and
+\[
+ \lambda_r=u_r-\bigl((k-1)/2-r\bigr).
+ \tag{GLE.5}
+\]
+The intervening entries are integral and strictly interlace the $u_r$.
+Thus $u_r-u_{r+1}\ge1$, and (GLE.5) is decreasing.  At a top place the
+first and last entries are exactly $a_T$ and $-b_T$.  The original
+window for $a_T$ gives $a\le a_T\le2a$.
+For $b_T$, put $q=N_*x^\varepsilon L.\mathrm{LaG}/k$.
+The fields \texttt{S\_le}, $S>0$, and $b'>0$ imply
+$L.\mathrm{LaG}>0$.  The definition of \texttt{rhoP} is
+\[
+ \rho_P=4q+C_\rho\log x\,L.\mathrm{LaG}/k.
+\]
+All terms on the right are nonnegative, and
+$\rho_P\le x^{-2}\le1$.  Hence $q\le1/4$ and the actual
+\texttt{bT\_le} and \texttt{bT\_ge} fields give
+\[
+ b'\le b_T\le\tfrac54 b'.                       \tag{GLE.6}
+\]
+Every middle top entry belongs to $[0,S]$.  Indeed $u_1\le S$ and
+the shift $(k-1)/2-1$ is nonnegative, so $\lambda_1\le S$.
+At the other endpoint $u_{k-2}\ge0$ and the shift
+$(k-1)/2-(k-2)$ is nonpositive, so $\lambda_{k-2}\ge0$.
+The monotonicity of (GLE.5) places all intermediate entries between
+these two bounds.  Off the top set, \texttt{uk\_extreme} and the
+last cloud bound give $\lambda_{k-1}\ge0$; the first cloud bound and
+\texttt{cloud\_place\_bound} give $\lambda_0\le3S$.
+Thus all off-top entries belong to $[0,3S]$.
+Since $3S\le3b'/4\le b\le a$, these entries also satisfy (GLE.2).
+The maximum defining $a_{\max}$ is the maximum of $0$ and the original
+top entries $a_T$; hence $a_{\max}\le2a$.  The original definition
+$b_{\mathrm{top},\tau}=-\lambda_{0,\tau}(k-1)$ identifies it with
+$b_T$ at every top place, proving its positivity.
+
+For the appended block indexed by $0\le r<m$, the original weight
+formula is $-w_r$, where
+\[
+ w_r=w_{r+1}^{\mathrm{raw}}-\delta_r,
+ \qquad
+ \delta_r=\frac{k}{2}+\frac{(2r+1)(t+1)}2,
+ \qquad 0\le\delta_r\le N.                       \tag{GLE.7}
+\]
+The three raw windows are
+\[
+ \begin{array}{c|c}
+ \text{top}&[b_T+b'/x,\ b_T+b'/x+\eta]\\
+ \text{thick}&[b,\ b+\eta+1]\\
+ \text{thin}&[w'',\ w''+\eta].
+ \end{array}                                      \tag{GLE.8}
+\]
+Every lower endpoint is at least $w''\ge N$.
+The top upper endpoint is at most $7b'/4$, the thick one at most
+$b+b'/2$, and the thin one at most $b'/2$; here $1\le w''\le b'/4$.
+Subtracting (GLE.7) therefore gives $0\le w_r\le2b$.
+The source's literal \texttt{lam\_eq} identifies the first $k$ entries
+with (GLE.5) and every remaining entry with one of these $-w_r$.
+This proves (GLE.2) for all $j$, including $j=0$ and $j=m$.
+No general \texttt{NumsL} conclusion is being presumed in this proof.
+% END GLE1
+
+% BEGIN GLE2
+\paragraph{GLE2: \texttt{TuSize} supplies every clause of the eventual setting.}
+\label{claim:GLE2}
+For every original family $\mathrm{Fm}:\texttt{FamP}\,\varepsilon$,
+\[
+ \texttt{TuSize}(\mathrm{Fm})
+ \quad\Longrightarrow\quad
+ \texttt{SettingEventually}(\mathrm{Fm}).          \tag{GLE.9}
+\]
+The conclusion means that there is one $A$ such that, for every
+$x\ge A$ with $x>\mathrm{Fm}.x_1$, every $i\in\mathrm{Fm}.I_x$ and
+every word $u$ of $D=\mathrm{Fm}.D(x,i)$ satisfy all four original
+\texttt{HidaSetting} requirements.  The threshold is chosen before
+$i$ and $u$.
+
+To check its existence directly, put $\delta=\varepsilon/3>0$.
+For $x\ge1$, $\log x\le x^{\delta/2}/(\delta/2)$, by
+$\log y\le y$ with $y=x^{\delta/2}$.
+Thus $x^{\delta/2}\ge2/\delta$ implies $x\le e^{x^\delta}=X'$.
+Increase a single family threshold until this holds, $x\ge32$, and
+the \texttt{TuSize} threshold has been reached.  All original parameter
+and size records are then supplied by \texttt{Fm.params} and
+\texttt{Fm.sizes}; their scale satisfies $L.\mathrm{sc}.x=x$ and
+$L.\mathrm{sc}.\varepsilon=\varepsilon$.
+
+The lower $m$-size field says
+\[
+ m\ge x^{-\varepsilon/100}\sqrt{x\,x^{-\varepsilon/8}}
+   =x^{1/2-29\varepsilon/400}\ge x^{2/5}\ge4.
+ \tag{GLE.10}
+\]
+The middle inequality uses the original $0<\varepsilon<1/52$.
+The lower prime bound in \texttt{TuSize}, namely
+$p\ge b^{m/2}$, now gives $p\ge b^2$.
+The original rank law is $f\le N$, so (GLE.3) yields
+\[
+ 2fN+1\le2N^2+1<9N^2\le b^2\le p,
+ \qquad 4a_{\max}\le8xb<24xb\le b^2\le p.
+ \tag{GLE.11}
+\]
+For every $j\le m$ one has $N(j)\le N$.  By (GLE.2),
+\[
+ \begin{split}
+ 2\bigl(\lambda_{j,\tau}(r)-\lambda_{j,\tau}(s)+N(j)\bigr)
+ &\le4xb+4b+2N\\
+ &\le6xb<24xb\le b^2\le p.
+ \end{split}                                      \tag{GLE.12}
+\]
+Indeed $N\le b/4$ and $x\ge4$ give $4b+2N\le2xb$.
+This is the literal strict \texttt{Alcove} inequality, for every ordered
+pair of entries.  The last clause $b_{\mathrm{top},\tau}\ge0$ follows
+from GLE1.  Equations (GLE.11)--(GLE.12) prove the original setting,
+including its strict inequalities, on one common threshold.
+
+This proof needs only the lower \texttt{TuGe} part of \texttt{TuSize}.
+The upper bound for $\log p$ and the logarithmic derivative estimate
+are not extra premises.  They occur in the source's stronger general
+$\texttt{NumsL}/\texttt{WtsL}$ supplier, whose remaining conclusions
+are not claimed here.
+% END GLE2
+
+\subsection{The exact polynomial coordinate lattices}
+
+% BEGIN GLE3
+\paragraph{GLE3: integral and rational changes of polynomial coordinates.}
+\label{claim:GLE3}
+For a dominant integral weight $\lambda$ of rank $k$, put
+$s=\lambda_{k-1}$ and $\nu_r=\lambda_r-s$.  Let
+$\Delta_{\nu,\mathbb Z}$ be the original \texttt{delSq} lattice: the
+integer span of all divided-power root words applied to the product of
+principal minors of weight $\nu$.  For a coefficient DVR $\mathcal O_w$
+put
+\[
+ \Lambda_w=\bigotimes_\tau
+       (\mathcal O_w\otimes_{\mathbb Z}\Delta_{\nu_\tau,\mathbb Z}),
+ \qquad V_K=K\Lambda_w.
+ \tag{GLE.13}
+\]
+The tensor variables for different $\tau$ are disjoint.  After the
+stored embedding $K\hookrightarrow\mathbb C$, these are exactly
+\texttt{IntSpan D w (lam 0)} and \texttt{RatSpan D (lam 0)}.
+Indeed the definitions are the additive spans of precisely the pure
+tensors in (GLE.13), with respectively integral-at-$w$ and arbitrary
+$K$ coefficients.  Negative determinant shifts belong to the value
+function, not to this polynomial lattice.
+
+For an invertible matrix $C$, use the source convention
+\[
+ R_\lambda(C)P(Z)=\det(C)^s P(CZ).                 \tag{GLE.14}
+\]
+If $C\in\mathrm{GL}_k(\mathcal O_w)$, then (GLE.14) preserves the
+original integral lattice, with equality; if $C\in\mathrm{GL}_k(K)$,
+it preserves its rational span.  To prove this without changing
+lattices, a transvection $I+cE_{ab}$ acts by the finite Taylor expansion
+$\sum_{r\ge0}c^r E_{ab}^{[r]}$.  Every divided-power root operator
+preserves the span of root words.  A diagonal unit preserves each
+integer row-weight summand, and its determinant shift is a unit even
+when $s<0$.  Gaussian elimination over a local ring factors every
+invertible matrix into transvections, permutations and diagonal units:
+a unit determinant forces a unit entry in the first pivot column after
+a row permutation; eliminate that column and induct.  Row permutations
+are products of transvections and diagonal units.  This proves the
+assertion and its inverse.  The same argument over $K$ proves the
+rational assertion.  Tensoring proves both assertions for independent
+matrices at the different $\tau$.
+
+The lattice $\Delta_{\nu,\mathbb Z}$ has a basis homogeneous in all row
+degrees.  Every generating root word has such a degree, it is a
+submodule of the finite free integer module of polynomials of the
+fixed total degree, and its distinct row-degree pieces have zero
+intersection.  Choose an integer basis of each piece and take their
+union.  If $r_\lambda$ is its rank and $d_j(h)$ is the $j$th row degree
+of the basis element $h$, row permutations give equal total degrees
+in all $k$ rows.  The total degree of every $h$ is $|\nu|$.  Hence
+\[
+ \sum_h(d_j(h)+s)=\frac{r_\lambda}{k}|\lambda|,
+ \qquad d_j(h)+s\ge s.                            \tag{GLE.15}
+\]
+This elementary degree identity, including the shift $s$, will compute
+the local length below.  It needs no semisimplicity in the residue
+characteristic.
+
+Finally, the polynomial-to-value map in the source is injective on
+these coordinates.  Its frames range over all invertible matrices,
+and the determinant factors in \texttt{fnOf} are nonzero.  A polynomial
+vanishing on all such tuples is zero: for any fixed tuple of matrices
+replace each component $Z$ by $Z+tI$.  Its determinant is nonzero for
+all but finitely many $t$.  Here a separate variable $t_\tau$ is used
+for each component.  The resulting polynomial vanishes on a product
+of cofinite sets, hence is zero by induction on the number of
+variables.  Setting all $t=0$ proves the assertion on every tuple.
+The ordinary polynomial identity principle over the infinite field
+$\mathbb C$ finishes the proof.  Therefore the displayed coordinate
+transports are equalities of the actual forms, not merely maps on a
+larger ambient polynomial space.
+% END GLE3
+
+% BEGIN GLE4
+\paragraph{GLE4: exact coordinate descriptions of the original local lattices.}
+\label{claim:GLE4}
+Assume the original level-zero stabilizers are trivial, as in
+\texttt{admS}; RSL7 supplies this from the actual forms in the selected
+application.  Let $\mathcal C$ be the original finite class set.
+For each $c\in\mathcal C$ choose a $p$-local basis $B_c$ of the original
+dual class lattice
+$H_c=\texttt{Ld D u 0 c}$.  The prescribed frame coordinates give a
+$K$-linear isomorphism
+\[
+ V= ((D.\mathrm{fm}\,u).\mathrm{lat}\,0).V
+       \ \simeq\ \bigoplus_{c\in\mathcal C}V_K.
+ \tag{GLE.16}
+\]
+There are no further classwise constraints: the original
+\texttt{cls0.stabI\_range} identifies the compatibility group at $c$
+with its trivial stabilizer.  Arbitrary values at the preferred
+representatives therefore extend uniquely by the original adelic
+equivariance rule.  The \texttt{val0.rat} equality identifies those
+whose coordinates lie in the original rational polynomial span.
+Injectivity is GLE3 and the original injective embedding of $V$.
+Thus both directions of (GLE.16) use the original rational form.
+
+Write $S_w=(D.\mathrm{fm}\,u).S(0,w)$.  In (GLE.16) one has exactly
+\[
+                         S_w=\bigoplus_{c\in\mathcal C}\Lambda_w.
+ \tag{GLE.17}
+\]
+First, two allowed local bases differ, after each relevant embedding,
+by a matrix in $\mathrm{GL}_k(\mathcal O_w)$.  GLE3 therefore converts
+the source's condition ``in every local basis'' into membership in
+$\Lambda_w$ in the chosen basis.  To check the localization itself,
+choose a nonzero integral scalar $d$ with $d z$ in the original global
+lattice.  If $z$ has integral coordinates at $w$, choose
+$t\in\mathcal O_K\setminus w$ which is divisible, at every other prime
+dividing $(d)$, by at least the corresponding valuation of $d$.
+Such $t$ exists by the Chinese remainder theorem, with $t\equiv1$
+modulo $w$.  At $w$, the coordinates of $tz$ remain integral; elsewhere
+$t/d$ is locally integral.  The original \texttt{val0.lat} criterion
+now puts $tz$ in the global lattice, so $z\in S_w$.  Conversely a
+denominator outside $w$ is a unit in every coordinate in (GLE.17).
+This proves the equality without a new lattice choice.
+
+Fix a seen place $w\mid p$ and a selected place $v$ of the original
+\texttt{AtTTied} record.  Put $\tau_v=(D.\mathrm{fm}\,u).\mathrm{tauOf}(w,v)$.
+Let
+\[
+ K_{v,c}=\texttt{Lk}\,\mathcal F.\mathrm{atT}\,0\,v\,c
+        =\texttt{clsCrd}(c)+P_vH_c,
+ \qquad P_v=\mathcal F.\mathrm{atT}.P_v.
+ \tag{GLE.18}
+\]
+Choose a $p$-local basis $B'_{v,c}$ of $K_{v,c}$.  Such bases exist
+because localization at the finitely many primes above $p$ is a
+semilocal Dedekind ring, hence a PID: every ideal is generated by an
+element with its finitely many prescribed valuations.  A finite
+torsion-free module over this ring is free; expressing that basis in
+the original $E$-space gives the required matrix.  The lattices in
+(GLE.18) are full: $H_c$ is a Hermitian dual of a full lattice, and
+$\texttt{clsCrd}(c)\subset K_{v,c}\subset H_c$.
+
+Set $C_{v,c}=(B'_{v,c})^{-1}B_c$ at $\tau_v$, and set $C_{v,c}=1$
+at the other embeddings.  In the same coordinates the original
+neighbor lattice is exactly
+\[
+ B_{w,v}=(D.\mathrm{fm}\,u).\mathrm{Bw}(0,w,v)
+       =\bigoplus_c R_{\lambda_{0,\tau_v}}(C_{v,c})\Lambda_w.
+ \tag{GLE.19}
+\]
+The forward implication is the original \texttt{bw0} clause.
+For the reverse implication, each right-hand coordinate is a rational
+polynomial by GLE3, since the entries of the basis matrices are in $E$
+and the stored embedding is $K$-valued.  Use (GLE.16) to realize those
+coordinates in $V$.  Changing either local basis changes the mixed
+coordinate matrix by integral invertible matrices at the appropriate
+embeddings.  GLE3 preserves $\Lambda_w$ under those changes, so all
+the bases quantified in \texttt{bw0} satisfy the required condition.
+This proves surjectivity as well as inclusion in (GLE.19).
+
+In particular, if $r$ is the rank of the tensor lattice $\Lambda_w$,
+then the literal source dimension is
+\[
+                  d_S=D.\mathrm{duS}(u)=|\mathcal C|r.
+ \tag{GLE.20}
+\]
+The original \texttt{emb\_basis} identifies scalar extension of $V$
+with the complex forms; GLE3 and (GLE.16) calculate its dimension.
+No identification of $d_S$ with the smaller ramified dimension is made.
+% END GLE4
+
+\subsection{Integral maps and the second branch on those lattices}
+
+% BEGIN GLE5
+\paragraph{GLE5: the two original Hecke operators are integral.}
+\label{claim:GLE5}
+Supply the same original $\mathcal F$, its finite level character with
+values in $K$, and \texttt{admS}.  For each seen $w\mid p$ and every
+selected $v$, the original operators satisfy
+\[
+              U_v(B_{w,v})\subseteq S_w,
+              D_v(S_w)\subseteq B_{w,v}.           \tag{GLE.21}
+\]
+They are $K$-rational operators on $V$.  This is the complete literal
+\texttt{HeckeIntegralLevelZero}; it in particular proves the
+source's version with the additional \texttt{HidaSetting} hypothesis.
+
+We verify the geometric and coefficient parts separately on the same
+move.  Work at $P_v$ and use the original residue map.  We first check
+the precise uniformizer assertion, following the elementary norm
+argument of FC1.  There are $f$ distinct selected primes, each of
+residue cardinality $p$, and every one divides $\pi_u$.  The original
+host has degree $[E:\mathbb Q]=2f$ and
+$\pi_u\bar\pi_u=p$.  Thus the absolute ideal norm of $(\pi_u)$ is
+$p^f$: its square is the norm $p^{2f}$ of $(p)$, and conjugation
+preserves ideal norm.  The $f$ displayed primes already account for
+this whole norm.  Each therefore occurs in $(\pi_u)$ with exponent
+one.  The original nonzero residue of $\bar\pi_u$ makes it a unit at
+each of them.  Consequently $p$ has valuation one at $P_v$, and
+$P_v\mathcal O_{E,P_v}=p\mathcal O_{E,P_v}$.
+Write $H$ for the localized $H_c$, and let $z$ lift an up index with
+$f(z)=1$.  The exact up naturality fields, already reconstructed in
+NB2 and NB7, say that its rational unitary transport $\gamma$ identifies
+\[
+ \gamma\,\texttt{clsCrd}(c^+)=H,\qquad
+ \gamma H_{c^+}=H+\mathcal O_{E,P_v}p^{-1}z.
+ \tag{GLE.22}
+\]
+Consequently
+\[
+ \gamma (K_{v,c^+})_{P_v}
+   =H+p\bigl(H+\mathcal O_{E,P_v}p^{-1}z\bigr)=H.
+ \tag{GLE.23}
+\]
+For a down index $g$ with $g(t_e)=1$, NB3 and NB8 identify the original
+transport by
+\[
+             \gamma(H_{c^-})_{P_v}
+                     =(\texttt{clsCrd}(c))_{P_v}=(K_{v,c})_{P_v}.
+ \tag{GLE.24}
+\]
+For the last equality, $pH_c\subseteq\texttt{clsCrd}(c)$ follows from
+the original base-lattice dual bound.  At each selected place $v'\ne v$
+the transported dual lattices are equal, because the adelic move is
+the identity there and the residual level factor preserves the base
+lattice and its Hermitian dual.  To descend that completed equality
+to rational localization, clear the finitely many denominators at the
+moved place with an element which is a unit at $P_{v'}$.  Equivalently,
+the two rational lattices have identical localizations away from the
+support of their finite quotient.  This proves the exact
+\texttt{AwayLat0} assertion used by the source.
+
+Let $B_{\rm in}$ denote the appropriate incoming base or neighbor
+basis, and $B_{\rm out}$ the outgoing one.  Equations (GLE.23)--(GLE.24)
+and their away-place versions say precisely that
+\[
+       B_{\rm in}^{-1}\gamma^{-1}B_{\rm out}
+                \in\mathrm{GL}_k(\mathcal O_{E,P_{v'}})
+ \tag{GLE.25}
+\]
+at the prime indexed by each $v'$.  Its inverse is integral too.
+Here the place dictionary on the CM field deserves a check:
+\texttt{tauOf} states a residue equality on the totally real field,
+whereas these matrices have entries in $E$.  Let $\nu$ be the
+$w$-valuation after the stored embedding $E\to K$ at
+$\tau=(D.\mathrm{fm}\,u).\mathrm{tauOf}(w,v')$.  It is nonnegative on
+$\mathcal O_E$.  The original \texttt{seenP} gives $\nu(\pi_u)>0$.
+The element $\pi_u+\bar\pi_u$ lies in the totally real field and has
+nonzero residue at $P_{v'}$.  Thus \texttt{tauOf} gives it valuation
+zero, and hence $\nu(\bar\pi_u)=0$.  If $y\in P_{v'}$, then
+$y\bar\pi_u+\bar y\pi_u$ is totally real and has zero residue.
+Its valuation is positive, as is that of $\bar y\pi_u$; subtraction
+shows $\nu(y\bar\pi_u)>0$, so $\nu(y)>0$.
+If $b\notin P_{v'}$, choose $a\in\mathcal O_E$ with
+$ab-1\in P_{v'}$.  Were $\nu(b)>0$, both $ab$ and $ab-1$ would have
+positive valuation, a contradiction.  Thus $\nu(b)=0$.
+It follows that $\mathcal O_{E,P_{v'}}$ maps to $\mathcal O_w$,
+with every denominator outside $P_{v'}$ mapping to a unit.  Applying
+this to the matrix and its inverse in (GLE.25) gives an integral
+invertible coefficient matrix at every $\tau$.
+
+The original function transport is
+$\chi(\kappa)^{-1}$ times substitution by $\gamma^{-1}$ for the
+source's factorization $\gamma y_{c'}=y_c\eta\kappa$, including
+the determinant powers in (GLE.14).  Its character factor is a unit
+at every coefficient place: if $\chi(\kappa)=\iota_K(r)$ and
+$\chi(\kappa)^q=1$ with $q>0$, injectivity gives $r^q=1$;
+both $r$ and $r^{-1}$ are algebraic integers.  GLE3 applied to
+(GLE.25) therefore sends each integral incoming polynomial to an
+integral outgoing polynomial.  This is valid for every choice of
+local bases, so GLE4 identifies the resulting conditions with the
+actual lattices in (GLE.21).
+
+Finally the operators are the original finite sums
+\[
+ (U_v\phi)(c)=\sum_{z:f_v(z)=1}\operatorname{upT}_{v,c,z}
+                         \phi(c^+_z),\qquad
+ (D_v\phi)(c)=\sum_{g:g(t_e)=1}\operatorname{dnT}_{v,c,g}
+                         \phi(c^-_g).             \tag{GLE.26}
+\]
+There is no averaging denominator.  Naturality identifies these sums
+with the finite adelic translates, and changing a representative
+permutes their residue indices.  They consequently remain in the
+same complex forms space.  Every summand has a $K$-rational
+polynomial value: $\gamma$ is over $E$, its stored embeddings take
+values in $K$, and the character factor is in $K$.  The reverse
+direction of the original \texttt{val0.rat} condition therefore places
+the sum in the original $V$.  Summing the integral coordinate
+conditions proves both inclusions in (GLE.21), with exactly the
+source's \texttt{Into} preimages under its injective embedding.
+% END GLE5
+
+% BEGIN GLE6
+\paragraph{GLE6: the exact second-branch inclusion and length.}
+\label{claim:GLE6}
+For the same original forms and trivial stabilizers, fix seen $w\mid p$
+and $v$, and put
+$b_v=(D.\mathrm{fm}\,u).bTop(\tau_v)=-\lambda_{0,\tau_v}(k-1)$.
+If $b_v\ge0$, then
+\[
+ \begin{split}
+ p^{b_v}S_w&\subseteq B_{w,v},\\
+ \ell_{\mathcal O_w}(B_{w,v}/p^{b_v}S_w)
+   &=\frac{e_wd_S}{k}
+           \bigl(|\lambda_{0,\tau_v}|+kb_v\bigr).
+ \end{split}                                      \tag{GLE.27}
+\]
+In particular the displayed rational number is a nonnegative integer.
+This is the full original \texttt{SecondBranchInclusionLength}.
+
+The original residue functional on $H_c$ is nonzero, has scalar
+residue-field target of cardinality $p$, and has kernel $K_{v,c}$.
+This is exactly \texttt{lv0.fv\_ker}; surjectivity follows by scaling
+one nonzero value.  Thus, over $\mathcal O_{E,P_v}$, this is a
+colength-one sublattice of $H_c$.  Choosing a lift $z_0$ with
+$f(z_0)=1$ and lifting a basis of its kernel gives bases with relative
+matrix $\operatorname{diag}(p,1,\ldots,1)$.  The prime $p$ has valuation
+one here, as in GLE5.  Any chosen global $p$-local bases have the same
+Smith form after localization.  Under the original embedding at
+$\tau_v$, their relative matrix therefore has the form
+\[
+ B_c^{-1}B'_{v,c}
+       =A_c\operatorname{diag}(p,1,\ldots,1)C_c,
+       \qquad A_c,C_c\in\mathrm{GL}_k(\mathcal O_w).
+ \tag{GLE.28}
+\]
+This description is made only in the coefficient DVR for computing
+the existing lattices; it does not replace their global bases.
+The other factors in the tensor representation are unchanged.
+
+By GLE3, the unit matrices in (GLE.28) preserve $\Lambda_w$, and
+also preserve its scalar multiple $p^{b_v}\Lambda_w$.
+It suffices to calculate the quotient with the inverse diagonal
+matrix in (GLE.19).  In a homogeneous row-degree basis, its entries
+are $p^{-\beta_h}$, where
+$\beta_h=d_1(h)+\lambda_{0,\tau_v}(k-1)$.
+For every such basis element,
+$b_v+\beta_h=d_1(h)\ge0$.  Thus the inclusion holds and its elementary
+divisor has length $e_w(b_v+\beta_h)$.  Tensor the basis with the
+bases of the other factors and use (GLE.15).  On one class the length
+is
+\[
+                  e_wr\bigl(b_v+|\lambda_{0,\tau_v}|/k\bigr).
+\]
+Sum over the same finite class set and use the exact identity
+$d_S=|\mathcal C|r$ from (GLE.20).  This proves (GLE.27), including
+finiteness and the exact normalization by $e_w$ and $k$.
+The determinant shift is essential: omitting it would give the wrong
+index when the lowest weight is negative.
+% END GLE6
+
+\subsection{The finite local calculation on the original ramified forms}
+
+% BEGIN GLE7
+\paragraph{GLE7: diamond matchings and the exact local move dictionary.}
+\label{claim:GLE7}
+Fix a selected place $v$, write $\mathbb F=\mathbb F_p$ for its
+original residue field, and localize the original lattices at $P_v$.
+Write $H$ for the dual lattice, $L$ for the primal lattice, and
+$f:H/pH\to\mathbb F$ for the original nonzero functional.  The
+source's \texttt{fv\_ker} identifies $L/pH$ with $\ker f$, so
+$pH\subset L\subset H$.  Put $V_0=L/pL$, of dimension $k$, and
+choose $z_0\in H$ with $f(z_0)=1$.  Its original distinguished vector is
+\[
+                         t_e=pz_0\pmod {pL}\ne0.                 \tag{GLE.30}
+\]
+This is independent of $z_0$: two such lifts differ by an element of
+$L$.  Nonvanishing follows because $pz_0\in pL$ would put $z_0\in L$.
+The prescribed residue projections identify this $V_0$ and $t_e$
+with \texttt{lk} and \texttt{te}, without a choice of a new residue
+space.
+
+The original local moves have the following precise description.
+An up index is $z\in H/pH$ with $f(z)=1$.  After its original rational
+transport the new dual lattice is $H+p^{-1}\mathcal O z$, the new
+primal lattice is $H$, and the new functional is
+\[
+                         f^+(y)=f(py).
+\]
+An arbitrary down index is a nonzero functional $g\in V_0^*$.
+After its original transport the new dual lattice is $L$, its new
+primal lattice is the inverse image of $\ker g$ in $L$, and the new
+functional is $g$.  The ordinary down operator restricts these
+indices by $g(t_e)=1$; the auxiliary operator $E_v$ uses all
+$g\ne0$.  These are the local equalities of NB2--NB3 and NB7--NB8.
+At the conjugate prime the data are fixed by Hermitian duality;
+at every other prime they are unchanged.
+
+The original diamond indexed by $a\in\mathbb F^\times$ replaces
+$f$ by $af$ and leaves $H,L$ unchanged.  It replaces $t_e$ by
+$a^{-1}t_e$.  In an up sum the bijection $z\mapsto a^{-1}z$
+preserves the enlarged lattice and multiplies the resulting
+functional by $a$.  In a down sum the bijection $g\mapsto ag$
+preserves the condition $g(t_e)=1$ after this change of $t_e$, and
+again multiplies the resulting functional by $a$.
+These give, on the original forms,
+\[
+ \rho_{v,a}U_v=U_v\rho_{v,a},\qquad
+ \rho_{v,a}D_v=D_v\rho_{v,a},\qquad E_v\rho_{v,a}=E_v.          \tag{GLE.31}
+\]
+For the last equality, all nonzero functionals occur, and multiplication
+by $a$ simply permutes them.  At two distinct selected places the
+local moves have disjoint support.  Their finite-adelic matrices
+commute componentwise, which proves the corresponding commutations
+of $U_v,D_v$ with every $\rho_{v',a}$ for $v'\ne v$.
+
+We check why these identifications are equalities of transported
+values, rather than only equalities of lattice shapes.  Work at the
+original preferred adelic representative and use moves supported at
+the place in question.  If their final dual lattice, primal lattice
+and functional agree, the ratio of the two move matrices stabilizes
+these data.  The original \texttt{UlocAlt} and \texttt{U\_eq}
+identify this stabilizer with the original level subgroup.  Its
+components away from the moved place are the identity.  The selected
+place is disjoint from the two auxiliary bad primes: RSL8 proves this
+from $\pi_u\equiv1$ modulo $(g_0g_1)^2$ and
+$\pi_u\bar\pi_u=p$.  The original \texttt{chi\_triv} therefore
+makes the level character of the ratio equal to one.  Adelic
+equivariance gives equal values, with no residual scalar.
+Factoring the moves through the prescribed class representatives
+introduces the same natural transforms as in (GLE.26), so it does
+not alter the equality.  This also proves preservation of the
+original forms space by $U_v,D_v,E_v$ and the diamonds: changing a
+level representative permutes the displayed finite indices and
+uses this same equivariance.  No transitivity or approximation
+assertion for a different class space is being invoked.
+% END GLE7
+
+% BEGIN GLE8
+\paragraph{GLE8: the actual $DU$ formula by finite fibers.}
+\label{claim:GLE8}
+Continue with exactly the preceding local data.  First make a down
+move indexed by $g\ne0$, then an up move from its new dual lattice
+$L$.  The original down transport identifies the latter residue
+space with $V_0=L/pL$.  Thus its up indices are in bijection with
+\[
+                         \{y\in V_0:g(y)=1\}.                  \tag{GLE.32}
+\]
+Both directions use the original residue projections: a lift of $y$
+in $L$ pulls back to a lift in the down dual lattice, and two lifts
+give the same index exactly when their difference lies in $pL$.
+The projection is surjective and has this kernel by \texttt{prk}
+and \texttt{prk\_ker}.  This verifies the whole bijection, including
+its uniqueness.
+
+For a nonzero $y\in V_0$ choose a lift $\widetilde y\in L$.
+After the two transports the final dual and primal lattices and
+functional are
+\[
+ H_y=L+p^{-1}\mathcal O\widetilde y,\qquad L_y=L,
+ \qquad h_y(l+c p^{-1}\widetilde y)=\bar c.                    \tag{GLE.33}
+\]
+Here $\bar c$ denotes reduction to $\mathbb F$.
+Indeed the up functional is $g(p\,\cdot)$, and $g(y)=1$;
+its kernel in $H_y/pH_y$ is the image of $L$.
+The expression is well defined: if $c p^{-1}\widetilde y\in L$,
+then $\bar c\,y=0$, hence $\bar c=0$.
+Changing the lift by $pL$ does not change any of these data.
+In particular the endpoint depends only on $y$, not on $g$.
+The conjugate local component is determined by its Hermitian dual,
+and all other components are unchanged.  The character-one
+comparison in GLE7 therefore proves equality of the actual
+transported form values.  Denote that common value, at a fixed class
+and frame, by $W(y)$.
+
+For $y=t_e$, (GLE.33) gives the original $H,L,f$, so $W(t_e)=\phi$.
+For $y=a t_e$ with $a\ne0$ it gives $H,L,a^{-1}f$.  Thus
+$W(a t_e)=\rho_{v,a^{-1}}\phi$ at that class and frame.  In
+particular
+\[
+             \sum_{a\in\mathbb F^\times} W(a t_e)
+                       =\operatorname{Nm}_v\phi,\qquad
+             \operatorname{Nm}_v=\sum_a\rho_{v,a}.             \tag{GLE.34}
+\]
+The inversion in this formula records the literal source diamond
+convention.
+
+It remains to count fibers, a calculation in the $k$-dimensional
+space $V_0$.  If $y\ne0$, choosing a basis beginning with $y$
+shows that exactly $p^{k-1}$ functionals satisfy $g(y)=1$;
+none of them is zero.  For $y=0$ there are none.
+Requiring in addition $g(t_e)=1$ gives
+\[
+ \#\{g:g(t_e)=g(y)=1\}=
+ \begin{cases}
+ p^{k-1},&y=t_e,\\
+ 0,&y\in\mathbb F t_e, y\ne t_e,\\
+ p^{k-2},&y\notin\mathbb F t_e.
+ \end{cases}                                                  \tag{GLE.35}
+\]
+The middle case follows by linearity.  In the last case extend
+$t_e,y$ to a basis; two coordinates of $g$ are fixed and the other
+$k-2$ are arbitrary.  The original ranks have $k\ge5$, so the
+exponents are ordinary nonnegative integers.
+
+Expanding the exact finite sums, reindexing by (GLE.32), and using
+(GLE.35) now gives
+\[
+ \begin{split}
+ D_vU_v\phi&=p^{k-1}\phi+
+                   p^{k-2}\sum_{y\notin\mathbb F t_e}W(y),\\
+ E_vU_v\phi&=p^{k-1}\sum_{y\ne0}W(y).
+ \end{split}
+\]
+Subtract the line contribution (GLE.34).  With the original
+normalization $\operatorname{trp}_v=p^{-(k-1)}E_vU_v$, the result is
+\[
+ D_vU_v\phi=p^{k-1}\phi-p^{k-2}\operatorname{Nm}_v\phi
+                              +p^{k-2}\operatorname{trp}_v\phi. \tag{GLE.36}
+\]
+Every step holds at each original class and frame, so this is an
+identity in the original forms space.  It is the complete literal
+\texttt{DUFormulaLevelZero}; its proof has supplied the move,
+fiber, endpoint and scalar identifications needed for that formula.
+% END GLE8
+
+% BEGIN GLE9
+\paragraph{GLE9: the inverse composite on the original ramified space.}
+\label{claim:GLE9}
+Let
+\[
+ M^{\rm ram}=\mathcal F.\mathrm{Fi}(0)\cap
+                  \bigcap_{v'}\ker\operatorname{Nm}_{v'}
+                    =\texttt{MramI D u 0}.
+\]
+The commutations (GLE.31), including those at distinct places,
+show that $U_v$ and $D_v$ preserve every displayed kernel and the
+forms space.  Moreover (GLE.31) gives
+\[
+ \operatorname{trp}_v\rho_{v,a}
+       =p^{-(k-1)}E_vU_v\rho_{v,a}
+       =p^{-(k-1)}E_v\rho_{v,a}U_v
+       =\operatorname{trp}_v.
+\]
+For $\phi\in M^{\rm ram}$ this implies
+\[
+ 0=\operatorname{trp}_v(\operatorname{Nm}_v\phi)
+                 =(p-1)\operatorname{trp}_v\phi.
+\]
+Since $p$ is a prime, $p-1\ne0$ in $\mathbb C$, and hence
+$\operatorname{trp}_v\phi=0$.  Equation (GLE.36) reduces to
+$D_vU_v\phi=p^{k-1}\phi$.
+
+The original forms space is finite dimensional by its original
+\texttt{emb\_basis}, so its subspace $M^{\rm ram}$ is too.
+The last identity makes $U_v$ injective there.  A linear injective
+endomorphism of a finite-dimensional space is surjective, and
+therefore $D_v=p^{k-1}U_v^{-1}$ on this same space.  Consequently
+\[
+ U_v(M^{\rm ram})\subseteq M^{\rm ram},\qquad
+ D_v(M^{\rm ram})\subseteq M^{\rm ram},\qquad
+ U_vD_v\phi=p^{k-1}\phi\quad(\phi\in M^{\rm ram}).             \tag{GLE.37}
+\]
+This is exactly \texttt{HeckeRamifiedLevelZero}, with $k=N(0)$.
+No change of the ramified subspace, of the finite character, or of
+the preferred representative system has occurred.  The proof uses
+the original \texttt{Forms0} ties; neither a new abstract Hecke
+module nor an additional matching predicate is required.
+% END GLE9
+
+\subsection{The original congruence lattice and its length}
+
+% BEGIN GLE10
+\paragraph{GLE10: a DVR estimate for one normalized original operator.}
+\label{claim:GLE10}
+Let $\mathcal O=\mathcal O_w$, let $e=e_w$ be the valuation of $p$,
+and write $S=S_w$, $B=B_{w,v}$, $W=\mathcal F.\mathrm{ramSub}$.
+The rationality in GLE5 descends the two original operators uniquely
+to $K$-linear operators on $V$.  Their descent is unique because
+the original embedding is injective.  GLE9 and the original
+\texttt{ramSub} equality make both descend to $W$, with
+$UD=p^{k-1}I$ there.  Put
+\[
+ R=S\cap W,\qquad B_R=B\cap W,\qquad b=b_v\ge0,
+ \qquad G=p^bU.
+\]
+Thus $R$ is the original \texttt{Sram}, not a substitute lattice.
+The equalities $p^bR=(p^bS)\cap W$ and
+$U(p^bR)=p^bU(R)$ follow because $W$ is a $K$-subspace.
+GLE5--GLE6 and GLE9 give
+\[
+ p^bR\subseteq B_R,\qquad U(B_R)\subseteq R,\qquad
+ D(R)\subseteq B_R,\qquad
+ p^{k-1}R\subseteq U(B_R).
+\]
+In particular $G(R)\subseteq R$.
+
+All these are finitely generated torsion-free modules over a DVR,
+hence free.  Multiplication by $p$ has cokernel length $e$ on each
+free generator.  The last inclusion gives
+\[
+ \ell(R/U(B_R))\le e(k-1)\operatorname{rank}_{\mathcal O}R
+                                       \le e(k-1)d_S.
+\]
+The natural injection
+$B_R/p^bR\hookrightarrow B/p^bS$ shows
+$\ell(B_R/p^bR)\le\ell(B/p^bS)$.
+Applying $U$ gives a surjection
+$B_R/p^bR\twoheadrightarrow U(B_R)/U(p^bR)$, so the same upper
+bound holds for the latter quotient.  The exact sequence of the
+three nested modules
+$U(p^bR)\subseteq U(B_R)\subseteq R$ therefore yields
+\[
+ \ell(R/G(R))\le
+      \ell(B/p^bS)+e(k-1)d_S
+   =e d_S\left(\frac{|\lambda_{0,\tau_v}|+kb_v}{k}+k-1\right).
+                                                               \tag{GLE.38}
+\]
+The term on the left is finite; each step has just exhibited a
+finite-length quotient that bounds it.  The rank inequality uses
+only $\operatorname{rank}R\le\dim_K V=d_S$, established on the
+original coordinates in GLE4.  This independently proves the
+source's local \texttt{LemmaC\_core} estimate with the exact
+original dimension and normalization.
+% END GLE10
+
+% BEGIN GLE11
+\paragraph{GLE11: the ordered product, its power, and the complete length bound.}
+\label{claim:GLE11}
+Assume \texttt{HidaSetting D u} and fix $w\mid p$.
+Let $\mathcal V_w$ be the original \texttt{VVT}: it consists of the
+selected places whose $\tau_v$ is top if $w$ is seen, and is empty
+otherwise.  On this set $b_v\ge0$ by the last clause of
+\texttt{HidaSetting}.  For seen $w$ let $G_v=p^{b_v}U_v$ on the
+same $R=\texttt{Sram D u w}$.  GLE10 applies to every $v$.
+
+We spell out the finite-index argument to avoid any commutativity
+assumption about the chosen order.  If $A(R),B(R)\subseteq R$, then
+$A(R)/AB(R)$ is a quotient of $R/B(R)$ under $A$.  The exact
+sequence with submodule $A(R)/AB(R)$ gives
+\[
+ \ell(R/AB(R))\le\ell(R/A(R))+\ell(R/B(R)).                    \tag{GLE.39}
+\]
+Induct over the original \texttt{toList.foldr} order and then over
+the $m$ powers.  The resulting operator $G_*$ satisfies
+\[
+ G_*^m(R)\subseteq R,\qquad
+ \ell(R/G_*^m(R))\le
+ m e_wd_S\sum_{v\in\mathcal V_w}
+       \left(\frac{|\lambda_{0,\tau_v}|+kb_v}{k}+k-1\right).
+                                                               \tag{GLE.40}
+\]
+Scalars commute with all linear maps, so, in that very same order,
+\[
+ G_*^m=p^{m\sum_{v\in\mathcal V_w}b_v}
+       \left(\prod_{v\in\mathcal V_w}^{\rm original\ order}U_v\right)^m.
+\]
+The exponent and product are literally \texttt{expT} and
+\texttt{Uprod}.  The source's definition of \texttt{imgL}, together
+with the unique rational descent in GLE10, therefore identifies
+\[
+              G_*^m(R)=\texttt{Nlam D u w}.                    \tag{GLE.41}
+\]
+This is equality of submodules of the original rational $V$.
+
+For completeness, the weight simplification in the stated source
+bound is also elementary.  At a top $\tau$, the first entry is
+at most $a_{\max}$, and the absolute values of every later entry
+are at most the source's $\operatorname{Wt}(\tau)$.  The last
+entry has absolute value $b_v\le\operatorname{Wt}(\tau)$.
+Thus
+\[
+ \frac{|\lambda_{0,\tau}|+kb_v}{k}
+ \le \frac{a_{\max}}k+
+       \frac{k-1}{k}\operatorname{Wt}(\tau)+b_v
+ \le \frac{a_{\max}}k+2\operatorname{Wt}(\tau).
+\]
+Here $|\lambda|$ continues to denote the signed sum of its entries,
+not their absolute-value sum.  Using $k-1\le k$ and $b_v\ge0$ in
+(GLE.40) proves the exact, slightly looser source bound
+\[
+ \begin{split}
+ \texttt{Nlam D u w}&\subseteq\texttt{Sram D u w},\\
+ \ell(\texttt{Sram}/\texttt{Nlam})
+ &\le e_w m d_S
+   \sum_{v\in\mathcal V_w}
+     \left(\frac{a_{\max}}k+2\operatorname{Wt}(\tau_v)+k+b_v\right).
+ \end{split}                                                  \tag{GLE.42}
+\]
+The length is a natural number, as proved in (GLE.40).
+If $w$ is unseen, the original list is empty, its product is the
+identity, and its exponent is zero.  Hence \texttt{Nlam} equals
+\texttt{Sram} and both sides of the required length inequality are
+zero.  This handles that case without presupposing a seen place.
+Equations (GLE.41)--(GLE.42) are the complete literal
+\texttt{CongruenceLatticeLengthBound D u}.
+% END GLE11
+
+% BEGIN GLE12
+\paragraph{GLE12: uniform installation and the remaining common producer.}
+\label{claim:GLE12}
+The logical roles of the preceding statements are distinct.
+GLE1--GLE2 prove
+\[
+             \texttt{TuSize}(\mathcal D)
+                 \Longrightarrow\texttt{SettingEventually}(\mathcal D)
+                                                               \tag{GLE.43}
+\]
+for the actual family with its original parameter witnesses.
+GLE5, GLE9 and GLE6 respectively prove the literal pointwise
+\texttt{HeckeIntegralLevelZero}, \texttt{HeckeRamifiedLevelZero},
+and \texttt{SecondBranchInclusionLength} from the same original
+\texttt{Forms0}, its finite $K$-valued level character and
+\texttt{admS}.  The second-branch statement retains its explicit
+$b_v\ge0$ hypothesis.  GLE11 consumes these three statements and
+\texttt{HidaSetting}, on the same $D,u$, to produce the complete
+congruence lattice length bound.
+
+In the selected application the original
+\texttt{RealPlaceSecondLayerConditions} supplies, eventually, the
+same \texttt{FormsTiedSym}, its \texttt{ChiFin} data, and the
+required real-place ties.  RSL6 fixes the common original selector;
+RSL7 supplies \texttt{admS} on those forms.  Take the maximum of
+that supplier threshold and the threshold in GLE2.  It is chosen
+before $i$, before the word $u$, and before the places $w,v$.
+The pointwise proofs above are uniform in all of these variables.
+Thus the original guarded family predicate is satisfied for each
+of the three operator conclusions:
+\[
+ \exists A\ \forall x\ge A\ \forall i\ \forall u,
+ \quad \mathcal D.x_1<x\ \Longrightarrow
+ \bigl(\texttt{HidaSetting}(D_{x,i},u)\Longrightarrow
+          P(D_{x,i},u)\bigr).                                  \tag{GLE.44}
+\]
+This is the literal \texttt{FamU} guard and quantifier order.
+One may then discharge its guard using (GLE.43), on the same late
+family.  Maxima of finitely many thresholds do not change the
+family, its class constants, any parameter witness, or the
+selector.  Accordingly this also transports to the source's
+\texttt{Closed} predicates whenever those upstream predicates are
+supplied on a class.  It does not choose a fresh family separately
+for the three conclusions.
+
+The five implication tasks
+\texttt{TASK\_GL6\_SIZE\_SETTING},
+\texttt{TASK\_GL6\_INTEGRAL},
+\texttt{TASK\_GL6\_RAMIFIED},
+\texttt{TASK\_GL6\_SECOND\_BRANCH}, and
+\texttt{TASK\_GL6\_CONGRUENCE\_LENGTH} are thereby closed in this
+stated scope.  The first now composes with the original construction
+class's \texttt{TuSize} producer; the other four retain the
+original same-selector forms and finite-character input as explicit
+upstream columns.  The compatible common selector remains a
+producer obligation, and this chapter does not assert the GL4
+$hZ_a,hZ_b,t_{CV}$ inputs or the entire eleven-field
+\texttt{FamGLmin} output.  Once their separate inputs are supplied,
+the present conclusions are available on exactly the original
+families required for that final assembly.  RSL11--RSL12 may also
+reuse the inclusion in (GLE.42) to obtain their already proved
+fullness conclusion without a separate congruence-lattice inclusion
+producer.
+% END GLE12
+
+

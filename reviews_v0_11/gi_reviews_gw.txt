@@ -1,0 +1,154 @@
+INDEPENDENT REVIEW: GW1, GW4--GW6, WITH THEIR FINITE-AVERAGE INTERFACES
+===================================================================
+Reviewer: /root/remarks_math. Date: 2026-11-21.
+Pinned source commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+This is a scoped mathematical/source review, not a Lean compilation.
+
+Observed component bytes
+------------------------
+v0_11/global_weight_choice/main.tex
+  SHA256 d20a4d8d21f5cd7acb3b7f13cfbbe69dd5ab4d65641aec4fddba68a27b127805
+v0_11/global_weight_choice/report.txt
+  SHA256 f185ce730ffe9adc4fce981f37ba2ad9727c1081778389feec173f14e88ec514
+
+Verdict
+-------
+The reviewed arguments pass. No substantive error, missing numerical
+premise, or required correction was found. In particular, the weaker
+harmonic bound suffices for the actual WReq coefficients, and the
+ChosenW/ChosenWS distinction is preserved correctly. The statement is
+conditional on the literal family data and, for ChosenWS, the separate
+CoverAll property; it does not construct that global family.
+
+GW1: thresholds and the actual integer boxes
+--------------------------------------------
+I checked the literal SizeN, SizeM, SizeK and SizeTT substitutions and
+the distinction between m_ch and the local coefficient-rank parameter.
+The displayed bounds are valid weakenings:
+  k <= x^6,
+  m_ch <= x^(1/2+eps/100),
+  |TT| <= 2 x^(2+8eps+eps/100),
+  N1 <= Ce log x.
+Because eps, rG and the coefficient vector are fixed before x, the
+conditions K.kII rG^2 <= x^8 and Cm Ce log x <= x are uniform in the
+family index. They give the two required coefficients exactly:
+  K.kII rG^2 k x^(-26) <= x^(-12),
+  Cm N1/x^13 <= x^(-12).
+
+The first box has width a/(kx^13) >= 1 from a >= x^19 and k <= x^6.
+The second has width Nstar x^eps Lambda b'/k >= 1 because Nstar >= 1,
+Lambda >= 1 and b' >= x^6 >= k. The proposed sufficient inequalities
+  x^(eps/3) <= x^eps/2,
+  x^eps/2 >= 5 log x
+indeed imply log b' = log x+x^eps-x^(eps/3) >= 6 log x.
+The lower estimate for Nstar has positive exponent
+  2+(8-1/100-1/8)eps.
+The rounding implication width >= 1 => ceil(lower) <= floor(upper)
+is correct, including integer endpoints. No limiting or probabilistic
+assumption is needed to make the boxes nonempty.
+
+GW2--GW3: interfaces needed by the requested checks
+---------------------------------------------------
+I read these paragraphs and checked their use of the actual definitions
+in IsResidueClassZero.lean (Cand, Sig, winA, winB, boxLoc, meanLoc,
+MeanKappaBound). The small-prime deficit is nonnegative and independent
+of the degrees. The large-prime mean is precisely the canonical
+universal-deficit mean supplied by GI8, with local numerical/band input
+from GI5--GI6. No choice of a different certificate at each weight is
+silently exchanged with the source's canonical infimum.
+
+For a fixed orbit, the injection identifies its selected set with a
+subset of TT. Hence every local pair has exactly
+  |Ia|^(|TT|-Nv) |Ib|^(|TT|-Nv)
+global extensions. Dividing finite sums by cardinalities proves the
+claimed marginal equality. Summing Nv over disjoint good orbit fibres
+gives <= |TT|, so E Sigma_p <= m_ch |TT| x^(-12). This argument uses
+linearity only; no independence across distinct primes is assumed.
+
+GW4--GW5: harmonic sum, exponent and literal WReq
+------------------------------------------------
+Put t=x^(eps/3)>=1 and M=ceil(exp t)-1. Then M>=1, M<exp t, and every
+candidate prime is among the positive integers <= M. Thus
+  sum_p log(p)/p <= t H_M <= t(1+log M) <= t(1+t) <= 2t^2.
+The integral bound H_M <= 1+log M includes M=1. It needs no statement
+about the distribution of primes.
+
+For s>=0 the pointwise inequality 1_{s>x^(-eps)} <= x^eps s holds,
+with the correct strict threshold. It yields
+  E Z <= (x^eps+1) m_ch |TT| x^(-12) 2x^(2eps/3)
+      <= 8 x^(-19/2+(1453/150)eps).
+I recomputed the epsilon coefficient:
+  1 + 1/100 + 8 + 1/100 + 2/3 = 1453/150.
+The constant coefficient is 1/2+2-12 = -19/2. Consequently
+  gamma = 1/2-(1453/150)eps > 2447/7800 > 0
+under the strict source assumption eps<1/52. The threshold
+32x^(-gamma)<=1 gives E Z <= x^(-9)/4 as asserted.
+
+The source WReq is exactly the weighted sum with coefficients 2 on
+the exceptional indicator and 4 on Sigma. Since 2I+4Sigma <=
+4(I+Sigma), one pair with Z <= x^(-9)/4 satisfies WReq. Nonempty
+finite averaging gives such a pair without any extra compactness or
+measurability hypothesis. The source MeanEx is the conjunction of
+nonnegativity on candidate primes and existence of this same Z bound;
+both clauses are provided. The report correctly avoids claiming a
+pointwise small deficit at every prime.
+
+GW6: actual family transport and the coverage boundary
+------------------------------------------------------
+I compared the report with the fields in FamCore.lean and ParConsts.lean,
+the source pg_* transport lemmas in PowFourLtCeilThresholdPrime.lean,
+the chosenW_of proof in LossRequirementsOfSmallShares.lean, and the
+literal ChosenW/ChosenWS/chosenWS_of_cover declarations.
+
+1. Ix_win supplies i0 for x in Win. The value map is injective on the
+   frame, so TT_eq transports the chosen functions to the common
+   finite set TTn(x), with zero extension outside it.
+2. bTop_eq and the final ParametersFill equality LaG=Lambda give
+   precisely winB=winBz, not merely an inclusion. Choosing a finite
+   place above 2 to instantiate fills is legitimate for the actual
+   number-field setting and agrees with pg_LaG. winA agrees by its
+   definition and the shared scale.
+3. R_eq identifies the frame and hence n,k,m_ch and addition/value
+   labels. TT_eq identifies selected sets. q_eq,d_eq,QS_eq suffice
+   for the source prime class map, as witnessed by pg_cls. hP_eq and
+   bs_eq give the identical orbit periods, selectors and good sets.
+   L_x,L_eps,L_J give the same scale. The candidate sets are equal.
+4. Carried degrees agree on TT. Both global extensions are zero off
+   TT, so all cyclic pullbacks agree, including positions not selected.
+5. The small-prime formula depends only on the shared data. ParConsts
+   explicitly contains kapI_eq for the whole large-prime function.
+   Therefore Sigma agrees term by term. The larger sameServed package
+   also transports off/ep, but those fields are not used for Sigma.
+6. ChosenW quantifies universally over carriers and does not provide
+   one. CoverAll is defined separately in FamCore, not included as a
+   field. Applying it at an existing member's valid distinguished
+   position produces the carrier needed for ChosenWS. coverS alone
+   only moves the distinguished position while preserving an existing
+   degree assignment. The report retains this distinction explicitly.
+
+Primary source targets inspected
+--------------------------------
+All paths are relative to the pinned repository.
+  src/Formalism/SharpRestriction/GrowthBounds/IsResidueClassZero.lean
+    Cand, Sig, winA/winB, boxLoc/meanLoc, MeanKappaBound (279--335).
+  src/Formalism/SharpRestriction/GrowthBounds/SmallOrderPrimes.lean
+    cands and WReq (27--36).
+  src/Formalism/SharpRestriction/GrowthBounds/LogarithmicSums/Conclusion1OfGainBoundAll.lean
+    candF, ZZ and MeanEx (138--150).
+  src/Formalism/SharpRestriction/FamCore.lean
+    FamCore and its equalities, CoverAll and coverS_carry (71--207).
+  src/Formalism/SharpRestriction/ParConsts.lean
+    fills, family equalities and kapI_eq (32--98).
+  src/Formalism/SharpRestriction/GlobalSchurBounds/WeightVectorSmallSharesSeven.lean
+    ChosenW, ChosenWS and chosenWS_of_cover (44--84).
+  src/Formalism/LocalToGlobal/GlobalTheory/PowFourLtCeilThresholdPrime.lean
+    pg_cls/pg_more, sAt_eq, pg_mem_TTn, pg_aL, Sig_eq, pg_LaG
+    and exact family-window transport (420--550, 1810--1885).
+  src/Formalism/LocalToGlobal/GlobalTheory/LossRequirementsOfSmallShares.lean
+    chosenW_of (253--329).
+
+Review scope does not independently reconstruct the full upstream
+GII orbit-counting or BC coefficient-base-change components. Those
+have separate reviews. Nor does this review certify a construction
+of CoverAll, all other global family structures, or the final RH/GRH
+claim. No source or component was edited during this review.

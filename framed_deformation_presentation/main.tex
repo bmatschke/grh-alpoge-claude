@@ -1,0 +1,851 @@
+% Version 0.26. Full literal LemmaP supplier.
+% Pinned Lean source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+\section{The weighted framed deformation presentation}
+\label{sec:framed-deformation-presentation}
+
+\status{FP1--FP8 prove the entire general \texttt{LemmaP} statement.
+The proof constructs the universal ring, its weighted relative
+generators, and its relations, and proves the exact cohomological
+counts.  The stated hypotheses on the original group, local
+conditions and framed obstruction spaces remain hypotheses of this
+general theorem.  This section does not assert that an arithmetic
+datum satisfies them, and does not construct its later
+\texttt{Model} or prove automorphy.}
+
+\subsection{The original data and the exact output}
+
+Let $O$ be a complete Noetherian local ring with finite residue field
+$k$ of odd characteristic $\ell$; $O$ need not be a domain or a DVR.
+Write $\mathcal C_O$ for the complete Noetherian local $O$-algebras
+whose residue map identifies their residue field with the specified
+$k$.  This is the source's \texttt{IsCO}.  All maps are $O$-algebra
+maps; they are automatically local and continuous, as FP1 proves.
+For a group with a topology, a representation over $A\in\mathcal C_O$
+is called continuous if its entries modulo $\mathfrak m_A^n$ are
+locally constant for every $n$.  This is precisely \texttt{Lift}.
+
+The global group $\Gamma$ is compact, Hausdorff, totally disconnected
+and a topological group.  Its given hypothesis is
+\[
+ \Phi_\ell(\Gamma):\quad
+ \operatorname{Hom}_{\rm cts}(H,\mathbb F_\ell)
+       \text{ is finite for every open subgroup }H\le\Gamma .
+ \tag{FP.1}
+\]
+The target is additive.  Locally constant homomorphisms to this
+finite group are exactly the source's open-kernel homomorphisms in
+\texttt{PhiCond}; no finite-generation hypothesis on $\Gamma$ is
+added.
+
+Let $\iota$ be a finite index set, $X$ a free abelian group of finite
+rank, and $w:\iota\to X$.  The specified \texttt{FormData} consists
+of an invertible matrix $J$ over $O$, with $J^t=J$ or $J^t=-J$,
+a block map $\beta:\iota\to\mathcal B$, an involution
+$\varsigma$ on $\mathcal B$, and $c\in X$, such that
+\[
+ J_{ab}\ne0\ \Longrightarrow\
+       \beta(b)=\varsigma\beta(a),\quad w(a)+w(b)=c .
+ \tag{FP.2}
+\]
+For $A\in\mathcal C_O$, put
+\[
+ \begin{split}
+ H(A)&=\{h:h^tJh=J,\ h_{ab}=0\text{ if }\beta(a)\ne\beta(b),
+                         \ h\bmod\mathfrak m_A=1\},\\
+ \mathfrak g(A)&=\{Y:Y^tJ+JY=0,\
+                     Y_{ab}=0\text{ if }\beta(a)\ne\beta(b)\},\\
+ \mathfrak g_j(k)&=\{Y\in\mathfrak g(k):
+                       Y_{ab}=0\text{ if }w(a)-w(b)\ne j\}.
+ \end{split}
+ \tag{FP.3}
+\]
+The first set is a group: preservation of the invertible form gives
+an inverse, and all block and residue conditions are preserved.
+
+Fix an original residual representation $\bar r$ and a continuous
+lift $r_0$ over $O$.  Both satisfy \texttt{Normalises}: their
+matrices preserve $J$ up to a scalar, permute the prescribed blocks,
+and have zero entries when $w(a)\ne w(b)$.  Conjugation by
+$\bar r$ therefore preserves every $\mathfrak g_j(k)$; denote this
+representation by $\operatorname{ad}_j$.
+A direct check of the form condition is
+$\rho^{-t}[Y^t(\rho^tJ\rho)+(\rho^tJ\rho)Y]\rho^{-1}=0$;
+the block permutation and equal-weight support give the other
+two conditions in (FP.3).  Thus no extra adjoint-stability input
+is being used.
+A lift $r$ satisfies \texttt{InH} if
+$r(s)r_0(s)^{-1}\in H(A)$ for every $s\in\Gamma$.
+
+The specified frame has finite sets $T,Q$, a distinguished $v_0\in T$,
+groups $\Gamma_v,\Gamma_q$ with topologies, continuous homomorphisms
+$\phi_v:\Gamma_v\to\Gamma$ and $\psi_q:\Gamma_q\to\Gamma$,
+and subgroups $N_q\le\Gamma_q$ with
+$\bar r(\psi_qN_q)=1$.  No topological-group hypothesis on the
+individual local groups is inserted.
+For each $q$ a condition $L_q$ on local lifts has the following
+five properties, which are exactly \texttt{IsLocCond}.
+\begin{enumerate}
+\item It is cut out, on any fixed lift satisfying \texttt{InH}, by
+an ideal of its coefficient ring, universally under base change.
+\item It is invariant under conjugation by $H(A)$.
+\item It is invariant under diagonal torus conjugation whose
+characters all reduce to one.
+\item It lifts across every surjection $A\to A'$ in $\mathcal C_O$
+whose kernel is killed by $\mathfrak m_A$.
+\item For two \texttt{InH} lifts across such a surjection with the
+same reduction, if the first satisfies $L_q$, the second does so
+exactly when the two representations agree on $N_q$.
+\end{enumerate}
+Also $L_q(r_0|_{\Gamma_q})$ holds.
+
+The framed spaces used in the output are specified cochain spaces,
+not an unspecified choice of Selmer complex.  For a $k$-representation
+$V$ of $\Gamma$, let $H^1_F(V)$ consist of pairs
+$(z,(y_v))$ such that $z$ is a locally constant cocycle,
+\[
+ z(\psi_q n)=0\ (n\in N_q),\qquad
+ z(\phi_v s)=(\phi_v s)\cdot y_v-y_v,\qquad y_{v_0}=0,
+ \tag{FP.4}
+\]
+where the dot denotes the given action on $V$.
+This is \texttt{Frame.H1c}, without quotienting by coboundaries.
+Write $d h(s,t)=h(s)+s h(t)-h(st)$ and $d^0y(s)=sy-y$.
+Let $Z^2_F(V)$ consist of locally constant triples
+$(z,(z_v),(z_q))$ satisfying
+\[
+ dz=0,\qquad z|_{\Gamma_v}=dz_v,\qquad
+ z|_{\Gamma_q}=dz_q .
+ \tag{FP.5}
+\]
+Let $B^2_F(V)$ be the subspace of triples of the form
+\[
+       (dh,\ (h\circ\phi_v-d^0y_v)_v,\
+                         (h\circ\psi_q-e_q)_q),
+ \tag{FP.6}
+\]
+where $h$ is locally constant and each $e_q$ is a locally constant
+cocycle vanishing on $N_q$.  These triples form a subspace, so their
+linear span, as written in the source, is the same set.
+Set
+$\operatorname{Ob}_F(V)=Z^2_F(V)/(Z^2_F(V)\cap B^2_F(V))$,
+as in the source.  For the actual $V=\operatorname{ad}_j$ used
+below, the action is locally constant and the local maps are
+continuous.  Consequently every triple in (FP.6) is locally
+constant and satisfies (FP.5), so $B^2_F(V)\subset Z^2_F(V)$
+in these applications.
+The hypothesis is that every $\operatorname{Ob}_F(\operatorname{ad}_j)$
+is finite dimensional.
+
+Finally $B\in\mathcal C_O$ has a given finite weighted presentation
+$W_B:O[[x_s:s\in\Sigma_B]]\twoheadrightarrow B$ with homogeneous
+kernel and all variable images in $\mathfrak m_B$.
+For each $v$ fix an \texttt{InH} lift $\rho_v$ over this same $B$,
+whose $(a,b)$ entry has weight $w(a)-w(b)$.
+We will construct a universal tuple
+\[
+       (i:B\to R,\ r,\ (\alpha_v)_{v\in T}),\qquad
+       \alpha_v\in H(R),\quad\alpha_{v_0}=1,
+ \tag{FP.7}
+\]
+with $r$ satisfying \texttt{InH} and all $L_q$, and
+\[
+       r(\phi_v s)\alpha_v=\alpha_v\,i(\rho_v(s)).
+ \tag{FP.8}
+\]
+Universality means unique maps preserving $i,r$ and every $\alpha_v$;
+there is no quotient by change of frame.
+
+\subsection{Finite coefficient rings and genuine representability}
+
+% BEGIN FP1
+\begin{proposition}[FP1: complete local algebra and finite tangent separation]
+\label{claim:FP1}
+Rings in $\mathcal C_O$ are compact Hausdorff for their adic topology;
+their ideals are closed, and their Artinian quotients are finite.
+An $O$-algebra map between them is local and continuous.  Such a map
+$f:A\to A'$ is surjective if
+\[
+       \mathfrak m_{A'}=f(\mathfrak m_A)A'+\mathfrak m_{A'}^2.
+ \tag{FP.9}
+\]
+Under (FP.1), finitely many elements of $\Gamma$ distinguish all
+lifts of $\bar r$ to $k[\epsilon]/(\epsilon^2)$.
+\end{proposition}
+
+\begin{proof}
+The quotients $A/\mathfrak m_A^n$ are finite: their successive
+layers are finite-dimensional vector spaces over the finite field
+$k$.  Completeness identifies $A$ with their inverse limit.
+This proves compactness and Hausdorffness.  Every ideal has finitely
+many generators; it is the image of a finite power of the compact
+space $A$ under the continuous sum-of-products map, hence is closed.
+Every proper quotient is consequently complete local with the same
+residue field.
+
+If $a\in\mathfrak m_A$ had nonzero residue after applying $f$,
+choose $u\in O$ whose residue is its inverse.  Then $1-ua$ is a
+unit, whereas its image has zero residue, a contradiction.  Thus
+$f$ is local; it preserves powers of maximal ideals and is continuous.
+The residue fields agree, so the converse membership also holds.
+Nakayama applied to the finite $A'$-module $\mathfrak m_{A'}$
+in (FP.9) gives finitely many $a_i\in\mathfrak m_A$ whose images
+generate $\mathfrak m_{A'}$.  Approximate an element of $A'$
+successively by polynomials over $O$ in the $f(a_i)$.
+At stage $n$, reduce the coefficients of its degree-$n$ error
+modulo $\mathfrak m_{A'}$ and lift them through $O\to k$.
+The resulting correction is the image of an element of
+$\mathfrak m_A^n$.  Their sum converges in $A$ and maps to the
+desired element.  This proves surjectivity.
+The same argument gives a power-series presentation of any
+$A\in\mathcal C_O$ using lifts of a basis of
+$\mathfrak m_A/(\mathfrak m_OA+\mathfrak m_A^2)$.
+
+A lift of $\bar r$ to dual numbers has the unique form
+$(1+\epsilon z(s))\bar r(s)$, where $z$ is a locally constant
+cocycle for the full matrix adjoint action.
+Let $H=\ker\bar r$.  It is open, since $r_0$ has locally constant
+reduction, and has finite index by compactness.
+The restriction $z|_H$ is an additive homomorphism into the finite
+$\mathbb F_\ell$-vector space of matrices over $k$.
+Its coordinates have finitely many possibilities by (FP.1).
+The values on finitely many coset representatives also have
+finitely many possibilities, and these data determine $z$.
+There are therefore finitely many dual-number lifts.
+For every distinct pair choose an element where they differ.
+The finite collection of chosen elements distinguishes all pairs.
+\end{proof}
+% END FP1
+
+% BEGIN FP2
+\begin{proposition}[FP2: the universal continuous matrix lift]
+\label{claim:FP2}
+There is $R_{\rm rep}\in\mathcal C_O$ with a continuous lift
+$r_{\rm rep}$ of $\bar r$ such that every continuous lift over any
+$A\in\mathcal C_O$ is obtained by a unique $O$-algebra map
+$R_{\rm rep}\to A$.  Its construction uses only (FP.1), not a
+representability theorem or an unproved deformation-ring supplier.
+\end{proposition}
+
+\begin{proof}
+Choose the finite set $S\subset\Gamma$ from FP1 and lifts in $O$ of
+the residual matrix entries at its elements.  Let
+$P=O[[x_{s,a,b}:s\in S,\ a,b\in\iota]]$.
+For a lift $r$ over a finite Artinian $A$, let $C\subset A$ be the
+$O$-subalgebra generated by all its matrix entries.
+This is a finite local ring with residue field $k$: the entries
+have the prescribed residues, and an element with nonzero residue
+has an inverse given by a finite geometric series after division
+by a suitable unit of $O$.
+
+The map from $P$ evaluating its variables at the selected entry
+differences surjects onto $C$.
+Indeed, if those differences did not span
+$\mathfrak m_C/(\mathfrak m_OC+\mathfrak m_C^2)$, a nonzero
+$k$-linear functional vanishing on them would give two distinct
+$O$-algebra maps $C\to k[\epsilon]$ with the same values on the
+selected entries.  The associated representation lifts would be
+equal by the definition of $S$, so the maps would agree on every
+matrix entry and hence on $C$, a contradiction.
+Here the functional defines a derivation by subtracting a constant
+in $O$ with the same residue; the result is independent of that
+constant modulo $\mathfrak m_OC+\mathfrak m_C^2$.
+FP1, or its finite approximation argument, now gives the asserted
+surjection.
+
+Fix $n\ge1$.  Consider the kernels of all these evaluations with
+$\mathfrak m_A^n=0$.  Each contains $\mathfrak m_P^n$, so there are
+only finitely many possible kernels.
+They are closed under finite intersections: take the $O$-subalgebra
+of a product generated by the tuples of the representation entries.
+It lies in the fibre product over $k$, is a finite local ring, has
+$n$th maximal-ideal power zero, and again is a quotient of $P$ by
+the selected-entry argument.  Its kernel is exactly the
+intersection.  Let $J_n$ be the intersection of all kernels.
+Thus $P/J_n$ itself carries a representation and dominates every
+lift of this Artinian level.  The map is unique, since the selected
+entry differences generate this ring.
+Two putative representations on the same quotient with those
+selected entries agree by applying the same product argument.
+
+The rings $R_n=P/J_n$ have compatible surjections
+$R_{n+1}\to R_n$ and representations.
+Universality shows
+$R_{n+1}/\mathfrak m_{R_{n+1}}^n\simeq R_n$:
+both have the just-proved universal property among rings with
+$n$th maximal-ideal power zero.
+Put $J=\bigcap_nJ_n$ and $R_{\rm rep}=P/J$.
+Compactness of $P$ gives
+\[
+          J_n=J+\mathfrak m_P^n,\qquad
+          R_{\rm rep}\simeq\varprojlim_nR_n .
+ \tag{FP.10}
+\]
+For the first equality, the compatibility at finite levels supplies
+nonempty nested compact sets of lifts in the $J_m$ of any chosen
+residue class in $J_n/\mathfrak m_P^n$; their intersection supplies
+the required element of $J$.
+The inverse-limit representation is continuous modulo every
+maximal-ideal power.  Every lift over a complete $A$ gives unique,
+compatible maps to its finite quotients, hence a map
+$R_{\rm rep}\to A$.  Conversely this map recovers the original
+entries.  Uniqueness follows on the selected variables and then
+by continuity on the power series.  This proves the proposition.
+\end{proof}
+% END FP2
+
+\subsection{Weights, small extensions and the local conditions}
+
+% BEGIN FP3
+\begin{proposition}[FP3: formal torus extraction and homogeneous presentations]
+\label{claim:FP3}
+For the free finite-rank group $X$, near-identity torus characters
+detect all weights over every coefficient ring.
+Consequently a finite power-series presentation stable under all
+such weighted substitutions has homogeneous kernel.
+An element which transforms by the character of weight $j$ belongs
+to its actual weight-$j$ part.  Every homogeneous ideal has finitely
+many homogeneous generators, and its quotient modulo the maximal
+ideal times that ideal has a basis represented by homogeneous
+elements.
+\end{proposition}
+
+\begin{proof}
+Choose a basis $X\simeq\mathbb Z^d$ and put
+\[
+            \tau^j=\prod_{\nu=1}^d(1+u_\nu)^{j_\nu}
+                    \in S[[u_1,\ldots,u_d]]^\times .
+ \tag{FP.11}
+\]
+These characters all reduce to one.  Any finite family of them is
+linearly independent over $S$, even in positive characteristic or
+with zero divisors.  Multiply a purported relation by a sufficiently
+large positive character; it becomes a polynomial relation in
+the $1+u_\nu$.  The invertible polynomial substitution
+$T_\nu=1+u_\nu$ shows every coefficient is zero.
+
+Let $P=O[[x_s]]\twoheadrightarrow A$ be a presentation with variable
+weights $d_s$.  In $A/\mathfrak m_A^n$ every evaluation of a power
+series uses only finitely many monomials of total degree less than
+$n$.  Substitute $x_s\mapsto\tau^{d_s}\overline x_s$ and group
+them by weight.  If this substitution kills a relation, (FP.11)
+says that it kills each separate weight component.
+Letting $n$ increase and using separatedness proves homogeneity of
+the kernel.  Comparing a transforming element with $\tau^j$ times
+itself proves the assertion about weight parts by the same argument.
+
+The weight projection on $P$ preserves the maximal ideal and is
+continuous.  Each weight part is closed in the compact ring $P$,
+and its image in a quotient is therefore closed.
+If $I$ is homogeneous, so is $\mathfrak m_PI$.
+The finite-dimensional space $I/\mathfrak m_PI$ is discrete:
+$\mathfrak m_PI$ is a closed ideal of finite index in the compact
+additive group $I$.  A power series is the limit of finite sums of
+its weight components, so this quotient is the direct sum of its
+weight subspaces, with only finitely many of them nonzero.
+Choose a basis weight by weight and lift it homogeneously to $I$.
+Nakayama says that these finitely many lifts generate $I$.
+The same argument applies to a quotient of one homogeneous ideal
+by another, as used below.
+\end{proof}
+% END FP3
+
+% BEGIN FP4
+\begin{proposition}[FP4: graded small-extension lifts and matrix corrections]
+\label{claim:FP4}
+Let $p:A\twoheadrightarrow R$ in $\mathcal C_O$ have homogeneous
+kernel $I$ with $\mathfrak m_AI=0$, and give $A,R$ compatible
+finite weighted presentations.  A graded continuous family of
+matrices in $H(R)$ has a graded continuous lift in $H(A)$.
+Moreover a graded \texttt{InH} representation over $R$ satisfying
+one of the specified conditions $L_q$ has a graded lift over $A$
+satisfying that same condition.
+These assertions hold with the original topology on its local
+group, without assuming it is a topological group.
+\end{proposition}
+
+\begin{proof}
+The ideal $I$ is a finite-dimensional $k$-vector space.  It is
+finite and discrete in $A$; choose $n$ with
+$I\cap\mathfrak m_A^n=0$.
+The map on each weight part is onto its indicated image.
+It has continuous set sections: on the deep subgroup
+$A_j\cap\mathfrak m_A^n$ it is injective, and its image is a closed
+finite-index subgroup of the target weight part.
+The inverse is continuous by compactness; finitely many coset
+representatives complete a section.
+These sections preserve adic continuity of families.
+Equivalently, homogeneous projection of lifts shows that their
+deep images are the corresponding deep target parts.
+
+Lift the entries of $h\in H(R)$ in their required weights, setting
+off-block entries to zero, to obtain $h_0$ with residue $1$.
+The error $E=h_0^tJh_0-J$ has entries in $I$.
+Since $\ell$ is odd, $2$ is a unit in $O$.
+The correction
+\[
+                Z=-\tfrac12J^{-1}E,\qquad h=h_0+Z
+ \tag{FP.12}
+\]
+has entries in $I$, has the required blocks and weights, and
+satisfies $Z^tJ+JZ=-E$.
+The support assertion follows from (FP.2), also for $J^{-1}$:
+the projections onto a block and a weight commute through $J$
+to their paired block and complementary weight, and the same
+identity multiplied by $J^{-1}$ proves it for the inverse.
+Because $(h_0-1)I=I^2=0$, expansion of $h^tJh$ leaves exactly
+$h_0^tJh_0+Z^tJ+JZ=J$.  Thus (FP.12) is a lift in $H(A)$.
+All operations are continuous and preserve the asserted weights.
+The same expansion shows that adding any $I$-valued element of
+$\mathfrak g(A)$ to a member of $H(A)$ stays in $H(A)$.
+
+For the assertion about $L_q$, its lifting axiom first gives some
+continuous lift $r_1$ satisfying $L_q$.
+Choose homogeneous continuous lifts $y_{ab}(s)$ of the entries
+of its graded reduction.  Then
+$\delta_{ab}(s)=r_1(s)_{ab}-y_{ab}(s)\in I$ is locally constant:
+its reduction modulo the chosen $\mathfrak m_A^n$ determines it.
+Write $I=\bigoplus_c I_c$ using FP3 and decompose each $\delta$
+accordingly.  Only finitely many weights $c$ occur.
+
+Here is the point that ensures that imposing weights preserves
+$L_q$, rather than merely the representation equations.
+Let $S=A[[u_1,\ldots,u_d]]$ and let
+$c_-:A\to S$ be the inverse weighted torus substitution:
+$c_-(a_j)=\tau^{-j}a_j$.
+For an entry of required weight $b=w(a)-w(b')$, torus conjugation
+of $c_-(r_1)$ has entry
+\[
+                 y_{ab'}+\sum_c\tau^{\,b-c}\delta_{ab',c}.
+ \tag{FP.13}
+\]
+Let $\mathcal E$ be the finite set of nonzero differences $b-c$
+which occur.  Form the finite square-zero extension
+\[
+ A^\dagger=A\oplus\bigoplus_{e\in\mathcal E}I\,e_e,\qquad
+ \iota^\dagger(a,(\eta_e))=a+\sum_e\tau^e\eta_e\in S.
+ \tag{FP.14}
+\]
+Its extra summand has the usual $A$-module action and zero product.
+It belongs to $\mathcal C_O$.
+The map $\iota^\dagger$ is a ring injection: $I^2=0$ proves
+multiplicativity and (FP.11) proves injectivity.
+The entries (FP.13) lie in its image.  Hence the matrix equations
+and the \texttt{InH} identities hold already over $A^\dagger$,
+by injectivity.  Their entries are continuous: the $y$'s are
+adic-continuous and the finitely many $\delta$'s are locally
+constant.  Reduction gives the original residual representation.
+
+Closedness of $L_q$ makes it functorial under base change.
+Thus $c_-(r_1)$ satisfies it, and its torus conjugate does too.
+Apply the same closedness axiom to the just-constructed
+$A^\dagger$-representation: its defining ideal vanishes under the
+injective map $\iota^\dagger$, so that ideal is zero.
+It therefore still vanishes under the projection $A^\dagger\to A$.
+The resulting representation satisfies $L_q$ and has entries
+$y_{ab'}+\delta_{ab',b}$, of precisely the required weight.
+It lifts the given representation over $R$.
+Every step used pointwise matrix identities and locally constant
+reductions, so no additional topology on a local group was used.
+\end{proof}
+% END FP4
+
+\subsection{The universal framed object and its minimal coordinates}
+
+% BEGIN FP5
+\begin{proposition}[FP5: the actual universal framed ring and its weights]
+\label{claim:FP5}
+For the original $B,\rho_v,\Gamma,r_0,F,L_q$, there is a tuple
+(FP.7)--(FP.8) with the literal \texttt{IsUnivFramed} property.
+It has a finite weighted presentation, all entries of $r$ and
+$\alpha_v$ have weights $w(a)-w(b)$, and the map $i$ preserves
+the given weight parts of $B$.
+\end{proposition}
+
+\begin{proof}
+Present $R_{\rm rep}$ and $B$ by finitely many power-series
+variables and take the quotient of the power-series ring in
+both sets by the two old relation ideals.
+This completed coproduct represents pairs of maps out of the
+two rings: evaluation at maximal-ideal elements is unique and
+converges, as in FP1.
+Adjoin finitely many variables for the entries of $\alpha_v-1$.
+Impose their off-block entries, form equations and
+$\alpha_{v_0}=1$, then impose the identities (FP.8).
+Impose \texttt{InH} for the universal representation by its form,
+block and residue equations, and impose each $L_q$ by its
+universally defining ideal after this cut.
+There may be infinitely many indexed equations, but their ideal
+is finitely generated in the Noetherian ambient power-series ring.
+Quotients and the evaluation construction give the asserted
+universal property, with unique maps preserving every entry and
+the base map.
+The quotient is proper: the residual representation, all frames
+equal to $1$, and the residue map $B\to k$ satisfy the equations.
+For the $L_q$ equations this follows from the given condition at
+$r_0$ by closedness and base change to $k$.
+Thus the constructed ring lies in $\mathcal C_O$.
+
+To construct its weights, use the coordinate family consisting of
+the images of the variables of $W_B$, all entries
+$r(s)_{ab}-r_0(s)_{ab}$, and all entries $(\alpha_v-1)_{ab}$.
+All lie in the maximal ideal.  Give them respectively their old
+weights and $w(a)-w(b)$.  This family distinguishes maps out of
+$R$, by universality and the original presentation of $B$.
+Consequently its classes span the relative cotangent space over
+$O$: a missing linear functional would give two maps to dual
+numbers agreeing on that family but not on $R$, exactly as in FP2.
+Choose a finite spanning subfamily.  FP1 gives a surjective
+power-series presentation using it.
+
+For a near-identity character $t:X\to A^\times$ after any base
+change, twist each coordinate of $B$ by its weight, and conjugate
+the representation and the frames by the diagonal characters
+$t^{w(a)}$.  The kernel of $W_B$ is homogeneous, so the changed
+base map is well defined.  Relation (FP.2) makes diagonal
+conjugation preserve $H$; $r_0$ is fixed because it has entries
+only at equal weights.
+The local $L_q$ conditions are preserved by their torus axiom.
+The graded hypothesis on $\rho_v$ makes (FP.8) compatible with
+the changed base map.  Thus universality gives the corresponding
+map out of $R$.
+It scales each member of the coordinate family by its declared
+weight.
+FP3 proves that the chosen presentation has homogeneous kernel,
+and that every coordinate in the full family belongs to its
+asserted weight part.
+The same weighted substitution argument applied to power series
+in $W_B$ proves that $i$ preserves all its weight parts.
+This establishes the full weighted assertion on the original tuple.
+\end{proof}
+% END FP5
+
+% BEGIN FP6
+\begin{proposition}[FP6: framed tangent coordinates and minimal relative relations]
+\label{claim:FP6}
+The ring in FP5 has a weighted presentation
+\[
+ P=O[[x_s\ (s\in\Sigma_B),\,z_t\ (t\in\mathcal T)]]
+       \twoheadrightarrow R
+ \tag{FP.15}
+\]
+whose old variables map through $i$ and whose new variables are
+actual entries $r(s)_{ab}-r_0(s)_{ab}$ or $(\alpha_v-1)_{ab}$.
+For every weight $j$,
+\[
+ \#\{t:\operatorname{wt}(z_t)=j\}
+            =\dim_k H^1_F(\operatorname{ad}_j).
+ \tag{FP.16}
+\]
+If $K=\ker(P\to R)$ and $K_B$ is the extended old relation ideal,
+there are homogeneous $f_u\in K$ whose residues form a basis of
+$K/(K_B+\mathfrak m_PK)$, and
+\[
+                     K=K_B+(f_u)_u .
+ \tag{FP.17}
+\]
+Put $A=P/(K_B+\mathfrak m_PK)$ and $I=\ker(A\to R)$.
+Then $I$ has the homogeneous $k$-basis
+$\epsilon_u=\overline f_u$, is killed by $\mathfrak m_A$, and
+\[
+                     I\subset\mathfrak m_BA+\mathfrak m_A^2.
+ \tag{FP.18}
+\]
+\end{proposition}
+
+\begin{proof}
+Maps $R\to k[\epsilon]$ whose restriction to $B$ is its residue
+map are the relative tangent vectors.
+Write their representations and frames uniquely as
+\[
+ r(s)=(1+\epsilon z(s))\bar r(s),\qquad
+                   \alpha_v=1-\epsilon y_v .
+ \tag{FP.19}
+\]
+The group and form equations give a cocycle $z$ in
+$\mathfrak g(k)$.
+The framing equations become $z\circ\phi_v=d^0y_v$, with
+$y_{v_0}=0$.
+The local tangent axiom, applied to the constant lift of $r_0$
+and to this lift over $k[\epsilon]\to k$, gives exactly
+$z(\psi_qn)=0$ on $N_q$.
+Conversely these equations give a framed tuple over dual numbers,
+including the local conditions by the same tangent axiom.
+Every function used is locally constant precisely when the
+dual-number lift is continuous.
+Thus the relative tangent space is exactly
+$H^1_F(\mathfrak g(k))$ with these signs.
+
+Conjugation by $\bar r$ respects weights by its normalization
+hypothesis, so masking the matrix entries gives
+\[
+ H^1_F(\mathfrak g(k))
+                 =\bigoplus_jH^1_F(\operatorname{ad}_j).
+ \tag{FP.20}
+\]
+There are only finitely many relevant weights $w(a)-w(b)$.
+On the other hand the relative tangent space is the dual of
+$V=\mathfrak m_R/(\mathfrak m_BR+\mathfrak m_R^2)$.
+This identification follows directly from the derivation
+construction in FP2.
+A functional supported on the weight-$j$ cotangent coordinates
+corresponds in (FP.19) to matrices in $\mathfrak g_j(k)$:
+multiplication by $\bar r(s)^{-1}$ preserves those entry weights.
+Thus the weight index in (FP.16) is $j$, with no inverse-weight
+convention hidden by the terminology of duality.
+The coordinate entries in FP5 span $V$; the old coordinates are
+zero there.  Choose a basis from the remaining entries separately
+in each weight.  Dualizing (FP.20) gives (FP.16).
+Keeping all the specified old variables and these chosen new ones
+gives (FP.15) by FP1.
+Torus stability and FP3 give its homogeneous kernel; the old
+kernel maps into it, with the original rename of old variables.
+Its weight parts coincide with those of FP5: by FP3, in either
+presentation they are exactly the elements transforming by the
+specified intrinsic formal-torus character.  Thus all entries
+of $r$ and $\alpha_v$, and the original map from $B$, retain
+their weights in this new minimal relative presentation.
+
+The module $K/K_B$ is finite over $P$.
+Its residue quotient has a homogeneous basis by FP3.
+Lift this basis to homogeneous $f_u$.
+Nakayama gives (FP.17).  It also shows directly that their images
+form the asserted basis of $I$, which is killed by
+$\mathfrak m_A$ by its definition.
+There are no missing coefficient-ring relations: $K_B$ is the
+extended kernel of the original presentation of $B$ throughout.
+
+To prove (FP.18), let $g\in K$ and expand it modulo
+$\mathfrak m_P^2$ into its constant and linear terms.
+The constant term belongs to $\mathfrak m_O$, since $g$ maps to
+zero and all variables map into $\mathfrak m_R$.
+The old linear terms lie in $\mathfrak m_BA$.
+In the relative cotangent space $V$, the coefficients of the new
+linear terms must all have zero residue, by the selected basis.
+Those terms therefore lie in $\mathfrak m_A^2$.
+This proves (FP.18) for every element of the kernel after passage
+to $A$.
+\end{proof}
+% END FP6
+
+\subsection{The actual obstruction classes and their detection of relations}
+
+% BEGIN FP7
+\begin{proposition}[FP7: the framed small-extension obstruction, with its correction]
+\label{claim:FP7}
+For $A\to R$ and its homogeneous basis $\epsilon_u$ in FP6, there
+are classes
+\[
+        o_u\in\operatorname{Ob}_F
+                      (\operatorname{ad}_{\operatorname{wt}(f_u)}).
+ \tag{FP.21}
+\]
+For any $k$-linear map $\lambda:I\to k$, homogeneous of weight $j$,
+let $A_\lambda=A/\ker\lambda$ if $\lambda\ne0$.
+If $\sum_{\operatorname{wt}(f_u)=j}\lambda(\epsilon_u)o_u=0$,
+the universal framed tuple over $R$ lifts to a framed tuple over
+$A_\lambda$, with the specified map from $B$.
+\end{proposition}
+
+\begin{proof}
+Use FP4 to lift the global matrices
+$r(s)r_0(s)^{-1}$ into $H(A)$, and multiply back by $r_0(s)$.
+This gives continuous graded matrices $\widetilde r(s)$.
+Lift every frame by FP4, setting $\widetilde\alpha_{v_0}=1$.
+For each $q$, FP4 gives a genuine graded local representation
+$r_q$ lifting $r|_{\Gamma_q}$ and satisfying $L_q$.
+The base map $B\to A$ is the one supplied by the old variables.
+
+Write $\lambda_u:I\to k$ for the coefficient of $\epsilon_u$.
+The following defects have entries in $I$:
+\[
+ \begin{split}
+ D(s,t)&=(\widetilde r(s)\widetilde r(t)-\widetilde r(st))
+                                      \bar r(st)^{-1},\\
+ E_v(s)&=(\widetilde r(\phi_vs)\widetilde\alpha_v
+             -\widetilde\alpha_v\,i(\rho_v(s)))
+                                      \bar r(\phi_vs)^{-1},\\
+ F_q(s)&=(\widetilde r(\psi_qs)-r_q(s))
+                                      \bar r(\psi_qs)^{-1}.
+ \end{split}
+ \tag{FP.22}
+\]
+Multiplication of an $I$-valued matrix by a residual matrix is
+unambiguous: any lift of that residual matrix gives the same
+product, because $\mathfrak m_AI=0$.
+Apply $\lambda_u$ entry by entry to (FP.22).
+The results lie in $\mathfrak g(k)$.
+Indeed each difference compares two matrices in the same
+form-preserving coset, and the first-order form equation is
+$Y^tJ+JY=0$; the block conditions are identical.
+Since the defects are graded and $\epsilon_u$ has its specified
+weight, their only possible nonzero entries have
+$w(a)-w(b)=\operatorname{wt}(f_u)$.
+For this last assertion decompose the finite $k$-space $I$ into
+its actual homogeneous subspaces; their sum is direct by FP3.
+
+Associativity of three $\widetilde r$ matrices gives
+$dD=0$ after taking coefficients.
+Comparison with
+$\widetilde\alpha_v i(\rho_v)\widetilde\alpha_v^{-1}$
+gives $D|_{\Gamma_v}=dE_v$; comparison with $r_q$ gives
+$D|_{\Gamma_q}=dF_q$.
+In these expansions every product of two errors vanishes and
+every other factor on an error reduces to $\bar r$.
+For example the global equation is exactly
+\[
+ sD(t,u)+D(s,tu)=D(st,u)+D(s,t).
+ \tag{FP.23}
+\]
+The local equations are
+$D(\phi_vs,\phi_vt)=E_v(s)+\phi_vs\,E_v(t)-E_v(st)$
+and the same formula with $\psi_q,F_q$.
+All defects are locally constant: they are adic-continuous and
+take values in the finite discrete kernel $I$.
+They therefore define a member of $Z^2_F(\operatorname{ad}_j)$
+and its class $o_u$.
+
+Suppose the displayed combination of classes vanishes.
+The ideal $\ker\lambda$ is legitimate because $A$ acts on $I$
+through $k$.  In $A_\lambda$ its remaining kernel is the
+one-dimensional space $k\eta$; write $\mu:k\to k\eta$ for its
+specified identification.
+The combined triple in (FP.22), now multiplied by $\eta$, has
+the form (FP.6).  We may take $y_{v_0}=0$:
+replace $h$ by $h-d^0y_{v_0}$, every $y_v$ by $y_v-y_{v_0}$,
+and $e_q$ by $e_q-d^0y_{v_0}|_{\Gamma_q}$.
+The last cocycle still vanishes on $N_q$ because
+$\bar r(\psi_qN_q)=1$.
+This changes none of the three defects.
+
+The corrected matrices and frames are
+\[
+ \begin{split}
+ r'(s)&=\widetilde r(s)-\mu(h(s)\bar r(s)),\\
+ \alpha'_v&=\widetilde\alpha_v+\mu(y_v).
+ \end{split}
+ \tag{FP.24}
+\]
+Here and below tildes have been mapped into $A_\lambda$.
+Expanding the first product shows that its error is
+$\mu(D-dh)\bar r(st)=0$, so $r'$ is multiplicative.
+It preserves \texttt{InH} by the last small Lie correction in
+FP4; in particular its matrices are invertible, and multiplicativity
+then gives $r'(1)=1$.
+The framing error is
+$\mu(E_v-h\circ\phi_v+d^0y_v)\bar r(\phi_vs)=0$.
+Thus (FP.8) holds and the distinguished frame remains $1$.
+The difference between $r'|_{\Gamma_q}$ and the image of $r_q$
+is $-\mu(e_q(s)\bar r(\psi_qs))$.
+It vanishes on $N_q$, so the local tangent axiom gives $L_q(r')$.
+Continuity is preserved because all correcting cochains are
+locally constant.
+All matrices and frames return to the original ones over $R$.
+This is the required actual framed lift, on the same base map.
+\end{proof}
+% END FP7
+
+% BEGIN FP8
+\begin{theorem}[FP8: the literal \texttt{LemmaP} and its exact weight counts]
+\label{claim:FP8}
+For all the data and hypotheses stated at the beginning of this
+section, the tuple and presentation in FP5--FP6 can be chosen with
+finite equation index set $\mathcal K$ such that, at every $j\in X$,
+\[
+ \begin{split}
+ \#\{t:\operatorname{wt}(z_t)=j\}
+      &=\dim_kH^1_F(\operatorname{ad}_j),\\
+ \#\{u:\operatorname{wt}(f_u)=j\}
+      &=\dim_k\operatorname{Ob}_F(\operatorname{ad}_j).
+ \end{split}
+ \tag{FP.25}
+\]
+The old variables, their weights and their original relations are
+preserved; the new variables are the actual representation or frame
+entries specified in FP6.  The kernel is exactly (FP.17), and every
+entry of $r,\alpha_v$ has its required weight.
+These are all fields of the source's \texttt{IsUnivFramed},
+\texttt{IsRelPres} and literal \texttt{LemmaP} conclusion.
+There is no remaining bespoke supplier in this general implication.
+\end{theorem}
+
+\begin{proof}
+We prove that the classes $o_u$ of each weight in FP7 are linearly
+independent.  A nontrivial linear dependence defines a nonzero
+functional $\lambda:I\to k$, zero on every other weight, because
+the $\epsilon_u$ form a basis.
+FP7 gives a framed lift over $A_\lambda$.
+Universality of $R$ supplies an $O$-algebra map
+$s:R\to A_\lambda$ respecting the original $B$-map, the
+representation and all frames.
+Its composite with $p_\lambda:A_\lambda\to R$ preserves the
+universal tuple, so uniqueness implies $p_\lambda s=1_R$.
+
+The nonzero kernel $k\eta$ of $p_\lambda$ is killed by the maximal
+ideal.  However (FP.18) implies
+\[
+       k\eta\subset\mathfrak m_BA_\lambda+\mathfrak m_{A_\lambda}^2.
+ \tag{FP.26}
+\]
+For any $x\in\mathfrak m_{A_\lambda}$, the difference
+$x-s(p_\lambda x)$ belongs to this kernel.
+Since $s$ agrees with the specified map on $B$,
+the first summand on the right of (FP.26) lies in
+$s(\mathfrak m_R)A_\lambda$.
+It follows that
+\[
+ \mathfrak m_{A_\lambda}
+          =s(\mathfrak m_R)A_\lambda+\mathfrak m_{A_\lambda}^2.
+ \tag{FP.27}
+\]
+FP1 makes $s$ surjective.  A surjective section of $p_\lambda$
+makes $p_\lambda$ injective as well, contradicting its nonzero
+kernel.  No nontrivial dependence was possible.  Hence
+\[
+   \#\{u:\operatorname{wt}(f_u)=j\}
+        \le\dim_k\operatorname{Ob}_F(\operatorname{ad}_j).
+ \tag{FP.28}
+\]
+This proves the actual relation bound; no dimension bound was
+imported as a deformation-theoretic theorem.
+
+Only the finite set $\{w(a)-w(b):a,b\in\iota\}$ can contribute:
+outside it $\mathfrak g_j(k)=0$, and all its cochain spaces and
+obstruction spaces are zero.
+By hypothesis the finitely many remaining obstruction dimensions
+are finite.  Adjoin enough equations equal to zero at each weight
+to turn (FP.28) into equality.
+Zero belongs to every weight part, and adjoining zero equations
+does not change (FP.17).
+The generator equality is already (FP.16).
+The disjoint union $\Sigma_B\sqcup\mathcal T$ is literally the
+old/new variable bijection required by \texttt{IsRelPres}; its
+rename sends the old presentation to the original map $i$.
+FP5 proves universality and all representation/frame weights.
+FP6 identifies each new variable as an actual entry of the
+required weight.  These observations verify every outgoing field
+of \texttt{LemmaP}, including exact counts rather than inequalities.
+\end{proof}
+% END FP8
+
+\paragraph{Classical boundary and downstream scope.}
+The basic algebra used here is that finite formal power-series
+rings over Noetherian rings are Noetherian, and Nakayama's lemma;
+see the Stacks Project,
+\href{https://stacks.math.columbia.edu/tag/0306}{Tag 0306}
+and \href{https://stacks.math.columbia.edu/tag/00DV}{Tag 00DV}.
+Finite-dimensional linear algebra, the universal property of a
+power-series evaluation, and compactness of inverse limits of
+finite spaces are used in their elementary forms.
+The finite-level universal representation, closedness of the
+required ideals, formal torus extraction, local graded lift,
+matrix obstruction correction and relation-detection argument
+have all been proved in this section.
+No Mazur or Schlessinger representability assertion, general
+deformation-obstruction bound, or arithmetic automorphy theorem
+is a retained leaf.
+The theorem still requires the original $\Phi_\ell(\Gamma)$,
+all five local-condition axioms, the local base-point conditions,
+the finite framed obstruction spaces, and the original graded
+local data over $B$.  Supplying these for a later arithmetic
+\texttt{Raw} datum, and obtaining its \texttt{Model}, remain
+separate tasks.

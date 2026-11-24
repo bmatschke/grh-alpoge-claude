@@ -1,0 +1,246 @@
+\section{Finite coefficient extension and the actual standard subring}
+\label{sec:finite-base-change}
+
+\status{BC1--BC8 construct the source's standard coefficient ring at a
+specified finite place and prove the actual \texttt{LPBaseChange} theorem.
+The parameters $t,D,\kappa,c_*$ are unchanged. This closes the finite
+extension step that HM12's ring-isomorphism argument did not address.
+For a literal \texttt{recC} datum the standard subring is automatic;
+existence of the full globally compatible family remains separate.}
+
+\paragraph{BC1: what the standard ring actually is.}
+Let $p\ge5$ be prime, $f\ge2$ even and $q=p^f$. With $W(k)$ denoting
+Witt vectors, set
+\[
+ W=W(\mathbb F_q),\quad W_2=W(\mathbb F_{q^2}),\quad
+ O_s=W_2[\omega]/(\omega^2-p),\quad K_s=\operatorname{Frac}(O_s).
+                                                               \tag{BC.1}
+\]
+The field $Q=\operatorname{Frac}(W)$ embeds in $K_s$. Its Frobenius
+$\sigma$ reduces to $x\mapsto x^p$ and satisfies $\sigma^f=1$.
+The extension $W_2/W$ is unramified of degree two, whereas adjoining
+$\omega$ is ramified of degree two. Thus $O_s$ is free of rank four
+over $W$, has uniformizer $\omega$ and residue field $\mathbb F_{q^2}$.
+These are the source's \texttt{WQ, OO, KO, jO, iota, wU}.
+
+To check the assertions directly, lift a residue-field basis of
+$\mathbb F_{q^2}/\mathbb F_q$ and successively subtract its residue
+expansion, dividing the remainder by $p$. Completeness gives a spanning
+basis of $W_2$ over $W$; reduction of a relation after removing its
+smallest $p$-power proves independence. The polynomial $X^2-p$ is
+irreducible since a square in $\operatorname{Frac}(W_2)$ has even
+$p$-valuation. For $a+b\omega\ne0$ the candidate orders
+$2v_p(a)$ and $2v_p(b)+1$ differ. Factoring the smaller power of
+$\omega$ leaves a unit. This proves the DVR and residue assertions;
+$\omega^2=p$ also proves completeness.
+
+Every integer is a square in $O_s$. Write $z=p^m u$ with $p\nmid u$.
+Every nonzero element of $\mathbb F_q$ is a square in
+$\mathbb F_{q^2}$, since $q-1$ divides $(q^2-1)/2$.
+Hensel iteration lifts a square root of $\bar u$ to $y\in W_2$
+(the derivative $2y$ is a unit), and $(\omega^m y)^2=z$.
+The case $z=0$ is immediate. This checks the full standard quadratic
+setting, including its finite structural map from $W$.
+
+\paragraph{BC2: the finite extension at the chosen place exists.}
+We need two elementary facts, with proofs recorded here because they
+supply the actual coefficient ring.
+
+First, if $R$ is a complete DVR with characteristic-zero fraction field
+$K$ and $E/K$ is finite, its integral closure $S$ in $E$ is a finite
+free complete DVR. Choose an integral primitive element and the full
+order $A=R[\theta]$. Separability and integrality of traces give
+\[
+ A\subset S\subset A^\#,
+ \qquad A^\#=\{x\in E:\operatorname{Tr}_{E/K}(xA)\subset R\}.
+                                                               \tag{BC.2}
+\]
+The trace form is nondegenerate, so $A^\#$ is a finite fractional
+lattice. Hence $S$ is finite and torsion free, therefore free over $R$.
+Clearing polynomial coefficients shows $\operatorname{Frac}(S)=E$.
+The ring $S$ is complete in the uniformizer-adic topology. If it had
+several maximal ideals, the finite Artinian ring $S/\pi S$ would
+have a nontrivial idempotent. Elements of $1+\pi S$ are units by the
+convergent geometric series; Newton iteration for $X^2-X$ therefore lifts it
+to $S$, contradicting that $S$ is a domain. Thus $S$ is local.
+It is normal and one-dimensional, hence a DVR; explicitly, for
+$0\ne a\in\mathfrak m$, the equality $\sqrt{(a)}=\mathfrak m$
+and finite generation give a power $\mathfrak m^n\subset(a)$. Choose the least $n$ with
+$\mathfrak m^n\subset(a)$ and $b\in\mathfrak m^{n-1}\setminus(a)$.
+Then $(b/a)\mathfrak m\subset S$. If this lay in $\mathfrak m$,
+the determinant trick would make $b/a$ integral. Otherwise
+$(b/a)x$ is a unit for some $x\in\mathfrak m$, forcing
+$\mathfrak m=(x)$. The two adic topologies agree, proving completeness.
+
+Second, let $L$ be the source number field and $v$ a specified prime
+above $p$. Inside $\Omega=\overline{K_s}$, each embedding $\tau:L\to\Omega$
+defines
+\[
+ E_\tau=K_s\tau(L),\qquad
+ S_\tau=\text{integral closure of }O_s\text{ in }E_\tau.  \tag{BC.3}
+\]
+This extension is finite, and its maximal ideal induces a prime
+$P_\tau$ of $L$ above $p$. Suppose none is $v$. The Chinese remainder
+theorem gives an integer $a\in L$ that is $0$ modulo $v$ and $1$
+modulo every distinct $P_\tau$. All $\tau(a)^{-1}$ are integral over
+$O_s$, so their product $N_{L/\mathbb Q}(a)^{-1}$ is integral.
+But $p\mid N_{L/\mathbb Q}(a)\ne0$, since the norm is an integer
+multiple of $a$ in the ring of integers. This makes $p^{-1}$ integral
+over the integrally closed ring $O_s$, a contradiction.
+Thus some $\tau$ induces $v$, and
+\[
+ \tau(x)\in S_\tau\quad\Longleftrightarrow\quad v(x)\ge0.
+                                                               \tag{BC.4}
+\]
+For the reverse implication use a local fraction with denominator
+outside $v$; for the converse use $x^{-1}$ in the local maximal ideal.
+These are precisely the objects \texttt{KfRec, ORec, embRec, extRec}.
+
+\paragraph{BC3: exact lattice identities and ramification.}
+Let $\phi:R\hookrightarrow S$ be a finite inclusion of DVRs, with
+fraction fields $K\hookrightarrow K'$. The finite torsion-free
+$R$-module $S$ is free. Moreover $1$ is primitive: if $\pi$ were
+invertible in $S$, then $\pi^{-1}\in K$ would be integral over $R$.
+Choose an $R$-basis $b_1=1,b_2,\ldots,b_d$ of $S$. For a
+$K$-space $V$ and any $R$-submodule $M\subset V$,
+\[
+ SM=\bigoplus_{a=1}^d b_aM\subset K'\otimes_KV.
+ \quad\text{Consequently}\quad
+ S\Bigl(\bigcap_iM_i\Bigr)=\bigcap_iSM_i,
+ \qquad SM\cap V=M.                                     \tag{BC.5}
+\]
+The intersection may be infinite: finite freeness, not flatness alone,
+justifies the coordinate argument. Kernels, invariant submodules defined
+by universal coefficient equations, saturation and ranks also commute
+with this extension. These statements give faithful descent of lattice
+inclusions and equalities.
+
+The dual map is the semilinear map
+$\delta(G)(a\otimes x)=a\phi_K(G(x))$. A lattice basis and its
+algebraic dual basis prove
+\[
+ S\delta(M^\vee)=(SM)^\vee.                              \tag{BC.6}
+\]
+The pairing is $K'$-valued evaluation. No trace-dual or different is
+involved. If $\phi(\pi_R)=u\pi_S^e$, then
+\[
+ \operatorname{ord}_S\phi_K(x)=e\operatorname{ord}_R(x),
+ \qquad
+ \frac{\operatorname{ord}_S\phi_K(x)}{\operatorname{ord}_S(p)}
+ =\frac{\operatorname{ord}_R(x)}{\operatorname{ord}_R(p)}.
+                                                               \tag{BC.7}
+\]
+Lengths multiply by $e$, as follows by applying extension to each
+Smith factor $R/(\pi_R^a)$. Normalized lengths and determinant
+valuations are unchanged. In particular the image of $\omega$ has
+integer valuation $e$ and $p$-normalized valuation $1/2$; it need
+not be a uniformizer.
+
+\paragraph{BC4--BC5: identify the actual polynomial lattices.}
+CB2 supplies the same monic integral tableau basis for the literal
+dual-Weyl module $\nabla_\mu$ over every domain. Hence
+$S\otimes_R\nabla_\mu(R)=\nabla_\mu(S)$, including the generic
+unipotent-invariance identities. For decreasing integral $\lambda$,
+put $\mu_i=\lambda_i-\lambda_k$ and $T(g)f(X)=f(gX)$. The actual
+lattice at $\Lambda=gR^k$ is
+\[
+ H_\lambda(\Lambda)
+ =\det(g)^{-\lambda_k}T(g^{-1})\nabla_\mu(R).             \tag{BC.8}
+\]
+Replacing $g$ by $gh$, $h\in\mathrm{GL}_k(R)$, leaves it unchanged:
+$T((gh)^{-1})=T(g^{-1})T(h^{-1})$, the inner factor preserves
+$\nabla_\mu(R)$, and $\det(h)^{-\lambda_k}$ is a unit.
+Thus the source's intersection over all lattice bases equals
+(BC.8). Determinants, inverses and substitution commute with coefficient
+maps, so (BC.8) commutes with extension. Products of tableau bases in
+disjoint variable blocks give the same assertion for the actual tensor.
+
+Here is the full dictionary. For $s=0,\ldots,f-1$, use
+$\lambda_s=\lambda_s^0$ when $s$ is even and
+$\lambda_{s,i}=-\lambda^0_{s,k+1-i}$ when $s$ is odd. Set
+$A_r=\sum_s\sum_{i\le r}\lambda_{s,i}$ and
+\[
+\begin{aligned}
+ \Lambda_s(L)&=O\,\iota(\sigma^sL),&
+ \Lambda_s(e)&=\Lambda_s(e.\mathrm{src})
+                   +\omega^{-1}\Lambda_s(p\,e.\mathrm{tgt}),\\
+ H(L)&=\bigotimes_s H_{\lambda_s}(\Lambda_s(L)),&
+ H(e)&=\bigotimes_s H_{\lambda_s}(\Lambda_s(e)),\\
+ R_e&=\omega^{-A_r}H(e),&R'_e&=\omega^{-A_r}H(e)^\vee,
+ \qquad b(F,G)=p^{A_r}G(F).
+\end{aligned}                                             \tag{BC.9}
+\]
+An adapted $W$-basis of the edge has target
+$g\operatorname{diag}(p^{-1}I_r,I)W^k$ and source $gW^k$;
+therefore its midpoint lattice is
+$\iota(\sigma^sg)\operatorname{diag}(\omega^{-1}I_r,I)O^k$.
+These are genuine full lattices, with no implicit choice of representation.
+
+Let $\nu$ map polynomial coefficients and $\delta$ map duals. Their
+common tableau basis identifies the two representation spaces by scalar
+extension, with equal dimension. The exact clean lattices are
+\[
+\begin{aligned}
+ N_{\rm src}(L)&=\omega^{-t}H(L)\cap
+                           \bigcap_{e.\mathrm{src}=L}R_e,\\
+ N_{\rm tgt}(L)&=\omega^{-t}H(L)^\vee\cap
+                           \bigcap_{e.\mathrm{tgt}=L}R'_e.
+\end{aligned}                                             \tag{BC.10}
+\]
+Equations (BC.5)--(BC.9) identify their scalar extensions with the
+actual target clean lattices. They also preserve every extra
+$\omega^{c_*}R_{e'}$ condition. Crucially,
+$b'(\nu F,\delta G)=\phi_K(b(F,G))$, even if $A_r<0$.
+
+\paragraph{BC6--BC7: transport the rank certificate without loss.}
+The source's \texttt{GoodRankK} certificate is an integral map
+$u:O^n\to N_{\rm tgt}(L)$ and an integral matrix $M$ with
+\[
+ \sum_i M_{ji}b(F_i,u(x))=p^Dx_j\qquad(x\in O^n).
+\]
+For $y\in S^n$ put $u'(y)=\sum_\ell y_\ell\delta(u(\epsilon_\ell))$
+and $M'=\phi(M)$. The previous lattice identities give the correct
+codomain, and
+\[
+ \sum_iM'_{ji}b'(\nu F_i,u'(y))
+ =\sum_\ell y_\ell\phi_K\!\left(
+         \sum_iM_{ji}b(F_i,u(\epsilon_\ell))\right)=p^Dy_j.
+                                                               \tag{BC.11}
+\]
+Keep the same $W$-edges and send $F_i$ to $\nu F_i$. All clean
+and alternative-edge divisibilities hold, and the rank inequality
+$n\ge(1-\kappa)\dim V$ is unchanged. So is $4(D+1)\le c_*$.
+This proves
+\[
+ \texttt{LPprime}_{O}(t,D,\kappa,c_*)
+ \ \Longrightarrow\
+ \texttt{LPprime}_{S}(t,D,\kappa,c_*).                    \tag{BC.12}
+\]
+If a source weight is not dominant, the defined representation has a
+zero tensor factor; the empty list and $n=0$ supply the literal
+exceptional branch. The larger coefficient residue field never replaces
+$q=\#(W/pW)$ in the edge data. The expanded report also proves descent
+for a fixed family of tests by fractional Smith form; no arbitrary newly
+chosen family of vectors is claimed to descend.
+
+\paragraph{BC8: match the actual global-family interface.}
+The source \texttt{StdSubAt} asks for the standard ring and a finite map
+satisfying $\phi_K\iota_s=\iota$, $\phi j_s=j$ and
+$\phi(\omega_s)=\omega$. In \texttt{locPackC/recC}, the rings are
+literally $WQ,QQ,ORec,KfRec$, and all three maps are the composites
+constructed in BC1--BC2. Thus \texttt{ringTied\_recC} uses identity
+isomorphisms and the interface follows. For a compatibly isomorphic
+presentation, compose the field/ring isomorphisms and their inverses;
+finiteness and the three displayed equations persist. The actual
+Frobenius on $Q$ stays fixed, using its supplied period and reduction
+properties.
+
+This proves \texttt{StdSubAt} pointwise for every well-formed
+\texttt{recC}, and eventually for a supplied \texttt{IsRecCEv} family.
+The latter is one sufficient identification, not a necessary route:
+an actual \texttt{GroupCompatibilityFamily} also supplies the required
+ring identifications directly, and BC applies to its ring field.
+It does not assume that an arbitrary Hida coefficient DVR already
+contains the doubled residue field: that field was deliberately built
+into \texttt{recC}. Supplying the remaining global construction and its
+simultaneous compatibility is the precise boundary retained here.

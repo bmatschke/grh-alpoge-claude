@@ -1,0 +1,706 @@
+COMPATIBLE INTEGRAL PARTNERS AND THE EXACT DIMENSION-WEIGHTED TIE MEAN
+RH reconstruction v0.9; claims TP1--TP11
+Pinned source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+STATUS AND SCOPE
+
+This note reconstructs the actual multitie construction in TieOpsX,
+PartnerMX, PointMX and TheoremMXB, including the sharper GamIntC needed for
+their literal constants. It proves the exact multiplicity identity and
+dimension monotonicity used in the averaging. The specialization is exactly
+TheoremMV7, with kapSeg=3(s+2)r^2 lgSeg, subject only to the explicitly named
+HypP, HypW and graded-Gram inputs supplied by the companion GG proof.
+These are not the final Type-I edge lifts or their dimension/digit-class
+transfer; those are separate SW/RL interfaces.
+
+All representation decompositions below are over Q_p, a field of
+characteristic zero. No integral splitting into irreducible representations
+is assumed. Integral statements are obtained by saturated intersections,
+Smith form, explicit coefficient calculations, and the quantitative HypP/
+HypW lattice bounds. The source imposes p!=2 and r>=2 in the multitie
+theorems; these restrictions are retained. Some individual lemmas work more
+generally, as indicated. No Lean build or kernel replay is asserted.
+
+Throughout O=Z_p, K=Q_p, v(p)=1 and |p|=p^(-1). Scalar-valued Fock forms are
+bilinear, not Hermitian. All polynomial spaces have fixed letter
+multidegrees and are therefore finite-dimensional. We use the standard
+characteristic-zero highest-weight theory of split GL_r (weight
+decomposition, complete reducibility, unique highest line in an irreducible,
+and dominance of its weights), as already stated in IW. The field-level
+argument can equally be carried out with the explicit Casimir constructions
+in the pinned TieOps and WeightSpaceDimensionMonotone files.
+
+TP1. THE LITERAL PREFIX SPACES, FREEZING, AND INTEGRAL BASES
+
+There are N ordered letters. Each is either a vector x_i or a covector xi_i
+with r coordinates, and has prescribed degree d_i. The prefix Lie action is
+
+  E_ab^[j]=sum_(i<j,vector) x_(i,a) partial_(i,b)
+            -sum_(i<j,covector) xi_(i,b) partial_(i,a).
+
+The notation here E_ab^[j] denotes the prefix j, not a divided power.
+Divided powers will always be written E_ab^m/m!.
+
+For a prefix j and M in Z union {infinity}, YCond(j,M) is the sum of the
+GL_r-stable prefix subspaces whose first-coordinate weights are at most M.
+Equivalently it is the sum of prefix isotypic components with highest
+weight lambda satisfying lambda_1<=M. This is exactly the source's
+maximal-stable-subspace definition, since the greatest first-coordinate
+weight of an irreducible is lambda_1. For finitely many cutoffs (J_k,M_k),
+
+  Y(L,J,M)=Pol_L intersect intersection_k YCond(J_k,M_k),
+  Y_Z=Y intersect O[all variables].
+
+The normalized form is
+
+  B_L(F,G)=sum_alpha F_alpha G_alpha alpha! / product_i d_i! .       (TP1.1)
+
+T has ordered tie positions a_i, i=0,...,t-1. Literal admissibility means
+a_i strictly increase; letter a_i is a vector and a_i+1 a covector; and
+some cutoff occurs at J_k=a_i+1. In particular the pairs are disjoint:
+a_(i+1)>=a_i+2. The tie parameter z_i is a nonnegative integer. Set the
+covector degree at a_i+1 to n_i, leaving all other degrees unchanged.
+This is L(n)=LL.setTies T n. Let S_i(n) be the sum of the degrees through
+a_i, and impose S_i(n)<=n_i. Let M^(i)_k=M_k for J_k<=a_i+1 and infinity
+otherwise; this is thrUpTo i.
+
+For the first K+1=a_i+1 letters, put S=sum d_j and let rho=r-1. The source
+MM_w is the subspace satisfying the earlier prefix constraints, full torus
+weight w, and the highest-vector equations E_ab F=0 for a<b with a,b!=rho.
+MM_w,Z=MM_w intersect O[variables]. This is a GL_(r-1)-highest space with a
+full GL_r torus weight; replacing it by a full GL_r-highest space before
+freezing would be incorrect.
+
+Append a covector y of degree n>=S. The exact freeze map is
+
+  fr_n(f)=y_rho^(n-S) f(x_i,c -> F_i,c),                         (TP1.2)
+
+where a vector letter has F_i,rho=sum_c x_i,c y_c and
+F_i,c=y_rho x_i,c for c!=rho. A covector letter has
+F_i,rho=y_rho xi_i,rho and
+F_i,c=y_rho xi_i,c-xi_i,rho y_c for c!=rho.
+Thus fr_n is integral, preserves every old letter degree, has y-degree n,
+and specializes to f at y=e_rho. It is injective.
+
+Here is the converse without an additional integral representation theorem.
+Localize at y_rho. Every substitution F_i,c/y_rho is the action of the same
+unitriangular matrix g(y) on vectors and its inverse transpose on covectors.
+The new positive-root derivations E_(c,rho), c!=rho, are the infinitesimal
+translations that take y_c to zero while fixing y_rho. A polynomial killed
+by these derivations is invariant under the corresponding unipotent
+one-parameter groups: the exponential is a finite polynomial since these
+derivations are locally nilpotent. Apply the parameter y_c/y_rho and use
+homogeneity in y. It gives F=fr_n(F|_(y=e_rho)) in K[variables,y_rho^-1].
+The polynomial inclusion into this localization is injective, so equality
+holds already in the polynomial ring. If F is integral, its specialization
+is integral. This proves the literal integral FreezeBij.
+
+The remaining upper-root equations, with neither index rho, commute with
+freezing. The torus weight changes from w to w-n e_rho. Consequently fr_n
+identifies MM_w,Z with the entire integral highest-vector lattice of weight
+w-n e_rho in the prefix through a_i+1, subject to the old cutoffs.
+Old cutoffs are preserved in both directions: over the localization g(y)
+is a group substitution on each prefix, while the action on later letters
+commutes with that prefix group; conversely specialize y=e_rho. The
+largest-stable-subspace definition of YCond therefore gives exactly the
+same cutoff, with no additive shift. Renaming the first a_i+2 letters into
+the full word gives source Ffull and hw_is_Ffull.
+
+Each MM_w,Z is a full lattice in MM_w: it is an intersection of a rational
+subspace with a finite free coefficient lattice, so it is finite free and
+clearing coefficient denominators proves fullness. Its order filtration by
+powers of x_(a_i,rho) is saturated. More explicitly, the order-e coefficient
+map has kernel Fil_(e+1) in Fil_e and image grLat_e; the latter is a submodule
+of a free coefficient module, hence free. Choose and lift a basis of this
+image, then continue downwards from the maximum possible order o=d_(a_i).
+The resulting O-basis is simultaneously adapted to all orders. This is
+exactly AdaptedBasisExists. No simultaneous integral isotypic decomposition
+is used. Only finitely many w occur: every coordinate is between -S and S.
+
+TP2. THE SHARPER GAMMA INTEGRALITY WITH THE SOURCE CONSTANT
+
+This proves GamIntC, which was explicitly not claimed in TI4. Let there be
+K+1 old letters, the last a vector x of degree o, with total old degree S.
+Let f,g be integral polynomials of that multidegree, rho any coordinate,
+z>=0 an integer, and r>=1. Write F=fr_S(f), G=fr_S(g), n=S+m, m>=0, and
+
+  D=sum_c partial_(x_c)partial_(y_c)=D_rho+D_perp,
+  A=o+n+r+z-1,
+  Phi=sum_(j=0)^o (-1)^j E^j D^j/[j! A(A-1)...(A-j+1)],
+  Gamma(n)=binom(A,o) B_Fock(Phi fr_n(f),fr_n(g))
+            /[m! S! product_i d_i!].                       (TP2.1)
+
+All these conventions agree with TI3 and literal tieGam. The potentially
+zero falling denominators never occur: A>=o when n>=S>=o and r>=1,z>=0,
+except o=0 where only the j=0 term is present. Set
+
+  B=floor(log_p(S+o+r)),  cI=((K+4)r+6)B.                  (TP2.2)
+
+Claim: p^cI Gamma(n) has O-valued binomial coefficients and degree at most
+S+o. In particular it is a sum from k=0 to S+o of c_k binom(n,k), c_k in O.
+
+Proof. Moving E^j across the Fock form replaces it with D^j. Expand
+D^j=(D_rho+D_perp)^j. For a term indexed by 0<=a,a'<=j<=o, let h x^beta
+and h' x^gamma be terms of D_perp^(j-a) F and D_perp^(j-a') G. The exact
+integer coefficients in the contraction expansion imply
+
+  v(h)>=2v((j-a)!)-rB,
+  v(h')>=2v((j-a')!)-rB.                                  (TP2.3)
+
+Indeed D_perp^b is the sum over multiindices alpha of size b of
+(b!/alpha!) partial_x^alpha partial_y^alpha. Each differentiated monomial
+contributes two factors divisible by alpha!. Thus its valuation is at
+least v(b!)+sum_c v(alpha_c!). Grouping at most r coordinate factorials
+loses at most rB, since each binomial coefficient of upper entry <=S+o+r
+has valuation at most B. This is Legendre's floor-sum formula. The bound
+also holds for a zero coefficient, using infinite valuation.
+
+The support of F has beta_(x_rho)<=beta_(y_rho); the same remains true
+after D_perp powers. All terms differentiated too often are zero. For a
+nonzero paired term the final monomials must match. Therefore
+
+  beta=delta+a(e_xrho+e_yrho),
+  gamma=delta+a'(e_xrho+e_yrho).
+
+Put e=delta_(y_rho)+a, e'=delta_(y_rho)+a',
+c1=o+S+r+z-1-j, d1=(delta_(x_rho)+a) falling a,
+d2=(delta_(x_rho)+a') falling a', and Q=product_v(delta+a e_yrho)_v!.
+After canceling the m! and the A-dependent denominators, the term is exactly
+
+  C binom(m+c1,o-j) binom(m+e,e) binom(m+e',a'),
+  C=(-1)^j h h' binom(j,a)binom(j,a')d1 d2 a'! Q
+        /[binom(o,j)(j!)^2 S! product_i d_i!].              (TP2.4)
+
+For example, the y_rho factorial cancellation is
+  (m+e)!(m+e')!/[(m+delta_y)!m!]
+   =e! a'! binom(m+e,e)binom(m+e',a').
+The remaining factorials in Q include this e!. All binomial upper shifts
+c1,e,e' are nonnegative. The y-row degree gives e<=S-j+a, so the degree of
+the three binomial factors is at most S+o-2j+a+a'<=S+o.
+
+It remains to check C. The row degrees of delta+a e_yrho are the K earlier
+degrees d_i, o-j in the x row and S-j+a in the y row. Hence
+
+  v(Q)>=sum_(i<K)v(d_i!)+v((o-j)!)+v((S-j+a)!)-(K+2)rB.
+
+Also v(d1)>=v(a!) and v(d2)>=v(a'!). Combine this with (TP2.3).
+Writing F(t)=v(t!), the exact residual factorial expression after these
+row losses is
+
+  -v binom(S,j-a)-2v binom(o,j)-v binom(j,a').              (TP2.5)
+
+To verify it, replace v binom(j,a) with F(j)-F(a)-F(j-a)
+and likewise for a', then replace F(j)+F(o-j) with
+F(o)-v binom(o,j), and F(j-a)+F(S-j+a) with
+F(S)-v binom(S,j-a). These are equalities, not asymptotic estimates.
+Thus the residual loss is at most 4B. The two differentiated coefficients
+and the K+2 row groupings together lose (K+4)rB. The source's cI, with
+6B rather than the sufficient 4B, clears every term.
+
+Products of integer-valued binomial polynomials have integral binomial
+coefficients: their forward differences at nonnegative integers are
+integral, and the finite Newton expansion recovers them. Multiplication by
+the integral scalar p^cI C preserves this property. Summing the finite
+terms proves it in m. Translation m=n-S preserves integral binomial
+coefficients, by Vandermonde with the integer coefficients binom(-S,k).
+This proves literal GamIntC, including S=0. The 4B intermediate improvement
+is not substituted into any downstream source parameter.
+
+TP3. EXACT MeanGamX, INCLUDING THE ROUNDING COMPENSATION
+
+Fix the MM_w,Z order-adapted basis f_1,...,f_b from TP1, with orders e_j.
+Assume the exact GG bound on each equal-order initial Gram block:
+
+  v det G_e <= kappa4 #I_e,
+  (G_e)_(u,v)=Fock(in_e f_u,in_e f_v)/product_i d_i!.       (TP3.1)
+
+Let M=ceil(kappa), with kappa>=0. Form A(n)=(p^M Gamma_(f_u,f_v)(n)).
+TI3 gives degree<=S+o-max(e_u,e_v) entrywise. Therefore det A has exact
+degree delta=sum_u(S+o-e_u) and nonzero leading coefficient
+
+  product_e [ (p^M e! binom(z+e,e)/(o!S!))^(#I_e) det G_e]. (TP3.2)
+
+In a determinant permutation the sum of max(e_u,e_pi(u)) is at least
+sum e_u, with equality only if every matched pair has equal order. This
+proves (TP3.2), with no cancellation across different order blocks.
+
+Take integers X,Y,s,d with 1<=Y, d>0, p not dividing d, S<=s,
+2S<=X, z+o<=X, Y<=X and r<=X. Let ell>=floor(log_p X)+1 and suppose
+kappa>=((K+4)r+6)ell. Since S+o+r<=2X<=pX,
+floor(log_p(S+o+r))<=floor(log_p X)+1<=ell; TP2 makes A integral in the
+binomial basis. Let h=floor(log_p X)+1, an integer; then Y,2S<=p^h and h<=ell.
+
+For each e<=o, Legendre's formula gives
+
+  v(e! binom(z+e,e)/(o!S!))+(S+o-e)/(p-1)
+   =[s_p(o)+s_p(S)-s_p(e)]/(p-1)+v binom(z+e,e).
+
+The first two digit sums contribute at most 2ell. The binomial contributes
+at most floor(log_p X)<=ell-1, and M<kappa+1. Consequently
+
+  M+v(e! binom(z+e,e)/(o!S!))+(S+o-e)/(p-1)
+       <=kappa+3ell.                                      (TP3.3)
+
+This is where the source absorbs the ceiling; keeping M and also claiming
+the sharper kappa budget without this compensation would be incorrect.
+By (TP3.1)--(TP3.3), the determinant leading coefficient lambda satisfies
+v(lambda)+delta/(p-1)<=b(kappa+3ell+kappa4).
+Apply the proved TI5 polynomial-matrix lemma to n=s+dj, 0<=j<Y. The source
+uses the strict bad condition v(Smith factor)>E; TI5 bounds even >=E.
+For E>=1 the literal conclusion is
+
+  average_j badSmith(A(s+dj);E)
+   <=b[2S/Y+(kappa+3ell+kappa4+2S ell/Y)/E].                (TP3.4)
+
+There is no upper bound on s+dj in this version. It is the polynomial
+binomial-coefficient theorem, rather than a bounded-value interpolation
+argument, that permits this. The zero-dimensional space contributes zero.
+
+TP4. EXTENDING A HIGHEST-VECTOR MAP INTEGRALLY
+
+We use exactly the two inputs HypP(e1), HypW(e1), supplied by GG from IW.
+HypP gives self-adjoint canonical prefix isotypic projectors, their nested
+commutation, and p^e1 times each projector integral on the fixed-degree
+coefficient lattice. HypW says that for a pure full-GL_r isotypic integral
+vector x, p^e1 x belongs to the divided-power span of the integral highest
+vectors of that type. These inputs do not assert integral semisimplicity.
+
+Fix a prefix j0. Let C be its fixed-degree module satisfying only those
+cutoffs J_k<j0, with later letter degrees zero. This is source Cset. Compose
+the canonical cutoff projectors for prefixes j=0,...,j0-1, grouping all
+constraints at a common j into one type set. They commute, preserve letter
+multidegrees and later variables, and their product Pi fixes C. Its
+denominator is p^(j0 e1). It commutes with the full GL_r action on the
+prefix j0: a smaller-prefix central isotypic projector commutes with that
+prefix action, and later letters commute with it. Pi has the required
+weight and cutoff properties on every polynomial multidegree. This is the
+actual projC construction, not a projection onto an integral summand.
+
+Let tau:C->C be an equivariant rational map that sends every integral
+highest vector of C to an integral polynomial. Extend tau Pi coefficient
+by coefficient in the later variables, using the fixed-prefix multidegree
+component before Pi. Call the resulting operator T. It preserves Y: its
+image has the early cutoffs by construction, and the later cutoffs follow
+from equivariance for each larger prefix (the remaining-letter action
+commutes with T).
+
+On an integral highest vector for prefix j0, p^(j0 e1)Pi is integral,
+and each later-variable coefficient is still a highest vector. Applying
+tau therefore shows p^(j0 e1)T is integral on all such highest vectors.
+To extend this estimate to an arbitrary integral vector y, first apply the
+canonical pure-type projectors and multiply by p^e1. HypW spends one more
+p^e1 to write each resulting integral pure-type vector in divided-power
+words on integral highest vectors. The operators E_ab^m/m!, a!=b, preserve
+the coefficient lattice: they are the coefficients of an elementary
+unipotent substitution, with the inverse substitution on covectors. T
+commutes with those words. Hence
+
+  p^(e1(j0+2)) T(Y_Z) subset Y_Z.                           (TP4.1)
+
+This is source int_main with K0=j0 e1, followed by bigOp_int. In summing
+the pure types there is no cost proportional to their number. The three
+denominator contributions are j0 e1 for the early cutoffs, e1 for the
+isotypic projection and e1 for highest-vector generation.
+
+TP5. THE ACTUAL PARTIAL INVERSE FOR ONE TIE
+
+Fix a degree vector n, a tie i, j0=a_i+2, and its prefix MM_w,Z lattices.
+Choose Smith left and right bases f'_x,f''_x for p^ceil(kappa)Gamma; x ranges
+over all pairs (w,basis index). These bases are integral, and f'_x together
+span all integral highest vectors after freezing, by TP1. Write
+
+  h_x=fr_(n_i)(f'_x), h''_x=fr_(n_i)(f''_x),
+  lambda_x=w_x-n_i e_rho,
+  cst=p^ceil(kappa) binom(o+n_i+r+z_i-1,o)
+           /[(n_i-S)! S! product_(old j)d_j!].
+
+Smith form gives, when lambda_x=lambda_y,
+
+  cst Fock(phi_i h_x,h''_y)=delta_xy d_x.                  (TP5.1)
+
+Also cst Fock(h_x,h_y) is integral. For clarity, this second assertion
+does not follow by deleting phi_i from an arbitrary integral matrix.
+For each paired monomial the normalized factorial denominator loses at
+most (K+2)r floor(log_p X) relative to the product of its coordinate
+factorials, where K+1=a_i+1 and all row degrees, including n_i, are <=X.
+This follows by grouping the coordinate factorials row by row; additionally
+(n_i-S)!S! divides n_i!. Thus p^ceil(kappa) clears this denominator under
+kappa>=(N+2)r^2 ell and ell>=floor(log_p X)+1. Multiplication by the integer
+binomial does not worsen it. This is exactly gamma_zero_integral.
+
+Set e=floor(E), c=p^e. A Smith index is good when |d_x|>=p^(-E), or
+equivalently v(d_x)<=E. Because v(d_x) is an integer, c/d_x is integral
+for every good index. On the highest vectors define
+
+  varpi h_x = h_x if x is good, and 0 otherwise,
+  tau h_y = sum_(x good,lambda_x=lambda_y)
+               (c/d_x)[cst Fock(h_x,h_y)] h''_x.            (TP5.2)
+
+All coefficients in this sum are integral. A type-preserving map on highest
+vectors extends uniquely to an equivariant map on C: over K, C is a direct
+sum of irreducible cyclic modules generated by the independent h_x, and
+two nonzero highest vectors of the same weight generate isomorphic
+modules. This statement is only over K. Formula (TP5.2) proves integral
+highest-vector preservation, exactly the premise needed in TP4.
+
+The contravariance Fock(E_ab u,v)=Fock(u,E_ba v), together with the Lie
+equivariance of phi_i, extends (TP5.1) to the full identity
+
+  Fock(phi_i u,tau v)=c Fock(varpi u,v),  u,v in C.         (TP5.3)
+
+One can verify this by moving every lowering word across the form to the
+other side. The highest-highest equal-weight case is the single surviving
+term in (TP5.2); unequal weights pair to zero. Thus it applies to all
+cyclic summands and their sums.
+
+Extend tau and varpi to the full word by the Pi-and-coefficient construction
+of TP4. Denote the results T_i and pi_i. Splitting the Fock form by the
+later-variable monomials, whose factorial weights multiply the prefix
+form, yields
+
+  B_L(phi_i u,T_i v)=p^e B_L(pi_i u,v),                    (TP5.4)
+
+for u in Y with only the cutoffs J_k<=a_i+1 imposed, and v in full Y.
+This precise asymmetry is the thrUpTo i interface. Both coefficient slices
+belong to the same C, since C only uses cuts J_k<j0=a_i+2. Moreover
+T_i preserves full Y and
+
+  p^K_i T_i(Y_Z) subset Y_Z,
+  K_i=e1(a_i+4)<=e1(N+2).                                (TP5.5)
+
+All coefficients/operators defining pi_i are confined to the first j0
+letters. Later ties use disjoint later pairs, so pi_i phi_j=phi_j pi_i for
+j>i. No assertion that all T_i commute is needed or made.
+
+For each w choose any nonzero prefix highest vector of that type and let
+D_i,w(n) be the dimension of the following full-word subspace: multiply its
+GL_r cyclic module on the first j0 letters by arbitrary later polynomials,
+then intersect with full Y. This is exactly YYsp in StatementTM. It is
+independent of the chosen nonzero vector, by a rational equivariant
+isomorphism extended over later variables. If b_i,w(n) counts the bad Smith
+indices of that type, the image of Id-pi_i on Y is contained in the sum of
+their continuation spaces. Consequently
+
+  codim_Y ker(pi_i-Id) <=sum_w b_i,w(n) D_i,w(n).           (TP5.6)
+
+This is a dimension-weighted bound. It does not count only highest vectors
+and does not assume a common continuation dimension for different weights.
+
+TP6. A PRIMITIVE PARTNER BEFORE APPLYING TIES
+
+Let u be primitive in Y_Z. Because Y_Z is the intersection of a rational
+subspace with the coefficient lattice, u has a unit coefficient u_alpha:
+otherwise u/p would still lie in Y_Z. Put m=X^alpha. Formula (TP1.1) gives
+
+  |B_L(u,m)|=|u_alpha alpha!/product_i d_i!|>=1,            (TP6.1)
+
+since product_i d_i!/alpha! is a product of integer multinomials.
+Compose the canonical type projections encoding all cutoffs at the
+N+1 prefix lengths 0,...,N; call the product P_Y. Group repeated cutoffs
+at the same length. These projectors commute, are Fock self-adjoint, fix
+u, and have range Y inside the fixed multidegree. Thus
+
+  z=p^(e1(N+1))P_Y m is in Y_Z,
+  |B_L(u,z)|>=p^(-e1(N+1)).                               (TP6.2)
+
+This proves literal YPartnerC. It constructs the partner from a unit
+coefficient, with the exact normalized Fock ratio; it does not assume the
+Fock form is unimodular on Y_Z.
+
+TP7. SIMULTANEOUS PARTNERS, SATURATION, AND THE POINTWISE BAD COUNT
+
+Let W=Y intersect intersection_i ker(pi_i-Id) and L1=W intersect Y_Z.
+It is saturated in Y_Z: if a!=0 and a x lies in the rational subspace W,
+then x lies in W. Hence a vector primitive in L1 is primitive in Y_Z.
+The codimension inequality for an intersection, together with (TP5.6), is
+
+  rank Y_Z-rank L1 <=sum_i sum_w b_i,w(n)D_i,w(n).          (TP7.1)
+
+For primitive u in L1 choose z from TP6, and define
+
+  u'=(p^K_0 T_0)(p^K_1 T_1)...(p^K_(t-1) T_(t-1))z.     (TP7.2)
+
+Composition is written in its actual source order: the rightmost operator
+is applied first. Every factor preserves Y_Z, so u' is integral and
+satisfies every prefix constraint. Let Phi=phi_0 phi_1...phi_(t-1).
+Repeated use of (TP5.4) gives
+
+  B_L(Phi u,u')=p^(sum_i(K_i+floor(E))) B_L(u,z).          (TP7.3)
+
+At step i, the remaining later phi_j preserve the required earlier cutoffs,
+pi_i commutes past those later ties, and pi_i u=u. The remaining T factors
+keep the second argument in full Y. This proves the exact ordered peeling;
+no independent partner choice for successive ties, and no unproved
+commutation of their partial inverses, is being used.
+
+Assume e1(N+2)<=kappa. Then K_i<=kappa and e1(N+1)<=kappa.
+The integer exponent sum_i(K_i+floor(E))+e1(N+1) is at most
+
+  D=floor[t(E+kappa)+kappa].                              (TP7.4)
+
+Equations (TP6.2)--(TP7.4) prove |B_L(Phi u,u')|>=p^(-D).
+The source's PartnerMX is precisely this saturated sublattice, its
+primitive-partner assertion, and (TP7.1).
+
+For completeness, the passage to the actual bad count is Smith linear
+algebra. Restrict the map b: Y_Z -> Hom_O(Y_Z,K), b(u)(v)=B_L(Phi u,v),
+to a basis of L1. If any elementary divisor of this map had valuation>D,
+its corresponding primitive basis vector would pair with all of Y_Z to
+valuation>D, contradicting the partner assertion. Thus all rank L1
+elementary divisors are nonzero and have valuation<=D. Unimodular row and
+column operations, followed by multiplying each column partner by the
+integral scalar p^(D-v_i) and a unit, produce rank L1 pairs with exact
+matrix p^D Id. Therefore goodCount>=rank L1 and
+
+  bad(B_L composed with Phi,Y_Z,D)
+        <=sum_i sum_w b_i,w(n)D_i,w(n).                   (TP7.5)
+
+This also applies when the form has some negative elementary-divisor
+valuations; scaling it temporarily by a common power of p gives the usual
+integral Smith form and does not change the argument. An empty tie set
+reduces to TP6 with D=floor(kappa); zero-dimensional spaces contribute zero.
+
+TP8. THE EXACT HIGHEST-WEIGHT MULTIPLICITY IDENTITY
+
+Fix one tie i and all degrees, with n_i>=S_i. Let m_w=dim MM_w for the
+prefix before the covector. By the freeze isomorphism TP1, these are the
+dimensions of the full GL_r highest-vector spaces in C after adding that
+covector, at weights lambda_w=w-n_i e_rho. Choose a rational basis in each
+highest-vector space. Over K, it generates a direct-sum decomposition
+
+  C=direct_sum_(w,b=1,...,m_w) V_(w,b).                    (TP8.1)
+
+Here every V_(w,b) is an irreducible copy of highest weight lambda_w.
+The sum is direct by complete reducibility and independence of the highest
+vectors. This decomposition is rational only.
+
+The full fixed-multidegree space with the early constraints is C tensor the
+polynomial space on later letters. The product map realizes this tensor
+product faithfully because the variable sets are disjoint. Later-prefix
+Lie actions are the sum of the action on C and the action on the remaining
+letters. Thus every summand V_(w,b) tensor later polynomials is stable for
+those actions. The canonical later-prefix type projectors preserve each
+summand. Intersecting with all the later cutoffs therefore preserves the
+direct sum (TP8.1), and its (w,b) summand is exactly the source YYsp for
+that highest vector.
+
+If b changes at fixed w, the unique equivariant map taking one nonzero
+highest vector to the other extends by the identity on later variables.
+It and its inverse preserve every later-prefix cutoff. Hence all those
+summands have the same dimension D_i,w(n). The result is the exact identity
+
+  sum_w m_w D_i,w(n)=dim Y(n).                            (TP8.2)
+
+This proves MonoCount. It holds with any chosen nonzero fw in each nonzero
+MM_w, not just with a special basis. For zero MM_w the multiplicity is zero.
+All sums are finite. In particular (TP8.2) uses the dimension of the actual
+selected subspace Y, not the ambient monomial dimension.
+
+TP9. WHY EACH CONTINUATION DIMENSION INCREASES WITH THE TIED DEGREE
+
+Hold every degree except n_i fixed, and let n'_i=n_i+u, u>=0. The prefix
+MM_w itself is unchanged. If h=fr_(n_i)(fw), then
+
+  h'=fr_(n_i+u)(fw)=y_rho^u h.                            (TP9.1)
+
+Let V=K[GL_r]h and V'=K[GL_r]h'. Their highest weights are lambda and
+lambda'=lambda-u e_rho. Put eta=y_rho^u and consider the product space
+W=V Sym^u(K^r)^*, in the polynomial ring of the prefix. It is a quotient
+of the corresponding tensor product. Every weight of W is dominated by
+lambda', and its lambda'-highest line is K eta h. To see uniqueness, the
+only way to obtain the maximal weight in the tensor product is to use the
+highest weight of both factors: lower weights differ by nonnegative sums
+of simple roots, whose sum can be zero only when each difference is zero.
+The product eta h is nonzero in the polynomial domain. Thus V' is the
+unique Cartan component in W, with multiplicity one.
+
+Let Q be the rational canonical projection of W onto this component, and
+define F(v)=Q(eta v) on V. Equivalently, Q can be a polynomial in the
+prefix Casimir: for dominant mu strictly dominated by lambda' and with
+the same total weight, cas(mu)<cas(lambda'); multiply the factors for the
+other finitely many types and divide by its nonzero value at lambda'.
+This is the construction used explicitly in the pinned proof. No integral
+estimate for Q is needed here.
+
+F shifts every weight by -u e_rho. Since eta is a highest vector, it commutes
+with every raising operator E_ab, a<b, in the sense F(E_ab v)=E_ab F(v).
+Also F(h)=h'!=0. It follows that F is injective. Indeed, a nonzero kernel
+would be stable under weights and raising operators; choose a maximal
+weight in it. Its vector is killed by all raising operators and hence
+lies in the unique highest line Kh of the irreducible V, a contradiction.
+This argument does not claim that F intertwines lowering operators.
+
+Extend F by the identity on later polynomial variables. It remains
+injective, since this is a tensor product over K. We check the actual
+cutoffs. Those before j0=a_i+2 hold on all of V' times later variables:
+the frozen highest vector h' has the same old cutoffs by TP1, and they
+are stable under the prefix j0 action and later multiplication. For a
+cutoff J>=j0, multiplying an allowed polynomial by eta preserves the
+upper first-weight bound. The GL_J orbit of eta consists of covector
+polynomials of degree u; all their first-coordinate weights are <=0.
+Thus the product of this orbit with an invariant space having first
+weights <=M still has first weights <=M. Applying Q also preserves that
+cutoff: Q is a central operator for prefix j0 and commutes with the
+remaining-letter action, hence with the full GL_J action and its
+canonical isotypic projectors. Letter multidegrees change only by u in
+the tied covector row, as required.
+
+We have therefore constructed an injection of the actual continuation
+spaces, proving precisely WeightSpaceDimMonotone:
+
+  D_i,w(n)<=D_i,w(n with n_i replaced by n'_i).             (TP9.2)
+
+There is no assumption that the original polynomial multiplication by eta
+itself lies in V'. The Cartan projection Q is essential to this proof.
+
+TP10. THE EXACT WEIGHTED MULTITIE MEAN, TheoremMXB
+
+For each tie choose a finite progression
+
+  I_i={s_i+d_i j: 0<=j<Y_i},  Y_i>=1, d_i>=1, p not dividing d_i,
+  top_i=s_i+d_i(Y_i-1),  G=product_i I_i.                  (TP10.1)
+
+Here d_i denotes the progression step, not a letter multidegree. Assume
+S_i(top)<=s_i. Let X>=r be an integer bounding every letter degree at top,
+every Y_i, every 2S_i(top), and every z_i plus its preceding vector degree.
+Set ell>=floor(log_p X)+1, E>=1, and assume
+
+  kappa >= (3/2)(N+2)r^2 ell,
+  kappa >= e1(N+2),
+  kappa >= 3ell+kappa4.                                  (TP10.2)
+
+Assume HypP(e1), HypW(e1) on every L(n), and GG with exponent kappa4 on
+every tie-prefix MM_w,Z order-graded block. This is the literal list of
+TheoremMXB input hypotheses. All grid members satisfy the size premises,
+since increasing tied degrees increases every preceding total S_i.
+
+Fix i and the other coordinates. The prefix before the i-th covector is
+independent of n_i, so use one adapted basis of each MM_w,Z for the whole
+progression I_i. Let b_i,w(n_i) be the bad Smith count for its gamma matrix.
+TP3 applies with K=a_i. Its kappa requirement is implied by (TP10.2):
+since a_i+2<=N and r>=2,
+
+  (a_i+4)r+6 <= (3/2)(N+2)r^2.
+
+Replacing its actual prefix total by S_i(top), and using
+kappa+3ell+kappa4<=2kappa, gives
+
+  average_(n_i in I_i) b_i,w(n_i) <=m_w epsilon_i,
+  epsilon_i=2S_i(top)/Y_i
+                +(2kappa+2S_i(top)ell/Y_i)/E.              (TP10.3)
+
+By TP9 every D_i,w(n_i) is at most its endpoint value D_i,w(top_i).
+The factors b_i,w are nonnegative, so multiplication and summation give
+
+  average_(n_i in I_i) sum_w b_i,w(n_i)D_i,w(n_i)
+    <=epsilon_i sum_w m_w D_i,w(top_i)
+    =epsilon_i dim Y(n with coordinate i replaced by top_i). (TP10.4)
+
+The final equality is TP8. Averaging (TP7.5) in all the other coordinates
+and summing over i proves the exact source conclusion
+
+  Avg_(n in G) bad(B_(L(n)) composed with Phi_n,Y_Z(n),D)
+   <=sum_i epsilon_i Avg_(n in G) dim Y(n^(i,top)),
+  D=floor[t(E+kappa)+kappa].                              (TP10.5)
+
+This is ordinary finite Fubini summation. The update map n->n^(i,top) is
+not injective, and no such assertion is required. It occurs with its
+actual multiplicity on both sides of the coordinate average. The result
+has exactly the endpoint dimensions required by the downstream segment
+proof, rather than a replacement by dim Y(n) or by a fixed ambient rank.
+
+TP11. THE LITERAL TheoremMV7 PARAMETER SPECIALIZATION
+
+Take N=2s+1, with alternating vector/covector letters beginning and ending
+with a vector. Assume the literal admissibility and ConditionShape: every
+cutoff is either at the end N or at the prefix a_i+1 before a tied
+covector. The proof above works for more cutoffs, but we retain these
+actual source hypotheses. Let a>=1, E>=1, and let the progressions satisfy
+(TP10.1) and S_i(top)<=s_i. The exact SizeHypothesis is
+
+  total(L(top))<=8a+r,
+  o_i(top)+n_i(top)+r+z_i+1<=8a+r,
+  Y_i<=8a+r,
+  2S_i(top)+1<=8a+r.                                    (TP11.1)
+
+The inequalities are real-valued; all displayed degrees, z_i and Y_i are
+integers. Put
+
+  ell=log_p(8a+r)+1,
+  X=floor(8a+r),
+  e1=floor(r^2 ell),
+  kappa4=(s+4)r^2 ell,
+  kappa=3(s+2)r^2 ell.                                  (TP11.2)
+
+The natural floors agree with ordinary floors because all quantities are
+nonnegative. From X<=8a+r and X>=r we have
+floor(log_p X)+1<=ell, while (TP11.1) supplies all the X bounds in TP10.
+The three numerical comparisons there are immediate but recorded exactly:
+
+  (3/2)(N+2)=(3/2)(2s+3)<=3(s+2),
+  e1(N+2)<=(2s+3)r^2 ell<=3(s+2)r^2 ell,
+  3ell+(s+4)r^2 ell<=3(s+2)r^2 ell,
+
+where the last inequality uses r>=2.
+
+For completeness, the projection and Gram input sizes match the GG route,
+not an untracked larger exponent. For a full grid word of total T<=8a+r,
+the quantitative projection/Weyl cost supplied by GG is
+
+  binom(r,2) floor(log_p(T+r-1)) <= r^2 ell.
+
+Indeed T+r-1<=p(8a+r), p>=3, and binom(r,2)<=r^2/2. The bound is natural,
+so it is <=e1. For tie prefix K=a_i and total S,
+2S+1<=8a+r gives S+r-1 and 4S+r-1 at most p(8a+r).
+The GG graded exponent is at most
+
+  (K+7)(r^2/2)ell <= (s+4)r^2 ell=kappa4,
+
+because K+2<=N=2s+1 implies K+7<=2(s+4). These are exactly the comparisons
+in gram_hypothesis_of_log_bound and theoremMV7, including the separate
+zero-prefix branch handled in GG. No new lattice-identification assumption
+is introduced by this specialization.
+
+Insert (TP11.2) into (TP10.5). With the source notation
+
+  epsSeg(S,Y,kappa,ell,E)=2S/Y+(2kappa+2S ell/Y)/E,
+
+this is exactly TheoremMV7, including its floor depth, rectangular
+progression weights and coordinate-top dimensions. The hypotheses
+HypP/HypW/graded Gram are the sole representation-lattice inputs of this
+component and are the explicit GG interfaces; TP2 separately supplies the
+previously unresolved sharper GamIntC.
+
+WHAT THIS CLOSES AND WHAT IT DOES NOT
+
+This closes the simultaneous-partner and weighted-mean bridge listed in
+TI9(a), once combined with the GG proof of the stated input lattices.
+It also supplies the exact partner theorem, with its literal constants,
+used in the first step of TI9(b). It does not by itself prove the
+segment/digit-class endpoint-dimension comparison, terminal contraction,
+harmonic/highest-weight dimension transfer, or paired polynomial lifts
+into cleaned Type-I edge lattices. Those are SW/RL work, and are not
+inferred merely by counting good Smith blocks.
+
+SOURCE AND PROOF POLICY
+
+The accompanying ledger records the literal source definitions, the
+implementation declarations, and the human derivation for each claim.
+The projection/multiplicity arguments use characteristic-zero background
+only in the places stated. Our simplifications are the direct factorial
+cancellation in TP2, the abstract Cartan-projection injection in TP9
+(matching the source Casimir implementation), and the short ordered
+peeling explanation in TP7. All old artifacts remain untouched.
+
+INDEPENDENT REVIEW
+
+The lean_audit agent independently checked TP2 and TP9. Its review verified
+the exact binomial factorization in TP2.4, the y_rho factorial identity,
+the row degrees of Q, the residual valuation in TP2.5, degree <=S+o and
+integer binomial translation. It also checked the Cartan projection,
+raising/weight-stable kernel argument and later-prefix cutoff preservation
+in TP9. No mathematical correction was requested in that review. This
+records the review's scope rather than claiming an independent audit of
+the entire release or a kernel replay.
+
+

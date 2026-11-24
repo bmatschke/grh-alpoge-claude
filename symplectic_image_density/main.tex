@@ -1,0 +1,1572 @@
+% Version 0.28.  The actual valued-point image-density reduction.
+% Pinned source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+\section{Valued points, nonsplit blocks, and the image-density reduction}
+\label{sec:symplectic-image-density}
+
+\status{IX1--IX8 prove the entire valued-point reduction to
+\texttt{Fin0}, \texttt{NoEnd}, and automorphy with one common
+complex embedding.  All of its local and global cohomological
+inputs are supplied by AX, DX, BR, FP and LD; the full
+\texttt{CohomologyHyp} record is unnecessary here.
+IX9--IX10 also prove the characteristic-$\ell$ trace obstruction
+and the characteristic-zero transport from an actual
+\texttt{ProModAlt} witness.  These results do not construct
+that witness.  The remaining seed, modular-support and
+component-reaching assertions are recorded at the end with
+their original quantifiers.  Consequently this chapter does
+not assert that \texttt{SymplecticFourImageDense} has already
+been supplied.}
+
+\subsection{Fixed arithmetic data and the three exact incoming assertions}
+
+Fix the original algebraic closure $\Omega/\mathbb Q$, an odd
+prime $\ell$, the specified coefficient DVR
+$O\subset\overline{\mathbb Q}_\ell$, and an actual good datum
+$D$.  Write $k=O/\mathfrak m_O$, $E=\operatorname{Frac}O$,
+$G=\operatorname{Gal}(\Omega/\mathbb Q)$, and retain every
+chosen $G_p,I_p$ in $D$.  As in MX and PX, put
+\[
+ \theta=(\alpha\Psi,\Psi,\alpha,1),\quad
+ r_0=\operatorname{diag}(\theta_i),\quad
+ \lambda=(1,0,1,0),\quad \mu=(1,1,0,0),\quad
+ w_{ij}=(\lambda_i-\lambda_j,\mu_i-\mu_j).
+ \tag{IX.1}
+\]
+The cyclotomic exponents of $\theta$ on
+$I_\ell\cap\ker\psi\cap\ker\omega$ are
+$(e+1,e,1,0)$, with $e\ge2$.  We use exactly the alternating
+form $J$ of (MX.3), and $X^*=J^{-1}X^tJ$.
+Write $V_A=\langle e_0,e_2\rangle$ and
+$V_B=\langle e_1,e_3\rangle$.  A block matrix preserves both
+these summands.  They are isotropic and are paired perfectly.
+
+Here a \emph{valued ambient field} is the source's
+$\mathfrak a:\texttt{Amb}\,\ell$: an algebraically closed field
+$K$ with a valuation ring $V$, compatible local maps
+$a_{O'}:O'\to V$ for all permitted coefficient DVRs $O'$, and
+the source's residue-field algebraicity condition.  A
+representation, together with finitely many auxiliary matrices,
+is \emph{small} if it is defined over a complete DVR $A\subset V$
+with finite residue field, is continuous modulo each power of
+$\mathfrak m_A$, and $K$ is algebraic over
+$\operatorname{Frac}A$.  This is \texttt{Amb.Small}, including
+all clauses of \texttt{IsDvr}; a merely bounded infinite set is
+not being substituted for it.
+
+The exact \texttt{KPair} consists of $r:G\to\operatorname{GSp}_4(V)$
+and $u\in\operatorname{Sp}_4(V)$ such that:
+the pair is small; $r$ reduces to $a_O r_0$;
+its multiplier is $a_O\vartheta$; it satisfies
+$D.\texttt{UnrT}$ and kills $I_p\cap\ker\psi$ for $p\in S_b$;
+$u^{-1}r(G_\ell)u$ is upper triangular; its diagonal characters
+reduce to the prescribed $\theta_i$ on $G_\ell$ and equal
+$a_O\theta_i$ on $I_\ell$.
+The exact \texttt{VPt} adds a witness consisting of an actual
+$\texttt{IsPt}$ lift $\rho$ over some $R\in\mathcal C_O$ and a
+local coefficient-compatible map $R\to V$ giving $r$; before
+choosing $u$, smallness refers to $(r,1)$.
+
+Set $\operatorname{Irr}(r)$ to mean that the $K$-span of the
+matrices $r(g)$ is $M_4(K)$.  This is the source definition.
+Set $\operatorname{BlockExt}(r)$ to mean that $r$ is block
+triangular with its $A\leftarrow B$ block zero, its $B$-block
+span equal to $M_2(K)$, and no matrix $Y\in\operatorname{Hom}(V_A,V_B)$
+turns every $(1-Y)r(g)(1+Y)$ into a block diagonal matrix.
+Put $\operatorname{Star}=\operatorname{Irr}\lor\operatorname{BlockExt}$.
+The direction of the off-diagonal block is part of this definition.
+
+Fix a field isomorphism
+$\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C$.
+The three incoming assertions are exactly these:
+\begin{enumerate}
+\item $\operatorname{Con}(D)$: over every ambient field of
+characteristic $\ell$, every actual \texttt{KPair} has
+$\neg\operatorname{Star}(r_K)$.
+\item $\operatorname{PurityAtPoints}(D,\iota)$: every
+\texttt{KPair} with $\operatorname{Star}$, in every ambient
+field identified with $\overline{\mathbb Q}_\ell$ by the
+source's coefficient- and valuation-preserving
+\texttt{IsZero} isomorphism, satisfies \texttt{PureW}.
+\item $\operatorname{AutmAlt}(D,\iota)$: every such
+characteristic-zero \texttt{KPair} with full matrix span
+satisfies the literal \texttt{IsAut4Alt}$\,\iota$.
+\end{enumerate}
+In particular the second assertion concerns all these
+\texttt{KPair}s, including the new nonsplit pair constructed
+below; it is not just a purity statement for original
+\texttt{EPt}s.  The source's \texttt{PureW} is the following
+strict inequality, and is weaker than equality of absolute values:
+there are an open $H\le G$ and $M\ne0$ such that, at every
+prime $p\nmid M$, for every original place over $p$ and every
+arithmetic Frobenius $\sigma\in H$ of degree $f>0$,
+\[
+ |\iota x|<p^f|\iota y|
+ \quad\text{for all roots }x,y\text{ of }
+                 \det(X-r(\sigma)),\quad y\ne0.
+ \tag{IX.2}
+\]
+We keep \texttt{IsAut4Alt} as the literal \texttt{IsAutQA}
+of the source, including its quadratic CM extensions,
+regular algebraic cuspidal attachment and \texttt{WitA}
+clauses.  A generic assertion of potential automorphy is
+not substituted for it.
+
+The additional classical facts used below are Noetherian
+completion and Hensel's lemma, the weak Nullstellensatz,
+properness of the symplectic flag variety, finite extensions
+of complete discrete valuation fields, and Minkowski's theorem
+that $\mathbb Q$ has no nontrivial finite extension unramified
+at all finite primes.  The precise forms are recorded in the
+classical-input registry.  For the geometric facts see Stacks
+Project tags \href{https://stacks.math.columbia.edu/tag/04GH}{04GH},
+\href{https://stacks.math.columbia.edu/tag/01WC}{01WC} and
+\href{https://stacks.math.columbia.edu/tag/01KF}{01KF};
+for the two number-theoretic facts see Milne,
+\emph{Algebraic Number Theory}, Theorems 4.9 and 7.38--7.40,
+\url{https://www.jmilne.org/math/CourseNotes/ANT.pdf}.
+All finite local/global duality, finiteness and Euler formulas
+are the already matched DX1 and LD3 inputs on the original
+groups and finite coefficient modules.
+
+% BEGIN IX1
+\begin{proposition}[IX1: one universal ring for all actual points]
+\label{claim:IX1}
+There is a complete Noetherian local $O$-algebra $U$ with the
+original residue field, an actual universal $\texttt{IsPt}$ lift
+$\rho^u$, its origin $x:U\to O$, and a finite weighted
+presentation
+\[
+       O[[z_1,\ldots,z_d]]\twoheadrightarrow U
+ \tag{IX.3}
+\]
+with homogeneous kernel.  The variables are actual matrix-entry
+differences $\rho^u(g)_{ij}-\theta_i(g)\delta_{ij}$ of weight
+$w_{ij}$.  Every actual $\texttt{IsPt}$ lift over every
+$R\in\mathcal C_O$ is induced by its unique $O$-algebra map
+$U\to R$.
+The full-weight-zero ring $B=U_0$ is complete Noetherian local
+with residue field $k$.  If $B$ is finite over $O$, then
+$D.\texttt{Fin0}$ holds.
+\end{proposition}
+
+\begin{proof}
+DX2 and FP2 give the universal continuous matrix lift on
+$D.Gam$.  MX1 identifies its pullbacks with precisely the
+original global lifts satisfying the required inertia-killing
+equations.  It remains to check that \texttt{IsPt}, including
+its \texttt{OnComp} clauses, is a closed condition on these
+actual lifts.
+
+For each original local group, use the integral universal
+ring $U_v$ of DX5--DX7 for $\operatorname{condL}$ or
+$\operatorname{condP}$.  Let $x_v:U_v\to O$ be its origin,
+$\phi_v:U_v\to E[[t_1,\ldots,t_{d_v}]]$ its
+characteristic-zero chart, and $P_v=\ker\phi_v$.
+The chart is a domain, $P_v$ is prime, and DX5 supplies
+$a_v\notin\ker x_v$ with $a_vP_v=0$.
+For every $f:U_v\to R$ we claim
+\[
+ \operatorname{OnComp}(\rho^u_v\otimes_fR,r_{0,v})
+                  \quad\Longleftrightarrow\quad f(P_v)=0.
+ \tag{IX.4}
+\]
+If $f$ kills $P_v$, the domain $U_v/P_v$, its induced origin,
+its universal local representation and its map to $R$ are the
+required \texttt{OnComp} witness.  Conversely a domain witness
+$C$ gives, by local universality, a map $h:U_v\to C$ with
+its composite to $O$ equal to $x_v$.  Hence $h(a_v)\ne0$.
+The equality $a_vP_v=0$ and the fact that $C$ is a domain
+force $h(P_v)=0$, and then $f(P_v)=0$.
+This proves (IX.4) even for nonreduced target rings.
+
+On an arbitrary lift first impose the local polynomial
+equations, obtaining its quotient ring and its unique map
+from $U_v$.  Impose the image of $P_v$ in that quotient.
+The inverse image of this ideal gives exactly its
+\texttt{OnComp} condition by (IX.4).  Add the multiplier,
+inertia and normalization equations.  There are finitely
+many local groups, and the ideal generated by all equations
+is finitely generated and closed.  Its quotient is nonzero
+because the actual diagonal lift $r_0$ satisfies them, by
+MX1.  The quotient therefore represents the full actual
+point functor, not only its characteristic-zero tangent
+functor or one preselected family of points.
+
+Conjugation by the formal diagonal torus preserves this
+condition.  The \texttt{OnComp} clause is preserved directly:
+for a domain witness $C$, replace it by
+$C[[T_1,T_2]]$, conjugate by
+$\operatorname{diag}((1+T_1)(1+T_2),1+T_2,1+T_1,1)$,
+and send $T_i$ to the desired unit minus $1$ in the target.
+The origin sends the $T_i$ to zero and still gives $r_0$.
+The other clauses are polynomial conjugation identities.
+Take finitely many universal entry differences spanning the
+relative cotangent space.  FP1 makes them topological
+generators, and the formal-torus coefficient argument of FP3
+makes their presentation kernel homogeneous, with the stated
+entry weights and actual origin.
+
+The finite-monomial proof in PX1 applies to any finite set of
+weights: a fixed weight has finitely many coordinatewise
+minimal exponent vectors; every exponent of that weight is
+one of these plus a weight-zero exponent.  The nonzero minimal
+weight-zero exponents generate their monoid.  Therefore $B$
+is a quotient of a formal power series ring over $O$ on
+finitely many positive-order invariant monomials.  It has the
+stated completeness, locality and residue field.
+
+Finally any entry monomial of total weight zero in any actual
+lift is the image of an element of $B$.  Its generated
+$O$-algebra lies in the image of $B$ under the universal map.
+If $B$ is finite, that image is a finite $O$-module, and any
+submodule is finite because $O$ is Noetherian.  This is
+\texttt{Fin0} with its full quantification over $R$ and $\rho$.
+\end{proof}
+% END IX1
+
+% BEGIN IX2
+\begin{proposition}[IX2: ordinary flags on every small valued point]
+\label{claim:IX2}
+Every actual $\operatorname{VPt}(D,\mathfrak a,r)$ admits
+$u\in\operatorname{Sp}_4(V)$ making it an actual
+$\operatorname{KPair}(D,\mathfrak a,r,u)$.
+Every original $D.\texttt{EPt}$ is such a valued point in the
+standard ambient $\overline{\mathbb Q}_\ell$ with its valuation
+ring.  These assertions do not require
+$\operatorname{CohomologyHyp}$ or any automorphy input.
+\end{proposition}
+
+\begin{proof}
+Choose the original $\texttt{IsPt}$ witness and its local
+domain witness $C$ at $\ell$.  The map $C\to O$ giving the
+origin makes $O\hookrightarrow C$ injective.  Over
+$F=\operatorname{Frac}C$ the four prescribed eigenvalues
+$\theta_i(s_0)$ are distinct by AX6.  The unnormalized
+projector equations in \texttt{Ord}, after these nonzero
+differences are inverted, give their ordered stable full
+flag; the multiplier pairs the $i$th and $(3-i)$th lines,
+so it is a symplectic flag.  Its inertia quotient characters
+are exactly $\theta_i$.
+
+Take the schematic closure of this generic flag in the
+symplectic flag variety over $C$.  The latter is projective:
+embed a full flag in the product of the Grassmannians and
+impose the closed incidence and isotropy equations.  Its
+closed generic-flag closure is proper over $C$ and has image
+all of $\operatorname{Spec}C$, since that image is closed and
+contains the generic point.  All stability and fixed-inertia
+equations hold on this closure: on each tautological
+quotient they are regular equations vanishing at its generic
+point.  After the given map $C\to V$ its generic fibre has a
+$K$-point, because $K$ is algebraically closed.  Properness
+extends that flag over the valuation ring $V$.
+All its subquotients are free direct summands; successive
+choice of a primitive vector and its symplectic dual gives
+an adapted symplectic basis.  Let $u$ be its matrix.
+
+The residual labels also need justification.  For $g\in G_\ell$
+the $i$th generic quotient eigenvalue $b_i(g)$ belongs to
+$F$: the ordered eigenspaces of $\rho(s_0)$ are defined over
+$F$.  It is integral over $C$, because it is a root of the
+monic characteristic polynomial of $\rho(g)$.
+The finite domain $C[b_i(g)]$ is local because $C$ is
+complete henselian.  Evaluating the projector expression
+at the origin sends $b_i(g)$ to $\theta_i(g)$; this is
+well-defined because its denominator is a product of the
+nonzero scalars $\theta_i(s_0)-\theta_j(s_0)$.
+Initially this evaluation takes values in $E$.  Its values
+are integral over $O$, so they belong to $O$, which is
+integrally closed.  The resulting map $C[b_i(g)]\to O$
+is local: the inverse image of $\mathfrak m_O$ is a
+maximal ideal above $\mathfrak m_C$, and the finite
+henselian domain has only one such maximal ideal.
+Thus $b_i(g)-\theta_i(g)$ belongs to the maximal ideal of
+$C[b_i(g)]$.  Modulo $\mathfrak m_C$ it is nilpotent.
+The determinant trick for this finite $C$-module supplies
+a monic polynomial for it whose nonleading coefficients
+lie in $\mathfrak m_C$.
+The same polynomial equation holds on the generic-flag
+closure and hence on the specialized quotient line.
+In the valuation ring its root is in $\mathfrak m_V$.
+This proves exactly the required residual character label
+on every element of $G_\ell$, even when the characteristic
+is $\ell$ and the four special eigenvalues coincide.
+
+The remaining local conditions pass through the domain
+witness by their polynomial equations, including identity
+on $I_p\cap\ker\psi$ for $p\in S_b$.
+Smallness is preserved: start with the DVR $A$ defining $r$;
+the finitely many entries of $u$ and $u^{-1}$ are algebraic
+over $\operatorname{Frac}A$.  Enlarge to their finite field
+extension and its valuation ring $A'$.  It is a complete
+DVR with finite residue field, and $u\in\operatorname{Sp}_4(A')$.
+The induced maps are local, the entrywise adic continuity
+of $r$ survives, and $K$ remains algebraic over its fraction
+field.  This is the complete \texttt{Small} assertion.
+The standard theorem for finite separable extensions is
+Milne 7.38; in equal characteristic the purely inseparable
+part is obtained by adjoining $\ell$-power roots of a
+uniformizer.  Since the residue field is finite and perfect,
+its valuation ring is again a finite complete DVR.
+
+For an original $\texttt{EPt}$ with map $R\to
+\overline{\mathbb Q}_\ell$, the boundedness argument of PX6
+puts every element of $\mathfrak m_R$ in the open unit ball
+and proves continuity.  A finite formal presentation shows
+that its image lies in the finite extension of $E$ generated
+by the variable values.  Its ring of integers gives the
+required small local map and original residual congruence.
+The identity ambient isomorphism fixes every coefficient
+and its valuation, so satisfies the literal \texttt{IsZero}.
+This also explains why the auxiliary DVR does not replace
+the original datum or its coefficient maps.
+\end{proof}
+% END IX2
+
+% BEGIN IX3
+\begin{proposition}[IX3: an actual nonconstant characteristic-$\ell$ curve]
+\label{claim:IX3}
+If $D.\texttt{Fin0}$ fails, there are an ambient field of
+characteristic $\ell$, an actual valued point $r$, and an
+entry monomial $x$ of total weight zero such that
+\[
+                   x^{\ell^n}\ne x\qquad(n>0).
+ \tag{IX.5}
+\]
+In particular the conclusion is a small actual point on the
+original functor, not an arbitrary point of a larger special
+fibre.
+\end{proposition}
+
+\begin{proof}
+Use $U$ and $B=U_0$ from IX1.  Then $B$ is not finite over
+$O$.  If $B/\mathfrak m_OB$ were Artinian, some
+$\mathfrak m_B^N$ would lie in $\mathfrak m_OB$; the two
+adic topologies would be equivalent, and successive
+approximation from a basis modulo $\mathfrak m_O$ would
+make $B$ a finite $O$-module.  Thus choose a prime
+$P\supset\mathfrak m_OB$, maximal among those different
+from $\mathfrak m_B$.  Such a maximal prime exists by
+Noetherianity.  For $t\in\mathfrak m_B\setminus P$, the
+domain $C=B/P$ has only its maximal ideal above $(t)$,
+so $\mathfrak m_C^N\subset(t)$ for some $N$.
+It is complete, contains $k$, and the continuous map
+$k[[T]]\to C$, $T\mapsto t$, is injective: a nonzero series
+is $T^a$ times a unit.  Successive approximation modulo
+$t$ makes $C$ finite over $k[[T]]$.
+Embed its fraction field in an algebraic closure
+$K$ of $k((T))$ and take the extended valuation ring $V$.
+This gives a local $y:B\to V$ with $y(t)\ne0$ and
+$y(\mathfrak m_OB)=0$; its values lie in one finite extension
+of $k((T))$.
+
+To make the original ambient coefficient system, identify
+the residue field of the union of the original $\ell$-adic
+coefficient DVRs with $\overline{\mathbb F}_\ell\subset K$,
+extending the specified embedding of $k$.  Reduction gives
+all the maps $a_{O'}$.  They are local and compatible, and
+every residue element comes from a finite residue extension,
+hence from an unramified coefficient extension.  Therefore
+the full \texttt{Amb} condition holds, not just the choice
+of $K$ and $V$.
+
+We now lift the point of the invariant ring.  Write
+$U^{\mathrm{gr}}=\bigoplus_wU_w$.  Projection to weight zero
+is $B$-linear and sends $1$ to $1$, so the fibre
+$U^{\mathrm{gr}}\otimes_{B,y}K$ is nonzero.  The
+finite-monomial argument of PX1 makes it a finite-type
+$K$-algebra: it is generated by the finitely many $z_i$.
+The weak Nullstellensatz gives a map
+$\xi:U^{\mathrm{gr}}\to K$ extending $y$.
+For its nonzero variable values put $a_i=v(\xi(z_i))$.
+Whenever $n_i\ge0$ are integers, not all zero, and
+$\sum n_iw_i=0$, locality of $y$ gives
+\[
+                         \sum n_i a_i>0.
+ \tag{IX.6}
+\]
+The strict linear inequalities
+$a_i+\langle h,w_i\rangle>0$ consequently have a rational
+solution $h$.  Indeed otherwise separation from the positive
+orthant gives nonzero rational $q_i\ge0$ with
+$\sum q_iw_i=0$ and $\sum q_i a_i\le0$; clearing denominators
+contradicts (IX.6).  This is the same finite rational
+separation argument proved in PX5.
+Scale by a torus element with valuation vector $h$.
+It fixes $B$ and makes every nonzero variable value have
+positive valuation.
+
+These finitely many values, together with the finite field
+of definition of $y(B)$, lie in one finite extension of
+$k((T))$.  Let $A'$ be its complete valuation ring.
+Power series can now be evaluated there.  This evaluation
+agrees with $y$ on the full weight-zero formal ring: both
+maps are continuous and agree on its finite monomial
+generators.  For another weight, the finite-monomial
+decomposition gives agreement with the scaled $\xi$.
+Thus evaluation kills each homogeneous part of a defining
+relation of $U$.  To kill the whole relation, sum the
+finitely many complete weight components which have a
+monomial of degree less than $N$; the remaining series has
+order at least $N$.  Continuity and $N\to\infty$ finish the
+argument.  We have obtained an actual local map $U\to A'$,
+preserving $y$ on $B$, and hence a small actual valued point.
+
+The maximal ideal of $B$ is generated by
+$\mathfrak m_O$ and finitely many positive-order invariant
+monomials in the entry differences.  Since $y(t)\ne0$,
+at least one of these monomials has nonzero image in
+$\mathfrak m_V$.  Every such invariant monomial is an
+$O$-linear combination of entry monomials of total weight
+zero: subtracting the origin affects only diagonal entries,
+whose weights are zero.  If all the latter values were
+fixed by some positive power of Frobenius, their sums and
+products and the finite coefficient field would have the
+same property after taking a common multiple of the powers.
+But a nonzero element of $\mathfrak m_V$ cannot satisfy
+$b^{\ell^n}=b$: the factor $1-b^{\ell^n-1}$ is a unit.
+This contradiction proves (IX.5).
+\end{proof}
+% END IX3
+
+% BEGIN IX4
+\begin{proposition}[IX4: all reducible patterns and their constant invariants]
+\label{claim:IX4}
+For any actual small valued point, in either characteristic,
+the alternatives of (PX.14) hold: full matrix span,
+\texttt{DiagType}, or the two $2$-element blocks with all
+cross-block entries zero in one direction and both $02,20$
+entries present.  In the third case there is a block diagonal
+\texttt{KPair} whose $A$-block span is $M_2(K)$.
+In characteristic $\ell$, every weight-zero entry monomial
+of a \texttt{DiagType} point satisfies
+$x^{\ell^n}=x$ for some $n>0$.
+\end{proposition}
+
+\begin{proof}
+The polynomial projector proof of PX6 takes place over the
+actual complete coefficient ring before specialization.
+It supplies all $e_{ii}$ in the $V$-span of $r(G)$, and
+remains valid in characteristic $\ell$.  Consequently the
+relation $i\rightsquigarrow j$ defined by a nonzero entry
+is reflexive and transitive, is reversed by
+$(i,j)\mapsto(3-j,3-i)$, and has full matrix span exactly
+when all pairs occur.
+
+We spell out the arithmetic exclusion in the new valued
+setting.  A two-element strongly connected component
+$\{s,u\}$ crossing the $\lambda$ blocks gives a
+two-dimensional subquotient and an ordinary stable local
+line by IX2.  In one of its coordinate charts the slope
+$v$ lies in $V$, interchanging $s,u$ if necessary.
+In the DVR defining smallness, choose a least-valuation
+nonzero coefficient $b=r(g_1)_{su}$ and write
+$r(g)_{su}=b c(g)$ with $c(g)\in V$.
+The reductions of the $c(g)$ are locally constant and
+not all zero: continuity modulo the valuation of $b$
+plus one proves the first assertion.  The component
+matrix identity gives the residual cocycle
+\[
+ z(g)=\frac{\overline{c(g)}}{\bar\theta_u(g)},
+ \qquad \gamma=\bar\theta_s\bar\theta_u^{-1}.
+ \tag{IX.7}
+\]
+It cannot be a coboundary.  A coboundary would say
+$\overline{c(g)}=a(\bar\theta_s(g)-\bar\theta_u(g))$.
+Apply the integral linear combination of $r(g)$ giving
+$e_{ss}$: its off-diagonal entry says $0=a$, whereas some
+$\overline{c(g)}$ is nonzero.
+
+Outside $T$ the original unramified condition kills the
+cocycle on the inertia kernel specified by \texttt{XVan}.
+At $p\in S_b$, AX6 supplies $\sigma_p$ with
+$\bar\chi_\ell(\sigma_p)=1$ and
+$\gamma(\sigma_p)\ne1$.  Hence both the invariants of
+$k(\gamma)$ and of its cyclotomic dual vanish; DX1 local
+duality and the Euler formula for $p\ne\ell$ give $H^1=0$.
+The same holds after any finite extension of the residue
+field.  At $\ell$, use the coordinate chart in which the
+stable line is generated by $(v,1)$, and write the
+two-dimensional matrix as
+$\bigl(\begin{smallmatrix}a_g&bc(g)\\ \beta_g&d_g\end{smallmatrix}\bigr)$.
+Stability says
+$bc(g)=(d_g-a_g+\beta_gv)v$.
+At $g=\sigma_\ell$ the factor in parentheses is a unit:
+$d_g-a_g$ is a unit by AX6, whereas
+$\beta_g\in\mathfrak m_V$ and $v\in V$.
+It follows first that $v/b\in V$.
+Now divide every stable-line equation by $b$.
+The extra term is $\beta_gv(v/b)$, whose reduction is
+zero because the opposite off-diagonal entry $\beta_g$
+is in $\mathfrak m_V$.  Hence
+$\overline{c(g)}=(\bar\theta_u(g)-\bar\theta_s(g))
+\overline{v/b}$ for $g\in G_\ell$.
+Eliminating $\overline{v/b}$ gives exactly
+\[
+ \overline{c(g)}(\bar\theta_u(\sigma_\ell)
+                         -\bar\theta_s(\sigma_\ell))
+ =\overline{c(\sigma_\ell)}(\bar\theta_u(g)
+                         -\bar\theta_s(g)).
+ \tag{IX.8}
+\]
+The denominator on the left is nonzero by AX6, so the local
+cocycle is a coboundary also at $\ell$.
+The residue field of an ambient is algebraic over
+$\mathbb F_\ell$; a locally constant cocycle on the compact
+group has finite image.  Its values therefore lie in one
+finite extension of $k$.  Applying a $k$-basis coordinate
+to this cocycle and all its local primitives reduces it to
+the exact residual vanishing in $D.\texttt{Good}$, supplied
+by BR7.  Recombining coordinates makes (IX.7) a coboundary,
+the desired contradiction.
+
+The remaining finite graph argument is elementary.
+Strong components are permuted by $i\mapsto3-i$.
+A component of size three would meet its reversed image,
+so would be reversal-stable, impossible for this
+fixed-point-free involution.  A component of size four
+gives full span.  A component of size two cannot cross
+$\lambda$ by the preceding paragraph, so the two components
+are $\{0,2\}$ and $\{1,3\}$.  Their quotient graph cannot
+have edges in both directions.  If there is no component
+of size two, there is no directed cycle between distinct
+vertices, which is \texttt{DiagType}.
+
+In the two-block case erase all cross-block entries.
+Block projection is multiplicative on matrices triangular
+in the same block direction and commutes with the
+symplectic adjoint.  It therefore gives a representation
+with the same multiplier, residual representation and
+inertia-killing properties.  For the ordinary flag use
+the following explicit specialization.  Capture the
+original $r,u$ in its small DVR $A$.  Multiply its only
+possible cross block by an indeterminate $t$.  The
+resulting $r_t$ is a representation over $A[t]$ with the
+same multiplier, and over $\operatorname{Frac}(A)(t)$
+is conjugate to $r$ by a one-parameter diagonal torus.
+Its ordered local diagonal characters are the original
+elements of $A$, independent of $t$.
+Take the closure of this generic flag in the projective
+symplectic flag variety over $A[t]$, including the closed
+equations for those fixed quotient characters.  Its
+proper image contains the generic point and hence all
+of $\operatorname{Spec}A[t]$.  At $t=0$ there is a flag
+over $K$ with those same ordered characters, and
+properness extends it over $V$.
+Choose an integral adapted symplectic basis and capture
+its finitely many entries in a finite DVR extension as
+in IX2.  This proves every \texttt{KPair} clause for the
+block projection.  The existing $e_{00},e_{22}$ and both
+nonzero $02,20$ entries give all four $A$-block matrix
+units, so that block has full span.
+
+Finally suppose the characteristic is $\ell$ and the
+pattern is \texttt{DiagType}.  Each diagonal entry
+$d_i(g)=r(g)_{ii}$ is a character, since no off-diagonal
+two-step return contributes to a diagonal product.
+Put $U_1=\ker\bar r\cap\ker\psi$ and let $m=[G:U_1]$.
+For inertia at $\ell$, $r(s^m)$ is conjugate to an upper
+unipotent matrix; its fourth nilpotent power is zero, so
+$r(s^m)^{\ell^2}=1$.  At $p\in S_b$ it is already $1$,
+and away from $T$ the \texttt{UnrT} condition gives the
+same conclusion.  Conjugacy of places gives
+$d_i(s)^{m\ell^2}=1$ on every inertia group.
+Reduce the powered character $d_i^{m\ell^2}$ modulo each power of the small
+DVR's maximal ideal.  Its finite continuous image then
+defines an extension of $\mathbb Q$ unramified at every
+finite prime, hence trivial by Minkowski's theorem.
+Separatedness gives $d_i(g)^{m\ell^2}=1$ for all $g$.
+
+There is an integral linear functional $L$ on the weight
+lattice which is positive on every present nonzero
+off-diagonal weight.  One explicit choice is obtained
+from $a_i=|\{j:i\rightsquigarrow j\}|$,
+$h_i=a_i-a_{3-i}$ and
+$L(x,y)=(h_0-h_1)x+(h_0-h_2)y$.
+For a present strict edge its value is $h_i-h_j>0$.
+A nonzero monomial of total weight zero can therefore
+use only diagonal entries.  Their values have finite
+order, so in characteristic $\ell$ they belong to a
+finite field.  The monomial, or zero if one factor
+vanishes, is fixed by a positive Frobenius power.
+\end{proof}
+% END IX4
+
+% BEGIN IX5
+\begin{theorem}[IX5: finite Selmer sizes produce a nonzero integral cocycle]
+\label{claim:IX5}
+Let $A$ be a complete DVR with finite residue field of
+characteristic $\ell\ne2$, uniformizer $\pi$, and let $T_A$
+be a finite free $A$-module with an adically continuous
+action $\rho$ of the original $G$.
+Fix a finite prime set $S$ containing $\ell$, an original
+complex conjugation $c$, the original decomposition group
+$H=G_\ell$, and $s\in H$ such that
+\[
+ \rho(c)=-1,\qquad \chi_\ell(s)=1,\qquad
+                       \rho(s)-1\text{ is an automorphism of }T_A.
+ \tag{IX.9}
+\]
+Let $P\ne0$ be a saturated $A$-submodule of $T_A$ stable
+under $H$.  Let $K_0\le\ker\rho$ contain inertia outside
+$S$, and put
+\[
+ N=\{g\in K_0:g\text{ belongs to an inertia group away from }\ell\}.
+ \tag{IX.10}
+\]
+Then there are an adically continuous nonzero cocycle
+$z:G\to T_A$ and $y\in T_A$ satisfying
+\[
+ \begin{gathered}
+ z(gh)=z(g)+\rho(g)z(h),\qquad z(c)=0,
+                  \qquad z(N)=0,\\
+ z(h)-(\rho(h)y-y)\in P\qquad(h\in H).
+ \end{gathered}
+ \tag{IX.11}
+\]
+This holds in mixed and equal characteristic.  Its only
+arithmetic input is the exact finite duality, finiteness
+and Euler package already installed in DX1 and LD3.
+\end{theorem}
+
+\begin{proof}
+Put $M_n=T_A/\pi^nT_A$ and
+$P_n=(P+\pi^nT_A)/\pi^nT_A$.  Saturation over a DVR makes
+$T_A/P$ free, so
+$|P_n|=q^{n d}$, where $q=|A/\pi|$ and $d=\operatorname{rank}P>0$.
+The finite module $M_n$ is killed by $\ell^n$, since
+$\ell\in\mathfrak m_A$; it is therefore a legitimate
+finite module for the installed $\mathbb Z/\ell^{n+1}$
+cohomology interfaces, even in equal characteristic.
+No freeness over that coefficient ring is asserted.
+
+On $G_\ell$ choose the local condition
+\[
+ L_\ell=\operatorname{im}
+                  \bigl(H^1(G_\ell,P_n)\to H^1(G_\ell,M_n)\bigr).
+ \tag{IX.12}
+\]
+The map in (IX.12) is injective.  Indeed $\rho(s)-1$
+is bijective on $M_n$ and on its stable finite subgroup
+$P_n$; if a $P_n$-valued cocycle is the coboundary of
+$m\in M_n$, evaluating at $s$ puts $m$ in $P_n$.
+The local Euler formula at $\mathbb Q_\ell$ gives
+\[
+ |H^1(G_\ell,P_n)|
+       =|P_n|\,|H^0(G_\ell,P_n)|\,|H^2(G_\ell,P_n)|
+       \ \ge\ |P_n|.
+ \tag{IX.13}
+\]
+At every other prime in $S$ use the unramified local
+condition.  Its cardinality is that of $H^0(G_p,M_n)$:
+both are the kernel or cokernel of Frobenius minus $1$
+on the same finite inertia-invariant group.
+
+The Greenberg--Wiles cardinality identity obtained from
+the normalized finite Poitou--Tate pairing now gives
+\[
+                         |\operatorname{Sel}(M_n)|\ge |L_\ell|.
+ \tag{IX.14}
+\]
+Here are all the cancellations in that formula.
+The global invariants and real-place invariants of $M_n$
+are zero because $c$ acts by $-1$ and $2$ is a unit.
+The local invariants at $\ell$ are zero by $s-1$.
+The global invariants of the cyclotomic dual are also
+zero: a fixed functional evaluated on
+$(\rho(s)-1)m$ is zero, since $\chi_\ell(s)=1$,
+and these elements exhaust $M_n$.
+At the other finite places the unramified factors
+$|L_p|/|H^0(G_p,M_n)|$ equal $1$.
+The only factor left besides $|L_\ell|$ is the positive
+cardinality of the dual Selmer group.  All groups in
+this argument are finite by DX1, with the same local
+decomposition-group transport as LD3 and KB6.
+
+Each Selmer class has a unique representative with
+$z(c)=0$: subtract a coboundary, using
+$\rho(c)-1=-2$.  This representative vanishes on $N$.
+At $p\ne\ell$ a locally unramified class is a
+coboundary on inertia, and a coboundary vanishes on
+inertia intersected with $K_0\le\ker\rho$.
+Outside $S$ it is already unramified.
+Condition (IX.12) says exactly that some $y_n\in M_n$
+makes its restriction differ from $\delta y_n$ by
+$P_n$-valued elements.  Consequently the finite set
+\[
+ Z_n=\{z:G\to M_n:\ z\text{ satisfies the finite version of
+                                      (IX.11) for some }y_n\}
+ \tag{IX.15}
+\]
+satisfies $|Z_n|\ge q^{nd}$.  Its finiteness follows
+also directly from its injection into the finite global
+$H^1$: normalized coboundaries are zero.
+
+We must produce compatible nonzero elements; mere size
+growth would not suffice.  Call $z\in Z_n$ primitive
+if its reduction in $M_1$ is nonzero.  Suppose for a
+fixed $n\ge1$ that no element of $Z_n$ is primitive.
+The same holds at every higher level by reduction.
+For a nonprimitive $z\in Z_{m+1}$, divide its values
+by $\pi$ to obtain a unique $z'\colon G\to M_m$.
+This is a continuous cocycle, with the same zero
+conditions.  To check its local condition, let $y$
+be a witness for $z$.  At $s$, reduction modulo
+$P+\pi T_A$ gives $(\rho(s)-1)y=0$.
+The endomorphism $\rho(s)-1$ preserves $P$ and is
+bijective on $P$ and $T_A/P$: its matrix is block
+triangular for a splitting of the saturated submodule,
+and its determinant is a unit.  Thus
+$y=p+\pi y'$ with $p\in P$.
+Replace $y$ by $\pi y'$ and divide the local equation
+by $\pi$; saturation of $P$ gives the required condition
+for $z'$ modulo $\pi^m$.
+This division map $Z_{m+1}\to Z_m$ is injective whenever
+all its elements are nonprimitive.
+The resulting bounded sequence of cardinalities for
+$m\ge n$ contradicts $|Z_m|\ge q^{md}$.
+Hence each $Z_n$ contains a primitive element.
+
+For each level take all pairs $(z_n,y_n)$ with $z_n$
+primitive and $y_n$ a local witness.  They form nonempty
+finite sets; reduction maps preserve both the equations
+and primitivity for levels at least one.
+The finite-branching tree of such pairs has paths of
+every length, so has an infinite path: successively
+choose a vertex with arbitrarily long continuations.
+Completeness of the finite free module $T_A$ then gives
+$z(g)=\lim z_n(g)$ and $y=\lim y_n$.
+All the equations pass to the limit.
+The submodule $P$ is closed since $T_A/P$ is finite
+free and separated.  Adic continuity follows at each
+finite level, and primitivity at level one gives
+$z\ne0$.  This proves (IX.11) with no inverse-limit
+surjectivity assumption.
+\end{proof}
+% END IX5
+
+% BEGIN IX6
+\begin{theorem}[IX6: the actual nonsplit block constructor]
+\label{claim:IX6}
+Let $(r,u)$ be any actual \texttt{KPair} for the original
+good datum.  Suppose $r$ is block diagonal and its
+$A$-block span over $K$ is $M_2(K)$.  Then there is another
+actual \texttt{KPair} $(r',u')$ in the same ambient field
+such that
+\[
+ \operatorname{BlockExt}(r'_K),\qquad
+          \det(X-r'(g))=\det(X-r(g))\quad(g\in G).
+ \tag{IX.16}
+\]
+No assertion that $r'$ is an original \texttt{EPt} is
+needed or made.
+\end{theorem}
+
+\begin{proof}
+Capture $r,u$ in their defining complete DVR $A$.
+All identities hold there by injectivity into $V$.
+Let
+\[
+ \mathcal U=\operatorname{Hom}(V_A,V_B)
+                         \cap\mathfrak {sp}_4(A)
+   =A(E_{10}-E_{32})\oplus AE_{12}\oplus AE_{30}.
+ \tag{IX.17}
+\]
+It is free of rank three, its elements multiply to zero,
+and it is stable under $\rho(g)Y=r(g)Yr(g)^{-1}$.
+Put
+\[
+             P=\{Y\in\mathcal U:u^{-1}Yu
+                                      \text{ is strictly upper triangular}\}.
+ \tag{IX.18}
+\]
+It is saturated because its defining entries are linear
+equations over a domain, and is stable under $G_\ell$
+because upper triangular matrices preserve strict upper
+triangularity by conjugation.
+
+We check that $P\ne0$, rather than assuming it from a
+dimension count.  Write $X=r(\sigma_\ell)$ and
+$U=u^{-1}Xu$.  Residual cross-block separation makes
+the $B$-block of $X-U_{00}$ invertible, so the first
+column of $u$ is $v=(v_0,0,v_2,0)$.
+Likewise $X|_{V_A}-U_{11}$ and $U_{00}-U_{11}$ are
+invertible.  The first two column equations then give
+the $A$-part of the second column as $a v$, for some
+$a\in A$.  Put $w=u_1-av=(0,w_1,0,w_3)$.
+The columns are independent, so $v,w\ne0$.
+Isotropy gives $v_0w_3=v_2w_1$.
+For $\varphi=(v_2,0,-v_0,0)$ the nonzero outer product
+$Y=w\varphi$ lies in (IX.17).  It kills the first two
+flag steps and has image in the second; hence
+$u^{-1}Yu$ is strictly upper triangular.  This proves
+$P\ne0$ over the original $A$.
+
+Modulo $\mathfrak m_A$, the operator
+$\rho(\sigma_\ell)-1$ on (IX.17) has the nonzero
+diagonal eigenvalues
+$\bar\theta_i(\sigma_\ell)/\bar\theta_j(\sigma_\ell)-1$
+for the indicated cross-block positions.
+Its determinant is therefore a unit, so it is an
+automorphism over $A$.  AX6 also gives
+$\chi_\ell(\sigma_\ell)=1$.
+Complex conjugation acts on the two blocks as $-1,+1$:
+each block of the involution $r(c)$ is congruent to that
+scalar, and the other factor in $(r(c)-1)(r(c)+1)=0$
+is a unit.  Thus
+\[
+                  r(c)=\operatorname{diag}(-1,1,-1,1),
+                   \qquad \rho(c)|_{\mathcal U}=-1.
+ \tag{IX.19}
+\]
+The original \texttt{UnrT} condition and AX6 make $r$
+unramified outside $D.S$.  Its kernel lies in $\ker\rho$.
+Every hypothesis of IX5 is now verified for $T_A=\mathcal U$,
+$P$ as in (IX.18), and $K_0=\ker r$.
+
+Let $z,y$ be the resulting nonzero cocycle and primitive.
+Multiply both by $\pi$; they still satisfy (IX.11),
+$z$ remains nonzero, and all entries of $z(g)$ lie in
+$\mathfrak m_A$.  Define
+\[
+                       r'(g)=(1+z(g))r(g),
+                       \qquad u'=(1-y)u.
+ \tag{IX.20}
+\]
+Because products of two members of $\mathcal U$ vanish,
+the cocycle identity is exactly the multiplicativity of
+$r'$.  Also $(1+z)^*(1+z)=1$ and
+$(1-y)^*(1-y)=1$; hence its multiplier and the symplectic
+condition on $u'$ are unchanged.
+The representation remains small and adically continuous,
+with the same reduction.  If $g$ is in inertia away from
+$\ell$ and $r(g)=1$, (IX.11) gives $z(g)=0$, so $r'(g)=1$.
+This verifies the full original \texttt{UnrT} and all
+$I_p\cap\ker\psi$ conditions, including their specified
+kernel restrictions.
+
+For $h\in G_\ell$ set
+$W_h=z(h)-(r(h)yr(h)^{-1}-y)\in P$.
+Using the same zero-product identities gives
+\[
+ (u')^{-1}r'(h)u'
+           =(1+u^{-1}W_hu)(u^{-1}r(h)u).
+ \tag{IX.21}
+\]
+This is upper triangular with exactly the old diagonal,
+because the first added term is strictly upper triangular.
+Thus the integral flag, residual labels and prescribed
+inertia characters are all unchanged.  Every field of
+the new \texttt{KPair} has been checked.
+
+The matrix $r'$ is block triangular with the same two
+diagonal blocks as $r$, proving the characteristic
+polynomial identity.  The $B$-block has full span:
+the symplectic multiplier identifies it with the
+inverse transpose of the $A$-block, multiplied for
+each $g$ by its nonzero similitude.  As $g$ ranges over
+$G$, inversion and transpose preserve the full-span
+condition, and these individual nonzero scalar factors
+do not change the span.
+If a cross-block $Y$ split the representation, expansion
+of $(1-Y)r'(g)(1+Y)$ would give
+$z(g)=Y-r(g)Yr(g)^{-1}$.
+At $c$, (IX.19) and $z(c)=0$ give $2Y=0$, so $Y=0$;
+then $z=0$, a contradiction.  The same argument works
+after passage from $A$ to $K$, so the nonsplitting is
+exactly the required \texttt{BlockExt} over $K$.
+\end{proof}
+% END IX6
+
+% BEGIN IX7
+\begin{proposition}[IX7: a block diagonal pair violates the exact weak purity bound]
+\label{claim:IX7}
+For every characteristic-zero ambient identification
+satisfying \texttt{IsZero}, every block diagonal
+\texttt{KPair} fails the literal \texttt{PureW} condition
+(IX.2), for every fixed $\iota$.
+\end{proposition}
+
+\begin{proof}
+Transport the pair to $\overline{\mathbb Q}_\ell$ using
+the specified identification.  Smallness makes all its
+entries continuous: an element in the $n$th power of
+the defining DVR's maximal ideal has norm at most
+$a^n$ for a fixed $a<1$.  Thus its two block determinants
+$\delta_A,\delta_B$ are continuous characters.
+
+The ordered ordinary flag gives
+\[
+ \delta_A|_{I_\ell}=\theta_0\theta_2,
+                  \qquad
+ \delta_B|_{I_\ell}=\theta_1\theta_3.
+ \tag{IX.22}
+\]
+To justify the assignment of the two characters, use the
+two blocks of $r(\sigma_\ell)$.  Their characteristic
+polynomials are coprime over the valuation ring, since
+their residual eigenvalues are disjoint by AX6.
+The polynomial block projectors therefore preserve the
+ordinary flag.  Their diagonal values on the flag
+quotients are $1,0,1,0$ and $0,1,0,1$, as determined
+by the original residual labels.  Multiplying the
+appropriate quotient characters proves (IX.22).
+
+Each of $\delta_A\chi_\ell^{-(e+2)}$ and
+$\delta_B\chi_\ell^{-e}$ has finite image.
+Here is the full global argument.  Choose an integer
+$m>0$ killing the finite quotients attached to
+$\bar r,\psi,\omega$.  On inertia at $\ell$, (IX.22)
+makes the $m$th power of the relevant ratio trivial.
+At $p\in S_b$ this follows from identity on
+$I_p\cap\ker\psi$, and away from $T$ from
+\texttt{UnrT}; the cyclotomic character is unramified
+away from $\ell$.
+Conjugacy of places gives the assertion at every finite
+prime.  The characteristic-zero small DVR is finite
+over $\mathbb Z_\ell$: it is complete, its residue field
+is finite, and $\ell$ is a nonzero power of its
+uniformizer times a unit, so successive approximation
+from a basis modulo $\ell$ proves finiteness.
+In this finite coefficient field defining the
+pair, reduce the powered ratio modulo every maximal
+ideal power.  Minkowski's theorem makes each of these
+everywhere-unramified finite characters trivial.
+Separatedness shows the powered ratio itself is $1$.
+A continuous character with image in the finite set of
+$m$th roots of unity has open kernel.
+Hence on some common open subgroup $H_0$,
+\[
+                       \delta_A=\chi_\ell^{e+2},
+                       \qquad \delta_B=\chi_\ell^e.
+ \tag{IX.23}
+\]
+
+Suppose (IX.2) held with $H,M$.  Choose a prime
+$p\nmid \ell M$.  An arithmetic Frobenius in the
+chosen decomposition group at $p$ has some positive
+power $\sigma$ in $H\cap H_0$, since that subgroup
+has finite index.  If the power is $f>0$, then
+$\chi_\ell(\sigma)=p^f$ and $\sigma$ is an arithmetic
+Frobenius of degree $f$ at that same place.
+Let $a_1,a_2$ and $b_1,b_2$ be the roots of the two
+block characteristic polynomials.  They are all
+nonzero because both blocks are invertible.
+Using (IX.2) for $(a_1,b_1)$ and $(a_2,b_2)$ gives
+\[
+ |\iota\delta_A(\sigma)|
+                   <p^{2f}|\iota\delta_B(\sigma)|.
+ \tag{IX.24}
+\]
+But (IX.23) makes the two sides respectively
+$p^{f(e+2)}$ and $p^{2f}p^{fe}$, which are equal.
+This is a strict-inequality contradiction.
+It uses exactly \texttt{PureW}, including its finite
+exceptional set, open subgroup, all-place and
+positive-Frobenius-degree quantifiers.
+\end{proof}
+% END IX7
+
+% BEGIN IX8
+\begin{theorem}[IX8: the complete actual image-density reduction]
+\label{claim:IX8}
+For the original good datum and one fixed $\iota$,
+\[
+ \begin{gathered}
+ \operatorname{Con}(D),\quad
+ \operatorname{PurityAtPoints}(D,\iota),\quad
+ \operatorname{AutmAlt}(D,\iota)\\
+ \Longrightarrow\quad
+ D.\texttt{Fin0}\ \land\ D.\texttt{NoEnd}\ \land\
+ D.\texttt{AllIrr}(\texttt{IsAut4Alt}\,\iota).
+ \end{gathered}
+ \tag{IX.25}
+\]
+All cohomological, valued-point, curve and block-extension
+steps in this implication are proved, including the
+coefficient identifications.  The three displayed arithmetic inputs
+are not themselves asserted by it.
+\end{theorem}
+
+\begin{proof}
+If \texttt{Fin0} failed, IX3 would give a characteristic-$\ell$
+actual valued point with a weight-zero monomial satisfying
+(IX.5).  IX2 gives its \texttt{KPair}.
+Apply IX4.  Full matrix span contradicts
+$\operatorname{Con}(D)$.  In \texttt{DiagType}, IX4 makes
+the chosen monomial fixed by a positive Frobenius power,
+contradicting (IX.5).  In the two-block case, IX4 first
+gives a block diagonal pair with full $A$-block span;
+IX6 turns it into a \texttt{BlockExt} pair.  This also
+contradicts $\operatorname{Con}(D)$.
+Thus \texttt{Fin0} holds on all original actual lifts.
+
+To prove \texttt{NoEnd}, suppose an original algebraic
+point were block diagonal with full $A$-block span.
+IX2 places it in the standard ambient as an actual
+\texttt{KPair}.  IX6 gives a new \texttt{BlockExt} pair
+with exactly the same characteristic polynomial at
+every group element.  The stated
+$\operatorname{PurityAtPoints}$ applies to this new pair.
+Since (IX.2) concerns only those characteristic
+polynomials, it transfers to the old block diagonal
+pair.  IX7 rules this out.  This is why the scope of
+$\operatorname{PurityAtPoints}$ was retained literally.
+
+Finally take any original algebraic point with full
+matrix span.  IX2 makes it a \texttt{KPair} in the same
+standard ambient, so $\operatorname{AutmAlt}(D,\iota)$
+applies.  A field isomorphism carries a full matrix
+span onto a full matrix span: map a finite spanning
+linear combination entrywise and map its scalar
+coefficients by the same isomorphism.
+Thus no restriction on the actual point has been lost.
+The isomorphism $\iota$ was fixed before this arbitrary
+point was chosen.  It is the one common embedding in
+the conclusion, not a point-dependent choice.
+\end{proof}
+% END IX8
+
+\subsection{The finite-weight-fibre obstruction and the actual promodular witness}
+
+The next two results unpack the exact source witness rather
+than treating ``promodular'' as a classical theorem.  A
+\texttt{ProModAlt} witness consists of a tower $T$, a
+permitted coefficient extension $O\subset O'$, an actual
+\texttt{Space} $X$ for $T$, an ideal $J\subset X.B$, a map
+$y:X.A\to V$, and a global representation $r_1$ over $V$.
+Here $X.B$ is complete Noetherian local with residue
+$k'=O'/\mathfrak m_{O'}$, $X.B\hookrightarrow X.A$ is
+injective, and $X.A$ is a finite-type $X.B$-algebra.
+The universal framed pair $P$ has characteristic
+polynomials $c_g(X)\in X.B[X]$ and local characters
+$\psi_{vi}(s)\in X.B$.  Their residual values are the
+specified four characters of $D$, with the tower's
+permutation of labels.  The field $F=T.F$ is totally
+real and abelian over $\mathbb Q$, $K_0=T.K$ is imaginary
+quadratic, and $L=FK_0$.
+
+The witness includes the full, unchanged
+\texttt{T.Fit}, \texttt{T.Deep}, and
+\texttt{PotentialModularityTower}$\,\iota\,X\,J$.
+It also includes all of the following equations:
+\[
+ \begin{gathered}
+ y|_{O'}=a_{O'},\qquad
+ y(\mathfrak m_{X.B})\subset\mathfrak m_V,\qquad y(J)=0,\\
+ r_K\simeq (r_1)_K,\qquad
+ r_1|_{G_F}=P\otimes_yV,\qquad
+ r_1(g)^*r_1(g)=a_O\vartheta(g),\\
+ y(\psi_{vi}(s))=a_O\theta_i(s)
+       \quad(s\in I_{F,v}),
+ \end{gathered}
+ \tag{IX.26}
+\]
+where the last line uses the original label convention of
+\texttt{ProModAlt}; the residual characteristic-polynomial
+formula uses the tower's possibly permuted labels.
+The five clauses of the potential-modularity tower record are
+a finite special weight fibre, local vanishing at the
+specified characteristic-$\ell$ curve points, local
+vanishing at actual seed points, weak purity for the
+specified arithmetic points, and literal
+\texttt{IsAut4Alt} for their irreducible global descents.
+Only the first, fourth and fifth clauses are used below.
+The unused clauses remain part of the actual source
+record; no existence of such a record is inferred from
+their names.
+
+% BEGIN IX9
+\begin{proposition}[IX9: finite weight modules, residual traces, and the full obstruction]
+\label{claim:IX9}
+The finite-fibre clause used in the obstruction has a
+complete algebraic supplier.  Namely, on an actual
+\texttt{Fit}, \texttt{Deep} tower retain a
+\texttt{Link}, its universal ordinary determinant ring
+$R$, its universal inertial-character algebra $\Lambda$,
+an ideal $J_0\subset R$, and the actual
+\texttt{IsPhi}$\,0$ map $\phi:R\to B=X.B$.
+If $R/J_0$ is finite over $\Lambda$, then for
+$J=J_0B$ there is $N\ge0$ such that
+\[
+ \mathfrak m_B^N\subset
+ I:=J+\mathfrak m_{O'}B+
+       (\psi_{vi}(s)-1:s\in I_{F,v}).
+ \tag{IX.27}
+\]
+Consequently, every actual characteristic-$\ell$
+\texttt{KPair} admitting a \texttt{ProModAlt} witness
+has neither full matrix span nor \texttt{BlockExt}.
+The conclusion uses no automorphic purity or
+\texttt{CohomologyHyp} assumption.
+\end{proposition}
+
+\begin{proof}
+\emph{Finite module to finite special fibre.}
+Take a prime $\mathfrak q\supset I$ and put
+$C=B/\mathfrak q$.  It is a complete local domain with
+residue $k'$, and $\mathfrak m_{O'}C=0$.
+An element of $C$ integral over $k'$ must belong to
+$k'$: subtract its residue in $k'$; if the difference
+were nonzero, it would be algebraic over a field and
+therefore invertible, although it lies in the maximal
+ideal.  Write $\pi:B\to C$.
+
+The map $\Lambda\to R\xrightarrow{\phi}B\to C$
+sends every universal inertial character to a scalar
+in $k'$.  Indeed the exact \texttt{IsPhi}$\,0$
+equation is
+\[
+ \phi(\psi^R_{vi}(s))
+        =\kappa(s)\psi_{e(v),i}(s|_F),
+ \tag{IX.28}
+\]
+with $\kappa(s)\in(O')^\times$; the last factor is $1$
+in $C$ for inertial $s$.  The \texttt{Link} identifies
+the places and inertia groups in this formula.
+These characters therefore equal those from the
+residue map $\Lambda\to k'\to C$.
+Both maps satisfy the same inertial lifting conditions:
+they are obtained from actual local characters, their
+residues agree, and their prescribed product and
+multiplier equations are preserved.
+The uniqueness clause of \texttt{LamObj.univ} makes
+the two maps equal.  Thus the entire image of
+$\Lambda$ is contained in $k'$.
+Since $R/J_0$ is finite over $\Lambda$, every element
+of the image of $R$ in $C$ is integral over $k'$.
+
+For $g\in G_F$, its square belongs to $G_L$, since
+$L/F$ is quadratic.  The characteristic-polynomial
+part of \texttt{IsPhi}$\,0$ identifies the polynomial
+of the universal determinant at a lift of $g^2$ with
+$c_{g^2}$ after multiplying its roots by the coefficient
+unit $\kappa(g^2)$.  Consequently every coefficient
+of $\pi(c_{g^2})$ is integral over $k'$; multiplication
+by an $O'$-unit does not affect integrality.
+It follows that every coefficient of $\pi(c_g)$
+is integral over $k'$ as well.  Here is a proof that
+does not assume that $B\hookrightarrow X.A$ remains
+injective after quotienting.  For formal roots
+$z_1,\ldots,z_4$, each $z_i$ satisfies the monic
+polynomial $\prod_j(T^2-z_j^2)$.  Thus each elementary
+symmetric polynomial in the $z_i$ is integral over
+the ring of elementary symmetric polynomials in the
+$z_j^2$.  The resulting monic polynomial identities
+are universal identities for the coefficients of
+the characteristic polynomials of a matrix and its
+square.  Apply them to $P(g)$ in $X.A$ and descend
+the identities to $B$ using the original injection
+$B\hookrightarrow X.A$; only then apply $\pi$.
+Transitivity of integrality proves the assertion.
+
+Every element of a chosen decomposition group of
+$G_F$ at $\ell$ lifts to $G_L$: the splitting clause
+of \texttt{T.Ok}, with $\ell\in D.S$, puts that
+decomposition group in the subgroup fixing $K_0$.
+Equation (IX.28), now for arbitrary decomposition-group
+elements, shows that each $\pi(\psi_{vi}(s))$ is
+integral over $k'$.  All characteristic-polynomial
+coefficients and all these local character values
+therefore equal their residues in $k'\subset C$.
+The exact \texttt{Space.genB} uniqueness clause says
+that two maps $B\to C$ agreeing on these quantities
+are equal.  Compare $\pi$ with the residue map
+$B\to k'\to C$.  It follows that
+$\pi(\mathfrak m_B)=0$, hence
+$\mathfrak q=\mathfrak m_B$.
+Every prime over $I$ is therefore the maximal ideal.
+Since $B$ is Noetherian, some power of $\mathfrak m_B$
+lies in $I$: take powers of finitely many generators
+lying in $\sqrt I$ and expand a sufficiently large
+power of their ideal.  This proves (IX.27).
+It supplies exactly \texttt{TPmFin}'s conclusion;
+the source's additional \texttt{UnramifiedInputs}
+argument is not used in this algebraic proof.
+
+\emph{Finite fibre to constant characteristic polynomials.}
+Now take an actual \texttt{ProModAlt} witness in
+characteristic $\ell$.  Its \texttt{fin} clause is
+(IX.27), possibly with a larger ideal $J$.
+Every coefficient map $a_{O'}$ kills
+$\mathfrak m_{O'}$: its prime kernel contains the
+nonzero element $\ell$, and a nonzero prime of a DVR
+is its maximal ideal.  Equation (IX.26) kills $J$.
+The \texttt{T.Ok.ineL} condition says that the original
+residual representation is trivial on $I_{F,v}$;
+therefore (IX.26) also kills each $\psi_{vi}(s)-1$.
+The map $B\to V$ thus kills $\mathfrak m_B^N$.
+Its kernel is prime, so it kills $\mathfrak m_B$ and
+factors through $k'$.
+The actual \texttt{Space.cp\_red} and the conjugacy
+in (IX.26) now give
+\[
+ \det(X-r(g))=\prod_{i=0}^3
+       (X-a_O\theta_i(g))\qquad(g\in G_F).
+ \tag{IX.29}
+\]
+The tower permutation of the four labels does not
+change this product.
+
+For any $g\in G$, choose $a>0$ such that $g^a\in G_F$.
+The four elements $a_O\theta_i(g)$ have finite order,
+since they belong to the finite residue field of $O$.
+Equation (IX.29) for $g^a$ implies that every eigenvalue
+$z$ of $r(g)$ is algebraic over $\mathbb F_\ell$:
+its $a$th power is one of the algebraic elements
+$(a_O\theta_i(g))^a$.  Its trace is therefore algebraic
+over $\mathbb F_\ell$.  The difference
+\[
+              \operatorname{tr}r(g)
+                         -\sum_i a_O\theta_i(g)
+ \tag{IX.30}
+\]
+lies in $\mathfrak m_V$ by the original
+\texttt{KPair.red}.  A nonzero element algebraic over
+a finite field has finite multiplicative order and
+is a unit in every valuation ring containing it.
+Thus (IX.30) is zero.  Since the $\theta_i$ are
+characters, we obtain
+\[
+ \operatorname{tr}r(xgh)=\operatorname{tr}r(xhg)
+                    \qquad(x,g,h\in G).
+ \tag{IX.31}
+\]
+
+\emph{The trace obstruction for both kinds of star point.}
+Suppose a matrix representation $S$ of dimension
+$d>1$ spans $M_d(K)$, and an invertible $Q$ satisfies
+\[
+ \operatorname{tr}(QS(xgh))
+                         =\operatorname{tr}(QS(xhg))
+                    \qquad(x,g,h\in G).
+ \tag{IX.32}
+\]
+Linear extension in $x$ makes
+$\operatorname{tr}(QM[S(g),S(h)])=0$ for every
+$M\in M_d(K)$.  Taking
+$M=Q^{-1}e_{ji}$ proves that every matrix entry of
+the commutator is zero.  Linear extension in $g,h$
+would make the entire matrix algebra commutative,
+contrary to its two elementary matrix units.
+Taking $Q=1$ in (IX.31) rules out full matrix span.
+
+For \texttt{BlockExt}, write the diagonal blocks
+as $A(g),B(g)$ in the order $V_A,V_B$, with $B$
+spanning $M_2(K)$.  The distinguished $g_0\in G_F$
+from \texttt{T.Ok.dist} has four distinct eigenvalues
+by (IX.29).  Put
+\[
+ f_A(X)=X^2-\operatorname{tr}(A(g_0))X+\det A(g_0),
+                 \qquad Q=f_A(B(g_0)).
+ \tag{IX.33}
+\]
+The two block characteristic polynomials are coprime.
+Bezout's identity and Cayley--Hamilton make $Q$
+invertible.  Cayley--Hamilton on the $A$ block also gives
+\[
+ \begin{split}
+ \operatorname{tr}(QB(y))={}&\operatorname{tr}r(g_0^2y)
+     -\operatorname{tr}(A(g_0))\operatorname{tr}r(g_0y)\\
+     &+\det A(g_0)\operatorname{tr}r(y).
+ \end{split}
+ \tag{IX.34}
+\]
+Apply (IX.31) to the three terms.  It gives (IX.32)
+for the full $B$-block span, another contradiction.
+This last argument uses only the triangular pattern
+and the full block span; it therefore rules out the
+source's stronger nonsplit \texttt{BlockExt} assertion
+with no extra premise.  This proves the
+finite-weight-fibre-to-star-obstruction chain.
+\end{proof}
+% END IX9
+
+% BEGIN IX10
+\begin{theorem}[IX10: exact characteristic-zero transport and the common embedding]
+\label{claim:IX10}
+An actual \texttt{ProModAlt} witness, together with
+the source's \texttt{IsZero} identification, gives
+the literal \texttt{PureW} assertion for $r$.
+If $r,u$ is also an actual \texttt{KPair} with full
+matrix span, it gives the literal
+\texttt{IsAut4Alt}$\,\iota$ assertion for $r$.
+Consequently, for one fixed original good datum and
+one fixed $\iota$, the assertion
+\[
+ \begin{gathered}
+ \text{every actual \texttt{KPair} with \texttt{Star},
+ in every \texttt{Amb},}\\
+ \text{admits the literal \texttt{ProModAlt}$\,D\,\iota$
+ witness}
+ \end{gathered}
+ \tag{IX.35}
+\]
+implies the entire conclusion of (IX.25), on the same
+datum and with that one common $\iota$.
+This theorem proves the reduction from (IX.35);
+it does not assert (IX.35).
+\end{theorem}
+
+\begin{proof}
+Let $f:V\to\overline{\mathbb Q}_\ell$ be the
+valuation-preserving coefficient-compatible
+identification, and compose $y$ with $f$.
+It is an $O'$-algebra map, since
+$f a_{O'}$ is the original inclusion of $O'$.
+It kills $J$, and the transported $r_1$ restricts
+to $P\otimes_{fy}\overline{\mathbb Q}_\ell$ on $G_F$.
+
+The weight hypothesis of \texttt{PotentialModularityTower}
+must be checked with its actual normalization.  On the
+open subgroup
+\[
+             G_F\cap\ker\psi\cap\ker\omega
+ \tag{IX.36}
+\]
+and on inertia at every place over $\ell$, the last
+line of (IX.26) becomes
+$f y(\psi_{vi}(s))=\chi_\ell(s)^{w_i}$,
+where $(w_0,w_1,w_2,w_3)=(e+1,e,1,0)$.
+The original character formula at the chosen place
+extends to every such place by conjugacy of places;
+one-dimensional characters are unchanged by
+conjugation.  The source's \texttt{T.Wts} takes
+\emph{squares} of these local characters.
+Its parameter is therefore precisely
+$(2(e+1),2e,2,0)$, not $(e+1,e,1,0)$.
+The \texttt{pur} clause now supplies (IX.2) for
+$f r_1$.  Conjugacy in (IX.26) makes all characteristic
+polynomials of $fr$ and $fr_1$ identical.  Every
+quantifier of \texttt{PureW}, including the same
+open subgroup and excluded integer, transfers directly.
+
+For automorphy there are two more hypotheses to prove.
+First, smallness supplies continuity of $fr$: a
+uniformizer of its defining DVR has image of norm
+strictly less than $1$, and congruence modulo its
+$n$th power bounds each matrix-entry difference by
+that norm to the $n$th power.  Conjugacy gives
+continuity of $fr_1$.  The multiplier equation of
+(IX.26), with coefficient compatibility of $f$,
+gives exactly $D.\texttt{Mult}(fr_1)$.
+
+Second, full matrix span on $G$ must remain full
+on $G_L$.  We give the whole argument.
+Write $\rho=fr$ and $H=G_L$.  The extension $L/\mathbb Q$
+is finite abelian, since $F/\mathbb Q$ is abelian and
+$K_0/\mathbb Q$ is quadratic.  Thus $H$ is normal and
+$G/H$ is finite abelian.
+The \texttt{T.Ok.g3} clause supplies, for each
+nonzero root difference, an element of $G_L$ on
+which that residual root character is not $1$.
+In the source's notation the root character satisfies
+$\operatorname{rt}(w_{ij})\chi_j=\chi_i$;
+this follows by substituting the two torus characters
+and $\chi_0\chi_3=\chi_1\chi_2$.
+After undoing the tower permutation, the four
+$\bar\theta_i|_H$ are consequently distinct.
+
+Full matrix span makes the four-dimensional
+representation of $G$ simple.  Its restriction to
+$H$ is semisimple: choose a simple $H$-submodule;
+the sum of its finitely many $G/H$-translates is
+a nonzero $G$-submodule and hence the whole space.
+A sum of simple submodules is semisimple.
+If this restriction were reducible, its commutant
+$\operatorname{End}_H(\overline{\mathbb Q}_\ell^4)$
+would have dimension greater than $1$.
+The finite abelian quotient acts by conjugation
+on this commutant.  In characteristic zero that
+action diagonalizes.  Its fixed part is
+$\operatorname{End}_G=\overline{\mathbb Q}_\ell$
+by Schur's lemma, so there is a nontrivial character
+$\eta$ of $G/H$ and a nonzero eigenvector $T$
+intertwining $\rho$ with $\rho\otimes\eta$.
+Its kernel and image are $G$-stable, so $T$ is invertible.
+For $g$ with $\eta(g)\ne1$ and any $h\in H$, equality
+of traces under this intertwiner gives
+\[
+                        \operatorname{tr}\rho(gh)=0.
+ \tag{IX.37}
+\]
+The map $f$ is injective.  Thus (IX.37) is already
+an equality for $r$ over $V$, which can be reduced
+modulo $\mathfrak m_V$.  The original residual
+condition gives
+\[
+       \sum_{i=0}^3\bar\theta_i(g)\bar\theta_i(h)=0
+                                  \qquad(h\in H).
+ \tag{IX.38}
+\]
+Distinct characters of any group into any field are
+linearly independent: in a relation with the fewest
+nonzero coefficients, translate by an element on
+which two characters differ and subtract a suitable
+scalar multiple to obtain a shorter relation.
+The four characters here are distinct, whereas
+every coefficient $\bar\theta_i(g)$ is a nonzero
+unit.  Equation (IX.38) is impossible.
+The restriction is therefore simple, and its matrix
+span over the algebraically closed field is full.
+For completeness, the latter implication is the
+finite-dimensional density argument: a proper
+matrix subalgebra acting simply has scalar
+commutant, and the semisimple quotient acts through
+a single full matrix block; its radical acts as
+zero on the simple faithful module, so the algebra
+itself is that full block.
+This is the finite-dimensional density theorem over
+an algebraically closed field; see Etingof et al.,
+\emph{Introduction to Representation Theory},
+Theorem~2.5 and Section~2.5,
+\url{https://math.mit.edu/~etingof/replect.pdf}.
+
+Conjugacy transfers full span on $G_L$ to $fr_1$.
+All hypotheses of the actual \texttt{aut} clause
+are now verified, so it gives literal
+\texttt{IsAut4Alt}$\,\iota$ for $fr_1$.
+This predicate is invariant under isomorphism of
+the Galois representation.  In its defining
+\texttt{IsAutQA}, continuity and irreducibility
+are invariant under a fixed conjugation; for each
+quadratic CM extension the same cuspidal
+representation and regular algebraic weight remain,
+and its attachment intertwiner is composed with
+that conjugation.  The same operation transports
+the intertwiners in \texttt{WitA}.
+Thus it gives exactly the stated predicate for $fr$.
+
+Finally (IX.35) and IX9 give
+$\operatorname{Con}(D)$.
+The first part of this theorem gives
+$\operatorname{PurityAtPoints}(D,\iota)$ on all
+star pairs, including the pairs created by IX6.
+The second part gives
+$\operatorname{AutmAlt}(D,\iota)$ on all full-span
+pairs.  IX8 now proves (IX.25).
+Every construction used the original $D$, coefficient
+maps and local groups.  The auxiliary $O'$ occurs
+only inside the literal witness and is compatible
+with the ambient maps; it does not change the
+original quantified endpoint.
+The single $\iota$ is fixed before any ambient or
+point is chosen, exactly as required.
+\end{proof}
+% END IX10
+
+\subsection{The remaining arithmetic frontier, with source quantifiers}
+
+The completed results in this chapter retain exactly
+the hypotheses printed in each statement: the
+geometric/cohomological constructions IX1--IX7 and
+the algebraic reductions IX9--IX10.  IX8 is the
+complete implication from the three explicitly
+stated arithmetic predicates.  No one of those
+predicates, and no actual witness (IX.35), has been
+manufactured by assuming that a Lean theorem named
+``published'' is an applicable classical theorem.
+
+The next source producer of (IX.35) separates
+the original \texttt{OfCase} data into
+\texttt{Ctx2} and \texttt{Ctx3}, with the same
+$\Omega,O,D$ and one choice of $\iota$.
+Its remaining inputs are the following.
+\begin{enumerate}
+\item \textbf{Actual modular support.}
+The literal \texttt{PMExAlt} says: for every tower
+$T$ satisfying \texttt{Fit} and \texttt{Deep}, and
+every $\iota$, there is a coefficient threshold
+$O_1$ such that for every permitted $O'$
+containing both $O$ and $O_1$, and for every actual
+$\texttt{Space}\ X$ over $O'$, there is an ideal
+$J\subset X.B$ satisfying all five clauses of
+\texttt{PotentialModularityTower}.
+The threshold precedes both $O'$ and $X$.
+The source constructs $J$ as a sum of images of
+two modular ideals under two actual
+\texttt{Link.IsPhi} maps.  IX9 closes its
+finite-weight-module-to-\texttt{fin} step completely.
+It does not construct the modular ideals, their
+finite modules, the two links, or the other four
+clauses.  In particular finite cohomological
+windows from TW do not supply a modular support.
+
+\item \textbf{Seed points with the prescribed residual entries.}
+\texttt{SeedIIAlt} quantifies over every original
+\texttt{Ctx2} datum and every
+\texttt{Ok}, \texttt{Two}, \texttt{Deep} tower,
+then over every $\iota$; it requires a coefficient
+extension and an actual continuous residual
+\texttt{SeedPairAlt} in \texttt{InV}, with the
+specified $-w_{\rm Al}$ alternative or both
+$w_{\rm Be},-w_{\rm Th}$ entries.
+For \texttt{SeedIVAlt}, fix an original
+\texttt{Ctx3} datum and an \texttt{Ok}, \texttt{Four}
+tower $T_0$.  For every $\iota$ and every ambient
+field, one must choose a prime $w$ splitting in
+$T_0$ and an actual residual pair $s$ for the
+frame with the added prime $w$, supported in
+$n_M$.  This choice is made before the following
+universal quantifier: for every tower $T\ge T_0$
+with \texttt{Ok} and \texttt{Dies}$\,\ell\,w\,T.F$,
+there must be a coefficient extension and actual
+\texttt{SeedPairAlt} $Q$ whose reduction lies over
+that same $s$, is in \texttt{InA}, and has both
+the $-w_{\rm Be}$ and $-w_{\rm Th}$ entries.
+These are exact seed constructions, including
+regular algebraic cuspidal attachment after the
+specified twist and the parity and gap conditions;
+they are not supplied by generic potential
+automorphy or by a theorem about already
+automorphic points.
+
+\item \textbf{Reaching the support from the actual star point.}
+The case-two and case-three producers require
+their actual tower and space constructions,
+entry-pattern reductions, characteristic-$\ell$
+curve connections and component chains.
+The resulting point must satisfy every equation
+of (IX.26), especially $y(J)=0$, its original
+inertial-character equations and conjugacy of the
+global representation.  Existence of a nonempty
+modular support does not give these assertions.
+The case-three source route includes
+\texttt{RedA}, \texttt{YCoin}, \texttt{FibY},
+\texttt{Chain4}, \texttt{ChainDesc4} and
+the literal fourth-chain reduction.  This chapter records their
+exact producer anchors but does not promote them
+to reconstructed human proofs.
+\end{enumerate}
+
+The original top-level source obtains these
+arithmetic objects through \texttt{HypothesesH'}
+and the unramified-input record, printed Hida and
+adjoint-lifting constructions, and the rank-two
+and rank-four seed producers.
+\texttt{HypothesesH'} contains exact literal
+automorphy, cohomological, base-change, descent,
+semisimplicity and quaternionic assertions; it
+has not been treated as one named standard
+theorem.  Even a complete supplier of
+\texttt{CohomologyHyp} would not by itself supply
+the modular ideals or seed and component chains.
+Conversely the entire lower reduction proved
+here already uses only DX1, DX2, DX5--DX7,
+AX6, BR7, FP2--FP3, MX1, PX1/PX5/PX6 and LD3.
+It needs no still-open Bloch--Kato record.
+
+The exact unclosed endpoint is therefore the
+actual arithmetic realization (IX.35), uniformly
+for the original \texttt{Good}/\texttt{OfCase}
+data and with one $\iota$ before the point
+quantifiers.  Once it is supplied, IX8--IX10
+give literal \texttt{SymplecticFourImageDense};
+the later MX/PX model and point comparisons can
+then use its \texttt{Fin0}, \texttt{NoEnd} and
+common-embedding automorphy on the very same
+datum.  This is a closed downstream dependency
+chain with an explicit arithmetic frontier,
+not a claim that the full image-density
+arithmetic input, RH, or GRH has been proved
+in the human reconstruction.

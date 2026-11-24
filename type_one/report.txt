@@ -1,0 +1,461 @@
+TYPE-I LOCAL CONSTRUCTION: POLYNOMIALS AND THE ARITHMETIC AVERAGE
+Version 0.8; source pin 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Component owner: remarks_math. Claim identifiers TI1 onward.
+
+STATUS
+This component proves the actual contraction-polynomial degree and leading-form
+identities (GamDeg/GamLead), a quantitative binomial-integrality estimate including
+the source's GamInt with constant 10, the p-adic polynomial-matrix window theorem,
+and its precise one-tie Gram application. It also proves the elementary lattice
+and averaging-transfer steps. It does NOT yet prove the full r=1 local theorem:
+the graded restricted Gram bound, simultaneous tie/partner construction, retained
+block density, raw paired lifts, and their exact global parameter supply remain
+explicit representation/construction inputs. The final list gives source targets.
+In particular no r>=2 RestSeg/RK theorem is invoked for the rank-one edge.
+
+NOTATION AND EXACT ROLE OF r
+The edge rank is 1. The ambient vector dimension is k=m+1, while the segment
+polynomials used after splitting off the edge coordinate have r=m coordinates.
+Thus r in the gamma calculation below is NOT the edge rank. The source assumes
+2*N1+2<=m; this is a genuinely high-dimensional polynomial construction even for
+rank-one edges. In the formulas below v=v_p is normalized by v(p)=1. For the
+ramified coefficient DVR O the chosen uniformizer w satisfies w^2=p, so v(w)=1/2.
+Fock means the bilinear, not Hermitian, form B(x^alpha,x^beta)=1_{alpha=beta} alpha!.
+
+TI1. THE ACTUAL INTEGRAL SEGMENT FAMILY
+
+Source: GrowthBounds/ObjSeg.lean, BlockData.gens/SSZ, blockData, specConst,
+bbSpec/blockLat, segLat/segForm (exact ranges in provenance.json).
+
+For a signed chain x_0,...,x_{N-1} of r-dimensional rows, a tie joins adjacent
+vector/covector rows at positions a_i,a_i+1. Add scalar pairs Z_i,S_i and an
+auxiliary r-dimensional covector xi. The actual invariant contractions are
+
+  E_i = Z_i S_i + sum_c x_{a_i,c} x_{a_i+1,c},
+  E_+ = Z_+ S_+ + sum_c x_{u,c} xi_c.
+
+For legal nonnegative levels j_i,j_+ the generators are
+
+  (product_i E_i^{j_i}) E_+^{j_+}
+  (product_i Z_i^{z_i}) Z_+^{z_+} f(x) g(xi),                 (TI1.1)
+
+where f lies in the integral signed-prefix space of the residual row degrees,
+and g has degree B-j_+. Legality means each removed level fits both tied row
+degrees and j_+<=min(d_u,B). The prefix spaces impose the source's largest
+GL-stable first-coordinate weight cutoffs, not merely a monomial inequality.
+SSZ is the O-span of exactly these generators.
+
+For a segment with s odd sites and sigma early sites, P_i=p^{G-d_i} and Q=p^G.
+The digit rows rz_i,ry_i have r+1 coordinates and entries in [0,P_i). Write
+  A_i=(b_i-sum rz_i)/P_i, C_i=(a_i-sum ry_i)/P_i,
+  oEff_i=w_i+sg_i (i<sigma), o_i (i>=sigma),
+  A0=floor((a-E0)/Q), cap(l)=A0+sum_{i<l}(A_i-oEff_i).
+The divisibilities defining A_i,C_i are part of DigitsOK. The chain vector
+degrees are w_i early and o_i late; covector degrees are C_i-sg_i early and
+C_i late. Its terminal vector degree is oPlus. Ties occur only at late sites;
+their scalar shifts are z_i=A_i-o_i, and zPlus=aPlus-oPlus. The terminal
+auxiliary degree is bPlus. The exact retained predicates Kept are:
+
+  i>=sigma: o_i<=A_i, o_i<=cap(i)+Lambda*A_i/(r+1), w_i=sg_i=0;
+  i<sigma:  o_i=0, w_i<=A_i, sg_i<=C_i,
+             w_i+sg_i<=A_i*(1+4/p^2)+Lambda*cap(i)/(r+1),
+             sg_i<=2*Lambda*A0/(r+1);
+  oPlus<=cap(s)+(Lambda/(r+1)+4/p^2)*sum_i(2*a/P_i)
+                     +Lambda*bPlus/(r+1).
+
+The actual factorial multiplier is sp=product_{i<sigma}(A_i-w_i)! sg_i!.
+The block lattice is not SSZ itself. It is
+
+  L = span_K(SSZ) intersect {F: v(F_alpha)+(v(alpha!)+v(sp))/2>=0
+                                  for every alpha}.           (TI1.2)
+
+Equivalently w^{v_p(alpha!)+v_p(sp)}F_alpha belongs to O. Blocks are put in
+orthogonal direct sum over the retained digit/level data; their form is sp*Fock.
+The fixed prefix margin is imposed by lowering the source thresholds before
+forming SSZ. These details matter for integral primitivity and cannot be
+replaced by the rational polynomial span alone.
+
+TI2. FULL LATTICES, PRIMITIVE TESTS, AND TENSOR PERTURBATIONS
+
+The span in (TI1.2) has bounded total degree: every legal level is bounded and
+the rows have fixed degrees. Choose a finite monomial support containing a basis.
+The ambient coefficient condition on that support is a free O-module with
+basis w^{-v(alpha!)-v(sp)}x^alpha. Its intersection with a rational subspace is
+saturated, finite and torsion-free, hence free; clearing finitely many coefficient
+denominators shows that it spans the entire rational subspace. For F,G in L,
+each term sp*F_alpha*G_alpha*alpha! has nonnegative valuation. Thus the actual
+block pairing is integral. This proves the source's finiteness/fullness step.
+
+For any finite free O-lattice L with integral bilinear form, take Smith bases
+e_i,f_i with B(e_i,f_j)=delta_ij d_i, including d_i=0 if necessary. For real D,
+let g=#{i:v(d_i)<=D}. The span of those e_i is saturated; every primitive
+vector u in it has a unit coefficient, and the corresponding f_i tests u with
+v(B(u,f_i))<=D. Conversely a saturated sublattice of rank>g has a nonzero
+rational vector whose first g Smith coordinates vanish. Clear denominators and
+divide out its common uniformizer power inside the saturated lattice. The
+result is primitive and pairs with every vector with valuation>D. Therefore
+the maximum good rank is exactly g. The source's badShare is (rank L-g)/rank L
+(and zero at rank zero). This is an actual integral primitive-test statement.
+
+Tensor good bases from several segments. If maps into the actual two edge
+lattices produce a pairing matrix
+  M=diag(kappa_beta product_j d_{j,i_j})+w^c R,  R integral,
+and every displayed diagonal entry has v<=D<c/2, then M=diag(d)(I+E), where
+every entry of E is in the maximal ideal. Thus I+E is unimodular, and these
+vectors have full claimed rank and all pairing elementary divisors<=D. This
+proves the linear-algebra part of PairLiftAt -> liftVecAt_of. Constructing the
+maps with this identity is a separate source input, not supplied by this lemma.
+
+TI3. THE ACTUAL GAMMA POLYNOMIAL: DEGREE AND LEADING FORM
+
+Work over any characteristic-zero field. Let a signed chain have N+1 rows,
+row degrees d_i, total S, and last row w of vector degree o. Fix a coordinate
+rho, a nonnegative integer scalar shift z, and append a new covector y.
+Here r>=1 and every d_i is a nonnegative integer. Define the substitution by
+
+  vector x:   x_rho -> sum_c x_c y_c,   x_c -> y_rho x_c (c!=rho);
+  covector x: x_rho -> y_rho x_rho,     x_c -> y_rho x_c-x_rho y_c (c!=rho).
+
+It preserves every old row degree, gives total y-degree S, is integral, and
+Fcal(f)|_{y_rho=1,y_c=0(c!=rho)}=f. For n>=S put fr_n(f)=y_rho^{n-S}Fcal(f).
+Set
+  E=sum_c w_c y_c, F=sum_c partial_{w_c} partial_{y_c}, A=o+n+r+z-1,
+  Phi_{o,n,z}=sum_{j=0}^o (-1)^j E^j F^j/[j!^2 binom(A,j)].
+The exact scalar used by the source is
+
+  Gamma_{f,g}(n)=binom(A,o) B(Phi_{o,n,z} fr_n(f),fr_n(g))
+                       /[(n-S)! S! product_i d_i!].             (TI3.1)
+
+For nonzero f,g, let ord_rho(f)=e, ord_rho(g)=e' be their least powers of
+w_rho. The case where either polynomial is zero has Gamma=0 and is immediate.
+Then Gamma
+extends to a polynomial of degree at most S+o-max(e,e'). If e=e',
+
+ [T^{S+o-e}]Gamma_{f,g}(T)
+   = e! binom(z+e,e) B(in_e f,in_e g)/(o! S! product_i d_i!).   (TI3.2)
+
+Here in_e extracts exactly the w_rho-degree e terms. These are precisely the
+source's GamDeg and GamLead, with no change of variables or normalization.
+
+Proof, including the cancellation responsible for the low degree.
+The commutator [F,E]=r+Euler_w+Euler_y gives the rational harmonic decomposition
+of bidegree (o,n) into E^l ker(F) at bidegree (o-l,n-l). To see existence and
+directness without an integral semisimplicity assertion, repeatedly subtract
+E^l times harmonic pieces, starting with the largest nonzero F-power; on such
+a piece F^l E^l is the nonzero scalar l!(o+n-2l+r)_l. Thus induction solves
+the decomposition over the characteristic-zero field.
+
+On E^l h with Fh=0, Phi acts by binom(z+l,l)/binom(A,l). The finite-sum identity
+follows by multiplying by binom(A,l) and taking the coefficient of X^l in
+  (1+X)^A (1-X/(1+X))^{A-z-l}=(1+X)^{z+l}.
+Consequently, for e<=min(o,n),
+  Phi_{o,n,z} E^e = [(z+1)_e/A_under_e] E^e Phi_{o-e,n-e,z+e},  (TI3.3)
+where (z+1)_e is rising and A_under_e falling. All denominators here are
+nonzero for n>=S>=o and r>=1.
+
+Write f=w_rho^e h, q=Fcal(h), v=Fcal(g), and m=n-S. Then q has y-degree S-e,
+v has y-degree S, and fr_n(f)=E^e y_rho^m q. For fixed q,v and nonnegative
+s,j, the function
+  H_{s,j}(m)=B(E^s F^j(y_rho^m q),y_rho^m v)/m!
+is a polynomial of degree<=S+j when s-j=e. Indeed
+  F^j(y_rho^m q)=sum_{u=0}^j binom(j,u)(m)_under_u
+                    y_rho^{m-u} partial_{w_rho}^u F^{j-u}q.
+Pair a fixed monomial of the second factor with y_rho-degree m+beta. Its
+contribution after division by m! contains
+  (m)_under_u (m+beta)!/m!,
+a polynomial of degree u+beta<=j+S. This argument initially uses m>=j,
+which suffices to identify the polynomial; the same falling-factorial formula
+holds for all m>=0, with terms u>m zero. At the top degree S+j one must have
+u=j and beta=S. Every y-coordinate except y_rho then vanishes, giving
+  [m^{S+j}]H_{e+j,j}(m)=B(w_rho^{e+j}partial_{w_rho}^j h,g).
+
+The coefficient outside H after (TI3.3) is
+  binom(A,o)*(z+1)_e/A_under_e * (-1)^j/[j!^2 binom(A-e,j)]
+   = (-1)^j (z+1)_e (A-e-j)_under_{o-e-j}/(o! j!).
+Its degree in n is o-e-j. This proves the bound S+o-e; symmetry of the Fock
+form and self-adjointness of E^jF^j prove the bound with max(e,e'). The leading
+coefficient is the common scalar (z+1)_e/(o!S!product d_i!) times
+  B(w_rho^e sum_j (-w_rho)^j partial_{w_rho}^j h/j!,g).
+The finite Taylor sum is h|_{w_rho=0}. Its product with w_rho^e is in_e f,
+and Fock orthogonality replaces g by in_e g. This proves (TI3.2).
+
+TI4. LOGARITHMIC INTEGRALITY VIA FINITE DIFFERENCES
+
+For integral f,g, Gamma has degree<=d=S+o. Let S>0 and put
+  L0=floor(log_p(S+o+r)), L3=floor(log_p(3S)).
+Then p^K Gamma(T) has integral binomial coefficients whenever the integer K
+satisfies
+  K >= [2(r-1)+3]L0+(N+2)(r-1)L3.                           (TI4.1)
+If S=0, Gamma is an integral constant. In particular the source exponent
+  K=10(N+3)r^2(floor(log_p(S+o+r))+1)
+works. This proves GamInt with its published constant 10, through an alternative
+shorter argument. The sharper GamIntC with its exact smaller exponent is not
+being claimed as a literal theorem here. The parameter-dependent form below
+is sufficient for the one-tie mean used in this component.
+
+Proof. For a composition a_1+...+a_r=R, Legendre's floor formula gives
+  0<=v(R!/product a_c!)<=(r-1)floor(log_p(max(1,R))).           (TI4.2)
+The same argument with two parts bounds v(binom(R,j)) by floor(log_p R).
+All monomials in fr_n(f) have integral coefficients and the prescribed row
+degrees. The divided contraction is
+  F^j/j! = sum_{alpha_1+...+alpha_r=j}
+                (product alpha_c!) product_c binom(partial_{w_c},alpha_c)
+                                             binom(partial_{y_c},alpha_c),
+where binom(partial_x,a) means partial_x^a/a!. These divided derivatives
+preserve integral coefficients. Thus every coefficient of
+  H_j=F^j fr_n(f)/j!
+has valuation>=v(j!)-(r-1)L0, and likewise for g.
+
+Evaluate only at n=S,S+1,...,S+d; all these n are at most 3S. The rows in H_j
+have degrees d_i for i!=N, o-j, n-j. By (TI4.2), each factorial monomial
+weight in their Fock pairing has valuation at least the sum of these row
+factorial valuations minus (N+2)(r-1)L3. Self-adjointness gives
+  Gamma(n)=sum_{j=0}^o (-1)^j binom(A-j,o-j)/binom(o,j)
+             *B(H_j(f),H_j(g))/[(n-S)!S!product_i d_i!].       (TI4.3)
+The potentially large linear factorial valuations cancel exactly:
+  2v(j!)+v((o-j)!)+v((n-j)!)-v(o!)-v((n-S)!)-v(S!)
+                       -v(binom(o,j))
+    =v(binom(n-j,S-j))-2v(binom(o,j))-v(binom(S,j)).
+The first term is nonnegative; the two remaining binomial losses total<=3L0.
+This proves p^K Gamma(n) integral at these d+1 consecutive integers. Newton's
+formula writes it as sum_{j=0}^d Delta^j(p^K Gamma)(S) binom(T-S,j), with
+integral coefficients. The identity
+  binom(T-S,j)=sum_{i=0}^j binom(-S,j-i)binom(T,i)
+has integral translation coefficients, so its ordinary binomial coefficients
+are integral too. Finally L3<=L0+2<=3(L0+1); the source constant 10 dominates
+the right side of (TI4.1) for every N>=0,r>=1.
+
+Useful form with the source's scale. If S<=2a and ell=log_p(8a+r)+1, then
+L0,L3<=ell. Hence
+  K >= ((N+4)(r-1)+3)ell                                  (TI4.4)
+suffices. For r>=2 this is at most (N+3)r^2 ell. Thus the actual normalized
+matrix p^{ceil(kappa)}Gamma is integral in the binomial basis whenever
+kappa>=(N+3)r^2 ell. No further scalar multiplication is needed for this
+one-tie estimate.
+
+TI5. A COMPLETE p-ADIC POLYNOMIAL-MATRIX AVERAGING LEMMA
+
+Let A(T) be an n by n matrix with entries sum_{k=0}^d c_k binom(T,k), c_k in
+the valuation ring of a nonarchimedean normed field extending Q_p. Suppose
+det A is nonzero, with degree delta, leading coefficient lambda0 and a
+factorization with roots zeta (multiplicity included) in a normed extension.
+Assume integral unimodular left/right diagonalizations at the sample points
+(in the actual Q_p setting these are the usual Smith forms).
+Let lambda=v(lambda0), E>0 and h be a nonnegative integer, with
+1<=Y<=p^h and d<=p^h. Fix t_j=t0+u*j, 0<=j<Y, with integer t0,u and p not
+dividing u. Let beta(t) count the Smith factors of A(t) with valuation>=E,
+including zero factors with infinite valuation. If
+  lambda+delta/(p-1)<=n*L,
+then
+  (1/Y)sum_j beta(t_j)<=n[d/Y+(L+d*h/Y)/E].                    (TI5.1)
+This is the source's WindowFullAP, with all norms normalized by |p|=p^{-1}.
+
+Proof of integral discs. Every coefficient of binom(t+p^h X,k) is integral
+for k<=p^h. In a product term choose l of the k factors to supply p^h X.
+At each level p^i, 1<=i<=h, the remaining factors from the consecutive block
+have at least floor(k/p^i)-l divisible factors; together with the l copies
+of p^h this contributes at least floor(k/p^i). Summing i gives v(k!).
+The assertion includes k=p^h; factorials have no contribution from i>h.
+
+Pointwise Smith argument. Use integral unimodular left and right matrices to
+make A(t) diagonal. Their inverses are integral by the adjugate formula, so
+the entire transformed polynomial A(t+p^h X) has integral coefficients.
+If beta diagonal entries have valuation>=E, its determinant coefficient of
+X^k for k<beta has valuation>=E(beta-k): a degree-k term uses a positive
+degree entry in at most k rows, leaving at least beta-k small constant rows.
+For k>=beta all determinant coefficients are simply integral.
+
+The Gauss norm of the determinant polynomial is
+  G_t=|lambda0| product_zeta max(p^{-h},|t-zeta|).
+This uses multiplicativity of the nonarchimedean polynomial Gauss norm: divide
+each factor by a coefficient of largest norm and reduce modulo the maximal
+ideal; a product of nonzero residue polynomials is nonzero. In that reduction
+the largest degree is
+  m_t=#{zeta:v(t-zeta)>=h},
+because outside-disc factors reduce to nonzero constants, and inside-disc
+factors have nonzero linear coefficients. Thus the coefficient at degree m_t
+attains G_t. The preceding Smith estimate yields, also when m_t>=beta,
+  E beta(t)<=lambda+sum_zeta min(v(t-zeta),h)+E m_t.            (TI5.2)
+For m_t>=beta use G_t<=1, so the non-root-count term is nonnegative. Roots
+equal to t are allowed; their truncated valuation is h.
+
+Root counting. For a fixed zeta the integers j with v(t_j-zeta)>i-1 lie in
+at most one residue class modulo p^i. Indeed any two have integer difference
+of valuation>i-1 and hence at least i, and u is a p-adic unit. There are at
+most Y/p^i+1 such j. The inequality
+  min(v,h)<=sum_{i=1}^h 1_{v>i-1}
+is valid also for negative real valuations. Therefore the sum over j of
+min(v(t_j-zeta),h) is at most Y/(p-1)+h. As Y<=p^h, the closed radius-p^{-h}
+discs about these progression points are disjoint, so sum_j m_{t_j}<=delta.
+Sum (TI5.2), use delta<=nd, and divide by YE. This proves (TI5.1).
+
+TI6. THE ACTUAL ONE-TIE GRAM AVERAGE, WITH ITS REMAINING INPUT EXPLICIT
+
+Let f_1,...,f_n be an integral basis adapted to the filtration by powers of
+w_rho in the source's MMwZ (highest-weight/prefix) lattice; e_i are their
+orders. Suppose every equal-order initial Gram block
+  G_e=(B(in_e f_i,in_e f_j)/product_l d_l!)_{e_i=e_j=e}
+has v(det G_e)<=kappa4 times its size. This is exactly the relevant
+GramDeterminantGradedHypothesis, not a consequence of polynomial integrality.
+Choose M=ceil(kappa), kappa>=(N+3)r^2 ell, r>=2, a>=0, S<=2a, z<=2a and
+ell=log_p(8a+r)+1. Then p^M Gamma has integral binomial coefficients by TI4.
+
+The determinant degree is delta=sum_i(S+o-e_i), and its nonzero leading
+coefficient is
+  product_e [p^{M |I_e|}
+      (e! binom(z+e,e)/(o!S!))^{|I_e|} det G_e].             (TI6.1)
+For a determinant term indexed by a permutation pi, the degree bound is
+  n(S+o)-sum_i max(e_i,e_{pi(i)})<=n(S+o)-sum_i e_i.
+Equality forces e_i=e_{pi(i)} for all i (sum of nonnegative differences is
+zero). Therefore precisely the equal-order blocks survive in the top
+coefficient; TI3 gives (TI6.1). This proves both degree and nonvanishing.
+
+Legendre's formula v(t!)=(t-s_p(t))/(p-1) shows, for each e<=o<=S,
+  v(e! binom(z+e,e)/(o!S!))+(S+o-e)/(p-1)
+    = [s_p(o)+s_p(S)-s_p(e)]/(p-1)+v(binom(z+e,e))
+    <=3 ell.                                               (TI6.2)
+The digit sums of o and S contribute at most ell each; the binomial contributes
+at most ell because z+e<=4a. Hence lambda+delta/(p-1)<=n(M+kappa4+3ell).
+
+On an arithmetic progression n_j=s+u*j with integers s>=S, u>=1, Y>=1,
+p not dividing u and
+n_{Y-1}<=2a, take h=ceil(log_p(8a+r)). Then d=2S and Y are at most p^h,
+and h<=ell. TI5 gives
+  average_j #{Smith factors of p^M Gamma(n_j) with v>=E}
+   <= n[2S/Y+(M+kappa4+3ell+2S*ell/Y)/E].                   (TI6.3)
+This is a source-normalized one-tie exceptional-fraction estimate. The source
+uses a strict bad threshold v>E; the same displayed upper bound applies.
+If kappa4<=kappa, the numerator M+kappa4+3ell is <=2kappa+1+3ell.
+The present statement does not suppress the +1 from rounding M=ceil(kappa).
+
+The source's sharpened MeanGamX/MeanGamC arranges slightly different rounding
+and logarithmic constants. We have proved the actual matrices' averaging
+mechanism, with the explicit harmless displayed constants, rather than claiming
+literal equality to every sharpened archival budget. Converting (TI6.3) into
+the full segment badShare average also requires the partner and dimension
+inputs listed in TI9.
+
+TI7. THE FINAL DIMENSION-WEIGHTED TRANSFER IS ELEMENTARY
+
+This section records a complete conditional argument, so that the eventual
+missing construction is not obscured by another averaging wrapper. Put
+  D_m(a)=binom(a+m,m),
+  H_m(a,b)=D_m(a)D_m(b)-D_m(a-1)D_m(b-1),
+with D_m(-1)=0. These are the polynomial and harmonic dimensions; the
+dimension formulas follow from the rational E/F decomposition used above.
+For N>=1 sites, m>=1 and nonnegative functions f,g, take nonempty finite
+Cartesian boxes B0 and B+. Suppose on the enlarged box B+
+  sum_{j in {0,...,J}^N} f(A-j,B-j)
+     product_s H_m(A_s-j_s,B_s-j_s)/[D_m(A_s)D_m(B_s)] <=g(A,B). (TI7.1)
+Only terms with nonnegative arguments are used. This is the source KeyIneq
+after canceling the common projective-space factor using RestDims.
+
+Let B0 be a smaller Cartesian box such that every translate (a+j,b+j) is in
+B+. Suppose for every scalar pair (a,b) in its coordinate intervals,
+  sum_{j=0}^J H_m(a,b)/[D_m(a+j)D_m(b+j)]>=delta,
+and |B+|<=2 delta^N |B0|. Sum (TI7.1) over B+. Keep only triples obtained
+from (a,b) in B0 by simultaneous translations (a+j,b+j); the map to
+(A,B,j) is injective. Its j-sum factors across sites, giving
+  delta^N sum_{B0}f<=sum_{B+}g.
+Dividing by volumes proves mean_{B0} f<=2 mean_{B+}g. This is avg_abs/avg_of.
+
+TI8. TRANSLATION/CLEANING COST IN THE FINAL kappa
+
+The actual final exceptional function is
+  kText(A,B)=kF(A-c,B-c) if all A_s>=a+c,B_s>=lb+c, else 1,
+              plus 2 kF(A+c,B+c)+12 N k c/b'.                 (TI8.1)
+The first line is one summand, not a condition on the last two terms. Let the
+boundary proportion of the small box be <=1/Y and 12Nkc/b'<=1/Y. Translation
+of its interior is injective into the unshifted box. If TI7 applies both to
+the unshifted and +c boxes, and mean_{B+} kx<=(CA+Cs)NN1/Y, then
+  mean kText <=6(CA+Cs)NN1/Y+2/Y
+             <=[6(CA+Cs)+8]NN1/Y                            (TI8.2)
+for N,N1>=1. This is the source Cmean; the last step is deliberately slack.
+The bound is uniform in the coefficient ring once LPRingIndep is supplied.
+The numerical density, boundary, and enlarged-box estimates have not all
+been re-proved from literal HypI in this component, and are explicit premises.
+
+TI9. EXACT OPEN BRIDGES TO THE FULL TYPE-I CONCLUSION
+
+The endpoint is flipOneThree.Conclusion2 in ProjectionLemmaBaseLevel.lean:
+under literal HypI it produces a single nonnegative weight-box function kappa
+with mean<=C|TT|N1/Y and LPprime at edge rank1, uniformly over coefficient
+settings. TI1-TI8 do not yet discharge this endpoint. The remaining work is:
+
+(a) Restricted graded Gram and simultaneous partners. The actual source
+  PartnerMeanProofs/GramHypothesisOfLogBound.gram_hypothesis_of_log_bound
+  uses restricted_saturation_holds, highest_vector_projection_holds and
+  hypPE_setLast to supply TI6's initial-block determinant bound. The
+  simultaneous tie construction tieOpsX_main/partnerMX_of_parts makes
+  these individual Smith good directions compatible with later ties and
+  integral highest-weight/prefix lattices. Its source identity is a weighted
+  sum over multiplicity spaces YYsp, not just the union bound on a fixed
+  polynomial space. Prior IP/IW results may help, but no identification
+  proving this exact bridge has been completed here.
+
+(b) Segment dimension and digit-class transfer. CountingStatementReduction
+  and MonomialFactorials/SegmentWeightedCountingBoundOfAllRemainingBounds
+  combine the partner estimate with RestPlus, RestTM, RestDir, RestFree,
+  RestRatio and RestDepth. They handle terminal contractions, endpoint
+  dimension changes and varying coarse digit classes. In particular the
+  actual multitie bound has endpoint dimensions as weights. TI5 alone does
+  not justify omitting them or dividing by a fixed common dimension.
+
+(c) Actual paired lifts into cleaned rank-one edge lattices. The source
+  CoarseMultiplicity/PairedLiftAtOfIdentity.paired_lifts_of_identity takes
+  WittIdent, RestRawTail1 and RestForm to produce RestPairLift. It is here
+  that the abstract tensors are realized in CCe and CCe' and the diagonal
+  pairing modulo w^c is proved. TI2 proves the ensuing rank/test linear
+  algebra only. Constructing these polynomials after all cleaning, and
+  bounding their order by tI, has not been reconstructed in this component.
+
+(d) Harmonic summand / arbitrary-highest-weight passage and numerical supply.
+  ColumnSpanDensity requires LPRingIndep, the explicit minor comparison and
+  RestCloudMaps for the midpoint LP statement, the KeyIneq and MeanX inputs
+  to TI7-TI8, and the uniform threshold family. These are separate from
+  the arithmetic root-count argument, even though the source packages them
+  into theorem_I_of_intermediate_bounds and projection_lemma_base_level.
+
+LITERAL NUMERICAL TARGET (a definition, not a newly proved implication)
+
+For reference, write k=m+1, N=|TT|, Q=p^{G'}, Lambda=C0*N1^2*log(a), and
+  delta=CH*N1*Lambda/k+2(bu-bl)/b'.
+The actual HypI says:
+  Y>=1, k^2Y^2<=p; TT has an even site, at least two even-top segments,
+  every such segment has length<=G' and at most N1 odd sites;
+  N1>=1, 2N1+2<=m, 8log(NY)<=Lambda;
+  0<b', bl<=b'<=bu;
+  Yb*N*Lambda*b'/k<=bu-bl<=b'/2;
+  CH<=Yb, 2Yb*N*Lambda<k;
+  kY^2Yb*N*Lambda*log(a)<=a/b', delta<1/6, p<a/b';
+  CH*N*Lambda^2<=k;
+  for every odd d, p^d is outside [(a/b')(1-2delta),(a/b')(1+2delta)];
+  ccl<=Lambda*b'/k;
+  CH*N*Y^2*(N1^5+k^3)*log_p(a)<=Dp;
+  8(Dp+1)<=cStar;
+  CH*k^3*N*Q^4*(cStar+N*ccl+n'*ccl)*Y<=b'.
+The a-weights lie in [ceil(a),floor(a+a/(kY))], the b-weights in
+[ceil(bl),floor(bu)]. They form IsBaseWeight TT aw bw ccl lam0, with lam0
+dominant. For the previous even site yPrev(y), put
+  c=cStar+C*N*k*log_p(a)+4N*ccl+2n'*ccl,
+  tI=sum_{odd y in TT} min(bw_y,aw_{yPrev(y)}/p^{dPrev(y)})
+       +C*N*N1*(a/p^2+b'/p+Lambda*a/(p*k)+Lambda*b'/k)
+       +C*N*(Q*c+k*Q+k*log_p(a)+ccl)+2n'*ccl.
+Conclusion2 requires LPprime at edge rank1 for every natural t>=tI,
+with depth Dp, exceptional fraction kappa(aw,bw) and cleanup cStar.
+The full ordered choice of sufficiently large C0,CH,C is part of the
+source's ClosedP packaging. None of the listed numeric assumptions has
+been silently replaced by the Type-II Dat.Hyp used in earlier components.
+
+INDEPENDENT REVIEW
+The readable_sources agent independently checked TI3--TI4 against literal
+tieGam/GamDeg/GamLead/GamInt, including the harmonic shift, leading-power
+selection, Taylor factor, divided-contraction bound, valuation cancellation,
+sampling range and Newton translation. Its review found no substantive error.
+The other claims remain subject to the parent review and exact stated inputs.
+
+PROVENANCE POLICY
+The ledger distinguishes exact source statements, source input boundaries,
+and new elementary proofs or slightly weaker constant variants. Every source
+range is byte-preserving and pinned. The builder verifies HEAD before hashing;
+it does not download or modify Lean source. No Lean build is asserted.

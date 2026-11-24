@@ -1,0 +1,207 @@
+[KIZ_SRC_COHINP] The original complete five-field CohInp record
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L19-L24
+structure CohInp : Prop where
+  loc : Loc.LocalPublishedTheorems
+  pt : GlobalTheory.Published.PoitouTateNormalised
+  gf : GlobalFiniteness
+  ge : GlobalEulerChar
+  lemK : ∃ CK : ℝ, LemmaK CK
+
+
+[KIZ_SRC_INPZ] The six additional fields of the exact InpZ record
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/KatoQuadraticCharacters/KatoTwoOfUseN.lean#L55-L61
+structure InpZ : Prop extends U3.CohInp where
+  lemM : LemmaM
+  lemM' : LemmaM'
+  lemP : LemmaP
+  rigII : RigII
+  adK : Af.AdVanishK
+  number : Af.CongruenceNumberRankThree
+
+
+[KIZ_SRC_COHOMOLOGY] The existing CohomologyHyp fields, projected without altered data
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/SymplecticGSp4/EntryMem.lean#L161-L167
+structure CohomologyHyp : Prop where
+  loc : Loc.LocalPublishedTheorems
+  pt : GlobalTheory.Published.PoitouTateNormalised
+  gf : GlobalFiniteness
+  ge : GlobalEulerChar
+  uo : UnramifiedOrthogonality
+  gw : GreenbergWiles
+
+
+[KIZ_SRC_LOCAL] All seven local published fields
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/LocalPublishedTheorems.lean#L12-L19
+structure LocalPublishedTheorems : Prop where
+  lfK : Formalism.GaloisCohomology.LocalFinitenessK
+  ltK : Formalism.GaloisCohomology.LocalTateDualityK
+  leK : Formalism.GaloisCohomology.LocalEulerCharK
+  lf : ReciprocityTheory.Gal.LocalFiniteness
+  lt : ReciprocityTheory.Gal.LocalTateDuality
+  le : ReciprocityTheory.Gal.LocalEulerChar
+  bk : GlobalTheory.Published.BlochKatoLocal
+
+
+[KIZ_SRC_K] HasMuQ, kBound and full universal LemmaK
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GeneratorCountTuples/LemmaK.lean#L9-L18
+def HasMuQ (l : ℕ) (L : Type) [Field L] : Prop := ∃ ζ : L, IsPrimitiveRoot ζ (if l = 2 then 4 else l)
+
+def kBound (C : ℝ) (e n D : ℕ) : ℝ := Real.exp ((2 * (e : ℝ) * n) ^ C * Real.log (2 * (D : ℝ)))
+
+def LemmaK (CK : ℝ) : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω]
+    (D : LData L Ω l), IsTotallyComplex L → HasMuQ l L → ∀ e : ℕ, 1 ≤ e →
+      Finite (H2 (zlTw D ((e : ℤ) + 1))) ∧
+        Real.log (Nat.card (H2 (zlTw D ((e : ℤ) + 1)))) ≤ kBound CK e (Module.finrank ℚ L) (discr L).natAbs
+
+
+
+[KIZ_SRC_M] Literal LemmaM including original M1-M5 and every-cover conclusion
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/OrbitVanishingLocal.lean#L111-L118
+def LemmaM : Prop :=
+  ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsAdicComplete (maximalIdeal O) O] [CharZero O]
+    (K : Type) [Field K] [Algebra O K] [IsAlgClosed K] [FaithfulSMul O K] (v : K → ℝ), IsNVal O K v →
+  ∀ (A : Type) [CommRing A] [Algebra O A] (𝒜 : ℤ → Submodule O A) [GradedAlgebra 𝒜] (x : A →ₐ[O] O), IsWRing 𝒜 x →
+  ∀ (r s r' s' m : ℕ) (Q : Eqns 𝒜 x r s r' s' m) (a : A),
+    M1 Q → M2 𝒜 Q.ideal → M3 𝒜 K x Q.ideal → M4 𝒜 K Q.ideal → M5 𝒜 K x Q.ideal a →
+    (∃ T : Finset (A →ₐ[O] K), Covers 𝒜 Q.ideal T) ∧ cotLen x 𝒜 (-1) Q.F ≠ ⊤ ∧
+    ∀ T : Finset (A →ₐ[O] K), Covers 𝒜 Q.ideal T → ((cotLen x 𝒜 (-1) Q.F).toNat : ℝ) ≤ 2 * ∑ ξ ∈ T, v (ξ a)
+
+
+[KIZ_SRC_MPRIME] Literal LemmaM-prime with additive injection and all derivation lifts
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/OrbitVanishingLocal.lean#L120-L130
+def LemmaM' : Prop :=
+  ∀ (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [Finite (ResidueField O)]
+    (A X : Type) [CommRing A] [Algebra O A] [AddCommGroup X] [DecidableEq X] (𝒜 : X → Submodule O A) [GradedAlgebra 𝒜]
+    (x : A →ₐ[O] O) (j : X), (∀ f ∈ 𝒜 j, x f = 0) →
+  ∀ (ι : Type) (F : ι → A), (∀ i, F i ∈ 𝒜 j) →
+  ∀ (c : O), c ≠ 0 → ∀ (M : Type) [AddCommGroup M] [Module O M] (D : M →+ (A →ₗ[O] O ⧸ Ideal.span {c})),
+    Function.Injective D → (∀ μ i, D μ (F i) = 0) →
+    (∀ μ, ∃ D' ∈ PtDer x O, HasWt 𝒜 j D' ∧ ∀ f, D μ f = Ideal.Quotient.mk _ (D' f)) →
+    Module.length O M ≤ cotLen x 𝒜 j F
+
+end UpperTheory.V.Alg
+
+
+[KIZ_SRC_P] IsUnivFramed, IsRelPres and full original LemmaP
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/FramedTwoCoboundaries.lean#L232-L274
+def IsUnivFramed {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (i : B →ₐ[O] R) (r : Lift O rbar R)
+    (α : F.T → Matrix ι ι R) : Prop :=
+  IsFramed Φ r0 F L ρ i r α ∧
+  ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (i' : B →ₐ[O] R') (r' : Lift O rbar R')
+    (α' : F.T → Matrix ι ι R'), IsFramed Φ r0 F L ρ i' r' α' →
+    ∃! f : R →ₐ[O] R', f.comp i = i' ∧ r.map f = r' ∧ ∀ v, (α v).map f = α' v
+
+end P
+
+def IsRelPres {O X B R : Type} [CommRing O] [AddCommGroup X] [CommRing B] [Algebra O B] [CommRing R] [Algebra O R]
+    (WB : WPres O X B) (i : B →ₐ[O] R) (W : WPres O X R) {τ κ : Type} (e : WB.σ ⊕ τ ≃ W.σ)
+    (f : κ → MvPowerSeries W.σ O) (wf : κ → X) : Prop :=
+  (∀ s, W.wt (e (.inl s)) = WB.wt s) ∧
+  (∀ x, W.π (MvPowerSeries.rename (fun s => e (.inl s)) x) = i (WB.π x)) ∧
+  (∀ u, f u ∈ wtPart O W.wt (wf u)) ∧
+  RingHom.ker W.π = (RingHom.ker WB.π).map (MvPowerSeries.rename (fun s => e (.inl s))) ⊔ Ideal.span (Set.range f)
+
+def LemmaP : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+    [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l], l ≠ 2 →
+  ∀ (ι X : Type) [Fintype ι] [DecidableEq ι] [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (w : ι → X)
+    (Φ : FormData O w) (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [CompactSpace Γ]
+    [TotallyDisconnectedSpace Γ] [T2Space Γ], PhiCond Γ l →
+  ∀ (rbar : Γ →* Matrix ι ι (ResidueField O)) (r0 : Lift O rbar O) (hbar : Φ.Normalises rbar), Φ.Normalises r0.hom →
+  ∀ (F : Frame Γ) (L : ∀ q, Cond O (rbar.comp (F.ψ q))), (∀ q, ∀ n ∈ F.N q, rbar (F.ψ q n) = 1) →
+    (∀ q, Φ.IsLocCond (r0.hom.comp (F.ψ q)) (F.N q) (L q)) → (∀ q, L q O (r0.comap (F.ψ q) (F.hψ q))) →
+    (∀ j, Module.Finite (ResidueField O) (F.Ob (FormData.adRep hbar j))) →
+  ∀ (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (WB : WPres O X B) (ρ : ∀ v, Lift O (rbar.comp (F.φ v)) B),
+    (∀ s, WB.z s ∈ maximalIdeal B) → (∀ v, Φ.InH (r0.hom.comp (F.φ v)) B (ρ v)) →
+    (∀ v s a b, (ρ v).hom s a b ∈ WB.part (w a - w b)) →
+  ∃ (R : Type) (_ : CommRing R) (_ : Algebra O R) (_ : IsCO O R) (i : B →ₐ[O] R) (r : Lift O rbar R)
+    (α : F.T → Matrix ι ι R) (W : WPres O X R) (τ κ : Type) (_ : Fintype τ) (_ : Fintype κ) (e : WB.σ ⊕ τ ≃ W.σ)
+    (f : κ → MvPowerSeries W.σ O) (wf : κ → X),
+    IsUnivFramed Φ r0.hom F L ρ i r α ∧ IsRelPres WB i W e f wf ∧
+    (∀ s a b, r.hom s a b ∈ W.part (w a - w b)) ∧ (∀ v a b, α v a b ∈ W.part (w a - w b)) ∧
+    (∀ t, ∃ a b, W.wt (e (.inr t)) = w a - w b ∧
+      ((∃ s, W.z (e (.inr t)) = r.hom s a b - algebraMap O R (r0.hom s a b)) ∨
+        ∃ v, W.z (e (.inr t)) = (α v - 1) a b)) ∧
+    (∀ j, Nat.card {t // W.wt (e (.inr t)) = j} =
+      Module.finrank (ResidueField O) (F.H1c (FormData.adRep hbar j))) ∧
+    ∀ j, Nat.card {u // wf u = j} = Module.finrank (ResidueField O) (F.Ob (FormData.adRep hbar j))
+
+end UpperTheory.V.Alg
+
+
+[KIZ_SRC_RIGII] Literal RigII including universal IsExt-to-IsModular antecedent
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/KatoQuadraticCharacters/KatoTwoOfUseN.lean#L49-L53
+def RigII : Prop :=
+  ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+    {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : D.ULoc}
+    {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ {r : G ℚ Ω →* GG 3 (PadicAlgCl l)} (_ : D.IsPt U g₁ r), ∀ (ι : Qbar l ≃+* ℂ),
+    TypeII D.η r → (∀ W : G ℚ Ω →* GL (Fin 2) (PadicAlgCl l), D.IsExt r W → D.IsModular ι W) → Af.BlochKatoSelmerVanishes l (adRep r)
+
+
+[KIZ_SRC_NUMBER] Original eis3 and complete CNR3 quantifier order/product inequality
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/CongruenceNumberRankThree.lean#L120-L142
+
+def eis3 (q e : ℕ) (z : ℂ) : ℂ := ((q : ℂ) ^ e)⁻¹ * z + 1 + (q : ℂ) ^ e * z⁻¹
+
+def eis4 (p e : ℕ) (z₁ z₂ z₃ : ℂ) : ℂ := (p : ℂ) ^ (e + 1) * z₁ + (p : ℂ) ^ e * z₂ + (p : ℂ) * z₃ + 1
+
+def CongruenceNumberRankThree : Prop :=
+  ∀ (K : Type) [Field K] [NumberField K] [IsCMField K], Module.finrank ℚ K = 2 → ∃ c A : ℕ,
+    ∀ e : ℕ, 1 ≤ e → ∀ N : ℕ, 1 ≤ N → ∀ (p : ℕ) (w : HeightOneSpectrum (𝓞 K)), p.Prime → (p : 𝓞 K) ∈ w.asIdeal → 7 ≤ p →
+      ¬ p ∣ N → ¬ (p : ℤ) ∣ discr K →
+    ∀ (Orb : Type) [Fintype Orb] (z : Orb → ℂ), (∀ o, ∃ k : ℕ, 0 < k ∧ z o ^ k = 1) →
+      (∀ σ : ℂ ≃+* ℂ, ∃ u : Orb ≃ Orb, ∀ o, z (u o) = σ (z o)) →
+    ∃ NN : ℤ, NN ≠ 0 ∧ Real.log |(NN : ℝ)| ≤ c * Fintype.card Orb * ((N : ℝ) * (e + 1)) ^ A * Real.log p ∧
+      ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → l ≠ p → ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] [IsScalarTower ℚ K Ω]
+        [IsAlgClosure K Ω] (ι : Qbar l ≃+* ℂ) (B : ValuationSubring Ω), IsPlaceOver B w →
+        ∀ σ : G K Ω, IsFrob B (normV w) σ →
+        ∀ X : Orb → Finset (G K Ω →* GL (Fin 3) (Qbar l)),
+          (∀ o, ∀ ρ ∈ X o, Adm3 ι e N ρ ∨ Adm2 ι e (N * (discr K).natAbs) ρ) →
+          (∀ o, ∀ ρ ∈ X o, ∀ ρ' ∈ X o, RepIso ρ ρ' → ρ = ρ') →
+          (∀ o, ∀ ρ ∈ X o, (ρ σ⁻¹ : Matrix (Fin 3) (Fin 3) (Qbar l)).trace ≠ ι.symm (eis3 (normV w) e (z o))) ∧
+          ‖((NN : ℤ) : Qbar l)‖ ≤
+            ∏ o, ∏ ρ ∈ X o, ‖(ρ σ⁻¹ : Matrix (Fin 3) (Fin 3) (Qbar l)).trace - ι.symm (eis3 (normV w) e (z o))‖
+
+def NumberSp4 : Prop :=
+
+
+[KIZ_SRC_ADK] Original full matrix IsAdOf and universal AdVanishK
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/CongruenceNumberRankThree.lean#L155-L176
+variable {F₀ F Ω : Type} [Field F₀] [Field F] [Field Ω] [Algebra F₀ F] [Algebra F₀ Ω] [Algebra F Ω] [IsScalarTower F₀ F Ω]
+  {k : Type} [Field k] {n : ℕ}
+
+def IsAdOf (r : G F Ω →* GL (Fin n) k) (μ : G F Ω →* kˣ) (ρ : Representation k (G F₀ Ω) (Matrix (Fin n) (Fin n) k)) : Prop :=
+  ∃ (c : G F₀ Ω) (P : GL (Fin n) k), (∃ j : Ω →+* ℂ, ∀ x, j (c x) = starRingEnd ℂ (j x)) ∧
+    (∀ s s' : G F Ω, s'.restrictScalars F₀ = c * s.restrictScalars F₀ * c⁻¹ →
+      (r s : Matrix (Fin n) (Fin n) k)ᵀ * (P : Matrix (Fin n) (Fin n) k) * (r s' : Matrix (Fin n) (Fin n) k) =
+        (μ s : k) • (P : Matrix (Fin n) (Fin n) k)) ∧
+    (∀ (s : G F Ω) (X : Matrix (Fin n) (Fin n) k), ρ (s.restrictScalars F₀) X =
+      (r s : Matrix (Fin n) (Fin n) k) * X * ((r s)⁻¹ : GL (Fin n) k)) ∧
+    ∀ X : Matrix (Fin n) (Fin n) k, ρ c X = -((P⁻¹ : GL (Fin n) k) * Xᵀ * (P : Matrix (Fin n) (Fin n) k))
+
+end Ad
+
+def AdVanishK : Prop :=
+  ∀ (K : Type) [Field K] [NumberField K] [IsCMField K], Module.finrank ℚ K = 2 → ∀ (n : ℕ), 2 ≤ n →
+    ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [Algebra ℚ Ω] [Algebra K Ω] [IsScalarTower ℚ K Ω] [IsAlgClosure K Ω]
+      (ι : Qbar l ≃+* ℂ) (r : G K Ω →* GL (Fin n) (Qbar l)), Continuous r → IsAutCsd ι r →
+      IsIrr (r.comp (cycBar K Ω l).ker.subtype) →
+      ∀ ρ : Representation (Qbar l) (G ℚ Ω) (Matrix (Fin n) (Fin n) (Qbar l)),
+        IsAdOf r (cycBar K Ω l ^ (1 - (n : ℤ))) ρ → BlochKatoSelmerVanishes l ρ
+
+
+
+[KIZ_SRC_ONECHAR_BOUNDARY] Separate OneChar endpoint, not a stored InpZ field or new conclusion
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L54-L64
+def OneChar : Prop :=
+  ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [IsCMField K] [Algebra K Ω]
+    [IsAlgClosure K Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) (N : ℕ) [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N),
+    GD Ω K l e ψ → ∀ (ι : Qbar l ≃+* ℂ) (σ : G K Ω) (t : Qbar l),
+    t = algebraMap c.O (PadicAlgCl l) ((Chr.Psi l e (Chr.dirG ℚ Ω ψ) (galEmb ℚ K Ω σ) : c.O) + 1 +
+      (((Chr.Psi l e (Chr.dirG ℚ Ω ψ) (galEmb ℚ K Ω σ))⁻¹ : c.Oˣ) : c.O)) →
+    (∀ ρ : G K Ω →* GL (Fin 3) (Qbar l), Af.Adm3 ι e N ρ ∨ Af.Adm2 ι e (N * (discr K).natAbs) ρ →
+      (ρ σ : Matrix (Fin 3) (Fin 3) (Qbar l)).trace ≠ t) →
+    Vlen Ω c e ψ ≠ ⊤ ∧ ∃ X : Finset (G K Ω →* GL (Fin 3) (Qbar l)),
+      (∀ ρ ∈ X, Af.Adm3 ι e N ρ ∨ Af.Adm2 ι e (N * (discr K).natAbs) ρ) ∧ (∀ ρ ∈ X, ∀ ρ' ∈ X, Af.RepIso ρ ρ' → ρ = ρ') ∧
+      Vn Ω c e ψ ≤ 2 * ∑ ρ ∈ X, vl l ((ρ σ : Matrix (Fin 3) (Fin 3) (Qbar l)).trace - t)

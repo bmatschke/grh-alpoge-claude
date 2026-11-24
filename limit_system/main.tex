@@ -1,0 +1,941 @@
+\section{The complete original Taylor--Wiles limit system}
+\label{sec:limit-system-v039}
+
+This chapter proves the whole original assertion \(\mathrm{S4}\), including
+uniform convergence of the local homomorphisms.  Its scope is
+\[
+ \forall\ell\text{ prime},\ L,\ G_0,\ T:\mathrm{TWGrp}(G_0),\qquad
+ T.\mathrm{ProL}\ \Longrightarrow\ \mathrm{Nonempty}(\mathrm{Lim}(T)).
+ \tag{LIM.1}
+\]
+Here \(L\), \(G_0\), and \(T\) are the original objects, not replacements
+with fewer fields.  In particular the two finite sets of local groups,
+their actual maps at every level, the distinguished involutions,
+the characters \(\eta,\epsilon\), and the Frobenius and tame elements
+are retained.  The hypothesis \(T.\mathrm{ProL}\) is precisely the
+antecedent in \texttt{PatchedSupportCompletions.S4}, lines 15--16.
+Constructing the matched quotient that supplies this antecedent is a
+separate arithmetic descent step.
+
+Write \(\Gamma_0=G_0.\Gamma\),
+\(\Gamma_N=(T.\mathrm{GN}\,N).\Gamma\),
+\(p_N=(T.h\,N).p\), and \(H=T.H\).
+The maps \(p_N\) are continuous surjective homomorphisms, and
+\(H\) is an open normal subgroup of \(\Gamma_0\).
+Put \(H_N=p_N^{-1}H\).  A profinite group below means a compact Hausdorff
+totally disconnected topological group.  The original compact,
+totally disconnected group assumptions imply the Hausdorff condition,
+as shown in LIM1.  Products of normal subgroups denote their join.
+
+For an open subgroup \(A\) of a profinite group, write
+\[
+ X_\ell(A)=\operatorname{Hom}_{\mathrm{cont}}(A,\mathbf F_\ell).
+\]
+This is the source's \(\mathrm{HomL}\), written additively: a homomorphism
+to the finite discrete group \(\mathbf F_\ell\) is continuous exactly
+when its kernel is open.  The \emph{literal} source hypothesis
+\(\mathrm{PhiCond}(Y,\ell)\) says that \(X_\ell(A)\) is finite for
+\emph{every open subgroup} \(A\le Y\), not merely for \(Y\) or for
+one selected local inertia group.  The proof below needs it at the
+specific open normal subgroup \(f_0^{-1}H\).
+
+All nineteen claims have complete human proofs at their printed scopes.
+They use elementary finite group, compactness, and linear algebra
+arguments; there is no new published-theorem input.  Source citations
+locate the precise formal contracts.  They do not replace the proofs.
+
+% BEGIN LIM1
+\paragraph{LIM1. Profinite quotients and finite coordinates.}
+\label{claim:LIM1}
+The compact totally disconnected topological groups in the original
+\(\mathrm{Loc}\) and \(\mathrm{Glob}\) have a basis at the identity of
+open normal subgroups.  Every such subgroup has finite index.  If
+\(K\triangleleft P\) is closed, then
+\[
+ K=\bigcap_{V\triangleleft_o P}KV,\qquad
+ P/K\ \simeq\ \varprojlim_{V\triangleleft_o P} P/KV
+ \tag{LIM.2}
+\]
+as topological groups.  The quotient is again profinite.  A continuous
+surjection of profinite groups is a quotient map.
+
+Here are the needed topological details.  The closure of a singleton is
+connected, so total disconnectedness makes every singleton closed.
+A topological group with this property is Hausdorff: for \(g\ne1\),
+choose an identity neighborhood omitting \(g\), and then a symmetric
+identity neighborhood whose square lies in it; the corresponding
+translates separate two distinct points.
+
+In a compact Hausdorff space the intersection of all clopen
+neighborhoods of a point is connected.  To see this, if that intersection
+were the disjoint union of two nonempty compact sets, separate them by
+disjoint open sets.  Compactness of the complement of those open sets
+gives a finite intersection of clopen neighborhoods of the point lying
+in their union.  Its intersection with the open set containing the point
+is then clopen and excludes the other compact set, a contradiction.
+Thus in a totally disconnected compact Hausdorff space the intersection
+is the singleton.  A second finite-intersection argument gives a clopen
+neighborhood inside every prescribed neighborhood.
+
+Choose a clopen identity neighborhood \(C\) inside a given identity
+neighborhood.  Continuity of multiplication and finite covers of the
+compact sets \(C\) and \(P\setminus C\) give an identity neighborhood
+\(W\) such that every element of \(W\) preserves both sets.  Explicitly,
+cover each compact set by finitely many neighborhoods \(U_i\) for which
+\(W_iU_i\) lies in that same set, and intersect the \(W_i\).
+The stabilizer \(E=\{g:gC=C\}\) is a subgroup containing an identity
+neighborhood and hence is open.  Since \(1\in C\), it is contained in
+\(C\).  Open cosets cover the compact group, so \(E\) has finite index;
+its normal core is a finite intersection of conjugates and is open.
+This proves the asserted basis and index statement.
+
+If \(x\notin K\), closedness of \(K\) gives an open normal \(V\)
+with \(xV\cap K=\varnothing\), and therefore \(x\notin KV\).
+This proves the first equality in (LIM.2).  A coherent family of cosets
+in the finite quotients \(P/KV\) has the finite-intersection property:
+for finitely many \(V\)'s use their intersection.  Compactness gives an
+element of all the cosets, unique modulo \(K\).  Hence the indicated map
+is a continuous bijection from the compact quotient onto the inverse
+limit, which is Hausdorff.  A continuous bijection from a compact space
+to a Hausdorff space is a homeomorphism because it sends closed sets to
+compact, hence closed, sets.  This also proves that a continuous
+surjection of profinite groups is a quotient map.  In particular,
+compatible homomorphisms into all these finite quotients define a
+unique continuous homomorphism into \(P/K\).
+The source uses these facts in \texttt{QuotProf.totallyDisconnected\_quot}
+and in the finite-quotient constructions of \texttt{LimKer} and
+\texttt{InLim}.
+% END LIM1
+
+% BEGIN LIM2
+\paragraph{LIM2. The relative pro-\(\ell\) residual, with its exact ambient meaning.}
+\label{claim:LIM2}
+Let \(H\triangleleft_o\Gamma\), with \(\Gamma\) profinite, and define
+exactly as the source does
+\[
+ P_\ell^\Gamma(H)=
+ \bigcap_{\substack{U\triangleleft_o\Gamma\\
+       \forall h\in H\ \exists e\ge0:\ h^{\ell^e}\in U}} U.
+ \tag{LIM.3}
+\]
+It is a closed normal subgroup contained in \(H\).  It equals, as a
+subgroup of \(\Gamma\), the intrinsic residual
+\[
+ \bigcap_{\substack{A\triangleleft_o H\\H/A\text{ a finite }\ell\text{-group}}}A.
+ \tag{LIM.4}
+\]
+The quotient \(H/P_\ell^\Gamma(H)\) is pro-\(\ell\).  Moreover for every
+\(V\triangleleft_o\Gamma\),
+\[
+ P_\ell^\Gamma(H)\le V
+ \quad\Longleftrightarrow\quad
+ \text{the image of }H\text{ in }\Gamma/V\text{ is an }\ell\text{-group}.
+ \tag{LIM.5}
+\]
+
+In a finite group, having all element orders powers of \(\ell\) is
+equivalent to having order a power of \(\ell\).  The nontrivial direction
+uses the following elementary proof of Cauchy's assertion.  If a prime
+\(p\) divides the order of a finite group \(Q\), cyclic rotation acts on
+the \(|Q|^{p-1}\) tuples \((a_1,\ldots,a_p)\) with product \(1\).
+Rotation preserves that condition, also in a noncommutative group.
+Nonconstant orbits have size \(p\).  The number of constant tuples,
+equivalently solutions of \(a^p=1\), is therefore divisible by \(p\).
+It includes the identity and hence includes a nonidentity solution.
+Thus every prime divisor of \(|Q|\) occurs as an element order.
+This establishes the equivalence and identifies the qualifying
+subgroups in (LIM.3) with those for which the image of \(H\) is an
+\(\ell\)-group.
+
+The family in (LIM.3) contains \(H\) and is closed under finite
+intersections: the image of \(H\) in the quotient by an intersection
+embeds in the product of its finite \(\ell\)-group images.
+Its intersection is consequently closed, normal, and contained in \(H\).
+For any qualifying \(U\), \(H\cap U\) occurs in (LIM.4).
+Conversely, if \(A\triangleleft_o H\) and \(H/A\) is an \(\ell\)-group,
+take the core of \(A\) in \(\Gamma\).  Only the finitely many cosets of
+\(H\) give distinct conjugates, because \(A\) is normal in \(H\).
+The core \(U\) is open and normal in \(\Gamma\), is contained in \(A\),
+and \(H/U\) embeds in a finite product of conjugates of \(H/A\).
+It therefore qualifies in (LIM.3).  These two inclusions prove (LIM.4).
+
+For the forward implication in (LIM.5), compactness gives finitely many
+qualifying \(U_i\) whose intersection is contained in \(V\).  Indeed,
+otherwise their closed intersections with the compact set
+\(\Gamma\setminus V\) would have the finite-intersection property,
+contradicting \(P_\ell^\Gamma(H)\le V\).
+Their intersection still qualifies, so the image in \(\Gamma/V\)
+is an \(\ell\)-group.  The converse is the defining intersection.
+Finally, an open normal subgroup of \(H/P_\ell^\Gamma(H)\) pulls back
+to an open normal subgroup \(A\) of \(H\) containing the residual.
+Its core \(V\) in \(\Gamma\) is open normal and still contains the
+residual.  By (LIM.5), \(H/V\), and hence \(H/A\), is an \(\ell\)-group.
+Every finite continuous quotient of \(H/P_\ell^\Gamma(H)\) is thus an
+\(\ell\)-group, as asserted.
+This is the relative interpretation of \texttt{PL}, not a replacement
+by a residual formed in an unspecified ambient group.
+% END LIM2
+
+% BEGIN LIM3
+\paragraph{LIM3. Functoriality and surjective images of the relative residual.}
+\label{claim:LIM3}
+Let \(f:\Gamma\to\Gamma'\) be a continuous homomorphism of profinite
+groups, let \(H\triangleleft_o\Gamma\), and let any subgroup
+\(H'\le\Gamma'\) satisfy \(f(H)\le H'\).  Then
+\[
+ f(P_\ell^\Gamma(H))\le P_\ell^{\Gamma'}(H').
+ \tag{LIM.6}
+\]
+If, further, \(H'\) is open normal, \(f\) is surjective, and
+\(H=f^{-1}H'\), this inclusion is equality.
+In particular, if the target residual is trivial, \(f\) kills the
+entire source residual, not only its characters.
+
+To prove (LIM.6), pull back any qualifying open normal subgroup \(U'\)
+from (LIM.3) for \(H'\).  Its preimage is open normal and qualifies
+for \(H\), so every element of the source residual maps into \(U'\).
+Intersect over \(U'\).  In the surjective case the map
+\(H\to H'\) is onto.  The image \(f(P_\ell^\Gamma(H))\) is closed
+because it is a continuous image of a compact subgroup, and is normal
+in \(\Gamma'\).  The quotient of \(H'\) by that image is a continuous
+quotient of the pro-\(\ell\) group \(H/P_\ell^\Gamma(H)\) from LIM2.
+It is pro-\(\ell\): any finite continuous quotient pulls back to a
+finite continuous quotient of the latter group.
+Every element of the intrinsic residual of \(H'\) is trivial in all
+these finite quotients, and hence in the quotient itself by LIM1.
+Thus \(P_\ell^{\Gamma'}(H')\le f(P_\ell^\Gamma(H))\), proving equality.
+This standalone lemma supplies the generic scope of
+\texttt{PlMap.pl\_map}; it does not construct an arithmetic
+\(\mathrm{TWQuot}\) or transport any determinant or Hecke ideal.
+% END LIM3
+
+% BEGIN LIM4
+\paragraph{LIM4. Finite \(\ell\)-groups are detected by linear characters.}
+\label{claim:LIM4}
+If \(Q\) is a finite \(\ell\)-group and \(M<Q\) is a proper subgroup,
+there is a nonzero homomorphism \(Q\to\mathbf F_\ell\) vanishing on
+\(M\).
+
+Choose a maximal proper subgroup \(J\) containing \(M\).  Let \(J\)
+act by left multiplication on \(Q/J\).  Every orbit has size a power
+of \(\ell\), while \(|Q/J|\) is divisible by \(\ell\).
+Thus the number of fixed cosets is divisible by \(\ell\).
+There is at least one, the identity coset, so there are at least
+\(\ell\) fixed cosets.  A coset \(gJ\) is fixed exactly when
+\(g^{-1}Jg=J\); consequently the fixed cosets form \(N_Q(J)/J\).
+The normalizer strictly contains \(J\).  Maximality forces
+\(N_Q(J)=Q\), so \(J\) is normal.
+The nontrivial quotient \(Q/J\) has no nontrivial proper subgroup.
+It is cyclic, since any nonidentity element generates it, and its
+order is prime, since a cyclic group of composite order has a
+nontrivial proper subgroup.  Its order is therefore \(\ell\).
+An isomorphism \(Q/J\simeq(\mathbf F_\ell,+)\), composed with the
+quotient map, proves the assertion.  This proves the finite character
+criterion used in \texttt{BurnsideHom.burnsideHom} without importing
+an additional generator theorem.
+% END LIM4
+
+% BEGIN LIM5
+\paragraph{LIM5. The exact finite-character generator bound.}
+\label{claim:LIM5}
+Suppose \(A\) is pro-\(\ell\) and \(X_\ell(A)\) is finite.  If
+\(|X_\ell(A)|\le b\), then \(A\) has a list of \(b\) topological
+generators, allowing identity entries.  Hence an open extension of
+\(A\) in a profinite group is topologically finitely generated.
+
+Pointwise addition and scalar multiplication make \(X_\ell(A)\) a
+finite-dimensional \(\mathbf F_\ell\)-vector space: finite
+intersections of open kernels show that sums are still continuous.
+Write its dimension as \(d\).  Evaluation at group elements spans
+its dual, because a character annihilated by all evaluations is zero.
+Choose \(a_1,\ldots,a_d\) whose evaluations are a basis.
+Let \(B\) be the closed subgroup they generate.
+If \(B\ne A\), choose \(x\notin B\).  By compactness of \(B\)
+and the identity basis from LIM1, some \(V\triangleleft_o A\)
+satisfies \(x\notin BV\).  The image of \(B\) in the finite
+\(\ell\)-group \(A/V\) is proper.  LIM4 supplies a nonzero character
+of \(A/V\) vanishing on that image.  Its pullback is a nonzero member
+of \(X_\ell(A)\) whose evaluations at all \(a_i\) vanish, a
+contradiction.  Thus the \(a_i\) topologically generate \(A\).
+
+Since \(d\le\ell^d=|X_\ell(A)|\le b\), append \(b-d\) identities.
+The case \(d=0\) is covered: the argument forces \(A=1\).
+If \(A\) is open in a profinite group \(B_0\), append finitely many
+coset representatives of \(B_0/A\); the resulting finite list
+topologically generates \(B_0\).  When the extension is not normal,
+the same assertion means representatives of its finitely many left
+cosets, and the generation argument is unchanged.
+Applied to \(H_N\), this gives exactly \(T.\mathrm{hb}\) entries
+from the literal \(\mathrm{finN}\) bound; no logarithmic or stronger
+bound is being assumed.  This is the scope of \texttt{PlGen.pl\_gen}.
+% END LIM5
+
+% BEGIN LIM6
+\paragraph{LIM6. A single finitely generated quotient for every local map.}
+\label{claim:LIM6}
+Let \(Y\) be a profinite group with the original
+\(\mathrm{PhiCond}(Y,\ell)\).  Let \(f_0:Y\to\Gamma_0\) be
+continuous and put
+\[
+ A=f_0^{-1}H,\qquad P_Y=P_\ell^Y(A).
+ \tag{LIM.7}
+\]
+Then \(Y/P_Y\) is topologically finitely generated.
+If continuous maps \(f_N:Y\to\Gamma_N\) satisfy
+\(p_Nf_N=f_0\), then every \(f_N\) kills this \emph{same} \(P_Y\).
+
+The subgroup \(A\) is open normal.  LIM2 shows that \(A/P_Y\)
+is pro-\(\ell\).  Pullback along the surjection \(A\to A/P_Y\)
+injects its continuous characters into \(X_\ell(A)\), which is
+finite by the actual \(\mathrm{PhiCond}\) hypothesis at \(A\).
+LIM5 makes \(A/P_Y\), and then its finite-index extension
+\(Y/P_Y\), topologically finitely generated.
+For each \(N\), the equality \(p_Nf_N=f_0\) gives
+\(f_N(A)\le H_N\).  By \(T.\mathrm{ProL}\),
+\(P_\ell^{\Gamma_N}(H_N)=1\).
+LIM3 therefore gives \(f_N(P_Y)=1\) for all \(N\).
+The quotient \(Y/P_Y\) is constructed once from \(f_0\) and \(H\);
+it does not depend on the level or on a finite target used later.
+This proves the exact local finiteness and factorization supplied by
+\texttt{Loc\_fin.loc\_fin}.
+% END LIM6
+
+% BEGIN LIM7
+\paragraph{LIM7. A free profinite group on a prescribed finite list.}
+\label{claim:LIM7}
+For every finite number \(r\) there is a profinite group \(F_r^{\mathrm{pf}}\)
+with \(r\) distinguished topological generators, and every assignment
+of those generators to elements of a profinite group \(Z\) extends
+uniquely to a continuous homomorphism \(F_r^{\mathrm{pf}}\to Z\).
+
+Take the abstract free group \(F_r\), formed by reduced words, and
+map it diagonally to the product of all its finite quotients
+\(F_r/N\), where \(N\) ranges over finite-index normal subgroups.
+Let \(F_r^{\mathrm{pf}}\) be the closure of the image.
+The product of finite discrete spaces is compact: extend any
+family of closed sets with the finite-intersection property to an
+ultrafilter, select its unique value at each finite coordinate,
+and note that every basic neighborhood of the resulting point
+belongs to the ultrafilter.  The point lies in all the original
+closed sets.  This uses the same maximal-filter principle spelled
+out in LIM9.  The product is Hausdorff, and its finite coordinate
+projections separate points; hence the closed subgroup is profinite.
+The images of the free generators topologically generate it by
+construction.  An assigned list in \(Z\) defines an abstract word
+homomorphism.  Modulo each \(V\triangleleft_o Z\), this homomorphism
+has finite image, so its kernel has finite index in \(F_r\).
+It consequently extends to a continuous map from
+\(F_r^{\mathrm{pf}}\) to \(Z/V\), through the corresponding coordinate
+finite quotient.  These maps are compatible: they agree on the dense
+word subgroup and the finite targets are Hausdorff.
+LIM1 assembles them into a continuous homomorphism to \(Z\).
+Two such homomorphisms agree on the dense word subgroup and hence
+everywhere.  For \(r=0\), the construction is the trivial group.
+This supplies the universal property used in \texttt{FreeProf} and
+\texttt{GenExt}, with its distinguished generators explicit.
+% END LIM7
+
+% BEGIN LIM8
+\paragraph{LIM8. One finite profinite cover for all original levels.}
+\label{claim:LIM8}
+There is one topologically finitely generated profinite group \(\Pi\),
+continuous surjections \(\pi_N:\Pi\to\Gamma_N\), and \(ct\in\Pi\)
+such that
+\[
+ \pi_N(ct)=c_N,\qquad
+ p_N\pi_N(x)\equiv p_M\pi_M(x)\pmod H
+ \quad\text{for all }N,M,x.
+ \tag{LIM.8}
+\]
+
+The quotient \(Q=\Gamma_0/H\) is finite; choose representatives
+\(r_q\in\Gamma_0\) for all \(q\in Q\).
+By LIM2 and \(T.\mathrm{ProL}\), each \(H_N\) is pro-\(\ell\).
+By the actual \(T.\mathrm{finN}\) and LIM5, choose a list of
+\(b=T.\mathrm{hb}\) topological generators of each \(H_N\).
+Let \(\Pi=F_{1+|Q|+b}^{\mathrm{pf}}\), with its generators divided
+into one distinguished generator \(ct\), a list indexed by \(Q\),
+and a list of length \(b\).
+At level \(N\), send \(ct\) to the original \(c_N\), send the
+\(q\)-generator to a lift of \(r_q\) under the surjection \(p_N\),
+and send the last list to the chosen generators of \(H_N\).
+LIM7 gives a continuous homomorphism \(\pi_N\).
+
+Its image is compact and therefore closed.  It contains the chosen
+topological generators of \(H_N\), so contains \(H_N\), and its
+image in \(\Gamma_N/H_N\simeq Q\) contains every coset.
+It is therefore all of \(\Gamma_N\).
+The maps \(p_N\pi_N\) have the same values modulo \(H\) on the
+finite generators: respectively \(c_0\), \(r_q\), and \(1\).
+Here \(p_N(c_N)=c_0\) is the original \(\mathrm{Glob.Hom.c}\) field.
+Uniqueness on a dense generated subgroup gives their equality modulo
+\(H\) on every \(x\in\Pi\), proving (LIM.8).
+No relation \(ct^2=1\) has been imposed on \(\Pi\); its square
+will lie in the limit kernel, which is exactly what is required.
+This constructs the whole common cover from \texttt{SysCover.sys\_cover}.
+% END LIM8
+
+% BEGIN LIM9
+\paragraph{LIM9. One ultrafilter and exact stabilization of the kernel joins.}
+\label{claim:LIM9}
+Fix an ultrafilter \(\mathcal U\) on \(\mathbf N\) extending the
+cofinite filter.  Such an ultrafilter exists by the maximal-filter
+argument: order proper filters containing the cofinite filter by
+inclusion, take unions of chains, and apply the maximal principle;
+maximality decides every subset or its complement.
+It contains every tail, so in the source filter order
+\(\mathcal U\le\mathrm{atTop}\).
+Put \(K_N=\ker\pi_N\) and define exactly the source limit kernel
+\[
+ K=\{x\in\Pi:\ 
+       \forall V\triangleleft_o\Pi,\quad
+       x\in K_NV\text{ for }\mathcal U\text{-almost every }N\}.
+ \tag{LIM.9}
+\]
+Then \(K\) is closed normal and, for every \(V\triangleleft_o\Pi\),
+\[
+ K_NV=KV\quad\text{for }\mathcal U\text{-almost every }N.
+ \tag{LIM.10}
+\]
+Also
+\[
+ K\le V\quad\Longleftrightarrow\quad
+ K_N\le V\text{ for }\mathcal U\text{-almost every }N.
+ \tag{LIM.11}
+\]
+
+There are finitely many subgroups of \(\Pi/V\).  Thus the finite
+partition according to \(K_NV\) has exactly one cell in \(\mathcal U\).
+Write its subgroup as \(S_V\), so \(V\le S_V\) and
+\(K_NV=S_V\) on that cell.  If \(W\le V\), intersect the two
+cells and take one index in their nonempty intersection to obtain
+\[
+ S_W\le S_V,\qquad S_WV=S_V.
+ \tag{LIM.12}
+\]
+For fixed \(x\), membership of \(x\) in \(K_NV\) is eventually
+equivalent to membership in \(S_V\).  Consequently (LIM.9) is exactly
+\(K=\bigcap_V S_V\), a closed normal subgroup.
+
+We claim \(KV=S_V\).  One inclusion follows from \(K\le S_V\)
+and \(V\le S_V\).  For the other, let \(x\in S_V\).
+The closed sets \(S_W\cap xV\), indexed by open normal \(W\),
+have the finite-intersection property.  For finitely many \(W_i\),
+take \(W=V\cap\bigcap_iW_i\); by (LIM.12),
+\(S_WV=S_V\), so \(S_W\cap xV\ne\varnothing\), and it lies
+in all those sets.  Compactness gives \(k\in K\cap xV\).
+Then \(x\in KV\), proving the claim and (LIM.10).
+Finally, \(K\le V\) is equivalent to \(KV=V\), which by the
+eventual equality is equivalent to \(K_NV=V\) eventually.
+This is (LIM.11).  This argument proves the full
+\texttt{LimKer.limKer\_sup} conclusion with its exact uniformity:
+for each \(V\) the equality holds on one set in \(\mathcal U\).
+No common set for infinitely many \(V\)'s has been asserted.
+% END LIM9
+
+% BEGIN LIM10
+\paragraph{LIM10. Uniform convergence of the outgoing homomorphisms.}
+\label{claim:LIM10}
+Set \(F_N=p_N\pi_N:\Pi\to\Gamma_0\).
+There is a continuous surjective homomorphism
+\(F:\Pi\to\Gamma_0\), with \(K\le\ker F\), such that
+\[
+ \forall W\triangleleft_o\Gamma_0,\quad
+ \mathcal U\text{-almost every }N:\quad
+ \forall x\in\Pi,\quad F_N(x)F(x)^{-1}\in W.
+ \tag{LIM.13}
+\]
+
+If a profinite group has \(r\) topological generators, continuous
+homomorphisms from it to a finite group \(Q\) are determined by
+the generator values and therefore number at most \(|Q|^r\).
+Equality on the dense word subgroup implies equality everywhere,
+which proves this assertion without any assumption that the
+topological generators generate abstractly.
+Apply it to \(\Pi\) and \(\Gamma_0/W\).
+The maps \(F_N\bmod W\) take values in a finite set of
+\emph{whole homomorphisms}.  The ultrafilter therefore chooses one
+homomorphism \(f_W:\Pi\to\Gamma_0/W\) to which they are equal,
+on one set in \(\mathcal U\), for all \(x\) simultaneously.
+For \(W'\le W\), the two choices are compatible by intersecting
+their eventual sets.  LIM1 gives a unique continuous homomorphism
+\(F\) with these finite coordinates.  This proves (LIM.13).
+
+Each \(F_N\) is onto, so each \(f_W\) is onto: choose one index
+from its nonempty eventual set.  The image of \(F\) is compact
+and closed.  If it omitted an element of \(\Gamma_0\), an open
+normal coset separating that element from the image would
+contradict surjectivity of one \(f_W\).  Thus \(F\) is onto.
+For each \(W\), let \(V=\ker f_W\triangleleft_o\Pi\).
+Eventually \(F_N\bmod W=f_W\), so \(K_N\le V\).
+By (LIM.11), \(K\le V\).  Intersecting over \(W\) and using
+finite-quotient separation proves \(K\le\ker F\).
+This proves the original \texttt{LimOut.exists\_lim\_hom\_out}
+endpoint; its convergence is uniform in all elements of the cover.
+% END LIM10
+
+% BEGIN LIM11
+\paragraph{LIM11. The limit quotient and the exact all-level comparison modulo \(H\).}
+\label{claim:LIM11}
+Let \(G_* =\Pi/K\), let \(\pi_o:\Pi\to G_*\) be the quotient
+map, and let \(h_*:G_*\to\Gamma_0\) be the homomorphism descended
+from \(F\).  Both maps are continuous and surjective.  They satisfy
+\[
+ \begin{split}
+ &h_*\pi_o=F,\qquad h_*(\pi_o(ct))=c_0,\\
+ &p_N\pi_N(x)\,(h_*\pi_o(x))^{-1}\in H
+       \qquad\text{for every }N,x.
+ \end{split}
+ \tag{LIM.14}
+\]
+The uniform statement (LIM.13) is also the original
+\(p_{\mathrm{lim}}\) statement for these same maps.
+
+LIM1 makes the quotient profinite, and LIM10 gives the well-defined
+descent.  Its continuity follows from the quotient-map property;
+its surjectivity follows from that of \(F\).
+For every \(W\triangleleft_o\Gamma_0\), choose an index in the
+eventual set of (LIM.13) and apply it to \(ct\).
+Since \(F_N(ct)=p_N(c_N)=c_0\), the images of \(F(ct)\) and
+\(c_0\) agree modulo every \(W\), proving their equality.
+By (LIM.8), \(F_N\bmod H\) is already independent of \(N\).
+It equals the ultrafilter's selected finite-coordinate homomorphism
+\(f_H\), which is \(F\bmod H\).
+Thus (LIM.14) holds for every \(N,x\), not merely eventually.
+This all-level distinction is needed by the subsequent common
+\(\eta\)-kernel and Selmer comparison.
+% END LIM11
+
+% BEGIN LIM12
+\paragraph{LIM12. Uniform finite local homomorphisms.}
+\label{claim:LIM12}
+Keep \(Y,f_0,f_N,P_Y\) from LIM6 and the common cover and kernel
+from LIM8--LIM11.  For every \(V\triangleleft_o\Pi\), put
+\(S_V=KV\).  There is a continuous homomorphism
+\[
+ a_V:Y\longrightarrow\Pi/S_V
+ \tag{LIM.15}
+\]
+with the following property.  On one set in \(\mathcal U\),
+\(K_NV=S_V\), the finite quotient map \(q_V:\Pi\to\Pi/S_V\)
+descends through \(\pi_N\) to a continuous homomorphism
+\(q_{N,V}:\Gamma_N\to\Pi/S_V\), and
+\[
+ q_{N,V}f_N(y)=a_V(y)\qquad\text{for every }y\in Y.
+ \tag{LIM.16}
+\]
+The maps \(a_V\) are compatible under refinement of \(V\).
+
+On the set from (LIM.10), \(K_N\le S_V\).
+Surjectivity of \(\pi_N\) gives the unique algebraic descent
+\(q_{N,V}\).  It is continuous because \(\pi_N\) is a quotient
+map and \(q_{N,V}\pi_N=q_V\) is continuous.
+LIM6 says that \(f_N\) kills the same \(P_Y\) for every \(N\),
+so \(q_{N,V}f_N\) factors continuously through \(Y/P_Y\).
+That quotient is topologically finitely generated.
+There are only finitely many continuous homomorphisms from it
+to \(\Pi/S_V\), by the generator argument of LIM10.
+For indices outside the kernel-stabilization set, use the trivial
+homomorphism solely to make a sequence defined at every index.
+The finite partition into these homomorphisms has a unique cell
+in \(\mathcal U\); its homomorphism, pulled back to \(Y\), is
+\(a_V\).  Intersecting that cell with the stabilization set gives
+(LIM.16), simultaneously for all \(y\).
+
+If \(W\le V\), then \(S_W\le S_V\).
+Choose an index in the intersection of the two stabilization sets
+and the two sets in (LIM.16).  The finite quotient maps at that
+index commute, because their composites with the surjection
+\(\pi_N\) are the original quotient maps of \(\Pi\).
+Their composites with \(f_N\) therefore prove that \(a_W\)
+maps to \(a_V\).  This is compatibility of the whole
+homomorphisms.  It does not interchange an infinite intersection
+of eventual sets with the quantifier over \(y\).
+% END LIM12
+
+% BEGIN LIM13
+\paragraph{LIM13. Continuous local limits with the exact uniform \(\mathrm{Close}\) statement.}
+\label{claim:LIM13}
+There is a continuous homomorphism \(F_Y:Y\to G_*\) such that
+\[
+ \begin{gathered}
+ h_*F_Y=f_0,\\
+ \forall V\triangleleft_o\Pi,\quad
+ \mathcal U\text{-almost every }N:\quad
+ \forall y\in Y,\quad
+ \mathrm{Close}(\pi_N,\pi_o,V)(f_N(y),F_Y(y)).
+ \end{gathered}
+ \tag{LIM.17}
+\]
+The source definition here is exactly
+\[
+ \mathrm{Close}(\pi_N,\pi_o,V)(a,b)
+ \iff \exists x,x'\in\Pi:\
+       \pi_N(x)=a,\quad\pi_o(x')=b,\quad x^{-1}x'\in V.
+ \tag{LIM.18}
+\]
+
+By LIM1 and LIM9,
+\(G_*\simeq\varprojlim_V\Pi/S_V\).
+The compatible continuous homomorphisms in LIM12 therefore give
+a unique continuous homomorphism \(F_Y\) with coordinates \(a_V\).
+On the eventual set of LIM12, choose lifts \(x,x'\in\Pi\) of
+\(f_N(y)\) and \(F_Y(y)\), respectively.
+Equation (LIM.16) says that their images in \(\Pi/S_V\) agree.
+Thus \(x^{-1}x'\in S_V=K_NV\).
+Write \(x^{-1}x'=kv\) with \(k\in K_N\), \(v\in V\),
+and replace \(x\) by \(xk\).
+Its \(\pi_N\)-image is unchanged, while
+\((xk)^{-1}x'=v\in V\).
+This proves (LIM.18) for every \(y\) on the same eventual set.
+
+It remains to prove the equality with the original map \(f_0\),
+not merely an equality up to a new quotient.
+Fix \(W\triangleleft_o\Gamma_0\) and put
+\(V=\ker(F\bmod W)\).  Since \(K\le\ker F\), we have
+\(S_V=KV=V\).  The map \(F\bmod W\) induces
+\(\overline F_W:\Pi/V\to\Gamma_0/W\).
+Choose one index in the intersection of the sets from LIM12 and
+(LIM.13).  Then
+\[
+ \overline F_Wq_{N,V}=p_N\bmod W.
+\]
+Indeed, after composition with the surjection \(\pi_N\), this is
+precisely \(F\bmod W=F_N\bmod W\).
+Composing with \(f_N\) and using (LIM.16) gives
+\(\overline F_Wa_V=f_0\bmod W\), since \(p_Nf_N=f_0\).
+The left side is \(h_*F_Y\bmod W\).
+Separation by all finite quotients of \(\Gamma_0\) proves
+\(h_*F_Y=f_0\).
+This is the full original \texttt{InLim.in\_lim} local endpoint,
+together with the matching-map conclusion used by
+\texttt{CloseMap.close\_map}.  It has been constructed through
+finite homomorphism sets, not inferred from pointwise limits of
+unrelated lifts.
+% END LIM13
+
+% BEGIN LIM14
+\paragraph{LIM14. Both original local families converge on one common cover.}
+\label{claim:LIM14}
+For each \(v\in L.\mathrm{Vl}\), apply LIM13 with
+\[
+ Y=L.G_v(v),\quad
+ f_N=\iota_{\ker\eta_N}\circ\phi_{N,v},\quad
+ f_0=\iota_{\ker\eta_0}\circ\phi_{0,v}.
+ \tag{LIM.19}
+\]
+The original \(T.\mathrm{phiV}\) gives \(\mathrm{PhiCond}(Y,\ell)\),
+and the original \((T.h\,N).\phi\) gives \(p_Nf_N=f_0\).
+All the continuity assumptions are the actual \(\mathrm{Glob}\)
+fields, composed with the subgroup inclusion.
+This constructs continuous \(F_v:L.G_v(v)\to G_*\), with
+\(h_*F_v=f_0\), and the full uniform conclusion of (LIM.17).
+
+Repeat the same construction for every \(u\in L.\mathrm{St}\),
+using \(L.G_u(u)\), \(\phi^u_{N,u}\), \(T.\mathrm{phiU}\),
+and \((T.h\,N).\phi^u\).  This gives continuous maps \(F_u\)
+with their original composites to \(\Gamma_0\).
+The same \(\Pi,\pi_N,K,\pi_o,h_*\), and \(\mathcal U\) are used
+in both constructions.
+
+For fixed \(V\triangleleft_o\Pi\), intersect the eventual sets
+for the finitely many members of \(L.\mathrm{Vl}\), and separately
+for the finitely many members of \(L.\mathrm{St}\).
+This yields respectively
+\[
+ \begin{split}
+ &\mathcal U\text{-almost every }N:\quad
+   \forall v,y,\ \mathrm{Close}(\pi_N,\pi_o,V)
+                 (\phi_{N,v}(y),F_v(y)),\\
+ &\mathcal U\text{-almost every }N:\quad
+   \forall u,y,\ \mathrm{Close}(\pi_N,\pi_o,V)
+                 (\phi^u_{N,u}(y),F_u(y)).
+ \end{split}
+ \tag{LIM.20}
+\]
+An empty index set causes no exception: its assertion holds at every
+level.  Each value of these maps lies in
+\(\ker(\eta_0h_*)\), because its image under \(h_*\) is the
+corresponding original value in \(\ker\eta_0\).
+Codrestricting to this kernel is continuous in the subgroup topology.
+This proves the exact \(\phi_{\mathrm{lim}}\) and
+\(\phi^u_{\mathrm{lim}}\) fields, including the quantifier order
+\(\forall V\), eventually \(N\), \(\forall\) place, \(\forall\)
+local element.  None of the original \(I_v\) or \(J_u\) has been
+changed; they remain the fields of the same \(L\).
+% END LIM14
+
+% BEGIN LIM15
+\paragraph{LIM15. Limits of the actual Frobenius and tame elements.}
+\label{claim:LIM15}
+For every \(j\in\operatorname{Fin}(T.q)\), choose lifts
+\(a_{N,j},b_{N,j}\in\Pi\) with
+\[
+ \pi_N(a_{N,j})=T.\mathrm{ph}_{N,j},\qquad
+ \pi_N(b_{N,j})=T.\mathrm{ta}_{N,j}.
+\]
+There are elements \(a_j,b_j\in\Pi\) such that, for each
+\(V\triangleleft_o\Pi\),
+\[
+ a_{N,j}^{-1}a_j\in V,\qquad b_{N,j}^{-1}b_j\in V
+ \quad\text{for }\mathcal U\text{-almost every }N.
+ \tag{LIM.21}
+\]
+To construct \(a_j\), use the unique ultrafilter-selected coset
+of the finite quotient \(\Pi/V\) for the sequence \(a_{N,j}\).
+These cosets are compatible by finite intersections of their
+eventual sets, and LIM1 gives the element \(a_j\).
+Do the same for \(b_j\).  This also proves (LIM.21).
+
+Put \(\mathrm{ph}_j=\pi_o(a_j)\),
+\(\mathrm{ta}_j=\pi_o(b_j)\).  The chosen lifts prove the exact
+\(\mathrm{Close}\) assertions for these two elements.
+Intersecting over the finite set of \(j\)'s proves both assertions
+simultaneously for every \(j\), as the original \(\mathrm{Lim}\)
+fields require.
+Furthermore
+\[
+ h_*(\mathrm{ph}_j)=T.\mathrm{sg}_j,
+ \qquad h_*(\mathrm{ta}_j)=1.
+ \tag{LIM.22}
+\]
+For the first equality, fix \(W\triangleleft_o\Gamma_0\) and let
+\(V=\ker(F\bmod W)\).
+Intersect the set in (LIM.13), the set in (LIM.21), and the
+eventual set supplied by the actual \(T.\mathrm{ph\_lim}\).
+Its guard \(P_\ell^{\Gamma_0}(H)\le W\) holds because
+\(T.\mathrm{ProL}\) makes that residual trivial.
+The last set belongs to \(\mathcal U\) since it contains a tail.
+At an index in their intersection, the successive congruences are
+\[
+ F(a_j)\equiv F(a_{N,j})
+       \equiv p_N(T.\mathrm{ph}_{N,j})
+       \equiv T.\mathrm{sg}_j\pmod W.
+\]
+All finite quotients separate points, giving the first equality.
+For the second, the same argument uses the exact all-level field
+\(p_N(T.\mathrm{ta}_{N,j})=1\).
+Since \(T.\mathrm{sg}_j\in\ker\eta_0\), both limit elements lie
+in \(\ker(\eta_0h_*)\).  They have not been replaced by arbitrary
+elements with the same image in \(\Gamma_0\).
+% END LIM15
+
+% BEGIN LIM16
+\paragraph{LIM16. The exact tame relation becomes commutation in the limit.}
+\label{claim:LIM16}
+For every \(j\), the two elements constructed in LIM15 commute:
+\[
+ \mathrm{ph}_j\mathrm{ta}_j
+       =\mathrm{ta}_j\mathrm{ph}_j.
+ \tag{LIM.23}
+\]
+
+Fix \(V\triangleleft_o\Pi\), let \(S_V=KV\), and let
+\(M=|\Pi/S_V|\), a positive finite integer.
+For \(\mathcal U\)-almost every \(N\), the equality
+\(K_NV=S_V\) gives the continuous surjection
+\(q_{N,V}:\Gamma_N\to\Pi/S_V\).
+The original \(T.\mathrm{ta\_ker}\) says that
+\(T.\mathrm{ta}_{N,j}\in H_N\).
+The group \(H_N\) is pro-\(\ell\) by LIM2 and
+\(T.\mathrm{ProL}\), so the image of this tame element in the
+finite quotient has order \(\ell^e\) for some \(e\), with
+\(\ell^e\le M\).  In particular \(e\le M\), including the
+order-one case.  If \(N\ge M\), its order divides \(\ell^N\).
+
+The original tame relation lies in
+\(P_\ell^{\Gamma_N}(H_N)=1\), and therefore is the exact equality
+\[
+ T.\mathrm{ph}_{N,j}^{-1}\,T.\mathrm{ta}_{N,j}\,
+ T.\mathrm{ph}_{N,j}
+       =T.\mathrm{ta}_{N,j}^{\,T.\mathrm{Nq}_{N,j}}.
+ \tag{LIM.24}
+\]
+The original congruence
+\(T.\mathrm{Nq}_{N,j}\equiv1\pmod{\ell^N}\)
+shows that its right side has the same image as
+\(T.\mathrm{ta}_{N,j}\) in \(\Pi/S_V\) when \(N\ge M\).
+Thus the images of the two actual level elements commute there.
+
+Intersect the kernel-stabilization set, the tail \(N\ge M\),
+and the two sets in (LIM.21).  At an index in this nonempty
+intersection, the images of \(a_j,b_j\) in \(\Pi/S_V\)
+are the images of those level elements, because \(V\le S_V\).
+They therefore commute in \(\Pi/S_V\).
+This holds for every \(V\), and \(\bigcap_V S_V=K\).
+Their commutator is consequently in \(K\), proving (LIM.23)
+in \(\Pi/K\).
+The bound \(M\) is chosen after the finite quotient \(V\), as
+permitted by the source; no threshold uniform over all finite
+quotients is needed.  This argument does not claim that the
+tame element itself is trivial in the limit.
+It proves the exact \texttt{CommLim.comm\_lim} conclusion.
+% END LIM16
+
+% BEGIN LIM17
+\paragraph{LIM17. Assemble every original \(\mathrm{Glob}\) and \(\mathrm{Hom}\) field.}
+\label{claim:LIM17}
+Define a \(\mathrm{Glob}(\ell,L)\) on \(G_*=\Pi/K\) by
+\[
+ \eta=\eta_0h_*,\qquad \epsilon=\epsilon_0h_*,\qquad
+ c=\pi_o(ct),
+ \tag{LIM.25}
+\]
+and use the kernel-valued maps from LIM14 for \(\phi\) and
+\(\phi^u\).  This is an actual \(G:\mathrm{Glob}(\ell,L)\).
+The same \(h_*\) gives an actual \(h:G.\mathrm{Hom}(G_0)\).
+
+The group and topological fields, compactness and total
+disconnectedness hold by LIM1 and LIM9.
+The kernel of \(\eta\) is the preimage under the continuous
+\(h_*\) of the original open \(\ker\eta_0\), so is open.
+The homomorphism \(\epsilon\) is continuous because both factors
+are continuous; its values are still the original
+\(\mathbf Z_\ell^\times\), not a residual character.
+For every \(N\),
+\(\pi_N(ct^2)=c_N^2=1\), so \(ct^2\in K_N\) for all \(N\)
+and therefore \(ct^2\in K\) by (LIM.9).
+Thus \(c^2=1\).
+LIM11 gives \(h_*(c)=c_0\), whence
+\(\eta(c)=\eta_0(c_0)=-1\).
+Both local families are continuous and kernel-valued by LIM14.
+These are all the fields of the source \(\mathrm{Glob}\).
+
+For \(h\), take \(p=h_*\).
+Its continuity and surjectivity were proved in LIM11.
+The \(\eta\) and \(\epsilon\) compatibility fields follow from
+(LIM.25), the \(c\) field from LIM11, and the two local-map
+compatibility fields from LIM13--LIM14.
+These are all the fields of \(\mathrm{Glob.Hom}\), without any
+change of local group or any new pointwise choice of global map.
+Codrestriction gives the original \(h.p_0:G.G_0\to G_0.G_0\).
+By LIM15, its values on the kernel-valued
+\(\mathrm{ph}_j,\mathrm{ta}_j\) are exactly
+\(T.\mathrm{sg}_j,1\).
+The subgroups used by \(G.\mathrm{frame}\), including the same
+\(L.I_v\) and the images of the same \(L.J_u\), are consequently
+the literal source frame fields.
+% END LIM17
+
+% BEGIN LIM18
+\paragraph{LIM18. Install the complete original \(\mathrm{Lim}(T)\) and prove S4.}
+\label{claim:LIM18}
+For every original \(T\) satisfying \(T.\mathrm{ProL}\), the
+objects above form an element \(\Lambda:\mathrm{Lim}(T)\).
+The full field verification is as follows; all entries refer to
+one common \(\Pi,K,\mathcal U,\pi_N,\pi_o,G,h\).
+
+\begin{longtable}{@{}p{0.34\linewidth}p{0.61\linewidth}@{}}
+\toprule
+Original fields & Constructed values and proof \\
+\midrule
+\endhead
+\(\mathrm{Ph},\mathrm{grp},\mathrm{top},\mathrm{tgrp},
+  \mathrm{cpt},\mathrm{tdisc},\mathrm{fg}\)
+& \(\Pi\) from LIM8, with the finite list of free generators.
+  The abstract subgroup it generates is dense, so its topological
+  closure is the whole group, exactly the stated \(\mathrm{fg}\). \\
+\(U,U_{\mathrm{le}}\)
+& The single ultrafilter of LIM9, containing every tail. \\
+\(\pi,\pi_{\mathrm{cont}},\pi_{\mathrm{surj}}\)
+& The all-level continuous surjections of LIM8. \\
+\(G,h\)
+& The complete \(\mathrm{Glob}\) and \(\mathrm{Hom}\) of LIM17. \\
+\(\pi_o,\pi_{o,\mathrm{cont}},\pi_{o,\mathrm{surj}}\)
+& The same quotient \(\Pi\to\Pi/K\), by LIM11. \\
+\(\mathrm{modH}\)
+& The equality modulo \(H\) for \emph{every} \(N,x\) in LIM11. \\
+\(ct,ct_N,ct_o\)
+& The distinguished free generator, \(\pi_N(ct)=c_N\),
+  and \(\pi_o(ct)=G.c\), by LIM8 and LIM17. \\
+\(\mathrm{ker\_lim}\)
+& LIM9: for each open normal \(V\), eventually
+  \(\ker\pi_N\,V=K V=\ker\pi_o\,V\). \\
+\(p_{\mathrm{lim}}\)
+& LIM10--LIM11: for each open normal \(W\) of \(\Gamma_0\),
+  eventually the comparison holds for \emph{all} \(x\in\Pi\). \\
+\(\phi_{\mathrm{lim}},\phi^u_{\mathrm{lim}}\)
+& LIM14: for each open normal \(V\), eventually for every
+  original place and every element of its original local group. \\
+\(\mathrm{ph},\mathrm{ta},\mathrm{ph\_lim},\mathrm{ta\_lim}\)
+& The kernel-valued elements of LIM15; for each \(V\), their
+  \(\mathrm{Close}\) assertions hold eventually for all \(j\). \\
+\(\mathrm{comm}\)
+& The exact equality in LIM16, also in the \(\eta\)-kernel subgroup. \\
+\(p_{\mathrm{ph}},p_{\mathrm{ta}}\)
+& The exact \(h.p_0\)-equalities of LIM15 and LIM17. \\
+\bottomrule
+\end{longtable}
+
+The source's join notation is the product of the two normal
+subgroups, so the displayed kernel identity is literal
+\(\ker\pi_N\sqcup V=\ker\pi_o\sqcup V\).
+The \(\mathrm{Close}\) relation is the original one in (LIM.18),
+including its orientation \(x^{-1}x'\in V\).
+Every object indexed by \(N\) still uses the given
+\(T.\mathrm{GN}\), \(T.h\), \(T.\mathrm{ph}\),
+\(T.\mathrm{ta}\), and \(T.\mathrm{Nq}\).
+All intersections of eventual sets used to verify a single field
+were finite.  The ultrafilter was selected once before the limit
+maps and auxiliary elements, and no passage to a new subsequence
+or a new ultrafilter occurred.
+This proves (LIM.1), the whole original \(\mathrm{S4}\), for every
+prime \(\ell\), including \(\ell=3\).
+\(T.\mathrm{ker\_le}\), \(H_\epsilon\), \(\mathrm{fin0}\),
+\(\mathrm{ph\_H}\), and \(\mathrm{sg\_mem}\) remain fields of
+the supplied \(T\); the construction does not need to use them
+to weaken or change the resulting object.
+% END LIM18
+
+% BEGIN LIM19
+\paragraph{LIM19. Exact contribution to the selected Count-II support route.}
+\label{claim:LIM19}
+At the selected odd-prime Count-II scope, including \(\ell=3\),
+suppose the original arithmetic data have been transported to one
+matched \(T\) satisfying \(T.\mathrm{ProL}\), with their original
+selected full-block point \(x\), \(a=n=4\), and chosen \(g=0\)
+Kap \(k\).  Keep its original B1 bound with
+\(D_0=4[L^+:\mathbf Q]+4T.q\) and its coupled chosen-Kap B2.
+Then LIM18 supplies the actual previously missing
+\(\Lambda:\mathrm{Lim}(T)\) input to CRW12--CRW15.
+Those claims now give their selected K1, Laurent K1, K2 and K3
+conclusions on this actual \(\Lambda.h\).
+
+This is a substitution into their printed hypotheses, and its
+same-object content is substantive.  The common cover, the all-level
+\(\mathrm{modH}\) identity, the uniform outgoing comparison,
+both uniform local-map comparisons, and the distinguished \(ct\)
+are exactly the fields used in CRW12's finite-cocycle transport.
+Its B1 constant is still chosen before the truncation \(m\);
+for each \(m\), its permitted eventual set of levels belongs to
+the \emph{same} \(\mathcal U\) because
+\(\mathcal U\le\mathrm{atTop}\).
+No original Selmer space is asserted to vanish, and no arbitrary
+Kap B2 theorem is used.  The \(g=0\) simplification concerns
+K2 and the coupled B2 only; the full \(4\times4\) first-order
+coefficient space and the exact K1 bound remain.
+
+The unconditional closure here is \(\mathrm{S4}\), with its
+original \(T.\mathrm{ProL}\) antecedent.  Applying it to the
+original arithmetic Taylor--Wiles system still requires the matched
+\(\mathrm{TWQuot}\) descent, including the original determinant,
+flags, old N4, point, B1/B2 and supplied \(\mathrm{TWAut}\).
+LIM2--LIM3 provide generic group facts usable in that separate proof;
+they do not assert that the original arithmetic \(T\) already has
+trivial residual.  Nor does this chapter produce the matched
+patched rings or modules, the S5 support dimension and fiber
+identities, coefficient normalization, or an automorphic system.
+
+Thus \(\mathrm{Raw}\) and \(\mathrm{COUNT\_II\_SUPPORT}\) remain
+open until their other actual producers are supplied.  The original
+ordinary/control/type data, four Hida endpoints, same-ideal
+\(\mathrm{HasAut}\), complete CohP and LocCFT keep their original
+scopes.  In the outer Count-II statement, the original complex
+embedding is fixed first and one coefficient threshold serves both
+rank-four Links and both Hida and P1 conclusions.  Each actual
+coefficient ring retains its own original ideal \(J\); no ideal is
+changed by constructing \(\Lambda\), and no common ideal across
+different rings is asserted.  The same Count-II improvement serves
+RH and unrestricted Dirichlet GRH; Case III alone has the previously
+proved two-primary-target vacuity, while I, II and V remain substantive.
+% END LIM19

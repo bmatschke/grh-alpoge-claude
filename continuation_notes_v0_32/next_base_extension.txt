@@ -1,0 +1,284 @@
+NEXT BASE-EXTENSION TARGETS AFTER BTH1–BTH15
+Read-only handoff refinement, 22 November 2026
+
+Scope
+-----
+
+This note proposes the next reconstruction work. It introduces no proof
+claim, closes no additional obligation, and does not change the frozen
+BTH component. The Lean source is assumed fully checked and correct.
+Pin: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+Recommendation: start with the ACTUAL FINITE ISOTROPIC AVERAGE, specifically
+GlobalTheory.ThetaSupport.exists_eigen, then
+sum_heisO_along_eq_zero. This is a concrete original-data producer,
+independent of ioP and of CuspRapidDecay, and feeds the missing cusp
+condition. Run the short published-boundedness hypothesis audit in parallel
+if another worker is available. The order below ranks expected contribution
+per reconstruction effort; it is not a claim that these are independent
+freely chosen witnesses.
+
+The exact join being supplied
+----------------------------
+
+Unless another directory is written, filenames below are relative to
+src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/.
+Other relative paths beginning Proofs/ or PublishedTheorems/ are relative
+to src/Development/AbelianVarietyTheory/.
+
+In ExistsThetaLiftLinearMapCuspFormMultiplicity.lean:
+
+* firesAt (186–218) calls exists_member with the original action, positive
+  definite source, coefficient space, polynomial/Fock map, original ioP,
+  lowering-killed extremal polynomial, target principal level, finite
+  isotropic average, coefficient function, Haar measure and domain.
+
+* exists_member (115–174) builds the lowest-type integral U and supplies
+  its automorphy, finite level, smoothness, uniform moderate growth, zero
+  transvection constant terms, compact-type equivariance and annihilation
+  by pMinus to exists_extension.
+
+* exists_extension (86–111) uses holomorphic shape/integral weight,
+  a nonzero smooth irreducible lowest compact type, the original target's
+  finite-volume Haar quotient, boundedness of U at an extremal vector,
+  holomorphic-type recognition and bounded-holomorphic realization.
+  Its final restriction-to-all-lowest-vectors step is a cyclicity argument.
+
+BTH already handles integral convergence, linear assembly, the final
+lowest-type uniqueness, actual finite covariance, source lifting and
+the subsequent good-projected Hilbert lift. Those should be reused.
+Target finite quotient volume is not the same assertion as the compact
+definite-source quotient used in BTH3.
+
+PRIORITY 1 — Produce the finite annihilating average, then the cusp condition
+---------------------------------------------------------------------------
+
+First exact target:
+Proofs/IwasawaDecomposition/FockVectorsKilledHeisenbergAverageIsotropic.lean
+  GlobalTheory.ThetaSupport.exists_eigen, 242–286;
+  exists_mem_Pg, 288–302;
+  sum_heisO_along_eq_zero, 309–342.
+
+For the actual IsThPVecOf vector, exhibit a finite-supported translation l
+and a root of unity zeta!=1 such that H(k l)f=zeta^k f. The source uses one
+of the actual Pg primes, the identity upper block in the stored half-datum,
+the exact self-dual frames, and the nonzero image of the transported
+rational isotropic vector at that split place. The key local supplier is
+exists_const, 172–240, with split-place charts and conductor precision.
+The geometric sum then vanishes. Transport it by the ACTUAL omega and
+commute finite translations through the Fock operators; BTH's isometry
+argument and exact-action work provide useful established infrastructure.
+
+Second, use:
+  ConstantTermHeisOAlong.lean,
+    GlobalTheory.TransvConst.constantTerm_heisO_along, 245–345;
+  ThetaLiftDefiniteConstantTermEqZero.lean,
+    GlobalTheory.DefLiftCusp.zcusp_lift, 66–127;
+  Proofs/DivisorProofs/IsCuspFunOfTransvectionConstantTermsZero.lean,
+    GlobalTheory.TransvCusp.isCuspFun_of_zCusp, 142–162.
+
+Why first: it supplies a real missing property, rather than another
+conditional analytic interface. The finite average holds for every
+polynomial and translated original kernel; it therefore serves all the
+base integral basis vectors at once and can be reused for other definite
+theta lifts on the same original finite data. It does not require
+IsIoW, an existing theta extension, or rapid decay. Expected category:
+the finite cancellation and compact Fubini transfer are B reconstruction
+targets; the full constant-term/central-unipotent dictionary remains
+unclosed until its exact measures and transvections are reconstructed.
+
+PRIORITY 2 — Close actual differentiation and the common moderate-growth bound
+-----------------------------------------------------------------------------
+
+Exact target pair:
+  ExistsWeilDatumGeneratorRealOneParamGroup.lean,
+    GlobalTheory.DefLift.Gen.exists_generator, 211–233;
+  DefiniteThetaLiftContinuousInvariantHasDerivAt.lean,
+    GlobalTheory.DefLiftDer.lift_continuous_invariant_hasDerivAt, 66–97.
+
+The generator must preserve the original theta space, have the specified
+Heisenberg commutator, commute with other real places, and differentiate
+the actual action at every external adelic pair and function argument.
+Its immediate operator supplier is
+HasDerivAtWeilRepRealOneParamAdelicPoint.lean,
+GlobalTheory.Mem.LiftGen.hasDerivAt_om (71–98).
+BTH14 now permits comparison with the constructed full canonical action,
+but equality alone must not be mistaken for a differentiability proof.
+The original charts, generator scalar and point-evaluation limit still
+have to be checked.
+
+Once that operator statement is proved, the compact differentiation
+lemma hasDerivAt_integral_of_cocompact (15–39 in the second file) is a
+bounded dominated-differentiation argument over the same source quotient.
+It is a good short B subtarget, not the entire remaining analytic work.
+
+Do not forget the independent uniform exponent:
+  Proofs/TwistedOperators/LintegralCompactLe.lean,
+    GlobalTheory.ThetaGrowth.thetaKO_growth, 470–end;
+  ThetaLiftDefiniteSmoothModerateGrowthAnnihilated.lean,
+    GlobalTheory.DefLiftSmooth.lift_growth, 19–54;
+    lift_smooth_growth_killed, 56–99.
+
+thetaKO_growth chooses one exponent N=dim_R(RW T S), independent of the
+theta vector. This is what lets every derivative word have the SAME
+growth exponent after its kernel is replaced by another theta vector.
+Pointwise polynomial growth with a fresh exponent for every word would
+not establish the source's uniform moderate-growth contract.
+
+Why second: the same generator is an immediate input to both the smooth
+lift and the lowering calculation below. This closes a shared dependency,
+not only one derivative identity. The compact analytic transfer is B;
+the full original-action generator/Sobolev growth package remains C until
+reconstructed.
+
+PRIORITY 3 — Construct and activate the original ioP, then prove lowering
+-------------------------------------------------------------------------
+
+Exact producer:
+  ExistsLowestKTypeFockMapThetaVectors.lean,
+    GlobalTheory.JointHarm.exists_io_poly, 168–272;
+    GlobalTheory.JointHarm.exists_ioP, 298–365.
+Its wrapper is
+Proofs/TwistedOperators/ExistsLowestKTypeCoeffSpaceFockMap.lean,
+GlobalTheory.IndefLinks.exists_ioP_of_realDat, 8–12.
+
+This constructs the coefficient/lowest-compact-type polynomial map with
+both intertwining identities and a normalized extremal tensor mapped to
+the EXACT Delta polynomial. Its immediate substantial inputs include
+LowestWeightVectorTransfer, ExistsMinorProductTranslateJointLowestWeight,
+ExistsPolynomialModelCoefficientSpaceRealPoints,
+WeilMaximalCompactFockSubstitutionCharacter and the exact weight equalities.
+These are C-level representation/model work until reconstructed.
+
+Important same-choice quantifier:
+  Formalism/LocalToGlobal/IndefiniteReal/LinksChar.lean:29–39 defines IsIoW;
+  LinksW.lean:48–49 defines PIoP(i,io) as forall t, IsIoW(...,io);
+  LinksW.lean:89–102 gives only OrZero(PIoP i)(stored ioP i);
+  LinksW.lean:121–122 defines ex_ioP.
+
+Thus constructing a fresh map only at t0 does NOT activate the stored
+ioP through its OrZero characterization. Following this source route
+requires one ioP for all t, or an independent proof of IsIoW for the
+already stored map. This is internal work within the base-extension
+producer; it does not enlarge BTH's direct sufficient contract, which
+can instead prove the extension of the given integral directly.
+
+Then close:
+  MixedLaplacianKillsProductOfMinors.laplacian_delta, 87–97;
+  FockVectorMixedLaplacianKilledLoweringKilled.rderC_theta_eq_zero, 465–500;
+  LowestKTypeValuesKilledByLoweringPart.values_killed, 149–195.
+
+The polynomial support calculation is a promising B sublemma. It must be
+paired with the actual generator and normalized extremal map before
+claiming pMinus kills every lowest-type value.
+
+Why third: the ioP witness is an actual existence obligation hidden by the
+short firesAt call. The same source map is consumed by the Fock
+matrix-coefficient and harmonic-letter/phase readings, so reconstructing
+it can assist the retained original theta/rationality dictionary.
+That sharing is source reuse, not a claim that every such consumer is
+required by the smaller base-rank route.
+
+PRIORITY 4 — Reconstruct the bounded holomorphic realization at one extremal vector
+---------------------------------------------------------------------------------
+
+Concrete first target inside this deeper branch:
+Proofs/DivisorProofs/L2MatrixCoeffBoundedHolomorphicFormEqExtremalVec.lean,
+GlobalTheory.HolDict.inner_reg_eq_coef_extremal, 106–180.
+
+Prove that the L2 matrix coefficient of the actual bounded holomorphic
+form equals its squared norm times the product of the prescribed
+extremal discrete-series coefficients. This is the decisive identification,
+with the same Haar quotient, weight and original model.
+
+Then:
+  BoundedHolomorphicFormEqMultiplicitySpaceValue.lean,
+    GlobalTheory.BackForm.exists_map_abs, 243–281;
+    exists_map, 293–306;
+    exists_multMap, 312–379.
+
+The equal-matrix-coefficient construction gives the continuous
+multilinear intertwiner. Smooth representatives, Sobolev bounds,
+central-finiteness, finite-level eigencharacters, and preservation of
+cuspidality in the orbit closure promote it to the literal IsMultMap.
+The theorem has many nontrivial immediate suppliers; the concise endpoint
+does not make them elementary.
+
+Why fourth: it is indispensable to this source extension route and
+central to other holomorphic multiplicity readings, but substantially
+deeper than the preceding finite and differential subtargets. It is C,
+with separable B Hilbert-space assembly after the decisive coefficient
+identity is proved. Do not start by re-proving another abstract existence
+wrapper.
+
+PRIORITY 5 — Audit only the boundedness actually needed from rapid decay
+-----------------------------------------------------------------------
+
+The name Published.CuspRapidDecay is not a completed published application.
+Its exact definition is in
+PublishedTheorems/AutomorphicForms₂/ExistsNormLeHeightPow.lean:28–33.
+It quantifies over every original unitary group, infinity chart/exponential
+family, smooth automorphic function, UNIFORM moderate-growth condition,
+and the source's full cuspidality predicate. Its conclusion uses
+quotHeight(g)=inf_{gamma rational} height(gamma g), and all decay powers.
+The displayed definition supplies no publication or hypothesis match.
+
+The actual use in exists_extension is narrower:
+BoundedOfSmoothCuspidalUniformModerate.bounded_of_smooth_unifModGrowth,
+11–16, converts the exact chart/smoothness/growth predicates and then uses
+the N=0 conclusion via IsRapidDecay.bounded (52–54).
+
+A useful parallel task is therefore to certify a published boundedness
+or rapid-decay theorem for THESE original functions, checking finite
+level, cusp definition, center treatment, smoothness versus K-finiteness,
+uniform derivative growth, and height/domain conventions. An exact
+boundedness proof for the extremal U e would suffice here; the full
+universal CuspRapidDecay record is not inherently needed for this base
+consumer. No theorem has been identified and hypothesis-matched in this
+note, so no A status is assigned. Its current role remains an unclosed
+deep analytic input or a prospective A certificate.
+
+Completion boundary
+-------------------
+
+These targets concern BTH's BASE EXTENSION producer. Completing them
+does not by itself construct the original Read/ReadL geometric reading,
+the simultaneous rational-test family, or RowsHold0_3. It also does not
+make the separate RankM consumer depend on this theta route.
+
+Pinned source locators
+----------------------
+These eight anchor ranges were reread at the pin; their full files were
+checked byte-for-byte against git show. No Lean replay was performed.
+
+entry point: theorem firesAt
+src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsThetaLiftLinearMapCuspFormMultiplicity.lean:180–218
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsThetaLiftLinearMapCuspFormMultiplicity.lean#L180-L218
+
+first exact subtarget: theorem exists_eigen
+src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/FockVectorsKilledHeisenbergAverageIsotropic.lean:242–286
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/FockVectorsKilledHeisenbergAverageIsotropic.lean#L242-L286
+
+finite-average endpoint: theorem sum_heisO_along_eq_zero
+src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/FockVectorsKilledHeisenbergAverageIsotropic.lean:309–342
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/FockVectorsKilledHeisenbergAverageIsotropic.lean#L309-L342
+
+differential producer: theorem exists_generator
+src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsWeilDatumGeneratorRealOneParamGroup.lean:211–233
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsWeilDatumGeneratorRealOneParamGroup.lean#L211-L233
+
+growth exponent: theorem thetaKO_growth
+src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/LintegralCompactLe.lean:470–523
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/LintegralCompactLe.lean#L470-L523
+
+simultaneous io producer: theorem exists_ioP
+src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsLowestKTypeFockMapThetaVectors.lean:298–365
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsLowestKTypeFockMapThetaVectors.lean#L298-L365
+
+bounded-form endpoint: theorem exists_multMap
+src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/BoundedHolomorphicFormEqMultiplicitySpaceValue.lean:312–381
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/BoundedHolomorphicFormEqMultiplicitySpaceValue.lean#L312-L381
+
+published-input contract: def CuspRapidDecay
+src/Development/AbelianVarietyTheory/PublishedTheorems/AutomorphicForms₂/ExistsNormLeHeightPow.lean:28–32
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/PublishedTheorems/AutomorphicForms₂/ExistsNormLeHeightPow.lean#L28-L32

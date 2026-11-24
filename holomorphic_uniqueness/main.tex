@@ -1,0 +1,1431 @@
+\section{Holomorphic coefficient uniqueness on the original frame domain}
+\label{sec:holomorphic-uniqueness}
+
+This chapter reconstructs the negative-frame uniqueness argument used by
+the original theta extension, together with its representation-theoretic
+consumers.  All source identifications refer to commit
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+The arguments are on the supplied original objects.  An existential
+auxiliary frame factor is constructed where the source asks for one;
+the original Hermitian forms, discrete-series models and coefficient
+maps are not changed.
+
+\subsection*{The exact finite-dimensional dictionary}
+
+Let \(I\) be a finite set.  At each \(\tau\in I\) fix an \(n\)-by-\(n\)
+complex matrix \(H_\tau\), an integer \(0\le q_\tau\le n\), and a matrix
+\(x_{0,\tau}\) satisfying the source's \(\mathrm{OrthFr}\) condition
+\[
+ x_{0,\tau}^{*}H_\tau x_{0,\tau}=J_\tau,\qquad
+ J_\tau=-S_\tau,\qquad
+ S_\tau=\operatorname{diag}(s_{\tau,a}),\quad
+ s_{\tau,a}=
+ \begin{cases}1&a<q_\tau,\\-1&a\ge q_\tau.\end{cases}
+ \tag{HCU.1}
+\]
+Indices start at zero.  For a matrix \(A\), let \(\Delta_k(A)\) be the
+determinant of its leading \(k\)-by-\(k\) submatrix, with
+\(\Delta_0(A)=1\), and put
+\(s_{\tau,[k]}=\prod_{a<k}s_{\tau,a}\).
+The actual source domain is
+\[
+ \mathcal D_\tau=\{x:\det x\ne0,\quad
+ s_{\tau,[k]}\operatorname{Re}\Delta_k(-x^*H_\tau x)>0
+ \ (0\le k\le n)\},\qquad
+ \mathcal D=\prod_{\tau\in I}\mathcal D_\tau .
+ \tag{HCU.2}
+\]
+Let \(B\) be the product of the invertible upper-triangular groups,
+\(G=\prod_\tau U(H_\tau)\), and
+\[
+ \chi_w(b)=\prod_{\tau,a}b_{\tau,aa}^{\,w_{\tau,a}},
+ \quad w_{\tau,a}\in\mathbb Z,\qquad
+ D(s)_\tau=\operatorname{diag}(e^{is_{\tau,a}}),\quad
+ t(s)=x_0D(s)x_0^{-1}.
+ \tag{HCU.3}
+\]
+Here and below \(s\) in \(D(s)\) is a tuple of real angles, distinct from
+the fixed signs in (HCU.1).  Write
+\(\chi_w(s)=\prod_{\tau,a}e^{iw_{\tau,a}s_{\tau,a}}\).
+The source's \(\mathrm{HolFn}(H,q,x_0,w,f)\) means exactly that there
+is a holomorphic function \(P\) on \(\mathcal D\) such that
+\[
+ P(xb)=\chi_w(b)P(x),\qquad f(u)=P(ux_0)\quad(u\in G).
+ \tag{HCU.4}
+\]
+Holomorphy means complex differentiability on this open subset of the
+finite-dimensional matrix space.  No extension to all matrices is
+required.  Empty products and zero-dimensional matrix spaces are allowed.
+
+% BEGIN HCU1
+\paragraph{HCU1: a smooth triangular factor on the original domain.}
+\label{claim:HCU1}
+The matrices \(H_\tau,x_{0,\tau}\) are nonsingular, and \(H_\tau\) is
+Hermitian.  There is a real-smooth map
+\(\beta_\tau:\mathcal D_\tau\to B_n\) such that
+\[
+ u_\tau(x)=x\beta_\tau(x)^{-1}x_{0,\tau}^{-1}\in U(H_\tau),
+ \qquad x=u_\tau(x)x_{0,\tau}\beta_\tau(x).
+ \tag{HCU.5}
+\]
+This is a witness for the literal
+\texttt{smooth\_gramSchmidt} existential statement.
+
+\emph{Proof.}
+Taking determinants in (HCU.1) proves nonsingularity, and solving that
+equation for \(H_\tau\) proves Hermitian symmetry.  Omit \(\tau\).
+For \(A=-x^*Hx\), all leading minors are nonzero.  Gaussian elimination
+without row exchanges gives
+\[
+ A=L\operatorname{diag}(d_0,\ldots,d_{n-1})L^*,
+ \quad L\text{ lower unitriangular},\qquad
+ d_a=\frac{\Delta_{a+1}(A)}{\Delta_a(A)}\in\mathbb R^\times .
+ \tag{HCU.6}
+\]
+For completeness, isolate the nonzero first pivot \(d=A_{00}\).
+Subtracting the outer product of the first column and row, divided by
+\(d\), leaves its Hermitian Schur complement.  Its leading \(k\)-minor
+is \(\Delta_{k+1}(A)/d\).  Induction constructs (HCU.6), and comparison
+of leading determinants gives its displayed pivot formula.  Every
+entry of \(L\) and every \(d_a\) is a rational expression in entries of
+\(A\), with the already nonzero pivots as denominators.
+
+The signs in (HCU.2) give \(s_a d_a>0\).  Set
+\[
+ \beta(x)=\operatorname{diag}(\sqrt{|d_a|})\,L^* .
+ \tag{HCU.7}
+\]
+Then \(\beta\) is upper triangular with positive diagonal, and
+\(A=\beta^*S\beta\).  Consequently
+\[
+ (x\beta^{-1})^*H(x\beta^{-1})=-S=x_0^*Hx_0,
+\]
+which proves (HCU.5).  The rational formulas, complex conjugation and square root on
+the positive real axis show real smoothness on the entire domain.
+For \(n=0\) all matrices are the unique empty matrix and all formulas
+have their empty-product meaning.  The source requires an existential
+factor with (HCU.5); it does not prescribe the particular diagonal
+sign convention of that factor.  Thus (HCU.7) changes no stored datum.
+% END HCU1
+
+% BEGIN HCU2
+\paragraph{HCU2: openness, stability and connectedness of the actual domain.}
+\label{claim:HCU2}
+The set \(\mathcal D\) is open, nonempty and path connected.  It contains
+\(x_0\) and is stable under \(x\mapsto uxb\), \(u\in G,b\in B\).
+In particular it has exactly the properties used in
+\texttt{frDoms\_open\_preconnected\_stable}.
+
+\emph{Proof.}
+The finitely many determinant inequalities in (HCU.2) are open
+conditions.  For upper-triangular \(b\), its first \(k\) columns involve
+only the first \(k\) rows, so
+\[
+ \Delta_k\bigl(b^*(-x^*Hx)b\bigr)
+   =|\det b_{[k]}|^2\Delta_k(-x^*Hx).
+ \tag{HCU.8}
+\]
+The multiplying scalar is positive.  Left multiplication by \(U(H)\)
+does not change the Gram matrix.  These observations prove stability;
+(HCU.1) proves \(x_0\in\mathcal D\).  HCU1 gives the surjection
+\((u,b)\mapsto ux_0b\) from \(G\times B\) to \(\mathcal D\).
+
+Here is a direct path-connectedness proof for its two factors.
+Conjugation by \(x_0\) identifies \(U(H)\) with \(U(J)\).
+For \(g\in U(J)\), put \(A=g^*g\), \(p=A^{1/2}\), \(k=gp^{-1}\).
+The positive square root is defined by unitary diagonalization of the
+positive Hermitian matrix \(A\).  From \(g^{-1}=Jg^*J\) one obtains
+\(JAJ=A^{-1}\), hence \(JpJ=p^{-1}\).  Thus \(k\) is both ordinarily
+unitary and \(J\)-unitary, and therefore commutes with \(J\).
+Choose a skew-Hermitian logarithm \(Y\) of \(k\), separately on its
+two \(J\)-eigenspaces, and let \(X=\log p\), defined by the same
+positive spectral calculus.  Then
+\[
+ JXJ=-X,\qquad
+ [Y,J]=0,\qquad
+ [0,1]\ni t\longmapsto e^{tY}e^{tX}\in U(J)
+ \tag{HCU.9}
+\]
+joins \(1\) to \(g\).  These assertions follow on each eigenspace:
+positive eigenvalues have real logarithms, unit eigenvalues have
+imaginary logarithms, and conjugation by \(J\) takes the positive
+spectral calculus of \(A\) to that of \(A^{-1}\).  Only the existence
+of a path for each fixed \(g\) is used; no continuous global choice of
+logarithms is being asserted.
+
+An upper-triangular invertible matrix has the form \(d(1+N)\), with
+\(d\) diagonal invertible and \(N\) strictly upper triangular.
+For fixed logarithms \(\ell_a\) of its diagonal entries,
+\(\operatorname{diag}(e^{t\ell_a})(1+tN)\) is a path from \(1\) to it.
+Finite products and continuous images preserve path connectedness.
+This proves the claim, also when a signature block, \(I\), or \(n\)
+is empty.
+% END HCU2
+
+% BEGIN HCU3
+\paragraph{HCU3: the local zero lemma with its exact hypotheses.}
+\label{claim:HCU3}
+Let \(\Omega\) be a neighborhood of the tuple \(1\) in
+\(\prod_I M_n(\mathbb C)\), and let \(Q\) be a function on that
+ambient space which is complex differentiable on \(\Omega\).
+Suppose:
+\begin{enumerate}
+\item if \(y\in\Omega\), \(Q(y)=0\) and \(b\in B\), then \(Q(yb)=0\);
+\item whenever \(y,y'\in\Omega\) and \(y'D(s)=D(s)y\), one has
+\(Q(y')=Q(y)\);
+\item \(Q(1)=0\).
+\end{enumerate}
+Then \(Q\) vanishes on a neighborhood of \(1\).  Only its restriction
+to a small open ball inside \(\Omega\) is used analytically;
+the first hypothesis is the literal ambient zero-set condition.
+
+\emph{Proof.}
+Use the maximum-entry norm and choose \(r>0\) with
+\(B(1,r)\subset\Omega\).  For a tuple \(z\) put
+\[
+ L_\zeta(z)_{\tau,ac}=
+ \begin{cases}\zeta^{a-c}z_{\tau,ac}&c<a,\\0&c\ge a,\end{cases}
+ \qquad
+ U(z)_{\tau,ac}=
+ \begin{cases}z_{\tau,ac}&a\le c,\\0&a>c.\end{cases}
+ \tag{HCU.10}
+\]
+If \(\|z\|<r\) and \(|\zeta|\le1\), then
+\(\|L_\zeta(z)\|\le\|z\|\).
+Thus \(h(\zeta)=Q(1+L_\zeta(z))\) is holomorphic on a neighborhood of
+the closed unit disc.  For \(\zeta=e^{it}\),
+\(D_\zeta=\operatorname{diag}(\zeta^a)\) gives
+\[
+ (1+L_\zeta(z))D_\zeta=D_\zeta(1+L_1(z)).
+ \tag{HCU.11}
+\]
+Hypothesis 2 makes \(h\) constant on the unit circle.
+The maximum-modulus principle applied to \(h-h(1)\), or the Cauchy
+integral formula, makes it constant throughout the disc.
+Since all exponents \(a-c\) in the lower part are positive,
+\(L_0(z)=0\), and \(h(1)=h(0)=Q(1)=0\).
+
+Now the polynomial map
+\[
+ \mathcal L(z)=(1+L_1(z))(1+U(z))
+       =1+z+L_1(z)U(z)
+ \tag{HCU.12}
+\]
+has derivative the identity at zero.  The finite-dimensional inverse
+function theorem therefore maps a sufficiently small neighborhood of
+zero onto a neighborhood of \(1\).  Shrink it to \(\|z\|<\min(r,1)\).
+The diagonal entries \(1+z_{\tau,aa}\) are nonzero, so \(1+U(z)\in B\).
+The first part of the proof and hypothesis 1 give
+\(Q(\mathcal L(z))=0\) throughout that neighborhood.  This proves
+exactly \texttt{Uniq.local\_zero}.  In a zero-dimensional ambient space,
+the conclusion is already \(Q(1)=0\).
+% END HCU3
+
+% BEGIN HCU4
+\paragraph{HCU4: global uniqueness with the original torus law.}
+\label{claim:HCU4}
+Assume \(\mathrm{HolFn}(H,q,x_0,w,f)\), together with the separate
+left torus law
+\[
+ f(t(s)u)=\chi_w(s)f(u)\quad(u\in G),\qquad f(1)=0.
+ \tag{HCU.13}
+\]
+Then \(f=0\) on \(G\).  This is the full original
+\texttt{Uniq.eq\_zero\_of\_torus\_law} contract.
+
+\emph{Proof.}
+Let \(P\) be its section in (HCU.4).  For \(x=ux_0b\), HCU1 and
+(HCU.13) give
+\[
+ P(t(s)x)=\chi_w(b)f(t(s)u)=\chi_w(s)P(x).
+ \tag{HCU.14}
+\]
+Consider \(Q(y)=P(x_0y)\) on
+\(\Omega=\{y:x_0y\in\mathcal D\}\), an open neighborhood of \(1\).
+Its zero set is stable under right multiplication by \(B\).
+If \(y'=D(s)yD(s)^{-1}\), then
+\[
+ Q(y')=P(t(s)x_0yD(s)^{-1})
+      =\chi_w(s)\chi_w(D(s)^{-1})Q(y)=Q(y).
+ \tag{HCU.15}
+\]
+The integer powers are well defined and the two characters cancel
+exactly.  Also \(Q(1)=f(1)=0\).  HCU3 makes \(P\) vanish on an open
+neighborhood of \(x_0\).
+
+A holomorphic function on a connected open set that vanishes on a
+nonempty open subset vanishes everywhere.  To see the needed
+several-variable statement directly, cover a path by overlapping balls.
+On a ball, restrict to a complex line through a point of an open zero
+set; the one-variable power-series identity theorem gives vanishing
+along that line wherever the line stays in the ball.  It follows that
+the whole ball is zero, and finitely many overlapping balls propagate
+the conclusion along the path.  HCU2 supplies such paths inside the
+actual domain.  Therefore \(P=0\) on \(\mathcal D\), whence \(f=0\)
+on \(G\).
+% END HCU4
+
+% BEGIN HCU5
+\paragraph{HCU5: the full smooth Borel--holomorphic dictionary.}
+\label{claim:HCU5}
+Let \(\mathfrak g_\tau=\{X:X^*H_\tau+H_\tau X=0\}\).
+Use the source right derivatives \(R_X\) and their complexification
+\[
+ c_H(Z)=-H^{-1}Z^*H,\qquad
+ R_Z^{\mathbb C}
+ =R_{(Z+c_H(Z))/2}
+    +iR_{(Z-c_H(Z))/(2i)}.
+ \tag{HCU.16}
+\]
+A function \(f\) on \(G\) has \(\mathrm{HolFn}(H,q,x_0,w,f)\) if and
+only if it has the source \(\mathrm{SmFn}\) smoothness and
+\[
+ R^{\mathbb C}_{x_{0,\tau}E_{ac}x_{0,\tau}^{-1}}f(u)
+   =\begin{cases}w_{\tau,a}f(u)&a=c,\\0&a<c\end{cases}
+ \quad(a\le c,\ u\in G).
+ \tag{HCU.17}
+\]
+Thus both \texttt{holFn\_of\_killed} and
+\texttt{smFn\_and\_killedFn\_of\_holFn} hold on the literal source domain.
+
+\emph{Proof.}
+First, the source smoothness condition, which tests finite products of
+real one-parameter exponentials at every \(u\), is ordinary smoothness
+on \(G\).  Here is the chart verification.  On the \(H\)-skew matrices,
+the Cayley map
+\((1+X/2)(1-X/2)^{-1}\) is a smooth chart into \(U(H)\) near \(1\);
+its inverse is \(2(g-1)(g+1)^{-1}\), and its derivative at zero is the
+identity.  Given a real basis \(X_1,\ldots,X_d\) of \(\mathfrak g\),
+the product \(\prod_j e^{t_jX_j}\) has the same derivative in this chart.
+The inverse function theorem makes these product exponentials local
+coordinates.  The source tests their left translates, so it supplies
+all smooth coordinate restrictions.  Conversely a smooth group function
+satisfies every such test.
+
+The right differential of a smooth function is real-linear in \(X\).
+The involution \(c_H\) has fixed space \(\mathfrak g\), and every
+complex matrix is uniquely \(X+iY\) with \(X,Y\in\mathfrak g\).
+Consequently (HCU.16) is its complex-linear extension.
+For a fixed real angle tuple \(s\), equation (HCU.17) on diagonal
+units gives the scalar ordinary differential equation along
+\(u\,t(ts)\), hence
+\[
+ f(u\,t(s))=\chi_w(s)f(u).
+ \tag{HCU.18}
+\]
+The integer weights ensure that this is the prescribed character of
+the diagonal torus.
+
+Use HCU1 to define
+\(P(x)=\chi_w(\beta(x))f(u(x))\).
+This is real smooth.  It has the stronger formula
+\[
+ P(ux_0b)=\chi_w(b)f(u)\qquad(u\in G,\ b\in B).
+ \tag{HCU.19}
+\]
+Indeed, two such decompositions differ by an element of
+\(U(J_\tau)\cap B_n\).  An upper-triangular \(J\)-unitary matrix is
+diagonal with entries of modulus one: its first column has only its
+first entry, its norm determines that entry's modulus, and its
+orthogonality to the other columns kills the remainder of the first
+row; induction finishes.  Thus the two factors differ by \(D(s)\),
+and (HCU.18) makes their two expressions in (HCU.19) identical.
+
+It remains to prove complex differentiability; real smoothness alone
+is insufficient.  At \(x=ux_0b\), write a tangent as
+\(\dot x=ux_0Zb\).  Every complex matrix \(Z\), considered as a real
+vector, is \(X+B_0\), where \(X\in\mathfrak u(J)\) and \(B_0\)
+is upper triangular.  An explicit choice sets
+\(X_{ac}=Z_{ac}\) for \(a>c\),
+\(X_{ca}=-J_{aa}J_{cc}\overline{Z_{ac}}\), and \(X_{aa}=0\);
+then \(B_0=Z-X\) is upper triangular.  Differentiating the factorized
+curve
+\(u e^{t x_0Xx_0^{-1}}x_0 e^{tB_0}b\) in (HCU.19) gives
+\[
+ dP_x(ux_0Zb)=\chi_w(b)
+ \left(R_{x_0Xx_0^{-1}}f(u)
+            +\sum_{\tau,a}w_{\tau,a}(B_0)_{\tau,aa}f(u)\right)
+ =\chi_w(b)R^{\mathbb C}_{x_0Zx_0^{-1}}f(u).
+ \tag{HCU.20}
+\]
+The last equality uses (HCU.17) for the whole upper-triangular
+\(B_0\), by complex linearity.  Its right side is complex-linear in
+\(Z\); multiplication by the fixed invertible frames identifies \(Z\)
+complex-linearly with \(\dot x\).  Therefore the real derivative of
+\(P\) is complex-linear at every point.  This is complex
+differentiability, and proves the forward construction of (HCU.4).
+
+Conversely let \(P\) satisfy (HCU.4).
+The restrictions \(f(u)=P(ux_0)\) are smooth.
+At \(ux_0\), its complex derivative in the tangent
+\(ux_0E_{ac}\) is obtained from the curve \(ux_0e^{zE_{ac}}\).
+For \(a<c\), its upper-triangular character is identically one; for
+\(a=c\), it is \(e^{zw_{\tau,a}}\).
+Differentiating gives (HCU.17), with precisely the complexification
+(HCU.16).  This also proves (HCU.18) directly from (HCU.4).
+% END HCU5
+
+% BEGIN HCU6
+\paragraph{HCU6: bounded integration preserves the original holomorphic type.}
+\label{claim:HCU6}
+Let \((\Omega,\nu)\) be a finite measure space, and suppose
+\(f_o:G\to\mathbb C\) has the same \(\mathrm{HolFn}(H,q,x_0,w)\)
+for every \(o\).  Suppose
+\(|f_o(u)|\le C\) for all \(o,u\), and \(o\mapsto f_o(u)\) is
+almost-everywhere strongly measurable for every fixed \(u\).
+Then
+\[
+ u\longmapsto\int_\Omega f_o(u)\,d\nu(o)
+ \tag{HCU.21}
+\]
+has the same \(\mathrm{HolFn}\).  This is the full
+\texttt{holFn\_integral} statement.
+
+\emph{Proof.}
+Choose any section \(P_o\) for \(f_o\).  Its right transformation law
+and HCU1 force the pointwise identity
+\[
+ P_o(x)=\chi_w(\beta(x))f_o(u(x)).
+ \tag{HCU.22}
+\]
+In particular every section value is measurable in \(o\), regardless
+of how the sections were chosen.  Near each \(x\in\mathcal D\),
+the continuous factor \(\chi_w(\beta(y))\) is bounded: the diagonal
+entries never vanish, including when some weights are negative.
+Thus on a sufficiently small closed polydisc in \(\mathcal D\)
+all \(P_o\) are bounded by a common finite constant.  Its constant
+function on \(\Omega\) is integrable.
+
+For clarity, holomorphy under this integral follows directly from
+Cauchy's formula on a slightly larger polydisc.  Its coefficient
+bounds give a uniformly summable majorant for the power series on
+each smaller polydisc.  Integrate each coefficient; domination
+justifies exchange of integral and series and gives a convergent
+holomorphic power series for \(\int P_o\).
+Measurability on the boundary products used in Cauchy's formula
+follows by approximating their continuous parameter dependence with
+finite grids: separate measurability in \(o\) and continuity in the
+finite-dimensional compact parameter give measurable step
+approximations with pointwise limits.  Hence Fubini is applicable.
+The same argument with \(\max(C,0)\) covers the zero-measure or empty
+index cases.  The right character law passes through the integral,
+and evaluation at \(ux_0\) gives (HCU.21), proving the assertion.
+% END HCU6
+
+% BEGIN HCU7
+\paragraph{HCU7: proportionality and a cyclic coefficient test.}
+\label{claim:HCU7}
+Two functions of the same \(\mathrm{HolFn}\) type, both satisfying
+the left torus law in (HCU.13), and with values \(c,1\) at \(1\),
+satisfy \(f=cg\) on \(G\).
+
+For a single place, let \(\sigma\) be a strongly continuous unitary
+irreducible representation of \(U(H)\) on a complex Hilbert space.
+Let \(v\ne0\) be smooth and satisfy the original Borel equations
+\[
+ d\sigma^{\mathbb C}(x_0E_{ac}x_0^{-1})v
+   =\delta_{ac}w_av\quad(a\le c).
+ \tag{HCU.23}
+\]
+If \(l\) has torus character \(\chi_w\) and \(\langle l,v\rangle=0\),
+then \(l=0\).  This closes the entire
+\texttt{HolLowOnce.}\allowbreak\texttt{eq\_zero\_of\_orth} implication.
+
+\emph{Proof.}
+The difference \(f-cg\) satisfies HCU4; this proves proportionality.
+For the second assertion, use the convention that the Hilbert inner
+product is conjugate-linear in its first argument.  The smooth
+coefficient \(F(u)=\langle l,\sigma(u)v\rangle\) satisfies (HCU.17)
+by differentiating in the second argument, so HCU5 supplies its
+literal \(\mathrm{HolFn}\).  Since \(\sigma(t(s))l=\chi_w(s)l\)
+and \(|\chi_w(s)|=1\), unitarity gives
+\[
+ \langle l,\sigma(t(s)u)v\rangle
+       =\chi_w(s)\langle l,\sigma(u)v\rangle .
+ \tag{HCU.24}
+\]
+HCU4 makes this coefficient zero.  The closed span of
+\(\{\sigma(u)v:u\in U(H)\}\) is a nonzero closed invariant subspace,
+hence the whole Hilbert space.  Therefore \(l\) is orthogonal to
+the whole space and is zero.  No assertion that all lowest compact
+types were already irreducible was used in this test.
+% END HCU7
+
+\subsection*{The full original lowest compact type}
+
+The next arguments concern the actual representation, not a replacement
+model.  For a sign pattern \(\epsilon\), let
+\(J_\epsilon=\operatorname{diag}(1_{\epsilon(a)}-1_{\neg\epsilon(a)})\),
+\(K_\epsilon=U(n)\cap U(J_\epsilon)\), and write \(E_{ac}\) for matrix
+units.  The source's \(\mathrm{IsKTypeOf}(\epsilon,\sigma,\Lambda,S)\)
+says that \(S\) is finite dimensional and \(K_\epsilon\)-stable,
+irreducible under this compact group, contains a nonzero torus vector
+of weight \(\Lambda\), and every weight \(\mu\) in \(S\) satisfies
+\[
+ \Lambda-\mu
+   =\sum_{\substack{a<c\\\epsilon(a)=\epsilon(c)}}m_{ac}(e_a-e_c),
+ \qquad m_{ac}\in\mathbb N .
+ \tag{HCU.25}
+\]
+This is the literal relation \(\mathrm{CDom}(\epsilon,\mu,\Lambda)\).
+For \(\Lambda=\mathrm{lowK}(\epsilon,\lambda)\), the original
+\(\mathrm{lowKSub}\) is the algebraic supremum of \emph{all} such
+subspaces \(S\).  It is not initially assumed finite dimensional or
+irreducible.
+
+% BEGIN HCU8
+\paragraph{HCU8: smooth vectors, derived actions and a smooth compact-type seed.}
+\label{claim:HCU8}
+Let \(\sigma\) be a strongly continuous unitary representation of \(U(H)\)
+on a complete complex Hilbert space.  Its source smooth vectors form a
+complex vector subspace, are preserved by the group and by all
+complexified derived operators, and satisfy on that subspace
+\[
+ \begin{split}
+ d\sigma^{\mathbb C}([Z,W])&=
+     [d\sigma^{\mathbb C}(Z),d\sigma^{\mathbb C}(W)],\\
+ \sigma(g)d\sigma^{\mathbb C}(Z)v
+   &=d\sigma^{\mathbb C}(gZg^{-1})\sigma(g)v,\\
+ \langle d\sigma^{\mathbb C}(Z)v,w\rangle
+   &=-\langle v,d\sigma^{\mathbb C}(c_H(Z))w\rangle .
+ \end{split}
+ \tag{HCU.26}
+\]
+Every finite-dimensional irreducible subspace for a compact subgroup
+\(K\) has an isomorphic \(K\)-subspace consisting of smooth vectors.
+For \(K=K_\epsilon\), this preserves its exact
+\(\mathrm{IsKTypeOf}\) weight.  In particular every original DSModel
+has a smooth compact-type seed of its specified lowest weight.
+
+\emph{Proof.}
+The product-exponential charts established in HCU5 apply equally to
+Hilbert-valued functions.  A smooth orbit map remains smooth after
+addition, scalar multiplication and translation.  If \(v\) is smooth,
+the function \((g,t)\mapsto\sigma(g e^{tX})v\) is smooth.
+Differentiating in \(t\) at zero gives the smooth orbit map of
+\(d\sigma(X)v\).  This proves stability under differentiation without
+an assumption that an unbounded derived operator is continuous on the
+whole Hilbert space.  The ordinary chain rule in these charts proves
+real linearity in \(X\) and complex linearity in \(v\).  Complexification
+gives linearity in every \(Z\).
+
+Differentiate
+\(g e^{tX}g^{-1}=e^{t gXg^{-1}}\) for covariance.
+The mixed derivatives of
+\(e^{sX}e^{tY}e^{-sX}e^{-tY}=1+st[X,Y]+o(st)\), or the
+corresponding right-invariant vector fields in a chart, give the
+commutator identity.  All derivatives here act on the same smooth
+orbit map, so their interchange is legitimate.
+Differentiating
+\(\langle\sigma(e^{tX})v,\sigma(e^{tX})w\rangle=\langle v,w\rangle\)
+gives skew adjointness for real \(X\); decomposing \(Z=X+iY\)
+and remembering conjugate linearity in the first argument gives the
+last formula in (HCU.26).
+
+Here is the smoothing argument with its exact compact type preserved.
+Let \(S\) be the given finite-dimensional irreducible \(K\)-subspace
+and \(v\in S\setminus\{0\}\).
+The real part of \(\langle v,\sigma(g)v\rangle\) is positive on a
+neighborhood of \(1\).  Compactness of \(K\) gives a smaller neighborhood
+all of whose \(K\)-conjugates lie in it: continuity of conjugation on
+\(K\times\{1\}\) and a finite cover of \(K\) prove this assertion.
+Choose a nonnegative smooth bump supported in that smaller neighborhood,
+positive at \(1\), and average it under compact conjugation to obtain
+\(a\).  The average is smooth, compactly supported, nonnegative and
+\(K\)-conjugation invariant, and its support remains in the positivity
+neighborhood.  These bumps exist directly in a finite-dimensional
+real chart by the usual function
+\(e^{-1/(1-\|x\|^2)}\) inside a ball, extended by zero.
+
+Conjugation by \(K\) preserves left Haar measure on \(U(H)\).
+Indeed its scaling factor is a continuous homomorphism
+\(K\to\mathbb R_{>0}\), whose compact image must be \(\{1\}\);
+taking logarithms proves the last assertion.
+Define
+\[
+ A v'=\int_{U(H)}a(g)\sigma(g)v'\,dg\quad(v'\in S).
+ \tag{HCU.27}
+\]
+Strong continuity and compact support give its Hilbert-valued integral.
+The real part of \(\langle v,Av\rangle\) is positive, so \(A\ne0\).
+Changing variables by compact conjugation shows
+\(A\sigma(k)=\sigma(k)A\).  Its kernel in \(S\) is invariant;
+irreducibility therefore makes \(A\) injective.  Its image is finite
+dimensional and isomorphic to \(S\) as a compact representation, so all
+parts of \(\mathrm{IsKTypeOf}\), including (HCU.25), are unchanged.
+
+Finally
+\(\sigma(x)Av'=\int a(x^{-1}g)\sigma(g)v'\,dg\).
+On a compact neighborhood of any \(x\), this integrand and all its
+coordinate derivatives have a common compact support in \(g\);
+their norms are bounded by a scalar smooth-bump derivative times
+\(\|v'\|\).  Dominated differentiation of the Bochner integral gives
+a smooth orbit map for \(Av'\).  The argument is unchanged after
+conjugating the matrix group by the original \(M.\mathrm{fr}\).
+Since the source \(M.\mathrm{sm}\) is the span of smooth vectors,
+the already proved linear-subspace property identifies it with the
+smooth vectors themselves.  This proves the complete seed contract
+\texttt{exists\_lowK\_le\_sm}.
+% END HCU8
+
+% BEGIN HCU9
+\paragraph{HCU9: the finite compact-weight facts actually needed.}
+\label{claim:HCU9}
+The following facts hold for a unitary continuous representation of
+\(K_\epsilon\).
+\begin{enumerate}
+\item Every nonzero finite-dimensional invariant subspace contains an
+\(\mathrm{IsKTypeOf}(\epsilon,\sigma,\mu,S')\).
+Every such highest weight \(\mu\) is integral and weakly decreasing
+along each increasing-index sign block.
+\item If \(L\) is the supremum of all compact subspaces of fixed type
+\(\Lambda\), then every vector of \(L\) belongs to a finite-dimensional
+compact-stable subspace of \(L\).
+If \(y\) has torus weight \(\nu\) and
+\(\langle w,y\rangle\ne0\) for some \(w\in L\), then
+\(\mathrm{CDom}(\epsilon,\nu,\Lambda)\).
+\item If a smooth \(v\in L\) has weight \(\Lambda\), then
+\(d\sigma^{\mathbb C}(E_{ac})v=0\) for
+\(a<c,\epsilon(a)=\epsilon(c)\), and
+\(d\sigma^{\mathbb C}(E_{aa})v=\Lambda_a v\).
+\end{enumerate}
+
+\emph{Proof.}
+A nonzero invariant subspace of smallest positive dimension is
+irreducible.  Commuting unitary operators of the diagonal torus on it
+are simultaneously diagonalizable: diagonalize one nonscalar operator,
+restrict the remaining commuting operators to its eigenspaces, and
+induct on dimension.  The resulting simultaneous characters are
+products \(e^{i\sum\mu_a s_a}\), with \(\mu_a\in\mathbb Z\).
+One elementary verification is to smooth the finite representation by
+the averaging argument of HCU8, now on the compact group itself; on an
+irreducible finite summand its nonzero intertwiner is invertible.
+Each character is therefore smooth, its differential is a real
+linear form in the angles, and the ordinary differential equation
+along a line gives the exponential formula.
+Period \(2\pi\) in each coordinate makes every \(\mu_a\) integral.
+
+Choose a weight maximizing \(\sum_a(-a)\mu_a\) among the finite weight
+set, and a nonzero vector of that weight.  Every matrix unit \(E_{ac}\)
+with \(a<c\) in the same sign block raises that quantity; hence its
+complexified derivative kills this vector.
+The span of words in the opposite, lower matrix units applied to it
+is invariant under the whole complexified compact Lie algebra.
+Here is the algebraic check: move an upper matrix unit to the right
+through a word using
+\([E_{ab},E_{cd}]=\delta_{bc}E_{ad}-\delta_{da}E_{cb}\);
+each commutator shortens the word, and induction reorders it into
+lower units, diagonal units and upper units.  Diagonal units act by
+the current weight, and upper units at the far right kill the vector.
+Thus all resulting weights are the chosen weight minus nonnegative
+integer sums of compact positive roots.
+The compact group is a product of unitary groups and is connected;
+each of its elements is an exponential of a skew-Hermitian block
+matrix.  A finite-dimensional Lie-stable subspace is stable under
+these exponentials by the matrix exponential series.  Irreducibility
+therefore makes this lower-word span the whole summand.
+This proves precisely (HCU.25) and all fields of
+\(\mathrm{IsKTypeOf}\), without an appeal to a classification theorem.
+
+For any \(i<j\) in a sign block, permutation of these coordinates is
+in \(K_\epsilon\).  It carries a vector of weight \(\mu\) to one of
+weight \(\mu\circ(ij)\).
+Apply (HCU.25) and pair its positive-root sum with the strictly
+decreasing vector \((-a)_a\).  The resulting inequality is
+\((\mu_i-\mu_j)(j-i)\ge0\), proving dominance.
+
+A vector in an algebraic supremum is a finite sum of vectors from the
+defining subspaces; their finite sum is the required finite invariant
+space.  The orthogonal projection onto any one defining compact
+subspace commutes with the compact action, since its orthogonal
+complement is invariant too.  If \(\nu\) fails (HCU.25), the projection
+of \(y\) onto every such subspace is zero, by its weight condition.
+Then \(y\) is orthogonal to their algebraic sum \(L\), which proves
+assertion 2 by contraposition.
+
+For assertion 3, choose a finite compact-stable subspace of \(L\)
+containing \(v\).  Differentiation along compact real directions
+preserves it because it is closed.  Their complex span contains
+\(E_{ac}\) within each sign block.  Covariance in (HCU.26) shows that
+\(d\sigma^{\mathbb C}(E_{ac})v\) has weight
+\(\Lambda+e_a-e_c\).  This weight cannot satisfy (HCU.25): pairing
+\(-e_a+e_c\) with \((-j)_j\) is negative.  Assertion 2, applied to
+the derivative vector itself, makes it zero.  Differentiation of the
+diagonal torus eigencharacter proves the diagonal formula.
+% END HCU9
+
+% BEGIN HCU10
+\paragraph{HCU10: the precise lowest-norm inequality.}
+\label{claim:HCU10}
+Suppose \(\epsilon(a)\) is true exactly when \(a<p\), with
+\(0<p<n\), and \(\lambda\) is strictly decreasing.
+Write the literal source weights and norm as
+\[
+ \Lambda=\lambda+\rho_N-\rho_C,\quad
+ V(\eta)=\|\eta+2\rho_C\|^2,\quad
+ \rho_N(a)+\rho_C(a)=\frac{n-1}{2}-a.
+ \tag{HCU.28}
+\]
+The last equality follows by counting all indices before and after \(a\).
+Assume \(\Lambda,\mu\) are dominant on each sign block and
+\[
+ \mathrm{CDom}(\epsilon,\mu+e_a-e_c,\Lambda),
+ \qquad a<p\le c .
+ \tag{HCU.29}
+\]
+Then \(V(\mu)<V(\Lambda)\).
+
+\emph{Proof.}
+Put \(L=\Lambda+2\rho_C\), \(M=\mu+2\rho_C\), and
+\(\gamma=\Lambda-\mu-e_a+e_c\), a nonnegative sum of compact positive
+roots.  The vectors \(\rho_C,L,M\) are weakly decreasing within each
+block, by their definitions and dominance.
+For \(a_0=p-1,c_0=p\), (HCU.28) gives
+\[
+ L_{a_0}-L_{c_0}
+       =\lambda_{a_0}-\lambda_{c_0}+1>1.
+ \tag{HCU.30}
+\]
+Every compact positive root has nonpositive \(a_0\)-coordinate and
+nonnegative \(c_0\)-coordinate.  Therefore
+\(\gamma_{a_0}-\gamma_{c_0}\le0\).
+Since \(L-M=e_a-e_c+\gamma\), it follows that
+\(M_{a_0}-M_{c_0}\ge L_{a_0}-L_{c_0}-2\).
+Pairing the root expansion with the block-decreasing vector \(L+M\)
+now gives
+\[
+ \begin{split}
+ \|L\|^2-\|M\|^2
+ &= (L_a+M_a)-(L_c+M_c)+\langle\gamma,L+M\rangle\\
+ &\ge (L_{a_0}+M_{a_0})-(L_{c_0}+M_{c_0})\\
+ &\ge 2(L_{a_0}-L_{c_0})-2>0.
+ \end{split}
+ \tag{HCU.31}
+\]
+This is the exact \texttt{Lowering.vNormSq\_lt} argument needed below.
+For an empty sign block there is no pair \(a<p\le c\); the associated
+annihilation statement is vacuous.
+% END HCU10
+
+% BEGIN HCU11
+\paragraph{HCU11: lowering on the full lowest subspace.}
+\label{claim:HCU11}
+Suppose \(\mathrm{IsDS}(\epsilon,\lambda,\sigma)\),
+\(\mathrm{IsHCParam}(\lambda)\), and the ordered sign pattern above.
+Let
+\(L=\mathrm{lowKSub}(\epsilon,\lambda,\sigma)\).
+For every smooth \(v\in L\),
+\[
+ d\sigma^{\mathbb C}(E_{ca})v=0\quad(a<p\le c).
+ \tag{HCU.32}
+\]
+This proves the original \texttt{lowK\_killed}, including its use on
+the whole supremum \(L\).
+
+\emph{Proof.}
+The source \(\mathrm{IsDS}\) supplies a complete unitary representation,
+a compact type of weight \(\Lambda=\mathrm{lowK}(\epsilon,\lambda)\),
+and the minimality condition
+\[
+ V(\Lambda)\le V(\mu)
+ \quad\hbox{for every actual compact type of weight }\mu.
+ \tag{HCU.33}
+\]
+Choose, by HCU9, a finite compact-stable space \(W\subset L\) containing
+\(v\), and replace it by its intersection with the smooth vectors.
+This intersection is a vector subspace by HCU8, is finite dimensional,
+is compact-stable, and still contains \(v\).
+Let \(S\) be the span of
+\(d\sigma^{\mathbb C}(Z)w\), where \(w\in W\) and \(Z\) is a linear
+combination of \(E_{ca}\) with \(a<p\le c\).
+It is finite dimensional, being the image of the finite-dimensional
+space of such \(Z\)'s tensor \(W\).
+It consists of smooth vectors and is compact-stable by covariance,
+since compact block conjugation preserves these off-diagonal units.
+
+If one expression in (HCU.32) is nonzero, then \(S\ne0\).
+HCU9 gives an irreducible compact subspace \(S'\subset S\) of highest
+weight \(\mu\), with a nonzero weight vector \(u\).
+Some generator has
+\(\langle d\sigma^{\mathbb C}(E_{ca})w,u\rangle\ne0\); otherwise
+\(u\), which belongs to their span, would be orthogonal to itself.
+Since \(c_{J_\epsilon}(E_{ca})=E_{ac}\), the last identity in
+(HCU.26) makes
+\[
+ \langle w,d\sigma^{\mathbb C}(E_{ac})u\rangle\ne0.
+ \tag{HCU.34}
+\]
+(The adjoint identity has a minus sign, which does not affect
+nonvanishing.)  Covariance under the diagonal torus gives the latter
+vector weight \(\mu+e_a-e_c\).
+Because \(w\in L\), HCU9 implies (HCU.29).
+Both \(\mu\) and \(\Lambda\) are compact dominant by HCU9.
+HCU10 contradicts (HCU.33).  Thus \(S=0\), proving (HCU.32).
+No prior finite-dimensionality or multiplicity-one assertion for \(L\)
+has entered the proof.
+% END HCU11
+
+% BEGIN HCU12
+\paragraph{HCU12: original frames, extremal vectors and Borel equations.}
+\label{claim:HCU12}
+Let \(M\) be any original DSModel with \(\mathrm{HolShape}(M)\).
+At each real place put \(q=n-p\).
+Let \(r=\mathrm{revNeg}(\epsilon)\), the permutation reversing the
+negative sign block and fixing the positive block, and let
+\[
+ a_q(j)=
+ \begin{cases}n-1-j&j<q,\\j-q&j\ge q.\end{cases}
+ \quad
+ x_0=M.\mathrm{fr}^{-1}P_{a_q},\quad
+ w_j=\Lambda_{\,r(a_q(j))}.
+ \tag{HCU.35}
+\]
+These are the source's \(\mathrm{arr}\), \(\mathrm{x0Mat}\) and
+\(\mathrm{WtIs}\) formulas.  If \(v\) is a smooth vector in the full
+lowest subspace and has the extremal torus weight
+\(\Lambda\circ r\), then the original \(M.\mathrm{rep}\) satisfies
+\[
+ d(M.\mathrm{rep})^{\mathbb C}(x_0E_{ac}x_0^{-1})v
+       =\delta_{ac}w_av\qquad(a\le c).
+ \tag{HCU.36}
+\]
+In particular every supplied source \(\mathrm{IsExtVec}\) satisfies
+the full \texttt{borel\_extVec} conclusion.
+
+\emph{Proof.}
+The stored identity
+\(M.\mathrm{fr}^*J_\epsilon M.\mathrm{fr}=H\) gives
+\(x_0^*Hx_0=\operatorname{diag}(-1_q,1_p)\), exactly (HCU.1).
+Conjugating the representation by \(M.\mathrm{fr}\) preserves
+unitarity, irreducibility and smoothness on their original Hilbert
+space.  Direct multiplication gives
+\[
+ x_0E_{ac}x_0^{-1}
+    =M.\mathrm{fr}^{-1}E_{a_q(a),a_q(c)}M.\mathrm{fr}.
+ \tag{HCU.37}
+\]
+The same identity for derived operators follows by differentiating
+\(F e^{tX}F^{-1}=e^{tFXF^{-1}}\); its complexification respects
+the original Hermitian involutions.
+
+For a diagonal matrix unit, HCU9 gives the required extremal weight.
+For a strict upper unit in the two negative-first coordinates of
+(HCU.35), there are three cases.
+If both indices lie in the negative block, their images under
+\(r\circ a_q\) are \(p+a,p+c\), in increasing order.
+If both lie in the positive block, these images are \(a-q,c-q\),
+again in increasing order.  The permutation \(r\) is compact;
+conjugating \(v\) by its permutation matrix turns it into a vector
+of weight \(\Lambda\).  HCU9's compact raising annihilation applies
+in both cases.  In the remaining case \(a<q\le c\), the matrix unit
+in (HCU.37) has its row in the negative block and column in the
+positive block, so HCU11 applies.
+This proves (HCU.36) with the actual order and signs.
+
+For use in constructing an extremal vector, HCU8 supplies a smooth
+compact subspace of highest weight \(\Lambda\); applying the compact
+permutation \(r\) to a normalized highest vector gives a unit vector
+of weight \(\Lambda\circ r\) in that same subspace.
+Its torus weights are integral by HCU9, so the \(w\)'s in (HCU.35)
+are integers.  This produces the required weight tuple before
+any appeal to lowest-type multiplicity one.
+% END HCU12
+
+% BEGIN HCU13
+\paragraph{HCU13: full LowSm and LowIrr, with multiplicity one proved.}
+\label{claim:HCU13}
+For every original DSModel \(M\) with \(\mathrm{HolShape}(M)\),
+\[
+ \mathrm{LowSm}(M)\ \wedge\ \mathrm{LowIrr}(M).
+ \tag{HCU.38}
+\]
+Thus the entire original
+\texttt{HolLowOnce.lowSm\_and\_lowIrr} producer is reconstructed.
+
+\emph{Proof.}
+Work at one real place.  HCU8 supplies a smooth irreducible compact
+subspace \(S_0\) of weight \(\Lambda\).
+Choose its unit extremal vector \(v\) by HCU12.
+Let \(T\) be any other subspace satisfying
+\(\mathrm{IsKTypeOf}(\epsilon,\sigma,\Lambda,T)\).
+Its definition supplies a nonzero highest vector, and the compact
+permutation \(r\), followed by normalization, gives a unit extremal
+\(v'\in T\) of weight \(\Lambda\circ r\).
+This \(v'\) is not assumed smooth for the full noncompact group.
+
+Set \(l=v'-\langle v,v'\rangle v\).
+It has the same torus weight, and \(\langle l,v\rangle=0\), by
+conjugate symmetry and \(\|v\|=1\).
+The representation on the original Hermitian coordinates is unitary
+and irreducible by its stored DSModel identities.
+HCU12 gives the Borel equations for the smooth vector \(v\), and
+(HCU.35) identifies the torus character of both \(v\) and \(v'\)
+with the exact \(\chi_w\).
+HCU7 therefore gives \(l=0\), so \(v'\in S_0\).
+
+The intersection \(T\cap S_0\) is nonzero and compact-stable.
+Irreducibility first gives \(T\subset S_0\), and then \(T=S_0\).
+Taking the supremum over \emph{all} defining subspaces proves
+\(\mathrm{lowKSub}=S_0\).
+It is consequently contained in the smooth vectors and is itself
+an \(\mathrm{IsKTypeOf}\) of the required weight.  These are exactly
+\(\mathrm{LowSm}\) and \(\mathrm{LowIrr}\), place by place.
+The equality was proved on the original Hilbert space and with the
+original compact action, not by selecting a different DSModel.
+% END HCU13
+
+\subsection*{Actual real lifts, holomorphic forms and the Hilbert coefficient}
+
+% BEGIN HCU14
+\paragraph{HCU14: the original archimedean lift, with no changed coordinates.}
+\label{claim:HCU14}
+For the original \(D,\theta,V\) with \(\mathrm{IsInfFam}(\theta)\),
+the map
+\[
+ G_{\infty}(V)\longrightarrow
+ \prod_\tau U(\mathrm{gramAt}(D,V,\tau)),\qquad
+ g\longmapsto(\mathrm{archM}(V,\theta_\tau,g))_\tau
+ \tag{HCU.39}
+\]
+is a continuous group isomorphism with continuous inverse \(L\).
+The inverse of a tuple supported at \(\tau\) is the original
+\(\mathrm{atTau}(\theta,V,\tau,g_\tau)\).
+Every adelic \(g\) decomposes as \(g=au\) with
+\(a\in G_f(V)\), \(u\in G_\infty(V)\), and its archimedean
+evaluations belong to the stated unitary groups.
+The finite and infinite adelic subgroups commute, and each original
+\(\mathrm{gramAt}\) is Hermitian and nonsingular.
+These are all the literal \texttt{exists\_real\_lift} fields.
+
+\emph{Proof.}
+Write \(E/F\) for the original CM quadratic extension.
+The stored \(\mathrm{tauE}\) indices give exactly one member of each
+conjugate pair of embeddings of \(E\).  More explicitly, the source
+maps its index set bijectively to the chosen set \(\Psi\) of embeddings,
+and the defining CM-type condition is
+\(\sigma\in\Psi\) if and only if \(\overline{\sigma}\notin\Psi\).
+Two embeddings of \(E\) over a real embedding of \(F\) are such a
+pair.  Thus these indices enumerate the real places of \(F\) once.
+
+Here the infinitary homomorphisms are forced by their stated
+\(\mathrm{IsInfEmb}\) conditions, not chosen afresh.
+The diagonal copy of \(F\) is dense in \(F_\infty=\prod_{v\mid\infty}F_v\).
+One direct proof chooses a rational basis of \(F\); its real embedding
+matrix is invertible by separability, as is seen from the Vandermonde
+matrix of a primitive element and change of basis.
+The image of the dense set \(\mathbb Q^{[F:\mathbb Q]}\) under this
+real linear isomorphism is the required diagonal copy.
+A homomorphism satisfying \(\mathrm{IsInfEmb}(\tau,\theta_\tau)\)
+therefore agrees on \(F_\infty\) with evaluation at the real place
+under \(\tau\), by continuity and its specified values on \(F\).
+For a pure tensor it must consequently satisfy
+\[
+ \theta_\tau(a\otimes e)=a_{v(\tau)}\,\tau(e).
+ \tag{HCU.40}
+\]
+
+To verify that these evaluations are a bijection, take
+\(\delta=y-\overline y\ne0\) in \(E\).
+The vectors \(1,\delta\) form an \(F\)-basis, since conjugation fixes
+the first and negates the second.  At every real place,
+\(\tau(\delta)\) is nonzero purely imaginary.
+Thus the two real coordinates of \(a+b\delta\) give all of
+\(\mathbb C\) at that place, uniquely and continuously.
+Place by place, (HCU.40) is the continuous ring isomorphism
+\[
+ F_\infty\otimes_F E\simeq\prod_\tau\mathbb C
+ \tag{HCU.41}
+\]
+that takes the original CM involution to complex conjugation.
+The formula is the given \(\theta\), not just an isomorphic alternative.
+
+Apply this isomorphism to each matrix entry.  The original Gram matrix
+evaluates to \(\mathrm{gramAt}\); the unitary equation and inverse
+matrices are preserved in both directions.
+The original \(HSp\) identity that its Gram matrix equals its
+CM-conjugate transpose evaluates to ordinary Hermitian symmetry.
+Its nonzero determinant stays nonzero under the field embedding;
+thus each evaluated Gram matrix is nonsingular.
+In particular evaluating any adelic unitary \(g\), without assuming
+that its finite component is the identity, gives an element of
+each stated \(U(\mathrm{gramAt})\).
+The adelic ring is the product of its finite and infinite parts.
+Gluing the tuple in (HCU.41) to the identity finite matrix therefore
+defines the unique element \(L(u)\in G_\infty(V)\).
+It is continuous and multiplicative, and both inverse identities in
+(HCU.39) follow entry by entry.
+The stored \(\mathrm{atTau}\) has exactly the same finite identity
+and single-place evaluations, so uniqueness identifies it with
+\(L(\mathrm{single}_\tau g_\tau)\).
+Finally matrices supported in the two different product factors
+commute.  For an arbitrary adelic unitary \(g\), retain its finite
+component and replace its infinite component by the identity to
+obtain \(a\); perform the opposite replacement to obtain \(u\).
+Both satisfy the original Gram equation componentwise, and \(g=au\).
+This supplies the asserted finite--infinite decomposition.
+These verifications retain the original \(F,E,\theta\),
+Hermitian equation and all evaluation maps.
+% END HCU14
+
+% BEGIN HCU15
+\paragraph{HCU15: the actual extremal model coefficient is holomorphic.}
+\label{claim:HCU15}
+Let \(M\) be an original DSModel, and assume its literal
+\(\mathrm{HolShape}\), integer-weight \(\mathrm{WtIs}(M,w)\)
+and \(\mathrm{IsExtVec}(M,v)\).
+Then
+\[
+ B(u)=\prod_\tau
+ \langle v_\tau,M.\mathrm{rep}_\tau(u_\tau)v_\tau\rangle
+ \tag{HCU.42}
+\]
+has \(\mathrm{HolFn}(\mathrm{gramAt},q,\mathrm{x0Mat},w)\),
+satisfies the left torus law of HCU4, and \(B(1)=1\).
+This proves the whole \texttt{holFn\_coef\_extVec} output used
+by the original L2 argument.
+
+\emph{Proof.}
+HCU8 identifies each \(v_\tau\in M.\mathrm{sm}_\tau\) with a genuine
+smooth vector.  Differentiation of a coefficient gives
+\[
+ R_Z^{\mathbb C}
+   \langle v_\tau,M.\mathrm{rep}_\tau(u)v_\tau\rangle
+ =\langle v_\tau,M.\mathrm{rep}_\tau(u)
+                 d(M.\mathrm{rep}_\tau)^{\mathbb C}(Z)v_\tau\rangle.
+ \tag{HCU.43}
+\]
+This follows first for real \(Z\) by bounded linearity of the
+fixed group operator and the inner product functional, and then
+by the complexification (HCU.16).
+HCU12 supplies the exact Borel equations for (HCU.43).
+The finite product (HCU.42) thus has the source \(\mathrm{SmFn}\)
+and \(\mathrm{KilledFn}\); HCU5 makes it a \(\mathrm{HolFn}\).
+
+The original extremal weight and the permutation in (HCU.35) give
+\[
+ M.\mathrm{rep}_\tau(t(s)_\tau)v_\tau
+ =\left(\prod_a e^{iw_{\tau,a}s_{\tau,a}}\right)v_\tau.
+\]
+Unitarity, as in (HCU.24), gives the left torus law for each
+coefficient and hence their product.  The normalization in
+\(\mathrm{IsExtVec}\) is \(\|v_\tau\|=1\), so \(B(1)=1\).
+Every factor in (HCU.42) is the original model coefficient.
+% END HCU15
+
+% BEGIN HCU16
+\paragraph{HCU16: original finite-volume representatives.}
+\label{claim:HCU16}
+Fix the original \(\mathrm{FinPair}(V,\mu,\mathcal F)\) and
+\(\mathrm{IsReg}(V,\mu,\mathcal F,\rho)\), and put
+\(\nu_Q=(\mu|_{\mathcal F})_*\mathrm{autMk}\).
+A continuous bounded rational-left-invariant function \(\phi\)
+has an \(L^2(\nu_Q)\) representative \(F\) satisfying the source
+\(\mathrm{Repr}(F,\phi)\).
+Representatives obey linearity and right translation, and
+\[
+ \langle F,F'\rangle
+   =\int_{\mathcal F}\overline{\phi(x)}\phi'(x)\,d\mu(x)
+ \tag{HCU.44}
+\]
+whenever \(\mathrm{Repr}(F,\phi)\) and
+\(\mathrm{Repr}(F',\phi')\).
+The integrand is integrable.  The \(L^2\) representative is unique;
+a continuous representative is also unique pointwise.
+In particular
+\[
+ \phi(xk)=c\phi(x)\ (\forall x)
+ \quad\Longrightarrow\quad \rho(k)F=cF .
+ \tag{HCU.45}
+\]
+
+\emph{Proof.}
+The invariant \(\phi\) descends to a measurable function on the
+quotient with its quotient measurable structure.  The pushed-forward
+measure is finite, since \(\mu(\mathcal F)<\infty\).
+Boundedness makes the descended function square integrable.
+Its chosen \(L^2\) representative equals it almost everywhere on the
+quotient, hence almost everywhere on \(\mathcal F\) after pullback.
+The exceptional set in the full group is rational-left-invariant.
+Countably many rational translates of the fundamental domain cover
+the group up to a null set; the rational group is countable since
+it is a set of matrices over the number field.
+Left invariance of \(\mu\) therefore makes that exceptional set
+globally null.  This is exactly the source's globally quantified
+\(\mathrm{Repr}\), not merely an equality on the fundamental domain.
+
+Conversely equality of two representatives globally almost everywhere
+implies their equality for \(\mu|_{\mathcal F}\) and then for \(\nu_Q\);
+this proves \(L^2\) uniqueness.
+If two continuous functions agree almost everywhere for Haar measure,
+their difference is zero everywhere: a nonzero value would give a
+nonempty open set on which its modulus is bounded below, and Haar
+measure is positive on every nonempty open set.
+The usual almost-everywhere identities for \(L^2\) addition and scalar
+multiplication lift globally by the same invariant-null-set argument.
+The \(\mathrm{IsReg.val}\) identity and the right invariance in
+\(\mathrm{FinPair}\) give
+\(\mathrm{Repr}(\rho(k)F,\phi(\,\cdot\,k))\).
+Finally Cauchy--Schwarz gives integrability of the product of the two
+\(L^2\) functions.  The definition of the pushforward measure and
+the representative identities transform its inner product into
+(HCU.44).  These facts prove linearity, translation and (HCU.45),
+including zero vectors and zero scalar eigenvalues where applicable.
+No existence of a finite-volume target quotient is asserted here:
+the same \(\mathrm{FinPair}\) remains an explicit input.
+% END HCU16
+
+% BEGIN HCU17
+\paragraph{HCU17: the original extremal coefficient identity.}
+\label{claim:HCU17}
+On the original \(D,\theta,V,M,w,v\), assume
+\(\mathrm{IsInfFam}\), \(\mathrm{HolShape}\), \(\mathrm{WtIs}\),
+\(\mathrm{IsExtVec}\), the same \(\mathrm{FinPair}\) and
+\(\mathrm{IsReg}\).
+Assume also \(\mathrm{HolForm}(\theta,M,w,J,\chi,\phi)\)
+and \(\mathrm{Repr}(F,\phi)\).
+Then for every \(g\in G_\infty(V)\),
+\[
+ \langle F,\rho(g)F\rangle
+ =\|F\|^2\prod_\tau
+  \langle v_\tau,M.\mathrm{rep}_\tau
+          (\mathrm{archM}(V,\theta_\tau,g))v_\tau\rangle .
+ \tag{HCU.46}
+\]
+This is the entire literal
+\texttt{inner\_reg\_eq\_coef\_extremal} statement.
+
+\emph{Proof.}
+Use the original \(L\) of HCU14.
+The \(\mathrm{HolAd}\) field of \(\mathrm{HolForm}\) says that, for
+each fixed \(x\),
+\(u\mapsto\phi(xL(u))\) has the exact \(\mathrm{HolFn}\) type.
+If \(|\phi|\le C\), then
+\[
+ (x,u)\longmapsto\overline{\phi(x)}\phi(xL(u))
+ \tag{HCU.47}
+\]
+is bounded in modulus by \(\max(C,0)^2\).
+It is measurable in \(x\), since \(L(u)\) is fixed when this
+measurability is required and \(\phi\) is continuous.
+Apply HCU6 with the finite measure \(\mu|_{\mathcal F}\).
+By HCU16 the resulting holomorphic-type function is
+\(A(u)=\langle F,\rho(L(u))F\rangle\).
+
+The right upper-triangular law (HCU.4), evaluated at the diagonal
+torus, gives directly
+\[
+ \phi(xL(t(s)))=\chi_w(s)\phi(x).
+\]
+Thus \(\rho(L(t(s)))F=\chi_w(s)F\) by (HCU.45).
+Unitarity of \(\rho\) gives
+\(A(t(s)u)=\chi_w(s)A(u)\), with the same character orientation as
+(HCU.24), and \(A(1)=\|F\|^2\).
+HCU15 gives the function \(B\) in (HCU.42), with the identical
+holomorphic type and left torus law, and \(B(1)=1\).
+HCU7 therefore yields \(A=\|F\|^2B\).
+Use both inverse identities of HCU14 to replace \(L(u)\) by the
+given \(g\in G_\infty(V)\); this gives (HCU.46).
+The conclusion is valid when \(F=0\).
+The boundedness of \(\phi\) and finite target measure were used as
+explicit inputs, not inferred from source compactness or from the
+name of a rapid-decay theorem.
+% END HCU17
+
+% BEGIN HCU18
+\paragraph{HCU18: the exact Hilbert multilinear realization.}
+\label{claim:HCU18}
+Let \(G_\tau=U(H_\tau)\) act unitarily and irreducibly on complete
+Hilbert spaces \(\mathcal H_\tau\), with unit vectors \(v_\tau\).
+Let \(\rho\) be a unitary representation of
+\(G=\prod_\tau G_\tau\) on a complete Hilbert space \(\mathcal K\).
+Suppose \(k\in\mathcal K\) satisfies
+\[
+ \langle k,\rho(u)k\rangle
+  =\|k\|^2\prod_\tau\langle v_\tau,\sigma_\tau(u_\tau)v_\tau\rangle .
+ \tag{HCU.48}
+\]
+Then there is a continuous multilinear map
+\(\Phi:\prod_\tau\mathcal H_\tau\to\mathcal K\) with
+\[
+ \begin{aligned}
+ \Phi(v)&=k,\\
+ \Phi(y_1,\ldots,\sigma_\tau(g)y_\tau,\ldots)
+      &=\rho(\mathrm{single}_\tau g)\Phi(y),\\
+ \|\Phi(y)\|&=\|k\|\prod_\tau\|y_\tau\|.
+ \end{aligned}
+ \tag{HCU.49}
+\]
+and whose image lies in the closed span of \(\rho(G)k\).
+
+This proves the full source
+\texttt{exists\_equivariant\_}\allowbreak
+\texttt{multilinear\_of\_}\allowbreak\texttt{matrixCoeff\_eq}
+contract.
+
+For an adelic \(\rho\), HCU14 transports this construction to the
+original one-place equivariance with \(\mathrm{atTau}\).
+Every finite-place eigenlaw \(\rho(a)k=c k\), \(a\in G_f(V)\),
+then holds for every \(\Phi(y)\).  Hence, with the inputs of HCU17,
+the whole original \texttt{BackForm.exists\_map} conclusion holds
+for the same \(L^2\) space and same initial representative \(F\).
+
+\emph{Proof.}
+Irreducibility makes the span
+\(E_\tau=\operatorname{span}\{\sigma_\tau(g)v_\tau:g\in G_\tau\}\)
+dense in \(\mathcal H_\tau\), because its closure is nonzero and
+invariant.  The inverse in each group and unitarity transform
+(HCU.48) into the orbit Gram identity
+\[
+ \langle \rho(a)k,\rho(b)k\rangle
+   =\|k\|^2\prod_\tau
+       \langle\sigma_\tau(a_\tau)v_\tau,
+              \sigma_\tau(b_\tau)v_\tau\rangle .
+ \tag{HCU.50}
+\]
+For finite expressions
+\(y_\tau=\sum_j c_{\tau,j}\sigma_\tau(g_{\tau,j})v_\tau\),
+define
+\[
+ \Phi_0(y)=
+  \sum_{(j_\tau)_\tau}
+       \left(\prod_\tau c_{\tau,j_\tau}\right)
+       \rho((g_{\tau,j_\tau})_\tau)k .
+ \tag{HCU.51}
+\]
+Expanding (HCU.50) gives
+\[
+ \langle\Phi_0(y),\Phi_0(z)\rangle
+       =\|k\|^2\prod_\tau\langle y_\tau,z_\tau\rangle .
+ \tag{HCU.52}
+\]
+If two expressions represent the same tuple, expansion of the squared
+norm of the difference using (HCU.52) gives zero.  Thus (HCU.51)
+is well defined and multilinear, and its norm is the one in
+(HCU.49).  Approximate an arbitrary tuple by tuples from the dense
+\(E_\tau\)'s.  A telescoping multilinear difference, bounded by the
+product norm formula, proves that the images are Cauchy.
+Completeness gives a limit independent of all approximations and
+yields the continuous multilinear \(\Phi\).
+All stated identities pass from the finite sums to these limits.
+This includes the image in the closed orbit span.  If \(k=0\), the
+construction gives the zero map; if the index set is empty it gives
+the constant value \(k\), the correct zero-variable multilinear map.
+
+For the adelic conclusion, compose the actual \(\rho\) with the
+real lift \(L\) and use (HCU.46).
+The original model representations are unitary, irreducible and
+complete by the DSModel fields and their fixed frame conjugations.
+HCU14 identifies the one-place action with \(\mathrm{atTau}\).
+Since a finite-place \(a\) commutes with every \(L(u)\), its
+\(c\)-eigenlaw holds on every real orbit vector \(\rho(L(u))k\)
+and then on their closed span by boundedness of \(\rho(a)-c\).
+HCU16 transfers each pointwise finite eigenlaw of the original
+\(\phi\) to its \(L^2\) representative \(F\).
+These are precisely the four outputs of
+\texttt{BackForm.exists\_map}, including its original finite
+characters and its larger full-adelic closed-orbit containment.
+This is a Hilbert-valued map; conversion to pointwise smooth
+automorphic functions is a separate remaining step.
+% END HCU18
+
+% BEGIN HCU19
+\paragraph{HCU19: the original lowest-type cusp packet is holomorphic at its extremal.}
+\label{claim:HCU19}
+Let \(M,\theta,w\) satisfy the original
+\(\mathrm{HolShape}\), \(\mathrm{IsInfFam}\) and \(\mathrm{WtIs}\).
+Let \(U\) be an original lowest-type multilinear map whose values
+are smooth, whose compact equivariance is the source
+\(\mathrm{KEquiv}\), and which is killed by every original
+\(\mathfrak p^-\) direction.
+If \(e\) is a tuple with
+\(\mathrm{IsExtVec}(M,(e_\tau)_\tau)\), then
+\[
+ \mathrm{HolAd}(\theta,M,w,U(e)).
+ \tag{HCU.53}
+\]
+Thus the complete \texttt{holAd\_of\_kEquiv} consumer is reconstructed
+with LowSm and LowIrr supplied by HCU13.
+
+\emph{Proof.}
+The lowest compact subspaces are finite dimensional by HCU13.
+For any fixed output point, evaluation of the multilinear map \(U\)
+is therefore a continuous multilinear form on them.
+Differentiate its compact equivariance along a real compact
+one-parameter group.  Ordinary finite-dimensional differentiation
+gives its derivative by replacing the corresponding input by the
+derived compact action.  Complexify within the compact blocks.
+No continuity of \(U\) on the full discrete-series Hilbert spaces
+is being assumed.
+
+Fix \(g\) in the target adelic group and consider
+\(f_g(u)=U(e)(gL(u))\), with the original \(L\) of HCU14.
+It satisfies the source \(\mathrm{SmFn}\).
+For the diagonal and same-sign upper units in the \(x_0\) coordinates,
+the preceding differentiation and the compact part of HCU12 give
+exactly \(w_a f_g\) and zero, respectively.
+The remaining upper units are precisely the original
+\(\mathfrak p^-\) directions after (HCU.37), and vanish by the
+assumed lowering equations.
+Thus \(f_g\) satisfies (HCU.17).  HCU5 gives its literal
+\(\mathrm{HolFn}\).
+Since \(L\) inverts the original archimedean evaluation, this is
+exactly the \(\mathrm{HolAd}\) requirement for every \(g\).
+% END HCU19
+
+% BEGIN HCU20
+\paragraph{HCU20: installation on the same original base model.}
+\label{claim:HCU20}
+Let \(R:\mathrm{RealDat}(D,A,K_s)\) be the original datum and retain
+its exact \(\mathrm{models\_order}\) field.  For every original \(i\),
+put \(M_i=R.MW(i,\mathrm{sg}_0)\).  Then
+\[
+ \mathrm{HolShape}(M_i),\qquad
+ \exists w_i,\ \mathrm{WtIs}(M_i,w_i),\qquad
+ \mathrm{LowSm}(M_i)\ \wedge\ \mathrm{LowIrr}(M_i).
+ \tag{HCU.54}
+\]
+There is also a unit original extremal tuple, with the same integer
+weight \(w_i\).  This supplies the entire
+\texttt{holShape\_fixed} installation and the full-lowest-type inputs
+retained in TAE12--TAE13.  It makes no assertion about an arbitrary
+other coefficient embedding.
+
+\emph{Proof.}
+The field \(R.hv0\) says that \(A.v_0\) is the infinite place of
+\(D.\mathrm{what}_2.\mathrm{embLL}\).
+By the definition of \(\mathrm{sgAt}\),
+\(\mathrm{sg}_0=\mathrm{sgAt}(\mathrm{embLL},A.v_0)=\mathrm{embLL}\).
+The stored identity \(D.\mathrm{embE}_{\phi_0}\) makes
+\[
+ \mathrm{labE}(\mathrm{embLL},\tau)
+   =\phi_0\circ\mathrm{sigmaOf}(D.eTau(\tau))
+   =\mathrm{tauE}(D,\tau).
+ \tag{HCU.55}
+\]
+The chosen CM-type embeddings are distinct and contain no conjugate
+pair, as checked in HCU14.  Therefore any index selected in
+\(\mathrm{lab}(\mathrm{embLL},\rho)\) must equal \(\rho\);
+the conjugate alternative in its definition is impossible.
+Unfolding \(\mathrm{kapAt}\) and \(\mathrm{parAt}\) now gives
+\(\mathrm{parAt}(W,\mathrm{sg}_0,\rho)
+=\mathrm{holPar}(p,q,\kappa)\), with the original
+\(p,q=\mathrm{sig}_W(\mathrm{tauE}(D,\rho))\),
+\(p+q=\mathrm{rank}(W)=n\), and
+\(\kappa=\mathrm{wtOf}(D,W,\rho)\in\mathbb Z^{p+q}\).
+No relabeling or conjugation of the chosen model has occurred.
+
+The model's stored \(\mathrm{enum}\) already asserts that
+\(\lambda=M_i.\mathrm{lam}(\rho)\) is strictly decreasing and
+enumerates this signed finite parameter set.
+Its entries are consequently among
+\[
+ \begin{aligned}
+  \kappa_c^+-\frac q2+\frac{p-1}{2}-c
+      &=\frac{n-1}{2}+(\kappa_c^+-q-c)
+        &&(0\le c<p),\\
+  \kappa_c^-+\frac p2+\frac{q-1}{2}-c
+      &=\frac{n-1}{2}+(\kappa_c^--c)
+        &&(0\le c<q).
+ \end{aligned}
+ \tag{HCU.56}
+\]
+Thus for each index \(a\) there is an integer \(m_a\) with
+\(\lambda_a=(n-1)/2+m_a\).  Together with strict decrease this is
+exactly \(\mathrm{IsHCParam}(\lambda)\).
+The original \(\mathrm{models\_order}\) states
+\(\epsilon_a=\mathbf 1_{a<p}\); since \(p\le n\), the remaining
+\(\mathrm{HolShape}\) field follows.
+
+For an explicit integral weight, let
+\(C_a^+=\#\{b>a:\epsilon_b=\epsilon_a\}\) and
+\(C_a^-=\#\{b<a:\epsilon_b=\epsilon_a\}\).
+The elementary partition of indices above and below \(a\) gives
+\(\rho_N(a)+\rho_C(a)=(n-1)/2-a\).  Hence
+\[
+ \Lambda_a=\lambda_a+\rho_N(a)-\rho_C(a)
+       =m_a+n-1-a-C_a^++C_a^-\in\mathbb Z .
+ \tag{HCU.57}
+\]
+Take \(w_i(\rho,j)=\Lambda_{r(a_q(j))}\), with the actual
+\(\mathrm{revNeg}\) and \(\mathrm{arr}\) of HCU12.
+This is exactly \(\mathrm{WtIs}\), including empty signature blocks.
+HCU13 now gives both full-lowest-type assertions on this same \(M_i\).
+HCU8 and HCU12 provide its unit extremal vector at each real place;
+their finite tuple uses the just computed weight.
+All conclusions hold for every \(i\) before any choice of the
+parameter \(t\).  They use \(R.\mathrm{models\_order}\), which is a
+field of the already required \(\mathrm{IsModels}\), and do not
+construct a new datum \(R\).
+% END HCU20
+
+\subsection*{What this closes, and what still must be produced}
+
+The proved endpoints are the actual local and global coefficient
+uniqueness, the complete smooth Borel--holomorphic dictionary,
+bounded holomorphic integration, full lowest-type smoothness and
+multiplicity one, the original extremal coefficient identity,
+and its Hilbert multilinear realization with original finite
+eigenlaws.  In particular the full-lowest-type producer retained
+in TAE is now supplied under its exact \(\mathrm{HolShape}\)
+hypothesis; it is not replaced by an existentially selected
+irreducible summand.
+
+For the base original model \(M_i=R.MW(i,\mathrm{sg}_0)\), the required
+\(\mathrm{HolShape}\) and integer weight are supplied by its ordered
+holomorphic parameter formulas, reconstructed with the
+\(\mathrm{sg}_0=D.\mathrm{what}_2.\mathrm{embLL}\) identification
+in HCU20.  For any other coefficient embedding, the
+same HCU implications apply when \emph{that model's}
+\(\mathrm{HolShape}\) is checked; this chapter does not assert that
+every embedding has that shape.
+
+The original TAE13 cusp packet, together with HCU13 and HCU19,
+therefore reaches a holomorphic extremal function.
+If the actual boundedness and finite target quotient are supplied,
+HCU16--HCU18 give the literal coefficient and Hilbert-map stages.
+They do not manufacture those analytic inputs.
+The source's predicate \(\mathrm{Published.CuspRapidDecay}\)
+has not been turned into a checked published application.
+A finite-volume \(\mathrm{FinPair}\), a regular realization
+\(\mathrm{IsReg}\), and the original scalar function are kept
+on the same target quotient throughout.
+
+To finish \texttt{exists\_multMap}, one still needs the original
+smooth representatives and all their derivative identities in that
+Hilbert image, point-evaluation Sobolev bounds and resulting
+uniform growth, central finiteness, and preservation of cusp
+integrals under closed orbit span.  HCU8 supplies smooth-vector
+calculus, but it does not prove those global automorphic
+point-evaluation estimates.
+The remaining exact sources are:
+\begin{itemize}
+\item \texttt{SmoothVectorAutomorphicDerivatives};
+\item \texttt{SobolevBoundForSmoothVectors};
+\item \texttt{GelfandInvariantsActByScalarsHighestWeight};
+\item \texttt{CuspidalityPreservedInClosure}.
+\end{itemize}
+No full \(\mathrm{MMap}\), \(\mathrm{firesAt}\) or
+\(\mathrm{exists\_thetaMap}\) conclusion is claimed yet.
+
+Independently, one must still construct, on the same original \(R\),
+one \(io_i\) with
+\[
+ \exists io_i\ \forall t,\quad
+ \mathrm{IsIoW}\bigl(R.\theta,M_i,R.cV(i),
+       R.\omega P(i,t),R.ptP(i,t),\mathrm{Delta}(i),io_i\bigr).
+ \tag{HCU.58}
+\]
+The two intertwining laws, exact polynomial normalization and the
+quantifier order are unchanged.  Only such a simultaneous witness
+activates the stored \(\mathrm{OrZero}(\mathrm{PIoP}(i))\).
+No argument above supplies this polynomial map.
+The same-Bundle weak-data producer, geometric Hilbert reading,
+rational adjoints and tests, and original \(\mathrm{RowsHold0_3}\)
+remain separate.  The present proofs are pointwise and introduce
+no new family threshold.  Formal correctness is assumed as in the
+project; no new Lean replay is claimed.
+
+
+
+
+

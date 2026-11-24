@@ -1,0 +1,613 @@
+TYPE-II COMPLEMENTARY WEIGHTS AND PRIMITIVE DUAL TESTS — v0.4
+
+Pinned source: CocoSgt/riemann-hypothesis-lean,
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+Repository: /workspace/scratch/b992d67d27b8/alpoge-rh.
+This is a source-reading reconstruction, not a new Lean build or kernel replay.
+Exact inclusive declaration ranges and SHA-256 hashes are in cloud_provenance.json.
+The main fragment is cloud_section.tex. CL1–CL12 are stable claim identifiers.
+
+0. WHAT IS ACTUALLY PROVED HERE
+
+The source's CloudStep is not merely a statement about a large family. Its
+quantifiers demand a bounded integral dual test for EVERY coefficient array
+having a unit coordinate, and the test must vanish to a prescribed order at
+every other incoming edge. Testing each displayed vector separately would not
+be enough. This note explains how the source meets that stronger condition.
+
+We reconstruct the complementary family, its exact count and Weyl comparison,
+its preservation of primitivity modulo w, the contraction/detection argument,
+the logarithmic cost arithmetic, the passage from a structured flat test to a
+full dual test, and the explicit source-compatible constant 54. We also give
+a different short proof of the characteristic-zero operator-word bound.
+
+The remaining inputs are real representation/structured-polynomial results:
+the integral standard-monomial basis, the Weyl/dual-Weyl sandwich with its
+explicit exponent, and production of a constrained signed-chain test. Their
+locations and exact interfaces are stated in Section 9. Their names are not
+counted as human proofs. In particular this note does not prove the entire
+arithmetic window theorem or RH/GRH on its own.
+
+1. SETTING AND NUMERICAL HYPOTHESES
+
+Let O be the source DVR with fraction field K of characteristic zero. Its
+uniformizer w satisfies w^2=p. The residue field of the unramified base W has
+q=p^{n'} elements; do not confuse q with the residue cardinal of a different
+extension appearing elsewhere. Write k=m+1, T for the selected twists,
+N=|T|, and Kperp=k-r. Effective weights alternate between lambda^0_s and
+the negative reverse of lambda^0_s. The polynomial representation has rank
+d_V=prod_s D_k(lambda^0_s), since dual reversal preserves Weyl dimension.
+
+The source's exact context is UnramifiedQuadraticSetting, Hyps, FramesOK,
+WeightHyp, a Witt identification, and an edge basis at the standard target.
+It includes p>=13, r>=2, N_1^2<=rN, k>=N_1+3r, r<=Y,
+
+  C N_1^2 log(a) <= k,
+  256 k^2 N Y^2 <= p^{L_1-1},
+  C N k^2 log_p(a) <= D_p,
+  8(D_p+1) <= c_*,
+  C k^3 r^2 N Q^5 (c_*+ell)Y <= a,
+  ell = r N c0 + 2 r n' c'',  Q=p^{G'}.
+
+OrbitHyp and FramesOK additionally control the positions, gaps, cyclic
+identifications and parity of the chosen frames. We do not replace those by
+the displayed consequences: the flat-test input requires the full original
+frame hypotheses. For sufficiently large C, the inequalities imply
+a>=8k, a>=4N, a>=p, N>=1, and L=N k^2 log_p(a)>=1.
+
+The selected flat degrees are d_s=lambda^0_{s,1}-lambda^0_{s,2}, with d_s=0
+off T. WeightHyp gives a<=d_s<=2a on T, spread of the selected remainder
+at most c0, and spread of an unselected weight at most 2c''. These precise
+facts are used below. The remainder weight is lambda^rem=lambda^0-flat(d).
+At a selected twist it begins (lambda^0_2,lambda^0_2,lambda^0_3,...).
+
+The perfect integral pairing beta_lambda(x,T)=T(p^{A_lambda}x) between
+R_e(lambda) and R'_e(lambda) is established in the companion EL section.
+A_lambda is a signed integer. We never assume A_lambda>=0.
+
+2. THE FAMILY, COUNT, AND PRIMITIVITY [CL1–CL3]
+
+2.1. The exact complement.
+
+For each effective remainder weight subtract its last entry to obtain a
+partition nu. The integral standard-monomial input supplies polynomials b_e,
+monic for column-lexicographic order, whose leading exponent arrays e(a,t)
+are nonnegative integers with column sums nu_t. Their interlacing says
+
+  sum_{b<=a} e(b,j) <= sum_{b<a} e(b,l),  l<j.
+
+Array indices in this section are 0,...,k-1. At a selected even twist retain
+e(0,0)=nu_0. The column sum then gives e(a,0)=0 for a>0, while interlacing
+gives e(0,t)=0 for t>0. Deleting the first row and column gives the
+interlaced (k-1)-square array of shape (nu_1,...,nu_{k-1}). Conversely insert
+nu_0 in the top-left corner and zeros elsewhere in that row and column.
+Interlacing across the inserted column follows from nu_t<=nu_0.
+
+At a selected odd twist retain e(0,t)=0 for every t. The normalized odd
+partition has last entry zero, so its last column is zero. Delete its first
+row and last column, and invert by reinserting those zero row/column. This
+gives shape (nu_0,...,nu_{k-2}). Because the effective weight was the negative
+reverse, this shape is lambda^0_2 minus the reverse of the original tail.
+Adding a constant to all weights and taking dual reversal leave Weyl
+dimension unchanged. Thus both parity cases have count
+
+  D_{k-1}(lambda^0_2,...,lambda^0_k).
+
+At unselected twists no array restriction is imposed. Taking independent
+products in the disjoint blocks gives the exact n2 in (CL.1). The equality
+between the number of interlaced arrays and Weyl's product is part of the
+standard tableau/Gelfand–Tsetlin counting input, not proved anew here.
+
+2.2. The coordinate transport is compatible with multiplication.
+
+For an edge basis M_s the model identifies R_e(lambda) with the coefficient
+lattice by applying
+
+  C_lambda(v)=w^{A_lambda} (prod_s det(M_s)^{lambda_{s,k}})
+               blockAct(M_s)v.
+
+This is an isomorphism onto the integral tensor polynomial lattice; its
+inverse constructs h_i from the selected products b_i. It is valid for
+signed determinant powers. Weight additivity gives
+
+  C_{lambda+mu}(uv)=C_lambda(u) C_mu(v).
+
+The flat-coordinate identity is
+C_flat(Theta F)=Theta_0(subst F), where Theta_0 replaces the flat variables
+by a first-column entry (even twist) or signed maximal minor (odd twist).
+These are precisely tr_theta and transStep in the source. The identity is
+a matrix substitution identity, with the powers of w and determinants
+cancelled by A_{lambda+mu}=A_lambda+A_mu. The EL polynomial lattice model
+justifies the assertion that C_lambda(v) is integral when v lies in R_e.
+
+2.3. Why the product map is injective modulo w.
+
+At an even selected twist the flat generators are X_{c,0}. Thus the first
+column of the leading exponent of X^alpha b_e is alpha plus the fixed
+column (nu_0,0,...,0). It recovers alpha, and then e.
+
+At an odd selected twist the flat generator N_c is, up to sign, the maximal
+minor in the first k-1 columns with row c omitted. Its leading monomial has
+a 1 at (t,t) precisely when t<c, for t<k-1. The zero first row of e and
+interlacing imply inductively e(a,t)=0 for a<=t. Therefore the diagonal of
+the product's leading exponent recovers the tails sum_{c>t} alpha_c. These
+tails and the fixed total sum_c alpha_c=d_s recover every alpha_c; subtract
+the flat exponent to recover e. At an unselected twist d_s=0, so there is
+nothing to recover. All leading coefficients are units, including the
+minor signs, over every residue characteristic.
+
+Distinct leading monomials prove independence over the residue field: a
+nontrivial finite relation has a greatest leading monomial among its
+nonzero terms, which cannot cancel. Independent blocks tensor together.
+Equivalently, for multihomogeneous Q_i of degree d,
+
+  sum_i Theta_0(Q_i)b_i=0  implies every Q_i=0.
+
+Now suppose span_O(B_b) is a direct summand of the symbol coefficient ring,
+the B_b are independent, and subst(F_b)=B_b P after renaming variables,
+where P is integral with nonzero reduction. If U=sum c_{b,i}Theta(F_b)h_i
+were in wR_e, transport and reduce to get
+
+  sum_i Theta_0(Pbar sum_b cbar_{b,i} Bbar_b) bbar_i=0.
+
+Injectivity makes each parenthesized polynomial zero. Since the residue
+polynomial ring is a domain and Pbar!=0, sum_b c_{b,i}B_b lies in w times
+the ambient coefficient ring for every i. Saturation gives
+span(B) intersect w Ambient = w span(B). Independence of the B_b then
+forces every c_{b,i} in wO. This contradicts a unit coordinate. This proof
+works for EVERY primitive array, not just basis vectors. It also explains
+why merely independent symbols over K would be insufficient.
+
+2.4. The dimension inequality.
+
+Shift the selected tail to a dominant (k-1)-tuple mu in [0,c0]. If d>=a,
+Weyl's product factors as
+
+  D_k(d+mu_0,mu)=D_{k-1}(mu)
+                prod_{j=1}^{k-1}(d+mu_0-mu_{j-1}+j)/j.
+
+Each factor is at most (1+c0/a)(d+j)/j. For x=c0/a in [0,1/k],
+(1-kx)(1+x)^{k-1}<=1: on [0,1/k) the logarithmic derivative is
+-k/(1-kx)+(k-1)/(1+x)<0. This gives (CL.2), and then (CL.3) from the
+separate symbol-size bound. If 1-C_rNr^2k/Y<0, the final count is already
+automatic; multiplying a lower bound by that negative factor would be
+invalid. The proof separates those two cases.
+
+3. A SHORT PROOF OF THE OPERATOR-WORD BOUND [CL4]
+
+This is a derived simplification. It proves the source's OpBound through
+characteristic-zero highest weights rather than reproducing its quadric
+vanishing implementation. It invokes the standard complete-reducibility
+theorem for finite-dimensional rational representations of GL_k in
+characteristic zero. It does NOT assert complete reducibility over O or
+over the residue field. All coefficient bounds below are field statements.
+
+Let H_d be the homogeneous degree-d polynomials in k>=2 variables over a
+characteristic-zero field F, and let E_ab=X_a partial_b act on H_d. Put
+U_c=span_F{products of at most c operators E_ab}. Claim: if a subspace
+W of End(H_d) is closed under commutators with every E_ab and is spanned
+by simultaneous diagonal-weight vectors whose every weight coordinate
+is <=c, then W is contained in U_c.
+
+It suffices to prove this after algebraic closure; membership in a finite
+dimensional linear span descends by solving linear equations over F.
+The stated diagonal-weight spanning makes W stable under the diagonal
+torus. Commutator stability makes it stable under the exponentials of
+the nilpotent off-diagonal E_ab. These elementary unipotents and the
+torus generate GL_k, so W is a rational GL_k-submodule to which complete
+reducibility applies.
+Identify End(H_d), as a GL_k-module, with the bidegree-(d,d) polynomials
+in X and Y, with infinitesimal action
+
+  E_ab acts as X_a partial_{X_b} - Y_b partial_{Y_a}.
+
+This is the natural Sym^d(F^k) tensor Sym^d((F^k)^*) identification. Its
+highest vectors are exactly
+
+  X_1^j Y_k^j Q^{d-j},  0<=j<=d,  Q=sum_i X_iY_i.
+
+Here is a direct proof, including multiplicities. A highest vector is
+annihilated by E_ab for a<b. Exponentiating these locally nilpotent
+derivations says it is invariant under
+X_b -> X_b+tX_a, Y_a -> Y_a-tY_b. Invert X_1Y_k. For b>1 choose
+t=-X_b/X_1 in the (1,b) transformation, killing every X_b and changing
+only Y_1. The remaining X is (X_1,0,...,0). For 1<a<k choose the (a,k)
+transformation to kill Y_a; this does not disturb X, since X_a=0. The
+remaining Y is (Q/X_1,0,...,0,Y_k). A bihomogeneous polynomial evaluated
+there is a linear combination of
+X_1^d(Q/X_1)^bY_k^{d-b}=Q^b X_1^{d-b}Y_k^{d-b}, 0<=b<=d.
+These are polynomials before localization, whose injection into the
+localized ring proves the same identity globally. Conversely each is
+annihilated by all upper E_ab. Their diagonal weights j(e_1-e_k) are
+distinct, so every highest-weight space has dimension exactly one.
+
+Complete reducibility now says End(H_d) is the multiplicity-free direct
+sum of irreducible modules of highest weights j(e_1-e_k), 0<=j<=d.
+The space U_c is adjoint-stable: commuting E_ab past a product replaces
+one factor by a linear combination of E_ij and does not increase length.
+For j<=d the operator E_{1k}^j=X_1^j partial_k^j is nonzero, has highest
+weight j(e_1-e_k), and lies in U_c when j<=c. Thus U_c contains all
+irreducible summands with j<=c. Every summand in W has highest weight
+coordinate j<=c by the assumed coordinate-weight bound. Hence W<=U_c.
+The case k=1 is immediate: End(H_d) consists of scalars and the empty
+word is the identity. The case d=0 is also covered by j=0.
+
+Application to Fock contractions.
+
+At one twist, define A_{beta,s} on H_d by
+
+  <Theta(A_{beta,s}P),Theta Q>_F
+       = <Theta P . s,Theta Q . beta>_F.
+
+The restricted flat Fock form is nondegenerate, so this operator exists
+uniquely. For a standard rational basis this nondegeneracy also follows
+by positivity of the real coefficient Fock form; the determinant is a
+nonzero rational number and stays nonzero over every characteristic-zero
+field. The explicit Theta image is the first-row or first-column-minor
+flat representation, as in theta_Hd.
+
+Let R_ab=sum_t X_{a,t} partial_{b,t} be the row derivation. Fock adjointness
+is <R_ab P,Q>=<P,R_ba Q>, checked on monomials. The row rule under Theta
+is E_ab in the even case and d delta_ab-E_ba in the odd case. For the
+odd case this follows by differentiating cofactors, or from
+adj(gX)=adj(X)adj(g) on invertible matrices and then polynomial identity.
+The product rule and adjointness give
+
+  [T_ab,A_{beta,s}]=A_{beta,R_ab s}-A_{R_ba beta,s},
+
+where T_ab is the appropriate row rule. Therefore the span of these
+contractions is adjoint-stable under the E_ab in either parity.
+
+Every bideterminant of shape nu has exactly nu_0 minor factors, and each
+minor uses a given row at most once. It is a row-weight vector with all
+coordinates between 0 and nu_0. Such bideterminants span the remainder
+module. Thus A_{beta,s}, for row-weight vectors beta and s, has coordinate
+weights mu_s-mu_beta in the even case and the reverse in the odd case.
+Every coordinate is <=nu_0<=c0. The operator-word lemma gives length <=c0.
+Expand tensor products of beta and s: Fock factorizes across disjoint
+twists, so each term uses <=c0 letters at EACH selected twist, and none
+at unselected twists. A linear change of the flat variables preserves
+this filtration, because it conjugates each X_i partial_j to a linear
+combination of the same operators. Scalars introduced by the field and
+Fock normalizations are harmless for the K-linear operator span.
+
+The short proof uses integral standard-monomial spanning only to obtain
+the finite row-weight bound; all subsequent operator coefficients may
+have denominators. The later primitive normalization is legitimate
+because SgOp is a K-linear subspace. No integral coefficient conclusion
+has been silently extracted from complete reducibility.
+
+4. CARTAN MULTIPLICATION AND THE INTEGRAL SANDWICH [CL5–CL6]
+
+Cartan multiplication spans the integral dual-Weyl module of weight
+lambda+mu by products from weights lambda and mu. Given standard-monomial
+spanning by products of initial-column minors, this is elementary: a
+shape lambda+mu has the sum of the prescribed numbers of minors of each
+height. Partition the factors of each height into the lambda and mu
+groups. Each group is an allowed bideterminant of its shape. Tensoring
+over twists preserves spanning. Determinant twists and the w^{-A}
+normalization multiply because the weights add. This proves the precise
+Cartan-onto property used in RhoAtGOfPair; it is stronger than surjectivity
+only after tensoring with K.
+
+The remaining integral representation fact is the following one-position
+sandwich, with normalized Fock duality:
+
+  p^{binom(k,2) floor(log_p(h+k-1))} nabla_nu
+       <= Delta_nu <= nabla_nu,  h=nu_0,
+  Delta_nu and nabla_nu are mutually dual for normalized Fock pairing.
+
+The zero-spread case has exponent zero. Equivariance transports these
+lattices to arbitrary integral bases and opposite edges; tensoring sums
+the exponents. Consequently Psi=the inverse normalized-Fock map satisfies
+p^kappa Rbar <= Psi(R') <= Rbar, both at the edge and at vertices. This
+is the content of FormCoreSKXOf.formCoreGX_of and JetMatrixAlgebra. It is
+an integral assertion and is retained independently of Section 3.
+
+Work first on T alone. For i=0 (the selected full weight) and i=f (the
+flat weight), let kappa_i be the sum of these sandwich exponents. The
+source bounds each spread h by h+k<=a^2. Hence
+
+  floor(log_p(h+k-1)) <= 2 log_p a,
+  binom(k,2) <= k^2,
+  kappa_0+kappa_f <= 4 N k^2 log_p a = 4L.
+
+These bounds are deliberately the source's bounds. Replacing binom(k,2)
+by a tighter elementary estimate might improve 4 but is not used here.
+The precise selected full spread is aT_s+bT_s, the flat spread is d_s,
+and the source's numerical inequalities give the asserted a^2 bound.
+
+5. DETECTION AND PRIMITIVE NORMALIZATION [CL5]
+
+Let R_0,R_f and their normalized duals have perfect integral pairings
+beta_0,beta_f. On selected twists, write the opposite-edge lattices
+Rbar_0,Rbar_f,Rbar_rem. Assume the two Psi sandwiches from Section 4
+and integral Cartan spanning Rbar_0=span{y beta}. For beta in Rbar_rem put
+
+  Lambda_beta=p^{kappa_0} Psi_0^{-1} M_beta Psi_f,
+  beta_f(rho_beta u,T)=beta_0(u,Lambda_beta T).
+
+The sandwich and Cartan multiplication imply Lambda_beta R'_f<=R'_0;
+perfect duality then gives rho_beta R_0<=R_f. Suppose u in R_0 and every
+rho_beta u lies in w^{2(kappa_0+kappa_f)+1}R_f. For Z in R'_0, write
+Psi_0 Z=sum y_j beta_j. Set T_j=Psi_f^{-1}(p^{kappa_f}y_j), which lies in
+R'_f. Then
+
+  beta_f(rho_beta_j u,T_j)
+    =p^{kappa_0+kappa_f} beta_0(u,Psi_0^{-1}(y_j beta_j))
+
+is divisible by w^{2(kappa_0+kappa_f)+1}. Cancel p^{kappa_0+kappa_f} and
+sum to conclude beta_0(u,Z) in wO for all Z. Perfectness gives u in wR_0.
+
+Reinsert unselected tensor factors using the normalized integral dual
+basis of their edge lattice. If all contractions of a tensor are in w
+times the selected lattice, its basis expansion shows the tensor itself
+is divisible by w. Thus these factors do not increase kappa. At any
+other edge with the same target, their dual basis is bounded by
+w^{-M}H(target)^vee, M<=2rn'c''. Selected remainder vectors cost at most
+rNc0. This accounts for ell=rNc0+2rn'c''. The source's RhoAt hypotheses
+are exactly
+
+  rho R_0(e)<=R_f(e),
+  rho R_0(e')<=w^{-ell}R_f(e') for all incoming e',
+  rho H_0(target)<=p^{A_rem}w^{-ell}H_f(target),
+  rho(Theta F . s)=Theta F' with F' in the c0-word closure,
+  all rho u in w^{2kappa+1}R_f implies u in wR_0.
+
+The height comparisons follow from the maximal representation weight
+spread; no positivity of A_rem is needed. Source declarations rho_peel,
+ordMax_top and ordMax_spec justify the stated constants.
+
+For primitive U select rho U not in w^{2kappa+1}R_f. Since R_f is finite
+free, write rho U=w^nu y with 0<=nu<=2kappa and primitive y in R_f. Its flat
+preimage F1 remains in the K-linear word closure after division by w^nu.
+The normalized adjoint is
+
+  Lambda=w^{2(A_f-A_0)}rho^*=p^{-A_rem}rho^*.
+
+Indeed beta_0(U,Lambda T)=beta_f(rho U,T). Multiplying by
+c=w^{2kappa-nu} gives c beta_0(U,Lambda T)=p^kappa beta_f(y,T).
+Its edge integral mapping follows by perfectness. At the target, the
+p^{-A_rem} factor cancels exactly the p^{A_rem} in the third inclusion,
+giving a loss only of w^{-ell}. At other incoming edges the same
+normalized adjoint gives Lambda(w^jR'_f(e'))<=w^{j-ell}R'_0(e').
+
+6. THE FACTORIAL AND PROJECTION COSTS [CL7–CL8]
+
+From here onward v is normalized by v(p)=1, so v(w)=1/2. The misleadingly
+named source definition twiceValuationFactorialProduct is actually
+v_p(prod_s d_s!), with NO extra factor 2. Our formulas use its definition.
+
+For coefficient Fock pairing, <X^alpha,X^beta>=alpha! delta_{alpha,beta}.
+Put f=prod_s d_s! and kappa_fl=sum_s k floor(log_p d_s), with log_p(0)
+defined as 0 for this integer bound. Legendre's formula gives
+
+  v_p(d!)-sum_i v_p(alpha_i!)
+    =sum_{j>=1}(floor(d/p^j)-sum_i floor(alpha_i/p^j)).
+
+Each summand is in [0,k-1], and is zero for p^j>d. Thus it is at most
+k floor(log_p d). Summing by blocks proves p^{kappa_fl}alpha!/f integral.
+Consequently, if G is integral of multidegree d and H has coefficient
+valuation >=t, then
+
+  v(<G,H>) >= t+v_p(f)-kappa_fl.
+
+This proves the normalized Fock integrality used in the final value bound;
+it does not require an invariant subspace or a positive form.
+
+The normal-variable projector cost is explicit. With true-letter set Z,
+normal dimension Kperp, and the nested/disjoint cut sets Z_i, it is
+
+  D_no=sum_i binom(Kperp,2)
+        floor(log_p(2 sum_{x in Z_i} d_no(x)+Kperp-1)).
+
+The source has |Z|<=N and at most |Z|+J<=2N cut indices, since r>=1.
+The block decomposition gives d_no(x)<=2a. Under 4N<=a and k<=a,
+2 sum_Z d_no + Kperp-1 <=4Na+k<=a^2+a<=a^3. Each summand is at most
+3k^2 log_p a, hence D_no<=6L. For plane or normal monomial exponents
+with their prescribed block degrees, the factorial deficit is at most
+3Nr log_p a or 3N Kperp log_p a respectively (the same Legendre argument,
+using d<=2a<=a^3). Half of each deficit plus D_no is <=9L. This is the
+source's SizeAt constant 9, with its actual coarse estimates.
+
+Here is the selection argument below the PickAt wrapper. Define the
+weighted coefficient valuation
+
+  b(F)=min_alpha [v(F_alpha)+v_p(alpha!)/2].
+
+It satisfies b(F+G)>=min(b(F),b(G)). A finite complete family of
+projectors has F=sum_mu P_mu F, so some component has b(P_mu F)<=b(F).
+Choose one component successively at each cut. The projectors commute
+for the source's nested/disjoint cuts, so their product is a joint
+projector, self-adjoint for Fock, without any loss in this selected
+inequality. If each projector is integral after multiplication by
+p^{D_i} on the weighted coefficient lattice, the product is integral
+after p^{sum D_i}. The existence, commutation and individual integral
+exponents of those isotypic projectors are representation inputs; the
+selection and additive cost are proved by the displayed argument.
+
+For completeness, the cancellation that produces the scalar 9L bound
+can be written without the source's packaging. Start with a unit
+coefficient of G. Its digit/block decomposition has plane and normal
+exponents alpha_P,alpha_N and a factorial factorization
+
+  alpha! = C alpha_P! alpha_N! gamma_P gamma_N,
+
+where gamma_P,gamma_N are p-adic units. Write the valuations of the four
+factorials as V_total,V_C,V_P,V_N, so V_total=V_C+V_P+V_N<=v_p(f).
+Project the normal coefficient polynomial, select a coefficient indexed
+by nu attaining b, and then take its plane coefficient polynomial P_c.
+If U=v_p(nu!) and q2 is the selected coefficient valuation, then
+
+  q2+U/2 <= V_N/2,
+  b(P_c)=q3 <= q2+V_P/2.
+
+Choose z with v(z)=q3 (the source uses a coefficient times
+w^{v_p(alpha'!)} attaining the minimum). Then F2=z^{-1}P_c has b(F2)=0.
+The normal-test approximation input supplies an integral N0 and scalar
+cY with
+
+  v(cY)<=Nfact/2+D_no-U/2,
+
+where Nfact=v_p(prod_x d_no(x)!). Define k0=C cY nu! z. If
+Pfact=v_p(prod_x d_plane(x)!), the preceding inequalities imply
+
+  v(k0) <= v_p(f)-Pfact/2
+             +D_no+(Pfact-V_P)/2+(Nfact-V_N)/2
+         <= v_p(f)-n0+9L,  n0=Pfact/2.
+
+This is the substantive cancellation in pick_core/gram_exponent_arithmetic.
+It prevents the large factorial values from becoming the final loss.
+The approximation N0, the unit digit factors, and the structured
+membership of F2 are still inputs; Section 9 specifies them.
+
+7. THE FLAT VALUE CORE [CL9]
+
+Let the signed-chain datum have
+M_D=D_m+D_l+3k_p<=20L, E_E=D_m+D_l+2k_p<=M_D, and
+kappa_fl<=20L. The source's numerical estimate gives the constant 20.
+Its constrained Gram input applied to the normalized F2 produces Gp,R
+with integral Gp, coefficient valuation of R at least c_P-E_E, and
+
+  v(Bform(F2,phi(Gp+R))) <= E_E+k_p+n0=M_D+n0.
+
+The actual source additionally imposes YY(24,60) on Gp, multidegree
+conditions, and a lower weighted coefficient valuation on phi(Gp+R).
+Those extra conditions are needed for the structured symbol realization,
+even though the following scalar calculation uses only the displayed
+upper bound and error size.
+
+The selection from Section 6 gives k0 with
+v(k0)<=v_p(f)-n0+9L, and for every integral plane polynomial A of the
+right multidegree,
+
+  v(<G,asm(A,N0)>-k0 Bform(F2,A))
+        >=c_P+v_p(f)-kappa_fl.
+
+The assembly map asm just inserts the digit monomial and substitutes
+p-power monomials in disjoint plane and normal variables, so it preserves
+coefficient lower bounds. Apply the last inequality to A=phi(Gp+R) and
+remove the R contribution. Section 6 gives its Fock valuation at least
+c_P-E_E+v_p(f)-kappa_fl. Thus for H=asm(phi(Gp),N0),
+
+  <G,H>=M+E,
+  v(M)<=v_p(f)+29L,
+  v(E)>=c_P-20L+v_p(f)-kappa_fl.
+
+If c_P>69L, the error has strictly higher valuation than M, because
+kappa_fl<=20L. Ultrametricity then gives v(<G,H>)=v(M), not just a
+lower bound. Multiplying by p^{kappa_fl}/f yields an integral value y
+with v(y)<=49L. Therefore y divides p^{ceil(49L)}. Since L>=1,
+ceil(49L)<=50L. This is the actual bound in value_core, not a fresh
+assumption of bounded nonzero testing. The production of Gp,R is the
+separate Gram input.
+
+8. REALIZATION AND FINAL EXPONENT [CL10–CL11]
+
+MembAt expresses H as a finite sum of permitted one-sided symbols sigma_q.
+The degree estimate deletes summands irrelevant to the pairing, obtaining
+orders o_q<=tF<=t0+Nc0. The RealAt identity realizes each symbol by a
+dual test T_q with the same order bound, edge integrality, off-edge
+divisibility w^{c_P}, and
+
+  beta_f(Theta F1,sum_q T_q)=y+w^{c_P}z, z in O.
+
+This realization is the exact seam with the companion localizer section;
+we do not count it again as proved here. If yb=p^{D_X} and 2D_X<c_P,
+(y+w^{c_P}z)b=p^{D_X}(1+w^{c_P-2D_X}zb). The final factor is 1 modulo
+the maximal ideal, hence a unit. The realized flat value y' therefore
+still divides p^{D_X}, without increasing its exponent.
+
+Push T=sum T_q through the normalized adjoint Lambda of Section 5. It
+lies in R'_0 at the chosen edge, has target height <=tF+ell, and at
+every other incoming edge lies in w^{c_P-ell}R'_0. Since c_P=c_*+ell,
+this is exactly the requested off-edge order. The full pairing x is
+integral. Its identity c x=p^kappa y' and y'b'=p^{D_X} give
+
+  x(cb')=p^{kappa+D_X}.
+
+No division by c is needed; c need not be a unit. Consequently
+D1=kappa+D_X<=4L+50L=54L. The same tF, D_X and kappa bounds apply to
+every primitive coefficient array, although rho, F1 and T may depend on
+that array. Source and target order bounds also do not depend on it.
+
+The extraction of 54 follows explicit witness choices:
+  SizeStepAlt.sizeStep' uses C_Dn=9;
+  LeOfOneLeMul.restNum uses C_Dm=20;
+  proposition5_at_of_three_parts gives ceil((9+2*20)L)<=50L;
+  XiStepN_of_P, xiAt_of and restFlat_of preserve that exponent;
+  LogSizeBoundLe.restSize uses C_K=4;
+  test_bound_of_two_halves adds C_K and C_Df.
+This is marked a derived simplification because the top source theorem
+only exports existence of a constant, not the numeral 54. Increasing the
+unspecified global threshold C is necessary; no claim is made that 54 is
+the threshold for every other numerical inequality. With C>=54 and the
+original source thresholds, D1<=D_p and c_*>=8(D_p+1) imply all required
+strict inequalities, including 2D_X<c_P and c_P>69L.
+
+9. PRECISE REMAINING INPUTS AND NONCLAIMS [CL12]
+
+(a) Integral standard monomials. We use a monic basis indexed by the
+specified interlaced arrays, its integral bideterminant spanning, and
+the tableau count equal to Weyl dimension. These are sSBasis,
+standardMonomialSpanDomain and dGT_weylDim. We prove the selected-array
+bijections and the distinct-leading-term argument, not the entire
+straightening theorem. The EL section establishes the full coefficient
+lattice and its elementary weight bounds without needing this basis;
+that does not by itself supply the particular complementary family.
+
+(b) Integral normalized Fock duality and the explicit Weyl sandwich.
+The exact retained statement is in Section 4. Its source is
+ThetaLogCoordinates/SandwichModelDomains/FinalW.sandwichLocal and the
+Weyl-pairing/dual-inclusion results feeding FormCoreSKXOf. The source's
+construction of Psi and the scalar exponent estimates are unpacked;
+the integral sandwich theorem is not. Characteristic-zero complete
+reducibility used in Section 3 cannot replace this integral input.
+
+(c) Structured flat testing. The remaining construction is considerably
+more specific than 'a nonzero pairing exists'. It needs the following:
+  - MemAt for the c0-word closure of the actual symbols B*SPR: after
+    digit splitting and normal isotypic projection, every plane
+    coefficient belongs to the signed-chain space XX.
+  - Commuting isotypic projectors at the nested/disjoint normal cut sets,
+    self-adjoint for Fock and integral on the weighted coefficient
+    lattice after p^{D_no}; the explicit costs are those in Section 6.
+  - GaAt: digit factorial ratios gamma_P,gamma_N are units and their
+    diagonal actions and inverses admit binomial-polynomial
+    approximations modulo p^j of degree <=6j.
+  - NoAt: an integral normal polynomial N0 of its prescribed isotypic
+    weight approximates diag(gamma_N^{-1})(cY e(X^nu)) modulo p^{c_P},
+    with the exact cY bound of Section 6.
+  - ProjectionDerivativeEstimate(26,2,24,60): for every signed-chain
+    F2 in XX with b(F2)=0, and Hyp(26), c>4(D_m+D_l+3k_p), there are
+    Gp,R satisfying coefficient integrality, YY(24,60), the error
+    bound c-E_E, multidegree, the weighted lower bound, and the
+    pairing upper bound in Section 7. Bform is coefficient Fock with
+    multiplication of the coefficient at alpha by the unit ga(alpha).
+  - MembAt: the assembled H=asm(phi(Gp),N0) is a finite sum of the
+    exact OneSidedLemma4Element symbols, so it is covered by the
+    localizer realization. The numeric bounds include
+    D_m+D_l+3k_p<=20L and kappa_fl<=20L; the factorial part is proved
+    here, while the frame-chain geometric estimate is retained.
+
+These are supplied by the pinned Lean development, but their substantive
+polynomial/representation proofs are not fully reproduced here. Precise
+source targets are PickDefs, PickCore, GramExponentArithmetic,
+TwistedSubstitution/JointEIntList, Proposition5Gram,
+Lemma5aAt.ProjectionDerivativeEstimate, and the closed DiagonalSupport
+and PlaneGram modules. Merely invoking restNS or restFlat is not counted
+as closing them. Our valuation/core proof starts from their explicit
+quantitative outputs and shows exactly why the final cost is logarithmic.
+
+(d) Symbol construction and dimension. The companion SY section treats
+SPtrue, the primitive polynomial P and the localizer algebra. Its
+remaining path-generator/span and dimension estimate are shared inputs
+to (CL.3), not an extra proof in this note. The finite-place lattice
+comparisons and perfect duality used above are in the companion EL
+section. JR algebra and the Smith tail-to-index proof from v0.3 are not
+rederived here.
+
+The common use of these local ingredients in the RH and Dirichlet-GRH
+branches does not change their quantifiers or constants. This note
+neither asserts a new formal theorem in Lean nor silently replaces a
+source condition by a more convenient one.

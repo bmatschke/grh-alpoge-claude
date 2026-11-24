@@ -1,0 +1,241 @@
+CENTERED CHARACTER SUMS — CC1–CC20
+Version 0.21, 2026-11-22
+Pinned source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+STATUS AND PURPOSE
+
+This component supplies the actual QH.thin and UpperTheory.Top.ThinH
+implications, with their real-zero exclusion and host RealBox assumptions
+retained. It proves the analytic inputs used in those implications,
+including the primitive functional equation, the zero window and zero-free
+estimates, the explicit formula, and the exact principal and nonprincipal
+centerings. It does not prove RH or GRH, and it does not infer the source's
+simultaneous PairEx or relative progression theorem from thinning.
+
+The full mathematical arguments are in main.tex, paragraphs CC1–CC20.
+Each paragraph has its own exact SHA-256 and source declaration ranges in
+provenance.json and source_locators.txt. This report explains the choices,
+quantifier discipline, and current connection to the larger reconstruction.
+
+1. THE ACTUAL FUNCTIONS
+
+For a character chi modulo N, extend chi by zero at nonunits and put
+  delta_chi = 1 if chi is principal, 0 otherwise;
+  psi0(chi,u) = sum_{1<=n<=floor(u)} Lambda(n) chi(n) - delta_chi u.
+The primitive principal case has N=1. This distinction matters: one cannot
+use the zeta principal centering for an imprimitive principal character
+without accounting for its deleted Euler factors.
+
+For nonprincipal chi the centered function is
+  G_chi(y) = sum_{n<=floor(y)} Lambda(n)chi(n)(y/n-1)
+             + y L'_chi(1)/L_chi(1).
+For the primitive principal character it is
+  G_1(y) = sum_{n<=floor(y)} Lambda(n)(y/n-1)
+             - y(log y-1-gamma).
+The source G0 chooses between these cases. On the actual summation range
+the max(y/n-1,0) in An.gChi equals y/n-1; therefore these are the same
+functions, with exactly the same logarithmic-derivative sign and constant.
+
+2. ANALYTIC INPUTS: CC1–CC8
+
+CC1 derives the primitive completion directly. The finite character Fourier
+transform is tau(chi) conjugate(chi(k)); primitivity forces vanishing at
+nonunit k, and finite Parseval gives |tau(chi)|=sqrt(N). Gaussian
+periodization gives the theta transformation and its factor
+tau(chi)/(i^a sqrt(N)), where chi(-1)=(-1)^a. Mellin integration then proves
+the functional equation. The principal case separates the theta constant
+and has the two usual completed poles. The DLMF reference records the
+normalization; it is not used in place of the derivation.
+
+CC2 does not assume a global completed Hadamard product. Periodic bounded
+character sums, four mean-zero periodic primitives, and integration by
+parts give polynomial growth on a strip wide enough for the disks in CC3.
+Euler products give a fixed nonzero lower bound on the line Re(s)=2 and
+the exact von Mangoldt logarithmic derivative.
+
+CC3 applies the finite disk lemma already proved in QR15. Jensen controls
+the number of zeros in a fixed smaller disk; a finite Blaschke product
+removes those zeros, and the logarithm of the remaining zero-free function
+has bounded derivative on a still smaller disk. This proves both the
+height-radius-one count (|Im rho-t|<=1) and the local logarithmic-derivative formula.
+Every disk remains inside the strip proved in CC2, and every radius gap
+is a fixed positive number.
+
+CC4 separates boundary issues from the later zero-free strip. QW14 gives
+nonprincipal nonvanishing at one. The alternating zeta series excludes
+principal real zeros in (0,1). The elementary trigonometric polynomial
+3+4 cos(theta)+cos(2theta) proves nonvanishing on Re(s)=1 at nonzero height.
+The functional equation then identifies the simple zero at the origin for
+a nonprincipal even primitive character; no other zero occurs in the
+left strip used for the contour.
+
+CC5 reuses the numerical positivity contradictions of QR17–QR18 after
+checking their analytic premises for actual Dirichlet characters. This
+does not assume a Dirichlet LFam instance. The output is the usual narrow
+zero-free region with at most one simple real exception at a fixed
+modulus. If a real nonprincipal character has no real zero in
+(1-c0,1), the exception is excluded and
+  beta <= 1 - c/(lambda+log(|gamma|+3))
+for lambda>=max(1,log N). The constant c depends only on c0. Uniform
+comparability of the two logarithmic denominators and a fixed shrinkage
+of b give the literal closed-strip zFRDirichlet statement. Taking c<=1
+also covers Re(rho)<=0 automatically; CC4 excludes Re(rho)>=1. Thus the
+actual every-zero pt_zero_free interface is obtained.
+
+CC6 reflects rho for chi to 1-rho for the inverse primitive character.
+The same exceptional-zero exclusion applies to that inverse. Hence low
+zeros also stay a controlled distance from zero. This is essential:
+estimating u^rho alone would not control the denominator rho in the
+explicit formula.
+
+CC7 sums all reciprocal zero weights, with multiplicity:
+  sum_{|Im rho|<T} m_rho/|rho| <= C2(lambda+log T)^2.
+Low zeros use the reflected lower bound on Re(rho); higher zeros are
+grouped in unit-height intervals and summed with weights 1/j. C2 is
+allowed to depend on the fixed exclusion c0.
+
+CC8 proves the literal ExplicitFormulaWith bound:
+  |psi0(chi,u)+sum_{|Im rho|<T} m_rho u^rho/rho|
+  <= C7 [u log^2(NuT)/T + log(Nu)
+          + sum_{|Im rho|<1} m_rho/|rho|],  2<=T<=u.
+
+The proof keeps full floor endpoints, including integer u. It chooses
+upper and lower contour heights separately in [T,T+1], avoiding zero
+ordinates by a reciprocal-logarithmic distance. The local logarithmic
+derivative controls the horizontal sides. Reflection to Re(s)=3/2 and
+a direct gamma logarithmic-derivative bound control the left side
+Re(s)=-1/2. The pole at one gives the main term; nontrivial zeros have the
+minus sign. The residue at zero is b0-e0 log u, and b0 is bounded by the
+same displayed low-zero reciprocal sum and O(log(N+2)). Finally the good
+heights are changed back to the source's strict |Im rho|<T convention.
+No unbounded constant at zero is silently dropped.
+
+3. CONDUCTOR-SENSITIVE THINNING: CC9–CC10
+
+Choose T=exp(sqrt(log u)), before making any conductor-dependent choice.
+For u>=e, this lies between 2 and u. The zero-free region, the reciprocal
+zero sum, and the explicit formula then give
+  |psi0(chi,u)|
+  <= C u (log u+lambda)^2
+       exp[-c log u/(lambda+sqrt(log u))].
+C and c are chosen from c0 before N, chi, lambda and u. The displayed
+real-zero exclusion is still a hypothesis. Nonreal and principal
+characters require no such extra condition. This is the precise
+QH.psi_thin quantifier order.
+
+4. THE EXACT CENTERINGS: CC11–CC14
+
+A fixed modulus has finitely many characters. Nonvanishing at one supplies
+a positive real-zero margin for that finite collection, so the previous
+estimate yields psi0=O_chi(u/log^2 u) for each fixed character.
+Imprimitive Euler-factor deletion contributes only O_N(log u).
+Consequently psi0/u^2 is absolutely integrable on [1,infinity).
+
+For a nonprincipal character, finite Abel summation and this integrability
+show that sum Lambda(n)chi(n)/n converges. Dominated convergence in the
+Euler logarithmic derivative identifies its sum as -L'(1)/L(1).
+This is convergence of the series, not absolute convergence of the series.
+Abel summation at finite y then gives its exact centered tail integral.
+
+For the primitive principal character, the Laurent expansion
+zeta(s)=1/(s-1)+gamma+O(s-1) gives
+  integral_1^infinity (psi(u)-u)/u^2 du = -1-gamma.
+The finite integral identity gives exactly the principal centered function
+above, including the otherwise easy-to-miss "-1" in the constant.
+
+Thus in both primitive cases,
+  G0(chi,y) = -y integral_y^infinity psi0(chi,u)/u^2 du, y>=1.
+This proves QH.g_integral and identifies An.gChi on the same actual
+arguments. The proof uses only fixed-character convergence and does not
+borrow a uniform Siegel–Walfisz theorem to justify the centerings.
+
+5. A SHORT UNIFORM TAIL ARGUMENT: CC15–CC16
+
+Assume
+  lambda <= A x^(eps/5) log^2 x,
+  y >= exp(x^(eps/3))/3,
+with positive fixed eps,A and x sufficiently large.
+Writing V=log y and u=exp(v), we have V>=x^(eps/3)/2. Uniformly for v>=V,
+  lambda <= v^(61/100).
+The reason is the strict exponent inequality 61/300>1/5; the spare power
+x^(eps/300) absorbs log^2 x and the fixed constants. Therefore
+  (v+lambda)^2 exp[-c v/(lambda+sqrt(v))]
+  <= 4v^2 exp[-(c/2) v^(39/100)].
+Factor half the exponential at V. The remaining integral is a fixed finite
+constant, while the extracted exponent is at least a fixed multiple of
+x^(13eps/100). The strict gap
+  13/100 - 1/8 = 1/200
+absorbs every prescribed multiplier c' and the fixed integral constant.
+
+Combining this estimate with the exact tail identity gives
+  |G0(chi,y)| <= y exp[-c' x^(eps/8)]
+simultaneously for every y above the cutoff and every primitive character
+satisfying log N<=A x^(eps/5) log^2 x and NoExc(c0).
+There is one threshold depending only on eps,A,c',c0. This is QH.thin.
+
+6. INSTALLING THE SAME-HOST STATEMENT: CC17–CC19
+
+A primitive real character has odd conductor exponents at most 1, and
+2-adic exponent at most 3. For odd p the principal-unit kernel is a
+p-group, so its image in {+1,-1} is trivial. At 2, every unit congruent to
+1 mod 8 is a square; the proof lifts an odd square root one binary digit
+at a time. The Chinese remainder theorem and primitivity give the
+source's actual real_cond divisibility conclusion.
+
+For a fixed bound B0, continuity and nonprincipal nonvanishing at one
+give one common positive zero-free interval for all characters modulo
+N<=B0. Neither reality nor primitivity is needed in this bounded-modulus
+small_zeros statement.
+
+Now take the actual supplied host with condN=QS*q*d and bounded odd part
+of QS. Every primitive host character has conductor dividing condN.
+If it is real and involves q or d, the supplied RealBox gives its zero
+exclusion with width 1/400. Otherwise its conductor divides 8*oddPart(QS)
+and is bounded by 8*floor(B); the bounded-modulus result supplies its
+exclusion. Choose the smaller of these two fixed widths and apply QH.thin
+with A=2 and c'=1. The exact function identification then gives ThinH with
+outer constant 1.
+
+This supplies the thinning premise in HC9. It does not construct a host
+with RealBox, nor does it weaken the original 0<eps<1/52 requirement of
+ThinH, even though the analytic thinning argument itself allows eps>0.
+
+7. A FURTHER CONSEQUENCE: CC20
+
+The exact integral identity and the finite ramp formula give local
+absolute continuity and, away from integers,
+  G0'(y)=psi0(chi,y)/y+G0(chi,y)/y.
+The right derivative uses the full floor convention at integers.
+The same pointwise majorant and thinning estimate, with a slightly
+stronger prescribed exponential, show that for any b>0,
+  |G0(chi,y2)-G0(chi,y1)|
+  <= (y2-y1) exp[-b x^(eps/8)]
+above the same exponential cutoff. This is an additional human
+consequence, distinguished in the ledger from literal source endpoints.
+
+It must not be substituted for the source's square-root estimates on
+the earlier polynomial-height interval [Y,Y^A]. The cutoff scales and
+quantifiers are different.
+
+8. REMAINING FRONTIER AND VERIFICATION LIMITS
+
+Still open in this reconstruction:
+* the actual simultaneous PairEx choice and its Jacobi-twist mean-square,
+  exceptional-character density and twisted zero-box suppliers;
+* the relative prime-progression theorem with its exceptional main term
+  and uniform polynomial-threshold error;
+* construction of RealBox on the actual selected host, together with the
+  independent cohomological, gain-to-prime-sum and final-parameter joins.
+
+The source map records exact ranges for these remaining declarations.
+The simpler late-cutoff thinning theorem is no longer a missing supplier
+once its stated RealBox hypothesis is provided.
+
+The build_provenance.py script reads immutable Git objects and verifies
+any materialized checkout file against the same pinned blob. It hashes
+all complete files, declaration ranges, proof paragraphs and reports.
+Independent reviews are recorded against the exact final paragraph
+hashes. These are human proof and provenance checks, not a full Lean
+build or independent kernel replay. No new PDF is required for this
+component.

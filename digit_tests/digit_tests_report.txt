@@ -1,0 +1,517 @@
+DIGIT FACTORIALS, NORMAL TESTS, AND ADMISSIBLE ASSEMBLY — v0.5
+
+Pinned source: CocoSgt/riemann-hypothesis-lean,
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+This note is a human reconstruction with an explicitly marked alternative
+proof. It does not claim a Lean build or kernel replay.
+
+1. A FINITE PRODUCT PROOF OF THE DIGIT-FACTORIAL APPROXIMATION [DT1–DT4]
+
+This is a derived simplification of the source's DigAbs/GaAt ingredient.
+It gives a stronger degree bound than the source interface requires. None
+of the later constants are reduced on that account in this version.
+
+Theorem. Let p be any prime. For finitely many indices v, let g_v>=0,
+P_v=p^{g_v}, and 0<=rho_v<P_v. For b=(b_v) in N^V put
+
+  Gamma(b)=prod_v (rho_v+P_v b_v)! /
+                    (rho_v! b_v! (P_v!)^{b_v}).
+
+Gamma(b) is a p-adic unit. For each integer c>=1 and epsilon in {1,-1},
+there is a finite rational polynomial Q(b), written in the multivariate
+binomial basis with coefficients in Z_(p), such that
+
+  total degree Q <= 2(c-1),
+  v_p(Gamma(b)^epsilon-Q(b)) >= c for every b in N^V.
+
+For c=0, Q=0 suffices. The source asks for degree <=4c in DigAbs and
+<=6c in GaAt, under p>=5. The theorem implies those statements, and
+continues to hold at p=2,3. This stronger scope is a human deduction,
+not an assertion about what the released Lean theorem exports.
+
+1.1. Integer-valued ordered sums [DT1].
+
+For positive integers t_1,...,t_m define
+
+  S_t(b)=sum_{0<=u_1<...<u_m<b} u_1^{t_1}...u_m^{t_m}.
+
+Write T=sum t_i. S_t is a rational polynomial in b of degree at most
+T+m, integer-valued on N. Consequently its expansion in binom(b,j)
+has integer coefficients. To prove this without a summation formula,
+use S_empty=1 and
+
+  S_(t_1,...,t_m)(b)
+     =sum_{u=0}^{b-1} u^{t_m} S_(t_1,...,t_(m-1))(u).
+
+Products of integer-valued polynomials remain integer-valued. Every
+rational polynomial R of degree d that takes integer values on N has
+Newton expansion R(b)=sum_{j=0}^d Delta^j R(0) binom(b,j), and the
+coefficients are integers because they are finite integer combinations
+of R(0),...,R(j). Finally
+
+  sum_{u=0}^{b-1} binom(u,j)=binom(b,j+1).
+
+These statements prove the induction and the degree bound T+m. As
+every t_i>=1, m<=T, so degree S_t<=2T. The same argument works with
+Z_(p) instead of Z. No denominator arising from Faulhaber polynomials
+is ever estimated separately; the integral binomial basis is decisive.
+
+1.2. A filtered product lemma [DT2].
+
+Suppose F(u)=1+sum_{t>=1} a_t u^t, where a_t lies in p^t Z_(p).
+For an infinite series this statement is interpreted at finite p-adic
+precision: modulo p^c, only t<c is retained. For each b in N consider
+
+  C_F(b)=prod_{u=0}^{b-1} F(u).
+
+Expanding by the occupied positions gives, at total selected degree T,
+the finite sum over positive compositions (t_1,...,t_m) of T of
+
+  (a_(t_1)...a_(t_m)) S_(t_1,...,t_m)(b).
+
+Each coefficient product is in p^T Z_(p), and each ordered-sum polynomial
+has degree <=2T with integral binomial coefficients. Discarding all
+T>=c therefore gives a universal polynomial approximation modulo p^c
+of degree <=2(c-1), with binomial coefficients in Z_(p).
+
+There is no uniform-in-b convergence issue. For each fixed b the product
+contains b factors, and every discarded summand is divisible by p^c.
+The finitely many retained ordered sums produce one polynomial valid
+for all b. This distinguishes the pointwise finite expansion from its
+universal polynomial expression.
+
+The construction respects a useful filtration: its contribution of
+grade T has degree <=2T and binomial coefficients in p^T Z_(p).
+Products of finitely many such filtered expressions have the same
+property, keeping only total grade <c. This holds also for independent
+variables: multiply their binomial polynomials and add their grades
+and total degrees.
+
+If F is a finite product of factors (1+q u) with q in p Z_(p), its
+inverse has a finite-precision expansion with coefficient of u^t in
+p^t Z_(p), by the geometric series. Hence the same argument applies
+to C_F(b)^{-1}. No appeal to an infinite-product analytic theorem is
+needed: work throughout in Z_(p)/p^c Z_(p).
+
+1.3. Exact factorial factorization [DT3].
+
+Let U(n)=prod_{1<=i<=n,p does not divide i} i. Repeatedly remove
+multiples of p from (p^g b)!. This gives the exact identity
+
+  (p^g b)! = p^{b(p^g-1)/(p-1)} b! prod_(l=1)^g U(p^l b).
+
+Apply the same identity at b=1 and divide. With P=p^g,
+
+  Gamma_(P,rho)(b)
+    = binom(Pb+rho,rho) prod_(l=1)^g U(p^l b)/U(p^l)^b.
+
+Every displayed quotient has a product expression in p-adic units:
+
+  U(p^l b)/U(p^l)^b
+    =prod_(u=0)^(b-1) prod_(1<=a<=p^l,p does not divide a)
+          (1+p^l u/a),
+
+  binom(Pb+rho,rho)=prod_(i=1)^rho (1+Pb/i).
+
+Here v_p(p^l/a)=l>=1. Also i<P implies v_p(P/i)>=1.
+This proves unitness, indeed Gamma_(P,rho)(b)=1 modulo p.
+When g=0, P=1 and rho=0, and Gamma_(1,0)(b)=1 exactly.
+
+1.4. Complete approximation proof [DT4].
+
+For each l, the inner product in u has coefficient at u^t in
+p^{lt} Z_(p), hence in p^t Z_(p). Apply the filtered product lemma
+to the quotient U(p^l b)/U(p^l)^b or its inverse. The extra factor
+binom(Pb+rho,rho), or its inverse, has coefficient at b^t in
+p^t Z_(p), and thus has the same filtration with the better degree
+bound t. Multiply the finitely many expressions and discard total
+grade >=c. Grade T has degree <=2T and p^T-integral binomial
+coefficients. The final degree is <=2(c-1).
+
+Repeat for the finite index set V, multiply, and truncate by the sum
+of the grades. This proves the full multivariate theorem with total
+degree independent of |V|, all g_v and all rho_v. It is essential to
+truncate by TOTAL grade, not to retain degree 2(c-1) separately in
+every variable and then multiply without truncating.
+
+2. SOURCE INTERFACE AND OPERATOR INTERPRETATION [DT5]
+
+The source's gamR is exactly Gamma_(P,rho); gamPl and gamNo are its
+products over the plane and normal variables. Its cstOf is
+
+  C_rho=prod_v rho_v! prod_x (P_x!)^(dPl_x+dNo_x).
+
+On a fixed digit class alpha_v=rho_v+P_v beta_v, the coefficient
+Fock factorial factors exactly as
+
+  alpha! = C_rho beta_Pl! beta_No!
+               Gamma_Pl(beta_Pl) Gamma_No(beta_No).
+
+Therefore the original Fock pairing becomes the source's twisted
+plane/normal pairing after digit splitting. This is a coefficientwise
+identity; disjoint digit classes do not pair, because the coefficient
+Fock form is diagonal in monomials.
+
+Every rational coefficient in Z_(p) maps to O: denominators prime to
+p are units in the DVR. Thus the approximation above supplies exactly
+the coefficient functions required by DigAbs and GaAt. In particular
+the source unit function ga may be chosen to be Gamma_Pl itself.
+
+For a multiindex m, divided differentiation satisfies
+
+  X^m partial^[m] X^alpha = prod_v binom(alpha_v,m_v) X^alpha.
+
+Here partial^[m]=prod_v partial_v^(m_v)/(m_v!). Hence a binomial
+polynomial in the exponent vector is the diagonal action of a finite
+sum of operators X^m partial^[m]. The total number of derivatives is
+|m|. The same operator uses |m| multiplications, and preserves every
+monomial exponent after the two operations are combined.
+
+This proves, directly, the source's diagK_binomCombF identity. It
+explains why polynomial degree controls the representation-weight
+budget of a digit correction. The representation estimate converting
+that operator degree to a highest-weight shift is a separate lemma;
+no integral spectral-projector estimate is inferred just from this
+identity.
+
+3. THE HIGHEST-WEIGHT COST OF A DIAGONAL CORRECTION [DT6]
+
+For a subset S of vector/covector letters, write lambda_1,S(F) for
+the largest first coordinate of a highest weight in the rational
+GL_k-submodule generated by F. This is the source's lam1S, expressed
+through its characteristic-zero isotypic interpretation. The value
+for F=0 is -infinity. We use the standard characteristic-zero weight
+theory: a constituent of dominant highest weight lambda has every
+coordinate of every weight <=lambda_1. This is a statement about
+finite-dimensional rational modules over the fraction field.
+
+If Q(alpha) is a binomial polynomial of total degree d, then
+
+  lambda_1,S(diag(Q)F) <= lambda_1,S(F)+d.
+
+Proof. Let E_v=X_v partial_v. The operator
+X^m partial^[m]=prod_v binom(E_v,m_v) is a polynomial of total degree
+|m| in the E_v. Under conjugation by GL_k on the indicated letters,
+an E_v belonging to a vector or covector letter lies in a copy of
+End(K^k) or End((K^k)^*). All its torus-weight coordinates are in
+{-1,0,1}. An E_v on a letter outside S is invariant. Thus the GL_k
+span of a product of at most d such operators has every weight
+coordinate <=d. Apply this operator module to the module generated
+by F. Every weight coordinate in the resulting tensor product is
+at most lambda_1,S(F)+d; hence the first coordinate of each of its
+highest weights is at most that value. Taking the sum of the
+operators proves the assertion. Division by m! occurs only in this
+fraction-field weight argument; coefficient integrality of the
+operator is already proved by its binomial eigenvalues.
+
+This proof works for signed letters and arbitrary subsets S. It does
+not assert integral decomposition into isotypic summands. Together
+with DT4 it gives a shift <=2(c-1) for the factorial correction at
+precision c>=1. In applying the source interfaces we retain their
+larger allowance 4c.
+
+4. CONSTRUCTING THE NORMAL TEST [DT7]
+
+Fix the normal multidegree dNo and its selected joint isotypic
+projector e. The exact projector properties needed are: Fock
+self-adjointness, preservation of dNo, image of type ka_j,u at every
+nested/disjoint cut, and
+
+  p^D e(BB) subset BB,
+  D=sum_(j,u) binom(K,2) floor(log_p(2 degIn(dNo,NSet_(j,u))+K-1)).
+
+Here BB is the weighted coefficient lattice b(F)>=0, where
+
+  b(F)=min_alpha (v(F_alpha)+v_p(alpha!)/2), v(p)=1.
+
+These projector properties are supplied by the explicit denominator
+argument and its Fock specialization in IW/PG. In this section w^2=p,
+as in the actual local coefficient setting.
+
+Let nu have multidegree dNo, put
+
+  FNo=v_p(prod_x dNo_x!), U=v_p(nu!),
+  cY=w^FNo p^D w^(-U), Y=cY e(X^nu).
+
+First w^(-U)X^nu belongs to BB. Apply p^D e, and then multiply by
+w^FNo. For every exponent beta of this multidegree,
+v_p(beta!)<=FNo because beta! divides prod_x dNo_x!.
+The resulting polynomial Y therefore has integral coefficients.
+It lies in the prescribed joint types and
+
+  v(cY)=FNo/2+D-U/2.
+
+Use DT4 to approximate Gamma_No(beta)^(-1) modulo p^c by a binomial
+polynomial Q(beta) of degree <=2(c-1), for c>=1, and put
+
+  N0=diag(Q)Y.
+
+Then N0 is integral, has the same multidegree, and
+
+  N0-diag(Gamma_No^(-1))(cY e(X^nu)) has coefficient valuation >=c.
+
+DT6 gives, at every normal cut,
+
+  lambda_1(N0)<=ka_(j,u),1+2(c-1)<=ka_(j,u),1+4c.
+
+For c=0 one may choose N0=0; its difference from the integral unit
+correction of Y has valuation >=0. This proves NoAt with the exact
+source scalar bound. In particular NoAt is no longer an independent
+approximation input once IW/PG projector properties are supplied.
+
+5. WEIGHTED COEFFICIENT SELECTION AND PickAt [DT8]
+
+Start with a primitive integral polynomial G of the prescribed
+multidegree d. The frame's true-letter indexing is a bijection onto
+the selected positions modulo n'; plane and normal coordinates are
+disjoint. At every coordinate use the unique Euclidean division
+
+  alpha_v=rho_v+P_v beta_v, 0<=rho_v<P_v.
+
+Choose a unit coefficient of G, with exponent alpha0. Its digit and
+block class gives a two-block polynomial H(A,B), with plane variables
+A and normal variables B. The coefficient indexed by (betaP0,betaN0)
+is the original unit. This is the source's levImg. Its reconstruction
+map is asm(A,N)=X^rho upPl(A) upNo(N). Distinct digit classes have
+disjoint monomial supports, so the Fock identity in DT5 is exact.
+
+Write VP=v_p(betaP0!), VN=v_p(betaN0!), VC=v_p(C_rho).
+The normal coefficient y(B) at betaP0 has b(y)<=VN/2. Since the finite
+complete family of joint projectors sums to the identity and b of a
+sum is at least the minimum b of its terms, one joint projector e
+satisfies b(e y)<=b(y). The source's cuts are nested or disjoint;
+their projectors commute, so the selected composition retains the
+joint-type and self-adjointness properties used in DT7.
+
+Choose a monomial nu attaining b(e y), and let Pc(A) be the coefficient
+of B^nu in (1 tensor e)H. If U=v_p(nu!), then
+
+  b(Pc)+U/2 <= (VP+VN)/2.
+
+Indeed, the coefficient of Pc at betaP0 is the selected coefficient
+of e y, so the displayed inequality is the definition of b applied
+twice. Pc is nonzero. If beta3 attains b(Pc), choose
+
+  z=(Pc)_beta3 w^{v_p(beta3!)}, F2=z^(-1)Pc.
+
+Then v(z)=b(Pc) and b(F2)=0. The source's separate MemAt hypothesis
+places Pc, and hence F2, in the signed-chain space XX. This membership
+does not follow from unit-coefficient selection alone; the exact
+upstream boundary is recorded in Section 8 below.
+
+Construct N0,cY by DT7 and put
+
+  k0=C_rho cY nu! z.
+
+Let FPl=v_p(prod_x dPl_x!), FNo=v_p(prod_x dNo_x!), and
+Ftot=v_p(prod_s d_s!). The scalar cost is
+
+  v(k0)<=VC+FNo/2+D+(VP+VN)/2.
+
+The unit factorial identity gives VC+VP+VN=v_p(alpha0!)<=Ftot.
+Thus, if the explicit size budget is
+
+  D+(FPl-VP)/2+(FNo-VN)/2 <= Dn,
+
+then
+
+  v(k0)<=Ftot-FPl/2+Dn.
+
+This is the source's PickAt scalar inequality, with n0=FPl/2. The
+source choices already reconstructed in CL8 give Dn<=9Nk^2 log_p(a).
+
+For any integral plane polynomial A of multidegree dPl, Fock
+self-adjointness of e and DT5 give the exact identity for the ideal
+normal test Nex=diag(Gamma_No^(-1))(cY e(X^nu)):
+
+  <G,asm(A,Nex)>=C_rho cY nu! <Pc,diag(Gamma_Pl)A>
+                     =k0 Bform(F2,A).
+
+Replacing Nex by N0 introduces a polynomial with coefficient
+valuation >=c. The normalized Fock integrality from CL7 therefore
+gives
+
+  v(<G,asm(A,N0)>-k0 Bform(F2,A)) >=c+Ftot-kappa_fl.
+
+All other clauses of PickAt are the block-degree equations, the
+joint-type data, b(F2)=0, and the supplied signed-chain membership.
+Thus the only upstream content not proved by this coefficient
+selection is the correct choice of the signed-chain datum and MemAt
+for the actual word closure; these are not silently discarded.
+
+6. INTEGRAL GLUING OF SEGMENT CONDITIONS [DT9]
+
+This section supplies the elementary tensor algebra used in DecAt.
+Let L_j be finite free coefficient lattices in polynomial rings on
+disjoint sets of variables. Let X_j be a saturated submodule of L_j.
+Over a DVR, L_j/X_j is torsion-free and hence free, so a basis of X_j
+extends to a basis of L_j. In the resulting product basis,
+
+  intersection_j (X_j tensor tensor_(i!=j) L_i) = tensor_j X_j.
+
+Indeed the left side permits a basis tensor precisely when its factor
+at every j belongs to the chosen X_j basis. This proves ATL with
+integral coefficients, without any integral isotypic decomposition.
+
+The X_j used here are the intersections of a rational vector subspace
+with a coefficient lattice. The rational subspace imposes support,
+homogeneity and prefix highest/lowest weight bounds. Such intersections
+are saturated: if a nonzero scalar multiple of a vector lies in the
+rational subspace, the vector itself lies there. All modules can be
+restricted to the finitely many degrees occurring in the polynomial.
+
+Coefficient extraction in variables outside a prefix commutes with
+the GL action on that prefix. Thus it cannot introduce an isotypic
+type absent before extraction, and preserves its highest and lowest
+weight bounds. The same applies to multihomogeneous projection and
+to injective, sign-preserving renaming. These prove ValSlice, ValComp
+and ValRen for the actual polynomial models. For noninjective
+equivariant maps the same assertion follows by passing to an image;
+the uses here have the stated disjoint support.
+
+Apply the intersection identity first to plane variables and then to
+normal variables. A polynomial satisfying the conditions in every
+segment is an integral finite sum of products of segment polynomials
+satisfying those conditions separately. A further finite decomposition
+into physical multidegrees gives DecAt. The source's plane_dec,
+normal_dec and dec_identity are exactly these three operations.
+
+7. ADMISSIBILITY OF THE ASSEMBLED TEST: MembAt [DT10]
+
+The assertion proved here is conditional on the explicit MFH frame
+and margin data, Tied signed-chain datum, BlockOK degree identities,
+NormTest, and the YY(24,60) conditions delivered by PG. It is the
+outgoing symbol-membership assertion MembAt. It is not the incoming
+word-closure assertion MemAt discussed in Section 8.
+
+7.1. The two numerical margins.
+Order the model positions x_u by the internal letters and then the
+current frame letters. Write B_u=Bo(x_u), s_u=sl(x_u), m=mStar, and
+a_u for the first coordinate of the normal joint highest weight at
+the corresponding cut. The definition thStar is
+
+  T_u=max(B_u/2,t1_u,t2_u),
+  t1_u=a_(u+1)+m+s_u when x_u is even, and B_u/2 otherwise,
+  t2_u=a_(u-1)+m+s_u when u>=1 and x_(u-1) is odd,
+       and B_u/2 otherwise.
+
+Put tau_u=T_u-s_u/2-60c. MFH gives s_u>=128c at the positions used.
+The Tied chain threshold is T_u-s_u/8 and its allowed loss is
+3s_u/8. Hence YY(24,60) gives a plane chain lower bound
+
+  T_u-s_u/2-24c >= tau_u.
+
+The corresponding link bound is T_u-3s_u/8-60c>=tau_u.
+The literal model-prefix preimages are the relevant chain or link
+sets, possibly with extra positive vector letters. Adding those
+letters cannot lower the minimum weight, as explained in PG's order
+calculus. Thus the plane orders immediately before and after an
+internal position x_u are at least tau_u and tau_(u+1).
+NormTest bounds the corresponding normal first weights by a_u+4c
+and a_(u+1)+4c.
+
+At an even position, T_u>=a_(u+1)+m+s_u, so
+
+  tau_u >= a_(u+1)+m+4c,
+
+because s_u/2-60c>=4c. At an odd position the same calculation at
+the next cut uses T_(u+1)>=a_u+m+s_(u+1). Choose the separating
+integer M(x) to be a_after+4c at an even position and a_before+4c
+at an odd one. The plane and normal bounds then give exactly the
+even/odd separation clauses in XX'. Finally
+
+  tau_u >= B_u/2-s_u,
+
+since T_u>=B_u/2 and s_u/2>=60c. This supplies its independent
+Bo/2-sl threshold clause. These two elementary inequalities are the
+substantive margin calculation in restXXG_b.
+
+7.2. Support, degree, and the Frobenius identity.
+The model letters are internal letters, labels, carries and tangents.
+Only the carry wc(j,m) receives a nontrivial exponent under phi:
+it is sent to its true coordinate to the power
+
+  P_j=p^(z_(j+1)-z_j).
+
+The subsequent up-map at physical position x contributes
+p^(z_j-x), so the composed carry exponent is p^(z_(j+1)-x),
+exactly the physical Frobenius substitution. Internal, label and
+tangent coordinates follow directly; periodic representatives give
+the same differences. This proves the algebra identity AlgAt by
+checking variables and then multiplying.
+
+Goodness gives every Gp monomial the same phi-multidegree dPl.
+At an internal physical letter the model has just its one internal
+preimage; at an incoming W letter only the carry preimages occur,
+and no normal variable occurs. Since all exponents are nonnegative,
+BlockOK yields, for the physical degree delta of a supported Gp term,
+
+  p^(z_j-x) (delta(j,x)+dNoOf(j,x)) <= deg(x mod n').
+
+This is the actual segment-degree inequality used by DegAt. In
+particular it implies the source's exported bound by 1.01 levDeg;
+the extra one percent is unnecessary for this pointwise estimate.
+Taking a physical homogeneous component only discards monomials,
+so every remaining monomial still has the original phi-degree dPl.
+The total assembled degree is d by BlockOK.
+
+The label exponents satisfy 0<=rho<P in every true coordinate.
+The true-letter indexing is bijective onto TT. Its periodic degree
+identity and these inequalities prove IsLabel for the global label
+polynomial, including support in TT. This proves LabAt.
+
+The total normal order is also constant on every supported term.
+Writing the sums over the true coordinates of the stated parity, it is
+
+  sum_even (rho_normal + P*dNo)
+    + sum_odd (rho_plane + P*dPl).
+
+The parity swap is essential: at odd letters the plane coordinate
+is the physical normal coordinate. This is oOf in MembDegF.
+
+7.3. Conclusion.
+DT9 decomposes the plane and normal factors into integral sums of
+segment products, with the prefix bounds from 7.1 and the support
+and degree bounds from 7.2. The finite physical-degree decomposition,
+the Frobenius identity, and the label factor then express
+
+  asm(phi(Gp),N0)
+
+as an integral sum of OneSidedLemma4Elements with its required degree
+and fixed normal order. The definition of their span proves MembAt.
+Thus the four interfaces DecAt, AlgAt, DegAt and LabAt have explicit
+pointwise arguments here. Producing the frame/parameter datum that
+satisfies MFH is a separate global construction; it has not been
+inferred from these local inequalities.
+
+8. THE REMAINING INCOMING CONDITION MemAt [DT11]
+
+MemAt and MembAt have different logical roles. MemAt says that,
+after digit extraction and the normal joint projection, the plane
+coefficients of the INPUT polynomial belong to the signed-chain
+space XX. This is an assumption in DT8 and PG's application. MembAt
+says that the OUTPUT test assembled from a constrained Gram test
+belongs to the allowed symbol span; that is Section 7 above.
+
+The source proves the incoming condition in two stages:
+
+  Lemma5aAt: initial symbols satisfy MemAtG(0,1/8);
+  WordConditionAt: at most c0 allowed operators and the selected
+      twist transport this to MemAtG(1/8,3/8).
+
+Theorem memAt_of_wordConditionAt then uses linearity to pass to the
+whole word-closure span. Lemma5aGeneratorProducts reduces the first
+stage to its actual plane/normal generator products. WordLossNonneg
+reduces the second to OneOpStep and WordBoundStep, with cost two
+at each touched prefix. These are useful exact reductions, but their
+substantive prefix and twisted-substitution estimates have not been
+reconstructed in this note. DT11 records them as retained inputs,
+not as consequences of the completed outgoing admissibility proof.
+
+The symbol-space dimension estimate and the construction of the full
+numerical frame/chain parameter system also remain separate. Closing
+the local factorial, normal-test, coefficient-selection and outgoing
+membership calculations does not assert a complete Type-II theorem,
+nor a complete human proof of RH or GRH.
+
+

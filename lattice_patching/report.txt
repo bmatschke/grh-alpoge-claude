@@ -1,0 +1,128 @@
+LP1-LP5: EXACT PATCHING OF THE PRESCRIBED LOCAL LATTICES
+Version 0.13. Pinned source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+READING AND STATUS
+The self-contained proof is in main.tex, section LP1-LP5. This report makes
+the source interfaces and the limits of the conclusions explicit. The
+patching is proved. The existence of the geometric and automorphic input
+records is not proved in this component. No Lean build or kernel replay
+was performed.
+
+BACKGROUND
+We use unique factorization of nonzero ideals in a Dedekind domain, the
+fact that nonzero prime ideals of a number ring are maximal, and the
+Noetherian property of a number ring. No class-number-one or principal
+prime assumption occurs. The vector space V need not be finite dimensional
+for LP1-LP3 existence, provided each vector has a nonzero integer multiple
+in the reference module. Finite generation is used only for the additional
+conclusion that the resulting module is a finite full lattice.
+
+LP1: PRIME-WISE DENOMINATOR CLEARING
+For a nonzero c in R and a designated prime P, write (c)=P^a Q with
+Q+P=R. Pick t in Q but outside P. For another prime Q', P^a is not
+contained in Q'. Pick s in P^a but outside Q'. Then st is in (c).
+The same t works for all Q'; only s changes. This uniformity is what
+allows the infinite intersection in LP2. If a=0, take any s outside Q'
+from R; the same proof applies. This is a direct translation of
+GlobalTheory.EX.Glue.exists_clear.
+
+LP2: THE INFINITE INTERSECTION WITH A COMMON DENOMINATOR
+Each B_Q is an R-submodule of V stable under division by every element
+outside Q. Assume every x has one nonzero c with cx in every B_Q.
+Then N=intersection_Q B_Q has localization N_P=B_P.
+If sx belongs to N for s outside P, local saturation gives x in B_P.
+Conversely choose x in B_P and a common denominator c. LP1 gives t
+outside P. At P, tx belongs to B_P. At Q != P, choose s outside Q
+with st=cd; then s(tx)=d(cx) belongs to B_Q, and local saturation gives
+tx in B_Q. Thus tx lies in N and x lies in N_P.
+Localizing arbitrary infinite intersections would be invalid in general;
+the common-denominator argument is the complete justification here.
+
+LP3: FINITE MODIFICATION AND GLOBAL BOUNDS
+Given full M, a finite S, and local modules A_P satisfying n_P M <= A_P
+and n_P A_P <= M_P for positive integers n_P, define B_P=A_P on S
+and B_P=M_P off S. For x choose m>0 with mx in M. Then
+c=m product_{P in S} n_P is a common denominator, including when S is
+empty (empty product equals 1). Apply LP2.
+
+The proof in MemLocSub.exists_glue needs the lower commensurability
+condition for this construction; its upper condition is present in the
+literal interface and is useful for the following strengthening.
+Let d=product n_P. Then dM <= N <= d^{-1}M. To prove the second
+inclusion, dx belongs to M_P for every P: outside S this is immediate,
+and on S use n_P x in M_P. Membership at all localizations implies
+membership in M. Indeed, if y is not in M, the ideal I={r:ry in M}
+is proper and lies in a maximal ideal P; y in M_P would give an element
+of I outside P, a contradiction. This also proves uniqueness of the
+patch from all its localizations. If M is finitely generated, N is a
+submodule of the finite module d^{-1}M, hence finite. It is full because
+it contains dM. These bounds, uniqueness and finite-generation statements
+are derived consequences, not claims that the Lean wrapper itself states
+them.
+
+LP4: ACTUAL INPUTS IN ExistsLedPart.exists_lat
+Fix a word u. The reference is DV.MramL D u in (D.div.Nu u).V.
+The coefficient number field is D.what_2.LL, with its ring of integers.
+The place bijection is D.plEq. The global injection is D.nuIn u.
+
+At a served admissible place w, A_w consists of x whose actual image
+c.cmp u w hg (D.nuIn u x) is in G.NP X Y K u w hg.
+This set is an additive R-module because the comparison is additive and
+semilinear. For a scalar a integral at w, c.embW_val converts that
+integrality into membership in the coefficient DVR; closure of NP under
+such scalars proves that A_w is local at w. For t outside the prime,+a=t^{-1} is integral at w, so t x in A_w implies x in A_w.
+
+At the own type prime T_u, replace NP by LT.Nlam D u w. This is already
+a module over the local integral subring of the coefficient number field,
+so the same inverse-scalar argument applies. Its definition is retained
+unchanged; no simplification of its Hecke operator or exponent is used.
+
+The set S consists of (GIdx and nonempty VV) or p_w=T_u. Nonempty VV
+implies the candidate condition and hence p_w<X'. Each rational prime
+has finitely many primes above it, so S is finite. GIdx excludes the
+own type prime, which makes the two prescriptions disjoint even without
+using a numerical inequality between T_u and X'. The source carries
+such numerical inequalities elsewhere, but they are not needed in this
+patching argument.
+
+The supplied hfull is exactly the integer-multiple fullness needed in
+LP3. At a served place, hS gives A_w <= M_w and n M <= A_w. Since
+M_w is an R-module, also n A_w <= M_w, giving both conditions of LP3.
+At a type place hT gives both conditions directly. Apply LP3 after
+transporting S through D.plEq.
+
+Off the type prime, a served patch is contained in M_w. An unserved
+patch is equal to M_w. At the type prime, retain the separate target
+LT.Nlam. It can be larger than M_w. The argument does not assert
+N <= M globally and does not assert that N is a saturated submodule.
+For example, R=Z, M=Z, S={(2)}, A_(2)=2 Z_(2) gives N=2Z.
+
+LP5: LATTICE INSTALLATION AND THE LENGTH CONVENTION
+The source setLat replaces NuLat by N and defines
+lenMN(u,w)=(lenLoc(w,N_u,Mram_u).toNat)/ramIdx(w).
+This is a rational-valued normalized length. ENat.toNat is the source's
+conversion function, not an assertion that every local length is finite.
+If the local length equals a natural number l, it converts to l; since
+ramIdx(w)>0, multiplying by ramIdx(w) gives l exactly. This is precisely
+the conditional hlen field proved in ExistsLedPart.exists_ledPart.
+At an unserved non-type place, local equality makes the length zero.
+All other size fields are copied. The transported instance setInst has
+identical canonical selector, offsets, epsilon-depth and deficit fields.
+There is no change of the scale, selected degrees or valuation convention.
+
+RETAINED INPUTS AND NEXT TARGET
+LP4 proves exists_lat under its literal hfull/hT/hS inputs and the
+supplied comparison record. It does not construct that record or establish
+the hS bounds from geometry. LP5 proves the actual setLat installation
+and normalization, provided the refilled comparison/size datum already
+exists. The next proof portion in ExistsLedPart is exists_refill and the
+source construction of RecOK/LedOK/Lay, followed by level and size supply
+in objCP_and_of_recExP. ExplicitConstantsParameterConditionsLarge and
+SzRowNumAt are still unexpanded numerical supplier targets.
+
+CONTINUITY
+PL13's uncertainty about the final source-lattice constructor is refined:
+the actual exists_lat -> setLat -> exists_ledPart route is identified, and
+its lattice patching/installation step is now proved. PL14's alternative
+generic constructor is not silently substituted. The original retained
+reference Mram and all prior normalized valuations are preserved.

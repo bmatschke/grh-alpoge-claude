@@ -1,0 +1,163 @@
+#!/usr/bin/env python3
+"""Current mathematical scope, kept separate from historical whole contracts."""
+from pathlib import Path
+import json
+
+ROOT=Path(__file__).resolve().parent
+PIN='7cbf7a0c32fca1badf05931879a37c3f8a2b03b4'
+geometry=('Complete the three remaining original FramesOK fields: triangular weight covariance, arithmetic invariance and holomorphic readings. '
+ 'Then construct CoverTri and FibTri and assemble full IsUnf/hasPrinc on the same Moduli, model, lattice, section and tangent frames. '
+ 'TDR now proves arbitrary-algebra finite descent and the whole AllTest implication under the exact SecBaseChangeSt; NFR proves ThetaData, IsNormUn and every FrameOK field, including mean exactly one. '
+ 'These results do not yet supply the other simultaneous frame fields or the full principal charts. Continue the original finite level system, Gaussian/reproduction, short-rule/simultaneous dictionaries and ramified jets; '
+ 'higher CoversAt, all-tuple class sums and uniqueness with their phase rescalings, one PointIdentCore with common lambda and z, and base ClassSumsSpan remain. '
+ 'Preserve both levels, the complete coefficient field, Fits and eta agreements, and original common-family quantifier order.')
+analytic=('Complete the original two-sided StepStatement. Standard StepUp at lambda+e_s still needs TMapStatement, complementary-minor EigStatement, EvalPStatement and QuotPStatement; '
+ 'dual StepDown at lambda-e_s needs TMapDStatement, EigStatement, EvalMStatement and QuotMStatement. '
+ 'BNV now supplies IntS, the large-parameter StepIBase, the full finite walk, data transport and universal return; BSP supplies GapNeed, PsiDatum, CapVal, Mult, Per and Fin at their full original premises. '
+ 'Once the remaining suppliers are proved on their actual modules, periods and quotients, BNV23 yields BesselNVGap and the inherited BWP setting result with Forms0 retained. '
+ 'The actual orbital/fiber and Siegel-Weil character/measure comparisons, Bessel uniqueness/local ties, full transport, AutTie/RowDictTie/LabTie, and the simultaneous arithmetic cylinder counts for CountIdempotentsClass remain separate.')
+arithmetic=('Complete the seven original Ok fields phi/gen/cl/ec/b1p/b1/h1 in the common GC construction, and separately the full entry implications Gen_gd and Gen_host. '
+ 'CAF supplies the character SeedClause uniformly before all later compatible fields and primes; MFC supplies the actual linked common field, all twelve UFacts, the uniform b0 class-rank bound, both strict cone classes, Big and 21 of 28 Ok fields. In the original coefficient-DVR case it also joins the CAF seed, with its modulus chosen first. '
+ 'The same actual marked g1 and fixed coefficient embedding must then receive FinEnd, AutEnd3 and AutEnd2, the actual rank-two and rank-three automorphic seeds, full ModUAlt/PfromAut, and original local/automorphic descent to GdEnd. '
+ 'UCE supplies the full GdEnd consumer, not the producer. The alternative GdEndAlt route still requires its exact additional local/descent fields. '
+ 'Do not exclude ell=3 from the independent CountV HostData seed scope merely because the final GD.gen guard excludes it.')
+denominator=('Construct one actual common family satisfying the original ConclF, including all its local table bounds, actual rows, arithmetic data and the original ShaFinOdd and vvTerm-summability guards. '
+ 'DNE now proves the full ConclF-to-AdmF-to-LinkN consumer and every original export quantifier, with K=2000(|Ca|+1)^3 chosen before the family and the eventual threshold in the original order. '
+ 'The prime estimates and analytic scale comparison need not be reopened. The existential common-family and ConclF producer remains, so GLOBAL_DENOMINATOR stays open.')
+rows=('Complete the original F3 local coefficient bridges and F4 common-overfield readings, with valuation/norm/GoodCoef/iq and the entire coefficient field, and actual complex Hecke standard/no-Jordan plus arithmetic character data on the same form datum. '
+ 'Construct the actual base rows, host/frame lengths, nonzero chains and group ties, MultEq support, eigensystem/carrier/parts, all-embedding logLam, HD/d3b and NEb. '
+ 'Keep the stronger second DivRows3 scope distinct from the completed first DivDef3 and row-pair integrability. '
+ 'The partial common marked frame and CountV seed do not by themselves install HOST_NUMBER_S, HOST_FRAME_LENGTH, TASK_HOST_VAN_E_INSTALL, TASK_HOST_XPP_INSTALL or TASK_COUNT_V_INSTALL.')
+global_inputs=('Continue the distinct retained-defect, period-height and normalized spectral producers, and the original compatible second-layer selection on one common arithmetic/geometric family. '
+ 'GLOBAL_LOCAL_GAIN remains closed at its complete v0.49 scope; the current denominator work only completes its separate consumer. '
+ 'Common design existence, NBUILT compatibility, original true-column records, shared fields/embeddings, Fits and eta agreement and eventual-family thresholds remain explicit. '
+ 'A stronger historical WPt/TSel construction may still serve other producers but is not needed to reopen the proved selected-class local-gain estimate.')
+extra=('Continue the seven additional unrestricted Dirichlet-GRH obligations: SEED_IV_ALT, TENSOR_FACTOR_TOWER, CHAIN_RANK_FOUR, CHAIN_DESC4, RANK4_CHAIN_REDUCTION, TASK_CASE3_PROMOD_JOIN and TASK_CASE3_AUT_JOIN. '
+ 'They remain distinct from the shared RH route. Preserve the fixed coefficient embedding, actual same-object support and full original CaseIII/promodularity and rank-four chain hypotheses. '
+ 'A supplied implication or selected rank-four Hida support does not supply the full automorphy/promodularity producer. The inherited conditional terminal RH/Dirichlet-GRH deduction CMP1-CMP6 remains available.')
+
+local=[
+ ('TDR1-TDR13 prove the complete original finite-generated-subalgebra descent for actual FrPt over arbitrary coefficient algebras, including nonreduced, non-Noetherian and nonflat targets. '
+  'The Lie eigenframe bundles and theta-section frame line represent the literal framed point functor; a direct local finite-data argument gives the same conclusion. '
+  'For reduced targets a finite polynomial presentation followed by the radical quotient gives the exact TRing and FrMap, proving allTest_of_secBaseChange and the literal FromTest return. '
+  'The supplied Moduli and exact SecBaseChangeSt are retained; section base change is used at the locally Noetherian universal base without imposing Noetherianity or flatness on the target.'),
+ ('NFR1-NFR13 construct the original ThetaData and actual normalized framed points, and prove every FrameOK field. '
+  'They identify the exact CM embedding and reversed-column period dictionary, prove holomorphic periods on the connected domain, and give an integral symplectic basis with the original modulus-eight adaptation. '
+  'A direct Fourier recurrence proves the actual complex theta section line is one-dimensional without a new section-twisting or base-change premise. '
+  'The original Hermitian determinant, unit-minor determinant, lattice fundamental domain, quadratic gauge and theta mean are calculated with all constants. The normConst square root makes the Gaussian mean exactly one. '
+  'One simultaneous family satisfies the first FramesOK field; the pointwise FromTest conclusion retains TDR SecBaseChangeSt. The other three FramesOK fields, CoverTri, FibTri and full IsUnf remain.'),
+ ('CAF1-CAF11 prove the full original SeedClause with one modulus chosen before every later compatible L and witness prime w. '
+  'The proof includes the exact local norm/Teichmuller/conductor argument, an actual imaginary quadratic field and discriminant, an order-ell auxiliary character and actual witness prime, and the prescribed fixed field inside the original algebraic closure. '
+  'An elementary Euclid-cyclotomic argument supplies the required primes congruent to one, so Dirichlet prime progression input is unnecessary here. '
+  'The Dat modulus is |discr K| times N_(ell-prime); the separate CountV HostData seed uses N_(ell-prime)^2 and retains ell=3. '
+  'These are actual character seeds on the same supplied marked frame, not the later rank-two and rank-three automorphic seed representations or a complete Gen condition.'),
+ ('MFC1-MFC14 construct the original linked marked frame under the full original Gen and GC.Hypotheses2 inputs. '
+  'A CRT construction gives a positive nonsquare n with n congruent to -1 modulo 4M and valuation one at a fresh odd prime; the real quadratic field Q(sqrt(Dn)) supplies the original H0 output without a prime progression theorem. '
+  'The proof constructs Hlay, proves all twelve UFacts, obtains one b0 class-rank bound before every m using inherited TW1, and proves literal link_ex with every GalLink/FLink field. '
+  'It proves strictness for both original characters and both f4 cone classes and gives actual common L, g1, Phi, C0 and w with Big and 21 of the 28 Ok fields. When O=c.O is the original coefficient DVR, the CAF seed joins this same frame with its modulus chosen first. '
+  'The seven generic GC outputs phi/gen/cl/ec/b1p/b1/h1 and the full Gen_gd/Gen_host entry implications remain explicit; full GdFrameEx, HostFrameEx and GdEnd are not inferred.'),
+ ('BNV1-BNV23 prove the original IntS exponent b>2rn^2, the complete finite parameter Walk, the cubic-gap comparisons and the full large-parameter StepIBase nonvanishing. '
+  'An explicit Vandermonde isotropic frame and Cayley matrix match the original character c_a(t)=-2it, including its trace sign and factor. '
+  'Polynomial exp/log coordinates give the original Haar measure; a global Cayley majorant and Casimir estimates give the tangent Gaussian and its nonzero complex Gaussian integral. '
+  'The GaussianLimitHaar proof has one eventual bound before all integration variables and retains AE-strong measurability; the Schur averaging factor is exactly 1/dim(Vpi) for any allowed sigma-finite ambient second measure. '
+  'Absolute convergence, actual Levi/character transport, compact cyclicity and the reconciliation of independently supplied Cayley witnesses give the full universal return to the original endomorphism integral. '
+  'The remaining StepStatement is explicit in BNV23; BesselNVGap and ConcreteSettingExists follow conditionally, the latter retaining the original Forms0 scope.'),
+ ('BSP1-BSP10 prove the full original GapNeedStatement, PsiDatumStatement, CapValStatement, MultStatement, PerStatement and FinStatement, with their original supplied data. '
+  'Cyclic lowest-type rigidity and coefficient orthogonality give pointwise finProj on the actual right-regular space. '
+  'The original ordered Capelli polynomial acts by its exact scalar on the entire generated module. Dominated differentiation gives the actual period derivative, including its literal real-smooth ambient meaning. '
+  'The final Fubini argument uses the simpler product majorant rho(y)^(-beta)rho(y^-1g)^(-beta) <= rho(g)^(-beta/4)rho(y)^(-beta/2), at the exact source exponents. '
+  'It returns the actual nonzero Bessel integral from a supplied shifted lowest type and its exact period-injectivity premise. Tensor coefficient maps, complementary-minor eigenspaces/evaluation and shifted quotient existence still supply the original StepStatement.'),
+ ('DNE1-DNE14 prove the complete original ConclF-to-AdmF-to-LinkN implication. The patched local denominator table includes the prime-three equal-share branch, all seventeen AdmT fields, exact coefficient-weight/host-degree conversion and zero cases. '
+  'A CRT/LTE cyclotomic budget and explicit ordinary, small-order, band, exceptional, generator and small-prime estimates bound every original prime sum. '
+  'Uniform exponential scale comparisons replace the source numerical Large cutoff while preserving the original eventual quantifiers. '
+  'The original UniformExportStatement has K=2000(|Ca|+1)^3 fixed before every family, and retains ShaFinOdd and vvTerm summability. '
+  'The upstream actual common ConclF family is not constructed, so this complete consumer does not close GLOBAL_DENOMINATOR.')
+]
+components=['test_ring_descent_v50','normalized_frames_v50','common_arithmetic_frame_v50','marked_frame_construction_v50','bessel_nonvanishing_v50','bessel_weight_propagation_v50','denominator_export_v50']
+authors=['geometry_alltest','geometry_alltest','arithmetic_common_frame','arithmetic_common_frame','bessel_nonvanishing','bessel_nonvanishing','root']
+status=('Partial human reconstruction of RH and unrestricted Dirichlet GRH, accepting the pinned Alpoge-Claude formal proof as correct. '
+ 'Version 0.50 adds 98 independently reviewed numbered claims, bringing the cumulative inventory to 3112. '
+ 'It completes arbitrary-coefficient test-ring descent, normalized theta points and every FrameOK field, uniform character seeds and much of the actual common marked frame, large-parameter Bessel nonvanishing and its universal return, the analytic final propagation step, and the full conditional global denominator export. '
+ 'No additional whole selected obligation is closed: 24 remain, comprising 17 class C and 7 class B, with 17 shared RH/GRH and 7 additional Dirichlet-GRH obligations. '
+ 'Full StepStatement, full simultaneous principal frames, the remaining common arithmetic frame and automorphy producers, actual ConclF families and other listed producers remain explicit. '
+ 'The existing full GLOBAL_LOCAL_GAIN closure is preserved. Claim counts are an inventory, not a completion percentage. No Lean build or kernel replay is claimed.')
+
+progress={
+ 'GLOBAL_DENOMINATOR':{'completed':['DNE1-DNE14 (whole original ConclF -> AdmF -> LinkN consumer)','Inherited original local-bound and length interfaces at their supplied-data scope'],'remaining':denominator},
+ 'AUT_UNRAM_COEF':{'completed':['CAF1-CAF11 (uniform original character seed)','MFC1-MFC14 (actual linked frame, 21 of 28 Ok fields)','UCE1-UCE19 (full original GdEnd consumer)','OCH1-OCH30','KIZ original InpZ','KTR1-KTR13','RNC16','PGK1-PGK6'],'remaining':arithmetic},
+ 'GLOBAL_SPECTRAL':{'completed':['BNV1-BNV22 (IntS, base nonvanishing, walk and exact universal return)','BNV23 conditional on original StepStatement','BSP1-BSP10 (full original analytic propagation suppliers)','BWP1-BWP24 at original nonvanishing/Forms0 scope','AMD1-AMD24 at stated scope'],'remaining':analytic},
+ 'DESIGN_CHOICES_COMMON':{'completed':['TDR1-TDR13 (arbitrary finite descent and original-premise AllTest)','NFR1-NFR13 (ThetaData, IsNormUn, every FrameOK field and simultaneous first field)','HUF1-HUF21','PUN1-PUN24','ICL1-ICL21','CNC1-CNC16','PCL1-PCL12','GCF and WRS at original supplied-member scope'],'remaining':geometry+' Common design nonemptiness remains distinct from the compatibility of a supplied member.'},
+ 'BASE_THETA_READINGS':{'completed':['TDR1-TDR13','NFR1-NFR13','HUF1-HUF21','PUN1-PUN24','CNC1-CNC16','Inherited actual-reading consumers at their original inputs'],'remaining':geometry+' '+rows},
+ 'BASE_THETA_RATIONAL_TESTS':{'completed':['TDR1-TDR13','NFR1-NFR13','HUF1-HUF21','PUN1-PUN24','ICL1-ICL21','CNC1-CNC16','PCL1-PCL12','Inherited both-level RatG/LiftTestB consumers at their exact supplied inputs'],'remaining':geometry},
+ 'TASK_COUNT_V_INSTALL':{'completed':['CAF9-CAF11 (full original CountV HostData character seed, including permitted ell=3)','MFC1-MFC14 on original Gen/GC hypotheses','Inherited CountV consumers at their supplied-frame scope'],'remaining':arithmetic+' '+rows},
+ 'HOST_NUMBER_S':{'completed':['CAF and MFC common-frame subresults at their exact original inputs','Inherited host-count consumers'],'remaining':rows},
+ 'HOST_FRAME_LENGTH':{'completed':['CAF and MFC common-frame subresults at their exact original inputs','DNE weight/host-degree dictionary on its supplied tables'],'remaining':rows},
+ 'GLOBAL_RETAINED_DEFECT':{'completed':['DNE1-DNE14 separate denominator consumer','WRS1-WRS10 full selected-class local gain','Inherited first DivDef3 and row-pair integrability'],'remaining':rows+' '+global_inputs},
+ 'LOCAL_NBUILT_COMMON':{'completed':['TDR and NFR actual-frame subresults','CAF and MFC actual marked-frame subresults','WRS selected built-class witness extraction at existing membership'],'remaining':global_inputs+' '+geometry},
+ 'SECOND_LAYER_COMPATIBLE_SELECTION':{'completed':['WRS1-WRS10 original selected-class compatibility/local gain','DNE1-DNE14 original denominator consumer','TDR/NFR and CAF/MFC subresults at stated scope','Inherited exact same-record realization/transport consumers'],'remaining':global_inputs}
+}
+cfg={
+ 'artifact_version':'0.50','date':'2026-11-23','source_commit':PIN,
+ 'title':'Frames, Bessel periods and denominator bounds',
+ 'components':components,'component_authors':dict(zip(components,authors)),
+ 'closed_selected_leaves':{},'closure_reviews':{},
+ 'closed_nested_producers':[
+  'Complete original TestDescent.exists_fg_descent over arbitrary coefficient algebras',
+  'Complete original allTest_of_secBaseChange and FromTest under exact SecBaseChangeSt',
+  'Actual Lie eigenframe and theta-section frame representation with arbitrary target base changes',
+  'Complete original ThetaData, exists_isThetaPt and exists_isNormUn',
+  'Exact mod-eight symplectic adaptation, Hermitian/unit-minor determinants and theta mean one',
+  'Every literal original FrameOK field and one simultaneous first FramesOK field',
+  'Direct complex theta-section line classification without a new SecTwistSt premise',
+  'Complete original SeedClause and actual auxiliary character/witness prime',
+  'Actual fixed field, CM and maximal-real subgroup identities and both distinct seed moduli',
+  'Full original H0 and Hlay construction at the original Gen input',
+  'All twelve original UFacts, uniform b0 and every link_ex GalLink/FLink field',
+  'Both actual strict cone classes, Big and 21 of 28 Ok fields on the same marked frame; CAF seed joined in the original coefficient-DVR case',
+  'Complete original IntSStatement, finite WalkStatement and gap comparisons',
+  'Exact character-compatible isotropic/Cayley frame and polynomial Haar exp/log chart',
+  'Uniform highest-weight tangent Gaussian and full original GaussianLimitHaar',
+  'Exact Schur factor with the source arbitrary ambient second-measure scope',
+  'Complete original StepIBase and BesselNZ-to-BesselAll universal return at GapLap',
+  'Full original integral return and conditional StepStatement-to-BesselNVGap implication',
+  'Complete original GapNeedStatement, PsiDatumStatement and CapValStatement',
+  'Complete original MultStatement and PerStatement',
+  'Pointwise finProj, full finFub_int and finFub, and complete original FinStatement',
+  'All original patched denominator table cases and seventeen AdmT fields',
+  'All required global prime-sum bounds and original-quantifier UniformExportStatement',
+  'Complete original ConclF-to-AdmF-to-LinkN implication with prescribed constant'
+ ],
+ 'status':status,'local_conclusions':local,
+ 'remaining_major_inputs':[analytic,geometry,arithmetic,denominator,rows,global_inputs,extra],
+ 'next_targets':[analytic,geometry,arithmetic,denominator,rows,global_inputs,extra],
+ 'selected_node_progress':progress,'updated_contracts':{},
+ 'published_applications':[],
+ 'publication_note':('All 98 new numbered claims are class-B written deductions at their explicitly stated scope. '
+  'The same inherited classical foundations and actual source data remain. The arithmetic auxiliary constructions use elementary CRT/cyclotomic arguments at precisely their stated scope; '
+  'the theta line has a direct Fourier proof. No synthetic foundational claim, arbitrary proof certificate, new formal replay or full RH/GRH completion is asserted.'),
+ 'validation_scope_updates':{
+  'original_arbitrary_coefficient_finite_framed_descent_complete':True,
+  'original_AllTest_complete_under_SecBaseChangeSt':True,
+  'full_original_ThetaData_IsNormUn_FrameOK_complete':True,
+  'simultaneous_first_FramesOK_field_complete':True,
+  'other_FramesOK_fields_CoverTri_FibTri_IsUnf_remain_explicit':True,
+  'principal_frames_IsUnf_FromTest_remain_explicit':False,
+  'superseded_v49_combined_frame_flag_explanation':'FromTest is now complete under exact SecBaseChangeSt and every FrameOK field is complete; full FramesOK/IsUnf remain explicit.',
+  'full_original_SeedClause_complete_before_later_fields_and_primes':True,
+  'CountV_HostData_seed_retains_ell_three':True,
+  'actual_marked_frame_Linked_UFacts_b0_and_21_Ok_fields_complete':True,
+  'seven_GC_Ok_fields_and_full_Gen_entry_remain_explicit':True,
+  'full_original_IntS_Walk_StepIBase_GaussianLimitHaar_complete':True,
+  'full_original_BesselNZ_to_BesselAll_universal_return_complete':True,
+  'full_original_PsiDatum_CapVal_Mult_Per_Fin_complete_on_original_premises':True,
+  'original_StepStatement_tensor_maps_adjugate_evaluation_quotients_remain_explicit':True,
+  'original_BesselNVGap_remains_conditional_on_StepStatement':True,
+  'ConcreteSettingExists_retains_original_Forms0_scope':True,
+  'full_original_ConclF_AdmF_LinkN_consumer_complete':True,
+  'global_denominator_actual_ConclF_family_producer_remains_explicit':True,
+  'original_GdEnd_common_producer_remains_explicit':True,
+  'no_new_whole_selected_obligation_closed':True
+ }
+}
+(ROOT/'increment_v0_50.json').write_text(json.dumps(cfg,ensure_ascii=False,indent=2)+'\n')
+print(json.dumps({'components':len(components),'scope_paragraphs':len(local),'whole_selected_closures':0}))

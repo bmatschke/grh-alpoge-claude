@@ -1,0 +1,311 @@
+PERIODIC FRAMES FROM THE ACTUAL MARKED TILES — v0.8
+Pinned source: CocoSgt/riemann-hypothesis-lean,
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+Claim IDs FG1–FG8.
+
+STATUS
+
+This report proves the actual FramesOK construction from
+tableLineDegreeFive.OrbitHyp, with all its stronger segment-span and L2-gap
+clauses. It also proves the common-marked-tile and coverage clauses of the
+stronger OrbitFrames/RestFrames conclusion. No abstract frame-existence
+premise is retained. The construction does not prove abundance of subsets
+TT satisfying OrbitHyp, nor the simultaneous global numerical conditions
+used to supply such subsets.
+
+The proof is finite combinatorics. It uses no representation-theoretic,
+DVR, path-basis or previous local-rank theorem. The source's cyclic
+enumeration is written with ordinary Euclidean division; the construction
+is the literal bf_F used by bf_frames and bc_frames. The only stronger
+observations are marked explicitly in FG8 and are not substituted into
+downstream constants.
+
+FG1. EXACT INPUTS AND DEFINITIONS
+
+Write n=n'>0 for the even period, and identify TT subset Fin n with
+T={t.val:t in TT} subset {0,...,n-1}. Let
+  Ttilde={z in Z : z mod n belongs to T}.
+All residues are the representatives in [0,n).
+
+The source actual parameters, with delta=de, are
+  u=ceil_+(1/delta),                  ell=(6r+1)u,
+  M=ceil_+((h+3) log(x) / 10^(-(6r+1))),
+  G'=(M+5)ell,
+  N1=ceil_+(max(6 e G' delta, (h+3) log_2(x)))+1.
+Here ceil_+ is the least nonnegative integer not below its argument;
+the source calls these goodU, goodEll, orbitSmallMultiplicity, goodG'
+and orbitWindowCount, respectively. The denominator in M can equivalently
+be replaced by multiplication by 10^(6r+1), with no estimate.
+
+For integers L>=0 and 0<=i<n, the cyclic window is
+  Win_n(i,L)={(i+d) mod n : 0<=d<L}.
+It is a set, not a list counting multiplicities. Put t=floor(n/ell).
+The complete tiles are [s ell,(s+1)ell), 0<=s<t. The remaining interval
+[t ell,n) is left over and must not be discarded in the cyclic spacing
+calculation. Tile s has cells numbered c=1,...,6r+1,
+  C(s,c)=[s ell+(c-1)u,s ell+c u).
+Only integer points are considered. A tile is marked if:
+  odd c: T intersect C(s,c) is empty;
+  even c: T intersect C(s,c) is one point, which is even.
+Thus every marked complete tile has exactly 3r selected even points.
+
+The exact OrbitHyp, in addition to r>=2, n even and L1>=1 in frames_of,
+says
+  2L1<=L2<u,               3G'<=n,
+and the following three finite conditions:
+  A: for every i<n, |T intersect Win_n(i,L2)|<=r-1;
+  Tiles: for every s0<t, some 0<=d<=M makes (s0+d) mod t marked;
+  Intervals: for every i<n, |T intersect Win_n(i,G')|<=N1.
+These are precisely CondA, CondTiles and CondIntervals; their conjunction
+is IsGoodOrbit. Condition A counts all selected points, not just even ones.
+
+The displayed inequalities imply u>=1. In the literal real-parameter
+form they also imply delta>0: if delta<=0, then ceil_+(1/delta)=0
+(with the source convention 1/0=0), contradicting L2<u. Hence ell>0,
+G'>=ell, L2<n, and
+  t>=3(M+5)>M+1.                                      (FG1.1)
+No separate assumptions h>=0, delta<=1 or x>=3 are needed for this
+finite construction once OrbitHyp is supplied. Those assumptions occur
+in the source's separate asymptotic size/abundance uses.
+
+In fact the raw construction only needs L1<=L2<u, r>=2, n positive
+and even, G'=(M+5)ell, 3G'<=n and A/Tiles/Intervals. This is exactly
+CornerGLContinuity.OrbitRaw. The stronger 2L1<=L2 belongs to the actual
+OrbitHyp application and is retained there.
+
+FG2. THE PERIODIC ENUMERATION AND ITS TRUE SUCCESSIVE GAP
+
+Let S be the set of marked indices in {0,...,t-1}. Tiles at s0=0
+and t>0 show S is nonempty. List it increasingly as
+  s_0<...<s_(J-1),             J=|S|>=1.
+For every integer j, write its Euclidean division uniquely as
+  j=qJ+a,             q in Z, 0<=a<J,
+and define
+  sidx(j)=s_a,         B_j=qn+s_a ell.                 (FG2.1)
+This is the source's explicit bf_seq; negative j use Euclidean
+division with nonnegative remainder, not truncation toward zero.
+It immediately gives B_(j+J)=B_j+n and enumerates every marked index.
+
+The cyclic distance D_a from s_a to the next marked index is
+  s_(a+1)-s_a                  if a+1<J,
+  t+s_0-s_(J-1)               if a=J-1.
+It satisfies
+  1<=D_a<=M+1.                                      (FG2.2)
+Indeed apply Tiles at (s_a+1) mod t. The supplied marked tile occurs
+at a positive cyclic distance 1+d<=M+1<t. The next marked tile is
+the first such tile, so it cannot be farther away. This proves both
+the ordinary and wrap cases at once; no probabilistic independence
+or choice of a sparse subsequence is involved.
+
+Write n=t ell+R, 0<=R<ell. At a non-wrap transition,
+B_(j+1)-B_j=D_a ell; at a wrap transition it is D_a ell+R.
+Consequently
+  ell<=B_(j+1)-B_j<(M+2)ell.                         (FG2.3)
+The extra ell in the strict upper bound is the remainder R. Replacing
+the physical period n by t ell at the wrap would be incorrect.
+Each lifted interval [B_j,B_j+ell) is a marked tile for Ttilde.
+This proves every bf_Seq clause, including the same marked index
+for a whole lifted tile and surjectivity onto all marked indices.
+
+FG3. THE THREE BLOCKS OF EVEN TOPS AND THEIR ISOLATION
+
+For every j and 0<=v<3r, let a_(j,v) be the unique selected point
+in the even cell c=2v+2 of [B_j,B_j+ell). Then
+  B_j+(2v+1)u <= a_(j,v) < B_j+(2v+2)u.             (FG3.1)
+The lifted marked condition follows directly from the original
+complete tile: subtract qn to identify its cells with C(s_a,c).
+Evenness is preserved because n is even, including negative q.
+This is the only parity requirement on the period; u need not be even.
+
+The 3r points are strictly increasing, and they are all selected
+points in the lifted tile, since the cells partition it. They obey
+  a_(j,v)+u<a_(j,v+1),                              (FG3.2)
+as the intervening odd cell is empty. Their endpoint buffers are
+  B_j+u<=a_(j,0),        a_(j,3r-1)+u<B_j+ell.      (FG3.3)
+
+More strongly, every other selected point y<a_(j,v), even if y
+is outside this tile, obeys
+  y+u<a_(j,v).                                     (FG3.4)
+For v>0 the greatest possible earlier selected point in this tile is
+a_(j,v-1)<B_j+2vu, whereas a_(j,v)>=B_j+(2v+1)u.
+For v=0 no earlier selected point lies in the tile, so y<B_j and
+the first inequality of (FG3.3) applies. The same argument works
+for earlier points outside the tile when v>0. A symmetric argument
+gives a_(j,v)+u<y for every selected y>a_(j,v). Neither assertion
+assumes the rest of the period is unselected.
+
+The source function bf_tp chooses exactly these unique cell points.
+The classification above is bf_class, the predecessor inequality is
+bf_gap, and uniqueness gives
+  a_(j+J,v)=a_(j,v)+n.                              (FG3.5)
+
+FG4. THE ACTUAL FRAMES AND ONE COMMON TILE INDEX
+
+Define the frame to be the middle r of those 3r points:
+  f_(j,i)=a_(j,r+i),              0<=i<r.            (FG4.1)
+Its cell number is 2r+2+2i. Set F.TT=TT and F.J=J.
+For the source's total function fr(j,i) on all natural i, put
+fr(j,i)=B_j when i>=r. This is exactly bf_F, not just an isomorphic
+frame choice, and ensures its period identity for every natural i.
+
+Equations (FG3.1–5) prove:
+  f_(j+J,i)=f_(j,i)+n;
+  f_(j,0)<...<f_(j,r-1);
+  f_(j,r-1)<f_(j+1,0);
+  every frame entry belongs to Ttilde and is even.
+For the inter-frame inequality, use
+f_(j,r-1)<B_j+4ru<B_j+ell<=B_(j+1)
+and f_(j+1,0)>=B_(j+1)+(2r+1)u.
+No selected point lies strictly between two consecutive entries
+of one frame: these are consecutive members of the marked tile's
+complete selected list.
+
+For each j, one and the same marked index sidx(j) serves every
+coordinate i<r:
+  f_(j,i) mod n belongs to C(sidx(j),2r+2+2i).       (FG4.2)
+It is not merely a separate existential choice of tile for each i.
+Conversely every marked complete tile occurs, by taking j=a when
+its index is s_a. In particular its cell 2r+2 contains f_(a,0) mod n.
+These are the stronger common-index and coverage clauses of bc_frames
+and OrbitFrames, beyond the weaker per-coordinate statement bf_frames.
+
+FG5. SEGMENT SPAN, BOUNDARY LETTERS AND THE STRONG L2 GAPS
+
+The source segment and its intermediate selected letters are
+  W_j=Ttilde intersect [f_(j-1,0),f_(j,r-1)],
+  LL_j=Ttilde intersect (f_(j-1,r-1),f_(j,0)).
+The old-frame condition IsW(j,x) means x<=f_(j-1,r-1).
+Because the frame entries are consecutive selected points, the selected
+old part of W_j consists of exactly those r frame entries.
+
+The exact first r members of LL_j are
+  a_(j-1,2r),...,a_(j-1,3r-1),
+and its exact last r members are
+  a_(j,0),...,a_(j,r-1).                             (FG5.1)
+Each displayed list lies in LL_j by the frame order and (FG2.3).
+Within each boundary marked tile there are no other selected points
+between its consecutive listed points. Anything outside the previous
+marked tile lies after its last listed point; anything outside the
+current marked tile lies before its first listed point. This proves
+the assertions about the first and last r members, regardless of
+the selected points in unmarked intervening tiles. The two lists
+are disjoint, so |LL_j|>=2r, in particular the source requirement
+|LL_j|>=r holds.
+
+The literal endpoint predicate is
+  |{y in LL_j:y<=x}|<=r
+        or |LL_j|<|{y in LL_j:y<=x}|+r.
+For an increasing finite list, these mean respectively that x is
+among its first r or its last r members, including both endpoints.
+Thus (FG5.1) covers the source predicate exactly. Every such x is
+even. By (FG3.4), it has distance >u>L2 from every earlier selected
+point; in particular its immediate predecessor in W_j has that gap.
+The same holds for f_(j,0). This is the full GapGt L2 assertion,
+not merely the weaker L1 gap in Valid. Passing to L1<=L2 preserves it.
+
+The segment has the required strict span:
+  f_(j,r-1)-f_(j-1,0)
+    < B_j-B_(j-1)+(2r-1)u
+    < (M+3)ell
+    <=G'.                                           (FG5.2)
+The first inequality uses the exact last and first frame cell bounds;
+the second uses (FG2.3) and (2r-1)u<ell. The source retains the
+looser G'=(M+5)ell. Neither equality at G' nor an extra inclusive
+endpoint is introduced. In particular every point of W_j lies in
+[f_(j-1,0),f_(j-1,0)+G').
+
+FG6. WINDOW CARDINALITY AND THE OLDEST VECTOR
+
+For any integer b and integer 0<=L<=n, reduction modulo n is injective
+on the integer half-open interval [b,b+L). Indeed two congruent integers
+differ by a multiple of n, whereas their difference has absolute value
+<n. Its image is Win_n(b mod n,L). It follows from A and Intervals that
+  |Ttilde intersect [b,b+L2)|<=r-1,
+  |Ttilde intersect [b,b+G')|<=N1.                    (FG6.1)
+Here L2<n and G'<=n/3, as already checked in FG1.
+Using (FG5.2) in the second estimate gives
+  |W_j|<=N1.                                         (FG6.2)
+This checks the interval-cardinality clause of Valid with the precise
+N1=orbitWindowCount from the actual input.
+
+For any x in W_j outside its old part, the r old-frame entries are
+distinct even selected points in W_j strictly before x. Hence the
+source sorted list of even predecessors has at least r entries.
+Its index length-r is valid: the default-zero branch in the source's
+getD definition of oldest is never used. Let y be that r-th most recent
+even predecessor. The r most recent even predecessors all lie in [y,x).
+
+If x-y<=L1, then x<=y+L1<=y+L2, so these r distinct selected points
+lie in [y,y+L2). This contradicts the first bound of (FG6.1).
+Therefore
+  x-oldest(j,x)>L1                                   (FG6.3)
+for every required late x. This argument explains the strictness even
+when L1=L2: the predecessor list is strictly below x, while the
+counting interval is half-open. It proves bc_oldest_far directly;
+the older bd_oldest_far assumes the unnecessary L1+1<=L2, which is
+also available in the actual OrbitHyp application.
+
+FG7. ASSEMBLY INTO FRAMESOK AND RESTFRAMES
+
+Take F from FG4. We now account for every Valid L1 N1 clause:
+
+  (i) J>=1: FG2.
+  (ii) Periodicity for all natural frame indices: FG4, including i>=r.
+  (iii) Increasing rows and ordered consecutive frames: FG4.
+  (iv) Selected even frame entries: FG3–FG4.
+  (v) No selected points between consecutive entries of a frame: FG4.
+  (vi) At least r intermediate selected points, and the exact first/last-r
+       endpoint parity and L1 gap, plus the gap before f_(j,0): FG5.
+  (vii) The full segment has at most N1 selected letters: FG6.
+  (viii) The r-th even predecessor has distance >L1 at every late x: FG6.
+
+In addition, FG5 proves the strict segment span<G' and retains both
+L2-gap assertions at the intermediate endpoints and f_(j,0). Along
+with F.TT=TT, these are exactly Pf14.FramesOK TT L1 L2 N1 G' F.
+Therefore frames_of is fully proved from its actual OrbitHyp premises.
+
+Under the more general OrbitRaw inputs of FG1, the same argument proves
+the full OrbitFrames conclusion: common marked-tile index for every
+frame, coverage of every marked tile, the span and segment-cardinality
+pair, and the stronger L2-gap clauses. This proves the actual content
+of TopChoiceBounds.restFrames_proved. The wrappers are consequences of
+the explicit construction above; they are not assumed as premises.
+
+FG8. QUANTITATIVE FRAME COUNT AND PRECISE REMAINING SCOPE
+
+For the constructed frame, different marked complete tiles are disjoint
+subsets of [0,n), and each has exactly 3r selected points. Hence the
+derived stronger count is
+  3rJ<=|TT|.                                         (FG8.1)
+In particular J*r<=|TT| and J<=|TT|. The exact weaker bound Jr<=|TT|
+used downstream also holds for any Valid periodic frame: the Jr entries
+f_(j,i), 0<=j<J,0<=i<r, are strictly ordered in one half-open period
+[f_(0,0),f_(0,0)+n), so their reductions inject into TT. This is the
+source's frame_count_mul_le_tops and does not require the special
+marked-tile construction.
+
+Likewise (FG5.2) and G'<n make reduction injective on W_j, so the
+derived bound |W_j|<=min(N1,|TT|) holds for the constructed data.
+The source standard choice Ns=min(N1,2|TT|) remains valid; we do not
+change that choice or any downstream estimate.
+
+No specialized frame-construction claim remains unexpanded in this
+report. What is still supplied is the actual OrbitHyp: the three
+finite selected-set conditions and their numerical separation. The
+probability/abundance theorem ensuring enough good orbits, the global
+choice of TT, the asymptotic inequalities for these parameters, and
+compatibility with all later Type-II degree/chain hypotheses are outside
+this finite construction. In particular a statement of CondTiles for a
+given T is not a proof that an abundant family of such T exists.
+
+This is a source-backed human proof. No Lean source was edited, no new
+Lean formalization of the shorter enumeration was made, and no full Lean
+build or kernel replay is asserted.
+
+SOURCE PROVENANCE
+
+provenance.json records stable FG claim IDs, exact source declarations,
+one-based inclusive ranges, full-file and range SHA256 hashes, and pinned
+URLs. build_provenance.py compares every source file byte-for-byte with
+its Git blob at the stated commit before generating those records.
+Historical component files are not edited.

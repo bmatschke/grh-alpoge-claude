@@ -1,0 +1,1110 @@
+\section{Constructing charts, residue functionals and Hermitian carriers}
+\label{sec:global-forms}
+
+\status{FC1--FC18 prove the arithmetic and linear-algebra constructions
+specified below, including actual finite charts from supplied adelic
+representatives, replacement of their residue functionals without changing
+their level groups, exact residue projections, the Fock metric and period
+identities, the common auxiliary-prime data, and the Hermitian carrier
+conversion. FC19 joins these with CV9 and NB7--NB8 to construct the
+actual step-zero \texttt{Forms0}, its matching level carrier, and all
+the global input records needed by VE9. This construction retains the
+initial decorated-point realizability input. The complete simultaneous
+\texttt{FormsTiedSym} and \texttt{ColsTiedSym} constructors still require
+the terminal incidence construction and the specified symmetric
+auxiliary-prime level descriptions. The original \texttt{TC.Ok},
+\texttt{Pins}, \texttt{Laws} and \texttt{Later} data remain hypotheses.}
+
+\paragraph{The data used here.}
+Write $E/F$ for the supplied CM extension, $\mathcal O=\mathcal O_E$,
+and $x\mapsto\bar x$ for its involution. Fix a word $u$, a step $i\le m$,
+and $n=N_i>0$. The exact coordinate identifications of SF2 put the
+Hermitian form in the form $h(x,y)=\bar x^{\mathsf T}y$ and preserve the
+original class lattice and frame matrices. Put $p=T_u$ and
+$\pi=\pi_u$, so $p$ is a rational prime and
+$\pi\bar\pi=p$. The prime data include
+$(\pi,\bar\pi)=\mathcal O$, the selected set
+$S=\{P:P\mid\pi\}$, $|S|=[F:\mathbb Q]$, and
+$|\mathcal O/P|=p$ for $P\in S$.
+
+The source's \texttt{Laws} are substantive supplied data. They include
+finite orbit and stabilizer statements for the actual column actions,
+the level and period action laws, and the polynomial lattices and their
+pairings. They do not mean merely that some unnamed compatible objects
+exist. Whenever the proof below uses adelic realizability or a supported
+move not yet reconstructed, that use is stated separately.
+
+\paragraph{FC1: the level-prime index and its real residue field.}
+First, $(\pi)=\prod_{P\in S}P$. Indeed, conjugation preserves absolute
+ideal norm, and $[E:\mathbb Q]=2[F:\mathbb Q]=2f$, so
+$\mathrm N((\pi))^2=p^{2f}$ and $\mathrm N((\pi))=p^f$.
+The $f$ distinct primes in $S$ already contribute $p^f$; none can have
+a larger exponent. Since distinct maximal ideals are comaximal,
+\[
+ r\in\bigcap_{P\in S}P\quad\Longleftrightarrow\quad\pi\mid r.
+ \tag{FC.1}
+\]
+This is the \texttt{BasePi.dvd} assertion, with its exact squarefree
+content, rather than merely a statement about the support of $(\pi)$.
+
+Restriction gives a bijection from $S$ to the primes $v$ of $F$ above
+$p$. For surjectivity, choose a prime $Q$ of $E$ over $v$. Since
+$p=\pi\bar\pi\in Q$, either $\pi\in Q$, or
+$\pi\in\bar Q$; conjugate primes have the same restriction. For
+injectivity, the primes over a fixed $v$ in this quadratic Galois
+extension are one conjugate orbit. Two selected primes cannot be
+conjugate, since that would put both $\pi$ and $\bar\pi$ in one
+prime, contrary to their coprimality. Thus the map is the literal
+\texttt{underT}; its inverse does not select a different orientation.
+
+There is also an explicit residue-field descent. Let
+$\rho:\mathcal O\twoheadrightarrow k$ be the chosen quotient at $P$,
+where $\rho(\pi)=0$ and $\rho(\bar\pi)\ne0$, and let
+$v=P\cap\mathcal O_F$. For $y\in\mathcal O$, the elements
+\[
+ t=\pi+\bar\pi,\qquad z=y\bar\pi+\bar y\pi
+ \tag{FC.2}
+\]
+are integral and fixed by conjugation, hence belong to $\mathcal O_F$.
+The residue of $t$ is nonzero. Choose $s\in\mathcal O_F$ with
+$st\equiv1\pmod v$. Then $\rho(sz)=\rho(y)$. Consequently the
+restriction of $\rho$ to $\mathcal O_F$ is onto, has kernel $v$, and
+induces the exact isomorphism
+\[
+ k\simeq\mathcal O_F/v,
+ \qquad \rho(a)\longmapsto a\bmod v\quad(a\in\mathcal O_F).
+ \tag{FC.3}
+\]
+No choice of an abstract field of the same cardinality is substituted
+for this map. Together with the supplied embedding/prime correspondence,
+these are the prime-index and residue fields of \texttt{atTTied} and
+\texttt{CarH.fv}. The coefficient-place labels \texttt{tauOf} and
+\texttt{seenP} still use that supplied arithmetic correspondence.
+
+\paragraph{FC2: coupling data are determined by their reductions, and
+every prescribed reduction can be lifted.}
+Here the reference twist-prime set is empty, as it is for $\mu_0$ in
+the source. For a decorated lattice $D$, write $D_P$ for its localized
+lattice and $b_P:D_P\to k_P^n$ for its supplied reduction frame.
+At an auxiliary prime $P$, the rational integer $q_P$ lies in
+$P\setminus P^2$; thus it is a uniformizer in $\mathcal O_P$ and
+\[
+ b_P(x)=0\quad\Longleftrightarrow\quad x\in q_P D_P
+ \quad(x\in D_P).                                      \tag{FC.4}
+\]
+This follows by writing $x$ in the local frame: zero reduction means
+that every coordinate is divisible by the uniformizer.
+
+At the coupling step $i=m-1$, the additional datum is a coset
+$y+M$, where $q_Py\in D_P$ and $M$ imposes $x\in D_P$ at each
+auxiliary prime. Its reduction at $P$ is the singleton
+$\{b_P(q_Py)\}$. If two such cosets have the same reductions,
+(FC.4) gives $y-y'\in D_P$ at every relevant $P$, hence
+$y-y'\in M$ and the cosets agree. At all other steps the additional
+set is empty. Thus a column point is determined by its decorated
+lattice and the family of coupling reductions. This proves the actual
+\texttt{eq\_of\_deco\_bar} assertion in the reference-tuple case.
+
+For existence, prescribe vectors $v_P\in k_P^n$ for an arbitrary
+decorated lattice $D$. Its global reduction frames supply
+$x_P\in D$ with $b_P(x_P)=v_P$. Choose $e_P\in\mathcal O$ with
+$e_P\equiv1\pmod P$ and such that $e_P/q_P$ is integral at every
+other auxiliary prime. Such elements follow from the Chinese remainder
+theorem, using sufficiently large powers at the other primes. Then
+\[
+ y=\sum_P\frac{e_P}{q_P}x_P                            \tag{FC.5}
+\]
+satisfies $q_Qy\in D_Q$ and $b_Q(q_Qy)=v_Q$ for every $Q$:
+the $Q$-summand gives $v_Q$, and each other summand is a multiple of
+$q_Q$ in $D_Q$. The coset $y+M$ is therefore the required point.
+This proves \texttt{exists\_ptAt\_bar\_eq}; no adelic approximation
+theorem is being used in this finite residue construction.
+
+\paragraph{FC3: the finite chart fibers and their exact representatives.}
+Let $\mathscr C_i$ be the supplied finite column-class set. A class
+$c$ has an index $b(c)$ and a preferred point $r(c)$; let
+$C(c)$ denote its coupling-reduction family. Define
+\[
+ \operatorname{Ch}_i=\operatorname{im}
+       \bigl(c\mapsto(b(c),C(c))\bigr),\qquad
+ \operatorname{chOf}(c)=(b(c),C(c)).                     \tag{FC.6}
+\]
+This is a finite image, not a new finite-class assumption. Choose a
+representative $c_\beta$ of each image point. If $H_b$ is the original
+product of finite reduction groups, put
+$H_{b,C}=H_b\cap\operatorname{Stab}(C)$, component by component.
+
+The fiber over $\beta=(b,C)$ is exactly the decorated-lattice orbit
+set for $\mathrm U(E)\times H_{b,C}$. To prove injectivity, an element
+of this group relating the decorated lattices also preserves $C$;
+FC2 then says that it relates the whole points. They represent the same
+original class. For surjectivity, lift any decorated lattice with the
+prescribed $C$ by (FC.5), and take its preferred representative. Preferred
+representatives normalize the coupling coset by choosing one value from
+its orbit. Starting with the same $C$ therefore gives the same normalized
+value: the two sets of attainable values are identical. The moving
+element consequently lies in $H_{b,C}$. This proves both directions,
+including the normalization step which would be missing from an arbitrary
+partition into fibers.
+
+For the passage to adelic charts we retain one precise geometric input:
+each actual decorated lattice has a realizing unitary adelic point.
+AD1 constructs the diagonal base point $k_u$ with the lattice and
+last-row residues specified in \texttt{kStd\_spec}. Choose the actual source representative
+$y_c=y_{\rm Std}(u,i,c)$ so that $y_ck_u$ realizes $r(c)$.
+Pulling a vector back by $y_c^{-1}$ gives the chart base lattice
+$L_\pi=\mathcal O^{n-1}\oplus\pi\mathcal O$. Equality of the
+decorated points says exactly that a quotient matrix preserves this
+lattice and has reduction in $H_{b,C}$: the lattice equality checks
+integrality of the matrix and its inverse, and equality of the finite
+decorations checks the reduction condition. Rational changes of frame
+act on the left. Thus the fiber bijection just proved is also the
+adelic double-quotient bijection required of a \texttt{LevelChart}.
+The supplied injective stabilizer map has exactly the rational elements
+in $y_cUy_c^{-1}$ as its image, by the same equality-of-points criterion.
+
+The chart character is the restriction of the original finite character,
+composed with reduction. More explicitly, right multiplication by an
+adelic $x\in U$ acts on the decoration by the inverse of its reduction.
+The definition of the level character contains this same inverse, so
+the two inversions cancel. Its value is precisely the original column
+character of the moving element. This proves the character clause of
+\texttt{ReadsK}, in addition to its lattice, level and stabilizer clauses.
+The matrices remain $y_{\rm Std}$, not representatives chosen anew
+inside each chart. At $i=0,m$ the column index is unique and the coupling
+set is empty; the nonempty image (FC.6) is therefore a singleton.
+This gives the exact endpoint \texttt{Unique} assertions.
+
+\paragraph{FC4: normalize the residue functional without changing the
+level.}
+The following local calculation supplies the substantial part of
+\texttt{charts\_funKilled}. Let $A$ be the integral algebra
+$\mathcal O_E\otimes_{\mathcal O_F}\mathcal O_{F_v}$ inside
+$E\otimes_FF_v$, with its involution; write $q=\bar\pi$.
+At a selected level prime, (FC.1) and FC1 identify both $A/\pi A$
+and $A/qA$ with fields of order $p$. Put
+\[
+ L=A^{n-1}\oplus\pi A,\quad
+ L^\#=A^{n-1}\oplus q^{-1}A,\quad
+ L^\#/L\simeq A/pA,\quad [x]\longmapsto[qx_n].         \tag{FC.7}
+\]
+The middle identity is SF3, after base change. Suppose $g$ is unitary
+and preserves $L$. It also preserves $L^\#$. Applying $g$ to
+$\pi e_j\in L$ shows that its last row is integral; applying it to
+$e_j\in L^\#$ shows that all other rows are integral. Moreover
+\[
+ g_{nj}\in\pi A\ (j<n),\qquad
+ g_{jn}\in qA\ (j<n).                                 \tag{FC.8}
+\]
+On the quotient (FC.7), $g$ therefore acts by multiplication by
+$d=g_{nn}$. The $(n,n)$ entry of $g^*g=1$ gives
+\[
+ d\bar d\equiv1\pmod{pA}.                             \tag{FC.9}
+\]
+
+Let $f:L^\#\to M$ be any nonzero $A$-linear functional vanishing on
+$L$, where the additive group of $M$ has prime order $p$. Multiplication
+by $\pi$ on $M$ is either zero or onto. In the second case
+$qM=0$, since $q\pi=p$ and $pM=0$. Thus $f$ factors nontrivially
+through either $A/\pi A$ or $A/qA$. The resulting map to $M$ is
+an isomorphism: both additive groups have prime order. It follows that
+$f(gx)=f(x)$ for every $x$ exactly when $d\equiv1$ modulo the
+chosen one of these ideals. By (FC.9) and conjugation, the two conditions
+are equivalent. In particular they are also equivalent to $g$ acting
+trivially on all of $L^\#/L$.
+
+Replace $f$ by the canonical quotient
+\[
+ f_0:L^\#\longrightarrow A/\pi A,\qquad
+ f_0(x)=qx_n\bmod\pi A.                               \tag{FC.10}
+\]
+It is nonzero, kills $L$, has a value group of order $p$, and
+$f_0(\pi x)=0$. The intersection of its stabilizer with the unitary
+stabilizer of $L$ is exactly the old intersection. Therefore one can
+replace only the chart's value module and functional: its base lattice,
+every local level group, global level, character, adelic representatives
+and stabilizer maps stay literally unchanged. Its \texttt{ReadsK}
+proof stays valid. Doing this independently at each level prime and
+each chart yields the actual \texttt{FunKilled} property. For $n=1$
+the off-diagonal statements are empty and the same proof applies.
+
+\paragraph{FC5: the quotient projections are constructed, not assumed.}
+Let $\mathfrak p\subset\mathcal O$ be maximal and let two lattices
+$A_0,M_0\subset E^n$ satisfy $(A_0)_{\mathfrak p}=(M_0)_{\mathfrak p}$.
+For $x\in A_0$, choose $s\notin\mathfrak p$ with $sx\in M_0$ and set
+\[
+ \operatorname{pr}(x)=\bar s^{-1}[sx]
+                 \in M_0/\mathfrak pM_0.              \tag{FC.11}
+\]
+Using a common denominator proves independence of $s$, additivity and
+$\operatorname{pr}(ax)=\bar a\operatorname{pr}(x)$.
+If $x\in M_0$, this is its usual residue. Given $[y]\in M_0/\mathfrak pM_0$,
+choose $s\notin\mathfrak p$ with $sy\in A_0$ and $t$ with
+$ts\equiv1\pmod{\mathfrak p}$; then $tsy\in A_0$ maps to $[y]$.
+Thus $\operatorname{pr}$ is onto. Its kernel is exactly
+$\mathfrak pA_0$: if its value is zero, clearing a second denominator
+gives $rx\in\mathfrak pA_0$ for some $r\notin\mathfrak p$;
+choose $a$ with $ar\equiv1\pmod{\mathfrak p}$ and write
+$x=arx+(1-ar)x$.
+
+For the actual decoration, its defining local laws give
+$(L^\#)_{\mathfrak p}=N_{\mathfrak p}$ and
+$(L+\mathfrak pL^\#)_{\mathfrak p}=(\operatorname{dn}N)_{\mathfrak p}$.
+Apply (FC.11) to these two pairs. They are the source's
+\texttt{pr} and \texttt{prk}, with the required surjectivity and kernels.
+The decoration functional satisfies
+\[
+ f_{\mathfrak p}(z)=0\quad\Longleftrightarrow\quad
+ z\in L+\mathfrak pL^\#\qquad(z\in L^\#).              \tag{FC.12}
+\]
+For the nontrivial implication, $f_{\mathfrak p}(z)=0$ puts $z$ in
+$L_{\mathfrak p}$; clear a denominator $s$ and choose
+$ts+r=1$, $r\in\mathfrak p$, to write
+$z=t(sz)+rz\in L+\mathfrak pL^\#$. The converse follows by
+linearity. Finally, if $f_{\mathfrak p}(z)=f_{\mathfrak p}(e)=1$,
+then $z-e\in L_{\mathfrak p}$ and
+$pz-pe\in\mathfrak p(\operatorname{dn}N)_{\mathfrak p}$.
+Their projections agree. This is the special \texttt{te} compatibility,
+and completes \texttt{exists\_level\_projections} with the literal
+\texttt{IdL} identities on global elements.
+
+\paragraph{FC6: the residue comparison has an explicit formula.}
+Let $f:L^\#\to M$ now be a nonzero normalized functional, so
+$f(\pi x)=0$. Its factorization in FC4 gives a unique additive
+isomorphism $e:M\simeq k_P$ satisfying
+\[
+ e(f(x))=\rho_P(\bar\pi x_n).                          \tag{FC.13}
+\]
+Indeed, the map $x\mapsto\rho_P(\bar\pi x_n)$ is onto, and its
+kernel is killed by $f$: subtract
+$\pi\bar\pi^{-1}ae_n$ when $\bar\pi x_n=\pi a$; the
+remainder lies in $L$. The induced nonzero map $k_P\to M$ is an
+isomorphism between groups of order $p$.
+
+This normalization is compatible with the actual decorated-class
+functional, not merely with an abstract residue field. If $y_ck_u$
+realizes the point, its inverse is $k_u^{-1}y_c^{-1}$. The defining
+last-row residue of $k_u^{-1}$ is
+$(0,\ldots,0,\bar\pi)$. Reduction of its product with
+$y_c^{-1}z$ therefore gives
+\[
+ f_P(sz)=\bar s\,\rho_P\!\left(
+        \bar\pi (y_{c,v}^{-1}z)_n\right)               \tag{FC.14}
+\]
+whenever $sz$ is in the original decorated lattice $N$.
+All the products in this reduction are integral at $P$: the first
+$n-1$ coordinates of $y_{c,v}^{-1}z$ are integral, and its last is
+integral at $P$ because $\bar\pi$ is a unit there. This checks the
+integrality needed when multiplying residue identities.
+
+Choose $s\notin P$ with $sz\in N$, as permitted by FC5.
+The defining rule (FC.11), (FC.13) and (FC.14) then agree after
+multiplication by the nonzero scalar $\bar s$; cancel it.
+This proves \texttt{FvTieG}. For a rational base-coordinate vector
+$x$, it also proves the precise terminal formula
+$e(f(x))=\operatorname{res}(r)$ when $r=\bar\pi x_n\in\mathcal O$.
+Combined with $h(\pi e_n,x)=\bar\pi x_n$, this is the
+\texttt{TilBaseFv} calculation once the terminal vector and its
+incidence data have been supplied.
+
+\paragraph{FC7: the metric comparison is a finite polynomial calculation.}
+For polynomials in all frame entries write
+$P=\sum_\alpha p_\alpha X^\alpha$ and define the normalized Fock form
+\[
+ N_\lambda(P,Q)=c_\lambda^{-1}
+       \sum_\alpha\alpha!p_\alpha\overline{q_\alpha},
+ \qquad c_\lambda>0,                                  \tag{FC.15}
+\]
+where $c_\lambda$ is the product of the Fock squared norms (the
+self-pairings) of the source's highest polynomials. This convention is linear in $P$ and conjugate
+linear in $Q$. It is positive definite. For completeness, the unnormalized
+sum equals the Gaussian integral
+$\pi^{-d}\int_{\mathbb C^d}P(z)\overline{Q(z)}e^{-|z|^2}\,dz$:
+angular integration kills unequal exponents and radial integration gives
+$\alpha!$. A unitary change of variables preserves this integral and
+therefore the form. Blockwise left multiplication of the frame matrices
+by unitary matrices is such a change of variables. Adding a common
+integer to every entry of a highest weight changes neither its
+normalized weight nor $c_\lambda$, hence does not change (FC.15).
+
+In the actual standard coordinates, an orthonormal frame $o$ satisfies
+$o_\tau^*o_\tau=I$, so $|\det o_\tau|=1$. Inserting the
+determinant-twisted polynomial definitions gives
+\[
+ \operatorname{ipV}(f_P,f_Q)=N_\lambda(Q,P),
+ \qquad f_P(z)=\operatorname{fnOf}(o^{-1},P)(z).
+ \tag{FC.16}
+\]
+The order $Q,P$ is essential: $\operatorname{ipV}$ is conjugate linear
+in its first argument. No reversal of the Hermitian convention is
+being made.
+
+The global Gram matrix is defined by the finite class sum with weights
+$a_c=|\operatorname{Stab}(c)|^{-1}>0$. Expanding a vector in its
+chosen basis and distributing this finite sum proves, at an embedding
+$s$ of the coefficient field,
+\[
+ \operatorname{maj}_s(x,x)
+   =\sum_c a_c\,N_\lambda(sP_c,sP_c)
+   =\sum_c a_c\prod_\tau|\det o_\tau|^{2\delta_\tau}
+       N_\lambda\bigl(P_c^s(oX),P_c^s(oX)\bigr).
+ \tag{FC.17}
+\]
+Taking real parts is the source's \texttt{NormTieG}. The following
+descent argument justifies the embedded Gram expansion even when the
+coefficient field $L$ is larger than a CM field. Define
+\[
+ L^{\mathrm c}=\{a\in L:
+    s(a^*)=\overline{s(a)}\text{ for every }s:L\hookrightarrow\mathbb C\}.
+ \tag{FC.17a}
+\]
+It is a subfield, since the displayed equality is preserved by field
+operations. It contains the subfield
+$L_0=\mathbb Q(\tau(E),\chi(g):\tau,g)$ generated by the embedded
+CM-field images and the character values in the stabilizer actions.
+For the first generators this follows from the supplied
+\texttt{FOk.emb\_star} and CM conjugation laws. For a root of unity
+$\zeta$, its distinguished embedding has modulus one, and
+\texttt{FOk.sig\_star} identifies star there with complex conjugation;
+injectivity
+of that embedding gives $\zeta^*=\zeta^{-1}$. Every other embedding
+also maps it to a root of unity, hence
+$s(\zeta^*)=s(\zeta)^{-1}=\overline{s(\zeta)}$.
+These are the generators actually used by the polynomial action.
+
+The integer Weyl-polynomial basis identifies the stabilizer equations
+with linear equations over $L^{\mathrm c}$. Their invariant space has
+an $L$-basis with coordinates in $L^{\mathrm c}$. One direct proof,
+valid simultaneously for all equations, chooses an
+$L^{\mathrm c}$-basis $a_j$ of $L$ and applies its coordinate
+projections to every coefficient of an invariant vector. Each projection
+commutes with every action matrix, so gives another invariant vector
+with coefficients in $L^{\mathrm c}$. The original vector is
+$\sum_j a_j$ times these projected vectors. The latter therefore span
+over $L$, and a basis can be extracted from them.
+
+Crucially, this is the basis used by the actual source: the definition
+\texttt{CSD.basis} selects a basis with these coordinates whenever
+\texttt{HasRatBasis} holds, as just proved. It is not an arbitrary
+$L$-basis followed by an unwarranted interchange of embedding and
+involution. For two vectors of this selected basis, every polynomial
+coefficient belongs to $L^{\mathrm c}$; thus (FC.17a) proves that
+their coefficient pairing, after embedding, is exactly (FC.15) with
+the Hermitian order reversed as in (FC.16). Expand a general vector
+$x=\sum_j a_jb_j$ only after those basis-pairing identities are proved.
+Both sides are then the same complex quadratic form in the scalars
+$s(a_j)$, with the usual complex conjugates. No equality
+$s(a_j^*)=\overline{s(a_j)}$ is required for arbitrary coefficients
+$a_j\in L$. This also explains the statement in any other coordinate
+basis: transport the already obtained complex quadratic form by the
+complex change-of-basis matrix.
+
+The combined matrix of all basis values is injective. It has a left
+inverse over $L$, whose embedded matrix remains a left inverse; hence
+a nonzero complex coefficient vector has a nonzero class value.
+The positive weighted Fock sum therefore makes the embedded Gram
+matrix positive definite. The source's standard Hermitian frame
+realizes precisely this Gram matrix. Polynomial injectivity (CV1)
+identifies any proposed family $P_c$ in the norm statement with the
+actual coefficient polynomials. Thus (FC.16)--(FC.17) prove the literal
+\texttt{ipV\_norm\_tie}, rather than assuming a metric comparison.
+The same argument in dimension $N_m-1$, with the terminal constant
+weight shift, supplies \texttt{ipP} and \texttt{NormPTie} for the
+terminal value construction of CV10. It proves no independent spectral
+or metric estimate elsewhere in the reconstruction.
+
+\paragraph{FC8: the period map is coefficient conjugation.}
+Let $\mathcal C P$ be the frame function obtained by conjugating the
+coefficients of $P$ and retaining the prescribed determinant twist.
+It is conjugate linear and injective by CV1; it maps onto the prescribed
+complex polynomial value space, because that space is defined over the
+real integer highest-polynomial generators. For a rational unitary
+matrix $\gamma$ and a character value $\chi$ of finite order,
+$\gamma^{-1}=\gamma^*$ and $\overline{\chi^{-1}}=\chi$.
+Substitution into the polynomial action gives the exact intertwining
+identity
+\[
+ \mathcal C\bigl(\chi^{-1}\rho(\gamma)P\bigr)
+          =\operatorname{tr}_{\gamma,\chi}(\mathcal C P).
+ \tag{FC.18}
+\]
+Here $\mathcal C$ conjugates coefficients; it does not replace the
+frame variable by its complex conjugate.
+
+Evaluate an equivariant polynomial section on each preferred terminal
+class representative and apply $\mathcal C$; call the resulting map
+$j_M$. The source's \texttt{PerIn.H} is the whole group. Values on
+preferred representatives therefore determine a section, proving
+injectivity. Conversely, lift each prescribed class value uniquely by
+$\mathcal C$ and extend by $\chi^{-1}\rho(\gamma)$ along its orbit.
+Two possible moving elements differ by a stabilizer. Equation (FC.18),
+the invariance of the class value and injectivity of $\mathcal C$
+show that the lift is fixed by that stabilizer. The extension is
+well-defined and equivariant. Thus $j_M$ maps onto exactly
+the source's \texttt{ptC} space.
+
+Conjugating the second polynomial in (FC.15) turns its Hermitian
+coefficient pairing into the symmetric bilinear coefficient pairing.
+Term by term in the weighted class sum this proves
+\[
+ \operatorname{period}(w,F)=\operatorname{ipP}(j_MF,w).
+ \tag{FC.19}
+\]
+For nonzero $z\in\texttt{ptC}$, at least one class polynomial is
+nonzero. Its Fock norm is positive, all class weights are positive,
+and every other summand is nonnegative. Hence
+$\operatorname{Re}\operatorname{ipP}(z,z)>0$. These statements prove
+all five assertions of the literal \texttt{period\_conj} supplier
+under the supplied column/period laws; they do not assert existence of
+those laws for a new arithmetic host.
+
+\paragraph{FC9: convert the chart levels and classes to Hermitian
+carriers.}
+This construction uses the auxiliary-prime descriptions
+$\texttt{GLevH}$ of the same charts, constructed in FC14 below. At an auxiliary prime, a matrix
+congruent to the identity lies in the chart level because its reduction
+is the identity of its finite subgroup. Away from the auxiliary and
+level primes the chart already has its stated full lattice stabilizer.
+At a level prime, FC4 proves the remaining Hermitian condition exactly:
+\[
+ U_v=\{g\in\mathrm U(h):gL=L,\quad
+                    (g-1)L^\#\subset L\}.            \tag{FC.20}
+\]
+In fact the old definition is the intersection with the stabilizer of
+the nonzero prime-order functional, and FC4 shows that this is equivalent
+to acting trivially on the whole discriminant module. This also explains
+why one cannot simply replace a functional by an arbitrary zero map.
+
+Use the coordinate basis of SF2 to carry the lattice, local groups and
+global group back to the actual Hermitian space. Transport along the
+single rank-index bijection takes addition, scalar multiplication,
+duals, localizations and matrix conjugation to themselves. For each
+class, use the very same $y_c$ and stabilizer homomorphism in these
+coordinates. Their quotient bijection, lattice-transport condition,
+injectivity and range formula are unchanged. This proves
+\texttt{classTie\_of\_chart}, including every equality in
+\texttt{SameCar}, rather than just an isomorphism of class sets.
+
+At step zero the same transport produces \texttt{ColLevel}. Its
+type-prime splitting and frames are the supplied $G$ and the same
+\texttt{glev0.fr}. The additional claim that a rational stabilizer
+preserves its class lattice follows as follows. Conjugating it by $y_c$
+puts it in $U$, so it preserves every completed class lattice.
+A full $\mathcal O$-lattice is the intersection of its finite localizations
+inside $E^n$, by the denominator argument of LP1. It therefore preserves
+the global lattice; apply the same argument to its inverse.
+
+For $1\le i<m$, apply this construction to each chart fiber. At
+$i=m$, the chart type is a singleton by FC3, so restriction to its
+fiber and the inverse inclusion are exact inverse class maps. There
+is no empty endpoint fiber. Use the residue equivalence (FC.3) and the
+same place bijection for the remaining fields. These choices construct
+the entire \texttt{CarH} output of \texttt{hermColsCh\_of\_forms},
+conditional on the given standard forms and their level descriptions.
+No separate Hermitian carrier existence assumption is needed after
+those forms are available.
+
+\paragraph{FC10: the step-zero value module is killed by the actual
+uniformizer.}
+The previous normalization proves this for the charts constructed here.
+There is also a useful intrinsic proof for any supplied standard forms,
+which is the source's \texttt{pi\_kills}. Choose a class, a vector in
+its nonzero residue-functional image, and a lift $z$ using the
+surjectivity of its projection. By \texttt{FvTie}, the corresponding
+value $m=f(y_c^{-1}z)$ in the chart value group is nonzero.
+Multiplication of $z$ by $\pi$ multiplies its projected value by
+$\operatorname{res}(\pi)=0$. Linearity and \texttt{FvTie} therefore
+give $\pi m=0$. An additive group of prime order is generated by
+any nonzero element, so $\pi M=0$.
+
+If a previously chosen \texttt{ColLevel} has the correct carriers but
+different residue-module fields, transport the forms' functional along
+the exact rank reindexing and use its value module. Nonzeroness,
+$p$-torsion, order $p$, vanishing on the base lattice and its stabilizer
+formula transport with it. This changes only those functional fields;
+the lattice, local and global groups, class representatives, stabilizer
+maps, splitting and frames remain identical. It proves the literal
+\texttt{stepZeroHermitianLevel\_with\_formsFunctional} and
+\texttt{stepZeroHermitianLevel\_uniformiser\_kills\_values} assertions.
+
+\paragraph{FC11: what the naturality calculation does once a supported
+move exists.}
+This paragraph proves the algebraic part of the move comparison, with
+its geometric premise exposed. Suppose an actual up/down/diamond move
+keeps the chart label, has moving column-group element $g=(\gamma,h)$,
+and has an adelic realization $y_c\delta k$ with $\delta$ equal to
+the identity away from the specified level place. Let $c'$ be the
+new preferred class. By \texttt{ReadsK},
+\[
+ \kappa=y_{c'}^{-1}\gamma^{-1}y_c\delta\in U,\qquad
+ y_c\delta=\gamma y_{c'}\kappa,
+ \qquad \chi_U(\kappa)=\chi_{\rm col}(g).              \tag{FC.21}
+\]
+The reason for membership is exact: $\gamma^{-1}$ moves the realized
+point to the preferred point by the finite component $h$, which
+preserves the chart coupling data. The level-reading equivalence of
+FC3 applies, and its character-reading equality gives the last formula.
+For frames with $z=\gamma z'$, the transported function is
+$\chi_{\rm col}(g)f(\gamma^{-1}z)=\chi_U(\kappa)f(z')$.
+This proves the character and frame parts of \texttt{upNatTie} and
+\texttt{dnNatTieG\_cols}; the inverse $\kappa^{-1}$ in the source's
+alternative factorization introduces exactly the displayed inverse
+character, with no new scalar.
+
+The elementary local-basis correction used in an up move is also exact.
+If $a$ is a uniformizer at $P$ and $x-z\in PA$, then
+$a^{-1}(x-z)\in A_P$, whence
+\[
+ (A+\mathcal Oa^{-1}x)_P=(A+\mathcal Oa^{-1}z)_P.
+ \tag{FC.22}
+\]
+For a down-move functional, an identity known on the original global
+lattice extends to its localization: choose $s\notin P$ making the
+vector integral, use the residue-linearity of both sides, and cancel
+$\bar s\ne0$. This is the cancellation in
+\texttt{dn\_level\_functional}. These arguments do not construct
+$\delta$, prove that the source's actual neighbor has the required
+local lattice, or establish that a move preserves the coupling label.
+Those are distinct geometric assertions retained below.
+
+\paragraph{FC12: a common finite orbit carrier for the penultimate
+charts.}
+For a group $J$ and a finite family of finite-index subgroups
+$U_\beta\le J$, set
+\[
+ Y=\coprod_\beta J/U_\beta,\qquad y_\beta=(\beta,U_\beta).
+ \tag{FC.23}
+\]
+This is a finite $J$-set. Every point belongs to exactly one orbit
+$J y_\beta$, and the stabilizer of $y_\beta$ is exactly $U_\beta$.
+If $\chi_\beta$ is the restriction of a common character $\chi_J$,
+its stabilizer character is also the required one. These assertions
+follow directly by multiplying cosets and retaining their disjoint-union
+label. They prove the actual \texttt{exists\_orbits} part of
+\texttt{stepBefore\_oneLevel}.
+
+For the actual penultimate charts, the supplied index law
+\texttt{last\_uniq} makes the finite column-group index independent
+of the class. Choose a point whose coupling coset contains zero.
+Such a point exists by taking the zero coset of the prescribed coupling
+lattice. Membership of zero is preserved by every linear column action,
+so its preferred representative still has zero coupling reduction;
+let $\beta_0$ be its chart. All zero-containing coupling cosets have
+the same reduction family: translating their defining lattice by zero
+leaves that lattice, and a reduction frame sends it to the prescribed
+standard lattice. In the reference case these reductions at the auxiliary
+primes are the singleton zero.
+
+Here is the exact group calculation. Let $J_0$ be the unitary integral
+adelic group whose reduction fixes the last row at every selected level
+prime, and let $r$ be its product of auxiliary-prime reduction maps.
+The AD1 base point normalizes $J_0$: if
+$e_n^{\mathsf T}k^{-1}=b e_n^{\mathsf T}$ after reduction, then
+$b$ is a unit (multiply by $k$), and the equation
+$e_n^{\mathsf T}x=e_n^{\mathsf T}$ is equivalent to the same
+equation for $k^{-1}xk$. At auxiliary primes $k=1$, so conjugation
+does not change $r(x)$. The point-reading argument of FC3 consequently
+gives
+\[
+ U_\beta=\{x\in J_0:r(x)^{-1}\in H,
+                   \ r(x)^{-1}C_\beta=C_\beta\},
+ \qquad \chi_\beta(x)=\theta(r(x)^{-1}),             \tag{FC.23a}
+\]
+where $H$ and $\theta$ are the same finite column group and character
+for all $\beta$. The zero reduction $C_{\beta_0}$ is fixed by $H$.
+Thus choosing $J$ to be the already constructed chart level at
+$\beta_0$ gives $U_\beta\subset J.U$, equality of all base
+lattices, and restriction of the character of $J$ to $U_\beta$.
+Moreover $\ker r\subset U_\beta$ and $r$ has finite image, so
+each $U_\beta$ has finite index in $J.U$. Applying (FC.23) now
+constructs the actual finite orbit carrier with its exact stabilizers.
+
+This proves the common level, inclusions, character restrictions and
+orbit part of \texttt{stepBefore\_oneLevel}. What remains there is
+the specified identification of its reduction group with
+$\texttt{HSym}$ and its character with the displayed
+$\texttt{lamSym}$ formula. The generic reduction-image construction
+of FC14 alone does not prove that particular matrix shape and character
+formula.
+
+\paragraph{FC13: construct the one common auxiliary-prime package.}
+Write $q_j=g_j$ for the two distinct supplied auxiliary rational primes,
+and $a_j=\texttt{piG}(j)$, with $a_j\bar a_j=q_j$.
+The supplied complete splitting at these primes gives, for each
+$v\mid q_j$, a splitting
+$E\otimes_FF_v\simeq F_v\times F_v$ which carries conjugation
+to exchange of factors and scalars to the diagonal. Its residue field
+is the prime field $\mathbb F_{q_j}$. Orient the splitting so that the
+first component of $\bar a_j$ has valuation less than one.
+This is always possible: the two components of $a_j$ have product
+$q_j$, whose valuation is less than one. If the required component is
+not small, the other is; exchange the two factors. Both displayed
+splitting identities survive that exchange. The equality
+$a_j\bar a_j=q_j$ and the chosen $a_j$ themselves are unchanged.
+
+Choose one selected auxiliary prime $w_j$ of $E$ above $q_j$; its
+existence follows from the supplied positive cardinality of the selected
+set. The rings $k_v$ and $\mathcal O/w_j$ both have order $q_j$.
+The unique unital map from $\mathbb F_{q_j}$ to either is an
+isomorphism: its kernel is zero and domain and codomain have the same
+finite cardinality. Let $e_v:\mathbb F_{q_j}\simeq k_v$ and
+$e_w:\mathbb F_{q_j}\simeq\mathcal O/w$ denote these maps.
+For the coefficient-field embedding $\sigma_0:L\hookrightarrow\mathbb C$,
+define
+\[
+ \psi_{j,v}(x)=\sigma_0\!\left(
+       \psi^{\rm col}_{w_j}(e_{w_j}e_v^{-1}x)\right).
+ \tag{FC.24}
+\]
+It is an additive character. If it were trivial, surjectivity of the
+field isomorphisms and injectivity of $\sigma_0$ would make the supplied
+column character trivial. Thus it is nontrivial. The column-character
+law says that $\psi^{\rm col}_w$ has the same value on every integer
+at every selected $w\mid q_j$. Since every element of these prime
+fields is an integer residue, (FC.24) agrees with the required character
+at every such $w$, not only at $w_j$.
+
+The supplied multiplicative-character law gives an injective homomorphism
+$\omega_j:\mathbb F_{q_j}^{\times}\to L^{\times}$ for which
+the $s$th column character is $\omega_j^{2(s+1)}$.
+Extend $\sigma_0\omega_j$ to a multiplicative character on the field,
+and transport its powers by $e_v^{-1}$:
+\[
+ \chi_{j,v,b}(x)
+       =\bigl(\sigma_0\omega_j\bigr)^{2(b+1)}(e_v^{-1}x).
+ \tag{FC.25}
+\]
+This character has the prescribed values on every nonzero integer
+residue. Injectivity gives the primitive character
+$\sigma_0\omega_j$ order $q_j-1$, since
+$\mathbb F_{q_j}^{\times}$ is cyclic of that order. If the powers
+in (FC.25) for $a,b<m$ were equal, transporting them to $w_j$ would
+make the corresponding supplied column characters equal. Their
+injectivity law gives $a=b$. Equations (FC.24)--(FC.25) also show
+agreement across all $v\mid q_j$ on integer residues and exhibit the
+single primitive multiplicative character required by
+\texttt{CharacterCompatible}.
+
+The oriented splittings, the original $a_j$, and these characters are
+the complete $G=\texttt{GLoc}$ object. They prove all three fields of
+\texttt{IdG} and the complete \texttt{CharacterCompatible} assertion
+in \texttt{exists\_gLoc\_idG\_chiTied}. Choose this $G$ once,
+independently of the word $u$. Since $G.\texttt{piG}=X.\texttt{piG}$,
+the required membership of its uniformizers in the designated subfield
+is exactly the supplied $X.\texttt{piG\_K}$ clause. Complete splitting,
+the original character laws and that subfield clause remain part of
+the host data, not consequences of this transport argument.
+
+\paragraph{FC14: construct the chart reduction groups and their
+characters.}
+Fix any chart $S$ from FC3 and any $v\mid q_j$.
+Because $q_j\ne p$, the element $p$ is a unit at $v$. Its base
+lattice satisfies
+$p\mathcal O^n\subset L_\pi\subset\mathcal O^n$, so the
+completed lattice is the standard integral lattice. This is the explicit
+denominator calculation of SF5. The first split projection therefore has
+the identity matrix as a frame, including the required existential
+lifting of every integral first-projection vector.
+
+Let $V_v$ be the unitary stabilizer of this completed lattice and let
+$r_v:V_v\to\mathrm{GL}_n(k_v)$ be reduction of the first split
+matrix. Its second split matrix is the inverse transpose of the first,
+because the Hermitian Gram matrix is $I$. Hence $r_v(x)=I$ implies
+that both split matrices of $x$ and $x^{-1}$ are congruent to $I$.
+Embed $x$ at the single place $v$, with identity elsewhere. It preserves
+the completed lattice and every reduction frame of the decorated point:
+at $v$ this follows from the congruence, and elsewhere it is the identity.
+The base point $k_u$ is also the identity at $v$.
+Thus right multiplication by this embedded element leaves the same
+decorated point and its coupling reductions. The exact \texttt{ReadsK}
+level and character clauses give
+\[
+ \ker r_v\subset U_v,\qquad
+ \chi_U(\iota_v x)=1\quad(x\in\ker r_v),             \tag{FC.26}
+\]
+where $\iota_v$ denotes the supported embedding.
+
+Define $H_v=r_v(U_v)$ and
+$\lambda_v(r_vx)=\chi_U(\iota_vx)^{-1}$ for $x\in U_v$.
+Equation (FC.26) makes this independent of the lift and multiplicative.
+Moreover
+\[
+ U_v=r_v^{-1}(H_v)\quad\hbox{inside }V_v.             \tag{FC.27}
+\]
+Indeed, if $r_vx=r_vy$ with $y\in U_v$, then
+$y^{-1}x\in\ker r_v\subset U_v$.
+Only finitely many places divide the two distinct nonzero $q_j$.
+For $x\in U$, remove its components at these places using the
+$\iota_v$. The remaining element is the identity at every bad place;
+the given \texttt{StepLevel} character is trivial on that subgroup.
+Consequently
+\[
+ \chi_U(x)=\prod_{j=0}^1\prod_{v\mid q_j}
+                  \lambda_v(r_vx_v)^{-1}.            \tag{FC.28}
+\]
+Each $H_v$ is finite, so each $\lambda_v$ has finite image and all
+its values have absolute value one. Equations (FC.27)--(FC.28), with
+the identity frame, supply every field of \texttt{GLevH}.
+This proves the actual \texttt{chart\_gLevH} supplier from the
+constructed charts. No further auxiliary-prime description is assumed
+for those charts.
+
+\paragraph{FC15: the explicit step-zero level and character.}
+At $i=0$, $n=N_0=k$, the coupling set is empty, and the supplied
+index law identifies the original finite column subgroup at each
+selected auxiliary prime with the upper unitriangular group
+$\mathrm U_n(k_v)$. This identification is part of
+$\texttt{idx\_ok.zero\_G}$; its matrix content is simply
+$A_{ab}=0$ for $b<a$ and $A_{aa}=1$. The source's
+$\texttt{InJ}(k,t,N_0,\mathrm{false})$ has exactly this content:
+all its block labels are singleton indices, while its extra fixed-column
+and last-row conditions have no applicable index.
+
+The oriented first split factor in FC13 corresponds to the unique
+selected prime $w\mid\bar a_j$ above $v$. Its residue map
+$\rho_w:\mathcal O/w\simeq k_v$ is the map induced by that
+first projection. It carries every integer to itself. Reading the
+same point after a matrix supported at $v$ changes its reduction frame
+by the inverse matrix at $w$ and leaves all other selected reductions
+unchanged. Since $\mathrm U_n$ is a group, the inverse has the
+required shape exactly when the matrix itself does. The absence of
+coupling and twist-prime data at step zero, together with \texttt{ReadsK},
+therefore proves
+\[
+ x\in U_v\quad\Longleftrightarrow\quad
+ r_v(x)\in\mathrm U_n(k_v)\qquad(x\in V_v).          \tag{FC.29}
+\]
+This proves the specified group identity, rather than merely choosing
+the image subgroup as in FC14.
+
+For $A\in\mathrm U_n$, put
+$s(A)=\sum_{a=1}^{n-1}A_{a,a+1}$. Matrix multiplication gives
+$s(AB)=s(A)+s(B)$: in the $(a,a+1)$ entry only the two diagonal
+terms survive. Thus $s(A^{-1})=-s(A)$.
+At step zero the column character is
+$\prod_w\psi_w^{\rm col}(s(A_w))$; there are no determinant
+block factors or twist-prime factors. The chart reads
+$A_w=r_w(x)^{-1}$. Applying (FC.24), the actual residue maps
+$\rho_w$, and the last identity gives
+\[
+ \chi_U(x)=\prod_{j=0}^1\prod_{v\mid q_j}
+               \psi_{j,v}\bigl(s(r_vx_v)\bigr)^{-1}. \tag{FC.30}
+\]
+This is exactly the source's \texttt{lamJ} formula with
+$(a,nb,skip,fc,zl)=(k,0,k,N_0,\mathrm{false})$.
+The finite-product reindexing is legitimate: restriction is a bijection
+on each selected auxiliary-prime set, by the same conjugate-prime and
+coprimality argument as FC1, and the two sets are disjoint because
+$q_0\ne q_1$. The additive-character values have finite order and
+absolute value one. The identity frame, (FC.29), (FC.30), and this norm
+calculation prove all fields of \texttt{glev\_zero}, including
+\texttt{fr0}$=I$.
+
+\paragraph{FC16: the exact joins to the comparison hypotheses.}
+The level-zero coefficient-field condition has a short proof which is
+stronger than requiring the particular construction (FC.24).
+For any additive character $\psi:k_v\to\mathbb C$ at $v\mid q_j$,
+\[
+ \psi(x)^{q_j}=\psi(q_jx)=\psi(0)=1.                 \tag{FC.31}
+\]
+The supplied \texttt{Base.roots\_Ks} contains a primitive
+$q_j(q_j-1)$st root $\zeta$ in $L$, with its specified complex
+embedding. Every complex $q_j$th root of unity is a power of
+$\sigma_0(\zeta)$: it is a root of
+$X^{q_j(q_j-1)}-1$, whose distinct roots are precisely those powers.
+Hence $\psi(x)=\sigma_0(\zeta^a)$ for some integer $a$.
+Applying this to any $G.\texttt{psi0}$ proves the literal
+\texttt{LevelZeroCharacterRational} condition. This proves the actual
+\texttt{additiveCharacter\_typePrimes\_values\_coefficientField}
+supplier without using its \texttt{IdG} argument, and without another
+global forms assumption.
+
+The step-zero carrier construction in FC9 uses only the step-zero
+chart, its lattice/stabilizer data and the level of FC15. Call this
+level $L_0(u)$. Any completion of our partial forms data to
+$T_u:\texttt{Forms0}$, keeping these specified fields, satisfies
+\texttt{Joint0} with $L_0$ directly: its five assertions are equality
+of the reindexed base lattice, local groups, global group, class matrices
+and stabilizer matrices, exactly the \texttt{car0} identities in FC9.
+They are unaffected by FC10's functional replacement.
+
+This also removes a need to supply separate companion ideals for
+these carriers. The FC3 base-lattice equality and FC9's exact reindexing
+give $L_0(u)=L_{\pi_u}$ in the standard space. SF2 supplies
+\texttt{StdTied}, and SF3 gives
+\[
+ L_0(u)+(\bar\pi_u)L_0(u)^\#=\mathcal O^{N_0}.
+ \tag{FC.32}
+\]
+Thus the comparison ideals are the explicit $(\bar\pi_u)$ for these
+same level-zero carriers. Their construction needs no terminal
+\texttt{CarT} data. Once the remaining fields of \texttt{Forms0}
+are supplied, VE9's \texttt{StdTied}, \texttt{Joint0},
+\texttt{LevelZeroCharacterRational} and companion premises are all
+discharged by these exact joins. FC19 supplies the full
+\texttt{Forms0} directly, using NB7--NB8 for its naturality fields.
+
+\paragraph{FC17: the distinguished-block lattice comparison.}
+Fix a coefficient prime $w$ above $p$ which is seen, and a selected
+level prime $P$. For a class decoration, put $A=L^\#$ and let
+$K_P\subset A$ be the kernel of its $P$-residue functional.
+The decorated-lattice laws and the denominator argument of FC5 give
+\[
+ (K_P)_P=(L+PA)_P,\qquad (K_P)_Q=A_Q
+             \quad(Q\ne P\text{ selected}).          \tag{FC.33}
+\]
+For the second equality, choose $a\in P\setminus Q$.
+Multiplication by $a$ kills the $P$-residue of every vector in $A$,
+while $a$ becomes a unit at $Q$; this proves the nontrivial inclusion.
+For the first, zero residue is exactly local membership in $L$,
+and the kernel after clearing denominators is $L+PA$, as in (FC.12).
+
+Choose rational $p$-local basis matrices $B,B'$ for $A$ and
+$L+PA$ respectively. Such bases exist because both are full lattices;
+for the second lattice use $L\subset L+PA\subset A$.
+The rational $p$-local basis condition implies the prime-local basis
+condition at every $Q\mid p$, by CV6. Indeed a rational integer
+prime to $p$ cannot belong to $Q$, and a product of the finitely many
+coordinate denominators clears the converse implication.
+At a seen $w$ the supplied place correspondence is exact:
+the place below $w$ through the block embedding labelled
+$\tau_Q=\texttt{tauAt}(w,Q)$ is $Q$.
+Thus (FC.33) gives a basis of $K_P$ in every block, namely
+\[
+ B_\tau=\begin{cases}B',&\tau=\tau_P,\\B,&\tau\ne\tau_P.
+            \end{cases}                              \tag{FC.34}
+\]
+Apply the exact localized Weyl-lattice transport of CV7 to this family.
+Membership in the $w$-localization of the polynomial lattice attached
+to $K_P$ is equivalent to one integral-span polynomial evaluated with
+$B_\tau^{-1}$ in each block. Formula (FC.34) is precisely the
+piecewise inverse-frame formula in \texttt{BwTieG}. CV8 takes the
+product of the classwise denominators to turn these conditions into
+membership in the global $\texttt{Bw}$ localization. All frame maps,
+embeddings and the determinant shift are the same identities as CV9.
+The source quantifies over every pair $B,B'$; the forward implication
+works for every such pair, and the reverse uses the existence just proved,
+so it is not vacuous. This proves the full actual \texttt{bw\_tie}
+supplier. These local matrices describe the class lattice and do not
+replace the common global comparison frame of SF1--SF6. The assertion
+is restricted to seen $w$ of residue characteristic $p$, as in the
+source; it makes no claim about unseen coefficient primes.
+
+\paragraph{FC18: the actual diamond move from its defining functional
+equation.}
+Let $s\in k_P^\times$, choose an integer $a$ representing $s$,
+and let $\delta$ satisfy the source's \texttt{IsDia} condition at
+$v=P\cap\mathcal O_F$. This means that $\delta$ is the identity
+away from $v$, is unitary, preserves the base lattice, and satisfies
+\[
+             a f(\delta x)=f(x)\qquad(x\in L^\#).
+ \tag{FC.35}
+\]
+Its inverse preserves the same lattices. FC4 therefore proves that
+both matrices have integral entries. Substitute $\delta^{-1}x$
+in (FC.35), and use FC6's exact functional identification, to obtain
+\[
+ \rho_P\bigl(\bar\pi(\delta^{-1}x)_n\bigr)
+                =s\,\rho_P(\bar\pi x_n).
+ \tag{FC.36}
+\]
+Every coordinate vector belongs to $L^\#$, and $\bar\pi$ is a
+unit at $P$. Testing (FC.36) on them gives
+\[
+        (\delta^{-1})_{nj}\equiv s\,\delta_{nj}\pmod P.
+ \tag{FC.37}
+\]
+Here the symbol on the right is the Kronecker delta.
+Thus the source's integral-support-last-row conclusion follows directly
+from the normalized functional; no choice of a special diamond matrix
+is needed.
+
+Suppose $y_ck_u$ realizes the preferred decorated point. AD1 gives
+$k_u^{-1}$ last row $\bar\pi e_n^{\mathsf T}$ modulo $P$,
+and $k_u$ preserves the standard integral adelic lattice.
+For a vector in the original decorated lattice, $y_c^{-1}z$ is
+therefore integral. Reducing the product
+$k_u^{-1}\delta^{-1}y_c^{-1}z$ is legitimate. Equations (FC.37)
+and the last-row formula multiply its old functional by $s$.
+The underlying lattice is unchanged, because $\delta$ and its inverse
+are integral. Every auxiliary reduction, every other selected level-prime
+functional, and every twist-prime frame is unchanged, since its place
+is outside $v$. No selected prime is conjugate to $P$.
+Consequently $y_c\delta k_u$ realizes exactly the source's
+\texttt{dia1} decoration.
+
+This operation changes only the $P$-functional. In particular its
+coupling reductions are unchanged. The supplied level law
+\texttt{dia\_act} says that the operation commutes with the column
+group action, so the sets of attainable coupling reductions are also
+unchanged. The preferred-normalization argument of FC3 proves that the
+new preferred class has the same chart label. Apply FC11 to the
+realizer just constructed: it gives the exact adelic factorization,
+character scalar and frame transport. This proves all clauses of the
+actual \texttt{dilTied} supplier, under the literal supplied column
+laws and the chart realizability input. It also supplies the dilation
+field required when CV9's chart values are made into an endpoint
+\texttt{ValTied} record.
+
+\paragraph{FC19: direct construction of Forms0 and its matching comparison data.}
+Fix the actual $D=I.\texttt{rec7}\,l\,Z$ and the supplied
+\texttt{Ok}, \texttt{Pins}, \texttt{Laws} and \texttt{Later} data.
+Retain the explicit initial realization hypothesis used in FC3 and
+NB6: every valid framed decorated point needed there has a unitary
+finite-adelic realizer in the full \texttt{IsPtOf} sense.
+We now construct, for every word $u$, an actual
+$T_u:\texttt{Forms0}\,D\,u$, level data $L_0$, and all of
+VE9's global joins. The construction uses only step-zero form data.
+
+\emph{First construct the form record.}
+Choose the common $G$ of FC13 once for all words. At $i=0$, FC3
+gives a unique chart label $\beta_u$ and
+$\operatorname{chOf}(c)=\beta_u$ for every class $c$. FC4 normalizes
+its functional without changing its level, class matrices or stabilizer
+matrices. Define $\operatorname{cls0}_u$ by retaining this level and
+setting
+\[
+ y_u(c)=K_u(\beta_u).y(c,\operatorname{chOf}(c)=\beta_u),\qquad
+ s_u(c,\gamma)=K_u(\beta_u).\operatorname{stabI}
+                      (c,\operatorname{chOf}(c)=\beta_u)(\gamma).
+ \tag{FC.38}
+\]
+The map from the original class set to this chart fiber is a bijection
+with inverse the first projection. Thus the class bijection, carried
+lattice identity, and injective stabilizer with its exact image are
+the same assertions as FC3. This is \texttt{clsOfChart} itself,
+with no replacement representatives.
+
+Take $\operatorname{atT}_u$ from FC1 and the frame equivalence $e_Y$
+from SF2. The determinant witness in \texttt{ValTied.de} is $C=I$:
+the Gram matrix is $I$, the integral-coordinate lattice is
+$\mathcal O^{N_0}$, and the original determinant label equals
+$\det(e_Y z)$ at every embedding. CV9 supplies the complex-form,
+coefficient-field and localized integral-value identities.
+Because the chart set is a singleton, a function satisfies its
+chartwise adelic condition if and only if its restriction through
+the bijection in (FC.38) does. Surjectivity of that bijection proves
+both implications by evaluation on every class; no extension is lost.
+
+The global integral field of \texttt{ValTied} also follows from
+these localized assertions. For any $\mathcal O_L$-submodule $M$
+of an $L$-vector space and any $x$ in every localization $M_w$,
+put $\mathfrak b_x=\{a\in\mathcal O_L:ax\in M\}$.
+If $x\notin M$, this ideal is proper and lies in a maximal ideal
+$w$. Membership $x\in M_w$ supplies an $a\notin w$ with
+$ax\in M$, contradicting $\mathfrak b_x\subseteq w$.
+Every maximal ideal of $\mathcal O_L$ is a coefficient prime, so
+\[
+                         M=\bigcap_w M_w.           \tag{FC.39}
+\]
+Here localization membership supplies such a denominator by taking
+the product of the finitely many denominators in an expression for
+$x$ in the localized span. This argument does not require an
+unproved freeness statement for $M$.
+Apply it to the actual form lattice, using the full prime correspondence
+and CV9 at every coefficient prime. FC7 supplies the exact inner-product
+field and FC18 supplies both dilation fields. These data are precisely
+\texttt{valOfG}, and give $\operatorname{val0}_u$ with unchanged $e_Y$.
+
+The remaining fields of \texttt{Forms0} are now specified individually.
+Its \texttt{gl} is the same $G$, and \texttt{gl\_K} follows from
+$G.\texttt{piG}=X.\texttt{piG}$ and the supplied
+$X.\texttt{piG\_K}$. Its \texttt{glev0} is the actual level of FC15,
+with parameters
+$(a,t,nb,skip,fc,zl)=(k,t,0,k,N_0,\mathrm{false})$ and frame $I$.
+FC5 gives \texttt{lv0} by retaining its quotient projections;
+FC6 gives the additive residue isomorphisms \texttt{fMe0} and
+their exact \texttt{fv0} identity. NB7 and NB8 give
+\texttt{up\_natural\_level\_zero} and
+\texttt{down\_natural\_level\_zero}: substitute the unique chart
+label, discard the now automatic chart-equality clause, and retain
+the same $\gamma,\eta,\kappa$, lattices, functionals and frame scalar.
+These are the source's \texttt{upOfG} and \texttt{dnOfG} conversions.
+FC7 gives \texttt{norm0}, and FC17 gives \texttt{bw0}; their endpoint
+conversions merely use the identical $e_Y$. We have therefore filled
+every field of \texttt{Forms0} directly. Neither the period map nor
+the penultimate or terminal form records are needed for this step.
+
+\emph{Next construct the matching level carrier.}
+Let $r:k=N_0$ be the fixed \texttt{rank\_eq\_first\_level}
+identity. Apply the reindexing construction in FC9 to
+$\operatorname{cls0}_u.\operatorname{lev}$, its actual class and
+stabilizer matrices, $G$, and the just constructed
+$\operatorname{glev0}_u$. This construction is the proof of
+\texttt{exists\_colLevel} with only its step-zero arguments:
+every occurrence of its apparent full form parameter is through
+\texttt{cls0}, \texttt{gl}, or \texttt{glev0}.
+Transport the lattice, local groups, global group, functional,
+class matrices and stabilizer matrices by $r$; transport every
+relation by the same coordinate permutation. The upper-unitriangular
+description in FC15 gives the required auxiliary level clause for
+\texttt{ColLevel}; the finite prime of $F$ above $q_0$ required in
+that record exists by lying over. The stabilizer preserves each actual global
+class lattice because it preserves every completed lattice. For a rational
+vector, membership in the completion of a prime-local lattice is the same
+as membership in that localization: write it in a local basis and test
+that each rational coefficient has nonnegative valuation. LP1's local
+membership criterion then recovers the global lattice.
+Thus these data satisfy all \texttt{ColLevel} fields. Call the result
+$L_0(u)$ and choose it for each word.
+
+In particular its five carried objects satisfy exactly
+\[
+\begin{split}
+ \operatorname{reL}_{r}(L_0(u).L_b)&=
+                         \operatorname{cls0}_u.\operatorname{lev}.L_b,\\
+ \operatorname{reGL}_{r}(L_0(u).U_{\rm loc,v})&=
+                         \operatorname{cls0}_u.\operatorname{lev}.U_{\rm loc,v},\\
+ \operatorname{reGL}_{r}(L_0(u).U)&=
+                         \operatorname{cls0}_u.\operatorname{lev}.U,\\
+ \operatorname{reGL}_{r}(L_0(u).y_c)&=y_u(c),\qquad
+ \operatorname{reGL}_{r}(L_0(u).s_{c,\gamma})=s_u(c,\gamma).
+ \tag{FC.40}
+\end{split}
+\]
+For groups the notation denotes their image under the reindexing
+homomorphism. Equation (FC.40) is the literal
+$\texttt{Joint0}\,L_0\,u\,T_u$, not merely an abstract isomorphism
+of class spaces. The splitting used in $L_0(u)$ is $G.\texttt{sp}$,
+and its local frame reindexes to the same identity frame of
+$\operatorname{glev0}_u$. Functional normalization has not changed
+any term of (FC.40).
+
+Finally SF2 proves \texttt{StdTied} for this actual $D$, including
+all of its positive spaces and its terminal positive space; it is
+independent of the missing terminal incidence construction. FC16 gives
+\texttt{LevelZeroCharacterRational} for $T_u.\texttt{gl}=G$.
+The transported base lattice is exactly
+$L_{\pi_u}=\mathcal O^{k-1}\oplus\pi_u\mathcal O$ because the
+single rank reindexing retains the last coordinate. Put
+$\mathfrak a_u=(\bar\pi_u)$. SF3 then proves
+\[
+ L_0(u).L_b+\mathfrak a_u\bigl(L_0(u).L_b\bigr)^\#
+       =\mathcal O^k
+       =D.\operatorname{sp}.\operatorname{crdLat0}
+                         \bigl((D.\operatorname{sp}.X_0).L_0\bigr).
+ \tag{FC.41}
+\]
+The common standard comparison frame can be taken to be $B=I$.
+Consequently the \texttt{Forms0}, \texttt{Joint0}, \texttt{StdTied},
+level-zero character-rationality and companion hypotheses in VE9 all
+have actual simultaneous suppliers here, under the stated true-column
+and initial realizability hypotheses. No full \texttt{CarT},
+\texttt{FormsTiedSym}, or \texttt{ColsTiedSym} has been assumed in
+order to construct these comparison inputs.
+
+\emph{The separate full-column boundary.}
+Ordinary choice over the word/step sets also assembles the other
+pointwise fields proved in FC1--FC18. Use the same $G$ everywhere;
+unused steps $i>m$ may have singleton chart type. CV9 and FC7 give
+the chart values and norm ties, FC8 gives the period tie, and CV10
+and FC7 give terminal row values and norms once its row chart is
+supplied. The full simultaneous \texttt{FormsTiedSym} route still
+requires the particular penultimate $\texttt{HSym}/\texttt{lamSym}$
+identification (FC12 already gives the actual common level and finite
+carrier), the terminal row level and \texttt{ReadsP}, and the terminal
+vector/incidence and adelic evaluation assertion \texttt{til\_ties}.
+The corresponding full \texttt{CarT} record must be tied to the same
+objects before \texttt{colsTiedSym\_std} is closed. Initial decorated
+realizability and the existence of the original arithmetic host,
+characters, column laws and later-stage data remain explicit inputs.

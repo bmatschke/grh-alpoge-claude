@@ -1,0 +1,592 @@
+\section{Construct the arithmetic columns and the level datum}
+\label{sec:arithmetic-constructors}
+
+This section proves the two conditional constructors retained in RF10:
+\texttt{chGood\_of\_host} and \texttt{exists\_levCh\_of\_levelPrime}.
+The first starts with the actual arithmetic host, its prescribed top weights,
+and an injective Boolean code. The second starts with the analytic
+\texttt{LevelPrime} assertion and the prescribed positive quantities
+$\mathrm{du}_u,D_*$ satisfying their logarithmic window. We construct the
+columns and the complete level record, including their integrality and
+root-of-unity conditions. The existence of those input hosts, good top
+weights, and analytic primes is not asserted here.
+
+Write $n=R.n$, $f=2n$, $r=k+m-1$ for the literal rank record. For a scale
+$s$ put
+\[
+ x=s.x,\quad \epsilon=s.\mathrm{eps},\quad
+ \mathcal L=x^\epsilon,\quad b=\exp(\mathcal L),\quad
+ X'=\exp(x^{\epsilon/3}),\quad
+ a=xb,\quad b'=\frac{xb}{X'},\quad w=\frac{b}{nX'}.
+                                                               \tag{AC.1}
+\]
+The letter $b_j$ below is a column coordinate, whereas $b$ in (AC.1)
+is a positive real scale. In the arithmetic host let
+$E=H.E$, $s_d=H.\mathrm{sqd}$, and
+$K=\mathbb Q(s_d)$, where $s_d^2=-d$.
+The literal host hypotheses give a prime $d\equiv7\pmod {16}$,
+an isomorphism
+\[
+ \operatorname{Gal}(E/\mathbb Q)
+       \simeq\{\pm1\}^2\times A,
+ \qquad |A|=n,
+\]
+and the second sign is the action on $s_d$.
+These statements, rather than an arbitrary choice of a CM type, are
+used in AC3.
+
+\paragraph{AC1: correct all roots of unity with one bounded shift.}
+Let $E$ be a number field, $F$ any field, and
+$\varphi_i:E\hookrightarrow F$ a finite family of field embeddings.
+Fix one index $i_0$ and arbitrary integers $a_i$. Put
+$w_E=|\mu(E)|$, the number of roots of unity in $E$.
+There exists an integer $q$ with $0\leq q<w_E$ such that
+\[
+       \prod_i\varphi_i(z)^{a_i+q\,1_{i=i_0}}=1
+                  \qquad(z\in\mu(E)).                       \tag{AC.2}
+\]
+Here $w_E$ is the literal \texttt{Units.torsionOrder}.
+For completeness, roots of unity are finite: an element of order $h$
+has cyclotomic degree $\phi(h)\leq[E:\mathbb Q]$, while
+$\phi(h)^2\geq h/2$ by the prime factor calculation in SZ10.
+There are thus finitely many possible orders and finitely many roots
+for each order. A finite subgroup of a field's multiplicative group is
+cyclic. Indeed, combining elements of maximal prime-power orders gives
+an element whose order is the exponent $e$ of the subgroup; all its
+elements solve $X^e-1=0$, so its order is at most $e$, and it is cyclic.
+Choose a generator $\zeta$ of $\mu(E)$.
+
+The element
+$U=\prod_i\varphi_i(\zeta)^{a_i}$ satisfies $U^{w_E}=1$.
+The $w_E$ distinct powers of $\varphi_{i_0}(\zeta)$ are all the roots
+of $X^{w_E}-1$ in $F$. Hence
+$\varphi_{i_0}(\zeta)^q=U^{-1}$ for one $0\leq q<w_E$.
+This proves (AC.2) at $\zeta$. Every $z\in\mu(E)$ is $\zeta^j$,
+and the left side at $z$ is the $j$th power of its value at $\zeta$.
+This proves the full assertion for every root of unity, including
+negative exponents. It is the substance of \texttt{exists\_shift}.
+
+\paragraph{AC2: the quadratic-subfield norm of every root is one.}
+We prove the following elementary statement, also present as
+\texttt{norm\_root\_of\_unity\_quadratic\_subfield} in the source:
+if $d>3$ is prime, $s_d^2=-d$ in a number field $E$, and
+$4\mid[E:\mathbb Q]$, then
+\[
+                  N_{E/K}(z)=1\qquad(z\in\mu(E)),
+            \qquad K=\mathbb Q(s_d).                         \tag{AC.3}
+\]
+This will establish the needed host norm property rather than simply
+reuse the field \texttt{HostDer.norm\_mu}.
+
+First, $[K:\mathbb Q]=2$. If $y=a+c s_d\in K$ has rational square,
+the coefficient of $s_d$ in $y^2$ gives $2ac=0$. Thus a rational number
+$u$ which is a square in $K$ is either a rational square or $-d$ times
+a rational square. It follows that
+\[
+             -1,-2,-3,2\quad\hbox{are not squares in }K.
+                                                               \tag{AC.4}
+\]
+For $-j$ with $1\leq j\leq3$, the only possible second case would be
+$j=d c^2$ with $c\in\mathbb Q$. The exponent of the prime $d$ on the
+right is odd and on the left is zero, a contradiction. The first
+case is excluded by negativity. For $2$, the second case is negative
+and the first contradicts the elementary irrationality of $\sqrt2$.
+
+The only root in $K$ of odd order is $1$. Otherwise a prime divisor
+$p$ of that order gives a primitive $p$th root in $K$. Its degree
+$p-1$ is at most two, so $p=3$. Such a root $v$ obeys
+$v^2+v+1=0$, whence $(2v+1)^2=-3$, contradicting (AC.4).
+
+Next let $y^{2^a}=1$. If $y^2=1$, then $y=\pm1$ and
+$N_{E/K}(y)=1$, since $[E:K]=[E:\mathbb Q]/2$ is even.
+If $y^2\ne1$, some power $i$ of $y$ has $i^2=-1$.
+Put $K_1=K(i)$, which is quadratic over $K$ by (AC.4), and put
+$v=N_{E/K_1}(y)$. The order of $v$ is a power of two.
+It cannot exceed four: if it did, a power $u$ of $v$ would satisfy
+$u^4=-1$, giving
+\[
+                         (u-u^3)^2=2.
+\]
+An element of $K_1$ whose square lies in $K$ has square either a
+square of an element of $K$ or its negative, by the same coefficient
+argument in the basis $1,i$. We would obtain a square root of $2$
+or $-2$ in $K$, again contradicting (AC.4).
+Thus $v\in\{1,-1,i,-i\}$. Each of these four elements has norm one
+from $K_1$ to $K$, since the nonidentity $K$-automorphism sends
+$i$ to $-i$. Norm transitivity proves $N_{E/K}(y)=1$.
+
+Finally write an exponent killing $z$ as $2^a o$ with $o$ odd.
+The result for $y=z^o$ gives $N_{E/K}(z)^o=1$.
+The odd-order result in $K$ gives (AC.3).
+This proof requires neither a class-number assertion nor an
+unramifiedness or prime-distribution assertion.
+
+\paragraph{AC3: identify the CM-type product and permit parallel shifts.}
+For the literal host, the Galois isomorphism above and the Galois
+degree formula give $[E:\mathbb Q]=4n$. Thus AC2 applies.
+Let $\Psi\subset\{\pm1\}^2\times A$ be the kernel of the second
+sign, and let $e_T:T\simeq\Psi$ be any finite reindexing.
+For $g\in\Psi$, the automorphism $\sigma_g=H.\mathrm{gal}^{-1}(g)$
+fixes $s_d$ and hence $K$. Conversely an automorphism fixing $K$
+fixes $s_d\ne0$, so its second sign is $+1$.
+Consequently $g\mapsto\sigma_g$ is a bijection from $\Psi$ to
+$\operatorname{Gal}(E/K)$. The ordinary norm formula gives
+\[
+       \prod_{\tau\in T}\sigma_{e_T(\tau)}(z)=N_{E/K}(z)
+                     \quad\hbox{inside }E.                  \tag{AC.5}
+\]
+Compose with the fixed host embedding $\varphi_0:E\hookrightarrow
+\mathbb C$. Its compositions with these automorphisms are precisely
+$H.\mathrm{emb}(e_T(\tau))$. By AC2,
+\[
+             \prod_{\tau\in T}H.\mathrm{emb}(e_T(\tau))(z)=1
+                          \qquad(z\in\mu(E)).               \tag{AC.6}
+\]
+
+Write $\mathrm{MU}(a)$ for the assertion that this product with
+integer exponents $a_\tau$ is one for every root $z$.
+Equation (AC.6) proves $\mathrm{MU}(1)$; raising it to any integer
+power proves $\mathrm{MU}(c)$ for every constant integer $c$.
+Multiplying the two root identities proves
+\[
+                 \mathrm{MU}(a)\Longrightarrow
+                      \mathrm{MU}(a+c).                     \tag{AC.7}
+\]
+If rational weights equal $a_\tau+c$ with these integer exponents,
+they satisfy the literal $\mathrm{MUQ}$ definition: the required
+integral lift is exactly $a+c$. This proves
+\texttt{muq\_of\_parallel}, including its integrality assertion.
+The condition is a product identity for all roots of unity; parity
+of the sum alone would not suffice.
+
+\paragraph{AC4: construct every field of a coded column.}
+Let $D,h\in\mathbb N$ satisfy
+\[
+        D\geq1,\qquad h\geq(t+3)/2,
+\]
+and let $U_0,U_L,B\in\mathbb Z$ satisfy
+\[
+             4D(k-2)\leq U_0,\qquad U_L<0,
+                         -B\leq U_L.                        \tag{AC.8}
+\]
+For a Boolean word $c=(c_0,\ldots,c_{k-3})$, put
+\[
+ \begin{split}
+ v_i&=4D(k-2-i) &&(0\leq i\leq k-2),\\
+ u_0&=U_0+\tfrac12,\qquad
+ u_{k-1}=U_L+\tfrac12,\\
+ u_{\ell+1}&=v_\ell-\tfrac12-D\,1_{c_\ell=\mathrm{true}}
+                                     &&(0\leq\ell\leq k-3),\\
+ b_j&=B+2hj,\qquad e_j=B+(2j+1)h &&(0\leq j<m).
+ \end{split}                                                 \tag{AC.9}
+\]
+These are the four actual data fields of an $\mathrm{HCParam}(R)$.
+We verify its nine proof fields.
+
+For each interior index, $v_\ell-u_{\ell+1}$ is $1/2$ or
+$D+1/2$, while
+$u_{\ell+1}-v_{\ell+1}$ is $4D-1/2$ or $3D-1/2$;
+all four numbers are positive. At the first endpoint,
+$u_0>v_0$ by (AC.8); at the last, $u_{k-1}\leq-1/2<0=v_{k-2}$.
+These prove both strict interlacing fields. Also
+$u_{k-1}=U_L+1/2>-B=-b_0$.
+The gaps $e_j-b_j$ and $b_{j+1}-e_j$ both equal $h$, so both
+required lower bounds are valid. Each $b_j,e_j,v_i$ is integral,
+and each $u_i$ is an integer plus $1/2$.
+This proves all fields, including the strict bottom inequality.
+It proves \texttt{exists\_hcParam\_of\_code} by an explicit formula.
+
+\paragraph{AC5: uniform numerical prerequisites for the column formula.}
+Fix $0<\epsilon<1/52$, $c_D\geq0$, and $c_h\geq402$.
+There is $x_0$, depending only on these three fixed numbers, such that
+for every scale with this $\epsilon$, every $x\geq x_0$, and every
+actual $R$ satisfying $\mathrm{RankVal}(s,R)$, set
+\[
+                  D=\lceil x^{c_D}\rceil_+,
+             h=\lceil x^{c_h}\rceil_+,
+                    h_0=2h.                                \tag{AC.10}
+\]
+Then
+\[
+ D\geq1,\quad (t+3)/2\leq h,\quad 4kD\leq a,
+       \quad k\leq b'/x,\qquad b',b,w>0.                    \tag{AC.11}
+\]
+Indeed, use RF12 to obtain $k\leq x^5$ and $t\leq x^{401}$,
+and require $x\geq8$. Since $D\leq2x^{c_D}$,
+\[
+       4kD\leq8x^{c_D+5}\leq x^{c_D+6}.
+\]
+RF11 lets us require $x^{c_D+6}X'\leq b$.
+Since $X'\geq1$ and $a=xb$, this proves $4kD\leq a$.
+It also proves $k\leq x^5\leq b/X'=b'/x$.
+The estimate $h\geq x^{402}\geq(t+3)/2$ follows from
+$t\leq x^{401}$ and $x\geq8$.
+All positivity assertions follow from (AC.1) and $n\geq1$.
+The threshold precedes the choices of $s,R$, the host, the code,
+and the top weights. This is the exact uniformity of
+\texttt{hc\_sizes}.
+
+\paragraph{AC6: construct the whole column family with exact root congruences.}
+Retain AC5, supply an actual host $H$ with
+$\mathrm{HostVal}(s,C_8,H)$, and supply integers $a_T(t),b_T(t)$
+on the host's top set satisfying
+\[
+                         a\leq a_T(t),\qquad b'\leq b_T(t).
+                                                               \tag{AC.12}
+\]
+Let $e_T:T\simeq\Psi$ be any finite reindexing. We construct
+\emph{simultaneously for every Boolean word} a family
+$p_{c,\tau}\in\mathrm{HCParam}(R)$.
+
+The top places are $((1,1),\iota(t))$, while thick places are
+$((-1,1),\iota(s\,a_0+H.u_0))$ for $s\in H.T_2$.
+Both lie in $\Psi$ and their first signs make them disjoint.
+The inequality $|H.T_2|\geq x^{-\epsilon}n>0$ in
+$\mathrm{HostVal}$ makes the thick set nonempty.
+Choose a thick place $\tau_0\in T$.
+For top places the index $t$ is unique, because $\iota$ is injective.
+Define the integer base
+\[
+ B^{\mathrm{raw}}_\tau=
+ \begin{cases}
+ b_T(t)+\lfloor b'/x\rfloor,&e_T(\tau)=\tau_1(t),\\
+ \lceil b\rceil,&e_T(\tau)\text{ is thick},\\
+ \lceil w\rceil,&e_T(\tau)\text{ is thin}.
+ \end{cases}                                                 \tag{AC.13}
+\]
+AC1 supplies $0\leq q<w_E$ such that
+\[
+             B_\tau=B^{\mathrm{raw}}_\tau+q\,1_{\tau=\tau_0}
+                          \quad\hbox{satisfies }\mathrm{MU}(B).
+                                                               \tag{AC.14}
+\]
+The correction changes no top or thin coordinate. On every thick
+place it gives exactly
+\[
+                 \lceil b\rceil\leq B_\tau
+                            <\lceil b\rceil+w_E.             \tag{AC.15}
+\]
+Thus the source's strict torsion bound is preserved.
+
+Write $k=2\kappa$, which is possible because $R.k$ is even.
+Choose endpoint integers
+\[
+ (U_0(\tau),U_L(\tau))=
+ \begin{cases}
+ (a_T(t)+\kappa-1,-b_T(t)-\kappa),
+                                  &e_T(\tau)=\tau_1(t),\\
+ (4D(k-2)+4kD,-1),                &\text{otherwise}.
+ \end{cases}                                                 \tag{AC.16}
+\]
+At a top place, $a_T\geq4kD$ gives the first condition in (AC.8).
+Also $b_T>0$ and
+$\lfloor b'/x\rfloor\geq k\geq\kappa$, so $U_L<0$ and
+$-B\leq-b_T-\kappa=U_L$.
+Off the top set, $B\geq1$ by positivity of $b,w$ and $q\geq0$;
+(AC.8) follows directly. Apply AC4 using these same $D,h,B,U_0,U_L$
+for every word.
+
+The resulting family has
+\[
+ \begin{split}
+ v_i(\tau)&=4D(k-2-i),\\
+ b_j(\tau)&=B_\tau+jh_0,\qquad
+ e_j(\tau)=B_\tau+(j+\tfrac12)h_0,\\
+ u_{\ell+1}(\tau)&=v_\ell(\tau)-\tfrac12
+                         -D\,1_{c_\ell=\mathrm{true}}.
+ \end{split}                                                 \tag{AC.17}
+\]
+Since $h_0=2h$, the weight $e_j$ is the integral weight $B+(2j+1)h$.
+Equations (AC.14) and (AC.7) prove $\mathrm{MUQ}(e_j)$ for every $j$.
+This supplies the exact root condition in $\mathrm{HCVal}$.
+All its other fields are (AC.13), (AC.15), (AC.16), and (AC.17).
+In particular, off the top set the endpoints are
+$4D(k-2)+4kD+1/2$ and $-1/2$, and on a top place they are
+\[
+         u_0=a_T(t)+(k-1)/2,\qquad
+         u_{k-1}=-b_T(t)-(k-1)/2.                            \tag{AC.18}
+\]
+The functions $v,b,e$ and both endpoint functions are independent
+of the word. This proves every conclusion of
+\texttt{exists\_hc\_family}, including the five compatibility
+identities between any two words and their prescribed top values.
+No unproved global simultaneous choice of these column families
+remains under the stated inputs.
+
+\paragraph{AC7: the literal \texttt{chGood\_of\_host} constructor.}
+Fix $\epsilon,C_5,c_6,C_b,c_D,c_h,C$ as in that theorem:
+$0<\epsilon<1/52$, $\mathrm{Std}(C)$, $c_D\geq0$, $c_h\geq402$.
+Then a uniform threshold works for all the following supplied data:
+an actual $R,H$, $\mathrm{RankVal}(s,R)$,
+$H.CT_2=C.CT_2$, the literal
+\[
+ \mathrm{HostGood}(s,C.P.C_{\mathrm{pde}},C_5,c_6,C_b,
+                                      H,q_0(H)),
+                                                               \tag{AC.19}
+\]
+prescribed weights $a_T,b_T$ with $\mathrm{WinOK}$, a code
+$c:\mathrm{Fin}(M)\hookrightarrow\{\mathrm{false},\mathrm{true}\}^{k-2}$,
+and
+\[
+ M=\left\lceil3\Gamma^2x^{C.P.C_F}\right\rceil_+,
+       \qquad \Gamma=\exp(C.C_\Gamma m^5f\mathcal L).
+                                                               \tag{AC.20}
+\]
+An arbitrary natural $u$ may also be prescribed as the host's
+unipotent translate.
+
+Put $N_c=H.Q_S H.q H.d$ and $C_8=C.P.C_{\mathrm{pde}}\geq1$.
+The pair-row part of (AC.19) gives
+\[
+              \log N_c\leq2x^{\epsilon/5}(\log x)^2.
+\]
+For every $z\leq N_c^{C_8}$, require the uniform elementary
+inequality
+$2C_8(\log x)^2< x^{2\epsilon/15}$.
+Then $z<X'$. The host bounds therefore give
+\[
+                q_0(H),p_{\mathrm{de}},p'_{\mathrm{de}}<X'.
+                                                               \tag{AC.21}
+\]
+On the other hand, each $g_i\geq(kb)^8\geq b\geq X'$.
+Thus $q_0(H)\ne g_i$, with no need to assume this extra inequality.
+
+The host's level-prime set is exactly
+$\{g_0,g_1,p_{\mathrm{de}},p'_{\mathrm{de}},q_0(H)\}$ by
+(AC.19). Every member is prime and congruent to $1$ modulo $N_c$:
+for the two $g_i$ this is $\mathrm{HostArith}$; for the two
+$p_{\mathrm{de}}$ it follows by reducing their stated congruence
+modulo $\operatorname{lcm}(15,N_c)$; for $q_0(H)$ it is already
+in (AC.19). Here $N_c>1$.
+The same input supplies $H.cc_K=\mathcal O_K$ and the disjointness
+of the two literal $\mathrm{BB}$ sets.
+
+There is also a stronger congruence in \texttt{ChOK.small}.
+The source defines $r_0(H)$ to be the least prime not dividing
+$N_c(p_{\mathrm{de}}-1)(p'_{\mathrm{de}}-1)N(cc_K)$ and defines
+$q_0(H)$ as the least prime $p$ with
+\[
+              p\equiv1\pmod {r_0(H)N_c},
+                           \qquad p\nmid N(cc_K).
+\]
+Because $q_0(H)$ is already prime by (AC.19), this defining set is
+nonempty: its natural infimum would be zero if it were empty.
+The least element of a nonempty set of natural numbers belongs to
+that set. Thus the stronger congruence follows directly from the
+literal definition. Since $cc_K=\mathcal O_K$ has norm one,
+$r_0(H)$ is exactly \texttt{leastOff}
+$\bigl(N_c(p_{\mathrm{de}}-1)(p'_{\mathrm{de}}-1)\bigr)$.
+This argument does not add a new prime-existence hypothesis.
+
+Replace only $H.u_0$ by $R.\mathrm{ofNat}(u)$.
+The definitions of $\mathrm{HostGood}$ and $\mathrm{WinOK}$ do not
+read that field, so (AC.19) and all prescribed weights persist.
+The thick set can change; construct the AC6 family after this
+replacement, so its thick-place correction uses the correct new set.
+The lower halves of $\mathrm{WinOK}$ give (AC.12).
+Since the positive expression in (AC.20) has positive ceiling,
+$M>0$. Choose the base word $0\in\mathrm{Fin}(M)$ and put
+\[
+                         \mathrm{hcW}(v,\tau)=p_{c(v),\tau}.
+\]
+Together with the supplied $R$, the translated $H$, and the preceding
+level and $\mathrm{BB}$ proofs, these data fill the actual
+\texttt{PreCh} record. Its five word-compatibility fields are exactly
+those proved in AC6.
+
+For precision, the sixteen fields of $\mathrm{ChOK}$ are supplied as
+follows:
+\[
+\begin{array}{c|l}
+\text{fields}&\text{proof or supplied value}\\ \hline
+\mathrm{rank},\mathrm{ct2}&\mathrm{RankVal},\ H.CT_2=C.CT_2\\
+\mathrm{val},\mathrm{arith},\mathrm{thick},\mathrm{dlog}
+      &\text{the corresponding clauses of (AC.19)}\\
+\mathrm{gnorm},\mathrm{pde}&\text{the integral norm and congruence clauses of (AC.19)}\\
+\mathrm{small}&\text{level membership, (AC.21), and the stronger congruence above}\\
+\mathrm{lev}&\text{the five-element level set and (AC.21)}\\
+\mathrm{win},\mathrm{card},\mathrm{inj}
+      &\mathrm{WinOK},\ \text{(AC.20)},\ \text{the supplied injective code}\\
+\mathrm{hc},\mathrm{code},\mathrm{top}&\text{AC6, (AC.17), and (AC.18)}
+\end{array}                                                   \tag{AC.22}
+\]
+In the \texttt{small} row, inequality with the two $p_{\mathrm{de}}$
+is a clause of (AC.19), while inequality with the $g_i$ was proved
+above. The retained $\mathrm{HostGood}$ is the second field of
+$\mathrm{ChGood}$. This proves the literal endpoint with its
+prescribed translate, weights and code. Its threshold depends only
+on the fixed displayed constants, and is chosen before $R,H,a_T,b_T,M,c,u$.
+
+\paragraph{AC8: turn an integral norm-form solution into the required element.}
+For $d$ prime with $d\equiv3\pmod4$, write $s_d^2=-d$ and let
+conjugation send $s_d$ to $-s_d$. The literal assertion
+$\mathrm{NormOne}(d,M,p)$ means that there are $A,B\in\mathbb Z$
+with
+\[
+ A^2+dB^2=4p,\qquad M\mid B,\qquad 2M\mid A-2-B.
+                                                               \tag{AC.23}
+\]
+The pair-based and two-integer source definitions are identical.
+Write $B=M u$, $A=2+Mu+2Mv$, and put $e=(d+1)/4\in\mathbb Z$.
+The element $\omega=(1+s_d)/2$ is integral because
+$\omega^2-\omega+e=0$. Define
+\[
+       \pi=1+M(v+u\omega)=\frac{A+B s_d}{2}\in\mathcal O_E.
+                                                               \tag{AC.24}
+\]
+It lies in $K$, satisfies $\pi\overline\pi=p$, and
+$\pi-1\in M\mathcal O_E$. Moreover expansion gives
+\[
+     p-1=M\left(u+2v+M(eu^2+uv+v^2)\right).
+                                                               \tag{AC.25}
+\]
+Thus $p\equiv1\pmod M$. This proves every conclusion of
+\texttt{normOne\_host}, with the actual element (AC.24), not just
+an abstract splitting assertion.
+
+The converse used in \texttt{normOne\_iff\_of\_sqrt} can also be
+proved directly. Suppose $M>0$, $\pi\in\mathcal O_E\cap K$,
+$\pi\overline\pi=p$, and $\pi-1=M y$ with $y\in\mathcal O_E$.
+Then $y\in K$, so write $y=a+c s_d$ with $a,c\in\mathbb Q$.
+Both its trace $2a$ and norm $a^2+dc^2$ are rational algebraic
+integers and hence integers, say $t$ and $v_0$.
+The identity $d(2c)^2=4v_0-t^2\in\mathbb Z$ implies
+$2c\in\mathbb Z$: in lowest terms its denominator squared divides
+the squarefree integer $d$. Write $2c=u$.
+Reducing $t^2+du^2=4v_0$ modulo four and using $d\equiv3\pmod4$
+shows that $t,u$ have the same parity. Set
+$A=2+Mt$ and $B=Mu$. Then (AC.23) follows by taking the norm of
+$\pi=1+My$, and $2M\mid A-2-B$ follows from the parity.
+For $M=0$, both sides of the equivalence force $\pi=1$ and $p=1$;
+use $A=2,B=0$. Finally, replacing $M$ by any divisor $M'$ preserves
+(AC.23), so the divisor version of the congruence follows as well.
+
+\paragraph{AC9: construct the full level record from its prime solutions.}
+Supply an actual $P:\mathrm{PreCh}$, positive integers $\mathrm{du}_v$,
+positive $D_*$, and $\Gamma>1$. Write
+\[
+ U_v=\left(\frac{D_*}{\mathrm{du}_v}\right)^{1/(fk)}
+                         \Gamma^{-2/(fk)},\qquad
+ M_c=N_c(g_0g_1)^2.                                         \tag{AC.26}
+\]
+Suppose for every word $v$ we have a prime $T_v$ and an integral
+$\pi_v\in K$ with
+\[
+ \begin{gathered}
+ \pi_v\overline{\pi_v}=T_v,\quad
+ \pi_v-1\in M_c\mathcal O_E,\quad
+ T_v\ne p_{\mathrm{de}},p'_{\mathrm{de}},\\
+       U_v\leq T_v\leq(1+1/(fk))U_v.
+ \end{gathered}                                              \tag{AC.27}
+\]
+These data construct the actual $\mathrm{LevCh}(P)$.
+The sole additional arithmetic field to check is
+$T_v\equiv1\pmod {N_c}$.
+Since $N_c\mid M_c$, write $\pi_v=1+N_c\alpha$ with
+$\alpha\in\mathcal O_E$. Then
+\[
+ \frac{T_v-1}{N_c}
+       =\alpha+\overline\alpha+N_c\alpha\overline\alpha
+\]
+is both rational and an algebraic integer, so it is an integer.
+Since $N_c>1$, the literal remainder is $1$.
+
+Set the five data fields $T,\pi T,\mathrm{duStar},Dstar,GamP$
+to $T_v,\pi_v,\mathrm{du}_v,D_*,\Gamma$, respectively.
+The ten proof fields are: primality, the congruence just proved,
+$\pi T\in K$, its norm identity, its congruence modulo $M_c$,
+avoidance of the two specified primes, positivity of $\mathrm{duStar}$,
+positivity of $Dstar$, $1<GamP$, and the two-sided window.
+They are exactly (AC.27) and the stipulated positive values.
+No pairwise distinctness of the $T_v$ is required by this record.
+This proves \texttt{LevelChoice.exists\_levCh}.
+
+The associated host has level set
+$H.\mathrm{levelPrimes}\cup\{T_v\}$. Its old membership fields persist.
+Each new prime is coprime to $Q_S$, since it is $1$ modulo the
+multiple $N_c$ of $Q_S$. The $cc_K$ coprimality fields follow from
+$cc_K=\mathcal O_K$. Thus this is also the literal
+\texttt{LevCh.host} used by the later joins, with the same field,
+rank, frame labels, and column data.
+
+\paragraph{AC10: use exactly the retained analytic level-prime assertion.}
+Assume the literal $\mathrm{LevelPrime}$ statement. For every fixed
+$0<\epsilon<1/52$, $c_s>0$, and standard $C$, there is a threshold
+$x_0$ with the following property, uniformly over \emph{all} $c_D,c_h$
+and all subsequently supplied $s,P,q_1,a_T,b_T,c$.
+Suppose $s.\mathrm{eps}=\epsilon$, $x\geq x_0$, and
+$\mathrm{ChOK}(s,C,c_D,c_h,P,q_1,a_T,b_T,c)$.
+Supply positive $\mathrm{du}_v,D_*$ with
+\[
+       c_s m\mathcal L\leq\log U_v\quad\text{for every }v,
+       \qquad
+       \Gamma=\exp(C.C_\Gamma m^5 f\mathcal L),               \tag{AC.28}
+\]
+where $U_v$ is (AC.26) for this $\Gamma$.
+We construct $L:\mathrm{LevCh}(P)$ with the exact equalities
+\[
+              L.\mathrm{duStar}=\mathrm{du},\quad
+              L.Dstar=D_*,\quad L.GamP=\Gamma.              \tag{AC.29}
+\]
+
+Here is the precise analytic input and how its hypotheses are met.
+$\mathrm{LevelPrime}$ supplies, once its threshold depending on
+$\epsilon,c_s$ is met, a prime $T$ in
+$[U,(1+1/(fk))U]$ and
+$\mathrm{NormOne}(d,N_c(g_0g_1)^2,T)$, provided
+\[
+ \begin{gathered}
+ \mathrm{RankVal}(s,R),\quad d\text{ prime},\quad d\equiv3\pmod4,
+       \quad d\geq100,\quad 0<N_c,\quad d\mid N_c,\\
+ \log N_c\leq3x^{\epsilon/5}(\log x)^2,\qquad
+ 1\leq g_i\leq b^9,\quad U>0,\quad c_s m\mathcal L\leq\log U.
+ \end{gathered}                                              \tag{AC.30}
+\]
+The conditions on $d$, $N_c$, and $\log N_c$ are the literal
+$\mathrm{ModRow}(s,N_c,d)$; $\mathrm{RankVal}$ is a separate input.
+The host supplies primality and $d\equiv7\pmod {16}$.
+Its bound $4tr+1<d$, together with $r\geq6,t\geq11$, gives
+$d>265>100$. The other two elementary conductor conditions are
+immediate from $N_c=Q_Sqd$. The pair row inside $\mathrm{ChOK.val}$
+has $1\leq Y\leq x$ and
+$\log N_c\leq2Y^{\epsilon/5}(\log Y)^2$; monotonicity gives
+the required stronger bound with coefficient two, hence (AC.30).
+
+Require the RF11--RF12 thresholds, $x\geq2$, and
+$x\geq(1/c_s)^4$. Then
+\[
+ k\leq x^5,\quad x^{41}\leq b,\quad m\geq x^{1/4},
+        \qquad 2k^8\leq2x^{40}\leq x^{41}\leq b.
+\]
+The host's upper bound $g_i\leq2(kb)^8$ now gives $g_i\leq b^9$.
+Its primality gives $g_i\geq1$.
+The same thresholds imply $c_s m\geq1$, and therefore
+\[
+              X'\leq\exp(c_s m\mathcal L)\leq U_v.
+                                                               \tag{AC.31}
+\]
+All $U_v$ are positive; $\Gamma>1$ because $C.C_\Gamma\geq1$
+and $m,f,\mathcal L$ are positive.
+For $p_{\mathrm{de}}$ and $p'_{\mathrm{de}}$, the field
+$\mathrm{ChOK.lev}$ gives either equality with some $g_i$ or a
+strict bound by $X'$. The equality is excluded by the literal host
+axiom $p_{\mathrm{de}},p'_{\mathrm{de}}\ne g_i$.
+Thus both specified primes are less than $X'$.
+
+Apply $\mathrm{LevelPrime}$ for each word with $U=U_v$.
+It supplies all the prime windows and integer norm solutions at
+one common threshold: its quantifier over $U$ occurs after its
+threshold, so neither the word nor $\mathrm{du},D_*$ changes $x_0$.
+Use AC8 to produce $\pi_v$ with congruence modulo $M_c$.
+Equation (AC.31) gives $T_v\geq U_v\geq X'$, excluding both
+$p_{\mathrm{de}}$ primes. AC9 constructs the desired record and
+(AC.29). Taking the maximum of these finitely many thresholds
+proves exactly \texttt{exists\_levCh\_of\_levelPrime}.
+
+Consequently RF10's two arithmetic constructor arrows are now proved.
+They remain conditional on the same actual inputs: the supplied
+$\mathrm{HostGood}$, top windows and injective code for AC7; and
+$\mathrm{LevelPrime}$ plus the positive discriminant data and their
+logarithmic window for AC10. The construction of recursive global
+forms, the joint $\mathrm{RecExP}$ data, and the independent analytic,
+spectral and pairing branches are not consequences of these arrows.

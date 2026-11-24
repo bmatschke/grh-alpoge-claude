@@ -1,0 +1,256 @@
+RH / DIRICHLET-GRH RECONSTRUCTION v0.14
+AD1--AD4: explicit adelic base points, transitions, splices and frames
+
+Source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Status: proved mathematical constructions under the explicit hypotheses
+below. This is not a Lean build or an independent kernel replay.
+
+1. Why these constructions matter
+=================================
+The chart construction needs a base point kStd with the standard carried
+lattice, identity outside the level prime and a prescribed last-row
+residue. It also needs an adelic realization of each actual decorated
+lattice. For naturality, a new neighbor must have a realizing point that
+differs from the old point only above its specified type prime.
+
+These are separate assertions. AD1 completely supplies the base point.
+AD3 supplies the supported point change once two realizers and the
+neighbor's local equalities have been supplied. AD4 proves that any
+initial realizer can be adjusted to the source's exact rational frame
+matrices. The arithmetic assertion that the initial self-dual lattice
+and its finite decorations have a realizer is retained. In particular,
+we do not infer realizability from the existence of abstract local bases.
+
+The proofs work in the original finite adelic algebra AfE F E. Its
+canonical isomorphism afIso with the finite adeles of E allows component
+checking; it does not change the coefficient embeddings, the CM
+involution or any chosen local residue fields. The conjugation of an
+adele at P depends on its component at the conjugate prime, not its
+component at P alone. All formulas below retain that distinction.
+
+2. AD1: actual finite-adelic unit and diagonal base point
+=======================================================
+Let pi be a nonzero algebraic integer, q=conjugate(pi), with (pi,q)=1.
+Let S be the finite prime support of pi. If P and conjugate(P) were
+both in S, then pi and q would both lie in P, contradicting a Bezout
+identity. Thus S and conjugate(S) are disjoint.
+
+The component formula for a is
+
+  a_P=q^(-1)     at P in S,
+  a_P=pi        at P in conjugate(S),
+  a_P=1         otherwise.
+
+This is an actual adele, because only finitely many components differ
+from 1. At P in S, q is a unit. At P in conjugate(S), pi is a unit.
+Thus a and its inverse are integral everywhere. Conjugation exchanges
+the first two cases: (conjugate(a))_P=q in the first case and pi^(-1)
+in the second. Their products with the corresponding a_P are 1.
+Every other component is 1. Hence a*conjugate(a)=1 globally.
+
+This is precisely BasePoint.exists_unit, including its requirement
+that the inverse component at each selected prime equal q before
+reduction. A weak-approximation argument would provide congruences;
+the finite adelic idempotents provide exact component equalities.
+
+Set k=diag(1,...,1,a). Its inverse is diag(1,...,1,conjugate(a)).
+The unitary equation follows from a*conjugate(a)=1. Both matrices
+preserve the integral adelic standard lattice, so k carries the
+actual global standard lattice to itself. The empty decorations are
+then immediate. If pi*q=T, every changed component lies above T.
+For a prime v of F not dividing T, all E-components of the projection
+to E tensor_F F_v are 1; injectivity of that finite product gives
+the exact identity matrix at v. The inverse's last row at P dividing
+pi is (0,...,0,q), hence it has the required residue at every entry.
+
+For n=0 the unique empty matrix is the identity and the last-row
+quantifier has no instances. Thus no positive-rank assumption is
+silently added to the literal exists_kStd statement. Specializing
+to piT(u) and T(u) proves exists_base and exists_kStd under the
+supplied primality/norm/coprimality laws. Ordinary simultaneous choice
+then gives the existing kStd with kStd_spec, rather than requiring a
+different base point for each later argument.
+
+3. AD2: transition matrices and residue cancellation
+===================================================
+The source Carries condition identifies the completed lattice with
+the image of the adelic standard lattice. If a carries N and b
+carries N', and N'_P is contained in N_P, then every column of b_P
+belongs to a_P O_P^n. Consequently all entries of a_P^(-1)b_P are
+integral. For equality of local lattices the reverse argument gives
+the inverse matrix integral as well. The transition is then in
+GL_n(O_P), not just in M_n(O_P).
+
+To connect this to the source's rational-localization convention,
+write any x in N' with s*x in N for s outside P. Since s is a local
+unit, the coordinates of a^(-1)x are integral at P. This extends
+under addition and multiplication by integral adeles to the completed
+module, including the columns of b. This proves the exact valuation
+inequality in valued_inv_mul_le. It does not assume that the columns
+of b are rational global lattice vectors.
+
+If s is outside P and s*z has prescribed residue residue(s)*c, then
+s is a local unit, so z is integral and its residue is c. For the
+explicit HasRes definition choose t and r with ts+r=1 and r in P.
+If b is an integral lift of the residue of sz, then
+
+  z-tb = t(sz-b)+r*z.
+
+Both summands have positive valuation. Also residue(tb)=c. This
+gives the actual integral lift required by HasRes; it proves more
+than formal cancellation of two symbols whose integrality was not
+known. Applied after clearing a denominator, it extends type and
+auxiliary residue identities to rational localizations.
+
+4. AD3: all five fields of the supported-splice conclusion
+=========================================================
+The source IsPtOf has five fields:
+
+  uni: unitary;
+  lat: carries the specified global lattice;
+  f: prescribed last-coordinate residues at type primes;
+  be: prescribed full residue vectors at auxiliary primes;
+  fr: exact prescribed rational matrices at twist primes.
+
+Supply realizers h for X and h0 for X0. Choose P in the type-prime
+set ST. The prime sets ST, SG and Q are pairwise disjoint, and their
+union contains no conjugate pair. The local lattices of X and X0
+agree outside P and conjugate(P); their type functionals agree at
+other primes in ST, their auxiliary reductions agree and their
+rational frames agree.
+
+Let e=e_P+e_conjugate(P). It is a conjugation-fixed idempotent.
+Define
+
+  g=(1-e)h+e h0,
+  G'=(1-e)h^(-1)+e h0^(-1),
+  epsilon=h^(-1)g.
+
+The cross terms vanish because e(1-e)=0, so gG'=G'g=1. The
+conjugate transpose of g is G', since the coefficient idempotents
+are fixed by conjugation. Hence g and epsilon are unitary.
+At P and conjugate(P), g=h0. Elsewhere g=h and epsilon=1.
+
+For the carried lattice, compare g to h0. At the changed primes
+their transition is identity. At all other primes, both directions
+of the transition are integral by AD2 and the assumed local equality.
+Thus g^(-1)h0 belongs to GL_n(O_hat), proving that g carries exactly
+the same lattice as h0, not just an isomorphic lattice.
+
+At P, use h0's type residue. At another type prime P', use g=h there.
+A vector x of N0 belongs to N_(P'), so choose s outside P' with
+sx in N. Apply h's residue identity to sx, use equality of the
+prescribed type functionals and their residue-linearity, then cancel
+s by AD2. This proves the residue identity for x. The same argument
+proves every coordinate of every auxiliary residue vector.
+
+No auxiliary or twist prime can equal P or conjugate(P): disjointness
+excludes the first, and orientation of the union excludes the second.
+Thus g=h at all twist primes and the exact rational matrices are
+unchanged. This checks fr as an equality of matrices, not merely
+congruences. All five IsPtOf fields hold for g=h*epsilon and X0.
+
+The literal source theorem obtains h0 using exists_isPtOf_cm. AD3
+does not independently prove that supplier. Its result is the full
+splice conclusion from h0; it removes the supported-patching step
+from the remaining realization problem. The source's actual up/down
+neighbors must still satisfy the local-lattice, functional and
+coupling equalities assumed here. A generic splice is not a proof
+of those neighbor-specific assertions.
+
+5. AD4: exact frame modification without changing the lattice
+============================================================
+We first prove the actual Carries(globLat(x)) input which the source
+uses automatically for an arbitrary x in GL_n(A_f). Both x and its
+inverse have integral entries outside a finite set S. Choose a nonzero
+rational integer d whose valuation at every exceptional prime is large
+enough to make d*x_P and d*x_P^(-1) integral. This is possible by taking
+large powers of the finitely many rational primes below S. Then
+
+  d O_(E_P)^n <= M_P:=x_P O_(E_P)^n <= d^(-1)O_(E_P)^n
+
+at every P. Define B_P=M_P intersect E^n inside the completion. B_P is
+closed under the rational local ring O_(E,(P)); if s is outside P and
+s*v belongs to B_P, the local unit s^(-1) shows v belongs to B_P.
+Outside S, B_P is the standard rational localization O_(E,(P))^n.
+Moreover d O_E^n is contained in B_P and d B_P is contained in that
+standard localization. These are precisely the LP2–LP3 local saturation
+and common-denominator bounds. Therefore
+
+  N=intersection_P B_P,
+  N localized at P = B_P,
+  d O_E^n <= N <= d^(-1)O_E^n.
+
+The last bounds make N a finite full lattice, by Noetherianity. They
+also follow directly by intersecting the displayed local bounds; hence
+the same d works, even if the generic LP3 product bound is larger.
+
+For each fixed P, density of E in its single completion E_P allows
+one to choose rational vectors v_j close to the columns x_P e_j so
+that x_P^(-1)(v_j)_j belongs to I+M_n(m_P), where m_P is the maximal
+ideal in O_(E_P). Its determinant reduces to 1, so this matrix is in
+GL_n(O_(E_P)). This is also the exact openness condition needed for
+the approximation. Consequently the v_j lie in B_P and are an
+O_(E_P)-basis of M_P. The completed span of N localized at P is
+therefore exactly M_P. This reasoning uses density at one place at a
+time, never a simultaneous rational strong-approximation theorem.
+
+To pass from individual completions to the integral adelic span, set
+M=dN, so d^2 O_E^n<=M<=O_E^n. The finite O_E/(d^2)-submodule
+M/(d^2 O_E^n) decomposes into its prime-power components by the finite
+Chinese remainder theorem. Its extension to the integral finite adeles
+is exactly the inverse image of those same local submodules modulo
+d^2. This identifies the adelic span of M, and hence that of N, with
+the product of their completed local modules. Thus N_hat=x O_hat^n.
+By definition a rational vector v belongs to globLat(x) exactly when
+x_P^(-1)v is integral at every P, so N=globLat(x). This proves the
+source carries_globLat assertion with its exact carried lattice. The
+zero-dimensional case is immediate. This recovery argument has
+dependencies LP2 and LP3, beyond the denominator lemma LP1 alone.
+
+Supply a unitary x carrying N, a finite oriented prime set Q and
+matrices M_P over E which are local bases for N at P in Q. Set
+g_P=M_P, g_conjugate(P)=conjugate(M_P)^(-transpose), and g=x
+elsewhere. The same idempotents construct these entries. The inverse
+uses the corresponding inverse matrices. The paired prescription
+is exactly the unitary equation, so g is unitary.
+
+Let b=x^(-1)g. At P in Q, x_P and M_P are bases of the same module;
+AD2 gives b_P and b_P^(-1) integral. Since b is unitary,
+
+  b_conjugate(P)=conjugate(b_P^(-1))^transpose.
+
+Thus the transition and its inverse are integral at the conjugate
+primes too. Elsewhere they are identity. Therefore b is in
+GL_n(O_hat) and g carries precisely N. At each P in Q the frame is
+M_P exactly. Outside Q and conjugate(Q), inverse pullback coordinates
+are the same as those of x. This proves all assertions of the actual
+PtExist.exists_modify.
+
+When Q is disjoint and jointly oriented with ST and SG, this keeps
+all the type and auxiliary residues while imposing the rational
+twist frames. The unresolved initial realization is now the
+self-dual lattice and its finite ST/SG reductions. In the pinned
+proof it is supplied by decoPtSurj_of, whose inputs include
+unimodGenus and reduction_surjective_bis. The former invokes the
+local self-dual-lattice genus theorem with the CMData.cmUnram
+hypothesis. No statement that arbitrary ramified Hermitian lattices
+share a genus is used or asserted here.
+
+6. Integration with the other v0.14 proofs
+==========================================
+FC3 uses AD1 for kStd_spec and retains the initial realizing points.
+FC6 then reads the last row of kStd inverse without another choice.
+FC's dilation proof uses the same identity. For up/down naturality,
+AD3 supplies the supported adele once the actual neighbor satisfies
+the required local equalities; FC11 handles the rational quotient
+representative and character correction. AD4 isolates the remaining
+arithmetic realization from the exact-frame bookkeeping.
+
+The dependency graph is noncircular: AD uses only the earlier
+local-lattice denominator/intersection/patching arguments LP1–LP3,
+density in a single completion, finite Chinese remainders, and its supplied
+CM/local data. It does not invoke the final FC assembly or CV values.
+FC may therefore use AD's base points and supported moves before
+assembling its own field and naturality records.

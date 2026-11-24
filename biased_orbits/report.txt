@@ -1,0 +1,347 @@
+BO1--BO5. NONCONSTANT BERNOULLI GOOD-ORBIT ESTIMATES
+==================================================
+Readable reconstruction v0.12, 2026-11-21.
+Source repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+RESULT AND BOUNDARY
+-------------------
+For fixed eps>0 and real Co,Lb, this component proves the actual finite
+orbit_terms/not_good_le/orbit_sum branch for independent point inclusion
+probabilities q in [3delta/4,delta]. It gives one explicit x threshold and
+the source-compatible positive constant
+  Cb=(|Co|+1)*((max(Lb,1))^K+2),
+where K=ceil_Nat(8(h+2)/eps), h=2+8eps. At every allowed orbit length
+  x^(eps/4)<=n<=Co*x^h,  L2<=Lb,
+the probability of a bad orbit, conditional on ANY one of its coordinates
+being selected, is <=Cb*x^-2. The orbit base is arbitrary. The exact
+ambient selected-and-bad probability is the conditional probability times
+the inclusion probability of that selected point, hence <=delta*Cb*x^-2.
+Weighted summation gives the input needed by the parent's finite coset
+selection, including the literal factor delta and no extra order factor.
+
+This closes a finite probability estimate. It does not construct the final
+top set, its biased Frame.Shares property, arithmetic hosts, geometric
+points or a global RH/Dirichlet-GRH proof. No Lean source was edited or
+compiled. Each declaration/range/file correspondence is in provenance.json.
+
+The uniform-law GII9 argument explains the general mechanism, but is NOT
+invoked to infer this biased result. The complete badness event is not
+monotone in the selected subset: a marked tile requires empty cells as
+well as singleton cells. We therefore prove the nonconstant product
+estimates directly. The count-tail part alone uses monotone domination.
+
+LITERAL PARAMETERS AND EVENTS
+-----------------------------
+For eps>0 put
+  theta=eps/8, h=2+8eps, K=ceil_Nat((h+2)/theta), r=K+1,
+  delta=x^-theta, u=ceil_Nat(delta^-1), ell=(6r+1)u,
+  pi0=10^(-(6r+1)),
+  M=ceil_Nat((h+3)log(x)/pi0),
+  G=(M+5)ell,
+  N=ceil_Nat(max(6eGdelta,(h+3)log_2(x)))+1.
+These equal dE, goodU, KE, rE, orbitSmallMultiplicity, goodG' and
+orbitWindowCount in the source; in particular N has its final +1.
+The source's hE/rE choices do not require eps<1/52 for this lemma.
+The global application uses that smaller range, which is a specialization.
+
+On the n coordinates {0,...,n-1}, define
+  W(i,L)={(i+j) mod n : 0<=j<L}.
+Its cardinality is at most L even if L>n. A complete tile of index s is
+[s ell,(s+1)ell), for 0<=s<t=floor(n/ell). Cell c, 1<=c<=6r+1,
+is [s ell+(c-1)u,s ell+c u). A tile is Marked exactly when its odd-numbered
+cells contain no selected points, and each even-numbered cell contains
+one selected point whose absolute orbit coordinate is even. Thus there
+are 3r+1 empty cells and 3r singleton-even cells. Cell-number parity and
+coordinate parity are distinct conditions; both are preserved here.
+
+The literal GoodOrbitIntervalTileCondition is the conjunction:
+  A: every L2-window has at most K selected points;
+  Tiles: for every s0<t, some j in {0,...,M} makes tile (s0+j) mod t marked;
+  Intervals: every G-window has at most N selected points.
+The remaining tail [t ell,n) is not a complete tile. The proofs below
+keep it; there is no assumption that ell divides n.
+
+BO1. FINITE PRODUCT LAWS, CONDITIONING AND COUNT-TAIL DOMINATION
+-------------------------------------------------------------
+For a finite coordinate set S and probabilities 0<=q_i<=1, set
+  mu_S(U)=prod_(i in U) q_i * prod_(i in S\U)(1-q_i), U subset S.
+Expanding prod_(i in S)(q_i+(1-q_i)) gives sum_U mu_S(U)=1.
+Every weight is nonnegative. Finite-sum expansion gives linearity and
+monotonicity of expectation immediately.
+
+If i is not in S, split subsets of S union {i} according to whether
+they contain i. This gives the exact insertion identity
+  E_(S+i) F = (1-q_i) E_S F + q_i E_S[U -> F(U union {i})].
+If S1 and S2 are disjoint, subset union identifies their powersets
+product with the powerset of S1 union S2 and their mu weights multiply.
+Summing unused coordinates therefore gives a factor 1. Consequently:
+  E_S F(U intersect A)=E_A F for A subset S;
+  E_S prod_j F_j(U intersect A_j)=prod_j E_(A_j) F_j
+for pairwise disjoint A_j subset S. These are all the source's
+expectation_spec clauses, including its nonconstant probabilities.
+
+For i0 in S and any event E of a selected subset, the same expansion gives
+  P(i0 in U and E(U))
+    =q_i0 * E_(S\{i0})[1_E(V union {i0})].              (BO1.1)
+This identity remains valid even if q_i0=0. When q_i0>0, the second
+factor is exactly the conditional probability given i0 selected. In the
+actual application q_i0>=3delta/4>0. Thus conditioning does not change
+the other probabilities; in particular it does not replace them by their
+upper or lower endpoint.
+
+Count-tail domination can also be proved with finite sample spaces.
+For each coordinate take a pair (X_i,Y_i) with possible states
+  (0,0), (0,1), (1,1)
+and probabilities 1-delta, delta-q_i, q_i. They are nonnegative and
+sum to one if 0<=q_i<=delta<=1. Make these pairs independent. Their
+marginals are Bernoulli(q_i) and Bernoulli(delta), and X_i<=Y_i in
+every state. Pad with g-|S| further Bernoulli(delta) variables if |S|<=g.
+For every natural b this proves
+  P(sum_(i in S) X_i>=b) <= binUpper(g,delta,b).        (BO1.2)
+Here binUpper=sum_(j=b)^g binom(g,j)delta^j(1-delta)^(g-j) is the exact
+binomial count probability. It is zero for b>g and one for b=0.
+
+If b>0, any set with at least b selected coordinates contains some
+selected b-subset. The union bound gives
+  P(sum X_i>=b) <= binom(|S|,b)delta^b
+                <= binom(g,b)delta^b.                 (BO1.3)
+The same inequality holds for b=0, with delta^0=1, and for b>g,
+where both sides are zero. This proves both clauses of the literal
+tail_le, rather than importing a general probability theorem. The source
+uses coordinate induction to prove the same monotone comparison.
+
+BO2. THE EXACT BIASED MARKED-TILE LOWER BOUND
+-------------------------------------------
+Suppose 0<=delta<=1, u>=1, r>=0 and 3delta/4<=q_i<=delta.
+For any cell C of length u,
+  P(C empty)=prod_(i in C)(1-q_i)>=(1-delta)^u=:A0.
+For a fixed even coordinate j in C, the event that precisely j is
+selected has probability
+  q_j prod_(i in C\{j})(1-q_i)
+    >=(3delta/4)(1-delta)^(u-1).
+Every interval of u consecutive integers contains at least floor(u/2)
+even integers: pair successive integers, or inject i -> a+(a mod 2)+2i
+for 0<=i<floor(u/2) into the even coordinates of [a,a+u).
+The singleton events for different j are disjoint, so their union has
+probability at least
+  A1=floor(u/2)*(3delta/4)*(1-delta)^(u-1).
+All 6r+1 cells are disjoint. BO1 therefore gives
+  P(tile s marked) >= A0^(3r+1) A1^(3r)
+                    =markedLow(delta,r,u)=:pi.        (BO2.1)
+This holds for every complete tile, irrespective of the probability
+profile or parity of its starting coordinate. Nonnegativity is explicit,
+and pi<=1 follows already from (BO2.1) and probability normalization.
+
+Now specialize to u=ceil(delta^-1), 0<delta<=1/100. The ceilings imply
+  1<=u delta<=1+delta,
+  floor(u/2)delta >= (u-1)delta/2 >=(1-delta)/2>=99/200.
+The integral identity
+  -log(1-delta)=integral_0^delta 1/(1-t) dt<=delta/(1-delta)
+gives
+  A0>=exp(-u delta/(1-delta))>=exp(-103/100)>3/10.       (BO2.2)
+Indeed (1+delta)/(1-delta)<=101/99<103/100. For an elementary check
+of the numerical exponential comparison, the power series gives
+  e<=5/2+(1/6)sum_(j>=0)4^-j=49/18<11/4,
+  exp(3/100)<=sum_(j>=0)(3/100)^j=100/97.
+Hence exp(103/100)<(11/4)(100/97)=275/97<10/3.
+The factorial estimate used in the first bound is
+(j+3)!>=6*4^j for j>=0.
+
+Since 0<1-delta<=1, its (u-1)st power is at least A0. Thus
+  A1 >= (99/200)*(3/4)*(3/10)=891/8000>1/10.
+Both factors are at most one; for instance
+  A1<=floor(u/2)*(3delta/4)<=3(1+delta)/8<=303/800.
+It follows that
+  0<=10^(-(6r+1))=pi0<=pi<=1.                          (BO2.3)
+This proves the literal markedLow_bounds. The lower factor 3/4 is the
+only change to the singleton probability from GII9, and the stronger
+delta<=1/100 preserves the source's exact pi0 without increasing r or M.
+
+BO3. FORCED-POINT FAILURE BOUND, INCLUDING THE CYCLIC REMAINDER
+------------------------------------------------------------
+For this finite lemma take arbitrary natural n,L2,K,r,u,M,G,N and
+0<=delta<=1 with u>=1 and (M+1)ell<=n, ell=(6r+1)u. Select coordinates
+in {0,...,n-1}\{i0} independently with probabilities in [3delta/4,delta]
+and adjoin i0. This is the forced-point law. When i0<n and q_i0>0 it is
+the actual conditional law from BO1. It also makes sense at delta=0
+without dividing by a zero probability.
+
+Short windows: if a window of length L2 has more than K points after
+i0 is inserted, its unforced part has at least K selected points.
+Its underlying coordinate set has cardinality at most L2. BO1.3 and
+the union bound over all n starts give
+  P(not A) <= n binom(L2,K)delta^K.                    (BO3.1)
+No assumption L2<n is needed. Here the actual n upper bound is Co*x^h,
+so this coarse short-window bound has sufficient exponent; the sharper
+split used by GII9 for the larger x^(h+eps/8) ambient range is unnecessary.
+
+Tiles: put t=floor(n/ell). The length hypothesis gives t>=M+1>=1.
+For a fixed start s0<t, the tile indices
+  (s0+j) mod t, 0<=j<=M,
+are distinct, because two congruent values would differ by a multiple of
+t of absolute value at most M<t. Remove the index floor(i0/ell), if it
+occurs in this set. At least M indices remain. Their complete tiles are
+pairwise disjoint, lie in {0,...,n-1}, and do not contain i0. Under the
+forced law their coordinates have their original probabilities. Their
+marking events are therefore independent, even though their marking
+probabilities may differ. Each is at least pi by BO2.1.
+
+If all M+1 original tiles are unmarked, then these remaining tiles are
+unmarked. Consequently its probability is at most (1-pi)^M. There are
+t<=n starting tiles, so
+  P(not Tiles) <= n(1-pi)^M.                           (BO3.2)
+If i0 lies in the remainder [t ell,n), its index floor(i0/ell) equals t
+and is not among the complete tile indices. No tile is then removed;
+weakening M+1 unaffected factors to M preserves the bound. The argument
+also works algebraically if i0>=n, although that case is not needed for
+conditioning. In particular there is no hidden periodic continuation
+of the coordinate parity through the incomplete remainder.
+
+Long windows: if its selected count exceeds N, deleting the possible
+forced point leaves at least N selected coordinates. This implies the
+weaker source threshold max(N-1,0); source N-1 is natural subtraction.
+The unforced underlying set has cardinality at most G. BO1.2 gives
+  P(not Intervals) <= n binUpper(G,delta,N-1).         (BO3.3)
+
+The complement of the conjunction is contained in the union of these
+three failure events. Summing (BO3.1)--(BO3.3) proves exactly
+  P_forced(not GoodOrbitIntervalTileCondition)
+    <= n binom(L2,K)delta^K + n(1-pi)^M
+         + n binUpper(G,delta,N-1).                   (BO3.4)
+This is the literal not_good_le under its supplied finite hypotheses.
+No badness-event monotonicity or rotation invariance was used.
+
+BO4. EXPLICIT UNIFORM NUMERICS AND SOURCE-COMPATIBLE CONSTANT
+-----------------------------------------------------------
+Return to the actual parameters at the start. Let
+  A=|Co|+1>0, B=(max(Lb,1))^K>=1,
+  C1=(h+3)/pi0+2>0, Cstar=2(6r+1)C1,
+  y0=max(1,4Cstar/theta^2,log(100)/theta), x0=exp(y0),
+  Cb=A(B+2)>0.
+This explicit threshold is a human simplification of the source's
+ot_exists_log_le_rpow. It depends only on eps; allowing dependence on
+Co,Lb is harmless but unnecessary. Fix any real x>=x0, any naturals
+n,L2 with x^(eps/4)<=n<=Co*x^h and L2<=Lb, any allowed probability
+profile, and any forced coordinate. If Co or Lb make these inequalities
+impossible, the assertion is simply vacuous; the positive constants
+remain defined.
+
+Write y=log x. Then y>=y0>=1 and delta<=1/100. From y>=4Cstar/theta^2,
+  Cstar(y+1)<=2Cstar y<=theta^2 y^2/2<=exp(theta y)=x^theta.
+The last inequality is the quadratic term of the exponential series.
+Also u<=delta^-1+1<=2x^theta and
+  M+1<=(h+3)y/pi0+2<=C1(y+1).
+It follows that
+  (M+1)ell<=Cstar(y+1)x^theta<=x^(2theta)
+              =x^(eps/4)<=n.                          (BO4.1)
+Thus the exact finite tile-fit premise of BO3 is proved, with all
+ceilings included. This alone does not assert 3G<=n; the separate local
+geometry uses its own already stated sufficiently-large-scale bound.
+
+For the short-window term, theta K>=h+2 and x>=1 give
+  delta^K=x^(-theta K)<=x^(-(h+2)),
+  binom(L2,K)<=L2^K<=(max(Lb,1))^K=B.
+Since n<=Co*x^h<=A*x^h,
+  n binom(L2,K)delta^K<=AB*x^-2.                       (BO4.2)
+
+For the marked-tile term, BO2 gives pi>=pi0 and pi<=1. Using
+1-z<=exp(-z) for z>=0 and pi0 M>=(h+3)log x,
+  (1-pi)^M<=exp(-pi0 M)<=x^(-(h+3)),
+  n(1-pi)^M<=A*x^-3.                                 (BO4.3)
+
+For the long-window term, first prove the source helper in a shorter way.
+For natural g,b and 0<=delta<=1, if b>=6e g delta, then
+  binUpper(g,delta,b)<=exp(-b).                        (BO4.4)
+If b=0 both sides are one. If b>g, the tail is zero. Otherwise b>=1,
+and the union bound in BO1.3 applied to g Bernoulli(delta) trials gives
+  binUpper(g,delta,b)<=binom(g,b)delta^b
+    <=g^b delta^b/b!<=(e g delta/b)^b<=6^-b<=e^-b.
+The factorial inequality follows from
+  log(b!)=sum_(j=1)^b log j>=integral_1^b log t dt
+          =b log b-b+1>=b log b-b.
+The elementary e<3 already proved in BO2 implies 6^-b<=e^-b.
+This establishes the full binomial-tail bound, not merely a point-mass
+bound. The source sums a geometric estimate for each point mass instead.
+
+At the actual parameters b=N-1 is exactly the natural ceiling in (BO.1),
+so b>=6eGdelta and b>=(h+3)log_2x>=(h+3)log x. Here 0<log 2<1,
+because 1<2<e, and log x>=0. Applying (BO4.4) gives
+  n binUpper(G,delta,N-1)<=A*x^-3.                    (BO4.5)
+Adding (BO4.2), (BO4.3), (BO4.5), and using x>=1, proves
+  n binom(L2,K)delta^K+n(1-pi)^M+n binUpper(G,delta,N-1)
+    <=A(B+2/x)x^-2<=Cb*x^-2.                          (BO4.6)
+Together with (BO4.1), this is the exact conclusion of orbit_terms.
+Combining it with BO3 gives the claimed conditional probability bound.
+The constants precede x,n,L2, the profile, the base, and the forced point.
+
+BO5. ACTUAL GROUP ORBIT MARGINAL AND WEIGHTED EXPECTATION
+-------------------------------------------------------
+Let A be a finite abelian group with independent inclusion probabilities
+q:A->[3delta/4,delta]. Fix a step v of finite positive order n, a point
+a, and a base b satisfying a=b+jv for some natural j. Reduce j modulo
+n to obtain i0<n with a=b+i0v. The map
+  phi:{0,...,n-1}->A, phi(i)=b+iv,
+is injective: phi(i)=phi(j) implies (i-j)v=0; the order n divides the
+integer i-j, whose absolute value is less than n, so i=j.
+
+For a prescribed subset U of the orbit coordinates, sum the ambient
+product weight over every T with phi^-1(T)=U. Each point outside im(phi)
+contributes q(z)+(1-q(z))=1. Hence the resulting weight is exactly
+  prod_(i in U) q(phi(i)) * prod_(i notin U)(1-q(phi(i))).
+This is the source's fibre_sum/marginal identity. It is an equality of
+finite products and sums, not an approximation or a uniform-orbit law.
+
+Let E(U) be any event of the coordinate subset. Marginalization and
+(BO1.1) now give the precise source orbit_sum identity
+  sum_(T subset A) pw(q,T) 1_{a in T and E(phi^-1(T))}
+   =q(a) * E_(q composed phi, [0,n)\{i0})
+                   [1_E(V union {i0})].               (BO5.1)
+This identity is valid for arbitrary real q as a polynomial identity;
+the probabilistic interpretation uses 0<=q<=1. In our application the
+conditional expression has no zero-probability ambiguity since q(a)>0.
+
+Take E to be the literal complement of IsGoodOrbit, after identifying
+Fin(n) with its natural value labels. Suppose x>=x0 and the order n is
+in the BO4 range. BO3--BO4 apply to q composed phi without changing any
+parameter. Therefore
+  P(a in T and E(phi^-1(T)))
+    <=q(a) Cb*x^-2<=delta Cb*x^-2.                    (BO5.2)
+The base b may depend on v and a. In the actual topsGroup application,
+b=bs(v,a); its only required property is existence of j with b+jv=a.
+We do not claim invariance of the parity-sensitive tile event under
+rotation, nor that two points on the same orbit necessarily use the
+same based event. Uniformity in b and a makes either claim unnecessary.
+
+Finally fix a finite index set P of steps v_p of orders in the same range,
+nonnegative real weights omega_p, and a prescribed allowed base b_(p,a)
+for each p,a. For
+  Z(T)=sum_(p in P) omega_p *
+        #{a in T : its prescribed based v_p-orbit is bad},
+write the cardinality as a sum of indicators and interchange the two
+finite sums with expectation. Equation (BO5.2) gives
+  E Z<=delta |A| Cb*x^-2 * sum_(p in P) omega_p.        (BO5.3)
+No independence among different primes, steps, orbit events, or points'
+badness events is used. If P is empty or all weights are zero, both
+sides vanish. The stronger pointwise hypothesis needed by the source
+select theorem is precisely (BO5.2), with beta=Cb*x^-2. The parent's
+selection proves the final factor-4 bound together with coset counts.
+
+DEPENDENCIES AND WHAT CHANGES FROM GII9
+-------------------------------------
+All five BO claims are proved here using finite product expansions,
+elementary order arithmetic, elementary inequalities for exp/log, and
+the exact displayed definitions. There is no retained representation,
+cohomological, or host-construction premise in these probability claims.
+The actual group/profile/order inequalities are hypotheses of their
+application and are supplied separately.
+
+Compared with GII9, the singleton lower bound receives the factor 3/4;
+delta<=1/100 restores pi0 unchanged. Unlike GII9's larger ambient upper
+exponent h+eps/8, this source branch assumes n<=Co*x^h, so its original
+coarse n*binom(L2,K)delta^K bound suffices. BO4 gives an explicit threshold
+instead of an asymptotic existence wrapper and shortens the long-tail
+proof, but keeps the exact source constant Cb and all parameter ceilings.
+BO5 identifies the actual t-dependent based orbit and keeps its exact
+selected-point factor q(t). The host identification and simultaneous
+biased coset selection are not silently imported into these results.

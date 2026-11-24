@@ -1,0 +1,236 @@
+GW1–GW6. ONE GLOBAL DEGREE PAIR WITH SMALL WEIGHTED PRIME LOSS
+============================================================
+Readable reconstruction v0.11, 2026-11-21.
+Repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+RESULT AND SCOPE
+---------------
+This component supplies actual MeanKappaBound, MeanEx and
+WeightVectorExists for the family data satisfying the explicit GI/GII
+conditions. Its last step supplies ChosenW for that family. If the
+additional CoverAll property is supplied, the selected pair is realized
+by an actual family member and satisfies ChosenWS. We do not assert
+existence of a full arithmetic family with CoverAll or simultaneous
+realization of its selected tops and all other global structures.
+
+The proof is a human reconstruction of the exact finite averages in
+SlopeEstimateOfLemmaBSlopeLine.lean and the family transport in
+PowFourLtCeilThresholdPrime.lean/LossRequirementsOfSmallShares.lean.
+It simplifies the total-loss budget: the harmonic bound already proved
+inside the source is sufficient, so no prime number theorem or sharper
+Mertens estimate is needed. No independence between different primes
+is assumed. We have not changed or compiled the Lean code.
+
+Throughout 0<eps<1/52 is fixed; all coefficient constants and rG(eps)
+are fixed before x and before the family index. Set
+  delta=x^(-eps/8), a=x exp(x^eps), X'=exp(x^(eps/3)),
+  b'=a/X', p0=k^2 x^26, Y=x^13, Lambda=K.La N1^2 log(a),
+  Nstar=2n delta.
+The global chain length m_ch=D.R.m is different from the local
+highest-weight parameter m_local=k-1. The selected subset is TT.
+The canonical deficit is the universal infimum of GJ1.
+
+GW1. EVENTUAL SMALL COEFFICIENTS AND NONEMPTY INTEGER BOXES
+---------------------------------------------------------
+From the literal SizesAt fields SizeN, SizeM, SizeK and SizeTT,
+  x^(2+8eps-eps/100) <= n <= x^(2+8eps+eps/100),
+  m_ch <= x^(eps/100) sqrt(x delta) <= x^(1/2+eps/100),
+  k <= x^(9/2+10eps+eps/100) <= x^6,
+  |TT| <= 2n delta <= 2x^(2+8eps+eps/100).
+The inequality k<=x^6 uses eps<1/52 and x>=1. GII2 gives
+N1<=Ce log x with Ce independent of the family index.
+
+For any fixed nonnegative K.kII and fixed Cm=302114, enlarge the
+threshold so that
+  K.kII rG^2 <= x^8,   Cm Ce log x <= x.
+Then
+  K.kII rG^2 k x^(-26) <= x^(-12),
+  Cm N1/x^13 <= x^(-12).                               (GW1.1)
+These are the first two fields of the source's NumMean, proved without
+requiring its other fields. GI5 already supplies the period and L2
+conditions needed below. The elementary log/power comparison can be
+made explicit by GJ2's fourth-term exponential bound, with the
+constant enlarged to at least one and log x>=1.
+
+Define the literal windows
+  Ia={ceil(a),...,floor(a+a/(k x^13))},
+  Ib={ceil(b'),...,floor(b'+Nstar x^eps Lambda b'/k)}.
+They are eventually nonempty. To check every bound, first
+  Nstar>=2x^(2+(8-1/100-1/8)eps)>=1.
+GJ2 with eta=eps/48 gives Lambda>=x^(47eps/48)>=1.
+Also a>=x^19 eventually, since x^eps>=18 log x eventually.
+Hence a/(k x^13)>=1. Finally
+  log b'=log x+x^eps-x^(eps/3)>=6 log x
+eventually: first impose x^(eps/3)<=x^eps/2, then impose
+x^eps/2>=5 log x. Thus b'>=x^6>=k and the Ib width is at least one.
+If v-u>=1, ceil(u)<=u+1<=v, so ceil(u)<=floor(v).
+This proves nonemptiness with the exact integer rounding.
+
+GW2. ACTUAL PER-ORBIT MEAN DEFICITS
+----------------------------------
+Let p be a candidate prime and let v be a good representative.
+The candidate definition includes primality, p<X', residue class zero,
+orbit period n'>=x^(eps/4), and, for p>=p0, exclusion from the band
+of width rhoB. GJ3 identifies Nv with the number of selected cyclic
+positions T. Let E_local denote uniform averaging over the two
+literal windows on T, with degree zero at positions outside T.
+
+If p<p0, the source's deficit is
+  kappa_v=min(1,K.kII Nv rG^2 k x^(-26)).
+It is nonnegative, independent of the degrees, and <=Nv x^(-12)
+by (GW1.1). This is the pointwise small-prime clause of
+MeanKappaBound, and gives its local-mean clause as well.
+
+If p>=p0, the deficit is X.kapI(p,n',T,a,b). It is nonnegative for
+all degree functions, whether or not they lie in the boxes, by GJ1.
+GI5 supplies the exact fourteen numerical hypotheses, the good-period
+and L2 bounds, and exclusion from the inner band. GI8 gives
+  E_local kappa_v <= Cm Nv N1/x^13 <= Nv x^(-12).        (GW2.1)
+The inner-band exclusion follows from rho<=rhoB, so the actual
+candidate condition is sufficient. The canonical average is justified
+by its universal infimum definition, not by making an independent
+choice of a certificate at each weight. This proves both clauses of
+the literal G.MeanKappaBound = AuxBlock8.Conclusion2.
+
+GW3. EXACT GLOBAL MARGINALIZATION
+--------------------------------
+Let Ba be the functions TT->Ia, extended by zero to A\TT; let Bb
+be the analogous functions into Ib. Both are finite nonempty by GW1.
+Use the uniform measure on B=Ba x Bb. For a fixed orbit v, the map
+  phi_v:Fin(n')->A, i |-> t0+i hP
+is injective by GJ3 and identifies T with the corresponding subset of
+TT. Each prescribed local a-function has exactly |Ia|^(|TT|-Nv)
+global extensions: its values on the complement in TT are arbitrary.
+Each local b-function has exactly |Ib|^(|TT|-Nv) extensions. Hence
+restriction sends the uniform global measure to the uniform local
+measure, and
+  E_B kappa_v = E_local kappa_v.
+This is an equality of finite sums divided by their actual cardinalities;
+there is no limiting argument or assertion of independence of orbits
+belonging to different primes.
+
+For a candidate prime put
+  Sigma_p(a,b)=m_ch sum_(v good) kappa_v(a,b).
+The good-representative fibres are disjoint subsets of TT, so
+sum_(v good) Nv<=|TT| (GJ3). Linearity of finite averaging gives
+  Sigma_p>=0,
+  E_B Sigma_p<=m_ch |TT| x^(-12).                      (GW3.1)
+Nonnegativity in fact holds for all primes and all degree functions:
+each small-prime formula is nonnegative, and each large-prime canonical
+infimum is nonnegative. The stronger universal statement is compatible
+with the source's MeanEx and family transport.
+
+GW4. SUM THE EXCEPTIONAL LOSSES OVER ALL CANDIDATE PRIMES
+-------------------------------------------------------
+Put t=x^(eps/3)>=1, X'=exp(t), M=ceil(X')-1>=1. Since every
+candidate prime p lies below X', and log p<=t,
+  sum_(p candidate) (log p)/p
+    <= t sum_(j=1)^M 1/j
+    <= t(1+log M) <= t(1+t) <=2t^2.                    (GW4.1)
+For M>=1 the harmonic bound follows by integrating 1/u on each
+[j-1,j], j>=2. M<X' holds both when X' is an integer and otherwise.
+Thus no sharper prime estimate is needed. The source proves t(1+t)
+as an intermediate bound, then weakens it to t(2+t); we retain the
+intermediate inequality.
+
+For every s>=0 and theta=x^(-eps),
+  1_{s>theta}<=x^eps s.
+If s<=theta this is 0<=x^eps s; otherwise x^eps s>1. Define
+  Z(a,b)=sum_(p candidate) (log p)/p
+            [1_{Sigma_p(a,b)>x^(-eps)}+Sigma_p(a,b)].
+Combine this pointwise inequality, (GW3.1), and (GW4.1):
+  E_B Z <= (x^eps+1) m_ch |TT| x^(-12) *2x^(2eps/3)
+        <=8x^(-19/2+(1453/150)eps).                    (GW4.2)
+For clarity the exponent is
+  eps + (1/2+eps/100) + (2+8eps+eps/100)
+       -12 + 2eps/3
+  =-19/2+(1453/150)eps.
+Set gamma=1/2-(1453/150)eps. Since eps<1/52,
+  gamma>1/2-1453/7800=2447/7800>0.
+Therefore E_B Z<=8x^(-9-gamma). Every bound is uniform in the
+family index, though its threshold may depend on eps and the fixed
+coefficient constants.
+
+GW5. SELECT ONE PAIR, WITH THE LITERAL WReq COEFFICIENTS
+------------------------------------------------------
+Enlarge the threshold to impose 32x^(-gamma)<=1. The finite nonempty
+box has E_B Z<=x^(-9)/4. Hence some (a,b) in B has
+Z(a,b)<=x^(-9)/4: if every value were larger, so would its average.
+At that same pair,
+  sum_(p candidate) (log p)/p
+       [2*1_{Sigma_p>x^(-eps)}+4Sigma_p]
+    <=4Z<=x^(-9).                                    (GW5.1)
+This is exactly AuxBlock8.WReq, with the source's 2 and 4 coefficients,
+not just a bound of the right order. The pair lies in the exact two
+global boxes, giving WeightVectorExists. Nonnegativity together with
+Z<=x^(-9)/4 gives the literal MeanEx statement as well.
+
+Nonnegativity permits dropping summands, so the same pair satisfies
+  sum_(p candidate, Sigma_p>x^(-eps)) (log p)/p<=x^(-9)/2,
+  sum_(p candidate) (log p)/p Sigma_p<=x^(-9)/4.
+It need not satisfy Sigma_p<=x^(-eps) at EVERY prime. The selected
+pair controls the total weighted exceptional set. For primes passing
+that test, the actual definition VV=goodReps applies. No abundance
+of candidate primes is claimed by this selection argument.
+
+GW6. TRANSPORT TO THE FAMILY, AND THE EXACT COVERAGE BOUNDARY
+-----------------------------------------------------------
+For x in Fm.Win above the common threshold, Ix_win gives a member i0.
+Apply GW5 to i0. Its frame's value map identifies TT bijectively
+with the common finite set TTn(x). Transfer the selected functions
+to integer labels av,bv:N->Z, assigning zero off TTn(x).
+
+The family's bTop_eq is
+  bTop=b'+2n delta x^eps LaG b'/k.
+ParametersFill equates LaG with Lambda. To read this equality from
+the quantified fills field choose any finite place, for example a
+place above 2: a maximal ideal over 2 exists in the integer ring of
+the number field by integrality/lying over. This is the short source
+proof pg_LaG. Thus winB=winBz exactly, and winA=winAz by definition.
+The selected integer functions satisfy all the family degree-window
+conditions, including b<=bTop. They define the source's Wt vector.
+
+We prove the universal clause in ChosenW explicitly. Let i be any
+member carrying those same integer functions. The equality R_eq
+identifies the finite additive frames, preserving addition and value
+labels. Under it, TT_eq identifies the selected sets; q_eq,d_eq,QS_eq
+identify the prime class map; hP_eq identifies the Frobenius steps;
+L_x,L_eps,L_J identify the scale; and bs_eq identifies the orbit
+selectors. Consequently their candidate conditions, orbit periods,
+representatives, and good-position sets coincide. In particular the
+finite candidate sets are equal, not merely comparable in cardinality.
+
+On TT the carried degrees agree by hypothesis, and outside TT both
+aL,bL and av,bv have value zero. Their wPos pullbacks therefore agree
+at every cyclic position. For small primes, the formula for kapIIf
+depends only on the shared scale, rank, constants and selected count,
+so the deficits agree. For large primes the family field kapI_eq
+identifies the canonical deficit functions on the common n',T,a,b.
+Thus the deficits agree term by term on good representatives, and
+  Sigma_p(i,actual aL,bL)=Sigma_p(i0,selected a,b).
+The same argument is the Sigma component of the source's sameServed
+transport; the extra off and ep equalities used by that larger package
+are not needed for Sigma alone. WReq transfers unchanged. This proves
+ChosenW from GW1–GW5 and the actual FamP equalities, without importing
+all the unrelated conclusions in LinkG.
+
+ChosenW itself asserts an admissible pair and the property of EVERY
+member carrying it. It does not assert that a carrier exists. The
+additional property Fm.CoverAll says that every admissible pair can
+be carried by some member, at any admissible distinguished position.
+Applying it to av,bv yields a carrier and hence ChosenWS. Once one
+carrier exists, the FamCore field coverS (or coverS_carry) can move
+the distinguished position while preserving these degrees.
+
+CoverAll is NOT a field of FamCore or FamP. FamCore contains only
+coverS; full coverage is defined separately. We therefore retain
+construction of a family satisfying CoverAll as an explicit remaining
+global obligation. This component closes the averaging and transport,
+not that existence claim and not a complete RH/GRH proof. Moreover,
+CoverAll is only an optional sufficient route. The active construction
+preselects one pair at the host stage and rebuilds its points at all
+distinguished positions before forming the final family. HW1–HW3
+reconstruct that transport, retaining the actual upstream host and
+point-construction hypotheses. The full proof is not being required
+to establish the stronger, optional CoverAll property.

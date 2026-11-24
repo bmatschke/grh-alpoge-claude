@@ -1,0 +1,635 @@
+LOCAL CONSTRAINED GRAM ESTIMATE — HUMAN RECONSTRUCTION, v0.5
+Owner: lean_audit. Date: 2026-11-21.
+Pinned repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+0. SCOPE, STATUS AND WHAT IS NEW
+
+This note reconstructs the actual ProjectionDerivativeEstimate used in
+CL9 of v0.4. It follows the substantive proof through MonomialOrderSegments,
+not merely the final conjunction/transport wrappers. The principal result
+is the construction G=p^N2 diag(g_minus) Pi diag(g_plus) Z, with the
+specified signed-chain and link conditions and a controlled nonzero
+Fock pairing. The source proof actually chooses its error polynomial R=0.
+
+The elementary derivative expansion, weighted-Fock estimates, marked-column
+lifting, composition of projectors, unit conjugations, and final error
+cancellation are proved below. Two representation results and one digit
+result are shared with the companion v0.5 work:
+
+  IP: the integral signed path-column basis and its prefix adaptation;
+  IW4: the universal integral isotypic-projector bound;
+  DT: integral binomial-polynomial approximation of factorial digit units.
+
+Their exact required forms are stated below. IP3--IP5 prove the integral
+basis, prefix adaptation and column clauses; IW4 proves the universal
+projector bound; DT1--DT5 prove the factorial-unit approximation. The
+IP2--IP5 and IW invariant/projector arguments have also been independently
+read by this note's author. These are companion proofs, not definitions
+being relabelled as theorems. The arbitrary unit gamma in a SignedChainData
+remains part of the datum and carries its explicit approximation hypothesis;
+DT supplies it in the actual factorial application. The incoming assertion
+MemAt, putting the selected input polynomial in XX, remains separate from
+the Gram theorem and is explicitly retained in DT11.
+
+The exact source ledger accompanies this report. Its statuses describe
+the human reconstruction, not Lean axioms. No Lean source was edited, no
+local compilation was attempted, and no kernel replay is claimed.
+
+1. DATA AND THE TARGET, WITHOUT PACKAGING [PG1]
+
+Let O be the source complete mixed-characteristic DVR, K its fraction
+field, and p>=5 a prime. Normalize v(p)=1. The actual standalone source
+allows arbitrary ramification e=v_w(p), where w is a uniformizer; it does
+not assume w^2=p. The later Cloud application has that additional relation.
+
+There are J>=1 cyclic segments and r>=1 coordinates per letter. Segment j
+has a finite set L_j of base letters, each designated vector or covector,
+and r additional vector letters z_(j,m), 0<=m<r. A letter has r coordinate
+variables. Prescribe a nonnegative multidegree d_x at every original
+letter x. Put d_L,j=sum_(x in L_j)d_x and P_(j,m)=p^(g_(j,m)).
+
+The model ring has the base variables, and three copies of each vector
+letter: labels a_(j,m), carries u_(j,m), and tangents tau_(j,m). Tangents
+with m=0 are absent. The substitution phi fixes base variables and sends
+each coordinate a_(j,m,c) and tau_(j,m,c) to z_(j,m,c), and u_(j,m,c) to
+z_(j,m,c)^P_(j,m).
+
+A model monomial x^zeta is good if:
+  (a) every label exponent is <P_(j,m);
+  (b) its base-letter degrees equal d_x;
+  (c) label degree + P_(j,m)*carry degree + tangent degree = d_(j,m);
+  (d) its tangent degree at (j,m) is <=d_L,j, and is zero for m=0.
+These are exactly the GoodE conditions, with the missing m=0 tangent
+represented by exponent zero in the larger temporary model.
+
+For a set S of letters define ord_S(F) as the least Laurent exponent t
+after applying a generic conjugate of diag(1,...,1,t) to vector letters
+in S and the corresponding dual action to covector letters in S. Set
+ord_S(0)=infinity. This order is algebraic, not the p-adic coefficient
+valuation. For each j choose strictly nested subsets C_(j,i) of L_j,
+i=1,...,n_j, and set
+
+  S_(j,i)=C_(j,i) union {all carries at j-1},
+  T_(j,m)=L_j union {original z_(j,m'):m'>m},
+  Y_(j,m)=L_j union {all carries at j-1} union {tau_(j,m'):m'>m}.
+
+The link conditions are imposed only for m+2<=r. Their thresholds thetaL
+are positive in the source. The original SignedChainData chain also
+contains all its r frame letters; the above C removes those frame labels
+before shifting them to carries from the preceding segment.
+
+Digit component D_rho(F) means: retain monomials whose exponent at each
+coordinate z_(j,m,c) is congruent to rho_(j,m,c) mod P_(j,m), replace those
+exponents by their quotients, and rename the resulting coordinates as
+carry variables. No label monomial is included in D_rho(F).
+
+The input is a polynomial F of multidegree d with
+
+  b(F)=min_alpha(v(F_alpha)+v_p(alpha!)/2)=0,
+  ord_(S_(j,i)) D_rho(F) >= theta_(j,i), for every rho,j,i,
+  ord_(T_(j,m)) F >= thetaL_(j,m).
+
+The coefficient operator Gamma is diagonal: (Gamma F)_alpha=gamma(alpha)
+F_alpha, where gamma(alpha) is a unit. For every positive integer h,
+gamma and gamma^(-1) each have approximations modulo p^h of the form
+sum_beta c_beta product_x binom(alpha_x,beta_x), with c_beta integral and
+sum beta_x<=6h. This is precisely the ga_dig clause of SignedChainData.
+
+Write
+
+  T=sum_x d_x,
+  kappa=sum_x r(log_p(d_x+r)+1),
+  eP=r^2(log_p(2T+r)+1),
+  Dm=eP sum_j n_j,    Dl=eP J(r-1),
+  n0=v_p(product_x d_x!)/2,   E=Dm+Dl+2kappa.
+
+This kappa is the source kp, not Cloud's top/flat comparison exponent.
+Assume c>=1,
+
+  c>4(Dm+Dl+3kappa),
+  r*d_L,j/P_(j,m)+CH*r*c<=s_(j+1,i),  CH>=26.       (1.1)
+
+Put h=ceil(c), an integer. Since c>=1, c<=h<=2c. Thus (1.1) implies the
+same slope inequality with 13rh in place of CH*r*c, and
+h>4(Dm+Dl+3kappa). These are the parameters of LiftBoundUniform.
+
+We construct an integral good G satisfying
+
+  ord_(S_(j,i))G>=theta_(j,i)-s_(j,i)-12h,
+  ord_(Y_(j,m))G>=thetaL_(j,m)-30h,
+  b(phi G)>=n0-kappa,
+  v(<F,Gamma(phi G)>)<=n0+Dm+Dl+3kappa.             (1.2)
+
+Every supported monomial has the correct degree after phi, by goodness.
+Replacing 12h,30h by 24c,60c gives the exact endpoint constants. Its
+remainder R may be zero, so all requested coefficient lower bounds for R
+hold automatically. The endpoint upper bound is n0+E+kappa.
+
+2. FACTORIAL NORMS AND INTEGRAL PROJECTORS [PG3]
+
+The coefficient Fock form is <F,H>=sum_alpha F_alpha H_alpha alpha!.
+Its elementary nonarchimedean inequality is
+
+  v(<F,H>)>=b(F)+b(H).                             (2.1)
+
+Legendre's factorial formula, or the count of carries, gives for a
+multinomial of total degree d in r coordinates
+
+  0<=v_p(d!/product alpha_a!)<=r floor(log_p d),
+
+with the right side zero at d=0. Consequently, for exponent alpha of
+multidegree d,
+
+  2n0-kappa<=v_p(alpha!)<=2n0.                     (2.2)
+
+The deliberately larger kappa makes this valid uniformly including
+d=0. In particular, coefficient valuations >=u imply
+b(F)>=u+n0-kappa/2, whereas b(F)>=u implies coefficient valuations
+>=u-n0. For a split alpha=A+M of multidegree d, apply the same estimate
+and the binomial-factorial identity to obtain
+
+  v_p(A!)+v_p(M!)>=2n0-2kappa.                     (2.3)
+
+The weighted lattice B_d={F of multidegree d:b(F)>=0} is full and finite
+free over O. For arbitrary ramification e, a monomial basis is
+w^(-floor(e*v_p(alpha!)/2)) x^alpha. It is torus-graded. For a vector
+letter, the divided root operator E_ab^[q] sends x^alpha to
+binom(alpha_b,q) x^(alpha+q e_a-q e_b). The change of its weighted
+coefficient valuation is
+
+  [v_p binom(alpha_b,q)+v_p binom(alpha_a+q,q)]/2>=0.
+
+For a covector the root is the signed transpose, giving the same formula
+with a,b exchanged. The divided power of a sum over letters is the sum
+of products of the divided powers on the separate letters. Hence B_d is
+stable under every integral root divided power. Diagonal binomial
+operators act by integers, even at negative integral weights. This is the
+actual lattice hypothesis needed for IW4; no square root of p or integral
+semisimplicity is being assumed.
+
+Here is the exact application of IW4. On the S-letter representation,
+each coordinate weight lies in [-D_S,D_S], where D_S=sum_(x in S)d_x.
+Thus the difference of the SAME coordinate in any TWO weights has
+absolute value <=2D_S. IW4 implies that every isotypic projector e_lambda
+and every sum of such projectors satisfies
+
+  p^A e_lambda B_d subset B_d,
+  A=binom(r,2) floor(log_p(2D_S+r-1)),             (2.4)
+
+with the source Nat.log convention at zero. The parameter in (2.4)
+bounds coordinates of Hom weights; it is not a bound for differences of
+two coordinates within one Hom weight.
+
+For completeness, ord_S on a nonzero isotypic component of highest weight
+lambda is lambda_r. Indeed all coordinate weights are >=lambda_r, while
+the weight lambda_r occurs; the orbit of a nonzero vector spans an
+irreducible factor, so its projection to that lowest-coordinate weight
+is nonzero after a generic change of basis. Apply a multiplicity-space
+linear functional to reduce the isotypic case to the irreducible case.
+Different isotypic components cannot cancel in their direct sum.
+Thus the cutoff ord_S>=theta is the sum of the components with
+lambda_r>=ceil(theta).
+
+Its projector pi is Fock self-adjoint. The root actions satisfy
+E_ab^*=E_ba for the coefficient Fock form. Equivalently, extend the
+rational polynomial model to C and use its positive Fock Hermitian form:
+inequivalent unitary isotypic components are orthogonal. The resulting
+identities are rational and descend to K. This uses ordinary
+characteristic-zero representation theory, not a positivity assertion
+about a p-adic field.
+
+For S subset T, pi_S commutes with the T-action: E_T=E_S+E_(T\S), and pi_S
+commutes with both terms. Consequently it commutes with the T-isotypic
+projectors. For disjoint S,T the actions commute directly. It also
+commutes with every coordinate Euler operator on a letter outside S.
+
+To get a bound for arbitrary F from (2.4), scale F by p^ceil(-b(F)). The
+scaled polynomial lies in B_d. Undoing the scalar gives
+
+  b(pi F)>=b(F)-A-1>=b(F)-eP.                    (2.5)
+
+The final inequality follows from D_S<=T and the definition of eP.
+Zero polynomials cause no difficulty. The extra one avoids a false claim
+that b(F) itself is always attained in the value group. A product of t
+commuting cutoff projectors therefore loses at most t eP, fixes every
+polynomial satisfying all the cutoffs, and preserves any further cutoff
+whose letter set is nested with or disjoint from every set in the product.
+These facts prove the source prodProj properties by induction.
+
+3. THE DERIVATIVE CONGRUENCE FROM A GENERATING FUNCTION [PG2]
+
+Let P=p^g, 0<=rho<P, and put
+
+  a_l=[z^M](1+z)^rho ((1+z)^P-1)^l.
+
+Expansion of (1+((1+z)^P-1))^beta gives the exact finite identity
+
+  binom(rho+P beta,M)=sum_(0<=l<=M) a_l binom(beta,l).   (3.1)
+
+The coefficient a_l vanishes if l>M or rho+Pl<M. In characteristic p,
+(1+z)^P=1+z^P, so over Z we have (1+z)^P-1=z^P+pQ(z), with Q integral.
+In a contribution to [z^M] of its l-th power, at most floor(M/P) factors
+can contribute z^P. All remaining factors contribute pQ. Therefore
+
+  p^(max(0,l-floor(M/P))) divides a_l.              (3.2)
+
+For several coordinates take products of (3.1). Retain only indices l
+with M_a<=rho_a+P l_a for all a and
+sum_a max(0,l_a-floor(M_a/P))<h. Every discarded term is zero or divisible
+by p^h, uniformly for all beta. Every retained index satisfies
+
+  |l|<=|M|/P+h.                                    (3.3)
+
+This proves the precise multivariable coefficient congruence. To read it
+as a differential operator, split rho+Pl-M=rho'+P delta coordinatewise,
+with 0<=rho'<P. Its l-term is
+
+  a_l x^rho' (x^P)^delta partial^[l](x^beta)|_(x -> x^P).
+
+If beta has a coordinate smaller than l, its binomial coefficient and
+divided derivative are both zero. Thus there is no illegal negative
+exponent. The remainder has coefficients divisible by p^h for every
+monomial input. This is the source DER statement with integral
+coefficients and derivative cost (3.3). The proof actually works for every
+prime p, although we preserve p>=5 in the surrounding theorem.
+
+4. ORDER CALCULUS AND BINOMIAL DIAGONAL OPERATORS [PG3,PG7]
+
+The elementary V2 rules can be seen directly from the generic matrix
+defining ord_S. Its vector entries have t-order >=0 and its inverse entries
+have t-order >=-1. The covector uses the inverse-transpose. Thus multiplying
+by a vector coordinate never lowers order; multiplying by a covector
+coordinate lowers it by at most one. The chain rule uses the inverse
+matrix: divided differentiation at a vector letter by order q loses at
+most q, while differentiation at a covector letter loses no order. Using
+divided derivatives changes only scalar binomial factors and not t-orders.
+These rules also follow at once by introducing Taylor variables and
+comparing their coefficients.
+
+Adding vector letters to S cannot lower ord_S: apply their matrices,
+which have nonnegative t-orders, to the coefficients of the previous
+substitution. Removing vector letters of total fixed degree d loses at
+most d, by using the inverse matrices. Addition takes minimum lower
+bounds, multiplication adds them, and extracting coefficients in letters
+outside S preserves an order bound. Individual multidegree components
+also preserve it, because the substitution preserves every letter degree.
+
+The diagonal operation multiplying coefficient alpha by binom(alpha_x,q)
+equals x^q partial_x^[q]. Whether x is a vector or covector coordinate,
+the preceding bounds give a loss at most q. Hence an integral binomial
+polynomial in the exponents of total degree b has order loss at most b.
+Products add such degree budgets; sums take their maximum.
+
+Affine substitution alpha=rho+P beta does not increase that degree or
+destroy integral binomial coefficients. Indeed binom(rho+P n,q) is a
+degree-q polynomial integral at every nonnegative integer. Its Newton
+coefficients are its finite differences at zero, hence are integers,
+and vanish above q. Apply this coordinatewise. These observations
+justify every 6h or 12h order loss used below without an operator-word
+denominator assumption.
+
+5. THE FIRST DETECTING TEST [PG4]
+
+Choose alpha with v(F_alpha)+v_p(alpha!)/2=0 and write a0=v_p(alpha!)/2.
+Let Pi_l be the product of the original link cutoff projectors. Their
+sets T_(j,m) are nested within a segment and disjoint between segments.
+There are at most J(r-1) projectors. Since F satisfies all the link
+conditions, H0=Pi_l(x^alpha) satisfies
+
+  <F,H0>=F_alpha alpha!,   v(<F,H0>)=a0,
+  b(H0)>=a0-Dl,
+  ord_(T_(j,m))H0>=thetaL_(j,m).                   (5.1)
+
+Choose an integral binomial-polynomial approximation g to gamma^(-1)
+modulo p^h with degree<=6h. Then Gamma diag(g)H0=H0+diag(epsilon)H0,
+where every epsilon coefficient has valuation>=h. By (2.1) the error in
+pairing with F has valuation>=h+a0-Dl>a0. Thus the new pairing still has
+valuation a0. The integral diagonal operation cannot lower b, and loses
+at most 6h from each link order.
+
+Set N1=ceil(n0+Dl-a0), which is nonnegative since a0<=n0. The polynomial
+H=p^N1 diag(g)H0 has integral coefficients: their valuations before the
+scaling are >=a0-Dl-n0. Its pairing with Gamma F, equivalently with F and
+Gamma H, has valuation
+
+  a0+N1<n0+Dl+1,
+
+and its links are at least thetaL-6h. This is the actual source StepB,
+with no nondetection or cancellation choice hidden in its conclusion.
+
+6. THE MARKED-COLUMN LIFT AND DIGIT SPLIT [PG5]
+
+The exact IP input is the following signed path-column basis. In any
+ordered list of letters of fixed degrees, there is an integral basis
+Psi_b=product_k C_bk, whose columns are multilinear on their occurrence
+sets. The number of columns containing letter i equals d_i. The basis is
+adapted simultaneously to every prefix order cutoff: an integral
+polynomial satisfying cutoff theta_i has an integral expansion supported
+on paths with last weights lambda_b,i,r>=theta_i.
+
+A column has integer index q and prefix height H(i), with
+
+  colVal(q,H,r)=1_(q>=1,H=r)-1_(q<=0,H<r),
+  ord_prefix(C)>=colVal,
+  lambda_b,i,r=sum_k colVal(q_k,H_k(i),r).
+
+For q>=1, H(i) is at most the number of positive-vector occurrences of
+that column preceding i. These are the exact SPAN clauses used here.
+
+For segment j order the base letters first, then frames in decreasing
+index m=r-1,...,0. Thus T_(j,m) is a prefix. A column is marked when it
+contains any base letter. In a marked column rename each frame m>0 as
+the corresponding tangent; retain frame m=0 as a label. In an unmarked
+column leave all frames as labels. Base variables are unchanged.
+
+This operation has four properties.
+
+First, substituting tangent=label=z restores each original column and
+therefore the original polynomial. Second, every tangent letter occurs
+at most once per marked column, and there are at most d_L,j marked columns:
+each marked column accounts for at least one occurrence of a base letter,
+whose total number is d_L,j. Thus the tangent-degree cap is obtained by
+construction. No tangent of index zero is introduced.
+
+Third, the link orders are preserved. In a marked column the renamed
+link has exactly the same prefix preimage, so the column order bound is
+unchanged. In an unmarked column no variable belongs to the renamed link,
+so its order is >=0. Its old colVal is <=0: if q>=1, the positive
+occurrences before the cut are among fewer than r frame letters, so
+H<r; if q<=0, the definition already gives colVal<=0. Sum the column
+bounds and use prefix adaptation of the integral expansion of H.
+
+Fourth, integrality is preserved even without separately assuming every
+column integral. The Gauss coefficient valuation satisfies
+v_G(product C_k)=sum v_G(C_k), and injective variable renaming preserves
+v_G. Hence the renamed product has the same nonnegative Gauss valuation
+as Psi_b. The multiplicativity is elementary: reduce normalized factors
+modulo the maximal ideal, or choose the first minimum-valuation monomial
+in a monomial order. Products of their nonzero leading terms cannot
+cancel. The integral basis coefficients then preserve integrality of the
+whole lift.
+
+Perform this operation segment by segment, coefficientwise in the other
+letters. Other segments' orders are preserved because their substitutions
+act on disjoint variables. Finally write every label exponent as
+rho+P beta, introduce its carry monomial u^beta and retain a^rho.
+The substitution phi is unchanged. Coefficient extraction in labels
+preserves the link orders, and all new carry variables are positive
+vectors, so their insertion into Y_(j,m) cannot lower those orders.
+We obtain an integral good Z with phi Z=H and link orders thetaL-6h.
+This proves StepC from the explicitly stated IP basis, rather than
+retaining a separate mysterious lifting theorem.
+
+7. THE CHAIN PROJECTOR AND ITS COEFFICIENT COST [PG6]
+
+Let Pi be the product of the cutoffs ord_(S_(j,i))>=theta_(j,i)-s_(j,i),
+defined separately on every model multidegree and extended linearly.
+Within a segment these chain sets are nested; between segments they
+are disjoint. Each is contained in its segment's Y-set and disjoint
+from all other segments' Y-sets. Consequently Pi preserves all link
+orders and has image in all the weakened chain conditions.
+
+All labels and tangents lie outside every chain set. Since Pi commutes
+with their individual coordinate Euler operators, a monomial can only
+map to monomials with exactly the same label and tangent exponents.
+Its individual letter degrees are also unchanged. Call this a fixed
+label/tangent block. It follows directly that Pi preserves goodness.
+
+For a good x^zeta, the sum of model letter degrees is at most T, so (2.5)
+gives
+
+  b(Pi x^zeta)>=v_p(zeta!)/2-Dm.                  (7.1)
+
+If zeta' occurs in Pi x^zeta, the label and tangent factorials cancel in
+zeta'!/zeta!. The remaining base and carry letters have fixed degrees,
+bounded by their original degrees. Legendre's multinomial bound gives
+
+  |v_p(zeta'!)-v_p(zeta!)|<=kappa.                (7.2)
+
+Thus every coefficient of Pi x^zeta has valuation>=-Dm-kappa/2.
+For any integral good Z this remains true by linearity and the
+ultrametric inequality. Scaling by p^N2, N2=ceil(Dm+kappa/2), clears all
+these denominators. Also, for every model polynomial A of the same
+multidegree satisfying all weakened chains,
+
+  <A,Pi x^zeta>=<A,x^zeta>.                      (7.3)
+
+This is the cancellation identity used below.
+
+8. DIAGONAL FACTORIAL CORRECTIONS [PG8]
+
+For good zeta write its label exponents rho, carry exponents beta, and
+tangent exponent M. Let A be the original exponent formed from its base
+exponents and rho+P beta, so phi(x^zeta)=x^(A+M). The digit factorial
+identity is
+
+  A! M! = C_B gamma_dig(zeta) zeta!,
+  C_B=product_t (P_t!)^(|beta_t|),                (8.1)
+
+where gamma_dig is a p-adic unit. This explicit C_B is constant on a fixed
+label/tangent block. The source's more general kapC formula is the same
+quantity after inserting its explicit digit constants.
+
+By DT, gamma_dig and its inverse admit integral binomial-polynomial
+approximations modulo p^h of total degree at most 6h (DT proves a stronger
+bound, but we preserve the pinned constants). By the input gamma
+hypothesis and the affine-binomial argument in Section 4, gamma(A) and
+its inverse also have cost at most 6h on each fixed label block. Hence
+
+  gamma_*(zeta)=gamma(A) gamma_dig(zeta)
+
+has integral diagonal approximations g_plus,g_minus to its two signs
+modulo p^h, each costing at most 12h in every order whose set excludes
+labels. Treat each label coefficient separately to combine the
+approximations into one diagonal operator. On invalid label blocks one
+may use the constant 1; only good blocks enter the proof.
+
+Define Omega=diag(g_minus) Pi diag(g_plus). All these operations preserve
+goodness. Their coefficient estimates show that p^N2 Omega maps integral
+good polynomials to integral good polynomials. The chain orders of Omega Z
+are theta-s-12h: Pi resets the chain condition, so only the outer diagonal
+operation costs anything there. For a pre-existing link condition of
+level theta, the two diagonals cost 12h each and Pi preserves it. Thus
+the link level is theta-24h, and for our Z it is thetaL-30h.
+
+9. THE CONJUGATED DERIVATIVE SATISFIES THE WEAKENED CHAINS [PG7]
+
+Let M be supported on the original vector-frame coordinates, with total
+degree at each frame t=(j,m) at most d_L,j. Define
+
+  F_M=Gamma^(-1) partial^[M](Gamma F).             (9.1)
+
+We prove that each digit component of F_M is Q+E, where Q satisfies all
+chain levels theta-s and every coefficient of E has valuation>=h-n0.
+This is not an additional representation assertion.
+
+Initially F has coefficients>=-n0 by (2.2). Replace Gamma by its degree
+6h binomial approximation. This loses at most 6h in every digit-chain
+order, and introduces error coefficients>=h-n0. For a single frame t,
+Section 3 approximates its divided derivative by integral operators on
+the corresponding carry, of order<=|M_t|/P_t+h. These only affect chain
+sets in segment j+1, the sets containing that carry. Multiplication by
+the residual carry monomial is a positive-vector operation and has no
+negative order cost. All other chains are unaffected.
+
+Compose over all frames. The errors retain coefficient valuation>=h-n0:
+all derivative and approximation operators have integral monomial
+coefficients, and the true divided derivatives have integer binomial
+coefficients. Finally replace Gamma^(-1) by its own 6h approximation.
+The total order loss at a chain in segment j is at most
+
+  12h + sum_(m=0)^(r-1) (|M_(j-1,m)|/P_(j-1,m)+h).    (9.2)
+
+For each m, hypothesis (1.1) in its integer-h form says
+r*d_L,j-1/P_(j-1,m)+13rh<=s_(j,i). Divide by r and sum over the r frame
+letters. As |M_t|<=d_L,j-1, (9.2) is <=s_(j,i), because
+12h+rh<=13rh for r>=1. This proves the claimed Q+E decomposition,
+uniformly for every allowed M and every digit class. Extracting digit
+components never decreases a coefficient valuation lower bound.
+
+10. THE CENTRAL BLOCK CANCELLATION [PG9]
+
+Put Lambda(W)=<F,Gamma(phi W)>. Fix a good model monomial zeta with
+label rho, tangent M, collapsed exponent A, and C_B as in (8.1). An exact
+coefficient computation gives
+
+  Lambda(x^zeta)=C_B gamma_*(zeta) (F_M)_A zeta!.  (10.1)
+
+Indeed (F_M)_A=gamma(A)^(-1) gamma(A+M) F_(A+M)
+binom(A+M,M); combine binom(A+M,M) A! M!=(A+M)! with (8.1).
+Nothing in this identity suppresses a factorial or a factor of two.
+
+Use Section 9 to decompose D_rho(F_M)=Q+E. Multiply Q by the fixed label
+and tangent monomial, then take its component of the same individual
+model-letter degrees as zeta; call the result A_Q. It satisfies all the
+weakened chains. Label/tangent multiplication has nonnegative order,
+and homogeneous component extraction preserves order. Therefore (7.3)
+applies to A_Q.
+
+For zeta' in the same block, set
+
+  epsilon_(zeta')=g_minus(zeta') gamma_*(zeta') (F_M)_(A')
+                    -(A_Q)_(zeta').
+
+Every such epsilon has valuation>=h-n0. To see this, gamma_* is a unit,
+g_minus differs from gamma_*^(-1) by valuation>=h, the coefficients of
+F_M are >=-n0, and the remaining difference is exactly the corresponding
+coefficient of E.
+
+Apply (10.1) to Pi x^zeta and to x^zeta. The main terms are
+C_B<A_Q,Pi x^zeta> and C_B<A_Q,x^zeta>, hence cancel. Every remaining
+summand is C_B u epsilon_(zeta') zeta'!, where u is the relevant
+coefficient of Pi x^zeta or x^zeta. Write a=v_p(zeta!), a'=v_p(zeta'!).
+By (7.1), v(u)>=a/2-a'/2-Dm; this also holds for the identity term.
+Moreover (8.1), the unit property, and (2.3) give BOTH inequalities
+
+  v(C_B)+a>=2n0-2kappa,
+  v(C_B)+a'>=2n0-2kappa.
+
+Averaging these two inequalities yields
+
+  v(C_B u epsilon_(zeta') zeta'!)
+    >= h-n0-Dm+v(C_B)+(a+a')/2
+    >= h+n0-2kappa-Dm.                            (10.2)
+
+This averaging is a short human simplification of the source's split
+according to a<=a' or a'<a. It is the cancellation of the large
+factorials which makes the final loss logarithmic.
+
+We have proved the same lower bound for
+Lambda(diag(g_minus)Pi x^zeta)-Lambda(diag(g_minus)x^zeta).
+To introduce g_plus, use the exact identity
+
+ Lambda(Omega x^zeta)-Lambda(x^zeta)
+ =g_plus(zeta)[Lambda(diag(g_minus)Pi x^zeta)
+                      -Lambda(diag(g_minus)x^zeta)]
+  +(g_plus(zeta)g_minus(zeta)-1)Lambda(x^zeta).
+
+The first coefficient is integral. The second scalar has valuation>=h,
+because both approximations are correct modulo p^h. By b(F)>=0 and (2.2),
+v(Lambda(x^zeta))>=n0-kappa/2. Hence the second term has at least the
+valuation in (10.2) as well. Expand any integral good Z into monomials
+and use the ultrametric inequality. We obtain
+
+  v(Lambda(Omega Z)-Lambda(Z))>=h+n0-2kappa-Dm.    (10.3)
+
+This proves the actual omega_value estimate; it is not assumed as a
+substitute for constructing the Gram test.
+
+11. FINISHING THE SOURCE ESTIMATE, WITH ZERO REMAINDER [PG10]
+
+The original letter set contains Jr vector-frame letters, so kappa>=1.
+Our depth condition implies
+
+  h+n0-2kappa-Dm > n0+Dl+1.
+
+But Section 5 gives v(Lambda(Z))<=n0+Dl+1. Thus (10.3) is a strictly
+higher-valuation error and cannot cancel the detected pairing. In
+particular Lambda(Omega Z) is nonzero and has exactly the valuation of
+Lambda(Z).
+
+Set G=p^N2 Omega Z, N2=ceil(Dm+kappa/2), and R=0. Section 8 proves all
+coefficient, chain, link and degree requirements. Its pairing satisfies
+
+  v(Lambda(G))<=n0+Dl+1+N2
+             <=n0+Dm+Dl+kappa/2+2
+             <=n0+Dm+Dl+3kappa,
+
+where the last inequality uses kappa>=1. Integrality of G implies
+integrality of phi G, and (2.2) gives the slightly stronger bound
+b(phi G)>=n0-kappa/2, which implies the exported n0-kappa.
+
+The shifts c<=h<=2c now turn the model chain and link losses 12h and 30h
+into 24c and 60c. The source's original slope constant CH>=26 provides
+the model constant 13, and CE=2 gives E=Dm+Dl+2kappa. The upper Gram
+valuation is n0+E+kappa, exactly ProjectionDerivativeEstimate's bound.
+Every R condition is automatic at R=0. The source combined-lemmas proof
+makes this same zero choice; it is stronger than what its endpoint
+statement advertises.
+
+No improved global denominator is inferred merely from R=0. It removes
+one remainder term in the downstream CL9 proof, but the existing divisor
+bound and its other approximation errors still require their own
+bookkeeping. The v0.4 constant 54 is therefore left unchanged here.
+
+12. EXACT DEPENDENCIES AND LIMITS [PG11]
+
+The source theorem is not invoked as a black box in this report.
+Its dependency map, with the human work now supplied, is:
+
+  V2: proved in Section 4 by generic-matrix order calculus.
+  DER: proved in Section 3 by generating functions and divisibility.
+  PROJ: IW4 plus the proved weighted-lattice specialization, cutoff
+        identification, self-adjointness and commutation in Section 2.
+  SPAN: IP3--IP5 prove the precise integral prefix-adapted path-column
+        basis stated in Section 6; the marked-column map is proved here.
+  DIG: the explicit factorial-unit identity and DT1--DT5 approximation
+       proof; the diagonal assembly/order costs are proved in Section 8.
+
+The universal characteristic-zero highest-weight facts and finite-field/
+p-adic valuation foundations are background mathematical theorems, not
+claimed as newly proved in this report. The specialized integral results
+IW4 and IP3--IP5 are proved in their companion notes. Their exact lattice,
+weight and prefix hypotheses remain visible here; no stronger integral
+semisimplicity statement is used.
+
+The full global construction still must place its selected polynomial F2
+in the exact XX space. This is the incoming MemAt assertion: initial
+symbol membership and its transport through the allowed c0-word family
+are not reconstructed in this pass (DT11). It must not be confused with
+outgoing MembAt. DT7--DT8 construct the normal test and PickAt from the
+signed datum and incoming MemAt, and DT10 proves outgoing MembAt under
+the explicit MFH frame/margin hypotheses, Tied and BlockOK degree data,
+NormTest, and the YY(24,60) output proved here. The actual factorial gamma
+is supplied by DT1--DT5. Producing the full global parameter/frame datum
+satisfying these numerical hypotheses remains a separate task. A Gram
+bound for arbitrary polynomials cannot establish incoming membership or
+that parameter supply.
+
+The source transport BrData uses injective renaming of variables, converts
+ZMod J to Fin J, and removes the unused tangent coordinates of index zero.
+These operations preserve Fock pairings and b exactly. Its only numerical
+changes are the explicit ceil(c)<=2c estimates already included above.
+No inequality, valuation normalization, parameter quantifier or allowed
+symbol constraint is being silently dropped at that transport step.

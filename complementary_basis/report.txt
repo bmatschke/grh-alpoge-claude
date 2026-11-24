@@ -1,0 +1,422 @@
+COMPLEMENTARY INTEGRAL BASIS, EXACT COUNT, AND CARTAN SPAN — v0.6
+
+Pinned source: https://github.com/CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Claim IDs: CB1--CB7.
+
+RESULT AND SCOPE
+
+This report proves the precise integral standard-monomial basis, complementary
+array count, quantitative dimension comparison, and integral Cartan product
+used by CL1--CL5. The actual matrix/determinant/edge conventions are included.
+The main argument works over every integral domain and uses no field-level
+irreducibility theorem, integral standard-monomial theorem, hook-length
+division, or residue-characteristic restriction. The determinant count is
+proved as an integer counting identity using rational polynomials; that does
+not introduce denominators into a lattice.
+
+The argument is reconstructed directly from the pinned source. It is not a
+Lean build or an independent verification of the entire RH/Dirichlet-GRH
+release. The primary route is FinalC -> FinalD -> TestSideCounting ->
+TheoremIIClosedOfTestBound.primStep_of, together with Cartan.cartanOnto_proved
+-> RestCloudBOfTwo.ontoAll. The signed path basis IP and Gaussian Fock duality
+IW are compatible but unnecessary for this proof. Exact declaration ranges,
+full-file/range SHA-256 hashes and pinned URLs are in provenance.json.
+
+1. CB1: THE ACTUAL INVARIANT POLYNOMIAL MODULE
+
+Let R be an integral domain, and let X=(X_at) be an r by n matrix of independent
+variables, indexed from 1 here. For a nonnegative tuple nu of length n, define
+
+  nabla_nu(R) = {f in R[X]: every monomial has column degree nu_t,
+    and f(...,C_j+t C_l,...) = f(...,C_j,...) in R[X,t] for all l<j}.
+
+This is exactly StatementA.dualWeyl. In particular the invariance condition
+is a polynomial identity with an extra independent parameter. Over a finite
+field, invariance at its finitely many scalar points would be a weaker and
+insufficient definition. No passage to pointwise invariants is made below.
+
+Use column-lexicographic order: compare exponents at (a,t) by t first, then a,
+and a larger exponent at the earliest differing variable gives the larger
+monomial. Thus X_11 > X_21 > ... > X_r1 > X_12 > ... . This is StatementC.colLex.
+Let e be the exponent array of the leading monomial of a nonzero f. The column
+degree condition immediately gives sum_a e_at=nu_t. We prove
+
+  sum_(b<=a) e_bj <= sum_(b<a) e_b,j-1.                 (CB1.1)
+
+The genuinely needed lemma is slightly more general. Fix columns l<j and
+write x_a=X_al, y_a=X_aj. Let f be nonzero with
+
+  deg_t f(x,y+t x) <= s.
+
+First project f to the component containing its leading monomial for the
+grading that fixes x_a-degree plus y_a-degree for each a and fixes each other
+variable's exponent. Column addition preserves this grading if t has degree
+zero, so projection retains the degree bound; its leading monomial is still
+that of f. The exponents of all other columns are now fixed. We may factor
+their common monomial and regard the coefficients as lying in a domain.
+Thus we may assume f homogeneous of degree omega_a in each pair (x_a,y_a).
+
+If (a_i,b_i) are its leading exponents, then
+
+  sum_(i<=q)b_i <= s + sum_(i<q)a_i,  1<=q<=r.       (CB1.2)
+
+Proof by induction on rows. At row 1, write
+
+  f = sum_(u=0)^K x_1^u y_1^(e+K-u) f_u,
+  f_K != 0, e=omega_1-K>=0,
+
+where K is maximal and every f_u is independent of x_1,y_1. The leading
+monomial is x_1^K y_1^e times the leading monomial of f_K: x_1 is the earliest
+variable that is not fixed, and all earlier-column variables are fixed.
+Put f_u^+(t)=f_u(x',y'+t x') and
+
+  Q=sum_(u=0)^K x_1^u (y_1+t x_1)^(K-u) f_u^+(t).
+
+Then f(x,y+t x)=(y_1+t x_1)^e Q. The substitution is injective (its inverse
+replaces t by -t), so f_K^+ is nonzero. Also Q evaluated at x_1=1,y_1=-t is
+exactly f_K^+, so Q is nonzero. Degrees in t add in a polynomial ring over a
+domain, whence e<=s and deg_t Q<=s-e. Since deg_(y_1)Q<=K, substitution
+x_1=1,y_1=-t gives deg_t f_K^+<=s-e+K. Apply induction to f_K with the new
+bound s-e+K. For q=1 this gives e<=s; for q>1 it gives
+
+  e+sum_(2<=i<=q)b_i <= e+(s-e+K)+sum_(2<=i<q)a_i
+                            = s+sum_(i<q)a_i.
+
+This proves (CB1.2). The generic invariance of nabla gives s=0. Apply it to
+each adjacent column pair to obtain (CB1.1). Adjacent inequalities also imply
+the weaker all-l<j version used in the earlier cloud description.
+
+Source match: PeelDegBound.peelDegBound_of uses exactly the specialization
+x=1,y=-t; TwoColumn.lctwo_main iterates the row peeling; LeadInterlaced takes
+the graded component with the original leading monomial. The present proof
+combines those steps but makes no stronger integral assumption.
+
+2. CB2: EXPLICIT TABLEAUX, MONICITY, AND INTEGRAL SPANNING
+
+Let SS(r,n,nu) be the finite set of nonnegative arrays e with the fixed column
+sums nu and (CB1.1). It is finite because 0<=e_at<=nu_t. If it is nonempty,
+nu is decreasing: take a=r in (CB1.1). Make a diagram with row t of length
+nu_t and fill that row with e_at copies of a, in weakly increasing order.
+The inequalities (CB1.1) are equivalent to strict increase down columns.
+Indeed, if the qth entry in a lower row is a, the lower row has at least q
+entries <=a; the upper row then has at least q entries <a. Conversely, strict
+column increase implies the same counting inequalities.
+
+For every tableau column c, of height h_c, let I_c be its strictly increasing
+list of entries. Define the integer polynomial
+
+  b_e(X)=product_c det X_(I_c,{1,...,h_c}).             (CB2.1)
+
+Each initial-column minor is invariant under every C_j -> C_j+t C_l, l<j:
+if j exceeds its height nothing changes, while otherwise both columns occur
+and the added determinant has two equal columns. Its column degree is the
+indicator of {1,...,h_c}. Thus b_e belongs to nabla_nu(R).
+
+For an increasing list I=(i_1<...<i_h), the diagonal monomial of its minor
+leads with coefficient +1. In a nonidentity permutation, at the first column
+where it differs, the previously used rows coincide, so the selected row is
+larger than the diagonal row. That monomial is smaller in column-lex order.
+Products preserve monic leading terms; consequently LT(b_e)=X^e. Row weight
+is also homogeneous, with a-th coordinate sum_t e_at.
+
+Distinct e give linearly independent b_e over R: a nonzero finite relation
+has a largest leading exponent, whose coefficient cannot be canceled. To
+span, start with any nonzero f in nabla_nu(R). CB1 puts its leading exponent
+e in SS. Subtract lc(f)b_e; the result remains in nabla and has a strictly
+smaller leading monomial, unless zero. Since all polynomials have fixed
+column degree nu, only finitely many monomials can occur. Repetition ends.
+No coefficient is divided at any step. Thus
+
+  nabla_nu(R)=direct_sum_(e in SS) R b_e.              (CB2.2)
+
+The empty shape gives b=1 and a rank-one module. If SS is empty the same
+argument shows nabla=0. For a square k by k matrix and a partition, SS is
+nonempty: use the highest tableau with row t filled by t.
+
+The same integer polynomials (CB2.1) give a basis over every domain. This
+includes the fraction field and any residue field, with unchanged monic
+leading terms. This assertion is proved directly for those domains; it
+does not assume that taking invariants generally commutes with reduction.
+For disjoint matrix blocks, products of basis elements span by expansion,
+and their distinct blockwise leading exponents prove independence. This is
+the source's TensorBasis without any extra tensor-flatness hypothesis.
+
+The source SSBasis existentially chooses a monic minor product for each e;
+the sorted tableau gives one explicit allowed choice. Downstream results
+use only its leading exponent, coefficient one, weight homogeneity and
+spanning. They do not depend on a different canonical tableau normalization.
+
+3. CB3: EXACT DIMENSION BY A FINITE DETERMINANT IDENTITY
+
+For a decreasing integer tuple lambda of length k set
+
+  D_k(lambda)=product_(1<=i<j<=k)
+                    (lambda_i-lambda_j+j-i)/(j-i),
+  D_0=D_1=1.
+
+For a partition nu of length k, SS(k,k,nu) counts tableaux of shape nu with
+entries 1,...,k. Removing entries k leaves a shape mu of length k-1 satisfying
+
+  nu_i >= mu_i >= nu_(i+1), 1<=i<k.                  (CB3.1)
+
+This is a bijection with the union of tableaux of the smaller shapes: the
+removed k's form a horizontal strip, because columns are strictly increasing,
+and reinserting k in that strip preserves weak rows and strict columns.
+Thus the count satisfies the usual interlacing recurrence, which is exactly
+the source's dGT. The following direct identity evaluates the recurrence.
+
+For strictly decreasing integers x_1>...>x_k, let Delta(x)=product_(i<j)
+(x_i-x_j). Then
+
+  sum_(x_(i+1)<=y_i<x_i, 1<=i<k) Delta(y)
+       = Delta(x)/(k-1)!.                            (CB3.2)
+
+Proof. Write Delta(y)=det[y_i^(k-1-j)]_(1<=i,j<k).
+For each j choose a rational polynomial Q_j with
+
+  Q_j(t+1)-Q_j(t)=t^(k-1-j).
+
+Such a polynomial is obtained by successively canceling the leading term;
+its degree is k-j and its leading coefficient 1/(k-j). Multilinearity of
+the determinant sums each row independently, giving
+
+  det[Q_j(x_i)-Q_j(x_(i+1))]_(1<=i,j<k).
+
+This equals the determinant with k rows (Q_1(x_i),...,Q_(k-1)(x_i),1): apply
+the determinant-one row transformation taking successive differences in
+the first k-1 rows. The last column becomes (0,...,0,1). The column degrees
+are k-1,k-2,...,1,0. Triangular changes to monomial columns show that its
+determinant is Delta(x) times the product of leading coefficients, namely
+1/(k-1)!. This proves (CB3.2), including its sign and endpoints.
+
+Now set x_i=nu_i+k-i and y_i=mu_i+(k-1)-i. Condition (CB3.1) becomes
+x_(i+1)<=y_i<x_i. Induction and (CB3.2) give
+
+  #SS(k,k,nu)=Delta(x)/product_(j=1)^(k-1) j!=D_k(nu).
+
+Subtracting lambda_k from all entries preserves D, so normalized dominant
+integer weights have the asserted count. Negative reversal also preserves
+D: the pair (i,j) corresponds to (k+1-j,k+1-i), preserving each positive
+factor. These facts require no representation-theoretic dimension formula.
+
+By CB2 the rank/field dimension of the actual square polynomial lattice is
+D_k(lambda). Tensoring gives
+
+  dim_K Vsp(K,lambda0)=product_s D_k(lambda0_s),       (CB3.3)
+
+because the effective odd weight is -rev(lambda0_s). This proves exactly
+tableLineDegreeFive.FewBadOrbits, whose name alone does not describe its
+mathematical content. It does not count the source's separate selected-symbol
+submodule Gen or its admissible frame data.
+
+4. CB4: THE SELECTED COMPLEMENTARY FAMILY
+
+Write k=m+1; the source assumes m>=2 in this application. Let T be its selected
+set TT and lambda0_s a dominant integer tuple at each position. Put
+
+  d_s = lambda0_(s,1)-lambda0_(s,2)  if s in T, otherwise 0,
+  ell_s = lambda0_s - d_s(1,0,...,0).
+
+At selected positions ell_s=(lambda0_(s,2),lambda0_(s,2),lambda0_(s,3),...,
+lambda0_(s,k)); at unselected positions ell_s=lambda0_s. This is restW.
+The effective weight is ell_s for an even/vector position and -rev(ell_s)
+for an odd/covector position. Subtract its last entry to get nu_s.
+
+The exact source index Xs is a subset of SS(k,k,nu_s): no further restriction
+off T; e_11=nu_1 at a selected even position; e_1t=0 for all t at a selected
+odd position. The source uses indices starting at zero, so these are its
+e(0,0)=nu(0) and e(0,t)=0.
+
+Even case. The first column sum and e_11=nu_1 force e_a1=0 for a>1, and
+interlacing forces e_1t=0 for t>1. Delete row 1 and column 1. This gives SS of
+size k-1 and shape (nu_2,...,nu_k). Conversely insert nu_1 at the top left
+and zeros elsewhere in the new row/column. Interlacing against the new first
+column follows because every relevant cumulative count is at most nu_2<=nu_1.
+
+Odd case. The imposed first row is zero. Normalization gives nu_k=0, hence
+the last column is zero. Deleting that row and column is a bijection with
+SS of size k-1 and shape (nu_1,...,nu_(k-1)); the inverse inserts zeros.
+Because ell_1=ell_2, in fact nu_(k-1)=nu_k=0. This stronger fact is exactly
+what the separate CL leading-term product-independence lemma requires.
+
+For even parity the reduced shape is the original tail minus lambda0_k.
+For odd parity it is lambda0_2 minus the reverse of the original tail.
+CB3 therefore gives the same count D_(k-1)(lambda0_2,...,lambda0_k) for both.
+At unselected positions the count is D_k(lambda0). Thus the product index I
+has exactly
+
+  n2=product_(s in T)D_(k-1)(lambda0_(s,2),...,lambda0_(s,k))
+        product_(s notin T)D_k(lambda0_s).             (CB4.1)
+
+Choose at each block the b_e from CB2 and form B_i=product_s b_(i_s), i in I.
+This is a subset of the integral tensor basis; its span is a direct summand,
+and its reductions remain independent over every residue field. It supplies
+the actual bX and sO in TheoremIIClosedOfTestBound.primStep_of. The additional
+independence of products Th(Q_i)B_i is the explicit leading-term injection
+already proved in CL2--CL3; CB2 supplies exactly the missing monic basis
+hypothesis there. We do not infer that stronger statement merely from
+independence of the B_i.
+
+5. CB5: QUANTITATIVE DIMENSION COMPARISON
+
+For one selected weight let d=lambda_1-lambda_2 and delta_j=lambda_2-lambda_j.
+The product definition gives the exact ratio
+
+  binom(d+k-1,k-1)D_(k-1)(lambda_2,...,lambda_k)/D_k(lambda)
+       =product_(j=2)^k (d+j-1)/(d+delta_j+j-1).       (CB5.1)
+
+Assume d>=a>0 and 0<=delta_j<=c0. Write each factor as 1-u_j, where
+u_j=delta_j/(d+delta_j+j-1) lies in [0,1). The elementary finite product
+inequality product(1-u_j)>=1-sum u_j yields
+
+  ratio >= 1-(k-1)c0/a >= 1-kc0/a.                 (CB5.2)
+
+This proof remains valid if the right side is negative. To multiply the
+weaker source lower bounds use its additional kc0/a<=1. Applying (CB5.2) at
+every selected position, CB3.3 at all positions, and CB4.1 gives
+
+  (1-kc0/a)^|T| dim_K Vsp(K,lambda0)
+      <= product_(s in T)binom(d_s+k-1,k-1) n2.      (CB5.3)
+
+The source WeightHyp supplies the assumptions: lambda_1=aT, lambda_k=-bT,
+all intervening entries have absolute value <=cpp, aT>=a+cpp, bT>=0, and
+bT+2cpp<=c0. Hence d>=aT-cpp>=a, and every tail entry plus bT lies between
+0 and bT+cpp<=c0. In particular 0<=delta_j<=c0. The source also has an upper
+bound for d and many frame inequalities; they are not needed for this count.
+The factor (k-1) above is slightly sharper than the source's k, but we retain
+the source factor downstream and claim no improvement to the RH exponent.
+
+6. CB6: INTEGRAL CARTAN MULTIPLICATION AND PRIMITIVITY
+
+Let nu and mu be partitions of length n, and set nu_(n+1)=mu_(n+1)=0.
+Then multiplication has exact integral span
+
+  nabla_(nu+mu)(R)=span_R{fg:f in nabla_nu(R), g in nabla_mu(R)}.  (CB6.1)
+
+The inclusion from right to left follows immediately from column degrees
+and multiplicative generic invariance. For the reverse inclusion, use CB2
+to write the target in minor products. In any such product of shape nu+mu,
+the number of factors of height j is
+
+  (nu_j+mu_j)-(nu_(j+1)+mu_(j+1)).
+
+Choose nu_j-nu_(j+1) of them for the first group, and all remaining factors
+of that height for the second. The groups have shapes nu and mu respectively.
+Every group is an allowed product of initial-column minors; it need not be
+standard. Thus each basis element itself factors into a permissible product,
+which proves (CB6.1) without any scalar division. Empty groups give the unit.
+The same argument works with rectangular matrices and with empty modules.
+
+Over a DVR O with uniformizer pi, coefficient divisibility is exact lattice
+divisibility: if f in nabla_nu(O) has all coefficients divisible by pi, then
+f/pi again satisfies its column degrees and generic invariance. Equivalently
+nabla is saturated inside the ambient multidegree polynomial module. Thus
+f is primitive iff its reduction is a nonzero coefficient polynomial.
+The residue polynomial ring is a domain, so primitive factors have primitive
+product. This proves the source's CartanDomain as well as CartanOnto. Its
+primitive-product assertion requires the designated element to generate the
+maximal ideal (or be irreducible in the DVR); for an arbitrary nonzero w it
+is not claimed as a residue-field argument. Span (CB6.1) needs no DVR.
+
+7. CB7: EXACT BASIS, DETERMINANT, TENSOR, AND EDGE TRANSPORT
+
+Let O embed in its fraction field K and M in GL_k(K). For dominant integer
+lambda, put c=lambda_k and nu=lambda-c. Write R(M)f(X)=f(MX). Then
+
+  R(M)R(N)=R(NM),
+  L_lambda(M)=det(M)^(-c) R(M^(-1)) nabla_nu(O).     (CB7.1)
+
+This agrees literally with StatementD.nablaL (a COMAP under R(M)) followed
+by nablaLTw (scalar det(M)^(-c)). The equivalent membership condition is
+det(M)^c R(M)F in nabla_nu(O), not its inverse. This distinction already
+matters for the one-dimensional shape.
+
+If N O^k=M O^k, then N=MU for U in GL_k(O). Row substitution by U and U^-1
+preserves nabla_nu(O), because it has integral coefficients, preserves column
+degrees, and commutes with all column additions; det U is a unit. Hence
+(CB7.1) is basis independent. Since the source H0 is the intersection of
+nablaLTw over all bases of the same lattice, it is exactly L_lambda(M).
+This is also EL2's elementary basis-independence proof, included to make the
+Cartan transport explicit rather than treating it as an abstract identity.
+
+For a finite set of positions s, take the effective weight lambda^eff_s=
+lambda0_s at even s and -rev(lambda0_s) at odd s. The tensor lattice has basis
+
+  product_s det(M_s)^(-lambda^eff_(s,k))
+            R(M_s^-1)b_(e_s),
+
+with block embeddings understood. Tensor products are products of polynomials
+in disjoint variables. The dimensions and selected-family indices proved
+above therefore refer to the actual source Vsp/Hten, not only to isomorphic
+abstract representations.
+
+At an actual edge, the EL midpoint calculation supplies matrices M_s with
+LeAt(s,e)=M_s O^k. The source edge exponent is the signed additive integer
+
+  A_r(lambda0)=sum_s sum_(a=1)^r lambda^eff_(s,a).
+
+No assertion that A_r>=0 is needed. For nonzero w define
+
+  C_lambda(F)=w^(A_r(lambda))
+      (product_s det(M_s)^(lambda^eff_(s,k))) blockAct(M_s)F.  (CB7.2)
+
+By (CB7.1) this is an O-linear isomorphism from the source
+Re=w^(-Ar)HLe onto the integral tensor coefficient lattice. Its inverse is
+w^(-Ar) times the product determinant factor with negative exponents and
+blockAct(M_s^-1). In particular the complementary vectors are explicitly
+
+  sh_i=C_rest^-1(B_i).                               (CB7.3)
+
+Their integrality, indexing, linear independence and direct-summand property
+follow at once. This agrees with TransStep.transStep: the existential
+tr_tens_lift witness is unique after applying the invertible coordinate map.
+
+Both lamAt and Ar are additive, and normalized partitions satisfy
+nu(lambda+mu)=nu(lambda)+nu(mu) for dominant weights. Thus
+
+  C_(lambda+mu)(FG)=C_lambda(F) C_mu(G).              (CB7.4)
+
+Tensor (CB6.1) over positions and transport by (CB7.4). This proves the actual
+source OntoAll: Re(lambda+mu) is spanned integrally by products from
+Re(lambda) and Re(mu). Setting lambda=flW(d), mu=restW gives precisely the
+Cartan span used for contraction detection in CL5. Primitive multiplication
+and coefficient reductions transport as well. Signed determinant twists and
+the edge's w^(-Ar) scalar introduce no additional denominators into the
+integral coordinate argument.
+
+8. WHAT HAS BEEN CLOSED, AND WHAT HAS NOT
+
+Closed here:
+  * The exact monic array-indexed integral basis in the actual invariant
+    polynomial module, including reduction to the residue field.
+  * The selected even/odd complementary family and its exact cardinality.
+  * The actual Vsp dimension formula (source FewBadOrbits), and the
+    quantitative source top_count/count_of_exact comparison.
+  * Integral Cartan onto and primitive-product properties, with the source
+    H0/Hten/Re identifications and complementary vector construction.
+
+Already handled elsewhere and used only at their stated boundaries:
+  * CL2--CL3 prove the additional product-family leading-term injection and
+    primitive-combination argument. CB supplies its former basis input.
+  * EL proves existence of the actual midpoint matrices and the local
+    polynomial-lattice transport. CB7 rechecks the convention and additivity.
+  * IW proves normalized Fock duality and the denominator sandwich;
+    neither follows merely from the basis or dimension formula here.
+
+Separate from CB:
+  * Incoming membership of the initial/word-closed selected symbol family
+    is handled by the distinct IN/WT companions in this version. The actual
+    initial route is Lemma5aAt via blocked MemAtB/PlanePairsOnBlocksAt and
+    rest5aMono_of_cut; the word route is WordConditionAt via OneOpStep and
+    WordBoundStep. Lemma5aGeneratorProductsAt is a stronger, uninstantiated
+    interface on this call path. CB's basis is a different polynomial family.
+  * Quantitative dimension/saturation of that selected symbol space and the
+    simultaneous frame/size hypotheses. The exact complementary count n2
+    is not a substitute for those selected-symbol estimates.
+  * The global arithmetic and cohomological window assertions, or the
+    geometric/spectral estimates listed separately in the main reconstruction.
+
+The v0.4 cloud report and v0.5 IW report are historical snapshots: their
+remaining integral-standard-monomial/Cartan boundary is discharged by this
+new proof, not by treating a source theorem name as a human derivation.

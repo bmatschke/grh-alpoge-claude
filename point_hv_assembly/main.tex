@@ -1,0 +1,890 @@
+\section{Original-field character comparison and the complete PointHV assembly}
+\label{sec:point-hv-assembly}
+
+\status{HV1--HV10 prove the entire original-field assembly of
+\texttt{PointHV}.  The two auxiliary count suppliers
+\texttt{CountVs} and \texttt{CountIV} are proved here; \texttt{CountZ}
+is already supplied by CZ6.  The precise remaining count premise is
+\texttt{CountI}$\wedge$\texttt{CountII}$\wedge$\texttt{CountIII}
+$\wedge$\texttt{CountV}.  No character comparison, layer descent,
+case partition, finite-prime summation or uniformity-of-constants
+premise remains in this implication.  In particular, the comparison
+does not discard primes dividing the original field degree.
+The arithmetic theorems that supply the remaining four counts are
+separate obligations.}
+
+\subsection{Notation and the exact interfaces}
+
+Let $\chi$ be the primitive Dirichlet character of the source, put
+$q=\operatorname{cond}(\chi)$ and $o=\operatorname{ord}(\chi)$,
+and let $h$ be a host with exponent $s\ge2$ and prime pair $q_1,d$.
+Thus $q_1\equiv3\pmod8$, $d\equiv7\pmod{16}$,
+$(q_1d,q)=1$, and
+\[
+ N=\operatorname{lcm}(2^{s+2},q)q_1d.
+ \tag{HV.1}
+\]
+Inside $(\mathbb Z/N)^\times$ let $H$ be the simultaneous kernel
+of the four conditions: reduction modulo $2^{s+2}$ lies in
+$\langle-1\rangle$; the $\chi$ value is $1$; and the reductions
+modulo $q_1$ and $d$ are squares.  Write $n=[(\mathbb Z/N)^\times:H]$.
+The finite exceptional set is the literal source set
+\[
+ \mathcal B_\chi=\{3\}\ \cup\
+ \{\text{odd prime divisors of }o q p_K h_* p_1\},
+ \tag{HV.2}
+\]
+where $p_K=p_K(\chi)$, $h_*=h_*(\chi)$ and $p_1=p_1(\chi)$
+are the fixed quantities of \texttt{StmtFields}.
+The condition \texttt{Big}$(t)$ says that $q_1,d>2t+1$ and that
+each of $q,o,p_K,h_*,p_1$ is smaller than both $q_1$ and $d$.
+All these constants have their original source meanings.
+
+For an odd prime $\ell$, let $O$ be any source coefficient DVR
+inside the fixed $\ell$-adic algebraic closure, finite over
+$\mathbb Z_\ell$, and put
+\[
+ a_O=\operatorname{length}_O(O/\ell O)>0,
+ \qquad A_O=O\otimes_{\mathbb Z_\ell}
+                         (\mathbb Q_\ell/\mathbb Z_\ell).
+ \tag{HV.3}
+\]
+For a character $\psi$ modulo $N$ trivial on $H$, the relevant
+representation on $A_O$ is
+\[
+                 \rho_{e,\psi}=\psi^{-1}\chi_{\rm cyc}^{-e}.
+ \tag{HV.4}
+\]
+Let $S'_\ell(\psi,e)$ be its continuous $H^1$ classes over
+$\mathbb Q$ which are unramified outside $\ell N$ and locally
+zero at every prime dividing $\ell N$.  Its length and normalized
+length are exactly
+\[
+ L_\ell(\psi,e)=\mathtt{Vlen}(\psi,e),\qquad
+ v_\ell(\psi,e)=L_\ell(\psi,e)/a_O=\mathtt{Vn}(\psi,e).
+ \tag{HV.5}
+\]
+The quotient notation for the length is used only after finiteness
+has been proved; before then we use extended lengths.  Let $X_e$
+be the characters trivial on $H$ with $\psi(-1)=(-1)^e$.
+The assertion \texttt{VLe}$(\psi,e,B)$ is precisely that
+$L_\ell(\psi,e)$ is finite and $v_\ell(\psi,e)\log\ell\le B$.
+
+For a number field $F$ we write $s_\ell(F,e)$ for the strict
+negative-twist Selmer length (TW.1).  In particular
+\texttt{VVat}$(\ell,F,t,B)$ bounds the sum of these Selmer
+lengths for $1\le e<t$; it is not a different normalization
+of the compact $H^2$ length.  The layer condition
+\texttt{LayerLe}$(\chi,\ell,j,t,B)$ requires this bound on
+every model of the $j$th cyclotomic $\mathbb Z_\ell$-layer of
+$\mathbb Q(\mu_{\ell q})$.  This is the original universal
+quantifier over \texttt{IsAbField} and \texttt{IsLayer}.
+
+The only classical arithmetic inputs below are the elementary
+cyclotomic local-field description, the abelian
+conductor--discriminant formula already matched in TW-CD, and
+the previously proved comparison TW3 and bound KB8.  All
+restriction errors and character decompositions are proved here.
+For the cyclotomic local description one can use the usual
+Eisenstein polynomial $\Phi_{\ell^r}(1+X)$; the valuation argument
+needed below is included in HV2.  The cohomological exact
+sequence used below is restriction--inflation, with its
+transgression; its cochain construction is recalled explicitly.
+For the finite cyclotomic and local-field facts see Milne,
+\emph{Algebraic Number Theory}, v3.08, Proposition 6.2 and
+Proposition 7.55,
+\url{https://www.jmilne.org/math/CourseNotes/ANT.pdf}.
+The conductor--discriminant formula is equation (4.2.1) in
+Sharifi, \emph{Iwasawa Theory}, Chapter 4,
+\url{https://math.ucla.edu/~sharifi/notes/iwasawa-ch04.html}.
+
+\paragraph{HV1: the original host field and its elementary character bounds.}
+\label{claim:HV1}
+Every original field $E$ satisfying \texttt{IsChiField} for $h$
+has, in any algebraic closure of $\mathbb Q$, image
+$\mathbb Q(\mu_N)^H$.  In particular it is abelian,
+unramified outside $N$, and has degree $n$, with
+\[
+ n\mid2^{s+2}o,\qquad n\le N,\qquad16\mid N,\qquad
+ 1\le o\le q,\qquad |X_e|\le N.
+ \tag{HV.6}
+\]
+Write $\psi_p$ for the CRT component of $\psi$ supported at $p$.
+For odd $p$, $\operatorname{ord}(\psi_p)\mid2o$; if $p\nmid q$
+then $\psi_p^2=1$.  If
+$c_2=v_2(\operatorname{cond}(\psi_2))$, then
+\[
+                   \operatorname{ord}(\psi)\le2o\,2^{c_2}.
+ \tag{HV.7}
+\]
+Write $\psi=\kappa\theta$ for its $\ell$-power and prime-to-$\ell$
+order parts, and put
+$\chi_P=\theta/\theta_\ell$ and $\theta_1=\theta/\theta_2$,
+as in the source.  If $\ell$ is odd, $\ell\ne q_1,d$ and
+$\operatorname{ord}(\chi_P)$ is odd, then
+\[
+          \psi_2=1,\qquad\operatorname{cond}(\psi)\mid q.
+ \tag{HV.8}
+\]
+The same conclusions hold if $\operatorname{ord}(\psi)$ is odd.
+Consequently the number of host characters satisfying (HV.8)
+is at most $q$, in any coefficient ring.
+Under \texttt{Big}$(t)$, every $\ell\in\mathcal B_\chi$ is
+smaller than $q_1,d$ and hence smaller than $N$.  If $\ell$ is
+odd and outside $\mathcal B_\chi$, then
+\[
+ \ell\ge5,\quad\ell\nmid oqn;
+ \quad 1\le e<t, \ell-1\mid2e
+       \ \Longrightarrow\ e\ge2,\ \ell\le2t,\ \ell\nmid N.
+ \tag{HV.9}
+\]
+
+\begin{proof}
+The defining embedding of \texttt{IsChiField} specifies exactly
+the automorphisms which fix its image: the sign condition at
+$2^{s+2}$, the kernel of $\chi$, and the two quadratic-residue
+conditions.  For a unit modulo an odd prime, being a square is
+equivalent to Legendre symbol $1$.  If the initially supplied
+cyclotomic level is $N'$, its divisibilities give $N\mid N'$.
+Its fixing group is the preimage of $H$ under reduction modulo
+$N$, since all four defining conditions depend only on those
+residues.  In particular it contains the kernel of the restriction
+to $\mathbb Q(\mu_N)$, so the image of $E$ already lies in
+that smaller field.  Cyclotomic restriction is surjective;
+its fixing group there is exactly $H$.
+The Galois correspondence gives the asserted field, with no
+change to the original $E$.
+Different embeddings are conjugate; since the cyclotomic Galois
+group is abelian they have this same image.
+
+The quotient by $H$ injects into the product of the quotient
+of $(\mathbb Z/2^{s+2})^\times$ by $\langle-1\rangle$, the
+image of $\chi$, and two groups of order two.  These have orders
+$2^s,o,2,2$, proving the divisibility in (HV.6).
+Also $n\le\varphi(N)\le N$, and $o\mid\varphi(q)$ gives
+$o\le q$.  A finite abelian group of order $n$ has at most $n$
+characters in a characteristic-zero domain: decompose it into
+cyclic groups and use the bound of $r$ roots for $X^r-1$.
+This proves the bound on $X_e$ and also on the union $X_0\cup X_1$.
+
+On an odd CRT factor the first quotient is trivial, so its
+exponent divides $2o$.  If $p\nmid q$, only the quadratic factors
+remain.  The component $\psi_2$ factors through the units modulo
+$2^{c_2}$, and its order divides $2^{c_2}$.  The product of all
+odd components has order dividing $2o$, which proves (HV.7).
+There are no components outside the prime divisors of $N$.
+
+For (HV.8), the $2$-component has $2$-power order.  Since $\ell$
+is odd, it is unchanged on removing the $\ell$-power order part,
+and also on removing the component at $\ell$.  Its order
+therefore divides the odd order of $\chi_P$, and it is trivial.
+At $q_1,d$, which differ from $\ell$, the component of $\psi$
+is a product of an odd-order component of $\chi_P$ and an
+$\ell$-power order component of $\kappa$.  It has odd order;
+it also has order dividing two, and is trivial.  At every other
+odd prime the exponent of that prime in $N$ is exactly its
+exponent in $q$.  This proves the conductor divisibility.
+For an odd-order $\psi$ the same argument applies directly.
+A character of conductor dividing $q$ factors uniquely modulo
+$q$, giving at most $\varphi(q)\le q$ possibilities.
+
+All factors defining (HV.2) are positive.  Every prime divisor
+is no larger than one of these factors; \texttt{Big} therefore
+bounds it by $q_1,d$.  The inserted prime $3$ also satisfies the
+bound.  Outside this set the assertions about $o,q,n$ follow
+from (HV.6), and $\ell\ge5$.  If $\ell-1\mid2e$, then
+$\ell-1\le2e$, so $\ell\le2t$ and $e\ge2$.
+The only possible prime divisors of $N$ are $2$, primes of $q$,
+$q_1$ and $d$.  The size condition excludes the last two and
+the earlier conclusions exclude the first two.  This proves
+(HV.9).
+\end{proof}
+
+\paragraph{HV2: quantitative restriction without inverting the degree.}
+\label{claim:HV2}
+Let $F/\mathbb Q$ be finite Galois of degree $b$, and suppose a
+finite-order character $\psi$ is trivial on $G_F$.
+For $e\ge1$ and odd $\ell$, the restriction kernel on global
+$H^1(\mathbb Q,A_O\rho_{e,\psi})$ has normalized length at most
+$3b^2e$.  Whenever restriction carries a Selmer group $S$ into
+the strict negative-twist group over $F$, one consequently has
+\[
+       \frac{\operatorname{length}_O S}{a_O}
+                         \le s_\ell(F,e)+3b^2e.
+ \tag{HV.10}
+\]
+Finiteness on the right implies finiteness on the left.
+The assertion applies to the original algebraic closure and to
+every original choice of local places.
+
+\begin{proof}
+For a finite extension $K/\mathbb Q_\ell$ of degree at most $b$,
+the image $J$ of its cyclotomic character has finite index
+$a\le b$ in $\mathbb Z_\ell^\times$.  Indeed the cyclotomic
+character of $\mathbb Q_\ell$ is surjective, and the map from
+the cosets of $G_K$ to the cosets of $J$ is surjective.
+Surjectivity at the base follows from the Eisenstein
+polynomials $\Phi_{\ell^r}(1+X)$, which give degree
+$\varphi(\ell^r)$ for the local cyclotomic extensions.
+The full image is compact and hence closed; its surjectivity
+at every finite level therefore gives surjectivity onto
+$\mathbb Z_\ell^\times$.
+Since the quotient by $J$ has order $a$, $(1+\ell)^a\in J$.
+The invariants of $A_O(-e)$ over $K$ are therefore killed by
+$(1+\ell)^{ae}-1$.  The binomial formula, successively applied
+to an exponent prime to $\ell$ and to powers of $\ell$, gives
+\[
+ \frac{\operatorname{length}_O A_O(-e)^{G_K}}{a_O}
+ \le v_\ell((1+\ell)^{ae}-1)
+ =1+v_\ell(a)+v_\ell(e)\le3be.
+ \tag{HV.11}
+\]
+Here the $u$-torsion of $A_O$ has length $a_Ov_\ell(u)$
+for $0\ne u\in\mathbb Z_\ell$.  Global invariants over $F$
+are a submodule of these invariants at any one place above
+$\ell$, so the same bound holds for
+$W=A_O(-e)^{G_F}$.
+
+Put $G=\operatorname{Gal}(F/\mathbb Q)$.
+The restriction--inflation sequence identifies the restriction
+kernel with $H^1(G,W)$, where the quotient action on $W$ is
+the one inherited from $\rho_{e,\psi}$, including its
+$\psi^{-1}$ factor.  Its underlying $O$-module is the invariant
+module just bounded.  In inhomogeneous cochains the degree-one
+group consists of $b$ copies of $W$, so
+$\operatorname{length}H^1(G,W)\le b\operatorname{length}W$.
+This proves the kernel bound, even when $\ell\mid b$.
+Restriction of a cocycle preserves each local coboundary and
+unramified-inertia condition.  Tensoring the strict group over
+$F$ with $O$ multiplies its $\mathbb Z_\ell$-length by $a_O$:
+the ring is finite free, so cochains, coboundaries and all local
+kernels commute with this tensor product.  These facts prove
+(HV.10), including finiteness.
+
+Conjugating a selected place or transporting an algebraic closure
+conjugates the cochains and their coboundary witnesses.  The
+restriction diagram commutes with this operation.  Thus this
+proof concerns the given $F$ and given local data, rather than
+only one convenient model.
+\end{proof}
+
+\paragraph{HV3: integral decomposition into characters.}
+\label{claim:HV3}
+Let $G$ be finite abelian, let $O$ contain its character values,
+and let $M$ be any $O[G]$-module, initially of possibly infinite
+length.  For $c\in G$ of order two, odd residue characteristic,
+and $\epsilon=\pm1$, put
+$M_\psi=\{x:gx=\psi(g)x\text{ for every }g\in G\}$.
+Then
+\[
+ \operatorname{length}_O M^{c=\epsilon}
+ \le\sum_{\psi(c)=\epsilon}\operatorname{length}_O M_\psi.
+ \tag{HV.12}
+\]
+In particular, finiteness of the displayed eigenspaces proves
+finiteness of the left side.  No condition on divisibility of
+$|G|$ by $\ell$ is imposed.
+
+\begin{proof}
+For commuting endomorphisms $f,g$, the map
+$g:\ker(fg)\to\ker f$ has kernel $\ker g$.
+Additivity and monotonicity of length give
+$\operatorname{length}\ker(fg)\le
+\operatorname{length}\ker f+\operatorname{length}\ker g$.
+If $T^r=1$, factor
+$T^r-1=\prod_{\zeta^r=1}(T-\zeta)$ and iterate this inequality.
+Apply it successively to cyclic generators in a decomposition
+$G=\prod_i C_{r_i}$, starting on $M^{c=\epsilon}$.
+All the kernels are stable under the remaining generators.
+Every final intersection is one of the simultaneous
+eigenspaces $M_\psi\cap M^{c=\epsilon}$.
+If $\psi(c)\ne\epsilon$, their difference is the unit $\pm2$,
+so that intersection is zero.  This proves (HV.12).
+The same successive kernel exact sequences prove finiteness
+when all final terms are finite; no arithmetic with infinite
+lengths is needed to infer it.
+\end{proof}
+
+\paragraph{HV4: the comparison on every original CM field.}
+\label{claim:HV4}
+Let $E$ be an original CM field of host $h$, and let $D$ be
+any of its original local-data records at an odd prime $\ell$.
+Fix $e\ge1$.
+Choose a source coefficient ring $O$ containing the values of
+all characters of $G=\operatorname{Gal}(E/\mathbb Q)$.
+If all $L_\ell(\psi,e)$ for $\psi\in X_e$ are finite, then
+$\mathtt{plusLen}_D(e)$ is finite and
+\[
+ \mathtt{plusLen}_D(e)
+ \le\sum_{\psi\in X_e}
+                 \bigl(v_\ell(\psi,e)+(Ne)^6\bigr).
+ \tag{HV.13}
+\]
+If $\ell\nmid n$, the error can be omitted:
+\[
+             \mathtt{plusLen}_D(e)
+                     \le\sum_{\psi\in X_e}v_\ell(\psi,e).
+ \tag{HV.14}
+\]
+The source's normalization, the original field, and all its
+local conditions are retained.
+
+\begin{proof}
+Use HV1 to embed the actual $E$ into the fixed rational
+algebraic closure.  Let $B$ be its strict Selmer module with
+coefficient $A_O(-e)$.  Normality gives the natural $G$-action
+on $B$.  If $c$ is complex conjugation, the defining plus
+condition, after this identification, is the eigenspace
+$B^{c=(-1)^e}$.  To check the sign, the natural action on a
+cocycle $z$ is $g\mapsto c\,z(c^{-1}gc)$, and $c$ acts on
+the coefficient as $(-1)^e$.  Thus the untwisted conjugation
+invariance defining the plus part is precisely the stated
+eigenvalue.  Finite free coefficient extension and conjugacy
+of the closures give the exact equality
+\[
+ a_O\mathtt{plusLen}_D(e)
+                    =\operatorname{length}_O B^{c=(-1)^e}.
+ \tag{HV.15}
+\]
+This is also the explicit \texttt{partModel} identification.
+Changing a local place changes the cocycle and its local
+coboundary witness by conjugacy; hence it changes no kernel
+in this equality.
+For the precise quotient used in $D$, a pure negative-twist
+cocycle unramified away from $\ell$ vanishes on those inertia
+groups: their action on the coefficient is trivial, so their
+coboundaries are zero.  The cocycle equation then makes it
+vanish on their conjugates and on the closed normal subgroup
+they generate.  It therefore descends to the actual
+$G_{E,S_\ell}$ quotient.  Inflation is its inverse on these
+classes and preserves every selected local kernel.  This
+identifies the absolute-cochain description with the one in $D$.
+
+For a character $\psi$ of $G$, twist the coefficient action by
+$\psi^{-1}$.  Over $E$ this does not change the coefficient,
+but on $H^1(E,A_O(-e))$ it multiplies the $G$-action by
+$\psi^{-1}$.  Thus $B_\psi$ becomes an invariant submodule.
+Restriction--inflation gives an exact sequence
+\[
+ H^1(\mathbb Q,A_O\rho_{e,\psi})
+ \xrightarrow{\mathrm{res}}H^1(E,A_O(-e))^G
+ \longrightarrow H^2(G,W_\psi).
+ \tag{HV.16}
+\]
+Here the action on the middle term is the twisted one just
+specified, and $W_\psi$ has underlying module
+$A_O(-e)^{G_E}$ with the quotient action inherited from
+$\rho_{e,\psi}$.  In particular this action retains the
+$\psi^{-1}$ factor; it need not be the untwisted action.
+The sequence can be constructed directly: choose representatives
+of $G_{\mathbb Q}/G_E$, express invariance of a cocycle by
+coboundary witnesses on these representatives, and compare the
+witness for a product with the two individual witnesses.
+The resulting degree-two cocycle takes values in
+$A_O(-e)^{G_E}$.  Altering the witnesses changes it by a
+degree-two coboundary, and its being zero is exactly the
+condition that the cocycle extend to $G_{\mathbb Q}$.
+All quotient choices are finite, so this is the continuous
+restriction--inflation sequence as well.
+
+Let $P$ be the preimage of $B_\psi$ under restriction in
+(HV.16).  At a prime $p\ne\ell$, the pure negative twist is
+unramified over $E_w$, and
+\[
+ H^1_{\rm unr}(E_w,A_O(-e))
+       =A_O/(p^{-fe}-1)A_O=0,
+ \tag{HV.17}
+\]
+where $f$ is the residue degree.  The scalar is nonzero for
+$e\ge1$ and acts surjectively on the divisible module $A_O$.
+Thus every strict Selmer class in $B_\psi$ is locally zero
+at every finite place of $E$.
+If $p\nmid\ell N$, the extension $E_w/\mathbb Q_p$ is
+unramified and its inertia is the same subgroup as rational
+inertia.  Any lift in $P$ is consequently unramified there.
+For $v\mid\ell N$, the localization of such a lift lies in
+the restriction kernel
+\[
+ K_v=H^1(G_v,A_O(-e)^{G_{E_w}}),
+       \qquad G_v=\operatorname{Gal}(E_w/\mathbb Q_v).
+ \tag{HV.18}
+\]
+Here too the quotient action on the displayed invariant
+module is the one inherited from $\rho_{e,\psi}$.
+The kernel of $P\to\prod_{v\mid\ell N}K_v$ is exactly
+$S'_\ell(\psi,e)$.  Conversely every class in that rational
+Selmer group restricts into $B_\psi$, since local zero at
+primes of $N$ gives the unramified condition over $E$ there.
+This proves the equality of kernels, including every original
+local condition.
+
+The global invariant module in (HV.16) has normalized length
+at most $3ne$ by (HV.11).  Degree-two inhomogeneous cochains
+have $n^2$ copies, so the cokernel contribution is at most
+$3n^3e$.  At $\ell$, (HV.11) and degree-one cochains bound
+(HV.18) by $3n^2e$.  At a prime $p\mid N$, $p\ne\ell$,
+the normalized invariant length is
+\[
+ v_\ell(p^{fe}-1)\le fe\log_\ell p\le neN,
+ \tag{HV.19}
+\]
+since $f\le n$, $p\le N$ and $\ell\ge3$.
+The corresponding degree-one cochains contribute at most
+$n^2eN$.  There are at most $N$ such primes.  We have proved
+\[
+ \frac{\operatorname{length}_O B_\psi}{a_O}
+ \le v_\ell(\psi,e)+3n^3e+3n^2e+Nn^2eN
+ \le v_\ell(\psi,e)+7N^4e
+ \le v_\ell(\psi,e)+(Ne)^6.
+ \tag{HV.20}
+\]
+Finiteness follows before taking these ordinary lengths: the
+local kernels and the degree-two obstruction are finite, and
+$S'_\ell(\psi,e)$ is finite by hypothesis.  The last inequality
+uses $N\ge16$ and $e\ge1$.
+If $\ell\nmid n$, positive-degree cohomology of $G$ and all
+$G_v$ is zero on these $\ell$-primary modules.  The averaging
+homotopy divides by their orders, which are units in $O$;
+equivalently restriction followed by transfer gives the same
+vanishing.  Thus every error in (HV.20) is zero in this case.
+Combine (HV.12), (HV.15) and (HV.20) to obtain (HV.13)--(HV.14).
+
+There always exists such a coefficient ring: adjoin the finitely
+many roots of unity of order dividing $n$ inside the specified
+$\ell$-adic algebraic closure and take its ring of integers.
+If an initial coefficient ring is prescribed, use the compositum.
+For a finite extension $O\subset O'$ of DVRs the length and
+$a_O$ are both multiplied by the relative ramification index.
+Continuous cochains and all local kernels commute with this
+finite free extension, so normalized lengths and their
+finiteness are unchanged.  This also verifies compatibility
+with the source's unrestricted coefficient quantifiers.
+\end{proof}
+
+\subsection{The two auxiliary counts are complete suppliers}
+
+\paragraph{HV5: the complete small-conductor count \texttt{CountVs}.}
+\label{claim:HV5}
+The literal assertion \texttt{CountVs} holds.  Its exponent can
+be chosen as one natural number depending only on $\chi$, before
+the host, $t$, prime, coefficient ring, character and algebraic
+closure are chosen.
+
+\begin{proof}
+In this case $\ell\in\mathcal B_\chi$, $e=1$, and
+\[
+ 2^{c_2}<R_1(\ell,\psi)
+      =16o(\ell q)^2 4^{n_0},\qquad
+ n_0=v_2(\ell^{f_0}-1),\quad
+ f_0=\operatorname{ord}_{\operatorname{lcm}(4,
+                      \operatorname{ord}(\theta_1))}(\ell).
+ \tag{HV.21}
+\]
+The order of $\theta_1$ divides $2o$ by HV1 and is prime to
+$\ell$, by construction of the prime-to-$\ell$ part.
+Consequently the modulus $m=\operatorname{lcm}(4,
+\operatorname{ord}(\theta_1))$ divides $4o$, and $\ell$ is
+a unit modulo $m$.  Thus $f_0$ is positive,
+$f_0\mid\varphi(m)$ and $\varphi(m)\mid\varphi(4o)$.
+The last divisibility follows directly from the prime-power
+formula for $\varphi$ whenever $m\mid4o$.
+It follows that
+\[
+ 2^{n_0}\le\ell^{f_0}-1<\ell^{\varphi(4o)},\qquad
+ R_1\le16o(\ell q)^2\ell^{2\varphi(4o)}.
+ \tag{HV.22}
+\]
+Let $M_\chi=\max\mathcal B_\chi$; this is defined since
+$3\in\mathcal B_\chi$.  Choose the fixed integer
+\[
+ b_* = 2o\,[16o(M_\chi q)^2M_\chi^{2\varphi(4o)}]M_\chi.
+ \tag{HV.23}
+\]
+Equations (HV.7), (HV.21) and (HV.22) give
+$\ell\operatorname{ord}(\psi)\le b_*$.
+
+Inside the given algebraic closure, take the abelian field
+fixed by the intersection of the kernel of $\psi$ and the
+kernel of the mod-$\ell$ cyclotomic character.  Denote it by
+$F$.  It contains $\mu_\ell$, has degree
+$b\le(\ell-1)\operatorname{ord}(\psi)\le b_*$, and lies
+in $\mathbb Q(\mu_{\ell N})$.
+Restriction carries $S'_\ell(\psi,1)$ into the strict group
+over $F$.  Indeed at primes dividing $N$ the rational class
+is already locally zero, and at every other prime away from
+$\ell$ it is unramified; these properties persist on restriction.
+HV2 therefore gives
+\[
+                  v_\ell(\psi,1)\le s_\ell(F,1)+3b_*^2.
+ \tag{HV.24}
+\]
+The field is totally complex, since $\ell$ is odd and
+$\mu_\ell\subset F$.  Apply TW3's strict Selmer comparison
+and the full original-field theorem KB8 to this $F$.
+With $\Delta_F=|\operatorname{disc}(F)|$ they give finiteness
+and
+\[
+ s_\ell(F,1)\log\ell
+ \le\log\bigl|H^2(G_{F,S_\ell},\mathbb Z_\ell(2))\bigr|
+ \le\exp\bigl((2b)^{31}\log(2\Delta_F)\bigr).
+ \tag{HV.25}
+\]
+The named abelian conductor--discriminant formula gives
+$\Delta_F\le(\ell N)^b$.  Put $x=\ell N\ge2$ and
+$A=(2b_*)^{31}(b_*+1)$.  Then
+$\log(2\Delta_F)\le(b_*+1)\log x$, so (HV.24)--(HV.25)
+imply
+\[
+             v_\ell(\psi,1)\log\ell
+                    \le x^A+3b_*^2\log\ell
+                    \le x^A+3b_*^2x.
+ \tag{HV.26}
+\]
+For every integer $b_*\ge1$ one has
+$3b_*^2\le2^{2b_*+2}$; this follows, for example, from
+$b_*\le2^{b_*}$.
+Thus the last expression is at most $x^{A+2b_*+4}$.
+Taking
+\[
+                     C_{\rm Vs}=A+2b_*+4
+ \tag{HV.27}
+\]
+proves the source's \texttt{VLe}$(\ell Ne)^{C_{\rm Vs}}$
+in every small-conductor case.  The proof established the
+finiteness part first.  Every quantity in (HV.23), (HV.27)
+depends only on $\chi$.  This proves the literal \texttt{CountVs},
+with a permissible larger exponent than the source construction.
+\end{proof}
+
+\paragraph{HV6: the complete layer comparison \texttt{CountIV}.}
+\label{claim:HV6}
+The literal assertion \texttt{CountIV} holds.  For fixed
+$\chi$, $\ell\in\mathcal B_\chi$ and layer index $j$, set
+$b_0=\ell q\ell^j$.  One may take
+$C_4=2b_0+4$, before the host and all its remaining data.
+In detail, for every $t\ge2$ with \texttt{Big}$(t)$ and every
+real $B$ satisfying \texttt{LayerLe}$(\chi,\ell,j,t,B)$,
+every host character with odd $\operatorname{ord}(\chi_P)$
+has finite $L_\ell(\psi,e)$ for $1\le e<t$ and
+\[
+          \sum_{1\le e<t}v_\ell(\psi,e)
+                                  \le B+(Nt)^{C_4}.
+ \tag{HV.28}
+\]
+No parity condition on this character is required in this claim.
+
+\begin{proof}
+HV1 gives $\ell\ne q_1,d$ and
+$\operatorname{cond}(\psi)\mid q$.
+Construct $F_0=\mathbb Q(\mu_{\ell q})$ in the given closure.
+It contains $\mu_\ell$ and has degree at most $\ell q$.
+Its cyclotomic image is an open subgroup of
+$1+\ell\mathbb Z_\ell$, so its root-adjoining tower is a
+$\mathbb Z_\ell$-extension.  More explicitly, the valuation
+formula from HV2 identifies this group with $\mathbb Z_\ell$;
+its successive open subgroups have indices $\ell^j$.
+Thus its $j$th layer $F_1$ is a root-adjoining field of exactly
+that degree over $F_0$, and
+$[F_1:\mathbb Q]\le b_0$.
+This constructs an actual field satisfying the source's
+\texttt{IsAbField} and \texttt{IsLayer} in the original closure.
+The universal layer premise applies to it and gives
+\[
+       \sum_{1\le e<t}s_\ell(F_1,e)\le B,
+       \qquad s_\ell(F_1,e)<\infty.
+ \tag{HV.29}
+\]
+Since the conductor of $\psi$ divides $q$, it is trivial on
+$G_{F_1}$.  The same local-condition argument as in HV5 shows
+that rational restriction maps $S'_\ell(\psi,e)$ into the
+strict Selmer group of $F_1$.  Applying HV2 and summing gives
+\[
+ \sum_{1\le e<t}v_\ell(\psi,e)
+ \le B+3b_0^2\sum_{1\le e<t}e
+ \le B+3b_0^2t^2.
+ \tag{HV.30}
+\]
+All these groups are finite by the same restriction argument.
+For $N\ge16$, $t\ge2$ and $b_0\ge1$,
+$3b_0^2t^2\le(Nt)^{2b_0+4}$; the elementary estimate
+$b_0\le2^{b_0}$ proves it immediately.  This is (HV.28).
+We used the premise on an actual layer in the original closure;
+any supplied layer model can be transported to it by its
+$F_0$-isomorphism, which conjugates all cocycles and local
+witnesses.  Thus no field-model restriction has entered the
+conclusion.  This proves the full \texttt{CountIV}.
+\end{proof}
+
+\subsection{The complete partition and summation}
+
+\paragraph{HV7: an exhaustive partition with the original predicates.}
+\label{claim:HV7}
+Let $\ell$ be odd, $1\le e<t$, assume \texttt{Big}$(t)$,
+and let $\psi\in X_e$.  The source cases are exhaustive:
+\[
+\begin{array}{ll}
+\mathrm{I}:&\ell\notin\mathcal B_\chi,\quad\ell-1\nmid2e;\\
+\mathrm{Z}:&\ell\notin\mathcal B_\chi,\quad\ell-1\mid2e,
+                                                        \quad\psi=1;\\
+\mathrm{II}:&e\ge2,\quad\operatorname{ord}(\chi_P)\text{ even},
+                 \quad(\ell\in\mathcal B_\chi\text{ or }\ell-1\mid2e);\\
+\mathrm{III}:&\ell\notin\mathcal B_\chi,\quad\ell-1\mid2e,
+                 \quad\operatorname{ord}(\psi)\text{ odd},\quad\psi\ne1;\\
+\mathrm{IV}:&\ell\in\mathcal B_\chi,\quad e\ge2,
+                                    \quad\operatorname{ord}(\chi_P)\text{ odd};\\
+\mathrm{V}:&\ell\in\mathcal B_\chi,\quad e=1.
+\end{array}
+\tag{HV.31}
+\]
+Case V splits into the two disjoint inequalities
+$R_1\le2^{c_2}$ and $2^{c_2}<R_1$, to which
+\texttt{CountV} and the proved \texttt{CountVs} apply.
+
+\begin{proof}
+Inside $\mathcal B_\chi$, first separate $e=1$; otherwise
+$e\ge2$ and the positive order of $\chi_P$ is even or odd.
+Outside $\mathcal B_\chi$, failure of divisibility is case I.
+When divisibility holds, HV1 gives $e\ge2$, $\ell\nmid N$
+and $\ell\nmid\operatorname{ord}(\psi)$: the latter follows
+from $\operatorname{ord}(\psi)\mid n$ and (HV.6).
+Hence $\psi$ already has prime-to-$\ell$ order, and its
+$\ell$-component is trivial.  Thus $\chi_P=\psi$.
+Separate the trivial character, and then even and odd order,
+to obtain Z, II and III respectively.  The numerical split in
+case V is the ordinary ordering of the two integers.
+\end{proof}
+
+\paragraph{HV8: every exceptional-prime sum, with the prescribed layer.}
+\label{claim:HV8}
+Assume the actual source statements \texttt{CountII} and
+\texttt{CountV}.  Then the literal statement \texttt{SumIn}
+holds.  Its constant for $(\chi,\ell,j)$ is chosen before
+the host, the twist cutoff, the layer budget, the original
+field and all its local data.
+
+\begin{proof}
+Fix $\chi$, $\ell\in\mathcal B_\chi$ and $j$.
+Take the exponents $C_2,C_5$ provided by the two assumed
+counts, $C_{\rm Vs}$ from HV5, and $C_4$ from HV6.
+Put
+\[
+ C_m=\max(C_2,C_5,C_{\rm Vs}),\qquad
+ C_{\rm in}=C_4+2C_m+12+\ell q.
+ \tag{HV.32}
+\]
+Now take any subsequent host, $t\ge2$, $B\ge0$ and its
+prescribed layer bound, and any original $E,\Omega,D$.
+Put $M=Nt\ge32$ and choose a coefficient ring splitting
+$\operatorname{Gal}(E/\mathbb Q)$, as in HV4.
+
+Let $Y$ be all host characters for which
+$\operatorname{ord}(\chi_P)$ is odd.  By HV1, $|Y|\le q$;
+this is a single finite set independent of $e$.
+For each $\psi\in Y$, HV6 gives
+$\sum_{1\le e<t}v_\ell(\psi,e)\le B+M^{C_4}$.
+For every $\psi\in X_e\setminus Y$, HV7 gives case II
+when $e\ge2$, or one of the two parts of case V when $e=1$.
+The assumed counts and HV5 therefore give
+\[
+          v_\ell(\psi,e)\log\ell
+                \le(\ell Ne)^{C_m}\le M^{2C_m},
+ \tag{HV.33}
+\]
+because $\ell<N$ and $e<t$.
+Every character length required by HV4 is finite: use HV6
+for $Y$ and these pointwise counts for its complement.
+Using $|X_e|\le N$, nonnegativity, and interchanging only
+finite sums yields
+\[
+ \log\ell\sum_{1\le e<t}\sum_{\psi\in X_e}v_\ell(\psi,e)
+ \le q\log\ell\,(B+M^{C_4})+M^{2C_m+1}.
+ \tag{HV.34}
+\]
+The total error in (HV.13) is bounded by
+\[
+ \log\ell\sum_{1\le e<t}|X_e|(Ne)^6
+             \le\ell Nt\,M^6\le M^8.
+ \tag{HV.35}
+\]
+Here $\log\ell\le\ell\le N$, and $q\le N$.
+Combining (HV.13), (HV.34) and (HV.35) gives
+\[
+ \log\ell\sum_{1\le e<t}\mathtt{plusLen}_D(e)
+ \le\ell q B+M^{C_4+2}+M^{2C_m+1}+M^8
+ \le M^{C_{\rm in}}+C_{\rm in}B.
+ \tag{HV.36}
+\]
+For the last inequality each of the three exponents is at
+most $C_4+2C_m+8$, and $3M^a\le M^{a+2}$ for $M\ge2$;
+also $C_{\rm in}\ge\ell q$.
+All plus lengths are finite by HV4.
+This is exactly \texttt{PlusLe} for the singleton $\{\ell\}$
+and proves \texttt{SumIn}, with every quantifier in its
+original order.
+\end{proof}
+
+\paragraph{HV9: the sum over all nonexceptional odd primes.}
+\label{claim:HV9}
+Assume the actual source statements \texttt{CountI},
+\texttt{CountII} and \texttt{CountIII}.  Then the literal
+statement \texttt{SumOut} holds.  Only the two auxiliary
+primes supplied by \texttt{CountI} occur in its host threshold.
+
+\begin{proof}
+Fix $\chi$.  Choose $C_1,r_1,r_2$ from \texttt{CountI},
+with $r_1,r_2$ prime, and choose the exponents $C_2,C_3$ of
+the two other counts.  Put $C_Z=0$ by CZ6 and
+\[
+       K=\max(C_Z,C_2,C_3),\qquad
+       C_{\rm out}=C_1+3K+4.
+ \tag{HV.37}
+\]
+All choices precede the host and field.
+Now take a permissible host above $r_1,r_2$, a cutoff $t\ge2$
+with \texttt{Big}$(t)$, any original CM field and local data,
+and an arbitrary finite set $S$ of odd primes outside
+$\mathcal B_\chi$.  Set $M=Nt$.
+Choose, for each prime, a coefficient ring splitting the
+finite Galois group of this original field.
+
+For a fixed $1\le e<t$, split $S=S_0\sqcup S_1$ according
+to whether $\ell-1\nmid2e$ or $\ell-1\mid2e$.
+On $S_0$, \texttt{CountI} applies to the whole finite set
+and gives the joint bound $M^{C_1}$, as well as finiteness
+of every required character length.
+For $\ell\in S_1$, HV1 gives $\ell\le2t$.
+The cases in HV7 are now Z, II or III; CZ6 and the two
+assumed counts give, for every $\psi\in X_e$,
+\[
+                 v_\ell(\psi,e)\log\ell
+                        \le(\ell Ne)^K\le M^{3K}.
+ \tag{HV.38}
+\]
+There are at most $2t$ such primes and at most $N$ characters
+at each prime.  Thus the combined character sum at this
+weight is at most
+\[
+                         M^{C_1}+2M^{3K+1}.
+ \tag{HV.39}
+\]
+Every prime of $S$ is coprime to $n$ by HV1.  Consequently
+the error-free comparison (HV.14) applies, including at the
+possibly very large primes of $S_0$; no sum of an uncontrolled
+error over those primes occurs.
+Summing (HV.39) over $e$ gives
+\[
+ \sum_{\ell\in S}\log\ell\sum_{1\le e<t}
+                         \mathtt{plusLen}_{D_\ell}(e)
+ \le t\bigl(M^{C_1}+2M^{3K+1}\bigr)
+ \le M^{C_1+3K+4}.
+ \tag{HV.40}
+\]
+For the last bound use $t\le M$, $M\ge2$, and bound both
+terms by the larger displayed monomial, with one extra
+power to absorb their sum.
+Finiteness follows at every $(\ell,e)$ from the relevant
+count and HV4.  Since $S$ was an arbitrary finite set, this
+is precisely \texttt{SumOut}, with the original uniform
+prime-set quantifier.
+\end{proof}
+
+\paragraph{HV10: literal PointHV and immediate window propagation.}
+\label{claim:HV10}
+The completed suppliers above prove
+\[
+ \boxed{\quad
+ \mathtt{CountI}\wedge\mathtt{CountII}\wedge
+ \mathtt{CountIII}\wedge\mathtt{CountV}
+                    \ \Longrightarrow\ \mathtt{PointHV}.
+ \quad}
+ \tag{HV.41}
+\]
+More explicitly, for each $\chi$ and each prescribed function
+$j:\mathbb N\to\mathbb N$, there are natural numbers
+$C,r_1,r_2$, with $r_1,r_2$ prime, before any host is chosen,
+such that for every permissible host above those thresholds,
+every $t\ge2$ satisfying \texttt{Big}$(t)$, and every $B\ge0$
+for which
+\[
+ \mathtt{LayerLe}(\chi,\ell,j(\ell),t,B)
+                      \quad(\ell\in\mathcal B_\chi)
+ \tag{HV.42}
+\]
+holds, every original CM field $E$ of that host satisfies
+\[
+                       \mathtt{VVplusLe}
+                               \bigl(E,t,(Nt)^C+CB\bigr).
+ \tag{HV.43}
+\]
+With TW8, OB8 and the already reconstructed VW assembly,
+the same four-count premise therefore implies the full
+cohomological window conclusion
+\[
+ \forall C_t\ge1\ \forall\text{ primitive }\psi,
+                         \mathtt{VWinAt}(\psi,C_t).
+ \tag{HV.44}
+\]
+The previously stated prime-pair inputs of VW retain their
+stated role.  In particular its $C_t=401$ specialization
+retains the fixed pair and the cutoff exponent $400$.
+
+\begin{proof}
+By HV8 and HV9 the four-count premise supplies \texttt{SumIn}
+and \texttt{SumOut}; HV5, HV6 and CZ6 have already supplied
+their other inputs.  Fix $\chi$ and the whole function $j$.
+Choose $C_{\rm out},r_1,r_2$ from HV9 and, for each prime
+of the finite set $\mathcal B_\chi$, choose the constant
+$C_{\rm in}(\ell,j(\ell))$ from HV8.  Put
+\[
+ D=\sum_{\ell\in\mathcal B_\chi}C_{\rm in}(\ell,j(\ell)),
+ \qquad k=|\mathcal B_\chi|,
+ \qquad C=C_{\rm out}+D+k+1.
+ \tag{HV.45}
+\]
+These are choices before the host, $t,B,E,\Omega$ and local
+data.  For any subsequent choices satisfying (HV.42), put
+$M=Nt\ge2$ and split an arbitrary finite set $S$ of odd primes
+into its intersection with $\mathcal B_\chi$ and its complement.
+The sum in (HV.43) over $S$ is bounded by
+\[
+ \begin{split}
+ M^{C_{\rm out}}+
+ \sum_{\ell\in S\cap\mathcal B_\chi}
+       \bigl(M^{C_{\rm in}(\ell,j(\ell))}
+                          +C_{\rm in}(\ell,j(\ell))B\bigr)
+ &\le (k+1)M^{C_{\rm out}+D}+DB\\
+ &\le M^C+CB.
+ \end{split}
+ \tag{HV.46}
+\]
+Here each $C_{\rm in}$ is positive, $B\ge0$, and
+$k+1\le2^k\le M^k$ (also valid at $k=0$).
+The two component results prove all individual finiteness
+assertions.  The field and local data were arbitrary,
+and (HV.46) is uniform over every finite $S$.
+This is exactly \texttt{VVplusLe}, hence the literal
+\texttt{PointHV}, with the full quantifier order in (HV.43).
+
+For (HV.44), use the single constant record and universal
+\texttt{ThmBab} supplied by TW8, and the odd-minus
+\texttt{ThmBcFree} supplied by OB8.  Substitution of (HV.41)
+into VW3--VW4 now fills their remaining odd-plus premise.
+Those proofs already keep the same original field, all the
+prescribed layer models, one common window and the fixed
+prime pair.  Their rescaling with $C_t=401$ is unchanged.
+This proves the asserted immediate propagation.
+\end{proof}
+
+\paragraph{Scope at the end of the chain.}
+HV proves the two auxiliary counts and every step after the
+four-count cut.  In particular the separate
+\texttt{PointHV}-assembly task is complete, including bad
+degree primes and the coefficient and field comparisons.
+The full human reconstruction still needs the actual
+\texttt{CountI}, \texttt{CountII}, \texttt{CountIII} and
+\texttt{CountV}, or complete sufficient suppliers for them.
+The common arithmetic family, genuine theta/local installation,
+denominator tables, arithmetic gap and exact metric/spectral
+comparisons remain the independent global obligations already
+identified in the audit.  Neither (HV.41) nor (HV.44) asserts
+that those inputs have been constructed.

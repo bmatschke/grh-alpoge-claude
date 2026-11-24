@@ -1,0 +1,509 @@
+RH/GRH READABLE RECONSTRUCTION v0.4
+COEFFICIENT EDGE LATTICES AND NORMALIZED NEIGHBOR COMPATIBILITY
+Working identifiers: EL1–EL10
+
+Source pin
+----------
+Repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Primary file:
+  src/Formalism/SharpRestriction/GrowthBounds/LatticeSystems.lean
+Its exact bytes have SHA-256:
+  36f6e1a75292c123bfc570bec63ab560e51802c715849b7e3dd5d3a8c7da61f5
+
+Companion files
+--------------
+edge_lattices_section.tex: compact mathematical proof for the main document.
+edge_lattices_provenance.json: exact declarations, inclusive line ranges,
+  range-byte hashes, full-file hashes, pinned source URLs, and derivation status.
+build_provenance.py: reproducible construction and git-byte verification.
+
+1. RESULT AND SCOPE
+===================
+
+The integral polynomial component retained in v0.3 as JR12 and LW4 can be
+discharged at the human level. The following are proved, rather than assumed:
+
+  • The source's coefficient H(L) is a full finite free O-lattice in its
+    fixed finite-dimensional polynomial representation V.
+  • H(L) is independent of the matrix used to represent the lattice L.
+  • Every source edge has the required elementary-divisor basis, with
+    precisely r factors p rather than an unspecified index.
+  • If H_e is the coefficient lattice at the edge midpoint and
+    A = sum_s sum_{i≤r} lambda_{s,i}, then
+        w^A H(L−) ⊂ H_e,       w^A H_e ⊂ H(L+).
+    A is an integer, potentially negative.
+  • R_e=w^(−A)H_e and R'_e=w^(−A)H_e^vee have a perfect integral pairing
+        (x,phi) ↦ phi(p^A x).
+  • The base, ball, and dual slots satisfy
+        w^t H(L) ⊂ P_t(L) ⊂ H(L) ⊂ B_t(L) ⊂ w^(−t)H(L).
+    They have the same rank dim_K V.
+  • Every normalized neighbor contribution satisfies
+        p^A B_t(L−) ⊂ P_t(L+).
+    The statement also transports w^c-divisible errors at unwanted targets.
+  • All these lattices transform under the actual determinant-twisted
+    representation. Hence the neighbor sum preserves the equivariance and
+    zero-off-lattice conditions of the source's section module.
+
+The polynomial weight estimate is proved here by an elementary generic-matrix
+calculation. This is an alternative human proof of the same estimate used by
+LatticeSystems.lb_P. It is not a claim that the archive itself uses that proof,
+and it has not been formalized as a replacement Lean declaration.
+
+No nontrivial representation theorem remains an input to THESE conclusions.
+The source uses a semistandard integral basis to obtain the weight bound and
+fullness; both can be avoided here. This does not remove the need for
+quantitative local test-vector construction, rank/separation bounds, finite
+global orbit data, trivial stabilizers, or the arithmetic/spectral assertions
+elsewhere in the RH/GRH argument. In particular, this report is not a claim
+that the whole RH or GRH proof is now complete.
+
+2. SOURCE CONVENTIONS THAT MATTER (EL1)
+======================================
+
+Write k=m+1. Source vector and matrix indices run from 0 through k−1; this
+report and the main section use 1 through k. The test "i.val < r" therefore
+becomes "1≤i≤r", with no shift in the number r.
+
+W is a DVR with fraction field Q. The rational prime p is a uniformizer in W.
+The residue field has cardinality q=p^(n'), and n'>0. O is a DVR with fraction
+field K. The actual source has embeddings tau_s=iota composed with sigma^s,
+0≤s<n', carrying W into O, and an element w in O with w²=p.
+
+The only local hypotheses used here are these DVR, fraction-field, embedding,
+uniformizer/cardinality, and square-root hypotheses, plus decreasing weights.
+The HidaSetting record also has p≥5, n' even, completeness, Frobenius, and
+periodicity data. Those additional hypotheses are not used in the local
+arguments except that Frobenius preservation supplies sigma^s(W)⊂W.
+No assumption that w itself is a uniformizer of O is needed. The rational p
+is a uniformizer in W, but may be ramified in O.
+
+The actual polynomial weight at embedding s is lamAt:
+  lambda_s = lambda0_s                         if s is even;
+  lambda_s,i = −lambda0_s,k+1−i                 if s is odd.
+If lambda0_s is decreasing, so is lambda_s. The signed normalization is
+  A = Ar(r,lambda0) = sum_s sum_{i=1}^r lambda_s,i.
+It is not a sum of the unmodified base weights, their absolute values, or
+their positive parts.
+
+The field element w is nonzero, since w²=p and the embedding of the fraction
+field of W into K sends the nonzero element p to a nonzero element.
+Consequently all integer powers w^A and p^A used below are legitimate.
+Only the truncation parameter t and the error exponent c are nonnegative.
+
+3. THE EXACT POLYNOMIAL MODEL AND FULLNESS (EL2)
+================================================
+
+For a ring R, let P_nu(R) be the finite free module of polynomials in entries
+of a k×k matrix X having prescribed degree nu_j in column j. It has the
+obvious finite monomial basis. Let D_nu(R) be the submodule satisfying
+
+  f(..., C_j+u C_i, ...) = f(..., C_j, ...) for every i<j,
+
+as an identity in the polynomial ring R[X,u]. This is exactly dualWeyl in
+StatementA.lean, which intersects the column-weight submodule with the kernels
+of colAddGen−rename. It is stronger than checking invariance only at the
+finitely many elements of a residue field. That distinction is essential.
+
+All these invariance equations form one linear map from P_nu(R) to a finite
+direct sum of finite polynomial coefficient modules: total degree in X is
+sum_j nu_j, and degree in the auxiliary u is bounded by that same integer.
+The map has integer coefficients. Therefore
+
+  D_nu(O) = D_nu(K) ∩ P_nu(O)
+
+inside P_nu(K). Indeed, polynomial identities with O-coefficients vanish over
+O if and only if they vanish after the injective map O→K.
+
+D_nu(O) is a submodule of a finite free O-module. Since O is a DVR, it is
+finite free. It spans D_nu(K): given a K-basis of the latter, multiply each
+basis vector by a nonzero common denominator to put all its coefficients in
+O. The cleared vector still satisfies the same linear identities and hence
+belongs to D_nu(O). Thus D_nu(O) is a full lattice. Equivalently this is
+localization of a kernel. No dimension formula, tableau basis, or
+irreducibility assertion is required.
+
+For lambda_1≥...≥lambda_k, put e=lambda_k and nu_j=lambda_j−e≥0.
+Let T(g) be row substitution, T(g)f(X)=f(gX). Be careful with order:
+
+  T(g) T(h) = T(hg).
+
+The actual representation is
+
+  rho_lambda(g) = det(g)^(−e) T(g^(−1)).
+
+It satisfies rho_lambda(g)rho_lambda(h)=rho_lambda(gh). It preserves
+D_nu(K), because row substitutions commute with the column substitutions
+that define invariance and preserve each column's total degree.
+
+For U∈GL_k(O), both U and U^(−1) have integral entries, and det U is an O-unit.
+Hence rho_lambda(U) maps D_nu(O) bijectively onto itself, including when e
+is negative. Define
+
+  H_lambda(g O^k) = rho_lambda(g) D_nu(O).
+
+If h O^k=g O^k, then h=gU for U∈GL_k(O). The representation identity and
+integral stability give rho_lambda(h)D_nu(O)=rho_lambda(g)D_nu(O).
+This proves basis independence. The source H0 is an intersection over all
+matrices presenting the same lattice; the equality of these presentations
+therefore identifies it exactly with the displayed lattice.
+
+The membership criterion used for sign-checking is
+
+  x∈H_lambda(gO^k)
+       iff det(g)^e T(g)x∈D_nu(O).
+
+The source names for this description are nablaL, nablaLTw, nablaLTwMem,
+H0_eq_twisted_nabla, la_indep, and lb_indep.
+
+More explicitly, no representation-model isomorphism is being assumed here:
+StatementD.nablaL is DEFINED as the inverse image of D_nu(O) under T(g),
+after coefficient extension O→K. Since g is invertible, it is exactly
+T(g^(−1))D_nu(O). StatementD.nablaLTw is DEFINED to be det(g)^(−e) times this
+module. It is therefore literally rho_lambda(g)D_nu(O). The preceding basis
+independence proves the equality with the all-presentations intersection H0.
+
+Tensoring over the embeddings creates the source's Hten and Vsp. These tensor
+products are represented by products in disjoint polynomial variable blocks.
+There is no quotient relation hidden by this notation: polynomial algebras
+in disjoint sets of variables identify with their tensor product, by their
+monomial bases. An O-basis of each factor gives a tensor basis of H(L), and
+a K-basis gives a tensor basis of V. Thus H(L) is full and finite free, of
+rank dim_K V, independently of L.
+
+The if-clauses in Vsp all choose dualWeyl, since every lamAt is decreasing.
+Thus Vsp is literally tensor_s D_nu_s(K). The operations toV and ofV in
+UnramifiedQuadraticSetting merely take the inverse image under the subtype
+map Vsp→ambient polynomials or its image. The lattice Hten is already
+contained in Vsp, so these operations lose no vectors and require no
+additional representation-theoretic identification.
+
+If positivity of this dimension is wanted, it too has an elementary proof:
+for decreasing nu and nu_(k+1)=0, the product over j of the leading j×j minor
+raised to nu_j−nu_(j+1) is a nonzero polynomial in D_nu(O). Each initial minor
+is invariant under all earlier-column additions. The shape gives the
+specified column degrees. This is the source's highest-weight vector, but
+its nonvanishing follows simply from the polynomial ring being a domain.
+The edge argument itself also works if a coefficient space is zero.
+
+4. ELEMENTARY ROW-DEGREE BOUND (EL3)
+===================================
+
+Claim. For f∈D_nu(K) and 0≤r≤k, every monomial of f has degree at most
+N_r=sum_{j=1}^r nu_j in the variables belonging to rows 1,...,r.
+
+The endpoints r=0,k are immediate. For 0<r<k use a generic matrix
+
+  X = [[B,C],[E,F]]
+
+where B is r×r. Work first in the domain
+  S=K[X, (det B)^(−1)]
+and introduce a new indeterminate z. The polynomial identities defining
+D_nu(K) remain valid after every substitution over S[z].
+
+The upper-unipotent matrix
+  U=[[I,−B^(−1)C],[0,I]]
+is a product of matrices adding a multiple of column i≤r to a column j>r.
+These are allowed earlier-column additions. Their coefficients belong to S
+and are independent of z. For S_z=diag(z I_r,I), invariance gives
+
+  f(S_z X) = f(S_z X U)
+            = f([[zB,0],[E,F−E B^(−1)C]]).
+
+There is no inverse of z in this identity. This is why it controls degree in
+z: every entry of the matrix on the right that depends on z belongs to one
+of the first r columns, and f has total degree N_r in precisely those
+columns. Thus its degree in z is at most N_r.
+
+The left side has coefficients in K[X]. The map K[X]→S is injective, since
+det B is a nonzero polynomial in a domain. Its coefficients of z^a, a>N_r,
+must therefore already vanish in K[X]. Those coefficients are sums of
+distinct monomials of row degree a. Every such monomial coefficient is zero.
+This proves the claimed bound.
+
+No highest-weight classification, semistandard straightening theorem, or
+dominance hypothesis beyond the nonnegativity of the column degrees is used.
+If nu is not a partition, the same degree bound still holds for any f that
+satisfies the stated polynomial conditions. Decreasing lambda is used to
+ensure that the source's nu=lambda−lambda_k is nonnegative and is its actual
+coefficient degree.
+
+Independent mathematical check: agent /root/lean_audit verified the rational
+upper-unipotent substitution, independence of z, and injection back from the
+det(B)-localization. This is a human cross-review, not a kernel check.
+
+Relation to the source proof. LatticeSystems.lb_basis invokes sSBasis and
+bidetDominance to produce a row-weight basis with partial row weight at most
+N_r. Its lb_P then checks lattice scaling on that basis. The argument above
+establishes the needed degree bound directly for every polynomial. It is an
+alternative proof, not a paraphrase of the tableau proof. The precise source
+statements of that route are included in the provenance ledger.
+
+5. SIGNED HIGHEST-WEIGHT SCALING (EL4)
+=====================================
+
+Put D_w=diag(w^(−1)I_r,I). If f∈D_nu(O), row substitution T(D_w) multiplies a
+monomial of first-r-row degree a by w^(−a). By Section 4, a≤N_r. Hence
+
+  w^N_r T(D_w)f∈O[X].
+
+It is still in D_nu(K), since row substitution and scalar multiplication
+preserve the defining equations. By the integral-intersection description
+in Section 3 it belongs to D_nu(O).
+
+Now let x∈H_lambda(gO^k), and put
+  f=det(g)^e T(g)x∈D_nu(O).
+Write A_r=sum_{i=1}^r lambda_i=N_r+r e. The target membership test gives
+
+  det(gD_w)^e T(gD_w)(w^A_r x)
+    = w^(A_r−r e) T(D_w) [det(g)^e T(g)x]
+    = w^N_r T(D_w)f ∈ D_nu(O).
+
+Here T(D_w)T(g)=T(gD_w). Thus
+  w^A_r H_lambda(gO^k) ⊂ H_lambda(gD_w O^k).
+
+All powers in the first and last expressions are integer powers in K.
+Only the final exponents N_r−a of monomial coefficients need be
+nonnegative, and Section 4 proves exactly that. There is no hidden inference
+that a negative power of w preserves an arbitrary integral lattice.
+
+As a simple sign check, take k=1 and lambda=e=−1. Then nu=0 and
+H_lambda(gO)=gO. The conclusion is w^(−1)gO=H_lambda(gw^(−1)O), an equality.
+It would be false to discard the negative determinant twist.
+
+6. EDGE SMITH NORMAL FORM AND THE MIDPOINT (EL5)
+===============================================
+
+For an edge (L−,L+) the source assumes both W-lattices full, L−⊂L+,
+pL+⊂L−, and |L+/L−|=p^(n'r)=q^r.
+
+Smith normal form over the DVR gives a basis b_i of L+ in which
+L− is generated by a_i b_i. The inclusion pL+⊂L− implies a_i|p.
+Since p is a uniformizer, a_i is either a unit or a unit times p.
+The quotient is a product of copies of W/(a_i), each of cardinality 1 or q.
+Its cardinality q^r forces exactly r nonunit a_i; this also proves r≤k.
+Reorder the basis and absorb the unit factors. If g is the matrix of the
+resulting source basis, then
+
+  L− = g W^k,
+  L+ = g diag(p^(−1)I_r,I) W^k.
+
+For each embedding s, tau_s fixes the rational integer p, and carries
+integral W-coefficients to O. Thus extended lattice bases are obtained by
+applying tau_s entrywise to g. With g_s=tau_s(g),
+
+  L_s− = g_s O^k,
+  L_s+ = g_s D_w² O^k,
+  Lambda_s(e)=L_s− + w L_s+ = g_s D_w O^k.
+
+The last equality is checked coordinate by coordinate. On the first r
+coordinates O+w·w^(−2)O=w^(−1)O, and on the rest O+wO=O.
+This is exactly LeAt, whose definition is the O-span of L_s− plus
+w^(−1) times the twist of pL+; w^(−1)p=w.
+
+The source realizes this chain as lc_snf → lc_main → restEdgeBasis →
+lb_edgeLat_of_basis. The source RestEdgeLat is the assertion that the three
+extended lattices have matrices g_s, g_sD_w, g_sD_w².
+
+7. TENSOR EDGE INCLUSIONS AND PERFECT NORMALIZED POLAR (EL6)
+============================================================
+
+Set H(L)=tensor_s H_lambda_s(L_s) and H_e=tensor_s H_lambda_s(Lambda_s(e)).
+The one-factor scaling in Section 5 gives, on elementary tensors, scalar
+w^(sum_s A_r,s). Hence with the actual A=Ar(r,lambda0),
+
+  w^A H(L−) ⊂ H_e,             w^A H_e ⊂ H(L+).
+
+The same proof works on arbitrary finite sums of elementary tensors.
+
+For a full O-lattice M⊂V define
+  M^vee={phi∈V*: phi(M)⊂O}.
+For N⊂V*, its polar N^vee lies in V. If b_i is an O-basis of M, it is a K-basis
+of V. Its coordinate functionals b_i* form an O-basis of M^vee. The same
+coordinate test proves (M^vee)^vee=M. This is a plain linear dual, not a
+Hermitian or Fock pairing.
+
+Let R_e=w^(−A)H_e and R'_e=w^(−A)H_e^vee. The first edge inclusion gives
+H(L−)⊂R_e. For phi∈H(L+)^vee the second edge inclusion implies
+w^A phi∈H_e^vee, so phi∈R'_e. Thus H(L+)^vee⊂R'_e.
+
+More strongly, beta_e(x,phi)=phi(p^A x) is a perfect O-pairing on
+R_e×R'_e, because in the bases w^(−A)b_i and w^(−A)b_i* its matrix is I:
+
+  (w^(−A)b_j*)(p^A w^(−A)b_i)
+     = w^(−A)p^Aw^(−A) delta_ij
+     = delta_ij.
+
+The scalar equality uses p=w² and is true for every integer A. Equivalently
+
+  p^A R_e = (R'_e)^vee.
+
+The source uses the required integrality rather than explicitly naming this
+perfectness strengthening. Its be, nt_scal, nt_local, and jm_Re have exactly
+the same normalization. This report proves the stronger equality from the
+full-lattice property; the ledger marks it as a derived consequence.
+
+8. THREE SLOTS AND THEIR FULL RANK (EL7)
+=======================================
+
+For t≥0 define
+
+  B_t(L) = w^(−t)H(L) ∩ intersection_{e.src=L} R_e,
+  T_t(L) = w^(−t)H(L)^vee ∩ intersection_{e.tgt=L} R'_e,
+  P_t(L) = T_t(L)^vee.
+
+The source names are Nsrc, Ntgt, and predual Ntgt, respectively.
+The three actual slots in piLattice₂ are base=H, ball=B_t, dual=P_t.
+Ntgt is a lattice of test functionals, and is NOT itself the dual slot.
+
+Because w^t∈O, H(L)⊂w^(−t)H(L). Section 7 gives its containment in all the
+outgoing R_e. Thus H⊂B_t⊂w^(−t)H.
+The incoming version gives H^vee⊂T_t⊂w^(−t)H^vee. Polars reverse inclusions,
+and (w^(−t)H^vee)^vee=w^tH. Therefore
+
+  w^tH ⊂ P_t ⊂ H ⊂ B_t ⊂ w^(−t)H.
+
+These are precisely base≤ball, dual≤base, w^t ball≤base, and w^t base≤dual.
+All four lattices H,B_t,T_t,P_t are full and finite free in the relevant
+fixed vector space. Indeed they contain a scalar multiple of a full lattice
+and are contained in another; their submodule is finite by the noetherian
+property of a DVR, and free by torsion-freeness. Their ranks are dim_K V.
+This argument does not even need finiteness of the intersections in the
+definitions. Finiteness is used separately for the neighbor sum.
+
+Source assembly:
+  RestLocD packages H⊂V, H(src)⊂R_e, H(tgt)^vee⊂R'_e, and
+  predual(dualLat(H))≤H.
+  restLocD_of_edgeBasis and restLocD establish it.
+  local_lattice_chain_of_local and ch_locChain produce RestLocChain.
+The proof above reconstructs every component, with equality for the double
+polar. The condition H⊂V follows from the exact coefficient model of Section 3.
+
+9. COVARIANCE (EL8)
+===================
+
+For a∈GL_k(Q), apply tau_s entrywise and let rho(a) be the tensor product of
+the rho_lambda_s(tau_s(a)). Section 3 gives
+
+  H(aL)=rho(a)H(L),
+  H_(ae)=rho(a)H_e,
+  R_(ae)=rho(a)R_e.
+
+The midpoint identity is compatible with a because a preserves addition
+and scalar multiplication of the underlying lattices.
+
+The dual action is the contragredient
+  rho(a)^(-*) phi = phi composed with rho(a)^(−1).
+Thus R'_(ae)=rho(a)^(-*)R'_e. The map e↦ae bijects edges with given source
+or target: a is W-linear and invertible on the ambient Q-vector space,
+preserves the two inclusions, and gives an isomorphism of the finite quotients.
+
+Taking intersections therefore gives
+  B_t(aL)=rho(a)B_t(L),
+  T_t(aL)=rho(a)^(-*)T_t(L),
+  P_t(aL)=rho(a)P_t(L).
+
+These are the actual polynomial assertions proved in mapsTo_je_loc and
+jEquiv. Multiplication by the additional character chi(gamma)∈O^× preserves
+each O-lattice. Tensoring over places gives the actual natAct of DataG.
+No unproved identification with another representation is used here:
+natAct is explicitly this determinant-twisted polynomial substitution.
+
+10. NORMALIZED NEIGHBOR MAP AND SECTION CONDITIONS (EL9)
+=======================================================
+
+For any edge e=(L−,L+) and x∈B_t(L−), take phi∈T_t(L+).
+By definition x∈R_e and phi∈R'_e. Section 7 gives
+  phi(p^A x)∈O.
+Since this holds for every phi, p^A x∈P_t(L+).
+
+On a lattice tuple the source operator is
+  (Y_v F)(L)=p^(A_v) sum_{L'→L_v} F(L with L_v replaced by L').
+This is the literal Level.yv definition, written as a finite sum by ef_yv_eq.
+It already includes the factor p^(A_v). One must not additionally normalize
+the operator, or reason that p^(A_v) is an integral scalar on every lattice.
+
+Incoming neighbors L' are sublattices with pL_v⊂L'⊂L_v and fixed quotient
+cardinality. They correspond to (k−r)-dimensional subspaces of the finite
+q-vector space L_v/pL_v. There are finitely many, so summation is justified.
+The fixed dimension is not needed just for finiteness.
+
+Keep all other coefficient slots fixed. On each pure tensor, put p^(A_v)
+in the v-th factor and use the local inclusion. By linearity, the image of
+every section value belongs to the target tensor lattice; a finite sum also
+belongs. Thus Y_v takes a ball slot to a dual slot.
+
+For F(gamma L)=chi(gamma)rho(gamma)F(L), the group action bijects incoming
+neighbors. Reindex the finite sum. Since rho(gamma) is K-linear, it commutes
+with multiplication by p^(A_v), even if A_v<0. This proves the same
+equivariance identity for Y_vF.
+
+The source defines sections on all tuples of submodules and imposes zero
+off tuples of full lattices. If the target tuple is not a lattice tuple:
+if the bad coordinate is v, no incoming edge can exist there; otherwise
+that unchanged bad coordinate persists in every summand. Hence Y_vF is zero.
+This verifies the third part of Level.funMod as well as integral membership.
+These arguments reconstruct nt_nat, nt_equiv, and restNat_proved.
+
+11. ERROR TRANSPORT AND THE CONNECTION TO JR/LW (EL10)
+====================================================
+
+The proof of Section 10 uses only x∈R_e, not the full B_t condition. In
+particular, for c≥0,
+
+  p^A (w^c R_e) ⊂ w^c P_t(e.tgt).
+
+Suppose a local test vector belongs to w^c R_e at every unwanted outgoing
+edge. Its normalized contribution at each unwanted target lies in the
+corresponding w^c dual slot. This is the integral input used by JR's
+one-good-coordinate cancellation and by the source jm_Re/jl_good.
+
+If c≥2(D+1), w^cO⊂p^(D+1)O, since w²=p. The archive imposes the stronger
+cStar≥4(D+1) in LPprime. This report does NOT propose reducing that global
+condition: other steps may consume the extra margin. It merely explains the
+particular error conversion in the existing cancellation.
+
+The preceding results close the following v0.3 retained hypotheses:
+  • actual base, ball, dual inclusions (JR12/LW4);
+  • constant finite-free coefficient ranks (JR12);
+  • integral normalized edge/neighbor pairing (JR12);
+  • covariance of the actual polynomial lattices and sections (JR12).
+
+The earlier joint-rank proof still uses finite global orbits and trivial
+stabilizers to turn values into orbit-supported sections. These do not follow
+from the local edge argument, and are not claimed here. The source's
+quantitative GoodRankK identity, localizer separation, cloud bounds,
+automorphic arithmetic construction, and analytic endpoint are outside
+this report.
+
+12. PROVENANCE AND VERIFICATION STATUS
+=====================================
+
+EL1 and all definitions match the fixed archive directly.
+EL2 gives a new human proof of fullness/basis independence using finite
+polynomial kernels and DVR algebra. The source instead constructs a specific
+semistandard basis.
+EL3 is the independent generic-matrix proof replacing the source's
+semistandard weight argument.
+EL4 translates the source's exact signed scaling conclusion and supplies
+the complete determinant calculation.
+EL5 translates source Smith and midpoint arguments.
+EL6 translates source edge inclusions and integral pairing, with a proved
+perfectness strengthening.
+EL7 translates the local chain and proves full ranks.
+EL8–EL9 translate actual covariance/neighbor formulas and prove their required
+section assertions.
+EL10 is the direct error-transport consequence used by the existing JR/LW
+arguments.
+
+Each ledger locator has a declaration name and the inclusive line range in
+the exact pinned file, together with SHA-256 of the original bytes in that
+range and of the whole file. New human proof steps are explicitly marked as
+derived alternatives; a source locator is never used to imply that the
+archive contains our Gaussian-elimination proof.
+
+This pass performs source-byte verification and a mathematical reconstruction.
+It does not rebuild the entire Lean archive, rerun the kernel on all imported
+declarations, or formalize the replacement proof. The main section should
+be described as a proved component of the readable reconstruction, not as
+independent certification of the complete archive.

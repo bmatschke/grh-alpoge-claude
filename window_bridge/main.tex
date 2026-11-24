@@ -1,0 +1,627 @@
+\section{Closing the character-to-window dependency chain}
+\label{sec:window-bridge}
+
+\status{WB1--WB8 give one complete implication, from the explicitly
+stated arithmetic gap and size data below to the fixed positive
+character window and then to RH and Dirichlet GRH. The finite Fourier
+identity, ramified-prime terms, subgroup averaging, moving cutoffs,
+primitive-character reading, and uniform quantifier order are proved.
+The arithmetic gap and the existence of one family satisfying its
+premises remain inputs. This section closes the character/analytic
+bridge left open in SC2; it does not assert those arithmetic inputs.}
+
+The point of this consolidation is to exhibit the whole chain in one
+place. Its leaves are concrete inequalities on one set of data, rather
+than a collection of mutually unrelated existence statements. The
+source route is \texttt{ChBalance}, \texttt{ChCore}, \texttt{GmAEq},
+\texttt{SigALe}, \texttt{CoreGm}, and \texttt{TopWin}.
+
+% BEGIN WB1
+\subsection{WB1. The actual characters, including ramification}
+
+Let $A$ be a finite abelian group of order $n$, and write
+\[
+ G=(\mathbb Z/2\mathbb Z)^2\times A,\quad
+ \Phi=\{(0,b,h)\},\quad f=|\Phi|=2n,\quad
+ c_0=(1,0,0),\quad c_\infty=(1,1,0).
+\]
+Use multiplicative notation for characters of the additive group $G$;
+the trivial character, written $1$ here, is written $0$ in the Lean
+\texttt{AddChar} notation. Put $\chi_d(a,b,h)=(-1)^a$.
+An arithmetic datum assigns an inertia subgroup $I_p\le G$ and a
+Frobenius class $F_p\in G$ to every prime. Define, for $j\ge1$,
+\[
+ v_\xi(p^j)=\frac1{|I_p|}\sum_{h\in I_p}\xi(jF_p+h),
+ \qquad
+ v_\xi(r)=\prod_{p^j\parallel r}v_\xi(p^j)\quad(r\ge1).
+ \tag{WB.1}
+\]
+Thus $|v_\xi(r)|\le1$ and $v_1(r)=1$. Finite-character
+orthogonality gives the exact ramified formula
+\[
+ \frac1f\sum_{\xi\in\widehat G}\overline{\xi(g)}v_\xi(p^j)
+ =\frac{2}{|I_p|}\mathbf1_{g-jF_p\in I_p}.
+ \tag{WB.2}
+\]
+Indeed, expand (WB.1) and interchange the two finite sums. The inner
+character sum is $|G|=2f$ when $jF_p+h=g$, and zero otherwise.
+There is at most one such $h\in I_p$.
+
+Here is why these are the values of the \emph{primitive} Dirichlet
+characters on an actual host. Suppose its positive modulus is $N_0$
+and its specified reciprocity map
+\[
+ r:(\mathbb Z/N_0\mathbb Z)^\times\longrightarrow G
+\]
+is onto. At a prime $p\mid N_0$, use CRT to split the unit group
+into its $p$-primary factor and its prime-to-$p$ factor. Let $I_p$
+be the image of the first factor and let $F_p$ be the image of a unit
+which is $p$ modulo the prime-to-$p$ part. Its value at the
+$p$-primary part is immaterial modulo $I_p$. For $p\nmid N_0$,
+take $I_p=0$ and $F_p=r(p)$.
+
+Let $\xi^*$ be the primitive inducer of $\xi\circ r$. If
+$\xi|_{I_p}$ is nontrivial, character averaging makes (WB.1) zero;
+the primitive conductor is then divisible by $p$, and
+$\xi^*(p)=0$ as well. If $\xi|_{I_p}=1$, the induced character
+factors through the prime-to-$p$ part. Its primitive conductor is
+prime to $p$, and its value at $p^j$ is exactly $\xi(jF_p)$.
+This proves
+\[
+ v_\xi(r)=\xi^*(r)\qquad(r\ge1),
+ \tag{WB.3}
+\]
+also at ramified primes, not only on integers prime to $N_0$.
+Uniqueness of primitive induction and surjectivity of $r$ imply
+\[
+ \xi^*=\zeta^*\Longrightarrow\xi=\zeta,
+ \qquad \xi^*=1\Longleftrightarrow\xi=1.
+ \tag{WB.4}
+\]
+For the first implication, induce both primitive characters back to
+$N_0$, and then use surjectivity. In particular no growing host
+introduces repeated copies of one primitive target.
+
+Extend the already centered principal ramp to every $y>0$ by the
+same finite-sum formula
+\[
+ G(y)=\sum_{r\le y}\Lambda(r)(y/r-1)-y\log y+(1+\gamma)y.
+\]
+For $0<y<1$ the sum is empty. This extension matters in the exact
+balance identity, where $a/w$ need not be at least $1$.
+Fix numbers $\ell_\xi\in\mathbb C$ for $\xi\ne1$ and set, for
+$y>0$,
+\[
+ \mathcal G_1(y)=G(y),\qquad
+ \mathcal G_\xi(y)=\sum_{r\le y}\Lambda(r)v_\xi(r)(y/r-1)
+                         +y\ell_\xi\quad(\xi\ne1).
+ \tag{WB.5}
+\]
+On the original host require the actual equality
+$\ell_\xi=L'/L(1,\xi^*)$. Equations (WB.3)--(WB.5) then identify
+$\mathcal G_\xi$ with the already centered primitive ramp
+$G_{\xi^*}$. This is the literal content of the
+\texttt{HostAddCharCompatible}/\texttt{prim\_read} join.
+The arbitrary value $\ell_1$ is never used.
+% END WB1
+
+% BEGIN WB2
+\subsection{WB2. Exact balance, with the exceptional prime retained}
+
+Assume that a finite prime set $S$ and a prime $d\notin S$ satisfy
+\[
+ I_p=0\ (p\notin S\cup\{d\}),\quad
+ I_p\subset\Phi,\ F_p\in\Phi\ (p\in S),\quad
+ I_d=\{0,c_0\}.
+ \tag{WB.6}
+\]
+These are the substantive fields of \texttt{HostFactsS}. The source
+also includes $2,q\in S$ to identify its inert-prime indexing.
+For $t\in A$, the map
+\[
+ g\longmapsto\rho_t(g):=c_\infty+g+(0,0,t)
+\]
+is a bijection $G\setminus\Phi\to\Phi$. Given $a>0$ and
+$w:\Phi\to\mathbb R_{>0}$, choose an integer $N$ at least every
+$a/w(\rho)$. Write $(z)_+=\max(z,0)$ and define the actual asked
+prime sum
+\begin{align*}
+ \mathcal A(a,t,w)={}&
+ 2\sum_{\substack{p\notin S\cup\{d\}\\F_p\notin\Phi}}
+    \log p\sum_{\substack{j\ge1\\jF_p\notin\Phi}}
+       (a/p^j-w(\rho_t(jF_p)))_+\\
+ &+\log d\sum_{j\ge1}
+       \sum_{\substack{g\notin\Phi\\g-jF_d\in I_d}}
+          (a/d^j-w(\rho_t(g)))_+ .
+ \tag{WB.7}
+\end{align*}
+All sums are finite: terms with $p^j>N$ vanish. This is the source's
+\texttt{ASK}; when $d>N$ its last summand vanishes, rather than
+requiring a separate assumption on $d$.
+
+Define
+\begin{align*}
+ \mathcal M(a,w)&=a\left(\log a-1-\gamma+\ell_{\chi_d}
+                       -\frac1f\sum_{\rho\in\Phi}\log w(\rho)\right),\\
+ \mathcal D(a,t,w)&=\frac1f\sum_{g\notin\Phi}
+       \sum_{\xi\in\widehat G}\overline{\xi(g)}
+       w(\rho_t(g))\mathcal G_\xi(a/w(\rho_t(g))).
+\end{align*}
+Then the precise complex identity is
+\[
+                 \boxed{\ \mathcal A-\mathcal M=\mathcal D.\ }
+ \tag{WB.8}
+\]
+To prove it, apply (WB.2) to each prime power. At an unramified prime
+the coefficient is $2$ at $g=jF_p$ and zero elsewhere. At $p\in S$
+the coset $jF_p+I_p$ lies in $\Phi$, so it contributes nothing.
+At $d$ the coefficient is $1$ on its inertia coset; that coset has
+exactly one member outside $\Phi$, because $c_0\notin\Phi$.
+Consequently (WB.7) equals
+\[
+ \frac1f\sum_{g\notin\Phi}\sum_\xi\overline{\xi(g)}
+       \sum_{r\ge1}\Lambda(r)v_\xi(r)(a/r-w(\rho_t(g)))_+ .
+\]
+For $W>0$, the innermost sum is $W\mathcal G_\xi(a/W)-a\ell_\xi$
+if $\xi\ne1$. For $\xi=1$ it is
+\[
+ WG(a/W)+a\log a-a\log W-(1+\gamma)a.
+\]
+Finally orthogonality on the index-two subgroup $\Phi$ gives
+\[
+ \sum_{g\notin\Phi}\overline{\xi(g)}=
+ \begin{cases} f,&\xi=1,\\-f,&\xi=\chi_d,\\0,&\text{otherwise}.
+ \end{cases}
+\]
+The $-a\ell_{\chi_d}$ correction is therefore multiplied by $-f$:
+this proves the \emph{plus} sign in $a\ell_{\chi_d}$ in
+$\mathcal M$. The bijection $\rho_t$ gives the logarithmic sum.
+This proves (WB.8) without dropping any ramified contribution.
+% END WB2
+
+% BEGIN WB3
+\subsection{WB3. Uniform regularity of the centered ramps}
+
+The following estimates use only $|v_\xi(r)|\le1$ and elementary
+Chebyshev bounds; their constants are independent of the host.
+First,
+\[
+ \Psi(y):=\sum_{r\le y}\Lambda(r)\le3y\quad(y\ge0),\qquad
+ \log k-1\le\sum_{r\le k}\frac{\Lambda(r)}r\le\log k+3
+ \quad(k\in\mathbb Z_{\ge1}).
+ \tag{WB.9}
+\]
+For completeness, central binomial coefficients give
+$\vartheta(y)=\sum_{p\le y}\log p\le y\log4$ by induction on
+$\lfloor y\rfloor$. At $2m$ use
+$\vartheta(2m)-\vartheta(m)\le\log\binom{2m}{m}\le2m\log2$;
+at $2m+1$ use
+$\vartheta(2m+1)-\vartheta(m+1)\le
+\log\binom{2m+1}{m}\le2m\log2$.
+The induction starts at $0,1,2$.
+Summing prime powers gives, for $y\ge1$,
+\[
+ \Psi(y)\le y\log4+2\sqrt y\log y
+ \le(\log4+4/e)y<3y;
+\]
+here $\log t/t\le1/e$ with $t=\sqrt y$. For the second bound use
+\[
+ \log(k!)=\sum_{r\le k}\Lambda(r)\lfloor k/r\rfloor,
+ \qquad k\log k-k\le\log(k!)\le k\log k.
+\]
+The two inequalities $k/r-1\le\lfloor k/r\rfloor\le k/r$ and
+the first part of (WB.9) give the result.
+
+There is an absolute $C_0>0$ such that, for $y,z\ge1$,
+\begin{align*}
+ |G(y)-G(z)|&\le C_0|y-z|,\\
+ |\mathcal G_\xi(y)-\mathcal G_\xi(z)|
+ &\le |y-z|\bigl(\log\max(y,z)+C_0+|\ell_\xi|\bigr)
+                 \quad(\xi\ne1),\\
+ |\mathcal G_\xi(x)|&\le x(\log x+C_0+|\ell_\xi|)
+                 \quad(x\ge1,\ \xi\ne1).
+ \tag{WB.10}
+\end{align*}
+Between consecutive integers, differentiate the finite sums. For $G$
+the derivative is $\sum_{r\le y}\Lambda(r)/r-\log y+\gamma$,
+bounded by (WB.9); replacing $\log\lfloor y\rfloor$ by $\log y$
+costs at most $\log2$. For a nontrivial character, bound the
+derivative termwise using (WB.9). Each ramp is continuous at the
+integers because the newly appearing term is zero there; integrate
+the derivative bounds interval by interval. The final estimate uses
+$\mathcal G_\xi(1)=\ell_\xi$. One may take $C_0=6+|\gamma|$.
+
+For every character, $a>0$ and $w,w'>0$, we also have the exact
+constant needed by the source:
+\[
+ \left|w\mathcal G_\xi(a/w)-w'\mathcal G_\xi(a/w')\right|
+ \le\frac{3a}{\min(w,w')}|w-w'|.
+ \tag{WB.11}
+\]
+For $\xi\ne1$, rewrite the left expression using
+\[
+ w\mathcal G_\xi(a/w)
+ =\sum_{r\ge1}\Lambda(r)v_\xi(r)(a/r-w)_++a\ell_\xi.
+\]
+The last term cancels; the positive-part function is $1$-Lipschitz,
+and (WB.9) bounds the remaining coefficient sum by
+$3a/\min(w,w')$. For the trivial character suppose $w\le w'$.
+The difference of the two uncentered ramp sums lies between $0$ and
+$3a(w'-w)/w$. The centering subtracts
+$a\log(w'/w)$, which lies between $0$ and $a(w'-w)/w$.
+The difference of these two nonnegative numbers has absolute value
+at most $3a(w'-w)/w$. Interchanging $w,w'$ proves (WB.11).
+% END WB3
+
+% BEGIN WB4
+\subsection{WB4. Subgroup averaging produces the scalar coefficient}
+
+Choose a subgroup $A_0\le A$, sets $T\subset A$ and
+$T_2\subset A_0$, and an integer $m\ge1$. Write
+\[
+ n_T=|T|>0,\quad n_2=|T_2|>0,\quad
+ d_2=n_2/n,\quad Q=n_Tmb,\quad
+ \mathcal B=\{\xi\in\widehat G:\xi(0,0,A_0)=1\}.
+\]
+Let $x\ge3$, $b,b',X'>0$ and $\eta,\theta\ge0$. Supply
+$a_t>0$ for $t\in T$ and positive weights
+$w_{u,j}(\rho)$ for $u\in A_0$, $1\le j\le m$, $\rho\in\Phi$,
+with
+\begin{gather*}
+ |a_t/b-x|\le1,\qquad b'X'\le xb,\\
+ b\le w_{u,j}(0,1,s+u)\le b+\eta+1\quad(s\in T_2),\\
+ w_{u,j}(\rho)\le2b'\quad
+       \bigl(\rho\notin\{(0,1,s+u):s\in T_2\}\bigr),\\
+ |\mathcal G_\xi(y)|\le y\theta
+       \quad(\xi\in\widehat G,\ y\ge X'/3),\\
+ 2f(x+1)\theta\le1/x,\qquad
+ 6f(x+1)(\eta+1)\le b/x.
+ \tag{WB.12}
+\end{gather*}
+The last two inequalities are precisely \texttt{CostWindows}.
+The bound for every $y\ge X'/3$ is the supplied
+\texttt{ThinScales}, not an estimate inferred from Fourier
+orthogonality. Choose a common finite cutoff $N$ for these weights.
+
+The one remaining arithmetic inequality at this point is
+\[
+ \sum_{t\in T}\sum_{j=1}^m
+   \bigl(\mathcal A(a_t,t,w_{u,j})
+                     -\Re\mathcal M(a_t,w_{u,j})\bigr)
+ \le E\qquad\text{for every }u\in A_0.
+ \tag{WB.13}\label{eq:wb-arithmetic-gap}
+\]
+It must hold for these exact data. It is not supplied by the following
+argument.
+
+Put $e_1(t)=(1,0,t)$ and define the ideal thick expression
+\[
+ \mathcal T_u(t,y)=\frac b f\sum_{s\in T_2}\sum_\xi
+             \xi(-e_1(s+u-t))\mathcal G_\xi(y).
+\]
+The preimage under $\rho_t$ of $(0,1,s+u)$ is
+$e_1(s+u-t)$. At such a thick point, (WB.11) bounds the change
+from $w\mathcal G_\xi(a_t/w)$ to
+$b\mathcal G_\xi(a_t/b)$ by $3(x+1)(\eta+1)$.
+At a thin point,
+\[
+ \frac{a_t}{w}\ge\frac{(x-1)b}{2b'}\ge X'/3
+\]
+because $x\ge3$ and $b'X'\le xb$. Thus its discarded term has
+absolute value at most $a_t\theta\le(x+1)b\theta$.
+There are $f$ outer points and $2f$ characters; after division by
+$f$, the total error is at most
+\[
+ 2f\{3(x+1)(\eta+1)+(x+1)b\theta\}\le2b/x.
+\]
+Use (WB.8) and sum over $t,j$ in (WB.13) to obtain
+\[
+ \sum_{t,j}\Re\mathcal T_u(t,a_t/b)\le E+2Q/x.
+ \tag{WB.14}
+\]
+Now average over $u\in A_0$. If $\xi\notin\mathcal B$ its
+subgroup sum vanishes. If $\xi\in\mathcal B$, the factors from
+$s$ and $u$ are one, leaving $\xi(e_1(t))$. Consequently
+\[
+ \frac1{|A_0|}\sum_u\mathcal T_u(t,y)
+ =\frac{bd_2}{2}\sum_{\xi\in\mathcal B}
+                         \xi(e_1(t))\mathcal G_\xi(y).
+ \tag{WB.15}
+\]
+Combining (WB.14)--(WB.15) proves the complete averaging inequality
+\[
+ \frac{mbd_2}{2}\sum_{t\in T}
+     \Re\sum_{\xi\in\mathcal B}\xi(e_1(t))
+                                     \mathcal G_\xi(a_t/b)
+ \le E+2Q/x.
+ \tag{WB.16}
+\]
+In particular the factor $d_2/2$ is forced by
+$f=2|A|$; there is no extra factor depending on $|A_0|$.
+% END WB4
+
+% BEGIN WB5
+\subsection{WB5. The biased set gives a fixed positive signal}
+
+Fix $\varepsilon>0$. Let $K\subset\mathcal B$ contain $1$, with $\xi(c_0)=1$ for
+$\xi\in K$. Let $0<c\le1$ and define
+\[
+ \omega_\xi=\begin{cases}1,&\xi(0,0,h)=1\text{ for all }h\in A,\\
+                         c,&\text{otherwise}.
+              \end{cases}
+\]
+Assume that $M,K_0,C_E\ge0$ are fixed independently of the growing
+host and that
+\begin{gather*}
+ |\mathcal B|\le M,\qquad
+ \left|\sum_{t\in T}\xi(0,0,t)-\omega_\xi n_T\right|
+       \le Mx^{-1+\varepsilon}n_T\quad(\xi\in K),\\
+ |\ell_\xi|\le K_0\quad(\xi\in K\setminus\{1\}),\qquad
+ |\ell_\xi|\le C_E\log x\quad(\xi\in\mathcal B\setminus K).
+ \tag{WB.17}
+\end{gather*}
+For characters trivial on $A$ the first error is exactly zero.
+Write
+\[
+ V(x)=\sum_{\xi\in K}\omega_\xi\Re\mathcal G_\xi(x)
+                    -\sum_{\xi\in\mathcal B\setminus K}
+                                      |\mathcal G_\xi(x)|.
+ \tag{WB.18}
+\]
+We claim that, for all sufficiently large $x$ with a threshold depending
+only on $M,K_0,C_E,\varepsilon$,
+\[
+ \frac1{n_T}\sum_{t\in T}\Re\sum_{\xi\in\mathcal B}
+       \xi(e_1(t))\mathcal G_\xi(a_t/b)
+ \ge V(x)-4x^{1/2+\varepsilon}.
+ \tag{WB.19}
+\]
+Here are all the error terms. Put $y_t=a_t/b$. The principal character
+costs at most $C_0$ by (WB.10). For a retained nonprincipal character,
+$\xi(e_1(t))=\xi(0,0,t)$, and the difference from
+$\omega_\xi n_T\mathcal G_\xi(x)$ is
+\[
+ \sum_t\xi(0,0,t)(\mathcal G_\xi(y_t)-\mathcal G_\xi(x))
+ +\left(\sum_t\xi(0,0,t)-\omega_\xi n_T\right)
+                                                   \mathcal G_\xi(x).
+\]
+After division by $n_T$ its norm is at most
+\[
+ \log(x+1)+C_0+K_0
+       +Mx^\varepsilon(\log x+C_0+K_0).
+\]
+For an omitted character, use absolute values; its lower bound is
+$-|\mathcal G_\xi(x)|-\log(x+1)-C_0-C_E\log x$.
+Thus the total loss is bounded by $MR(x)$, where $R$ is the maximum
+of these three displayed bounds. Since all their coefficients are
+fixed,
+\[
+ \frac{MR(x)}{x^{1/2+\varepsilon}}\longrightarrow0.
+\]
+This proves (WB.19), including uniformity in $n$, $|A_0|$, the prime
+pair, $m$, the individual weights, and the number of all characters
+of $G$. Only the bounded quotient family $\mathcal B$ is counted.
+
+The actual biased-set hypothesis supplies the Fourier estimate rather
+than assuming it separately. Let $[A:A_0]=o$ and
+$c=(3o+1)^{-1}$. If for every coset $r+A_0$
+\[
+ \left|\#(T\cap(r+A_0))-
+       \frac{3+\mathbf1_{r\in A_0}}{3o+1}\,n_T\right|
+       \le x^{-1+\varepsilon}n_T,
+ \tag{WB.20}
+\]
+then every nontrivial character of $A/A_0$ has sum over $T$ within
+$ox^{-1+\varepsilon}n_T$ of $cn_T$: the constant part vanishes
+by orthogonality and the distinguished coset contributes $cn_T$.
+The triangle inequality bounds the $o$ errors. The quotient
+$G/(0,0,A_0)$ has order $4o$, so
+$|\mathcal B|=4o$. Taking $M=4o$ proves (WB.17). This is the
+mathematical reason for the source's particular $3:4$ bias.
+% END WB5
+
+% BEGIN WB6
+\subsection{WB6. Closing the scalar and primitive-character joins}
+
+Combining (WB.16) and (WB.19) gives
+\[
+ \frac{Qd_2}{2}\bigl(V(x)-4x^{1/2+\varepsilon}\bigr)
+                   \le E+2Q/x.
+ \tag{WB.21}
+\]
+Assume now the exact scalar sizes from SC1:
+\begin{gather*}
+ \frac{n_T}{n}\ge\tfrac12x^{-\varepsilon/8},\qquad
+ x^{-\varepsilon}\le d_2\le1,\\
+ x^{1/2-\varepsilon}\le m\le x^{1/2+\varepsilon/2},\qquad
+ xm\le k\le n^2x^{1/2-\varepsilon},\qquad
+ 0\le a_E\le2xb,
+\end{gather*}
+and put
+\[
+ B=n_Ta_E(1+m^2/k)
+       +m\left(2nmbx^\varepsilon+
+                \frac{n_2kbx^\varepsilon}{n(nx^{-\varepsilon})}\right).
+ \tag{WB.22}
+\]
+For some fixed $C\ge0$, the remaining gap bound must give
+$E\le x^{C\varepsilon}B$. The complete proof of SC1 applied
+to (WB.21) gives, once $26\le x^{3\varepsilon/8}$,
+\[
+                    V(x)\le x^{1/2+(C+3)\varepsilon}.
+ \tag{WB.23}
+\]
+The elementary proof can be read without a dependency search: divide
+$B$ by $Q$. Its four terms are at most $2Z,2Z,4Z,2Z$, respectively,
+where $Z=x^{1/2+13\varepsilon/8}$. Divide (WB.21) by $Q/2$,
+use $d_2\ge x^{-\varepsilon}$, and obtain
+$V\le26x^{1/2+(C+21/8)\varepsilon}$. Absorb $26$ as stated.
+
+For the fixed primitive target $\psi$ of order $o$, retain exactly
+the primitive inducers of its powers, read via (WB.3). Require this
+reading to be onto that fixed family. Its injectivity follows from
+(WB.4). The source's cyclic level has \texttt{psK=none}; its
+\texttt{EAtH.ps} clause excludes the auxiliary character
+$\chi_q(a,b,h)=(-1)^b$ from $K$.
+Any character trivial on $A$ and taking value $1$ at $c_0$ is
+either $1$ or $\chi_q$. Thus only the trivial character in $K$ has
+weight $1$, and all other retained characters have weight $c$.
+Consequently the retained term in (WB.18) is exactly
+\[
+ H_\psi(x)=G(x)+\frac1{3o+1}
+       \sum_{\substack{\chi\text{ primitive inducer of }\psi^j\\\chi\ne1}}
+                                             \Re G_\chi(x).
+ \tag{WB.24}
+\]
+This equality uses the actual primitive values and the actual linear
+terms at $1$. A mere equality of the number of characters would not
+suffice. A general source level can retain $\chi_q$ with weight
+$1$ through its \texttt{psK} field; no such extra term occurs for
+the cyclic levels used here.
+
+If every omitted member of $\mathcal B$ obeys the supplied estimate
+$|\mathcal G_\xi(x)|\le x^{1/2+\varepsilon}$, then
+\[
+ \Sigma(x):=\sum_{\mathcal B\setminus K}|\mathcal G_\xi(x)|
+                  \le4o\,x^{1/2+\varepsilon}.
+\]
+The pointwise conclusion is therefore
+\[
+ \boxed{\ H_\psi(x)\le x^{1/2+(C+4)\varepsilon}\ }
+ \quad\text{when }x^\varepsilon\ge1+4o.
+ \tag{WB.25}
+\]
+In the source $C=e_D+e_L+3\ge0$, giving exactly
+$1/2+(e_D+e_L+7)\varepsilon$. All thresholds used to reach
+(WB.25) depend on fixed target constants and $\varepsilon$, before
+the varying host and its data are considered.
+% END WB6
+
+% BEGIN WB7
+\subsection{WB7. The complete input contract at the arithmetic boundary}
+
+The preceding implication has the following explicit contract. For
+each fixed primitive target and each sufficiently small
+$\varepsilon>0$, supply arbitrarily late windows
+$[Y,Y^{3/2}]$. For every $x$ in one such window, supply
+\emph{one common datum} satisfying all of the following:
+\begin{enumerate}
+\item An onto reciprocity reading, its actual inertia and Frobenius,
+the split/ramified conditions (WB.6), and the actual values
+$\ell_\xi=L'/L(1,\xi^*)$.
+\item A subgroup of fixed index $o$, the fixed primitive-power
+retained family, its auxiliary-character exclusion, the biased
+counts (WB.20), and fixed bounds $K_0,C_E$ in (WB.17).
+\item The same $T,T_2,a_t,w_{u,j},m,b,b',X',\eta,\theta,N$
+satisfying (WB.12), together with the omitted-ramp estimates in WB6.
+\item The scalar size inequalities of WB6 and the actual arithmetic
+gap (\ref{eq:wb-arithmetic-gap}) with
+$E\le x^{C\varepsilon}B$, for a fixed $C\ge0$.
+\end{enumerate}
+Here $C$ is chosen before $\varepsilon$. Bounds such as $K_0,C_E$
+may be chosen for the fixed target (or even for a fixed
+$\varepsilon$), but must be uniform as the windows move to infinity.
+The common datum may depend on $x$; the target family and $C$ may not.
+
+Every implication from this contract to (WB.25) is proved in
+WB1--WB6. There are no remaining character-orthogonality,
+ramified-value, moving-cutoff, or scalar-comparison inputs in this
+part of the chain. The unproved task is to construct this contract
+from the arithmetic geometry on the same maps and fields.
+
+For precise navigation, the source packages items 1--3 in
+\texttt{HostAx}, \texttt{EAtH}, the reading part of
+\texttt{CoreAtH}, \texttt{SizesA}, \texttt{ThinScales}, and
+\texttt{CostWindows}. Item 4 is the conclusion of \texttt{ch\_top}
+and the remaining fields of \texttt{CoreAtH}. Its gap is obtained
+there from the eleven-field \texttt{SizeData2} package, uniform
+error windows, and the two bounds on $B_0,N_c$. Those are not proved
+merely by unpacking \texttt{CoreAtH}.
+
+The algebraic part of that last source join is short and worth
+recording. \texttt{IdentU} supplies the exact bijections from the
+original top indices to $T$ and from the place indices to $\Phi$,
+the equalities of $a,w,\gamma$, the equality
+$\mathrm{LpL}=\Re\ell_{\chi_d}$, and the equality of the asked
+sums. Substitution into the definition of the ledger main term gives
+\[
+ \mathrm{Main}(u)=\sum_{t,j}\Re\mathcal M(a_t,w_{\mathrm{tr}(u),j}),
+ \qquad
+ \mathrm{ASK}(u)-\mathrm{Main}(u)
+    =\operatorname{gap}(\mathrm{tr}(u)).
+ \tag{WB.26}
+\]
+The source's coverage clause $A_0\subset\mathrm{range}(\mathrm{tr})$
+then transfers its bound to every $u\in A_0$ needed in (WB.13).
+The $B_0,N_c$ inequalities replace its error bracket by (WB.22),
+termwise and with nonnegative coefficients. Finally
+$e_{\rm Div}\le e_D$, $e_{\rm Loss}\le e_L$ bound its error
+exponent by $C=e_D+e_L+3$. These are exact substitutions on one
+supplied ledger. The independent divisibility, metric, dimension,
+theta-norm, and spectral estimates that establish that ledger are
+still the arithmetic frontier.
+% END WB7
+
+% BEGIN WB8
+\subsection{WB8. A closed terminal theorem with the quantifiers visible}
+
+\begin{theorem}[Arithmetic contract implies the fixed target's zero-free half-plane]
+Fix a primitive Dirichlet character $\psi$. Suppose there exist
+$C\ge0$ and $\varepsilon_0>0$ such that for every
+$0<\varepsilon<\varepsilon_0$, the contract in WB7 can be supplied
+on arbitrarily late windows $[Y,Y^{3/2}]$. Then every primitive
+inducer of a power of $\psi$ has no zero in $\Re s>1/2$,
+away from the principal pole. If the contract is available for every
+primitive $\psi$, RH and GRH for all Dirichlet $L$-functions follow.
+\end{theorem}
+
+\begin{proof}
+Choose $0<\delta<1/2$ and then
+\[
+ 0<\varepsilon<\min\{\varepsilon_0,\delta/(C+4)\}.
+\]
+All the pointwise thresholds in WB3--WB6 are now fixed. Choose one
+of the contract's windows whose left endpoint exceeds them and any
+prescribed $Y_0$. Equation (WB.25) holds at \emph{every} real $x$
+in this window and gives $H_\psi(x)\le x^{1/2+\delta}$.
+The positive-family one-sided criterion AN3 now rules out any
+constituent zero with real part greater than $1/2+\delta$.
+Given a proposed zero with real part $\beta>1/2$, choose
+$0<\delta<\min\{1/2,\beta-1/2\}$; this is a contradiction. Positivity of
+all coefficients in (WB.24), including the residue at a possible
+real zero, is the point that allows a one-sided upper bound.
+
+For an arbitrary character induced by primitive $\chi^*$,
+\[
+ L(s,\chi)=L(s,\chi^*)
+       \prod_{\substack{p\mid N\\p\nmid\mathrm{cond}(\chi^*)}}
+                       (1-\chi^*(p)p^{-s}).
+\]
+Every additional factor is nonzero for $\Re s>0$. The primitive
+functional equation maps a zero left of $1/2$ in the open critical
+strip to a zero right of $1/2$ of the conjugate character; its gamma,
+conductor, and root-number factors are nonzero there. This proves
+the all-character strip statement. The ordinary target $\psi=1$
+has $o=1$ and $H_\psi=G$, giving RH by AN2, including its standard
+functional-equation treatment outside the open strip. At $s=1$,
+nonprincipal characters use their classical nonvanishing theorem;
+the principal pole is excluded as in the exported statement.
+\end{proof}
+
+The retained analytic leaves are exactly those stated in AN2--AN3
+and GH6: ordinary analytic continuation, the functional equations,
+Euler products and classical nonvanishing on $\Re s=1$, together
+with elementary complex analysis. This theorem adds no cohomology
+or representation hypothesis beyond WB7's explicitly open
+arithmetic contract.
+
+The source's \texttt{tiedWin\_of\_ex} supplies the matching
+quantifier rule: first choose the common bounds demanded by all
+links, and only then use a family-existence theorem valid for
+\emph{every} such bound. The dependency audit below spells this out.
+On the literal \texttt{ShapeWin}\,$\to$\,\texttt{topDesWin}
+route the chosen values are $e_D=2,e_L=0$, so its conditional
+terminal exponent is $1/2+9\varepsilon$. This is an identification
+of the constants in that route, not a new construction of its
+required simultaneous family.
+% END WB8

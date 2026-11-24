@@ -1,0 +1,144 @@
+NEXT SOURCE HANDOFF AFTER AOS1--AOS18
+Version 0.54; source pin 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+Status and notation
+
+The human chapter is frozen at main SHA-256
+9b2ff7d9a81e7a29ee059086aa53bd6b1c69f5767a79d9d19e1ecd3374a06b40.
+It supplies full original PlaceJac, universal GaugeDens, GaugeVolU,
+HinfCompact, PushInf, ConstTest, ExInf, HtotInf, WeilInf, AinfValue and
+AprimeInf. Do not reconstruct those producers or replace their original
+measures in the next packet. This handoff proposes further work; it makes
+no new mathematical closure claim.
+
+Paths below are relative to the pinned repository. Write
+S = src/Formalism/LocalToGlobal/SiegelLatticeTheory/,
+N = S/CokernelGLCounts/RankPointCounts/DualFamilyCounting/,
+J = S/ClosedLocalOrbits/GaugeLatticeShifts/,
+P = src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/.
+
+1. Immediate analytic consumer: RealBracket on the same setting
+
+N/NcReal.lean:35--46 is the exact RealBracket contract. Its left side
+contains the actual DisintegrationConstant, old stabilizer mass and both
+specified unipotent fundamental-domain masses. Its right side contains
+the same a-prime from AinfClause, the factor
+  2^(k d) (pi^k/(k-1)!)^d Tw(u)^(-k d)
+and |disc F|^eDF(k,r), where
+  eDF(k,r)=-(8r^3+6r^2+6kr^2+r)/3.
+AOS18 supplies the exact a-prime, and AOS5 supplies the universal gauge
+antecedent. These results do not identify the other factors.
+
+The concrete join is N/NcRealPf.lean:159--217, realBracket_of. It still
+requires ProdExact and PlaceSplit. PlaceData and PlaceSplit are defined
+there at 124--142. PlaceData chooses four families of local measures,
+their positive mass/density scalars, and cN,cN-prime, simultaneously. It
+requires their products to be the actual X.muN(u), X.muN(u-prime),
+X.muH(u), X.muH(u-prime); its local DisintLoc coefficient is exactly
+  gaugeU_v volU(k)^2 /
+  ((Tw(u)Tw(u-prime))^k volU(k-1) a_v a-prime_v kappa_v kappa-prime_v).
+It also requires cN*cN-prime = |disc F|^eDF. This is stronger than an
+existence assertion for unrelated local Haar measures.
+
+Two independent bounded cards feed that join.
+
+Card R1: the reference unipotent covolume. Target the entire CovolRef
+at N/NcRealXPS.lean:169--174. Read its producer
+N/NcRealXCR.lean:35--87, especially covol_refN and covolRef_of_steps.
+The latter joins the actual CoordCovol and RefNBox, not an arbitrary
+lattice-volume formula. RefNBox is defined at 15--19 and its producer
+is N/RefNBoxOf.lean. The arithmetic coordinate branch enters through
+N/CovolNOfSteps.lean:43 onward (CoordCovol),
+S/CokernelGLCounts/RankPointCounts/CoordCovolOf.lean,
+N/CovolBR.lean:15 onward (RowBlockCovol), N/CovolBRb.lean
+(trace-determinant transfer) and N/CovolBRc.lean:9--13 (final assembly).
+The full assembly is S/ClosedVolumeStatements/RealBracketOfRowBlock.lean:
+15--37. Source declarations labelled outright are pointers to producer
+proofs, not evidence that their human arguments are already complete.
+Acceptance: derive the exact discriminant exponent for every original
+IsSFund set, all original words and the actual coordinate lattice; do
+not assume its covolume as a new normalization. This is a good bounded
+arithmetic/measure card independent of the next local Jacobian card.
+
+Card R2: JacGauge, then full PlaceSplit and ProdExact. The exact broad
+JacGauge is J/JacConst.lean:60--67. It allows all original k>=1, r,
+z,z-prime, gauge measure, compact-stabilizer Haar normalizations and
+section measure, with its prescribed jacConst. The current source
+join J/BruhatHaarProved.lean:9 still takes WB.RhsWLim; its definition
+is J/JacConstWbB.lean:59 onward. Reading JacConstFinal.lean alone
+would hide that actual limiting-integral supplier behind a Fact.
+The subsequent placeStep is N/NcRealXPlace.lean:38 onward and
+placeSplit_of is N/NcRealXPS.lean:176--263. The latter distributes the
+single global Haar scalar at one real place before assembling the
+product families. Preserve that construction or prove a compatible
+replacement; independent normalizations at every place do not suffice.
+Finally ProdExact is N/NcRealPf.lean:99--107, with producer
+J/ProdExactHolds.lean:26--164. It treats arbitrary supplied sigma-finite
+factor measures whose products are the actual measures, not just the
+canonical factors used during the proof. Acceptance is the full
+original all-section local disintegration and exact product transfer.
+
+2. Highest-value parallel volume card: full VolStabFromSWS and InVolumesAt
+
+This can start from GMR now; it need not wait for R1/R2 or a new Forms0
+producer. Target P/StabilizerVolume/VolStabFromSWS.lean and
+VolStabFromSWOf.lean:12--45. Retain exactly the original SWa1 and
+StabilizerFirstChernCompatibility premises, or obtain them from the
+same upstream SiegelWeilUnitaryConvergent premise already recorded
+by GMR19. Do not substitute a new axiom asserting the desired volume
+comparison. The target VolStabW is N/NcWeil.lean:40--43: every
+nondegenerate Hermitian space, every 1<=a with 2a<M, every rational
+nondegenerate tuple and the full VolStabAt witness order.
+
+GMR already supplies self-dual/fiber existence and uniqueness, positive
+good-place products, global IsOmT and compatible stabilizer Haar
+measures. The substantive remaining proof is to identify the exact
+Siegel-Weil density with integration against that same IsOmT measure,
+unfold the rational tuple orbit, and use a positive finite admissible
+test to cancel. The source bodies are
+P/StabilizerVolume/SWeqOm.lean:45--72,
+UnfoldFin.lean:11--12 together with UnfoldMain.lean and its concrete
+orbit/finiteness imports, and PosTest.lean:32--76 together with the
+TestNear producer in PosNear.lean. Inspect those producer
+bodies before assigning subclaims. The existence of a stabilizer
+fundamental domain must be justified; its finite mass must be derived
+at the correct stage, rather than assumed while proving the equality.
+VolStabFromSWOf.lean:22--45 shows the essential scalar cancellation:
+one common nonnegative admissible test has nonzero IsOmT integral,
+the normalized theta mean and unfolding use that same integral, and
+the resulting ratio of the two finite quotient masses is one.
+
+Acceptance: full VolStabAt for every allowed character, ambient Haar,
+IsOmT measure, compatible stabilizer Haar and both fundamental-domain
+witnesses. The common character and measures may not be silently
+reselected between theta-density identification and unfolding.
+
+The immediate actual-setting consumer is
+S/CokernelGLCounts/MassDataInst.lean:257--287, InVolumesAt. The join
+P/CovolumeFrames/InVolumesAtOfSWW.lean:23--49 proves
+covol_eq_covolBy_w; 65--87 applies it to both word frames and the
+supplied auxiliary X0. P/StabilizerVolume/InVolumesAtOfSWS.lean:
+13--25 packages the exact original SWXS premise and this join.
+Keep the supplied X0 of length 2r+2, its own Hermitian and determinant
+witnesses, both word frames, one psi and every compatible measure.
+The explicit rank bound stepSizeW at 51--56 puts all three tuples
+inside the original convergence range. The final InVolumesAt join
+also retains the two actual unipotent volume equalities it receives.
+
+3. Common data and review gate
+
+Fix the rescaled X, bridge hb and GMR19 character once. Reuse the
+original infinity Haar measures and the particular FdN,FdN-prime at
+each consumer. AOS supplies a calculated scalar, not a license to
+renormalize X.muH or X.muN. Retain all original auxiliary tuple and
+fundamental-domain quantifiers in the volume route.
+
+Review the exact consumer before proof expansion; then independently
+check each determinant, power of two, compact volume and discriminant
+exponent. Integration should record a completed named producer and
+the exact downstream premises it eliminates, not merely additional
+claim numbers. A packet stopping before JacGauge, CovolRef or the
+volume cancellation must state its remaining original supplier by
+name. None of these cards alone proves ambient Forms0, the original
+all-family Transport/LevelMatch, Bessel uniqueness, CountIdempotentsClass
+or a whole global RH/GRH obligation.

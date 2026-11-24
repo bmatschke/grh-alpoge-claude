@@ -1,0 +1,2685 @@
+[GUA_SRC_TARGET] Gd/WDT/CmpT/ParAtT/LocGlobT/HasHTAt and the complete GalUnitaryT
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/GalUnitaryT.lean#L18-L93
+def Gd (y : WD h) : Prop := UpperTheory.GalStar.Tor y ∧ y.mono0
+
+def WDT (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL (Fin n) (Qbar l)) (y : WD h) : Prop := ∃ x : WD h, IsWDOf ι r x ∧ (Gd y → x = y)
+
+variable {ι : Qbar l ≃+* ℂ} {r : G E Ω →* GL (Fin n) (Qbar l)} {y : WD h}
+
+theorem WDT.of_isWDOf (k : IsWDOf ι r y) : WDT ι r y := ⟨y, k, fun _ => rfl⟩
+theorem WDT.isWDOf (k : WDT ι r y) (g : Gd y) : IsWDOf ι r y := by
+  obtain ⟨x, hx, k⟩ := k
+  exact k g ▸ hx
+theorem WDT.of_conj (k : WDT ι r y) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) {r' : G E Ω →* GL (Fin n) (Qbar l)}
+    (P : GL (Fin n) (Qbar l)) (hP : ∀ g : ↥(Weil h), P * r g = r' g * P) : WDT ι r' y := by
+  obtain ⟨x, hx, k⟩ := k
+  exact ⟨x, hx.of_conj hl P hP, k⟩
+
+variable (ι r y) in
+
+def CmpT : Prop :=
+  (((l : ℕ) : 𝓞 E) ∉ w.asIdeal → WDT ι r y) ∧
+    ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l E Ω (Dec (F := E) A) O) (hj : Induces Bw),
+      Gd y → IsPstAt (Loc.PP l) Bw (r.comp (Dec (F := E) A).subtype) ∧
+        wdAt (Loc.PP l) ι Bw h hj (r.comp (Dec (F := E) A).subtype) = y
+end Local
+
+variable {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] {l : ℕ} [Fact l.Prime] {n : ℕ}
+
+def ParAtT {n : ℕ} (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l)) (w : HeightOneSpectrum (𝓞 F)) (p : Gu.Par Ω w) : Prop :=
+  ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion F) → WD h), IsRecT h rc → CmpT ι r (p A h rc)
+
+def LocGlobT (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l)) (w : HeightOneSpectrum (𝓞 F))
+    (σ : SmIrr (GL (Fin n) (w.adicCompletion F))) : Prop :=
+  ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion F) → WD h), IsRecT h rc →
+    CmpT ι r (rc (algNorm σ))
+
+omit [IsAlgClosure F Ω] in
+
+def HasHTAt (r : G F Ω →* GL (Fin n) (Qbar l)) (HT : (F →+* Qbar l) → Multiset ℤ) (w : HeightOneSpectrum (𝓞 F)) : Prop :=
+  ∀ A : ValuationSubring Ω, IsPlaceOver A w →
+    ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l F Ω (Dec (F := F) A) O), Induces Bw →
+      IsdRAt (Loc.PP l) Bw (r.comp (Dec (F := F) A).subtype) ∧
+      ∀ (τ : F →+* Qbar l) (LL' : FinExt l) (τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥LL'.1), IsInduced Bw τ τ' →
+        IsJumpsAt (Loc.PP l) Bw (r.comp (Dec (F := F) A).subtype) τ (HT τ)
+
+omit [IsAlgClosure F Ω] in
+theorem hasHT_iff {r : G F Ω →* GL (Fin n) (Qbar l)} {HT : (F →+* Qbar l) → Multiset ℤ} :
+    HasHT r HT ↔ ∀ w, HasHTAt r HT w := Iff.rfl
+
+def CompatT : Prop :=
+  ∀ (F Ω : Type) [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω] (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (n : ℕ), 1 ≤ n → ∀ (r : G F Ω →* GL (Fin n) (Qbar l)) (π : CuspSub F n), Continuous r →
+    (CG.mk π).IsRegAlg → (∃ χ, GlobalTheory.ContraPair.PolarizedPair π χ) → AttC ι r π →
+    ∃ HT : (F →+* Qbar l) → Multiset ℤ, (∀ τ : F →+* Qbar l, (HT τ).map (fun k : ℤ => (k : ℂ)) =
+        ((CG.mk π).infChar (ι.toRingHom.comp τ)).map fun z => ((n : ℂ) - 1) / 2 - z) ∧
+      ∀ w σ, π.IsLocComp w σ → LocGlobT ι r w σ ∧
+        (GlobalTheory.RoadU.PlainTor (IrrGL.of σ.ρ σ.smooth σ.irred) → HasHTAt r HT w)
+
+def GalUnitaryT : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω],
+    (∀ w : HeightOneSpectrum (𝓞 E), Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield E)) w.asIdeal) →
+    ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ), 1 ≤ n → ∀ σ : Submodule ℂ (UA E n → ℂ), IsAutRepU σ →
+      ∃ (r : G E Ω →* GL (Fin n) (Qbar l)) (HT : (E →+* Qbar l) → Multiset ℤ), Continuous r ∧ IsSSRep r ∧
+        (∀ w : HeightOneSpectrum (𝓞 E), ((l : ℕ) : 𝓞 E) ∉ w.asIdeal → IsUnramU σ w →
+          ∀ A : ValuationSubring Ω, IsPlaceOver A w → ∀ s ∈ Ine (F := E) A, r s = 1) ∧
+        (∀ (τ : E →+* Qbar l) lam, HasWeightAt σ (ι.toRingHom.comp τ) lam →
+          (HT τ).map (fun k : ℤ => (k : ℂ)) = (infOfWeight lam).map fun z => ((n : ℂ) - 1) / 2 - z) ∧
+        (∀ w, IsSplitAt w → ∀ τ : SmIrr (GL (Fin n) (w.adicCompletion E)),
+          IsCompAlong σ (locU n w) ((cLoc w).comp (locU n w).subtype) τ.ρ → LocGlobT ι r w τ ∧
+            (GlobalTheory.RoadU.PlainTor (IrrGL.of τ.ρ τ.smooth τ.irred) → HasHTAt r HT w)) ∧
+        (∀ c : G (maximalRealSubfield E) Ω, IsConjEl c → ∃ P, IsPairing c r (cycBar E Ω l ^ (1 - (n : ℤ))) P) ∧
+        (IsIrr r → ∃ π : CuspSub E n, (CG.mk π).IsRegAlg ∧ GlobalTheory.ContraPair.DualIsConj π ∧ AttC ι r π ∧
+          (∀ φ lam, HasWeightAt σ φ lam → π.HasInfChar φ (infOfWeight lam)) ∧
+          (∀ w, IsUnramU σ w → ∃ B, (CG.mk π).HasSat w B) ∧
+          ∀ w, IsSplitAt w → ∀ τ : SmIrr (GL (Fin n) (w.adicCompletion E)), π.IsLocComp w τ →
+            IsCompAlong σ (locU n w) ((cLoc w).comp (locU n w).subtype) τ.ρ)
+
+def CompatTOf : Prop := RowT → PlainRec → CompatT
+
+
+[GUA_SRC_INTERFACES] CompatG, GdLaws, PlainGd, SumHTAt, SumTwoG, SumFamG, PolG, HalfG, ProdT, SpehT, RecTotT, FrobTotT, IrrCaseT
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/UnitaryGaloisFamilies/IrrCaseT.lean#L19-L125
+  cont : Continuous r
+  ss : IsSSRep r
+  ht : ∀ w, (∀ A h rc, IsRecT h rc → Gd (p w A h rc)) → HasHTAt r HT w
+  par : ∀ w, ParAtT ι r w (p w)
+
+def GdLaws : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω)
+    (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w),
+    (∀ x y : WD h, Gd (x.lpSum y) ↔ Gd x ∧ Gd y) ∧ (∀ (x : WD h) (t : ℝ), Gd (x.lpTw t) ↔ Gd x) ∧
+      (∀ L : List (WD h), Gd (sumList L) ↔ ∀ x ∈ L, Gd x) ∧ ∀ x : WD h, x.unr → Gd x
+
+def PlainGd : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω)
+    (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion E) → WD h), IsRecT h rc →
+    ∀ (n : ℕ) (τ : SmIrr (GL (Fin n) (w.adicCompletion E))), GlobalTheory.RoadU.PlainTor (cl τ) → Gd (rc (algNorm τ))
+
+def SumHTAt : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (a b : ℕ) (r : G E Ω →* GL (Fin a) (Qbar l)) (r' : G E Ω →* GL (Fin b) (Qbar l)), Continuous r → Continuous r' →
+    ∀ HT HT' w, HasHTAt r HT w → HasHTAt r' HT' w → HasHTAt (Formalism.MainNotions.SumRepresentations.At.sumRep r r') (fun τ => HT τ + HT' τ) w
+
+def SumTwoG : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (a b : ℕ) (r : G E Ω →* GL (Fin a) (Qbar l)) (r' : G E Ω →* GL (Fin b) (Qbar l)) p p' HT HT',
+    CompatG ι r p HT → CompatG ι r' p' HT' →
+      CompatG ι (Formalism.MainNotions.SumRepresentations.At.sumRep r r') (fun w A h rc => (p w A h rc).lpSum (p' w A h rc)) fun τ => HT τ + HT' τ
+
+def SumFamG : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (c : ℕ), 1 ≤ c → ∀ (N : Fin c → ℕ), (∀ i, 1 ≤ N i) → ∀ (n : ℕ), ∑ i, N i = n →
+    ∀ (r : ∀ i, G E Ω →* GL (Fin (N i)) (Qbar l)) (p : Fin c → ∀ w : HeightOneSpectrum (𝓞 E), Par Ω w)
+      (HT : Fin c → (E →+* Qbar l) → Multiset ℤ), (∀ i, CompatG ι (r i) (p i) (HT i)) →
+      ∃ R : G E Ω →* GL (Fin n) (Qbar l),
+        CompatG ι R (fun w A h rc => sumList (List.ofFn fun i => p i w A h rc)) (fun τ => ∑ i, HT i τ) ∧
+        (IsIrr R → c = 1 ∧ ∀ i, IsIrr (r i))
+
+def PolG : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (a : ℕ), 1 ≤ a → ∀ (P : CuspSub E a) (χ : HChar (maximalRealSubfield E)),
+    (CG.mk P).IsRegAlg → IsPolarized P χ →
+    ∀ σ : ∀ w : HeightOneSpectrum (𝓞 E), SmIrr (GL (Fin a) (w.adicCompletion E)), (∀ w, P.IsLocComp w (σ w)) →
+      ∃ (r : G E Ω →* GL (Fin a) (Qbar l)) (HT : (E →+* Qbar l) → Multiset ℤ),
+        CompatG ι r (fun w _ _ rc => rc (algNorm (σ w))) HT ∧
+        ∀ τ : E →+* Qbar l, (HT τ).map (fun k : ℤ => (k : ℂ)) =
+          ((CG.mk P).infChar (ι.toRingHom.comp τ)).map fun z => ((a : ℂ) - 1) / 2 - z
+
+def HalfG : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (a : ℕ), 1 ≤ a → ∀ (P : CuspSub E a), P.IsCsd →
+    ∀ (ρ : ∀ w : HeightOneSpectrum (𝓞 E), SmIrr (GL (Fin a) (w.adicCompletion E))), (∀ w, P.IsLocComp w (ρ w)) →
+    ∀ (m : (E →+* ℂ) → Multiset ℂ), (∀ τ, P.HasInfChar τ (m τ)) → ∀ e : ℤ,
+      (∀ τ, (m τ).Nodup ∧ ∀ z ∈ m τ, ∃ j : ℤ, z + (e : ℂ) / 2 = j) →
+      ∃ (r : G E Ω →* GL (Fin a) (Qbar l)) (HT : (E →+* Qbar l) → Multiset ℤ),
+        CompatG ι r (fun w _ _ rc => (rc (cl (ρ w))).lpTw ((e : ℝ) / 2)) HT ∧
+        ∀ τ : E →+* Qbar l, (HT τ).map (fun k : ℤ => (k : ℂ)) = (m (ι.toRingHom.comp τ)).map fun z => -(z + (e : ℂ) / 2)
+
+def ProdT : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (n c : ℕ) (N : Fin c → ℕ) (hn : ∑ i, N i = n) (w : HeightOneSpectrum (𝓞 E))
+    (σ : ∀ i, SmIrr (GL (Fin (N i)) (w.adicCompletion E))), (∀ i, GlobalTheory.SmGL.IsUnitarisable (σ i).ρ) →
+    ∀ τ : SmIrr (GL (Fin n) (w.adicCompletion E)), Nonempty (τ.ρ.Equiv (locProd hn w σ)) →
+    ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion E) → WD h), IsRecT h rc →
+      rc (cl τ) = sumList (List.ofFn fun i => rc (cl (σ i)))
+
+def SpehT : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsTotallyComplex E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (a d : ℕ) (P : CuspSub E a) (w : HeightOneSpectrum (𝓞 E)) (ρ : SmIrr (GL (Fin a) (w.adicCompletion E)))
+    (σ : SmIrr (GL (Fin (d * a)) (w.adicCompletion E))), 1 ≤ a → 1 ≤ d → P.IsLocComp w ρ →
+    GlobalTheory.SmGL.IsUnitarisable ρ.ρ → IsSpeh (cl ρ) d σ.ρ →
+    ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion E) → WD h), IsRecT h rc →
+      rc (cl σ) = sumList ((List.range d).map fun k : ℕ => (rc (cl ρ)).lpTw (((d : ℝ) - 1) / 2 - k))
+
+def RecTotT : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsTotallyComplex E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (n c : ℕ) (a d : Fin c → ℕ) (hn : ∑ i, d i * a i = n) (P : ∀ i, CuspSub E (a i)) (w : HeightOneSpectrum (𝓞 E))
+    (ρ : ∀ i, SmIrr (GL (Fin (a i)) (w.adicCompletion E))) (σ : ∀ i, SmIrr (GL (Fin (d i * a i)) (w.adicCompletion E))),
+    (∀ i, 1 ≤ a i ∧ 1 ≤ d i) → (∀ i, (P i).IsLocComp w (ρ i)) →
+    (∀ i, GlobalTheory.SmGL.IsUnitarisable (ρ i).ρ ∧ GlobalTheory.SmGL.IsUnitarisable (σ i).ρ ∧ IsSpeh (cl (ρ i)) (d i) (σ i).ρ) →
+    ∀ τ : SmIrr (GL (Fin n) (w.adicCompletion E)), Nonempty (τ.ρ.Equiv (locProd hn w σ)) →
+    ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion E) → WD h), IsRecT h rc →
+      totPar n d ρ A h rc = rc (algNorm τ)
+
+def FrobTotT : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (n c : ℕ) (a d : Fin c → ℕ) (r : G E Ω →* GL (Fin n) (Qbar l)), Continuous r →
+    ∀ (w : HeightOneSpectrum (𝓞 E)), ((l : ℕ) : 𝓞 E) ∉ w.asIdeal →
+    ∀ (ρ : ∀ i, SmIrr (GL (Fin (a i)) (w.adicCompletion E))) (S : Fin c → Multiset ℂˣ), (∀ i, GlobalTheory.LFun.HasSatGL w (ρ i).ρ (S i)) →
+      ParAtT ι r w (totPar n d ρ) → FrobEig ι r w (algSat n (normV w) (satTot w d S))
+
+def IrrCaseT : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (n : ℕ), 1 ≤ n → ∀ (π : Submodule ℂ (UA E n → ℂ)), IsAutRepU π →
+    ∀ (c : ℕ) (a d : Fin c → ℕ) (hn : ∑ i, d i * a i = n) (P : ∀ i, CuspSub E (a i))
+      (ρ : ∀ i (w : HeightOneSpectrum (𝓞 E)), SmIrr (GL (Fin (a i)) (w.adicCompletion E))) (m : Fin c → (E →+* ℂ) → Multiset ℂ)
+      (σ : ∀ i (w : HeightOneSpectrum (𝓞 E)), SmIrr (GL (Fin (d i * a i)) (w.adicCompletion E))),
+      GlobalTheory.BcSpeh.Parts π a d hn P ρ m → (∀ i w, IsSpeh (cl (ρ i w)) (d i) (σ i w).ρ) →
+      (∀ w, IsSplitAt w → IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) (locProd hn w (σ · w))) →
+      (∀ w, IsUnramU π w → ∀ i, ∃ B, (CG.mk (P i)).HasSat w B) →
+      c = 1 → (∀ i, d i = 1) → ∀ r : G E Ω →* GL (Fin n) (Qbar l), IsSSRep r →
+      (∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ S : Fin c → Multiset ℂˣ, (∀ i, (CG.mk (P i)).HasSat w (S i)) ∧
+        FrobEig ι r w (algSat n (normV w) (satTot w d S))) →
+      ∃ Q : CuspSub E n, (CG.mk Q).IsRegAlg ∧ GlobalTheory.ContraPair.DualIsConj Q ∧ AttC ι r Q ∧
+        (∀ φ lam, HasWeightAt π φ lam → Q.HasInfChar φ (infOfWeight lam)) ∧ (∀ w, IsUnramU π w → ∃ B, (CG.mk Q).HasSat w B) ∧
+        ∀ w, IsSplitAt w → ∀ τ : SmIrr (GL (Fin n) (w.adicCompletion E)), Q.IsLocComp w τ →
+          IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) τ.ρ
+
+end UpperTheory.V.Z.Win.Gu
+
+
+[GUA_SRC_LITERATURE] Original LitLocAlt and LiteratureRankNHypothesis, including aut.gal=RowT and aut.bc
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/LitAut.lean#L12-L63
+structure LitLocAlt : Prop where
+  bz : BernsteinZelevinskyFiniteness
+  bern : BernsteinUnitaryProductIrreducible
+  geo : GeometricLemma
+  zel : ZelevinskyPolynomialRing
+  disj : TotallyDisjointProductIrreducible
+  mp : MoyPrasadJacquetIso
+  temp : TemperedProductOfSquareIntegrable
+  seg : EssSquareIntegrableSegments
+  sq : SquareIntegrableSegment
+  gen : GenericUnlinkedGL
+  multi : LanglandsMultisegments
+  exh : LanglandsExhaustionGL
+  cos : StandardCosocleGL
+  conv : LocalConverseGL
+  dzi : DepthZeroInduction
+  brauer : BrauerDegreeZero
+  chev : ChevalleyUnits
+  green : GreenRegularCharacters
+structure LiteratureAutomorphyHypothesis : Prop where
+  decay : CuspRapidDecay
+  hc : HarishChandraFinite
+  fin : AutomorphicFormsFiniteGL
+  js : JacquetShalika
+  cusp : CuspidalSpectrumGL
+  bc : _root_.PositivityTheory.Rg.BcN.BaseChangeIsobaricN
+  gk : GelfandKazhdanDual
+  gal : _root_.UpperTheory.V.Z.Win.RowT
+  pur : ClozelPurity
+  coh : ClozelCohomological
+  art : GlobalArtinReciprocity
+  ray : RayClassFieldSt
+  chA : HeckeLAdicCharacterAbove
+  chW : AlgebraicCharacterWD
+  berger : DeRhamPotSemistable
+structure LiteratureCMHypothesis : Prop where
+  gm : GrothendieckDeformation
+  dr : AbelianDeRham
+  dual : AbelianDualCrystal
+  per : PeriodComparison
+  gmp : GaussManinPeriods
+  st : SerreTateGoodReductionSt
+  cm : EllipticMainTheoremCM
+  hj : HilbertClassFieldJ
+  dri : SiegelKlingenDeligneRibet
+  pz : PartialZetaFunctionalEquation
+  fe : HeckeTateFunctionalEquation
+structure LiteratureRankNHypothesis : Prop where
+  loc : _root_.GlobalTheory.Mem.LiteralAutomorphy.LitLocAlt
+  aut : _root_.GlobalTheory.Mem.LiteralAutomorphy.LiteratureAutomorphyHypothesis
+  coh : LitCoh
+  cm : _root_.GlobalTheory.Mem.LiteralAutomorphy.LiteratureCMHypothesis
+
+
+[GUA_SRC_ROW_ALIAS] RowT is Row0b applied to the full IsRecT predicate
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/WeakOfAtt.lean#L47-L47
+def RowT : Prop := UpperTheory.GalStar.Row0b fun h rc => IsRecT h rc
+
+
+[GUA_SRC_ROW_FIELDS] IsQpBig, AwayB, AboveB, PropsB, Row0b: full retained attachment hypothesis
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/Foundations/GaloisRepresentations/TypeConditions/WeightsConjBis.lean#L17-L88
+
+theorem IsQpBig.isQp {E : Type} [Field E] [NumberField E] {w : HeightOneSpectrum (𝓞 E)} {n : ℕ} (k : IsQpBig w n) : IsQp w := by
+  obtain ⟨g, p, i, c, -⟩ := k
+  exact ⟨g, p, i, c⟩
+
+section Local
+variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
+
+structure AwayB (x y : WD h) : Prop where
+  dim : x.lpDim = y.lpDim
+
+  tor : Tor y → y.mono0 → x = y
+
+  tame0 : IsQpBig w y.lpDim → TmW y → Sqf y → y.mono0 → x.mono0 ∧ ∀ g : ↥(Weil h), deg g = 0 → x.charPol g = y.charPol g
+
+theorem Away.big {x y : WD h} (k : Away x y) : AwayB x y := ⟨k.dim, k.tor, fun q => k.tame0 q.isQp⟩
+end Local
+
+variable (Rc : RecNotion) {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] {l : ℕ} [Fact l.Prime] {a : ℕ}
+  [IsAlgClosure E Ω] [IsCMField E]
+
+structure AboveB (π : CuspSub E a) (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL (Fin a) (Qbar l))
+    (HT : (E →+* Qbar l) → Multiset ℤ) (P : LocPrime l) {w : HeightOneSpectrum (𝓞 E)} {A : ValuationSubring Ω}
+    (h : IsPlaceOver A w) {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+    (Bw : LocBridge l E Ω (Dec (F := E) A) O) (hj : Pst.Induces Bw) : Prop where
+  crys : ∀ σ, π.IsLocComp w σ → SmGL.IsSpherical σ.ρ → IsCrysAt P Bw (r.comp (Dec (F := E) A).subtype) ∧
+    IsdRAt P Bw (r.comp (Dec (F := E) A).subtype) ∧
+    ∀ (τ : E →+* Qbar l) (LL' : FinExt l) (τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥LL'.1), IsInduced Bw τ τ' →
+      IsJumpsAt P Bw (r.comp (Dec (F := E) A).subtype) τ (HT τ)
+
+  nice : ∀ σ, π.IsLocComp w σ → ∀ rc, Rc h rc → ((IsQpBig w a ∧ TmW (rc (algNorm σ)) ∧ Sqf (rc (algNorm σ))) ∨ Tor (rc (algNorm σ))) → (rc (algNorm σ)).mono0 →
+    IsdRAt P Bw (r.comp (Dec (F := E) A).subtype) ∧ IsPstAt P Bw (r.comp (Dec (F := E) A).subtype) ∧
+    (∀ (τ : E →+* Qbar l) (LL' : FinExt l) (τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥LL'.1), IsInduced Bw τ τ' →
+      IsJumpsAt P Bw (r.comp (Dec (F := E) A).subtype) τ (HT τ)) ∧
+    AwayB (wdAt P ι Bw h hj (r.comp (Dec (F := E) A).subtype)) (rc (algNorm σ))
+
+structure PropsB (π : CuspSub E a) (ι : Qbar l ≃+* ℂ)
+    (r : G E Ω →* GL (Fin a) (Qbar l)) (wt : ℤ) (HT : (E →+* Qbar l) → Multiset ℤ) : Prop where
+  cont : Continuous r
+  ss : IsSSRep r
+  away : ∀ (w : HeightOneSpectrum (𝓞 E)) (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (A : ValuationSubring Ω) (h : IsPlaceOver A w)
+    (rc : IrrGL (w.adicCompletion E) → WD h), Rc h rc → ∀ σ, π.IsLocComp w σ → AwayB (wdOf h hl ι r) (rc (algNorm σ))
+  weights : ∀ τ : E →+* Qbar l, (HT τ).map (fun n : ℤ => (n : ℂ)) =
+    ((CG.mk π).infChar (ι.toRingHom.comp τ)).map fun z => ((a : ℂ) - 1) / 2 - z
+  weights_conj : ∀ τ : E →+* Qbar l,
+    HT (τ.comp (IsCMField.complexConj E).toRingEquiv.toRingHom) = (HT τ).map (wt - ·)
+  above : ∀ (P : LocPrime l) (AI : LocAinf l P), Nonempty (LocTied l P AI) →
+    ∀ (w : HeightOneSpectrum (𝓞 E)) (A : ValuationSubring Ω) (h : IsPlaceOver A w)
+      (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+      (Bw : LocBridge l E Ω (Dec (F := E) A) O) (hj : Pst.Induces Bw), AboveB Rc π ι r HT P h Bw hj
+
+def Row0b : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ) (a : ℕ), 1 ≤ a →
+    ∀ (π : CuspSub E a) (χ : HChar (maximalRealSubfield E)), (CG.mk π).IsRegAlg → GlobalTheory.ContraPair.PolarizedPair π χ →
+      ∃ (r : G E Ω →* GL (Fin a) (Qbar l)) (wt : ℤ) (HT : (E →+* Qbar l) → Multiset ℤ), PropsB Rc π ι r wt HT
+
+theorem Props.big {π : CuspSub E a} {ι : Qbar l ≃+* ℂ} {r : G E Ω →* GL (Fin a) (Qbar l)} {wt : ℤ}
+    {HT : (E →+* Qbar l) → Multiset ℤ} (k : Props Rc π ι r wt HT) : PropsB Rc π ι r wt HT :=
+  ⟨k.cont, k.ss, fun w hl A h rc hrc σ hσ => (k.away w hl A h rc hrc σ hσ).big, k.weights, k.weights_conj,
+    fun P AI T w A h O _ _ _ Bw hj =>
+      have j := k.above P AI T w A h O Bw hj
+      ⟨j.crys, fun σ hσ rc hrc g m =>
+        have n := j.nice σ hσ rc hrc (g.imp (fun q => ⟨q.1.isQp, q.2⟩) id) m
+        ⟨n.1, n.2.1, n.2.2.1, n.2.2.2.big⟩⟩⟩
+
+theorem Row0.row0b (H : Row0 Rc) : Row0b Rc := fun E Ω _ _ _ _ _ _ l _ ι a ha π χ hr hp => by
+  obtain ⟨r, wt, HT, k⟩ := H E Ω l ι a ha π χ hr hp
+  exact ⟨r, wt, HT, k.big Rc⟩
+
+end UpperTheory.GalStar
+
+
+[GUA_SRC_TOR] Tor is the original commutator characteristic-polynomial condition
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/Foundations/GaloisRepresentations/TypeConditions/WeightsConjAlt.lean#L23-L29
+section Local
+variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
+
+def Tor (y : WD h) : Prop := ∀ s t : ↥(Weil h), LocalGlobalAboveLAlt.Triv y ⁅s, t⁆
+
+def Sqf (y : WD h) : Prop :=
+
+
+[GUA_SRC_RECT] Good/Toral/LawsT/IsRecT; every original correspondence and its Artin map
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/Foundations/LocalLanglands/IsRecTOfIsRec.lean#L20-L87
+def GoodCusp (y : IrrGL k) : Prop :=
+  y.1 = 1 ∨ ((∃ (g : ℕ) (_ : Fact g.Prime) (i : ℚ_[g] ≃+* k), Continuous i) ∧
+    ∃ (y₀ : IrrGL k) (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ), GlobalTheory.PRep.fixed y₀.rep (GlobalTheory.SplitWeil.KOne k (Fin y₀.1)) ≠ ⊥ ∧ y = y₀.tw χ hχ)
+
+def Good (x : IrrGL k) : Prop := ∃ s, HasSupport x.rep s ∧ ∀ y ∈ s, GoodCusp y
+
+def Toral (x : IrrGL k) : Prop := ∃ s, HasSupport x.rep s ∧ ∀ y ∈ s, y.1 = 1
+
+end Classes
+
+variable {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+  {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
+
+variable (h) in
+
+def TypeLaw (rc : IrrGL (w.adicCompletion E) → WD h) : Prop :=
+  ∀ (E' : Type) [Field E'] [NumberField E'] [Algebra E E'] [Algebra E' Ω] [IsScalarTower E E' Ω] [IsAlgClosure E' Ω]
+    (g : ℕ) [Fact g.Prime] (w' : HeightOneSpectrum (𝓞 E')) (h' : IsPlaceOver A w'),
+    ∀ (i : ℚ_[g] ≃+* w.adicCompletion E), Continuous i →
+    ∀ n : ℕ, 0 < n → ((g : ℕ) : 𝓞 E') ∉ w'.asIdeal ^ 2 → normV w' = g ^ n →
+    ∀ a' : Weil h' →* (w'.adicCompletion E')ˣ, IsLocalArtin h' a' →
+    ∀ (K : Type) [Field K] [Algebra (ZMod g) K] (red : 𝓞 E' →+* K), Function.Surjective red →
+      RingHom.ker red = w'.asIdeal →
+    ∀ θ : Kˣ →* ℂˣ, GlobalTheory.Published.IsRegularChar g n θ →
+    ∀ τ : FDRep ℂ (Gn g n), IsCusp τ.character →
+      (∀ y : Gn g n, Irreducible (y : Mt g n).charpoly → ∀ z : Kˣ, aeval (z : K) (y : Mt g n).charpoly = 0 →
+        τ.character y = (-1) ^ (n - 1) * ∑ j ∈ Finset.range n, ((θ (z ^ g ^ j) : ℂˣ) : ℂ)) →
+    ∀ σ : GlobalTheory.SmGL.IrrRep (GL (Fin n) (w.adicCompletion E)),
+      GlobalTheory.SerSys.TameGen.Inflates (σ.ρ.comp (Matrix.GeneralLinearGroup.map i.toRingHom)) τ →
+      (rc (cls σ)).mono0 ∧
+      ∀ (t : Ine (F := E') A) (x : 𝓞 E') (z : Kˣ), red x = z →
+        Valued.v ((a' (ineIncl h' t) : w'.adicCompletion E') - algebraMap E' (w'.adicCompletion E') (x : E')) < 1 →
+        (rc (cls σ)).inePol (AlgEquiv.restrictScalars E (t : G E' Ω)) =
+          ∏ j ∈ Finset.range n, (X - C ((θ (z ^ g ^ j) : ℂˣ) : ℂ))
+
+structure LawsT (a : Weil h →* (w.adicCompletion E)ˣ) (ha : IsLocalArtin h a)
+    (rc : IrrGL (w.adicCompletion E) → WD h) : Prop where
+  dim : ∀ x, (rc x).lpDim = x.1
+  one : ∀ χ hχ, rc (.ofChar χ hχ) = WD.lpOfChar h (χ.comp a) (ha.smooth hχ)
+  langlands : ∀ (l : List (Segment (w.adicCompletion E))) (x : IrrGL (w.adicCompletion E)),
+    IsL (l : Multiset (Segment (w.adicCompletion E))) x.rep → rc x = segSum rc l
+  cusp : ∀ x, x.IsCusp → IsIrrWD (rc x)
+  nu : ∀ x (s : ℝ), rc (x.nu s) = (rc x).lpTw s
+  absCentral : ∀ (x : IrrGL (w.adicCompletion E)) ω, HasCentralChar x.rep ω →
+    ∀ σ, ‖((rc x).eig σ).prod‖ = ‖(ω (a σ) : ℂ)‖
+  twist : ∀ x χ hχ, Good x → rc (x.tw χ hχ) = (rc x).lpChar (rc (.ofChar χ hχ))
+  central : ∀ (x : IrrGL (w.adicCompletion E)) ω, Good x → HasCentralChar x.rep ω →
+    ∀ σ, ((rc x).eig σ).prod = (ω (a σ) : ℂ)
+  dual : ∀ (n : ℕ) (π π' : IrrRep (GL (Fin n) (w.adicCompletion E))), Good (cls π) →
+    Nonempty (π'.ρ.Equiv (contra π.ρ)) → rc (cls π') = (rc (cls π)).lpDual
+  inj : ∀ x y, Good y → rc x = rc y → x = y
+  depth : ∀ x, Good x → GlobalTheory.PRep.fixed x.rep (GlobalTheory.SplitWeil.KOne (w.adicCompletion E) (Fin x.1)) ≠ ⊥ → IsTameWD (rc x)
+  type : TypeLaw h rc
+
+variable (h) in
+
+def IsRecT (rc : IrrGL (w.adicCompletion E) → WD h) : Prop := ∃ a ha, LawsT (h := h) a ha rc
+
+def RecTExists : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω)
+    (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w), ∃ rc, IsRecT h rc
+
+def RecTUnique : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (A : ValuationSubring Ω)
+    (w : HeightOneSpectrum (𝓞 E)) (h : IsPlaceOver A w) (rc rc' : IrrGL (w.adicCompletion E) → WD h),
+    IsRecT h rc → IsRecT h rc' → ∀ x, Good x → rc x = rc' x
+
+def AbConverse (y : WD h) (x : IrrGL (w.adicCompletion E)) : Prop :=
+
+
+[GUA_SRC_RECT_EXISTS] Retained full IsRecT existence/nonvacuity foundation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/Foundations/LocalLanglands/LocalCentralUnits/RecTExists.lean#L20-L66
+theorem UpperTheory.Zero.LLC.recTExists :
+    UpperTheory.Zero.LLC.RecTExists := by
+  intro E Ω _ _ _ _ _ A w h
+  obtain ⟨a, ha, -⟩ := UpperTheory.Zero.LLC.artEx E Ω A w h
+  obtain ⟨r, hr⟩ := UpperTheory.Zero.LLC.cuspEx E Ω A w h a ha
+  obtain ⟨⟨rc, hrc⟩, hcu⟩ :=
+    GlobalTheory.LocLanglands.exists_isLExt UpperTheory.Zero.LLC.Pr.exh UpperTheory.Zero.LLC.Pr.multi E Ω A w h r
+  have hcusp : ∀ x : IrrGL (HeightOneSpectrum.adicCompletion E w), x.IsCusp → rc x = r x :=
+    hcu rc hrc
+  have hD := UpperTheory.Zero.LLC.extDim E Ω A w h a ha r rc hr hrc
+  have hT := UpperTheory.Zero.LLC.extTw E Ω A w h a ha r rc hr hrc
+  refine ⟨rc, a, ha, ?_⟩
+  refine
+    { dim := fun x => (hD x).1.1
+      one := fun χ hχ => (hcusp _ (IrrGL.isCusp_ofChar χ hχ)).trans (hr.one χ hχ)
+      langlands := ?_
+      cusp := ?_
+      nu := hT.1
+      absCentral := fun x ω hω σ => ((hD x).2 ω hω σ).1
+      twist := ?_
+      central := fun x ω hg hω σ => ((hD x).2 ω hω σ).2 hg
+      dual := UpperTheory.Zero.LLC.extDual E Ω A w h a ha r rc hr hrc
+      inj := UpperTheory.Zero.LLC.extInj E Ω A w h a ha r rc hr hrc
+      depth := fun x hg hx => UpperTheory.Zero.LLC.extDepth E Ω A w h a ha r rc hr hrc x hg hx
+      type := ?_ }
+  · intro l x hl
+    rw [hrc l x hl]
+    unfold GlobalTheory.LocLanglands.segSum
+    congr 1
+    refine List.map_congr_left ?_
+    intro Δ _
+    rw [hcusp _ Δ.isCusp_first]
+  · intro x hx
+    rw [hcusp x hx]
+    exact hr.irr x hx
+  · intro x χ hχ hg
+    rw [hcusp _ (IrrGL.isCusp_ofChar χ hχ), hr.one χ hχ]
+    exact hT.2 x χ hχ hg
+  · refine (UpperTheory.Zero.LLC.typeIff E Ω A w h rc).2 ?_
+    intro x
+    unfold UpperTheory.Zero.LLC.TypeAt
+    intro g _ i hi n hn D R hR θ hθ τ hτ hN σ hσ hinf
+    have hx : x.IsCusp := by
+      subst hσ
+      exact IrrGL.isCusp_of.2 ⟨hn, DiscreteGroups.sglob.DzLc.isCuspidal_of_inflates i hi τ hτ σ hinf⟩
+    rw [hcusp x hx]
+    exact hr.type x hx g i hi n hn D R hR θ hθ τ hτ hN σ hσ hinf
+
+
+[GUA_SRC_ARTIN] IsLocalArtin and ord(a(g))=-deg(g)
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/PublishedTheorems/AutomorphicForms₂/HasExponentZeroIff.lean#L145-L156
+structure IsLocalArtin {E : Type} [Field E] [NumberField E] [Algebra E Ω] [IsAlgClosure E Ω]
+    {w : HeightOneSpectrum (𝓞 E)} (h : IsPlaceOver A w) (a : Weil h →* (w.adicCompletion E)ˣ) : Prop where
+  surj : Function.Surjective a
+  cont : Continuous fun σ : Ine (F := E) A => a (ineIncl h σ)
+  ord_eq : ∀ σ, ord (w.adicCompletion E) (a σ) = -deg σ
+  factor : ∀ ξ : Weil h →* ℂˣ, WeilDeligne.IsSmooth ξ → ∃ χ, IsSmoothChar χ ∧ ξ = χ.comp a
+  glob : ∀ art : Ideles E →* Gab E Ω, IsGlobalArtin art →
+    ∀ σ : Weil h, art (localIdele E w (a σ)) = toAb E Ω σ
+
+theorem IsLocalArtin.smooth {E : Type} [Field E] [NumberField E] [Algebra E Ω] [IsAlgClosure E Ω]
+    {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w} {a : Weil h →* (w.adicCompletion E)ˣ}
+    (ha : IsLocalArtin h a) {χ : (w.adicCompletion E)ˣ →* ℂˣ} (hχ : IsSmoothChar χ) :
+
+
+[GUA_SRC_ALG_NORM] algNorm = nu((1-n)/2)
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/PublishedTheorems/GaloisCohomology₂/GaloisRepOfPolarizedCuspidal.lean#L24-L26
+def algNorm {w : HeightOneSpectrum (𝓞 E)} (σ : SmIrr (GL (Fin a) (w.adicCompletion E))) :
+    IrrGL (w.adicCompletion E) :=
+  (IrrGL.of σ.ρ σ.smooth σ.irred).nu (((1 - (a : ℝ)) / 2 : ℝ) : ℂ)
+
+
+[GUA_SRC_TOTALS] Actual Par, cl, ex, totPar, satTot and original assembly interfaces
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/GuDefs.lean#L22-L158
+
+abbrev Par (w : HeightOneSpectrum (𝓞 E)) : Type 1 :=
+  ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w), (IrrGL (w.adicCompletion E) → WD h) → WD h
+
+abbrev cl {w : HeightOneSpectrum (𝓞 E)} {a : ℕ} (σ : SmIrr (GL (Fin a) (w.adicCompletion E))) : IrrGL (w.adicCompletion E) :=
+  IrrGL.of σ.ρ σ.smooth σ.irred
+
+def ParAt {n : ℕ} (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL (Fin n) (Qbar l)) (w : HeightOneSpectrum (𝓞 E)) (p : Par Ω w) : Prop :=
+  ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion E) → WD h), IsRec h rc →
+    (((l : ℕ) : 𝓞 E) ∉ w.asIdeal → Lev.WO ι r (p A h rc)) ∧
+    ∀ (O : Type) [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O] (Bw : LocBridge l E Ω (Dec (F := E) A) O) (hj : Induces Bw),
+      IsPstAt (Loc.PP l) Bw (r.comp (Dec (F := E) A).subtype) ∧
+        Lev.SsCmp (wdAt (Loc.PP l) ι Bw h hj (r.comp (Dec (F := E) A).subtype)) (p A h rc)
+
+theorem locGlob_iff {n : ℕ} (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL (Fin n) (Qbar l)) (w : HeightOneSpectrum (𝓞 E))
+    (σ : SmIrr (GL (Fin n) (w.adicCompletion E))) : LocGlob ι r w σ ↔ ParAt ι r w fun _ _ rc => rc (algNorm σ) := Iff.rfl
+
+theorem ParAt.congr {n : ℕ} {ι : Qbar l ≃+* ℂ} {r : G E Ω →* GL (Fin n) (Qbar l)} {w : HeightOneSpectrum (𝓞 E)} {p p' : Par Ω w}
+    (H : ParAt ι r w p) (e : ∀ A h rc, IsRec h rc → p A h rc = p' A h rc) : ParAt ι r w p' :=
+  fun A h rc hrc => e A h rc hrc ▸ H A h rc hrc
+
+structure Compat {n : ℕ} (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL (Fin n) (Qbar l)) (p : ∀ w : HeightOneSpectrum (𝓞 E), Par Ω w)
+    (HT : (E →+* Qbar l) → Multiset ℤ) : Prop where
+  cont : Continuous r
+  ss : IsSSRep r
+  ht : HasHT r HT
+  par : ∀ w, ParAt ι r w (p w)
+
+def ex (n d k : ℕ) : ℤ := (d : ℤ) - 2 * k - n
+
+def totPar (n : ℕ) {c : ℕ} {a : Fin c → ℕ} (d : Fin c → ℕ) {w : HeightOneSpectrum (𝓞 E)}
+    (ρ : ∀ i, SmIrr (GL (Fin (a i)) (w.adicCompletion E))) : Par Ω w := fun _ _ rc =>
+  sumList (List.ofFn fun i => sumList (List.ofFn fun k : Fin (d i) => (rc (cl (ρ i))).lpTw ((ex n (d i) k : ℝ) / 2)))
+
+def satTot (w : HeightOneSpectrum (𝓞 E)) {c : ℕ} (d : Fin c → ℕ) (S : Fin c → Multiset ℂˣ) : Multiset ℂˣ :=
+  ∑ i, ∑ k : Fin (d i), (S i).map (· * qPow w (((k : ℕ) : ℝ) - ((d i : ℝ) - 1) / 2))
+
+end Defs
+
+def SumAway : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (a b : ℕ) (r : G E Ω →* GL (Fin a) (Qbar l)) (r' : G E Ω →* GL (Fin b) (Qbar l)), Continuous r → Continuous r' →
+    ∀ (w : HeightOneSpectrum (𝓞 E)), ((l : ℕ) : 𝓞 E) ∉ w.asIdeal → ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (x x' : WD h),
+      IsWDOf ι r x → IsWDOf ι r' x' → IsWDOf ι (Formalism.MainNotions.SumRepresentations.At.sumRep r r') (x.lpSum x')
+
+def SumHT : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (a b : ℕ) (r : G E Ω →* GL (Fin a) (Qbar l)) (r' : G E Ω →* GL (Fin b) (Qbar l)), Continuous r → Continuous r' →
+    ∀ HT HT', HasHT r HT → HasHT r' HT' → HasHT (Formalism.MainNotions.SumRepresentations.At.sumRep r r') fun τ => HT τ + HT' τ
+
+def SumTwo : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (a b : ℕ) (r : G E Ω →* GL (Fin a) (Qbar l)) (r' : G E Ω →* GL (Fin b) (Qbar l)) p p' HT HT',
+    Compat ι r p HT → Compat ι r' p' HT' →
+      Compat ι (Formalism.MainNotions.SumRepresentations.At.sumRep r r') (fun w A h rc => (p w A h rc).lpSum (p' w A h rc)) fun τ => HT τ + HT' τ
+
+def SumRed : Prop :=
+  ∀ (Γ k : Type) [Group Γ] [Field k] (a b : ℕ) (r : Γ →* GL (Fin a) k) (r' : Γ →* GL (Fin b) k), 1 ≤ a → 1 ≤ b →
+    ¬ IsIrr (Formalism.MainNotions.SumRepresentations.At.sumRep r r')
+
+def SumFam : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (c : ℕ), 1 ≤ c → ∀ (N : Fin c → ℕ), (∀ i, 1 ≤ N i) → ∀ (n : ℕ), ∑ i, N i = n →
+    ∀ (r : ∀ i, G E Ω →* GL (Fin (N i)) (Qbar l)) (p : Fin c → ∀ w : HeightOneSpectrum (𝓞 E), Par Ω w)
+      (HT : Fin c → (E →+* Qbar l) → Multiset ℤ), (∀ i, Compat ι (r i) (p i) (HT i)) →
+      ∃ R : G E Ω →* GL (Fin n) (Qbar l),
+        Compat ι R (fun w A h rc => sumList (List.ofFn fun i => p i w A h rc)) (fun τ => ∑ i, HT i τ) ∧
+        (IsIrr R → c = 1 ∧ ∀ i, IsIrr (r i))
+
+def Eta : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (f : ℤ), ∃ (ξ : HChar E) (m : (E →+* ℂ) → ℤ), ξ.IsAlg m ∧
+    compNorm E (GlobalTheory.HeightCounting.Blocks.resReal (GlobalTheory.HeckeGal.Model.absPow E ((f : ℝ) / 2) * ξ)) = 1
+
+def TwistLoc : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] [IsTotallyComplex E] (a : ℕ) (P : CuspSub E a) (t : ℝ) (w : HeightOneSpectrum (𝓞 E))
+    (ρ : SmIrr (GL (Fin a) (w.adicCompletion E))), P.IsLocComp w ρ →
+      ∃ σ, (P.twist (GlobalTheory.HeckeGal.Model.absPow E t)).IsLocComp w σ ∧ cl σ = (cl ρ).nu (t : ℂ)
+
+def CompatPol : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (a : ℕ), 1 ≤ a → ∀ (P : CuspSub E a) (χ : HChar (maximalRealSubfield E)) (ξ : HChar E) (m : (E →+* ℂ) → ℤ),
+    (CG.mk P).IsRegAlg → IsPolarized P χ → ξ.IsAlg m → GlobalTheory.ContraPair.DualIsConj (P.twist ξ) →
+    ∀ σ : ∀ w : HeightOneSpectrum (𝓞 E), SmIrr (GL (Fin a) (w.adicCompletion E)), (∀ w, P.IsLocComp w (σ w)) →
+      ∃ (r : G E Ω →* GL (Fin a) (Qbar l)) (HT : (E →+* Qbar l) → Multiset ℤ),
+        Compat ι r (fun w _ _ rc => rc (algNorm (σ w))) HT ∧
+        ∀ τ : E →+* Qbar l, (HT τ).map (fun k : ℤ => (k : ℂ)) =
+          ((CG.mk P).infChar (ι.toRingHom.comp τ)).map fun z => ((a : ℂ) - 1) / 2 - z
+
+def Half : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (a : ℕ), 1 ≤ a → ∀ (P : CuspSub E a), P.IsCsd →
+    ∀ (ρ : ∀ w : HeightOneSpectrum (𝓞 E), SmIrr (GL (Fin a) (w.adicCompletion E))), (∀ w, P.IsLocComp w (ρ w)) →
+    ∀ (m : (E →+* ℂ) → Multiset ℂ), (∀ τ, P.HasInfChar τ (m τ)) → ∀ e : ℤ,
+      (∀ τ, (m τ).Nodup ∧ ∀ z ∈ m τ, ∃ j : ℤ, z + (e : ℂ) / 2 = j) →
+      ∃ (r : G E Ω →* GL (Fin a) (Qbar l)) (HT : (E →+* Qbar l) → Multiset ℤ),
+        Compat ι r (fun w _ _ rc => (rc (cl (ρ w))).lpTw ((e : ℝ) / 2)) HT ∧
+        ∀ τ : E →+* Qbar l, (HT τ).map (fun k : ℤ => (k : ℂ)) = (m (ι.toRingHom.comp τ)).map fun z => -(z + (e : ℂ) / 2)
+
+def Strings : Prop :=
+  ∀ (n c : ℕ) (d : Fin c → ℕ) (m : Fin c → Multiset ℂ) (lam : DomWeight n),
+    ∑ i, GlobalTheory.DefiniteBC.spehInf (d i) (m i) = infOfWeight lam →
+    (∀ i (k : Fin (d i)), (m i).Nodup ∧ ∀ z ∈ m i, ∃ j : ℤ, z + (ex n (d i) k : ℂ) / 2 = j) ∧
+      ∑ i, ∑ k : Fin (d i), (m i).map (fun z => -(z + (ex n (d i) k : ℂ) / 2)) =
+        (infOfWeight lam).map fun z => ((n : ℂ) - 1) / 2 - z
+
+def CompUnique : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (n : ℕ) (π : Submodule ℂ (UA E n → ℂ)), IsAutRepU π →
+    ∀ w : HeightOneSpectrum (𝓞 E), IsSplitAt w → ∀ (V W : Type) [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+      (ρ₁ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) V) (ρ₂ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) W),
+      IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) ρ₁ →
+      IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) ρ₂ → Nonempty (ρ₁.Equiv ρ₂)
+
+def RecTot : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsTotallyComplex E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    (n c : ℕ) (a d : Fin c → ℕ) (hn : ∑ i, d i * a i = n) (P : ∀ i, CuspSub E (a i)) (w : HeightOneSpectrum (𝓞 E))
+    (ρ : ∀ i, SmIrr (GL (Fin (a i)) (w.adicCompletion E))) (σ : ∀ i, SmIrr (GL (Fin (d i * a i)) (w.adicCompletion E))),
+    (∀ i, 1 ≤ a i ∧ 1 ≤ d i) → (∀ i, (P i).IsLocComp w (ρ i)) →
+    (∀ i, GlobalTheory.SmGL.IsUnitarisable (ρ i).ρ ∧ GlobalTheory.SmGL.IsUnitarisable (σ i).ρ ∧ IsSpeh (cl (ρ i)) (d i) (σ i).ρ) →
+    ∀ τ : SmIrr (GL (Fin n) (w.adicCompletion E)), Nonempty (τ.ρ.Equiv (locProd hn w σ)) →
+    ∀ (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion E) → WD h), IsRec h rc →
+      totPar n d ρ A h rc = rc (algNorm τ)
+
+def FrobTot : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (n c : ℕ) (a d : Fin c → ℕ) (r : G E Ω →* GL (Fin n) (Qbar l)), Continuous r →
+    ∀ (w : HeightOneSpectrum (𝓞 E)), ((l : ℕ) : 𝓞 E) ∉ w.asIdeal →
+    ∀ (ρ : ∀ i, SmIrr (GL (Fin (a i)) (w.adicCompletion E))) (S : Fin c → Multiset ℂˣ), (∀ i, GlobalTheory.LFun.HasSatGL w (ρ i).ρ (S i)) →
+      ParAt ι r w (totPar n d ρ) → FrobEig ι r w (algSat n (normV w) (satTot w d S))
+
+def PolOfFrob : Prop :=
+  ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω] (l : ℕ) [Fact l.Prime]
+    (ι : Qbar l ≃+* ℂ) (n : ℕ) (r : G E Ω →* GL (Fin n) (Qbar l)), Continuous r → IsSSRep r →
+    (∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∃ B : Multiset ℂˣ,
+      FrobEig ι r w (algSat n (normV w) (B.map (·⁻¹))) ∧ FrobEig ι r (Bc.cPl w) (algSat n (normV (Bc.cPl w)) B)) →
+    ∀ c : G (maximalRealSubfield E) Ω, IsConjEl c → ∃ P, IsPairing c r (cycBar E Ω l ^ (1 - (n : ℤ))) P
+
+def SatLink : Prop :=
+
+
+[GUA_SRC_FROB_ATT] FrobEig/algSat/AttachedSys/AttC; geometric inverse of every arithmetic Frobenius
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/BlochKatoSelmerVanishes.lean#L69-L82
+def FrobEig (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l)) (w : HeightOneSpectrum (𝓞 F)) (B : Multiset ℂ) : Prop :=
+  ∀ A : ValuationSubring Ω, IsPlaceOver A w → (∀ s ∈ Ine (F := F) A, r s = 1) ∧
+    ∀ σ : G F Ω, IsFrob A (normV w) σ →
+      (r σ⁻¹ : Matrix (Fin n) (Fin n) (Qbar l)).charpoly.map ι.toRingHom = (B.map fun b => X - C b).prod
+
+def algSat (n q : ℕ) (B : Multiset ℂˣ) : Multiset ℂ :=
+  B.map fun α => (((q : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) * (α : ℂ)
+
+def AttachedSys (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l))
+    (sat : HeightOneSpectrum (𝓞 F) → Multiset ℂˣ → Prop) : Prop :=
+  IsSSRep r ∧ ∀ᶠ w : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∃ B, sat w B ∧ FrobEig ι r w (algSat n (normV w) B)
+
+def AttC [IsTotallyComplex F] (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l)) (π : CuspSub F n) : Prop :=
+  AttachedSys ι r (CG.mk π).HasSat
+
+
+[GUA_SRC_PAIRING] IsConjEl and literal IsPairing matrix identity
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/IsAlgChar.lean#L41-L54
+def IsConjEl (c : G F Ω) : Prop := ∃ j : Ω →+* ℂ, ∀ x, j (c x) = starRingEnd ℂ (j x)
+
+end Sys
+
+section Pol
+
+variable {F₀ F Ω : Type} [Field F₀] [Field F] [Field Ω] [Algebra F₀ F] [Algebra F₀ Ω] [Algebra F Ω] [IsScalarTower F₀ F Ω]
+  {k : Type} [Field k] {n : ℕ}
+
+def IsPairing (c : G F₀ Ω) (r : G F Ω →* GL (Fin n) k) (μ : G F Ω →* kˣ) (P : GL (Fin n) k) : Prop :=
+  ∀ s s' : G F Ω, s'.restrictScalars F₀ = c * s.restrictScalars F₀ * c⁻¹ →
+    (r s : Matrix (Fin n) (Fin n) k)ᵀ * (P : Matrix (Fin n) (Fin n) k) * (r s' : Matrix (Fin n) (Fin n) k) =
+      (μ s : k) • (P : Matrix (Fin n) (Fin n) k)
+
+
+
+[GUA_SRC_CUSP_PAIR] Paired finite/compact/Lie identities, DualIsConj and PolarizedPair
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GaloisGeometry/DualIsConjByOne.lean#L27-L55
+  | .fin k => .fin (invT a (Af E) k)
+  | .cpt k => .cpt (barK k)
+  | .lie X => .lie (toL (-(Matrix.of X)ᵀ))
+
+def Paired (π π' : CuspSub E a) (s : Op E a → Op E a) : Prop :=
+  ∃ B : π.V →ₗ[ℂ] π'.V →ₗ[ℂ] ℂ, (∀ φ, (∀ ψ, B φ ψ = 0) → φ = 0) ∧ (∀ ψ, (∀ φ, B φ ψ = 0) → ψ = 0) ∧
+    (∀ k φ ψ, B (π.op (.fin k) φ) (π'.op (s (.fin k)) ψ) = B φ ψ) ∧
+    (∀ k φ ψ, B (π.op (.cpt k) φ) (π'.op (s (.cpt k)) ψ) = B φ ψ) ∧
+    ∀ X φ ψ, B (π.op (.lie X) φ) ψ + B φ (π'.op (s (.lie X)) ψ) = 0
+
+end
+
+variable {L : Type} [Field L] [NumberField L] [IsCMField L] {a : ℕ}
+
+def conjOp : Op L a → Op L a
+  | .fin k => .fin (GeneralLinearGroup.map (conjFin (IsCMField.complexConj L).toRingEquiv) k)
+  | .cpt k => .cpt (barK k)
+  | .lie X => .lie fun i j => star (X i j)
+
+def DualIsConj (π : CuspSub L a) : Prop := Paired π π conjOp
+
+def DualIsConjBy (π : CuspSub L a) (ψ : HChar L) : Prop := Paired (π.twist ψ⁻¹) π conjOp
+
+theorem dualIsConjBy_one (π : CuspSub L a) : DualIsConjBy π 1 ↔ DualIsConj π := by
+  rw [DualIsConjBy, inv_one, CuspSub.twist_one, DualIsConj]
+
+structure PolarizedPair (π : CuspSub L a) (χ : HChar (maximalRealSubfield L)) : Prop where
+  sign : ∀ v : InfinitePlace (maximalRealSubfield L), χ.locInf v (-1) = (-1) ^ a
+  dual : DualIsConjBy π (GlobalTheory.GalOfCusp.compNorm L χ)
+
+
+[GUA_SRC_HALF_POLARIZATION] resReal, norm pullback identity and exact quadratic-sign polarization of an absolute-value twist
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/IsPolarizedTwistAbsPow.lean#L195-L236
+  ⟨ξ.1.comp (ideleMap (maximalRealSubfield E) E), ξ.2.1.comp (continuous_ideleMap _ E),
+    fun k => (congrArg ξ.1 (ideleMap_principalIdele _ E k)).trans (ξ.2.2 _)⟩
+
+theorem mul_inv_compNorm (ξ : HChar E) : ξ * (compNorm E (resReal ξ))⁻¹ = thetaChar ξ := by
+  refine Subtype.ext (MonoidHom.ext fun x => ?_)
+  change ξ.1 x * (ξ.1 (ideleMap _ E (ideleNorm E x)))⁻¹ = _
+  rw [ideleMap_ideleNorm, map_mul, mul_inv, mul_inv_cancel_left, thetaChar_apply]
+  exact congrArg (fun y => (ξ.1 y)⁻¹) (Units.ext (conjAd_eq _).symm)
+
+theorem isConjDualBy_resReal {π : CuspSub E a} (h : π.IsCsd) (ξ : HChar E) :
+    IsConjDualBy (π.twist ξ) (compNorm E (resReal ξ)) := by
+  rw [IsConjDualBy, ← CuspSub.twist_mul, mul_inv_compNorm]
+  have h1 : (thetaSub π).Iso π := by
+    obtain ⟨T, hT⟩ := h
+    refine ⟨((pull E a).submoduleMap π.V).symm.trans T, fun o φ => ?_⟩
+    obtain ⟨φ, rfl⟩ := ((pull E a).submoduleMap π.V).surjective φ
+    have e : (thetaSub π).op o ((pull E a).submoduleMap π.V φ) = (pull E a).submoduleMap π.V (π.op (thetaOp o) φ) :=
+      Subtype.ext (act_pull o φ.1)
+    rw [e]
+    exact (congrArg T (((pull E a).submoduleMap π.V).symm_apply_apply _)).trans
+      ((hT o φ).trans (congrArg (π.op o) (congrArg T (((pull E a).submoduleMap π.V).symm_apply_apply φ)).symm))
+  have h2 := h1.twist (thetaChar ξ)
+  rw [← thetaSub_twist] at h2
+  obtain ⟨T, hT⟩ := h2
+  refine ⟨((pull E a).submoduleMap (π.twist ξ).V).trans T, fun o φ => ?_⟩
+  exact (congrArg T (Subtype.ext (act_pull o φ.1).symm)).trans (hT o ((pull E a).submoduleMap (π.twist ξ).V φ))
+
+theorem isPolarized_twist_absPow {π : CuspSub E a} (h : π.IsCsd) (s : ℝ) :
+    IsPolarized (π.twist (GlobalTheory.HeckeGal.Model.absPow E s))
+      (resReal (GlobalTheory.HeckeGal.Model.absPow E s) * quadChar E ^ (0 + a)) := by
+  refine (isConjDualBy_resReal h _).isPolarized fun v => ?_
+  have h1 : (resReal (GlobalTheory.HeckeGal.Model.absPow E s)).locInf v (-1) *
+      (resReal (GlobalTheory.HeckeGal.Model.absPow E s)).locInf v (-1) = 1 := by
+    rw [← map_mul, neg_mul_neg, one_mul, map_one]
+  obtain ⟨t, ht⟩ : ∃ t : ℝ, (((resReal (GlobalTheory.HeckeGal.Model.absPow E s)).locInf v (-1) : ℂˣ) : ℂ) =
+    Complex.exp (s * t) := ⟨_, rfl⟩
+  have h2 := congrArg Units.val h1
+  rw [Units.val_mul, Units.val_one, mul_self_eq_one_iff] at h2
+  refine Units.ext (h2.resolve_right fun e => ?_)
+  rw [ht, ← Complex.ofReal_mul, ← Complex.ofReal_exp] at e
+  have h3 : Real.exp (s * t) = -1 := by exact_mod_cast e
+  linarith [Real.exp_pos (s * t)]
+
+
+[GUA_SRC_POLG] Original RowT toral-branch consumer polG_of_printsH_of_rT
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/GuPolG.lean#L20-L34
+  intro PH hRow E Ω _ _ _ _ _ _ l _ ι a ha P χ hreg hpol σ hσ
+  obtain ⟨r, wt, HT, H⟩ := hRow E Ω l ι a ha P χ hreg
+    ⟨hpol.sign, GlobalTheory.T.cuspContragredientIsCMConjTwist_of_paired_invTranspose E a P (compNorm E χ) (PH.toClassicalTheorems.litN.aut.gk E a _) hpol.dual⟩
+  have hRc : Continuous fun g => (r g : Matrix (Fin a) (Fin a) (Qbar l)) := Units.continuous_val.comp H.cont
+  refine ⟨r, HT, ⟨H.cont, H.ss, fun w hg A h O _ _ _ Bw hj => ?_,
+    fun w A h rc hrc => ⟨fun hw => ?_, fun O _ _ _ Bw hj g => ?_⟩⟩, H.weights⟩
+  · obtain ⟨rc, hrc⟩ := UpperTheory.Zero.LLC.recTExists E Ω A w h
+    obtain ⟨g1, g2⟩ := hg A h rc hrc
+    obtain ⟨k1, -, k3, -⟩ := (H.above (Loc.PP l) _ (Loc.tiedP l) w A h O Bw hj).nice (σ w) (hσ w) rc hrc (Or.inr g1) g2
+    exact ⟨k1, k3⟩
+  · exact ⟨wdOf h hw ι r, isWDOf_wdOf hw ι hRc, fun g => (H.away w hw A h rc hrc (σ w) (hσ w)).tor g.1 g.2⟩
+  · obtain ⟨-, k2, -, k4⟩ := (H.above (Loc.PP l) _ (Loc.tiedP l) w A h O Bw hj).nice (σ w) (hσ w) rc hrc (Or.inr g.1) g.2
+    exact ⟨k2, k4.tor g.1 g.2⟩
+end
+end
+
+
+[GUA_SRC_HALF] Original HalfG producer and s=(e+a-1)/2 calculation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/UnitaryGaloisFamilies/HalfG.lean#L12-L46
+  intro hTw hC E Ω _ _ _ _ _ _ l _ ι a ha P hP ρ hρ m hm e he
+  set s : ℝ := ((e + a - 1 : ℤ) : ℝ) / 2 with hs
+  have hsC : (s : ℂ) = (e : ℂ) / 2 + ((a : ℂ) - 1) / 2 := by
+    rw [hs]; push_cast; ring
+  have hν := GlobalTheory.HeckeGal.Model.absPow_isAbsPow E s
+  have hinf : ∀ τ, (CG.mk (P.twist (GlobalTheory.HeckeGal.Model.absPow E s))).infChar τ = (m τ).map (· + (s : ℂ)) := fun τ => by
+    have h1 := (hm τ).twist (GlobalTheory.HeckeGal.Model.absPow E s)
+    rw [(InfType.expo_of_infType E _).2.1 s hν τ] at h1
+    exact CG.HasInfChar.infChar_eq (π := CG.mk _) h1
+  have hreg : (CG.mk (P.twist (GlobalTheory.HeckeGal.Model.absPow E s))).IsRegAlg := (GlobalTheory.CuspRep.CG.isRegAlg_iff _).2 fun τ => by
+    rw [hinf]
+    refine ⟨(he τ).1.map (add_left_injective _), fun z hz => ?_⟩
+    obtain ⟨y, hy, rfl⟩ := Multiset.mem_map.1 hz
+    obtain ⟨j, hj⟩ := (he τ).2 y hy
+    exact ⟨j, by rw [hsC, ← hj]; ring⟩
+  choose σ hσ hcl using fun w => hTw E a P s w (ρ w) (hρ w)
+  obtain ⟨r, HT, hr, hHT⟩ := hC E Ω l ι a ha _ _ hreg (GlobalTheory.HeightCounting.Blocks.isPolarized_twist_absPow hP s) σ hσ
+  have key : ∀ w (A : ValuationSubring Ω) (h : IsPlaceOver A w) (rc : IrrGL (w.adicCompletion E) → WD h), IsRecT h rc →
+      rc (algNorm (σ w)) = (rc (cl (ρ w))).lpTw ((e : ℝ) / 2) := by
+    intro w A h rc hrc
+    obtain ⟨_, _, L⟩ := hrc
+    rw [← L.nu]
+    refine congrArg rc ?_
+    change (cl (σ w)).nu _ = _
+    rw [hcl, IrrGL.nu_nu]
+    congr 1
+    rw [hsC]; push_cast; ring
+  refine ⟨r, HT, ⟨hr.cont, hr.ss, fun w hg => hr.ht w fun A h rc hrc => ?_,
+    fun w A h rc hrc => key w A h rc hrc ▸ hr.par w A h rc hrc⟩, fun τ => ?_⟩
+  · have := hg A h rc hrc
+    simp only [key w A h rc hrc]
+    exact this
+  · rw [hHT, hinf, Multiset.map_map]
+    refine Multiset.map_congr rfl fun z _ => ?_
+    simp only [Function.comp_apply, hsC]; ring
+
+
+[GUA_SRC_PLAIN_DEF] Unlinked and PlainTor literal support definition
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GaloisGeometry/CyclicStrongAtCusp.lean#L18-L31
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.HeckeGal GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.GLq
+open GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.GalCut
+attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
+namespace GlobalTheory.RoadU
+
+section Classes
+
+variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+
+def Unlinked (s : Multiset (IrrGL k)) : Prop := ∀ y ∈ s, ∀ z ∈ s, y ≠ z.nu 1
+
+def PlainTor (x : IrrGL k) : Prop := ∃ s, HasSupport x.rep s ∧ (∀ y ∈ s, y.1 = 1) ∧ Unlinked s
+
+
+
+[GUA_SRC_PLAIN] Original plainGd and its singleton principal-series proof
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/UnitaryGaloisFamilies/PlainGd.lean#L14-L69
+namespace UpperTheory.V.Z.Win.Gu.PrincipalSeriesDeterminant
+
+private theorem equiv_prinSeries {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    {n : ℕ} {V : Type} [AddCommGroup V] [Module ℂ V] (ρ : Representation ℂ (GL (Fin n) k) V)
+    (ξ : Fin n → kˣ →* ℂˣ) (hξ : ∀ i, IsSmoothChar (ξ i)) (hs : HasSupport ρ (GlobalTheory.RoadU.chars ξ hξ))
+    (hu : GlobalTheory.RoadU.Unlinked (GlobalTheory.RoadU.chars ξ hξ)) : Nonempty (ρ.Equiv (prinSeries ξ)) := by
+  obtain ⟨hi, hq⟩ := (UpperTheory.Gal.LocD.ofSupport_holds k n V ρ ξ hξ).1 hs
+  let y : Fin n → IrrGL k := fun i => IrrGL.ofChar (ξ i) (hξ i)
+  have hy : ∀ i, (y i).IsCusp := fun i => IrrGL.isCusp_ofChar _ _
+  have hd : ∑ i, (y i).1 = n := by simp [y, IrrGL.ofChar]
+  have hmem : ∀ i, y i ∈ GlobalTheory.RoadU.chars ξ hξ := fun i => Multiset.mem_map_of_mem _ (Finset.mem_univ i)
+  have hP : (prodIrr y hd).IsIrreducible :=
+    GlobalTheory.RgGu.Holds.lUnlinkedIrr_holds k n n (fun i => Segment.single (y i) (hy i)) y hd
+      (fun i j => GlobalTheory.CompanionTheory.BZPair.not_linked_single (hy i) (hy j) (hu _ (hmem j) _ (hmem i)) (hu _ (hmem i) _ (hmem j)))
+      (fun i => (single_spec (hy i)).2.1)
+  let e₀ := Equiv.sigmaUnique (Fin n) fun _ => Fin 1
+  obtain ⟨p⟩ := (Placing.parInd_jac_placing k _ _ _ e₀ (stdBlocks (fun i => (y i).1) hd) _).1
+    (piTensor fun i => detRep (Fin 1) (ξ i))
+  have hM : (multiProd e₀ fun i => detRep (Fin 1) (ξ i)).IsIrreducible :=
+    GlobalTheory.Parabolic.isIrreducible_of_equiv
+      (p.trans (multiProdEquiv (stdBlocks (fun i => (y i).1) hd)
+        fun i => equivRep (IrrRep.det (Fin 1) (ξ i) (hξ i)))).symm hP
+  haveI := nontrivial_of_irreducible hM
+  haveI := GlobalTheory.TypeTwo.PowIrrProof.nontrivial_of_isSubquotient (GlobalTheory.PermPrin.isSubquotient_multiProd_prinSeries e₀ ξ)
+  obtain ⟨e⟩ := GlobalTheory.TypeTwo.PowIrrProof.equiv_of_isSubquotient (GlobalTheory.PrinProd.isSubquotient_prinSeries_multiProd k n ξ) hM
+  obtain ⟨f⟩ := hq.nonempty_equiv hi (GlobalTheory.Parabolic.isIrreducible_of_equiv e hM)
+  exact ⟨f.symm⟩
+
+end UpperTheory.V.Z.Win.Gu.PrincipalSeriesDeterminant
+
+open UpperTheory.V.Z.Win.Gu.PrincipalSeriesDeterminant in
+theorem UpperTheory.V.Z.Win.Gu.plainGd :
+    PlainGd := by
+  intro E Ω _ _ _ _ _ A w h rc ⟨a, ha, L⟩ n σ hP
+  haveI : CharZero (w.adicCompletion E) := charZero_of_injective_algebraMap (algebraMap E _).injective
+  obtain ⟨ξ, hξ, hs, hu⟩ := GlobalTheory.RoadU.plainTor_exists_chars _ _ hP
+  have hs' : HasSupport σ.ρ (GlobalTheory.RoadU.chars ξ hξ) := hs.of_equiv (IrrGL.equivOf σ.ρ σ.smooth σ.irred).symm
+  obtain ⟨e⟩ := equiv_prinSeries σ.ρ ξ hξ hs' hu
+  have hL := (UpperTheory.V.Z.Win.MonodromyFreeReciprocity.isL_chars σ.ρ σ.irred ξ hξ hu e).of_equiv (IrrGL.equivOf σ.ρ σ.smooth σ.irred)
+  have hr : rc (IrrGL.of σ.ρ σ.smooth σ.irred) =
+      sumList (List.ofFn fun i => WD.lpOfChar h ((ξ i).comp a) (ha.smooth (hξ i))) := by
+    rw [L.langlands _ _ hL, segSum, List.map_ofFn]
+    congr 1
+    refine List.ofFn_inj.mpr (funext fun i => ?_)
+    simp only [Function.comp_apply, Segment.single, Segment.first_ofFirst, Segment.len_ofFirst, Nat.cast_one, sub_self,
+      zero_div, WD.lpTw_zero, Test.lpChar_lpSp_one, L.one]
+  have hA : rc (algNorm σ) = (sumList (List.ofFn fun i => WD.lpOfChar h ((ξ i).comp a) (ha.smooth (hξ i)))).lpTw
+      ((1 - (n : ℝ)) / 2) := by
+    rw [algNorm, L.nu, hr]
+  refine ⟨?_, ?_⟩
+  · rw [hA]
+    exact UpperTheory.V.Z.Win.MonodromyFreeReciprocity.tor_sum _ _ _ (by rw [← hA, L.dim]; rfl)
+  · rw [hA, WD.monomial_twist_iff]
+    exact UpperTheory.V.Z.Win.MonodromyFreeReciprocity.monodromy_free_sum_list _ fun z hz => by
+      obtain ⟨i, rfl⟩ := List.mem_ofFn.1 hz
+      exact UpperTheory.V.Z.Win.MonodromyFreeReciprocity.monodromy_free_of_character _ _
+
+
+[GUA_SRC_PROD] Original multisegment union argument for irreducible products
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/IsLanglandsClassificationAddOfIrreducibleProduct.lean#L1-L71
+import Mathlib
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.Langlands
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.LocalLanglandsExists
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.DepthZeroCuspidalLL
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.LocalConverseGL
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.LanglandsExhaustionGL
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.DepthZeroInduction
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.BrauerDegreeZero
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.LanglandsMultisegments
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.StandardCosocleGL
+import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.ExistsCellOfIsSubquotient
+import Development.AbelianVarietyTheory.PublishedTheorems.TwistedTraceFormula.HasFiniteLengthOfIsIrreducible
+import Development.AbelianVarietyTheory.PublishedTheorems.AutomorphicForms₂.ExistsUniqueHcharOfFiniteOrder
+import Development.AbelianVarietyTheory.PublishedTheorems.GaloisCohomology₂.ChevalleyUnits
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsListPairwiseNotRel
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.ExistsEquivProdIrrTw
+open NumberField IsDedekindDomain ValuativeRel Matrix Polynomial Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.SplitWeil GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.Published
+attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
+namespace GlobalTheory.LocGL.SumProd
+
+variable {k : Type} [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+  {V : Type} [AddCommGroup V] [Module ℂ V] {N : ℕ}
+
+theorem sum_fst_of_lFactors {𝔪 : Multiset (Segment k)} {h : ℕ} {x : Fin h → IrrGL k} (hx : LFactors 𝔪 x) :
+    ∑ a, (x a).1 = (𝔪.map Segment.deg).sum := by
+  obtain ⟨Δ, ⟨rfl, -⟩, hΔ⟩ := hx
+  rw [Multiset.map_map, ← Finset.sum_eq_multiset_sum]
+  exact Finset.sum_congr rfl fun a _ => (hΔ a).deg_eq.symm
+
+theorem deg_of_isL {𝔪 : Multiset (Segment k)} {π : Representation ℂ (GL (Fin N) k) V} (h : IsL 𝔪 π) :
+    (𝔪.map Segment.deg).sum = N := by
+  obtain ⟨_, x, hd, hx, -⟩ := h
+  exact (sum_fst_of_lFactors hx).symm.trans hd
+
+theorem exists_isLSeg_of_isL {𝔪 : Multiset (Segment k)} {π : Representation ℂ (GL (Fin N) k) V} (h : IsL 𝔪 π)
+    {Δ : Segment k} (hΔ : Δ ∈ 𝔪) : ∃ y : IrrGL k, IsLSeg Δ y.rep := by
+  obtain ⟨_, x, -, ⟨D, ⟨rfl, -⟩, hD⟩, -⟩ := h
+  obtain ⟨a, -, rfl⟩ := Multiset.mem_map.1 hΔ
+  exact ⟨x a, hD a⟩
+
+theorem exists_isL [CharZero k] (hS : StandardCosocleGL) {𝔪 : Multiset (Segment k)}
+    (h : ∀ Δ ∈ 𝔪, ∃ y : IrrGL k, IsLSeg Δ y.rep) (hN : (𝔪.map Segment.deg).sum = N) :
+    ∃ π : IrrRep (GL (Fin N) k), IsL 𝔪 π.ρ := by
+  obtain ⟨D, hD⟩ := exists_isOrderedForm 𝔪
+  have hm : ∀ i, D i ∈ 𝔪 := fun i => hD.1 ▸ Multiset.mem_map_of_mem D (Finset.mem_univ i)
+  choose x hx using fun i => h _ (hm i)
+  have hF : LFactors 𝔪 x := ⟨D, hD, hx⟩
+  have hd : ∑ a, (x a).1 = N := (sum_fst_of_lFactors hF).trans hN
+  obtain ⟨π, hπ⟩ := hS k 𝔪 _ _ x hd hF
+  exact ⟨π, _, x, hd, hF, hπ⟩
+
+theorem isL_add_of_equiv_prod₂ : LanglandsMultisegments → StandardCosocleGL → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k] (r t : ℕ) (σ : IrrRep (GL (Fin r) k)) (τ : IrrRep (GL (Fin t) k)) (π : IrrRep (GL (Fin (r + t)) k)) (𝔪 𝔫 : Multiset (Segment k)), IsL 𝔪 σ.ρ → IsL 𝔫 τ.ρ → Nonempty (π.ρ.Equiv (prod₂ σ.ρ τ.ρ)) → IsL (𝔪 + 𝔫) π.ρ := by
+  rintro hM hS k _ _ _ _ _ r t σ τ π 𝔪 𝔫 h1 h2 ⟨e⟩
+  obtain ⟨y, hy⟩ := exists_isL (N := r + t) hS (𝔪 := 𝔪 + 𝔫)
+    (fun Δ hΔ => (Multiset.mem_add.1 hΔ).elim (exists_isLSeg_of_isL h1) (exists_isLSeg_of_isL h2))
+    (by rw [Multiset.map_add, Multiset.sum_add, deg_of_isL h1, deg_of_isL h2])
+  have hd : ∑ a, (![IrrGL.of σ.ρ σ.smooth σ.irr, IrrGL.of τ.ρ τ.smooth τ.irr] a).1 = r + t := Fin.sum_univ_two _
+  obtain ⟨φ⟩ := nonempty_prod₂_equiv_prodIrr σ.ρ σ.smooth σ.irr τ.ρ τ.smooth τ.irr hd
+  have ψ := IrrGL.equivOf y.ρ y.smooth y.irr
+  have a1 : IsL 𝔪 (IrrGL.of σ.ρ σ.smooth σ.irr).rep := h1.of_equiv (IrrGL.equivOf _ _ _)
+  have a2 : IsL 𝔫 (IrrGL.of τ.ρ τ.smooth τ.irr).rep := h2.of_equiv (IrrGL.equivOf _ _ _)
+  have a3 : IsL (𝔪 + 𝔫) (IrrGL.of y.ρ y.smooth y.irr).rep := hy.of_equiv ψ
+  have hs := (hM k).2 𝔪 𝔫 ![IrrGL.of σ.ρ σ.smooth σ.irr, IrrGL.of τ.ρ τ.smooth τ.irr]
+    (IrrGL.of y.ρ y.smooth y.irr) hd a1 a2 a3
+  have E := (e.trans φ).symm
+  obtain ⟨θ⟩ := IsSubquotient.nonempty_equiv
+    (hs.trans (.of_injective E.toIntertwiningMap E.toLinearEquiv.injective)) (IrrRep.irr _) π.irr
+  exact a3.of_equiv θ.symm
+
+end GlobalTheory.LocGL.SumProd
+
+
+[GUA_SRC_SPEH] Original generic-unitary ordered-segment proof of SpehT
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/GuSpehT.lean#L1-L55
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.DiscreteSeriesCoefficientsCuspidal
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.AutomorphyLifting.UnitaryGaloisFamilies.RecSpehQuotT
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.AfDesc
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.LitAut
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.AutomorphicFormHyp
+import Development.WeilBound.CoreStatements.AutomorphicKernels.UnitaryDualGL.GenericUnitaryDual.GenericUnitaryDualGL
+
+set_option maxHeartbeats 800000
+set_option synthInstance.maxHeartbeats 200000
+
+section
+open UpperTheory.V.Af UpperTheory.V.Af.Gu UpperTheory.V.Z.Win UpperTheory.V.Z.Win.Gu
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal GlobalTheory.PRep GlobalTheory.SmGL GlobalTheory.LocGL GlobalTheory.WeilDeligne GlobalTheory.LocLanglands
+open GlobalTheory.CuspRep GlobalTheory.DefiniteBC UpperTheory.Zero.LLC
+attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+private theorem segSum_nu {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
+    {rc : IrrGL (w.adicCompletion E) → WD h} (hnu : ∀ x (s : ℝ), rc (x.nu s) = (rc x).lpTw s)
+    (l : List (Segment (w.adicCompletion E))) (c : ℝ) :
+    segSum rc (l.map fun Γ => Γ.nu (c : ℂ)) = (segSum rc l).lpTw c := by
+  simp only [segSum]
+  rw [← GlobalTheory.NuShift.sumList_lpTw, List.map_map, List.map_map]
+  congr 1
+  refine List.map_congr_left fun Γ _ => ?_
+  show ((rc (Γ.first.nu (c : ℂ))).lpTw _).lpChar _ = _
+  rw [hnu, WD.lpTw_add, add_comm, ← WD.lpTw_add, GlobalTheory.NuShift.lpChar_lpTw]
+  rfl
+private theorem rec_spehQuotT {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w}
+    {rc : IrrGL (w.adicCompletion E) → WD h} (hrc : IsRecT h rc) (hTZ : GlobalTheory.Published.GenericUnitaryDualGL)
+    (hLM : GlobalTheory.Published.StandardCosocleGL) (a d n : ℕ) (hd : ∑ _ : Fin d, a = n) (σ : LocIrr w a) (σ' : LocIrr w n)
+    (hu : IsUnitarisable σ.ρ) (hg : IsGeneric σ.ρ) (hq : IsSpehQuot hd σ σ') :
+    rc (cls (ParLaws.toRep σ')) =
+      sumList ((List.range d).map fun k : ℕ => (rc (cls (ParLaws.toRep σ))).lpTw (((d : ℝ) - 1) / 2 - k)) := by
+  haveI : CharZero (w.adicCompletion E) := charZero_of_injective_algebraMap (algebraMap E _).injective
+  obtain ⟨m, δ, Δ, s, hΔ, hδu, hs, hd0, hφ⟩ := hTZ.exists_prod σ.smooth σ.irred hu hg
+  have hA := GlobalTheory.T.isLanglandsQuotient_of_irreducible_unitary_segment_product _ (GlobalTheory.T.unitarisable_segment_twist_precedes_add_one_le _) a _ σ.ρ σ.irred m δ Δ s hΔ hδu hs hd0 hφ
+  have hB := GlobalTheory.T.langlandsQuotient_of_speh_type_product_isL _ hLM (GlobalTheory.T.unitarisable_segment_twist_precedes_add_one_le _) (GlobalTheory.T.parabolicInduction_in_stages_product_of_products _) a _ σ.ρ m δ Δ s hΔ hδu hs hd0 hφ d n hd _ σ'.ρ σ'.irred hq
+  obtain ⟨a', ha', L⟩ := hrc
+  rw [L.langlands _ _ (GlobalTheory.SpehRec.isL_of_equiv hB (equivRep (ParLaws.toRep σ'))),
+    L.langlands _ _ (GlobalTheory.SpehRec.isL_of_equiv hA (equivRep (ParLaws.toRep σ)))]
+  simp only [segSum]
+  rw [List.map_flatMap, GlobalTheory.SpehRec.sumList_flatMap]
+  congr 1
+  refine List.map_congr_left fun i _ => ?_
+  exact segSum_nu L.nu _ _
+theorem UpperTheory.V.Z.Win.Gu.spehT_alt :
+    _root_.UpperTheory.V.Af.HypothesesH' → ExtraV → SpehT := by
+  intro H _ E Ω _ _ _ _ _ _ a d P w ρ σ _ _ hP hu hS A h rc hrc
+  have L := H.litN.loc
+  have hd : ∑ _ : Fin d, a = d * a := by simp
+  exact rec_spehQuotT hrc (_root_.PositivityTheory.Gud.generic_unitary_dual_GL trivial L.sq L.gen L.multi L.cos) L.cos a d _ hd ρ σ hu
+    (GlobalTheory.CuspRep.Generic.isGeneric_of_isLocComp E a P w ρ hP)
+    (GlobalTheory.DiscreteSpectrumCM.isSpehQuot_of_isSpeh hd ρ σ hS)
+end
+
+
+[GUA_SRC_PRECEDENCE] Central-character norm identity and x+1<=y precedence bound
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/UnitarisableSegmentTwistPrecedesAddOneLe.lean#L24-L121
+  have h := hi g v v
+  have h0 : B v v ≠ 0 := fun e => by simpa [e] using hp v hv
+  rw [hc, B.map_smul, LinearMap.smul_apply, LinearMap.map_smulₛₗ, smul_eq_mul, smul_eq_mul, ← mul_assoc,
+    Complex.mul_conj, mul_eq_right₀ h0] at h
+  have h2 : ‖c‖ ^ 2 = 1 := by
+    rw [← Complex.normSq_eq_norm_sq]; exact_mod_cast h
+  exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).1 h2
+
+theorem log_norm_mul_absPow (ω : kˣ →* ℂˣ) (t : ℝ) (d : ℕ) (z : kˣ) :
+    Real.log ‖(((ω * absPow k (t : ℂ) ^ d) z : ℂˣ) : ℂ)‖ =
+      Real.log ‖(ω z : ℂ)‖ + d * t * Real.log (nabs k z) := by
+  have hz := nabs_pos' k z
+  have hω : ‖(ω z : ℂ)‖ ≠ 0 := norm_ne_zero_iff.2 (ω z).ne_zero
+  rw [MonoidHom.mul_apply, MonoidHom.pow_apply, Units.val_mul, Units.val_pow_eq_pow_val, val_absPow_ofReal,
+    norm_mul, norm_pow, Complex.norm_real, Real.norm_of_nonneg (Real.rpow_nonneg hz.le _),
+    Real.log_mul hω (pow_ne_zero _ (Real.rpow_pos_of_pos hz _).ne'), Real.log_pow, Real.log_rpow hz]
+  ring
+
+theorem sum_range_mul_two (l : ℕ) : (∑ i ∈ Finset.range l, (i : ℝ)) * 2 = l * ((l : ℝ) - 1) := by
+  induction l with
+  | zero => simp
+  | succ n ih => rw [Finset.sum_range_succ, add_mul, ih]; push_cast; ring
+
+theorem log_norm_centralChar {δ : IrrGL k} {Δ : Segment k} (hL : IsLSeg Δ δ.rep) (hU : IsUnitarisable δ.rep)
+    {ω : kˣ →* ℂˣ} (hω : HasCentralChar Δ.first.rep ω) (z : kˣ) :
+    Real.log ‖(ω z : ℂ)‖ = -((Δ.d : ℝ) * ((Δ.len : ℝ) - 1) / 2) * Real.log (nabs k z) := by
+  obtain ⟨hd, hi, f, hf, -⟩ := hL
+  have hterm : ∀ a : Fin Δ.len,
+      HasCentralChar (Δ.term a).rep (ω * absPow k (((a : ℕ) : ℝ) : ℂ) ^ Δ.d) := fun a => by
+    have h := hasCentralChar_nu Δ.first hω ((a : ℕ) : ℂ)
+    rw [Complex.ofReal_natCast]
+    exact h
+  have hsc : ∀ v, δ.rep (GeneralLinearGroup.scalar (Fin δ.1) z) v =
+      (∏ a : Fin Δ.len, (((ω * absPow k (((a : ℕ) : ℝ) : ℂ) ^ Δ.d) z : ℂˣ) : ℂ)) • v := by
+    intro v
+    obtain ⟨w, rfl⟩ := hf v
+    have h1 := GlobalTheory.BoundaryMaps.multiProd_scalar (stdBlocks (fun a => (Δ.term a).1) hd)
+      (fun a => (Δ.term a).rep) _ hterm z w
+    rw [← f.isIntertwining]
+    exact (congrArg f h1).trans (map_smul f _ _)
+  haveI := Model.nontrivial_of_isIrreducible hi
+  have hc := congrArg Real.log (norm_eq_one_of_isUnitarisable hU hsc)
+  rw [norm_prod, Real.log_one, Real.log_prod fun a _ => norm_ne_zero_iff.2 (Units.ne_zero _)] at hc
+  simp only [log_norm_mul_absPow] at hc
+  rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul,
+    ← Finset.sum_mul, ← Finset.mul_sum, Fin.sum_univ_eq_sum_range (fun i => (i : ℝ)) Δ.len] at hc
+  have hS := sum_range_mul_two Δ.len
+  have hl : (Δ.len : ℝ) ≠ 0 := Nat.cast_ne_zero.2 Δ.len_pos.ne'
+  apply mul_left_cancel₀ hl
+  linear_combination hc - ((Δ.d : ℝ) * Real.log (nabs k z) / 2) * hS
+
+theorem add_one_le_of_precedes (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k]
+    (δ δ' : IrrGL k) (Δ Δ' : Segment k) (hL : IsLSeg Δ δ.rep) (hU : IsUnitarisable δ.rep) (hL' : IsLSeg Δ' δ'.rep)
+    (hU' : IsUnitarisable δ'.rep) (x y : ℝ) (hP : (Δ.nu x).Precedes (Δ'.nu y)) : x + 1 ≤ y := by
+  obtain ⟨⟨-, -, hnsub⟩, j, hj, hfirst⟩ := hP
+  have hf : Δ'.first.nu (y : ℂ) = (Δ.first.nu (x : ℂ)).nu (j : ℂ) := hfirst
+  have hρ' : Δ'.first = Δ.first.nu (((x + j - y : ℝ)) : ℂ) := by
+    have h1 := congrArg (fun r => r.nu (-(y : ℂ))) hf
+    simp only [IrrGL.nu_nu, add_neg_cancel, IrrGL.nu_zero] at h1
+    rw [h1]
+    congr 1
+    push_cast
+    ring
+  have hd : Δ'.d = Δ.d := congrArg Sigma.fst hρ'
+  obtain ⟨ω, -, hω⟩ := exists_smooth_hasCentralChar Δ.first.2.rep.smooth Δ.first.2.rep.irr
+  have hω' : HasCentralChar Δ'.first.rep (ω * absPow k (((x + j - y : ℝ)) : ℂ) ^ Δ.first.1) := by
+    rw [hρ']
+    exact hasCentralChar_nu _ hω _
+  obtain ⟨ϖ, hϖ⟩ := exists_uniformizer k
+  have hne : nabs k ϖ ≠ 1 := fun e => uniformizer_lt_one.ne (hϖ ▸ (nabs_eq_one_iff ϖ).1 e)
+  have hL0 : Real.log (nabs k ϖ) ≠ 0 := Real.log_ne_zero_of_pos_of_ne_one (nabs_pos' k ϖ) hne
+  have hA := log_norm_centralChar hL hU hω ϖ
+  have hA' := log_norm_centralChar hL' hU' hω' ϖ
+  rw [log_norm_mul_absPow, hd] at hA'
+  have hdL : (Δ.d : ℝ) * Real.log (nabs k ϖ) ≠ 0 := mul_ne_zero (Nat.cast_ne_zero.2 Δ.d_pos.ne') hL0
+  have ht : x + j - y = ((Δ.len : ℝ) - Δ'.len) / 2 := by
+    apply mul_left_cancel₀ hdL
+    have e1 : (Δ.first.1 : ℝ) = Δ.d := rfl
+    rw [e1] at hA'
+    linear_combination hA' - hA
+  have hlen : Δ.len < j + Δ'.len := by
+    by_contra hcon
+    push_neg at hcon
+    apply hnsub
+    intro w hw
+    obtain ⟨a, ha, rfl⟩ := Segment.mem_carrier.1 hw
+    refine Segment.mem_carrier.2 ⟨j + a, ?_, ?_⟩
+    · have ha' : a < Δ'.len := ha
+      show j + a < Δ.len
+      omega
+    · rw [hfirst, IrrGL.nu_nu]
+      push_cast
+      rfl
+  have hj1 : (1 : ℝ) ≤ j := by exact_mod_cast hj
+  have hl1 : (Δ.len : ℝ) + 1 ≤ j + Δ'.len := by exact_mod_cast hlen
+  linarith
+
+end GlobalTheory.LocGL.UnitaryOrder
+
+
+[GUA_SRC_REC_TOTAL] Original RecTotT and exact exponent ex/2
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/UnitaryGaloisFamilies/RecTotT.lean#L1-L40
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.AutomorphyLifting.UnitaryGaloisFamilies.IrrCaseT
+
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp
+open UpperTheory.V.Af UpperTheory.V.Af.Gu UpperTheory.V.Z.Win UpperTheory.V.Z.Win.Gu
+
+attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
+private theorem tw_sumList {E Ω : Type} [Field E] [NumberField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω]
+    {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)} {h : IsPlaceOver A w} (s : ℝ) (L : List (WD h)) :
+    (sumList L).lpTw s = sumList (L.map fun x => x.lpTw s) := by
+  induction L with
+  | nil =>
+    change (WD.lpZero h).lpTw s = WD.lpZero h
+    rw [WD.lpZero, WD.lpTw_mk]
+    exact WD.sound ⟨.refl _ _, fun _ _ => Subsingleton.elim _ _, fun _ => Subsingleton.elim _ _⟩
+  | cons x L ih =>
+    change (x.lpSum (sumList L)).lpTw s = (x.lpTw s).lpSum (sumList (L.map fun x => x.lpTw s))
+    rw [WD.lpTw_sum, ih]
+
+theorem UpperTheory.V.Z.Win.Gu.recTotT :
+    ProdT → SpehT → RecTotT := by
+  intro hProd hSpeh E Ω _ _ _ _ _ _ n c a d hn P w ρ σ hpos hP hS τ e A h rc hrc
+  have h1 := hProd E Ω n c (fun i => d i * a i) hn w σ (fun i => (hS i).2.1) τ e A h rc hrc
+  have h2 : ∀ i, rc (cl (σ i)) = sumList ((List.range (d i)).map fun k : ℕ =>
+      (rc (cl (ρ i))).lpTw (((d i : ℝ) - 1) / 2 - k)) := fun i =>
+    hSpeh E Ω (a i) (d i) (P i) w (ρ i) (σ i) (hpos i).1 (hpos i).2 (hP i) (hS i).1 (hS i).2.2 A h rc hrc
+  have h3 : rc (algNorm τ) = (rc (cl τ)).lpTw ((1 - (n : ℝ)) / 2) := by
+    obtain ⟨_, _, L⟩ := hrc
+    exact L.nu _ _
+  rw [h3, h1, tw_sumList, List.map_ofFn]
+  refine congrArg sumList (congrArg List.ofFn (funext fun i => ?_))
+  rw [Function.comp_apply, h2, tw_sumList, List.map_map, List.ofFn_eq_map, ← List.map_coe_finRange_eq_range,
+    List.map_map]
+  refine congrArg sumList (List.map_congr_left fun k _ => ?_)
+  simp only [Function.comp_apply, WD.lpTw_add]
+  refine congrArg₂ WD.lpTw rfl ?_
+  simp only [ex]
+  push_cast
+  ring
+
+
+[GUA_SRC_WEIGHT_DEF] IsUnramU, HasWeightAt, infOfWeight with the actual cEmb map
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/PublishedTheorems/GaloisCohomology₂/BaseChangeDefiniteUnitary.lean#L125-L144
+
+def IsSplitAt (w : HeightOneSpectrum (𝓞 E)) : Prop :=
+  ∃ u : HeightOneSpectrum (𝓞 E), u ≠ w ∧
+    u.under (𝓞 (maximalRealSubfield E)) = w.under (𝓞 (maximalRealSubfield E))
+
+def IsUnramU (π : Submodule ℂ (UA E n → ℂ)) (w : HeightOneSpectrum (𝓞 E)) : Prop :=
+  ∃ φ ∈ π, φ ≠ 0 ∧ ∀ x ∈ locU n w, cLoc w x ∈ GlobalTheory.LFun.KGL w n → RU E n x φ = φ
+
+def HasSatAt (π : Submodule ℂ (UA E n → ℂ)) (w : HeightOneSpectrum (𝓞 E))
+    (s : w.adicCompletion E →+* w.adicCompletion E) (ϖ : w.adicCompletion E) (q : ℕ) (α : Fin (n / 2) → ℂˣ) : Prop :=
+  ∃ b ∈ GlobalTheory.LFun.KGL w n, cT s b.val * b.val = antiJ (w.adicCompletion E) n ∧
+    ∃ p : locU n w →* GU s n, (∀ x, (p x).val = b⁻¹ * cLoc w x.val * b) ∧
+      ∃ σ : SmIrr (GU s n), IsCompAlong π (locU n w) p σ.ρ ∧ GlobalTheory.LFun.HasSatU ϖ q σ.ρ α
+
+def HasWeightAt (π : Submodule ℂ (UA E n → ℂ)) (τ : E →+* ℂ) (lam : DomWeight n) : Prop :=
+  IsCompAlong π (embU n τ) ((cEmb τ).comp (embU n τ).subtype) (GlobalTheory.Branching.sqRep ℂ n lam)
+
+def infOfWeight (lam : DomWeight n) : Multiset ℂ :=
+  Finset.univ.val.map fun k : Fin n => (lam.w k : ℂ) + (((n : ℂ) - 1) / 2 - (k : ℕ))
+
+
+
+[GUA_SRC_WEIGHT_EXISTENCE] Actual finite infinity-orbit construction and evaluation-continuity argument
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsUniqueWeightDefiniteUnitaryAt.lean#L29-L103
+  exact this hψ
+
+theorem mem_infU_of_mem_embU {τ : E →+* ℂ} {x : UA E n} (hx : x ∈ embU n τ) : x ∈ infU E n :=
+  (Subgroup.mem_inf.1 hx).1
+
+theorem exists_hasWeightAt (U : AutSub E n) (τ : E →+* ℂ) : ∃ lam, HasWeightAt U.V τ lam := by
+  obtain ⟨e, he⟩ := GlobalTheory.T.archimedeanUnitaryPoints_equiv_unitaryGroup E n τ
+  obtain ⟨φ, hφU, hφ0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot U.isAut.ne_bot
+  let j : Matrix.unitaryGroup (Fin n) ℂ →* UA E n := (embU n τ).subtype.comp e.symm.toMulEquiv.toMonoidHom
+  have hj : ∀ u, j u ∈ infU E n := fun u => mem_infU_of_mem_embU (e.symm u).2
+  let S := infSpan φ
+  have hφS : φ ∈ S := by
+    have : RU E n (1 : infU E n) φ ∈ S := Submodule.subset_span ⟨1, rfl⟩
+    simpa using this
+  have hS : S ≤ U.V := Submodule.span_le.2 (by rintro _ ⟨k, rfl⟩; exact U.isAut.stable _ _ hφU)
+  haveI : FiniteDimensional ℂ S := (U.isAut.aut φ hφU).kfin
+  haveI : Nontrivial S := ⟨⟨⟨φ, hφS⟩, 0, fun h => hφ0 (congrArg Subtype.val h)⟩⟩
+  let ρ : Representation ℂ (Matrix.unitaryGroup (Fin n) ℂ) S :=
+    sub ((RU E n).comp j) S (fun u ψ hψ => RU_mem_infSpan φ (hj u) hψ)
+  have hρ : ∀ u (v : S), (ρ u v : UA E n → ℂ) = RU E n (j u) v := fun _ _ => rfl
+  have hcont : ∀ (l : Module.Dual ℂ S) (v : S), Continuous fun u => l (ρ u v) := by
+    let P : Submodule ℂ (Module.Dual ℂ S) :=
+      { carrier := {l | ∀ v : S, Continuous fun u => l (ρ u v)}
+        add_mem' := fun ha hb v => (ha v).add (hb v)
+        zero_mem' := fun _ => continuous_const
+        smul_mem' := fun c _ ha v => (ha v).const_smul c }
+    have hev : ∀ g : UA E n, (LinearMap.proj g ∘ₗ S.subtype : Module.Dual ℂ S) ∈ P := fun g v => by
+      have hv : Continuous (v : UA E n → ℂ) := (U.isAut.aut _ (hS v.2)).cont
+      have : Continuous fun u => (j u : UA E n) := continuous_subtype_val.comp e.symm.continuous
+      exact hv.comp ((continuous_const_mul g).comp this)
+    have h1 : P.dualCoannihilator = ⊥ := by
+      rw [eq_bot_iff]
+      intro v hv
+      rw [Submodule.mem_dualCoannihilator] at hv
+      exact (Submodule.mem_bot ℂ).2 (Subtype.ext (funext fun g => hv _ (hev g)))
+    have hP : P = ⊤ := by
+      rw [← Subspace.dualCoannihilator_dualAnnihilator_eq (W := P), h1, Submodule.dualAnnihilator_bot]
+    intro l v
+    have : l ∈ P := hP ▸ Submodule.mem_top
+    exact this v
+  obtain ⟨lam, f, hf⟩ := GlobalTheory.T.unitaryGroup_finiteDimensionalRep_contains_highestWeightRep n S ρ hcont
+  refine ⟨lam, isIrreducible_smallRep_id n lam, S.subtype ∘ₗ f.toLinearMap, fun h0 => hf ?_,
+    fun v => hS (f v).2, fun x v => ?_⟩
+  · refine Representation.IntertwiningMap.ext (LinearMap.ext fun v => Subtype.ext ?_)
+    simpa using LinearMap.congr_fun h0 v
+  · have h1 : ((cEmb τ).comp (embU n τ).subtype) x = unitaryIncl n (e x) := (he x).symm
+    rw [h1]
+    have h2 := Representation.IntertwiningMap.isIntertwining _ _ f (e x) v
+    change (f (smallRep (unitaryIncl n) lam (e x) v)).1 = _
+    rw [h2, hρ]
+    change RU E n ((e.symm (e x) : embU n τ) : UA E n) (f v).1 = _
+    rw [e.symm_apply_apply]
+    rfl
+
+theorem hasWeightAt_unique (U : AutSub E n) (τ : E →+* ℂ) {lam lam' : DomWeight n} (h : HasWeightAt U.V τ lam)
+    (h' : HasWeightAt U.V τ lam') : lam = lam' := by
+  obtain ⟨e, he⟩ := GlobalTheory.T.archimedeanUnitaryPoints_equiv_unitaryGroup E n τ
+  obtain ⟨r, -, hr1, hr⟩ := GlobalTheory.T.exists_continuous_retraction_onto_unitaryArchimedeanPoints E n τ
+  let s : Matrix.unitaryGroup (Fin n) ℂ →* UA E n := (embU n τ).subtype.comp e.symm.toMulEquiv.toMonoidHom
+  have mk : ∀ mu, HasWeightAt U.V τ mu →
+      ∃ f : (smallRep (unitaryIncl n) mu).IntertwiningMap (U.rep.comp s), f ≠ 0 := by
+    rintro mu ⟨-, F, hF0, hFm, hFi⟩
+    refine ⟨⟨F.codRestrict U.V hFm, fun u => ?_⟩, fun h0 => hF0 ?_⟩
+    · ext v : 1
+      apply Subtype.ext
+      show F (sqRep ℂ n mu (unitaryIncl n u) v) = RU E n (s u) (F v)
+      have : unitaryIncl n u = ((cEmb τ).comp (embU n τ).subtype) (e.symm u) := by
+        have h3 := he (e.symm u)
+        rw [e.apply_symm_apply] at h3
+        exact h3
+      rw [this, hFi]
+      rfl
+    · ext v : 1
+      exact congrArg Subtype.val (DFunLike.congr_fun h0 v :)
+  obtain ⟨f, hf⟩ := mk lam h
+
+
+[GUA_SRC_STRINGS] Exact Strings producer; integral exponents and multiset identity
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/BuildingsResidueChars/SpehParameterStrings.lean#L1-L65
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.GuDefs
+
+open UpperTheory.V.Af UpperTheory.V.Af.Gu
+open GlobalTheory.DefiniteBC
+
+private theorem spehInf_eq_sum_shifted_map (d : ℕ) (m : Multiset ℂ) :
+    spehInf d m = ∑ k : Fin d, Multiset.map (fun x => x + (((d:ℂ) - 1) / 2 - ((k:ℕ):ℂ))) m := by
+  unfold spehInf
+  rw [Fin.sum_univ_eq_sum_range (fun k => Multiset.map (fun x => x + (((d:ℂ) - 1) / 2 - (k:ℂ))) m) d]
+  rw [Finset.sum_eq_multiset_sum, Finset.range_val, Multiset.range, Multiset.map_coe, Multiset.sum_coe]
+
+private theorem infOfWeight_nodup' (n : ℕ) (lam : Formalism.BasicNotions.DomWeight n) :
+    (GlobalTheory.UnitaryBC.infOfWeight lam).Nodup := by
+  unfold GlobalTheory.UnitaryBC.infOfWeight
+  refine Multiset.Nodup.map ?_ Finset.univ.nodup
+  intro a b h
+  have h2 : ((lam.w a - (a:ℕ) : ℤ) : ℂ) = ((lam.w b - (b:ℕ) : ℤ) : ℂ) := by
+    push_cast
+    linear_combination h
+  have h3 : lam.w a - (a:ℕ) = lam.w b - (b:ℕ) := by exact_mod_cast h2
+  rcases lt_trichotomy a b with hab | hab | hab
+  · have := lam.anti hab.le
+    have : (a:ℕ) < (b:ℕ) := hab
+    omega
+  · exact hab
+  · have := lam.anti hab.le
+    have : (b:ℕ) < (a:ℕ) := hab
+    omega
+
+private theorem multiset_map_finset_sum {ι : Type*} (s : Finset ι) (g : ℂ → ℂ) (f : ι → Multiset ℂ) :
+    Multiset.map g (∑ i ∈ s, f i) = ∑ i ∈ s, Multiset.map g (f i) :=
+  map_sum (Multiset.mapAddMonoidHom g) f s
+
+theorem UpperTheory.speh_parameter_strings :
+    Strings := by
+  intro n c d m lam h
+  have hnd := infOfWeight_nodup' n lam
+  refine ⟨fun i k => ?_, ?_⟩
+  · have hle1 : Multiset.map (fun x => x + (((d i:ℂ) - 1) / 2 - ((k:ℕ):ℂ))) (m i) ≤ spehInf (d i) (m i) := by
+      rw [spehInf_eq_sum_shifted_map]
+      exact Finset.single_le_sum (f := fun k : Fin (d i) => Multiset.map (fun x => x + (((d i:ℂ) - 1) / 2 - ((k:ℕ):ℂ))) (m i))
+        (fun _ _ => Multiset.zero_le _) (Finset.mem_univ k)
+    have hle2 : spehInf (d i) (m i) ≤ ∑ j, spehInf (d j) (m j) :=
+      Finset.single_le_sum (f := fun j => spehInf (d j) (m j)) (fun _ _ => Multiset.zero_le _) (Finset.mem_univ i)
+    have hle : Multiset.map (fun x => x + (((d i:ℂ) - 1) / 2 - ((k:ℕ):ℂ))) (m i) ≤ GlobalTheory.UnitaryBC.infOfWeight lam :=
+      h ▸ hle1.trans hle2
+    refine ⟨(Multiset.nodup_of_le hle hnd).of_map _, fun z hz => ?_⟩
+    have hmem := Multiset.mem_of_le hle (Multiset.mem_map_of_mem _ hz)
+    unfold GlobalTheory.UnitaryBC.infOfWeight at hmem
+    rw [Multiset.mem_map] at hmem
+    obtain ⟨j, -, hj⟩ := hmem
+    refine ⟨lam.w j - (j:ℕ), ?_⟩
+    unfold ex
+    push_cast
+    linear_combination (-1 : ℂ) * hj
+  · rw [← h, multiset_map_finset_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [spehInf_eq_sum_shifted_map, multiset_map_finset_sum]
+    refine Finset.sum_congr rfl fun k _ => ?_
+    rw [Multiset.map_map]
+    refine Multiset.map_congr rfl fun z _ => ?_
+    simp only [Function.comp_apply]
+    unfold ex
+    push_cast
+    ring
+
+
+[GUA_SRC_PERIOD_MODELS] IsModel, IsdRAt, IsPstAt, IsInduced, IsJumpsAt and wdAt
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/FiniteDimensionalWdSpace.lean#L181-L244
+
+section Model
+
+variable {Gw : Subgroup (Ω ≃ₐ[E] Ω)} (Bw : LocBridge l E Ω Gw O) {a : ℕ}
+  (r : ↥Gw →* GL (Fin a) (Om l))
+
+def IsModel (LL' : FinExt l) (r' : ↥Gw →* GL (Fin a) ↥LL'.1) : Prop :=
+  Bw.LL.1 ≤ LL'.1 ∧ Formalism.MainNotions.N.mapRep (algebraMap ↥LL'.1 (Om l)) r' = r
+
+def IsCrysAt : Prop := ∃ LL' r', IsModel Bw r LL' r' ∧ Bw.IsCrysE P LL' r'
+
+def IsPotCrysAt : Prop := ∃ LL' r', IsModel Bw r LL' r' ∧ Bw.IsPotCrysE P LL' r'
+
+def IsdRAt : Prop := ∃ LL' r', IsModel Bw r LL' r' ∧ Bw.IsdRE P LL' r'
+
+def IsPstAt : Prop := ∃ LL' r', IsModel Bw r LL' r' ∧ IsPst P (Bw.repE LL' r')
+
+def IsInduced (τ : E →+* Om l) {LL' : FinExt l} (τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥LL'.1) : Prop :=
+  ∀ x : E, τ x = ((τ' ⟨Bw.j (algebraMap E Ω x), Bw.j_E x⟩ : ↥LL'.1) : Om l)
+
+def IsJumpsAt (τ : E →+* Om l) (J : Multiset ℤ) : Prop :=
+  ∃ LL' r', IsModel Bw r LL' r' ∧ Bw.IsdRE P LL' r' ∧ ∃ τ' : ↥Bw.Kw.1 →ₐ[ℚ_[l]] ↥LL'.1,
+    IsInduced Bw τ τ' ∧ ∀ n : ℤ, (J.count n : ℤ) = Bw.multE P LL' r' τ' n
+
+omit [NumberField E] in
+
+theorem IsCrysAt.isPotCrysAt (hr : IsCrysAt P Bw r) : IsPotCrysAt P Bw r := by
+  obtain ⟨LL', r', h1, h2⟩ := hr
+  exact ⟨LL', r', h1, Bw.Kw, le_rfl, h2⟩
+
+omit [NumberField E] in
+
+theorem IsModel.unique {LL' : FinExt l} {r₁ r₂ : ↥Gw →* GL (Fin a) ↥LL'.1} (h₁ : IsModel Bw r LL' r₁)
+    (h₂ : IsModel Bw r LL' r₂) : r₁ = r₂ := by
+  ext g i j
+  exact congrArg (fun f : ↥Gw →* GL (Fin a) (Om l) => (f g : Matrix (Fin a) (Fin a) (Om l)) i j)
+    (h₁.2.trans h₂.2.symm)
+
+omit [NumberField E] in
+
+theorem isModel_one : IsModel Bw (1 : ↥Gw →* GL (Fin a) (Om l)) Bw.LL 1 :=
+  ⟨le_rfl, MonoidHom.ext fun _ => by simp [Formalism.MainNotions.N.mapRep]⟩
+
+end Model
+
+section At
+
+variable [IsAlgClosure E Ω] {A : ValuationSubring Ω} {w : HeightOneSpectrum (𝓞 E)}
+  (Bw : LocBridge l E Ω (Dec (F := E) A) O) (h : IsPlaceOver A w) (hj : Induces Bw) {a : ℕ}
+  (r : ↥(Dec (F := E) A) →* GL (Fin a) (Om l))
+
+open Classical in
+
+def wdAt : WD h :=
+  if hr : IsPstAt P Bw r then wdPst P ι Bw h hj (Bw.repE hr.choose hr.choose_spec.choose) else trivWD h a
+
+variable {P r}
+
+theorem wdAt_of_isPstAt (hr : IsPstAt P Bw r) : ∃ LL' r', IsModel Bw r LL' r' ∧ IsPst P (Bw.repE LL' r') ∧
+    wdAt P ι Bw h hj r = wdPst P ι Bw h hj (Bw.repE LL' r') :=
+  ⟨_, _, hr.choose_spec.choose_spec.1, hr.choose_spec.choose_spec.2, dif_pos hr⟩
+
+theorem wdAt_of_not_isPstAt (hr : ¬ IsPstAt P Bw r) : wdAt P ι Bw h hj r = trivWD h a := dif_neg hr
+
+
+
+[GUA_SRC_TIED_PERIOD] Original chosen Loc.PP/AIP and tiedP witness
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/FiniteCohomology.lean#L74-L84
+end Rep
+
+section Period
+
+variable (l : ℕ) [Fact l.Prime]
+
+def PP : LocPrime l := (GlobalTheory.MemLoc.exists_locPrime_tied l).choose
+
+def AIP : LocAinf l (PP l) := (GlobalTheory.MemLoc.exists_locPrime_tied l).choose_spec.choose
+
+theorem tiedP : Nonempty (LocTied l (PP l) (AIP l)) := (GlobalTheory.MemLoc.exists_locPrime_tied l).choose_spec.choose_spec
+
+
+[GUA_SRC_WD_MONODROMY] Actual IsWDOfWith/IsWDOf/wdOf and its monodromy/Frobenius semisimplification
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/WeilDeligneParamMonodromyEqZeroIff.lean#L340-L382
+def IsWDOfWith (t : Ine (F := E) A →* Multiplicative ℤ_[l]) {φ : Weil h} (hφ : deg φ = 1)
+    (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL n (Qbar l)) (x : WD h) : Prop :=
+  ∃ (N : Matrix n n (Qbar l)) (a : WDRep h (n → ℂ)), IsMonodromy t r N ∧
+    IsFrobSS (fun g => toEndC ι (wdMat t hφ r N g)) (toEndC ι N) a ∧ WD.mk a = x
+
+def IsWDOf (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL n (Qbar l)) (x : WD h) : Prop :=
+  ∃ t : Ine (F := E) A →* Multiplicative ℤ_[l], IsTameChar t ∧
+    ∃ (φ : Weil h) (hφ : deg φ = 1), IsWDOfWith t hφ ι r x
+
+variable (h) in
+open Classical in
+
+def wdOf (_hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal) (ι : Qbar l ≃+* ℂ) (r : G E Ω →* GL n (Qbar l)) :
+    WD h :=
+  if H : ∃ x : WD h, IsWDOf ι r x then H.choose else WD.mk (WDRep.diag h fun _ : n => 1)
+
+section Param
+
+variable {t : Ine (F := E) A →* Multiplicative ℤ_[l]} {r : G E Ω →* GL n (Qbar l)}
+  {N : Matrix n n (Qbar l)} {φ : Weil h} {ι : Qbar l ≃+* ℂ}
+  (hl : ((l : ℕ) : 𝓞 E) ∉ w.asIdeal)
+
+include hl in
+
+theorem IsMonodromy.exists_isFrobSS (ht : IsTameChar t) (hN : IsMonodromy t r N) (hφ : deg φ = 1)
+    (ι : Qbar l ≃+* ℂ) : ∃ a : WDRep h (n → ℂ),
+      IsFrobSS (fun g => toEndC ι (wdMat t hφ r N g)) (toEndC ι N) a :=
+  WeilDeligne.exists_isFrobSS (hN.rep hl ht hφ ι) _ (hN.isSmooth_rep hl ht hφ ι) (hN.1.map _)
+    (hN.rep_comm hl ht hφ ι)
+
+include hl in
+
+theorem IsWDOf.unique {x y : WD h} (hx : IsWDOf ι r x) (hy : IsWDOf ι r y) : x = y := by
+  obtain ⟨t, ht, φ, hφ, N, a, hN, ha, rfl⟩ := hx
+  obtain ⟨t', ht', φ', hφ', N', b, hN', hb, rfl⟩ := hy
+  obtain ⟨c, hc0, hc⟩ := ht.exists_mul h hl ht'
+  obtain rfl : N' = c • N := hN'.unique ht' (hN.smul hc)
+  obtain ⟨a', ha'⟩ := hN.exists_isFrobSS hl ht hφ' ι
+  obtain ⟨s, hs⟩ := hN.exists_conj hl ht hφ hφ'
+  obtain ⟨u, hu⟩ := (isUnit_exp (hN.1.smul s)).map (toEndC ι)
+  have h1 : a.Iso a' := ha.iso ha' (LinearMap.GeneralLinearGroup.toLinearEquiv u)
+    (fun g v => by
+      show ((u : End ℂ (n → ℂ)) * toEndC ι (wdMat t hφ r N g)) v =
+
+
+[GUA_SRC_MONODROMY_OPEN] IsMonodromy includes equality with exp(tN) on an open inertia subgroup
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/WeilDeligneParamMonodromyEqZeroIff.lean#L78-L82
+def IsMonodromy (t : Ine (F := E) A →* Multiplicative ℤ_[l]) (r : G E Ω →* GL n (Qbar l))
+    (N : Matrix n n (Qbar l)) : Prop :=
+  IsNilpotent N ∧ ∃ U : Subgroup (Ine (F := E) A), IsOpen (U : Set (Ine (F := E) A)) ∧
+    ∀ σ ∈ U, (r σ : Matrix n n (Qbar l)) = exp (tval t σ • N)
+
+
+
+[GUA_SRC_FROB_SS] Literal IsFrobSS commuting nilpotent difference and equality on semisimple inertia matrices
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/CharpolyEqOfIsNilpotentSub.lean#L92-L104
+def IsFrobSS (ρ : Weil h → End ℂ V) (N : End ℂ V) (a : WDRep h V) : Prop :=
+  a.N = N ∧ ∀ g, Commute (a.ρ g) (ρ g) ∧ IsNilpotent (ρ g - a.ρ g)
+
+theorem isFrobSS_self (a : WDRep h V) : IsFrobSS a.ρ a.N a :=
+  ⟨rfl, fun g => ⟨Commute.refl _, by simp⟩⟩
+
+theorem IsFrobSS.ρ_eq {ρ : Weil h → End ℂ V} {N : End ℂ V} {a : WDRep h V} (ha : IsFrobSS ρ N a)
+    {g : Weil h} (hg : (ρ g).IsSemisimple) : a.ρ g = ρ g :=
+  (End.isNilpotent_isSemisimple_unique (ha.2 g).2 (a.semisimple g) IsNilpotent.zero hg
+    ((ha.2 g).1.symm.sub_left (Commute.refl _)) (Commute.zero_left _) (by simp)).2
+
+theorem IsFrobSS.ρ_unique {ρ : Weil h → End ℂ V} {N N' : End ℂ V} {a b : WDRep h V}
+    (ha : IsFrobSS ρ N a) (hb : IsFrobSS ρ N' b) : a.ρ = b.ρ :=
+
+
+[GUA_SRC_SUM] Original common-coefficient, split-period and sumTwoG producer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/GuSumTwoG.lean#L17-L138
+  [AddCommGroup V₁] [Module ↥LL.1 V₁] [Module ℚ_[l] V₁] [IsScalarTower ℚ_[l] ↥LL.1 V₁]
+  [AddCommGroup V₂] [Module ↥LL.1 V₂] [Module ℚ_[l] V₂] [IsScalarTower ℚ_[l] ↥LL.1 V₂]
+  {ρ₀ : Representation ↥LL.1 ↥(GK K) V₀} {ρ₁ : Representation ↥LL.1 ↥(GK K) V₁}
+  {ρ₂ : Representation ↥LL.1 ↥(GK K) V₂}
+private theorem tensV_section (p : V₁ →ₗ[↥LL.1] V₂) (s : V₂ →ₗ[↥LL.1] V₁) (hps : ∀ v, p (s v) = v)
+    (x : V₂ ⊗[ℚ_[l]] Bst P) : tensV P p (tensV P s x) = x := by
+  induction x using TensorProduct.induction_on with
+  | zero => simp
+  | tmul v b => simp [hps]
+  | add x y hx hy => simp only [map_add, hx, hy]
+variable [FiniteDimensional ↥LL.1 V₀] [FiniteDimensional ↥LL.1 V₁] [FiniteDimensional ↥LL.1 V₂]
+private theorem isPst_split {AI : LocAinf l P} (T : LocTied l P AI) {i : V₀ →ₗ[↥LL.1] V₁} {p : V₁ →ₗ[↥LL.1] V₂}
+    {s : V₂ →ₗ[↥LL.1] V₁} (hi : ∀ g v, i (ρ₀ g v) = ρ₁ g (i v)) (hp : ∀ g v, p (ρ₁ g v) = ρ₂ g (p v))
+    (hs : ∀ g v, s (ρ₂ g v) = ρ₁ g (s v)) (h1 : Function.Injective i) (h2 : Function.Exact i p)
+    (hps : ∀ v, p (s v) = v) (hV₀ : IsPst P ρ₀) (hV₂ : IsPst P ρ₂) : IsPst P ρ₁ := by
+  obtain ⟨hdom, hfrac, -⟩ := GlobalTheory.Pst.stRegular l P AI ⟨T⟩
+  haveI := LL.2
+  haveI : FiniteDimensional ℚ_[l] V₀ := Module.Finite.trans ↥LL.1 V₀
+  haveI : FiniteDimensional ℚ_[l] V₁ := Module.Finite.trans ↥LL.1 V₁
+  haveI : FiniteDimensional ℚ_[l] V₂ := Module.Finite.trans ↥LL.1 V₂
+  have b₁ := GlobalTheory.T.finrank_dpst_unramified_le_dim_representation P hdom hfrac ρ₁
+  haveI f₁ : FiniteDimensional ↥(MaximalUnramifiedExtension l) (DpstUr P ρ₁) :=
+    Module.rank_lt_aleph0_iff.mp (b₁.trans_lt (Cardinal.natCast_lt_aleph0))
+  obtain ⟨f₀, c₀⟩ := (isPst_iff P ρ₀).1 hV₀
+  obtain ⟨f₂, c₂⟩ := (isPst_iff P ρ₂).1 hV₂
+  obtain ⟨hinj, hex⟩ := UpperTheory.V.Loc.PstExact.dmap_exact P hi hp h1 h2
+  have inj : Function.Injective (UpperTheory.V.Loc.PstExact.dUr P hi) := fun x y h => hinj h
+  have sur : Function.Surjective (UpperTheory.V.Loc.PstExact.dUr P hp) := fun y =>
+    ⟨toUr P ρ₁ (dmap P hs ((toUr P ρ₂).symm y)), Subtype.ext (tensV_section P p s hps _)⟩
+  have ex : Function.Exact (UpperTheory.V.Loc.PstExact.dUr P hi) (UpperTheory.V.Loc.PstExact.dUr P hp) := fun y => hex y
+  have e := (UpperTheory.V.Loc.PstExact.dUr P hp).finrank_range_add_finrank_ker
+  rw [LinearMap.range_eq_top.2 sur, finrank_top, LinearMap.exact_iff.mp ex, LinearMap.finrank_range_of_inj inj] at e
+  have e' := (p.restrictScalars ℚ_[l]).finrank_range_add_finrank_ker
+  have exq : Function.Exact (i.restrictScalars ℚ_[l]) (p.restrictScalars ℚ_[l]) := h2
+  rw [LinearMap.exact_iff.mp exq, LinearMap.finrank_range_of_inj (f := i.restrictScalars ℚ_[l]) h1,
+    LinearMap.range_eq_top.2 (show Function.Surjective (p.restrictScalars ℚ_[l]) from fun v => ⟨s v, hps v⟩),
+    finrank_top] at e'
+  exact (isPst_iff P ρ₁).2 ⟨f₁, by omega⟩
+end Split
+section Sum
+variable {l : ℕ} [Fact l.Prime] {P : LocPrime l} {AI : LocAinf l P} {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+  {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+  (Bw : LocBridge l E Ω Gw O) {a b : ℕ}
+private theorem isPst_sum (T : LocTied l P AI) {L : FinExt l} (s : ↥Gw →* GL (Fin a) ↥L.1) (s' : ↥Gw →* GL (Fin b) ↥L.1)
+    (h : IsPst P (Bw.repE L s)) (h' : IsPst P (Bw.repE L s')) : IsPst P (Bw.repE L (Formalism.MainNotions.SumRepresentations.At.sumRep s s')) := by
+  let e : (Fin (a + b) → ↥L.1) ≃ₗ[↥L.1] (Fin a → ↥L.1) × (Fin b → ↥L.1) :=
+    (LinearEquiv.funCongrLeft ↥L.1 ↥L.1 finSumFinEquiv).trans (LinearEquiv.sumArrowLequivProdArrow _ _ ↥L.1 ↥L.1)
+  have he : ∀ g v, e (Bw.repE L (Formalism.MainNotions.SumRepresentations.At.sumRep s s') g v) =
+      (Bw.repE L s g (e v).1, Bw.repE L s' g (e v).2) := by
+    intro g v
+    rw [GlobalTheory.ConjLocal.repE_apply, GlobalTheory.ConjLocal.repE_apply, GlobalTheory.ConjLocal.repE_apply, GlobalTheory.BCGal.sumRep_val]
+    ext i <;>
+      simp [e, Matrix.submatrix_mulVec_equiv, Matrix.fromBlocks_mulVec, LinearMap.funLeft] <;> rfl
+  have he' : ∀ g x, e.symm (Bw.repE L s g x.1, Bw.repE L s' g x.2) =
+      Bw.repE L (Formalism.MainNotions.SumRepresentations.At.sumRep s s') g (e.symm x) := by
+    intro g x
+    apply e.injective
+    rw [he, e.apply_symm_apply, e.apply_symm_apply]
+  refine isPst_split P T (i := e.symm.toLinearMap ∘ₗ LinearMap.inl ↥L.1 _ _)
+    (p := LinearMap.snd ↥L.1 _ _ ∘ₗ e.toLinearMap) (s := e.symm.toLinearMap ∘ₗ LinearMap.inr ↥L.1 _ _)
+    (ρ₀ := Bw.repE L s) (ρ₂ := Bw.repE L s') (fun g v => ?_) (fun g v => ?_) (fun g v => ?_) ?_ ?_ ?_ h h'
+  · have := he' g (v, 0)
+    simpa using this
+  · simp [he]
+  · have := he' g (0, v)
+    simpa using this
+  · intro x y hxy
+    simpa using hxy
+  · intro y
+    constructor
+    · intro hy
+      refine ⟨(e y).1, ?_⟩
+      apply e.injective
+      have hy' : (e y).2 = 0 := hy
+      simp only [LinearMap.comp_apply, LinearEquiv.coe_coe, LinearMap.inl_apply, e.apply_symm_apply]
+      exact Prod.ext rfl hy'.symm
+    · rintro ⟨x, rfl⟩
+      simp
+  · intro v
+    simp
+private theorem isPstAt_sum (T : LocTied l P AI) {r : ↥Gw →* GL (Fin a) (Om l)} {r' : ↥Gw →* GL (Fin b) (Om l)}
+    (h : IsPstAt P Bw r) (h' : IsPstAt P Bw r') : IsPstAt P Bw (Formalism.MainNotions.SumRepresentations.At.sumRep r r') := by
+  obtain ⟨L₁, r₁, m₁, p₁⟩ := h
+  obtain ⟨L₂, r₂, m₂, p₂⟩ := h'
+  have l₁ : L₁.1 ≤ (supExt L₁ L₂).1 := le_sup_left
+  have l₂ : L₂.1 ≤ (supExt L₁ L₂).1 := le_sup_right
+  have n₁ := m₁.enlarge l₁
+  have n₂ := m₂.enlarge l₂
+  exact ⟨supExt L₁ L₂, _, ⟨n₁.1, by rw [GlobalTheory.Pst.SumParam.mapRep_sumRep, n₁.2, n₂.2]⟩,
+    isPst_sum Bw T _ _ (GlobalTheory.T.isPotentiallySemistable_coefficientField_enlarge P Bw l₁ r₁ p₁) (GlobalTheory.T.isPotentiallySemistable_coefficientField_enlarge P Bw l₂ r₂ p₂)⟩
+end Sum
+theorem UpperTheory.V.Z.Win.Gu.sumTwoG_of_printsH_gdLaws_sumAway_sumHTAt :
+    _root_.UpperTheory.V.Af.HypothesesH' → GdLaws → SumAway → SumHTAt → SumTwoG := by
+  intro _ hG hA hT E Ω _ _ _ _ _ l _ ι a b r r' p p' HT HT' C C'
+  obtain ⟨T⟩ := Loc.tiedP l
+  have hv := GlobalTheory.BCGal.cont_sumRep r r' (Units.continuous_val.comp C.cont) (Units.continuous_val.comp C'.cont)
+  have hc : Continuous (Formalism.MainNotions.SumRepresentations.At.sumRep r r') := by
+    refine Units.continuous_iff.2 ⟨hv, ?_⟩
+    simp only [← map_inv]
+    exact hv.comp continuous_inv
+  refine ⟨hc, GlobalTheory.BCGal.ss_sumRep r r' C.ss C'.ss, fun w hg => ?_, fun w A h rc hrc => ?_⟩
+  · exact hT E Ω l a b r r' C.cont C'.cont HT HT' w
+      (C.ht w fun A h rc hrc => (((hG E Ω A w h).1 _ _).1 (hg A h rc hrc)).1)
+      (C'.ht w fun A h rc hrc => (((hG E Ω A w h).1 _ _).1 (hg A h rc hrc)).2)
+  · obtain ⟨a1, b1⟩ := C.par w A h rc hrc
+    obtain ⟨a2, b2⟩ := C'.par w A h rc hrc
+    have sp := ((hG E Ω A w h).1 (p w A h rc) (p' w A h rc)).1
+    refine And.intro (fun hw => ?_) (fun O _ _ _ Bw hj hg => ?_)
+    · obtain ⟨x, hx, kx⟩ := a1 hw
+      obtain ⟨x', hx', kx'⟩ := a2 hw
+      refine Exists.intro (x.lpSum x') (And.intro (hA E Ω l ι a b r r' C.cont C'.cont w hw A h _ _ hx hx') fun g => ?_)
+      rw [kx (sp g).1, kx' (sp g).2]
+    · obtain ⟨p1, e1⟩ := b1 O Bw hj (sp hg).1
+      obtain ⟨p2, e2⟩ := b2 O Bw hj (sp hg).2
+      have e : (Formalism.MainNotions.SumRepresentations.At.sumRep r r').comp (Dec (F := E) A).subtype =
+          Formalism.MainNotions.SumRepresentations.At.sumRep (r.comp (Dec (F := E) A).subtype) (r'.comp (Dec (F := E) A).subtype) := by
+        ext g i j
+        rfl
+      have p3 := isPstAt_sum Bw T p1 p2
+      rw [e]
+      exact ⟨p3, by rw [GlobalTheory.T.weilDeligneParamAboveL_directSum_potSemistable l _ _ ⟨T⟩ ι E Ω A w O Bw h hj a b _ _ p1 p2 p3, e1, e2]⟩
+end
+
+
+[GUA_SRC_SUM_HT] Original all-bridge/all-embedding sumHTAt producer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/UnitaryGaloisFamilies/SumHTAt.lean#L1-L68
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.AutomorphyLifting.UnitaryGaloisFamilies.IrrCaseT
+import Development.AutomorphicArithmetic.AutomorphicVarieties.BuildingsResidueChars.SumHodgeTate
+
+open UpperTheory.V.Af UpperTheory.V.Af.Gu UpperTheory.V.Z.Win UpperTheory.V.Z.Win.Gu
+
+section
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N GlobalTheory.Pst
+
+private theorem map_sum' {Γ : Type} [Group Γ] {k k' : Type} [CommRing k] [CommRing k'] {a b : ℕ}
+    (f : k →+* k') (r₁ : Γ →* GL (Fin a) k) (r₂ : Γ →* GL (Fin b) k) :
+    mapRep f (Formalism.MainNotions.SumRepresentations.At.sumRep r₁ r₂) = Formalism.MainNotions.SumRepresentations.At.sumRep (mapRep f r₁) (mapRep f r₂) := by
+  ext g i j
+  change f (Matrix.fromBlocks (r₁ g : Matrix (Fin a) (Fin a) k) 0 0 (r₂ g : Matrix (Fin b) (Fin b) k)
+      (finSumFinEquiv.symm i) (finSumFinEquiv.symm j)) =
+    Matrix.fromBlocks (mapRep f r₁ g : Matrix (Fin a) (Fin a) k') 0 0 (mapRep f r₂ g : Matrix (Fin b) (Fin b) k')
+      (finSumFinEquiv.symm i) (finSumFinEquiv.symm j)
+  rcases finSumFinEquiv.symm i with i | i <;> rcases finSumFinEquiv.symm j with j | j <;> simp [mapRep]
+
+variable {l : ℕ} [Fact l.Prime] {E Ω : Type} [Field E] [Field Ω] [Algebra E Ω]
+  {O : Type} [CommRing O] [Algebra ℤ_[l] O] [TopologicalSpace O]
+  {Gw : Subgroup (Ω ≃ₐ[E] Ω)} {Bw : LocBridge l E Ω Gw O} {a b : ℕ}
+  {r : ↥Gw →* GL (Fin a) (Om l)} {r' : ↥Gw →* GL (Fin b) (Om l)}
+
+private theorem model_sum {L : FinExt l} {r₁ : ↥Gw →* GL (Fin a) ↥L.1} {r₂ : ↥Gw →* GL (Fin b) ↥L.1}
+    (h₁ : IsModel Bw r L r₁) (h₂ : IsModel Bw r' L r₂) :
+    IsModel Bw (Formalism.MainNotions.SumRepresentations.At.sumRep r r') L (Formalism.MainNotions.SumRepresentations.At.sumRep r₁ r₂) :=
+  ⟨h₁.1, by rw [map_sum', h₁.2, h₂.2]⟩
+
+private theorem dR_sum (h : IsdRAt (UpperTheory.V.Loc.PP l) Bw r) (h' : IsdRAt (UpperTheory.V.Loc.PP l) Bw r') :
+    IsdRAt (UpperTheory.V.Loc.PP l) Bw (Formalism.MainNotions.SumRepresentations.At.sumRep r r') := by
+  obtain ⟨L₁, r₁, m₁, -⟩ := id h
+  obtain ⟨L₂, r₂, m₂, -⟩ := id h'
+  have l₁ : L₁.1 ≤ (supExt L₁ L₂).1 := le_sup_left
+  have l₂ : L₂.1 ≤ (supExt L₁ L₂).1 := le_sup_right
+  have n₁ := m₁.enlarge l₁
+  have n₂ := m₂.enlarge l₂
+  exact ⟨_, _, model_sum n₁ n₂, (GlobalTheory.T.sumRep_deRham_iff_and_multiplicity_add l _ _ (UpperTheory.V.Loc.tiedP l) E Ω Gw O Bw _ a b _ _).1.2
+    ⟨(n₁.isdRAt_iff _).1 h, (n₂.isdRAt_iff _).1 h'⟩⟩
+
+private theorem jumps_sum {τ : E →+* Om l} {J J' : Multiset ℤ}
+    (h : IsJumpsAt (UpperTheory.V.Loc.PP l) Bw r τ J) (h' : IsJumpsAt (UpperTheory.V.Loc.PP l) Bw r' τ J') :
+    IsJumpsAt (UpperTheory.V.Loc.PP l) Bw (Formalism.MainNotions.SumRepresentations.At.sumRep r r') τ (J + J') := by
+  obtain ⟨L₁, r₁, m₁, d₁, τ₁, t₁, -⟩ := id h
+  obtain ⟨L₂, r₂, m₂, d₂, -⟩ := id h'
+  have l₁ : L₁.1 ≤ (supExt L₁ L₂).1 := le_sup_left
+  have l₂ : L₂.1 ≤ (supExt L₁ L₂).1 := le_sup_right
+  have n₁ := m₁.enlarge l₁
+  have n₂ := m₂.enlarge l₂
+  have t : IsInduced Bw τ (LL' := supExt L₁ L₂) ((IntermediateField.inclusion l₁).comp τ₁) := t₁
+  have S := GlobalTheory.T.sumRep_deRham_iff_and_multiplicity_add l _ _ (UpperTheory.V.Loc.tiedP l) E Ω Gw O Bw _ a b
+    (mapRep (IntermediateField.inclusion l₁).toRingHom r₁) (mapRep (IntermediateField.inclusion l₂).toRingHom r₂)
+  refine ⟨_, _, model_sum n₁ n₂, S.1.2 ⟨(n₁.isdRAt_iff _).1 ⟨_, _, m₁, d₁⟩, (n₂.isdRAt_iff _).1 ⟨_, _, m₂, d₂⟩⟩,
+    _, t, fun c => ?_⟩
+  rw [S.2, ← h.count_eq _ n₁ t, ← h'.count_eq _ n₂ t, Multiset.count_add, Nat.cast_add]
+
+end
+
+theorem UpperTheory.V.Z.Win.Gu.sumHTAt :
+    SumHTAt := by
+  intro E Ω _ _ _ _ _ l _ a b r r' _ _ HT HT' w H H' A hA O _ _ _ Bw hj
+  obtain ⟨d, J⟩ := H A hA O Bw hj
+  obtain ⟨d', J'⟩ := H' A hA O Bw hj
+  have e : (Formalism.MainNotions.SumRepresentations.At.sumRep r r').comp (ReciprocityTheory.Gal.Dec (F := E) A).subtype =
+      Formalism.MainNotions.SumRepresentations.At.sumRep (r.comp (ReciprocityTheory.Gal.Dec (F := E) A).subtype) (r'.comp (ReciprocityTheory.Gal.Dec (F := E) A).subtype) := by
+    ext g i j
+    rfl
+  rw [e]
+  exact ⟨dR_sum d d', fun τ L τ' t => jumps_sum (J τ L τ' t) (J' τ L τ' t)⟩
+
+
+[GUA_SRC_SPHERICAL_SINGLETONS] Langlands exhaustion, spherical segment factors, singleton support identification
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/SphericalSatakeEqLanglandsQuotientUnramified.lean#L24-L68
+
+theorem isL_single_unrChar : LanglandsExhaustionGL → LanglandsMultisegments → StandardCosocleGL →
+    ZelevinskyPolynomialRing → GeometricLemma → BernsteinZelevinskyFiniteness →
+    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
+      (x : IrrGL k) (α : Fin x.1 → ℂˣ), HasSatake x.rep α →
+      IsL (Finset.univ.val.map fun i => Segment.single (IrrGL.ofChar (GlobalTheory.SmGL.unrChar k (α i))
+        (isSmoothChar_of_isUnram (isUnram_unrChar k (α i)))) (IrrGL.isCusp_ofChar _ _)) x.rep := by
+  intro hEx hLM hSC hZP hGL hBZ k _ _ _ _ _ x α hsat
+  obtain ⟨𝔪, hL⟩ := hEx k x
+  obtain ⟨h, y, hd, ⟨Δ, hord, hseg⟩, hcos⟩ := id hL
+
+  have hsphy : ∀ a, IsSpherical (y a).rep :=
+    GlobalTheory.T.isSpherical_factor_of_spherical_subquotient k h x.1 y hd x.2.rep.V x.rep hcos.isSubquotient hsat.2.1
+
+  have hlen : ∀ i, (Δ i).len = 1 := fun i =>
+    (GlobalTheory.T.sphericalSegmentRep_length_one_unramified hLM hSC hZP hGL hBZ k (Δ i) (y i) (hseg i) (hsphy i)).1
+  have hsingle : ∀ i, Δ i = Segment.single (Δ i).first (Δ i).isCusp_first := fun i =>
+    Segment.ext_first rfl (by rw [hlen i]; rfl)
+  have hms : ∀ i, (Δ i).ms = {(Δ i).first} := fun i =>
+    (congrArg Segment.ms (hsingle i)).trans (Segment.ms_single _ _)
+
+  have h1 : HasSupport x.rep (msupp 𝔪) := GlobalTheory.T.langlandsClassification_supercuspidalSupport_multisegment hZP k 𝔪 x hL
+  have h2 := GlobalTheory.T.supercuspidalSupport_of_principalSeries_subquotient k x.1 (fun i => GlobalTheory.SmGL.unrChar k (α i))
+    (fun i => isSmoothChar_of_isUnram (isUnram_unrChar k (α i))) x.2.rep hsat.2.2
+  have heq := GlobalTheory.T.supercuspidalSupport_unique_GL hGL hBZ hZP k x _ _ h1 h2
+  have hsupp : msupp 𝔪 = Finset.univ.val.map fun i => (Δ i).first := by
+    rw [msupp, ← hord.1, Multiset.bind_map]
+    simp only [hms]
+    exact Multiset.bind_singleton _ _
+  rw [hsupp] at heq
+
+  have hinj : Function.Injective fun D : Segment k => (D.first, D.len) := fun a b e =>
+    Segment.ext_first (congrArg Prod.fst e) (congrArg Prod.snd e)
+  have hm : 𝔪 = Finset.univ.val.map fun i => Segment.single (IrrGL.ofChar (GlobalTheory.SmGL.unrChar k (α i))
+      (isSmoothChar_of_isUnram (isUnram_unrChar k (α i)))) (IrrGL.isCusp_ofChar _ _) := by
+    apply Multiset.map_injective hinj
+    have e1 := congrArg (Multiset.map fun ρ : IrrGL k => (ρ, 1)) heq
+    simp only [Multiset.map_map, Function.comp_def] at e1
+    rw [← hord.1, Multiset.map_map, Multiset.map_map]
+    simp only [Function.comp_def, hlen]
+    exact e1
+  rw [← hm]
+  exact hL
+
+end GlobalTheory.LocLanglands.SatakeL
+
+
+[GUA_SRC_SPHERICAL_SEGMENT] Actual proof that a spherical segment is length1 and an unramified character
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/SphericalSegmentRepLengthOneUnramified.lean#L43-L96
+  intro hLM hSC hZP hGL hBZ k _ _ _ _ _ Δ y hL hS
+  obtain ⟨N, c⟩ := y
+  obtain ⟨hd, hc⟩ := id hL
+  have hsub : IsSubquotient c.rep.ρ (prodIrr Δ.term hd) := hc.isSubquotient
+  have hsph := GlobalTheory.T.isSpherical_factor_of_spherical_subquotient k Δ.len N Δ.term hd _ c.rep.ρ hsub hS
+  have h0 : Δ.term ⟨0, Δ.len_pos⟩ = Δ.first := by simp [Segment.term]
+  have key : ∀ x z : IrrGL k, x = z → IsSpherical x.rep → IsSpherical z.rep := by
+    rintro _ _ rfl h; exact h
+  have hU : Δ.first.IsUnramChar :=
+    GlobalTheory.T.isUnramifiedChar_of_cuspidal_spherical hGL hBZ hZP k Δ.first Δ.isCusp_first (key _ _ h0 (hsph _))
+  refine ⟨?_, hU⟩
+  obtain ⟨μ, hμ, hfirst⟩ := hU
+  have hμs := isSmoothChar_of_isUnram hμ
+  have hterm : ∀ a, Δ.term a = IrrGL.ofChar (μ * absPow k ((a : ℕ) : ℂ)) (hμs.mul (isSmoothChar_absPow _)) :=
+    fun a => by simp only [Segment.term, IrrGL.nu, hfirst, IrrGL.tw_ofChar]
+  have hd1 : Δ.d = 1 := congrArg Sigma.fst hfirst
+  have hN : N = Δ.len := by
+    have h2 : ∑ a, (Δ.term a).1 = N := hd
+    rw [Segment.sum_term_fst, Segment.deg, hd1, mul_one] at h2
+    exact h2.symm
+  subst hN
+
+  let Γ := Segment.ofChar μ hμs Δ.len Δ.len_pos
+  have hterm' : ∀ a, Γ.term a = IrrGL.ofChar (μ * absPow k ((a : ℕ) : ℂ)) (hμs.mul (isSmoothChar_absPow _)) :=
+    fun a => by
+      show (IrrGL.ofChar μ hμs).nu _ = _
+      simp only [IrrGL.nu, IrrGL.tw_ofChar]
+  have hd' : ∑ a, (Γ.term a).1 = Δ.len := (Segment.sum_term_fst _).trans (mul_one _)
+  have hP := isSubquotient_prodIrr_prinSeries Δ.term hd _ _ hterm
+  have hP' := isSubquotient_prodIrr_prinSeries Γ.term hd' _ _ hterm'
+  let χ' := μ * absPow k (((Δ.len : ℂ) - 1) / 2)
+  have hu' : IsUnram χ' := fun x hx => by
+    rw [MonoidHom.mul_apply, hμ x hx, isUnram_absPow k _ x hx, one_mul]
+  have hχs : IsSmoothChar χ' := isSmoothChar_of_isUnram hu'
+  obtain ⟨f, hf⟩ := embeds_detRep_segment hμs Δ.len_pos hd'
+
+  obtain ⟨ϖ, hϖ⟩ := LocGL.exists_uniformizer k
+  have hu : ∀ i : Fin Δ.len, IsUnram (μ * absPow k ((i : ℕ) : ℂ)) := fun i x hx => by
+    rw [MonoidHom.mul_apply, hμ x hx, isUnram_absPow k _ x hx, one_mul]
+  let α : Fin Δ.len → ℂˣ := fun i => (μ * absPow k ((i : ℕ) : ℂ)) ϖ
+  have heq : (fun i => unrChar k (α i)) = fun i : Fin Δ.len => μ * absPow k ((i : ℕ) : ℂ) :=
+    funext fun i => (eq_unrChar (hu i) hϖ).symm
+  have hA : HasSatake c.rep.ρ α := ⟨c.rep.irr, hS, by rw [heq]; exact hsub.trans hP⟩
+  have hB : HasSatake (IrrRep.det (Fin Δ.len) χ' hχs).ρ α :=
+    ⟨(IrrRep.det (Fin Δ.len) χ' hχs).irr, isSpherical_detRep hu',
+      by rw [heq]; exact (IsSubquotient.of_injective f hf).trans hP'⟩
+  obtain ⟨E⟩ := GlobalTheory.T.nonempty_equiv_of_same_satakeParameters hBZ k Δ.len α c.rep (IrrRep.det (Fin Δ.len) χ' hχs) hA hB
+  have hL2 := (GlobalTheory.T.isLanglandsClassification_detCharacter hSC k Δ.len χ' hχs).of_equiv E.symm
+  have hL1 := hL.isL
+  have hm := (hLM k).1 _ _ ⟨Δ.len, c⟩ hL1 hL2
+  have := congrArg Multiset.card hm
+  simpa using this.symm
+
+end GlobalTheory.SphSeg
+
+
+[GUA_SRC_SPHERICAL_CUSP] Spherical supercuspidal has unramified rank-one support
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/IsUnramifiedCharOfCuspidalSpherical.lean#L23-L42
+theorem isUnramChar_of_isCusp_of_isSpherical : GeometricLemma → BernsteinZelevinskyFiniteness → ZelevinskyPolynomialRing →
+    ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k] [IsNonarchimedeanLocalField k] [CharZero k]
+      (x : IrrGL k), x.IsCusp → IsSpherical x.rep → x.IsUnramChar := by
+  intro hG hBZ hZ k _ _ _ _ _ x hx hs
+  have hadm : IsAdmissible x.rep := (hBZ k).1 (Fin x.1) x.2.rep.V x.rep x.2.rep.smooth x.2.rep.irr
+  have hI : fixed x.rep (iwahori k (Fin x.1)) ≠ ⊥ := by
+    obtain ⟨v, hv, hv0⟩ := (Submodule.ne_bot_iff _).1 hs
+    refine (Submodule.ne_bot_iff _).2 ⟨v, fun h => ?_, hv0⟩
+    exact hv ⟨h.1, iwahori_le_KO k _ h.2⟩
+  obtain ⟨α, hα⟩ := GlobalTheory.SatakeExists.exists_isSubquotient_prinSeries hadm x.2.rep.irr hI
+  have hχ : ∀ i, IsSmoothChar (unrChar k (α i)) := fun i => isSmoothChar_of_isUnram (isUnram_unrChar k (α i))
+  have h1 := GlobalTheory.T.supercuspidalSupport_of_principalSeries_subquotient k x.1 (fun i => unrChar k (α i)) hχ x.2.rep hα
+  have h2 : HasSupport x.rep {x} := hasSupport_self hx
+  have he := GlobalTheory.T.supercuspidalSupport_unique_GL hG hBZ hZ k x _ _ h1 h2
+  have hmem : x ∈ (Finset.univ.val.map fun i => IrrGL.ofChar (unrChar k (α i)) (hχ i)) := by
+    rw [he]; exact Multiset.mem_singleton_self x
+  obtain ⟨i, -, hi⟩ := Multiset.mem_map.1 hmem
+  exact ⟨unrChar k (α i), isUnram_unrChar k (α i), hi.symm⟩
+
+end GlobalTheory.LocLanglands
+
+
+[GUA_SRC_DETERMINANT_QUOTIENT] Embedding of determinant character and dual quotient of descending singleton induction
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/IsLanglandsClassificationDetCharacter.lean#L25-L219
+
+theorem nonempty_equiv_multiProd {t : ℕ} {n : Type} [Fintype n] [DecidableEq n] (e : (Σ _ : Fin t, Fin 1) ≃ n)
+    {θ : Fin t → kˣ →* ℂˣ} {Θ : Levi k (fun _ : Fin t => Fin 1) →* ℂˣ}
+    (hΘ : ∀ g, Θ g = ∏ a, θ a (GeneralLinearGroup.det (g a))) :
+    Nonempty ((parInd e (ofChar Θ)).Equiv (multiProd e fun a => detRep (Fin 1) (θ a))) := by
+  refine ⟨parIndEquiv e (Representation.Equiv.mk
+    (PiTensorProduct.constantBaseRingEquiv (Fin t) ℂ).toLinearEquiv.symm fun g => ?_)⟩
+  refine LinearMap.ext_ring ?_
+  apply (PiTensorProduct.constantBaseRingEquiv (Fin t) ℂ).injective
+  simp [ofChar_apply, hΘ, PiTensorProduct.one_def, piTensor_tprod, detRep, detChar_apply, Units.coe_prod]
+
+theorem exists_embedding {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+    [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n] (e : (Σ a, m a) ≃ n) {η : kˣ →* ℂˣ} (hη : IsSmoothChar η) :
+    ∃ f : (detRep n η).IntertwiningMap (parInd e (ofChar (detLevi e η))), Function.Injective f := by
+  have hsm : IsSmooth (detRep n η) := (isSmooth_ofChar_iff _).2 hη.detChar
+  let ψ : (jac e (detRep n η)).IntertwiningMap (ofChar (detLevi e η)) :=
+    { toLinearMap := (twKer (detRep n η) (unipRad k e) 1).liftQ LinearMap.id
+        (by rw [twKer_detRep]; exact bot_le)
+      isIntertwining' := fun g => LinearMap.ext fun x => by
+        rw [LinearMap.comp_apply, LinearMap.comp_apply, GlobalTheory.SmGL.Model.jac_detRep, map_smul, ofChar_apply,
+          smul_eq_mul] }
+  obtain ⟨f, hf⟩ := (GlobalTheory.SmGL.Model.evalOne_bijective e hsm (ofChar (detLevi e η))).2 ψ
+  refine ⟨f, (injective_iff_map_eq_zero f).2 fun c hc => ?_⟩
+  by_contra hc0
+  have h1 : f 1 = 0 := by
+    have h1' : (1 : ℂ) = c⁻¹ • c := by simp [hc0]
+    rw [h1', map_smul, hc, smul_zero]
+  have h2 : ψ (Submodule.Quotient.mk (p := twKer (detRep n η) (unipRad k e) 1) (1 : ℂ)) = 1 := rfl
+  have h3 : ψ (Submodule.Quotient.mk (p := twKer (detRep n η) (unipRad k e) 1) (1 : ℂ)) = (f 1).1.1 1 := by
+    rw [← hf]; rfl
+  rw [h1] at h3
+  exact one_ne_zero (h2.symm.trans h3)
+
+theorem exists_surjective_of_contra {G V : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] [AddCommGroup V]
+    [Module ℂ V] {π : Representation ℂ G V} {χ : G →* ℂˣ} (f : (ofChar χ⁻¹).IntertwiningMap (contra π))
+    (hf : Function.Injective f) : ∃ l : π.IntertwiningMap (ofChar χ), Function.Surjective l := by
+  set lam : Module.Dual ℂ V := ((f 1 : smoothPart π.dual) : Module.Dual ℂ V) with hlam
+  have key : ∀ g v, lam (π g v) = (χ g : ℂ) * lam v := by
+    intro g v
+    have h1 : f (ofChar (χ⁻¹) (g⁻¹) (1 : ℂ)) = contra π (g⁻¹) (f 1) :=
+      LinearMap.congr_fun (f.isIntertwining' (g⁻¹)) (1 : ℂ)
+    have h2 : ofChar (χ⁻¹) (g⁻¹) (1 : ℂ) = (χ g : ℂ) • (1 : ℂ) := by simp [ofChar_apply]
+    rw [h2, map_smul] at h1
+    have h3 := congrArg (fun x : smoothPart π.dual => (x : Module.Dual ℂ V) v) h1
+    simp only [contra_apply, inv_inv] at h3
+    rw [← h3]
+    simp [lam]
+  have hne : lam ≠ 0 := by
+    intro h0
+    have h1 : f 1 = 0 := Subtype.ext (by simpa [lam] using h0)
+    exact one_ne_zero (hf (h1.trans (map_zero f).symm))
+  obtain ⟨v, hv⟩ : ∃ v, lam v ≠ 0 := by
+    by_contra h
+    push Not at h
+    exact hne (LinearMap.ext h)
+  refine ⟨⟨lam, fun g => LinearMap.ext fun w => ?_⟩, fun c => ⟨(c / lam v) • v, ?_⟩⟩
+  · simp [key, ofChar_apply]
+  · simp [hv]
+
+theorem exists_surjective {α n : Type} {m : α → Type} [Fintype α] [LinearOrder α] [∀ a, Fintype (m a)]
+    [∀ a, DecidableEq (m a)] [Fintype n] [DecidableEq n] (e : (Σ a, m a) ≃ n) {η : kˣ →* ℂˣ} (hη : IsSmoothChar η) :
+    ∃ l : (parInd e (ofChar (detLevi e η⁻¹)⁻¹)).IntertwiningMap (detRep n η), Function.Surjective l := by
+  have hc : IsSmoothChar (detLevi e η⁻¹) := by
+    unfold detLevi
+    exact (hη.inv.detChar.comp (leviEmb k e) (continuous_leviEmb (R := k) e)).mul
+      (isSmoothChar_deltaHalf k).inv
+  have hc' : IsSmoothChar (detLevi e η⁻¹)⁻¹ := hc.inv
+  have hτ : IsSmooth (ofChar (detLevi e η⁻¹)⁻¹) := (isSmooth_ofChar_iff _).2 hc'
+  obtain ⟨Φ1⟩ := GlobalTheory.LocGL.ProjLine.nonempty_equiv_contra_ofChar hc'
+  rw [inv_inv] at Φ1
+  obtain ⟨Φ2⟩ := (GlobalTheory.SmGL.IndDual.inductionContragredient k).nonempty_equiv e hτ
+  obtain ⟨f, hf⟩ := exists_embedding e hη.inv
+  let F := (Φ2.toIntertwiningMap.comp (parIndEquiv e Φ1).toIntertwiningMap).comp f
+  have hF : Function.Injective F := fun a b h =>
+    hf ((EquivLike.injective (parIndEquiv e Φ1)) ((EquivLike.injective Φ2) h))
+  have hdet : detChar n η⁻¹ = (detChar n η)⁻¹ := by
+    ext g
+    simp [detChar_apply]
+  have key : ∀ (χ' : GL n k →* ℂˣ), χ' = (detChar n η)⁻¹ →
+      ∀ f' : (ofChar χ').IntertwiningMap (contra (parInd e (ofChar (detLevi e η⁻¹)⁻¹))), Function.Injective f' →
+      ∃ l : (parInd e (ofChar (detLevi e η⁻¹)⁻¹)).IntertwiningMap (ofChar (detChar n η)), Function.Surjective l := by
+    rintro χ' rfl f' hf'
+    exact exists_surjective_of_contra f' hf'
+  exact key (detChar n η⁻¹) hdet F hF
+
+theorem surj_of_equiv {G V W X : Type} [Group G] [AddCommGroup V] [Module ℂ V] [AddCommGroup W] [Module ℂ W]
+    [AddCommGroup X] [Module ℂ X] {π : Representation ℂ G V} {σ : Representation ℂ G W} {τ : Representation ℂ G X}
+    (Φ : π.Equiv σ) (l : π.IntertwiningMap τ) (hl : Function.Surjective l) :
+    ∃ l' : σ.IntertwiningMap τ, Function.Surjective l' := by
+  refine ⟨l.comp Φ.symm.toIntertwiningMap, fun y => ?_⟩
+  obtain ⟨x, rfl⟩ := hl y
+  refine ⟨Φ x, ?_⟩
+  show l (Φ.symm (Φ x)) = l x
+  rw [Representation.Equiv.symm_apply_apply]
+
+theorem detLevi_inv_apply {t : ℕ} {n : Type} [Fintype n] [DecidableEq n] (e : (Σ _ : Fin t, Fin 1) ≃ n)
+    (χ : kˣ →* ℂˣ) (g : Levi k fun _ : Fin t => Fin 1) :
+    (detLevi e χ⁻¹)⁻¹ g =
+      ∏ a : Fin t, (χ * absPow k ((((t : ℝ) - 1) / 2 - (a : ℕ) : ℝ) : ℂ)) (GeneralLinearGroup.det (g a)) := by
+  rw [MonoidHom.inv_apply, detLevi_apply, ← Finset.prod_inv_distrib]
+  refine Finset.prod_congr rfl fun a _ => ?_
+  have hs : (((((t : ℝ) - 1) / 2 - (a : ℕ) : ℝ) : ℂ)) =
+      -(-((modExp (fun _ : Fin t => Fin 1) a : ℤ) : ℂ) / 2) := by
+    rw [modExp_fin (fun _ : Fin t => Fin 1) (fun _ => Fintype.card_fin 1) a]
+    push_cast
+    ring
+  rw [hs, absPow_neg]
+  simp only [MonoidHom.mul_apply, MonoidHom.inv_apply, mul_inv, inv_inv]
+
+theorem exists_surjective_multiProd {t : ℕ} {n : Type} [Fintype n] [DecidableEq n] (e : (Σ _ : Fin t, Fin 1) ≃ n)
+    {χ : kˣ →* ℂˣ} (hχ : IsSmoothChar χ) :
+    ∃ l : (multiProd e fun a : Fin t => detRep (Fin 1)
+      (χ * absPow k ((((t : ℝ) - 1) / 2 - (a : ℕ) : ℝ) : ℂ))).IntertwiningMap (detRep n χ), Function.Surjective l := by
+  obtain ⟨Φ⟩ := nonempty_equiv_multiProd e (Θ := (detLevi e χ⁻¹)⁻¹)
+    (θ := fun a : Fin t => χ * absPow k ((((t : ℝ) - 1) / 2 - (a : ℕ) : ℝ) : ℂ)) (detLevi_inv_apply e χ)
+  obtain ⟨l, hl⟩ := exists_surjective e hχ
+  exact surj_of_equiv Φ l hl
+
+theorem exists_equiv_prodIrr {t : ℕ} {θ : Fin t → kˣ →* ℂˣ} (hθ : ∀ a, IsSmoothChar (θ a)) {x : Fin t → IrrGL k}
+    (hx : ∀ a, x a = IrrGL.ofChar (θ a) (hθ a)) :
+    ∃ (e : (Σ _ : Fin t, Fin 1) ≃ Fin t) (hd' : ∑ a, (x a).1 = t), Nonempty ((multiProd e fun a => detRep (Fin 1) (θ a)).Equiv (prodIrr x hd')) := by
+  obtain rfl : x = fun a => IrrGL.ofChar (θ a) (hθ a) := funext hx
+  have hd : ∑ a : Fin t, (IrrGL.ofChar (θ a) (hθ a)).1 = t := by simp [IrrGL.ofChar]
+  exact ⟨stdBlocks _ hd, hd, ⟨multiProdEquiv _ fun a => equivRep (IrrRep.det (Fin 1) (θ a) (hθ a))⟩⟩
+
+set_option maxHeartbeats 1600000 in
+private theorem exists_surjective_prodIrr_to_detRep (t : ℕ) {χ : kˣ →* ℂˣ} (hχ : IsSmoothChar χ) {x : Fin t → IrrGL k}
+    (hx : ∀ j, x j = (IrrGL.ofChar χ hχ).nu ((((t : ℝ) - 1) / 2 - (j : ℕ) : ℝ) : ℂ)) :
+    ∃ (hd : ∑ a, (x a).1 = t) (l : (prodIrr x hd).IntertwiningMap (detRep (Fin t) χ)), Function.Surjective l := by
+  have hθ : ∀ a : Fin t, IsSmoothChar (χ * absPow k ((((t : ℝ) - 1) / 2 - (a : ℕ) : ℝ) : ℂ)) :=
+    fun a => hχ.mul (isSmoothChar_absPow _)
+  have hx' : ∀ a, x a = IrrGL.ofChar (χ * absPow k ((((t : ℝ) - 1) / 2 - (a : ℕ) : ℝ) : ℂ)) (hθ a) :=
+    fun a => (hx a).trans (IrrGL.tw_ofChar χ _ hχ (isSmoothChar_absPow _))
+  obtain ⟨e, hd, hΦ⟩ := exists_equiv_prodIrr hθ hx'
+  obtain ⟨Φ⟩ := hΦ
+  obtain ⟨l, hl⟩ := exists_surjective_multiProd (t := t) (n := Fin t) e (χ := χ) hχ
+  refine ⟨hd, ?_⟩
+  exact surj_of_equiv Φ l hl
+
+theorem exists_surjective_prodIrr (t : ℕ) {χ : kˣ →* ℂˣ} (hχ : IsSmoothChar χ) {x : Fin t → IrrGL k}
+    (hx : ∀ j, x j = (IrrGL.ofChar χ hχ).nu ((((t : ℝ) - 1) / 2 - (j : ℕ) : ℝ) : ℂ)) :
+    ∃ (hd : ∑ a, (x a).1 = t) (l : (prodIrr x hd).IntertwiningMap (detRep (Fin t) χ)), Function.Surjective l :=
+  exists_surjective_prodIrr_to_detRep t hχ hx
+
+end GlobalTheory.LocGL.DetQuot
+
+namespace GlobalTheory.LocGL
+
+attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+
+theorem isL_det : StandardCosocleGL → ∀ (k : Type) [Field k] [ValuativeRel k] [TopologicalSpace k]
+    [IsNonarchimedeanLocalField k] [CharZero k] (t : ℕ) (χ : kˣ →* ℂˣ) (hχ : IsSmoothChar χ),
+    IsL (((List.range t).map fun j : ℕ => Segment.single ((IrrGL.ofChar χ hχ).nu
+      ((((t : ℝ) - 1) / 2 - j : ℝ) : ℂ)) ((IrrGL.isCusp_ofChar χ hχ).nu _) : List (Segment k)) : Multiset (Segment k))
+      (IrrRep.det (Fin t) χ hχ).ρ := by
+  intro H k _ _ _ _ _ t χ hχ
+  let x : Fin t → IrrGL k := fun j => (IrrGL.ofChar χ hχ).nu ((((t : ℝ) - 1) / 2 - (j : ℕ) : ℝ) : ℂ)
+  obtain ⟨hd, l, hl⟩ := DetQuot.exists_surjective_prodIrr t hχ (x := x) (fun j => rfl)
+  have hcusp : ∀ j, (x j).IsCusp := fun j => (IrrGL.isCusp_ofChar χ hχ).nu _
+  let Δ : Fin t → Segment k := fun j => Segment.single (x j) (hcusp j)
+  have hfirst : ∀ j, (Δ j).first = x j := fun j => Segment.first_ofFirst _ _ _ _
+  have hord : IsOrderedForm Δ (((List.range t).map fun j : ℕ => Segment.single ((IrrGL.ofChar χ hχ).nu
+      ((((t : ℝ) - 1) / 2 - j : ℝ) : ℂ)) ((IrrGL.isCusp_ofChar χ hχ).nu _) : List (Segment k)) : Multiset (Segment k)) := by
+    refine ⟨?_, ?_⟩
+    · rw [Fin.univ_val_map]
+      congr 1
+      apply List.ext_get (by simp)
+      intro i h1 h2
+      simp [Δ, x]
+    · rintro i j hij ⟨-, m, hm, heq⟩
+      rw [hfirst, hfirst] at heq
+      have key : (IrrGL.ofChar χ hχ).nu ((((t : ℝ) - 1) / 2 - ((j : ℕ) : ℝ) : ℝ) : ℂ) =
+          (IrrGL.ofChar χ hχ).nu ((((t : ℝ) - 1) / 2 - ((i : ℕ) : ℝ) + (m : ℝ) : ℝ) : ℂ) := by
+        calc (IrrGL.ofChar χ hχ).nu ((((t : ℝ) - 1) / 2 - ((j : ℕ) : ℝ) : ℝ) : ℂ) = x j := rfl
+          _ = (x i).nu (m : ℂ) := heq
+          _ = ((IrrGL.ofChar χ hχ).nu ((((t : ℝ) - 1) / 2 - ((i : ℕ) : ℝ) : ℝ) : ℂ)).nu (m : ℂ) := rfl
+          _ = _ := by
+            rw [IrrGL.nu_nu]
+            congr 1
+            push_cast
+            ring
+      rw [IrrGL.nu_ofChar_inj] at key
+      have hij' : ((i : ℕ) : ℝ) < ((j : ℕ) : ℝ) := by exact_mod_cast hij
+      have hm' : (0 : ℝ) < m := by exact_mod_cast hm
+      linarith
+  have hL : LFactors (((List.range t).map fun j : ℕ => Segment.single ((IrrGL.ofChar χ hχ).nu
+      ((((t : ℝ) - 1) / 2 - j : ℝ) : ℂ)) ((IrrGL.isCusp_ofChar χ hχ).nu _) : List (Segment k)) : Multiset (Segment k)) x :=
+    ⟨Δ, hord, fun j => (single_spec (hcusp j)).2.1⟩
+  obtain ⟨π0, hπ0⟩ := H k _ t t x hd hL
+  obtain ⟨Ψ⟩ := hπ0.equiv_of_surjective (IrrRep.det (Fin t) χ hχ).irr l hl
+  exact ⟨t, x, hd, hL, hπ0.of_equiv Ψ.symm (Representation.Equiv.refl _)⟩
+
+end GlobalTheory.LocGL
+
+end
+
+
+[GUA_SRC_SATAKE_LAW] Universal IsRecT product and spherical laws from original local foundations
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/AutomorphyLifting/PolarizedLinkage/ExtraV.lean#L59-L111
+  have h0 : ((((1 : ℕ) : ℝ) - 1) / 2) = 0 := by norm_num
+  rw [h0, (GlobalTheory.T.weilDeligne_charpoly_twist_special E Ω A w h _).1, H.nu]
+
+private theorem prod_law (H : LawsT a ha rc) (r t : ℕ) (σ : IrrRep (GL (Fin r) (w.adicCompletion E)))
+    (τ : IrrRep (GL (Fin t) (w.adicCompletion E))) (π : IrrRep (GL (Fin (r + t)) (w.adicCompletion E)))
+    (hπ : Nonempty (π.ρ.Equiv (prod₂ σ.ρ τ.ρ))) : rc (cls π) = (rc (cls σ)).lpSum (rc (cls τ)) := by
+  haveI := cz (E := E) (w := w)
+  obtain ⟨𝔪, h𝔪⟩ := Pr.exh _ (cls σ)
+  obtain ⟨𝔫, h𝔫⟩ := Pr.exh _ (cls τ)
+  have hp := GlobalTheory.T.isLanglandsClassification_add_of_irreducible_product Pr.multi Pr.cos _ r t σ τ π 𝔪 𝔫 (h𝔪.of_equiv (equivRep σ).symm)
+    (h𝔫.of_equiv (equivRep τ).symm) hπ
+  rw [H.langlands 𝔪.toList (cls σ) (by rwa [Multiset.coe_toList]),
+    H.langlands 𝔫.toList (cls τ) (by rwa [Multiset.coe_toList]),
+    H.langlands (𝔪.toList ++ 𝔫.toList) (cls π) (by
+      rw [← Multiset.coe_add, Multiset.coe_toList, Multiset.coe_toList]
+      exact hp.of_equiv (equivRep π)), segSum_append_lpSum]
+
+private theorem charPol_seg (H : LawsT a ha rc) (Δ : Segment (w.adicCompletion E)) (σ : Weil h) :
+    (((rc Δ.first).lpTw (((Δ.len : ℝ) - 1) / 2)).lpChar (WD.lpSp h Δ.len)).charPol σ
+      = (Δ.ms.map fun y => (rc y).charPol σ).prod := by
+  rw [(GlobalTheory.T.weilDeligne_charpoly_twist_special E Ω A w h (rc Δ.first)).2 Δ.len σ, Segment.ms, Multiset.map_map]
+  have h1 : ∀ j : Fin Δ.len, (rc (Δ.term j)).charPol σ = ((rc Δ.first).lpTw ((j : ℕ) : ℝ)).charPol σ := by
+    intro j
+    rw [Segment.term, show (((j : ℕ) : ℂ)) = ((((j : ℕ) : ℝ)) : ℂ) by push_cast; rfl, H.nu]
+  change _ = ∏ j : Fin Δ.len, (fun y => (rc y).charPol σ) (Δ.term j)
+  simp only [h1]
+  rw [Fin.prod_univ_eq_prod_range (fun j => ((rc Δ.first).lpTw (j : ℝ)).charPol σ) Δ.len]
+  rfl
+
+private theorem supp_law (H : LawsT a ha rc) (x : IrrGL (w.adicCompletion E)) (s : Multiset (IrrGL (w.adicCompletion E)))
+    (hs : HasSupport x.rep s) (σ : Weil h) : (rc x).charPol σ = (s.map fun y => (rc y).charPol σ).prod := by
+  haveI := cz (E := E) (w := w)
+  obtain ⟨𝔪, hm⟩ := Pr.exh (w.adicCompletion E) x
+  have h1 := GlobalTheory.T.langlandsClassification_supercuspidalSupport_multisegment Pr.zel _ 𝔪 x hm
+  obtain rfl : s = msupp 𝔪 := GlobalTheory.T.supercuspidalSupport_unique_GL geo Pr.bz Pr.zel _ x s _ hs h1
+  rw [H.langlands 𝔪.toList x (by rw [Multiset.coe_toList]; exact hm), segSum, SuppLaw.charPol_sumList, List.map_map,
+    msupp, Multiset.map_bind, Multiset.prod_bind]
+  have hl : ∀ (l : List (Segment (w.adicCompletion E))) (F : Segment (w.adicCompletion E) → ℂ[X]),
+      (l.map F).prod = ((l : Multiset _).map F).prod := fun l F => by rw [Multiset.map_coe, Multiset.prod_coe]
+  rw [hl, Multiset.coe_toList]
+  exact congrArg Multiset.prod (Multiset.map_congr rfl fun Δ _ => charPol_seg H Δ σ)
+
+private theorem sat_law (H : LawsT a ha rc) (x : IrrGL (w.adicCompletion E)) (α : Fin x.1 → ℂˣ)
+    (hα : HasSatake x.rep α) : rc x = WD.mk (WDRep.diag h fun i => (α i)⁻¹) := by
+  haveI := cz (E := E) (w := w)
+  have hL := GlobalTheory.T.spherical_satake_eq_langlandsQuotient_unramified Pr.exh Pr.multi Pr.cos Pr.zel geo Pr.bz (w.adicCompletion E) x α hα
+  rw [Fin.univ_val_map] at hL
+  rw [H.langlands _ x hL, segSum, List.map_ofFn, ← SatakeLaw.sumList_ofFn_diag]
+  congr 1
+  refine List.ofFn_inj.mpr (funext fun i => ?_)
+  simp only [Function.comp_apply, Segment.single, Segment.first_ofFirst, Segment.len_ofFirst, Nat.cast_one, sub_self,
+    zero_div, WD.lpTw_zero, Test.lpChar_lpSp_one, H.one]
+  exact Test.lpOfChar_unrChar ha (α i) _
+
+
+[GUA_SRC_SAT_LOCAL] Local/global Satake transfer on an isotypic actual representation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TSatLoc.lean#L11-L43
+    _root_.UpperTheory.V.Af.Hypotheses' → UpperTheory.V.Af.SatLoc := by
+  intro _ F _ _ n w σ
+  have hex : GlobalTheory.LGrp.IsSpherical σ.ρ (KGL w n) → ∃ B, HasSatGL w σ.ρ B :=
+    GlobalTheory.SatInd.exists_hasSatGL_of_isIrreducible σ.smooth σ.irred
+  refine ⟨fun ⟨v, h0, hv⟩ => hex ((Submodule.ne_bot_iff _).2 ⟨v, GlobalTheory.LGrp.mem_fixed.2 hv, h0⟩), ?_⟩
+  intro V _ _ ρ ⟨hV, htop⟩ B
+  have up : ∀ B, HasSatGL w σ.ρ B → HasSatGL w (ρ.comp (locGL F n w)) B := by
+    intro B h
+    constructor
+    · obtain ⟨f, h0⟩ : ∃ f : {f : σ.V →ₗ[ℂ] V // ∀ g v, f (σ.ρ g v) = ρ (locGL F n w g) (f v)}, f.1 ≠ 0 := by
+        by_contra hc
+        push Not at hc
+        refine top_ne_bot (htop.symm.trans (eq_bot_iff.2 (iSup_le fun f => ?_)))
+        rw [hc f, LinearMap.range_zero]
+      obtain ⟨x, hx⟩ := h.exists_vec
+      have hi : LinearMap.ker f.1 = ⊥ := ((isIrreducible_iff σ.ρ).1 σ.irred).2 _ (fun g v hv => by
+        rw [LinearMap.mem_ker] at hv ⊢
+        rw [f.2, hv, map_zero]) |>.resolve_right fun e => h0 (LinearMap.ker_eq_top.1 e)
+      have h1 := hx.map (ρ' := ρ.comp (locGL F n w)) f.1 f.2
+        ((map_ne_zero_iff f.1 (LinearMap.ker_eq_bot.1 hi)).2 hx.1)
+      exact (Submodule.ne_bot_iff _).2 ⟨_, h1.2.1, h1.1⟩
+    · intro x hx h0
+      exact GlobalTheory.HeightCounting.Blocks.isSatVecGL_of_mem_iSup (ρ := ρ.comp (locGL F n w)) σ.irred h
+        (fun f : {f : σ.V →ₗ[ℂ] V // ∀ g v, f (σ.ρ g v) = ρ (locGL F n w g) (f v)} => f.1) (fun f => f.2)
+        (htop ▸ Submodule.mem_top) hx h0
+  refine ⟨fun h => ?_, up B⟩
+  obtain ⟨x, hx, hx0⟩ := (Submodule.ne_bot_iff _).1 h.1
+  obtain ⟨y, hy0, hy⟩ := LocSph.exists_fixed_of_mem_iSup (ρ.comp (locGL F n w)) σ.ρ σ.irred
+    (fun f : {f : σ.V →ₗ[ℂ] V // ∀ g v, f (σ.ρ g v) = ρ (locGL F n w g) (f v)} => f.1) (fun f => f.2)
+    (KGL w n : Set _) x hx0 (fun k hk => GlobalTheory.LGrp.mem_fixed.1 hx k hk) (htop ▸ Submodule.mem_top)
+  obtain ⟨B', hB'⟩ := hex ((Submodule.ne_bot_iff _).2 ⟨y, GlobalTheory.LGrp.mem_fixed.2 hy, hy0⟩)
+  exact (up B' hB').unique h ▸ hB'
+end
+
+
+[GUA_SRC_FROB_TOTAL] Exact total-parameter Frobenius eigenvalues and all-valuation inertia statement
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/GuFrobTotT.lean#L25-L113
+  refine ⟨?_, fun σ => ?_⟩
+  · rw [WDRep.sum_N, ha.1, hb.1, LinearMap.prodMap_zero]
+  · rw [WDRep.sum_ρ, ha.2, hb.2]; exact LinearMap.prodMap_one
+private theorem sumList_spec (g : Weil h) : ∀ (c : ℕ) (f : Fin c → WD h) (M : Fin c → Multiset ℂ),
+    (∀ i, (f i).unr ∧ (f i).charPol g = ((M i).map fun b => X - C b).prod) →
+    (sumList (List.ofFn f)).unr ∧ (sumList (List.ofFn f)).charPol g = ((∑ i, M i).map fun b => X - C b).prod := by
+  intro c
+  induction c with
+  | zero =>
+    intro f M _
+    have e : sumList (List.ofFn f) = WD.lpZero h := by simp [sumList]
+    rw [e, WD.lpZero, WD.unr_mk, WD.charPol_mk, WDRep.diag_ρ, charpoly_diagEnd]
+    exact ⟨WDRep.unr_diag _, by simp⟩
+  | succ c ih =>
+    intro f M H
+    obtain ⟨h1, h2⟩ := ih (fun i => f i.succ) (fun i => M i.succ) fun i => H i.succ
+    have e : sumList (List.ofFn f) = (f 0).lpSum (sumList (List.ofFn fun i => f (Fin.succ i))) := by
+      rw [List.ofFn_succ]; rfl
+    rw [e, WD.charPol_lpSum, h2, (H 0).2, Fin.sum_univ_succ, Multiset.map_add, Multiset.prod_add]
+    exact ⟨unr_lpSum (H 0).1 h1, rfl⟩
+private theorem rec_eq_diagV {rc : IrrGL (w.adicCompletion E) → WD h} (H : IsRecV h rc) {a : ℕ}
+    {σ : IrrRep (GL (Fin a) (w.adicCompletion E))} {α : Fin a → ℂˣ} (hα : HasSatake σ.ρ α) :
+    rc (cls σ) = WD.mk (WDRep.diag h fun i => (α i)⁻¹) := by
+  obtain ⟨_, _, _, L⟩ := H
+  have φ := equivRep σ
+  exact L.sat (cls σ) α ⟨IrrRep.irr _, fixed_ne_bot_of_equiv φ hα.2.1,
+    (IsSubquotient.of_surjective φ.toIntertwiningMap φ.toLinearEquiv.surjective).trans hα.2.2⟩
+private theorem rec_tw_diag {rc : IrrGL (w.adicCompletion E) → WD h} (H : IsRecV h rc) {n : ℕ}
+    (σ : SmIrr (GL (Fin n) (w.adicCompletion E))) (B : Multiset ℂˣ) (hB : GlobalTheory.LFun.HasSatGL w σ.ρ B) (s : ℝ) :
+    ∃ α : Fin n → ℂˣ, B = Finset.univ.val.map α ∧
+      (rc (cl σ)).lpTw s = WD.mk (WDRep.diag h fun i => (α i)⁻¹ * qPow w s) := by
+  have hsph : IsSpherical (ParLaws.toRep σ).ρ := by
+    have := hB.1
+    unfold IsSpherical IsSphericalFor
+    rw [GlobalTheory.SmGL.SphCompletion.KO_completion w n]
+    exact this
+  obtain ⟨α, hα⟩ := GlobalTheory.SatakeExists.main UpperTheory.Zero.LLC.Pr.bz (w.adicCompletion E) n
+    ⟨_, σ.ρ, σ.smooth, σ.irred⟩ hsph
+  refine ⟨α, hB.unique (GlobalTheory.T.hasSatakeGL_of_hasSatakeParameters_principalSeries E w n _ σ.ρ α hα), ?_⟩
+  have e : rc (IrrGL.of σ.ρ σ.smooth σ.irred) = WD.mk (WDRep.diag h fun i => (α i)⁻¹) :=
+    rec_eq_diagV H (σ := ParLaws.toRep σ) hα
+  rw [e, WD.lpTw_mk]
+  refine WD.sound ⟨.refl _ _, fun g v => funext fun i => ?_, fun v => rfl⟩
+  simp [mul_zpow, mul_comm, mul_left_comm, mul_assoc]
+private theorem val_inv_eq (n d k : ℕ) (a : ℂˣ) :
+    (((a⁻¹ * qPow w ((ex n d k : ℝ) / 2) : ℂˣ) : ℂ)) ^ (-1 : ℤ) =
+      ((((normV w : ℕ) : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) *
+        ((a * qPow w ((k : ℝ) - ((d : ℝ) - 1) / 2) : ℂˣ) : ℂ) := by
+  have hq : ((normV w : ℕ) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (zero_lt_one.trans (one_lt_normV w)).ne'
+  rw [Complex.ofReal_cpow (Nat.cast_nonneg _), zpow_neg_one, Units.val_mul, mul_inv, Units.val_inv_eq_inv_val, inv_inv,
+    coe_qPow, ← Complex.cpow_neg, Units.val_mul, coe_qPow, mul_left_comm, Complex.ofReal_natCast, ← Complex.cpow_add _ _ hq]
+  congr 2
+  simp only [ex]
+  push_cast
+  ring
+private theorem totPar_spec {rc : IrrGL (w.adicCompletion E) → WD h} (H : IsRecV h rc) (n c : ℕ) (a d : Fin c → ℕ)
+    (ρ : ∀ i, SmIrr (GL (Fin (a i)) (w.adicCompletion E))) (S : Fin c → Multiset ℂˣ)
+    (hS : ∀ i, GlobalTheory.LFun.HasSatGL w (ρ i).ρ (S i)) (g : Weil h) (hg : deg g = -1) :
+    (totPar n d ρ A h rc).unr ∧
+      (totPar n d ρ A h rc).charPol g = ((algSat n (normV w) (satTot w d S)).map fun b => X - C b).prod := by
+  have e : algSat n (normV w) (satTot w d S) = ∑ i, ∑ k : Fin (d i),
+      algSat n (normV w) ((S i).map (· * qPow w (((k : ℕ) : ℝ) - ((d i : ℝ) - 1) / 2))) := by
+    have hm : ∀ {α β ι : Type} (f : α → β) (s : Finset ι) (M : ι → Multiset α),
+        (∑ i ∈ s, M i).map f = ∑ i ∈ s, (M i).map f := fun f s M => map_sum (Multiset.mapAddMonoidHom f) M s
+    simp only [algSat, satTot, Multiset.pure_def, Multiset.bind_def, Multiset.bind_singleton, hm]
+  rw [e]
+  refine sumList_spec g c _ _ fun i => sumList_spec g (d i) _ _ fun k => ?_
+  obtain ⟨α, hα, e⟩ := rec_tw_diag H (ρ i) (S i) (hS i) ((ex n (d i) k : ℝ) / 2)
+  rw [e, hα, WD.unr_mk, WD.charPol_mk, WDRep.diag_ρ, charpoly_diagEnd, hg]
+  refine ⟨WDRep.unr_diag _, ?_⟩
+  simp only [val_inv_eq, algSat, Multiset.map_map, Multiset.pure_def, Multiset.bind_def, Multiset.bind_singleton]
+  rfl
+end UpperTheory.V.Z.Win.Gu
+theorem UpperTheory.V.Z.Win.Gu.frobTotT_alt :
+    _root_.UpperTheory.V.Af.HypothesesH' → ExtraV → GdLaws → FrobTotT := by
+  intro _ hX hG F Ω _ _ _ _ _ l _ ι n c a d r _ w hl ρ S hS H A h
+  obtain ⟨rc, hrc⟩ := UpperTheory.Zero.LLC.recTExists F Ω A w h
+  have hsp := totPar_spec (hX F Ω A w h rc hrc) n c a d ρ S hS
+  have hu := (hsp (frob h)⁻¹ (by rw [deg_inv, deg_frob])).1
+  have hx := ((H A h rc hrc).1 hl).isWDOf ((hG F Ω A w h).2.2.2 _ hu)
+  have hw := hx.wdOf_eq hl
+  obtain ⟨t, ht, φ, hφ, N, b, hN, -⟩ := hx
+  refine ⟨(hN.unr_wdOf_iff hl ht ι).1 (by rw [hw]; exact hu), fun s hs => ?_⟩
+  have hd : deg (⟨s, mem_Weil_of_isFrob h hs⟩ : Weil h) = 1 := deg_eq_one_iff.2 hs
+  have := hN.charPol_wdOf hl ht ι (⟨s, mem_Weil_of_isFrob h hs⟩ : Weil h)⁻¹
+  rw [hw, (hsp _ (by rw [deg_inv, hd])).2] at this
+  exact this.symm
+end
+end
+
+
+[GUA_SRC_COMPONENT_UNIQUE] Split local inclusion, centralizer factor and original component uniqueness
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/BuildingsResidueChars/BuildingComponentUniqueness.lean#L12-L40
+    CompUnique := by
+  intro E _ _ _ n π hπ w hw V W _ _ _ _ ρ₁ ρ₂ h₁ h₂
+  obtain ⟨e, he⟩ := GlobalTheory.T.splitPlace_unitaryLocalPoints_equiv_GL E n w hw
+  obtain ⟨r, -, -, hc⟩ := GlobalTheory.T.exists_continuous_retraction_onto_unitaryLocalPoints E n w
+  let s : GL (Fin n) (w.adicCompletion E) →* UA E n :=
+    (locU n w).subtype.comp e.symm.toMulEquiv.toMonoidHom
+  have hs : ∀ y, cLoc w (s y) = y := fun y => by
+    have := he (e.symm y)
+    rw [e.apply_symm_apply] at this
+    exact this.symm
+  let P : GlobalTheory.DefU.AutSub E n := ⟨π, hπ⟩
+  have key : ∀ {X : Type} [AddCommGroup X] [Module ℂ X] (τ : Representation ℂ (GL (Fin n) (w.adicCompletion E)) X),
+      IsCompAlong π (locU n w) ((cLoc w).comp (locU n w).subtype) τ →
+      ∃ f : τ.IntertwiningMap (P.rep.comp s), f ≠ 0 := by
+    rintro X _ _ τ ⟨-, f, h0, hf, h2⟩
+    refine ⟨⟨f.codRestrict π hf, fun y => LinearMap.ext fun v => Subtype.ext ?_⟩, fun e0 => h0 ?_⟩
+    · have h3 := h2 (e.symm y) v
+      have hy : ((cLoc w).comp (locU n w).subtype) (e.symm y) = y := hs y
+      rw [hy] at h3
+      exact h3
+    · exact LinearMap.ext fun v => congrArg Subtype.val (DFunLike.congr_fun e0 v)
+  obtain ⟨f, hf⟩ := key ρ₁ h₁
+  obtain ⟨f', hf'⟩ := key ρ₂ h₂
+  have hcomm : ∀ g : UA E n, ∃ u, ∀ y, Commute ((s u)⁻¹ * g) (s y) := fun g =>
+    ⟨e (r g), fun y => by
+      have : s (e (r g)) = (r g : UA E n) := congrArg Subtype.val (e.symm_apply_apply (r g))
+      rw [this]
+      exact hc g (e.symm y)⟩
+  exact (GlobalTheory.T.irreducibleRep_isotypic_of_centraliser_factor _ _ _ _ _ P.rep s ρ₁ ρ₂ P.isIrreducible_rep h₁.1 h₂.1 hcomm f hf).2 f' hf'
+
+
+[GUA_SRC_SAT_CONJ] CSD Satake inversion and k -> d-1-k
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/BuildingsResidueChars/SatakeParametersComplexConjugate.lean#L11-L48
+  refine ⟨L.symm.trans T, fun o φ => ?_⟩
+  obtain ⟨φ, rfl⟩ := L.surjective φ
+  have e : (GlobalTheory.ThetaPull.thetaSub P).op o (L φ) = L (P.op (thetaOp o) φ) :=
+    Subtype.ext (GlobalTheory.ThetaPull.act_pull o φ.1)
+  rw [e]
+  exact (congrArg T (L.symm_apply_apply _)).trans
+    ((hT o φ).trans (congrArg (P.op o) (congrArg T (L.symm_apply_apply φ)).symm))
+
+private theorem normV_cPl {E : Type} [Field E] [NumberField E] [IsCMField E] (w : HeightOneSpectrum (𝓞 E)) :
+    normV (Bc.cPl w) = normV w := by
+  change Nat.card (𝓞 E ⧸ (Bc.cPl w).asIdeal) = Nat.card (𝓞 E ⧸ w.asIdeal)
+  rw [(GlobalTheory.Mem.Chr.conjPl_iff_comap _ _ _).1 (conjPl_conjSrc (IsCMField.complexConj E).toRingEquiv w)]
+  exact Nat.card_congr (Ideal.quotientEquiv _ _ (RingOfIntegers.mapRingEquiv _)
+    (Ideal.map_comap_of_surjective _ (RingEquiv.surjective _) _).symm).toEquiv
+
+private theorem qPow_cPl {E : Type} [Field E] [NumberField E] [IsCMField E] (w : HeightOneSpectrum (𝓞 E)) (s : ℝ) :
+    (qPow (Bc.cPl w) s)⁻¹ = qPow w (-s) := by
+  have e : qPow (Bc.cPl w) s = qPow w s := Units.ext (by rw [coe_qPow, coe_qPow, normV_cPl])
+  rw [e, inv_eq_iff_mul_eq_one, ← qPow_add, add_neg_cancel, qPow_zero]
+
+theorem UpperTheory.satake_parameters_complex_conjugate :
+    SatConj := by
+  intro E _ _ _ w
+  refine ⟨fun a P hP B hB => ?_, fun c d S => ?_⟩
+  · have e : CG.mk (GlobalTheory.ThetaPull.thetaSub P) = CG.mk P := Quotient.sound (theta_iso hP)
+    exact e ▸ UpperTheory.theta_satake_parameters_inverse E a P w B hB
+  · unfold satTot
+    rw [← Multiset.coe_mapAddMonoidHom (fun x : ℂˣ => x⁻¹), map_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [map_sum, ← Equiv.sum_comp Fin.revPerm]
+    refine Finset.sum_congr rfl fun k _ => ?_
+    rw [Multiset.coe_mapAddMonoidHom, Multiset.map_map, Multiset.map_map]
+    refine Multiset.map_congr rfl fun x _ => ?_
+    simp only [Function.comp_apply, mul_inv, qPow_cPl, Fin.revPerm_apply, Fin.val_rev]
+    congr 2
+    rw [Nat.cast_sub k.2]
+    push_cast
+    ring
+
+
+[GUA_SRC_POL_FROB] Original cyclotomic exponent1-n and matrix-pairing assembly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/BuildingsResidueChars/TwistedDualFrobeniusCompatibility.lean#L1-L234
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.GuDefs
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.BcPolar
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PartsConj
+import Development.AbelianVarietyTheory.Proofs.DivisorProofs.CharpolyScaledInverse
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CoeDualRep
+import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.CyclotomicBarContinuous
+
+open NumberField IsDedekindDomain Neutral.B1 Formalism.L2.Host Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Polynomial GlobalTheory.CuspRep GlobalTheory.HeckeGal
+open GlobalTheory.GalOfCusp UpperTheory.V UpperTheory.V.Af UpperTheory.V.Af.Bc UpperTheory.V.Af.Gu UpperTheory.V.Published GlobalTheory.MonoConj
+open scoped Matrix
+
+private theorem eig_dual {K : Type} [Field K] (φ : K →+* ℂ) {n : ℕ} (M : GL (Fin n) K) (t : K) (S : Multiset ℂ)
+    (h : (M : Matrix (Fin n) (Fin n) K).charpoly.map φ = (S.map fun b => X - C b).prod) :
+    (t • ((M⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)ᵀ).charpoly.map φ =
+      ((S.map fun a => φ t * a⁻¹).map fun b => X - C b).prod := by
+  rw [← Matrix.charpoly_map] at h
+  have h3 := GlobalTheory.charpoly_smul_inv_of_charpoly_eq_prod n (Matrix.GeneralLinearGroup.map φ M) (φ t) _ h
+  have h4 : (t • ((M⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K)).map φ =
+      φ t • (((Matrix.GeneralLinearGroup.map φ M)⁻¹ : GL (Fin n) ℂ) : Matrix (Fin n) (Fin n) ℂ) := by
+    rw [← map_inv]
+    ext i j
+    simp only [Matrix.map_apply, Matrix.smul_apply, smul_eq_mul, map_mul]
+    rfl
+  rw [← Matrix.transpose_smul, Matrix.charpoly_transpose, ← Matrix.charpoly_map, h4, h3, Multiset.map_map]
+  rfl
+
+private theorem cPl_eq {E : Type} [Field E] [NumberField E] [IsCMField E] (w : HeightOneSpectrum (𝓞 E)) :
+    cPl w = preplace (IsCMField.complexConj E).toRingEquiv w :=
+  HeightOneSpectrum.ext ((GlobalTheory.Mem.Chr.conjPl_iff_comap _ _ _).1 (conjPl_conjSrc _ w))
+
+private theorem normV_preplace {K : Type} [Field K] [NumberField K] (τ : K ≃+* K) (v : HeightOneSpectrum (𝓞 K)) :
+    normV (preplace τ v) = normV v := by
+  show Nat.card (𝓞 K ⧸ (preplace τ v).asIdeal) = Nat.card (𝓞 K ⧸ v.asIdeal)
+  refine Nat.card_congr (Ideal.quotientEquiv _ _ (RingOfIntegers.mapRingEquiv τ) ?_).toEquiv
+  exact (Ideal.map_comap_of_surjective (RingOfIntegers.mapRingEquiv τ : 𝓞 K →+* 𝓞 K)
+    (RingOfIntegers.mapRingEquiv τ).surjective v.asIdeal).symm
+
+private theorem isFrob_conjGal {K Ω : Type} [Field K] [NumberField K] [Field Ω] [Algebra K Ω] {τ : K ≃+* K} {σ : Ω ≃+* Ω}
+    (h : IsLift τ σ) {A A' : ValuationSubring Ω} (hA : ∀ x, σ x ∈ A' ↔ x ∈ A) {q : ℕ} {g : G K Ω}
+    (hg : IsFrob (F := K) A' q g) : IsFrob (F := K) A q (conjGal h g) := by
+  refine ⟨conjGal_mem_Dec h hA hg.1, fun x hx => ?_⟩
+  rw [← val_lt_one hA, map_sub, apply_conjGal, map_pow]
+  exact hg.2 _ ((A'.valuation_le_one_iff _).2 ((hA x).2 ((A.valuation_le_one_iff _).1 hx)))
+
+private theorem isLift_conj {F Ω : Type} [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω]
+    {c : G (maximalRealSubfield F) Ω} (hc : IsConjEl c) :
+    IsLift (IsCMField.complexConj F).toRingEquiv c.symm.toRingEquiv := by
+  obtain ⟨j, hj⟩ := hc
+  intro x
+  refine c.symm_apply_eq.2 (j.injective ?_)
+  rw [hj]
+  have h := IsCMField.complexEmbedding_complexConj F (j.comp (algebraMap F Ω)) x
+  exact (Complex.conj_conj _).symm.trans (congrArg (starRingEnd ℂ) h.symm)
+
+private noncomputable def dPerp {k : Type} [Field k] {a : ℕ} (W : Submodule k (Fin a → k)) : Submodule k (Fin a → k) :=
+  W.dualAnnihilator.comap (dotProductEquiv k (Fin a)).toLinearMap
+
+private theorem mem_dPerp {k : Type} [Field k] {a : ℕ} (W : Submodule k (Fin a → k)) (y : Fin a → k) :
+    y ∈ dPerp W ↔ ∀ x ∈ W, y ⬝ᵥ x = 0 := by
+  simp [dPerp, Submodule.mem_dualAnnihilator]
+
+private theorem isCompl_dPerp {k : Type} [Field k] {a : ℕ} {W U : Submodule k (Fin a → k)}
+    (h : IsCompl W U) : IsCompl (dPerp W) (dPerp U) :=
+  (Submodule.orderIsoMapComap (dotProductEquiv k (Fin a))).symm.isCompl
+    (Subspace.isCompl_dualAnnihilator h)
+
+private theorem dPerp_dPerp {k : Type} [Field k] {a : ℕ} (W : Submodule k (Fin a → k)) :
+    dPerp (dPerp W) = W := by
+  ext y
+  rw [mem_dPerp]
+  constructor
+  · intro h
+    rw [← Subspace.dualAnnihilator_dualCoannihilator_eq (W := W), Submodule.mem_dualCoannihilator]
+    intro φ hφ
+    obtain ⟨x, rfl⟩ := (dotProductEquiv k (Fin a)).surjective φ
+    have := h x hφ
+    rw [dotProduct_comm] at this
+    simpa using this
+  · intro hy x hx
+    rw [dotProduct_comm]
+    exact (mem_dPerp W x).1 hx y hy
+
+private theorem mulVec_mem_dPerp {k : Type} [Field k] {a : ℕ} {W : Submodule k (Fin a → k)}
+    (M : Matrix (Fin a) (Fin a) k) (h : ∀ v ∈ W, M.transpose.mulVec v ∈ W) :
+    ∀ y ∈ dPerp W, M.mulVec y ∈ dPerp W := by
+  intro y hy
+  rw [mem_dPerp] at hy ⊢
+  intro x hx
+  have := hy _ (h x hx)
+  rw [dotProduct_comm, Matrix.dotProduct_mulVec, ← Matrix.mulVec_transpose, dotProduct_comm]
+  exact this
+
+private theorem ss_dual : ∀ (Γ k : Type) [Group Γ] [Field k] (a : ℕ) (r : Γ →* GL (Fin a) k),
+    IsSSRep r → IsSSRep (GlobalTheory.MonoConj.dualRep r) := by
+  intro Γ k _ _ a r hr W hW
+  obtain ⟨U, hU, hc⟩ := hr (dPerp W) (by
+    intro g
+    apply mulVec_mem_dPerp
+    intro v hv
+    have := hW g⁻¹ v hv
+    rwa [coe_dualRep, inv_inv] at this)
+  refine ⟨dPerp U, ?_, ?_⟩
+  · intro g
+    apply mulVec_mem_dPerp
+    intro v hv
+    rw [coe_dualRep, Matrix.transpose_transpose]
+    exact hU g⁻¹ v hv
+  · have := isCompl_dPerp hc
+    rwa [dPerp_dPerp] at this
+
+private theorem ss_tw {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k) (χ : Γ →* kˣ)
+    (h : IsSSRep r) : IsSSRep (tw r χ) := by
+  have key : ∀ W, IsInv (tw r χ) W ↔ IsInv r W := fun W => by
+    constructor
+    · intro h g v hv
+      have := W.smul_mem ((χ g : k)⁻¹) (h g v hv)
+      rwa [tw_val, Matrix.smul_mulVec, smul_smul, inv_mul_cancel₀ (Units.ne_zero _), one_smul] at this
+    · intro h g v hv
+      rw [tw_val, Matrix.smul_mulVec]
+      exact W.smul_mem _ (h g v hv)
+  intro W hW
+  obtain ⟨W', hW', hc⟩ := h W ((key W).1 hW)
+  exact ⟨W', (key W').2 hW', hc⟩
+
+private theorem ss_comp {Γ k : Type} [Group Γ] [Field k] {n : ℕ} (r : Γ →* GL (Fin n) k) (f : Γ →* Γ)
+    (hf : Function.Surjective f) (h : IsSSRep r) : IsSSRep (r.comp f) := by
+  intro W hW
+  obtain ⟨W', hW', hc⟩ := h W fun g v hv => by
+    obtain ⟨g, rfl⟩ := hf g
+    exact hW g v hv
+  exact ⟨W', fun g v hv => hW' (f g) v hv, hc⟩
+
+private theorem cont_cycBar (F Ω : Type) [Field F] [NumberField F] [Field Ω] [Algebra F Ω] (l : ℕ) [Fact l.Prime] :
+    Continuous (cycBar F Ω l) :=
+  _root_.UpperTheory.Reformulated.B.CyclotomicBarContinuous.cont_cycBar F Ω l
+
+private theorem cont_twDual {Γ k : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Field k]
+    [TopologicalSpace k] [IsTopologicalRing k] {n : ℕ} (r : Γ →* GL (Fin n) k) (χ : Γ →* kˣ)
+    (hr : Continuous r) (hχ : Continuous χ) : Continuous (tw (dualRep r) χ) := by
+  have h : Continuous fun s => (tw (dualRep r) χ s : Matrix (Fin n) (Fin n) k) := by
+    simp only [tw_val, coe_dualRep]
+    exact (Units.continuous_val.comp hχ).smul
+      (Units.continuous_val.comp (hr.comp continuous_inv)).matrix_transpose
+  refine Units.continuous_iff.2 ⟨h, ?_⟩
+  simp only [← map_inv]
+  exact h.comp continuous_inv
+
+private theorem frob_conj {F Ω : Type} [Field F] [NumberField F] [IsCMField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {l : ℕ} [Fact l.Prime] {ι : Qbar l ≃+* ℂ} {n : ℕ} {r : G F Ω →* GL (Fin n) (Qbar l)} {σ : Ω ≃+* Ω}
+    (hL : IsLift (IsCMField.complexConj F).toRingEquiv σ) {w : HeightOneSpectrum (𝓞 F)} {B : Multiset ℂˣ}
+    (hB : FrobEig ι r (cPl w) (algSat n (normV (cPl w)) B)) :
+    FrobEig ι (r.comp (conjGal hL)) w (algSat n (normV w) B) := by
+  intro A hA
+  have hAA : ∀ y, σ y ∈ A ↔ y ∈ A.comap σ.toRingHom := fun _ => Iff.rfl
+  rw [cPl_eq] at hB
+  obtain ⟨h1, h2⟩ := hB _ (isPlaceOver_preplace hL hAA hA)
+  refine ⟨fun s hs => h1 _ (conjGal_mem_Ine hL hAA hs), fun s hs => ?_⟩
+  have e := h2 (conjGal hL s) (by rw [normV_preplace]; exact isFrob_conjGal hL hAA hs)
+  rw [normV_preplace, ← map_inv] at e
+  exact e
+
+private theorem frob_twDual {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {l : ℕ} [Fact l.Prime] {ι : Qbar l ≃+* ℂ} {n : ℕ} {r : G F Ω →* GL (Fin n) (Qbar l)}
+    {w : HeightOneSpectrum (𝓞 F)} (hw : ((l : ℕ) : 𝓞 F) ∉ w.asIdeal) {B : Multiset ℂˣ}
+    (hB : FrobEig ι r w (algSat n (normV w) (B.map (·⁻¹)))) :
+    FrobEig ι (tw (dualRep r) (cycBar F Ω l ^ (1 - (n : ℤ)))) w (algSat n (normV w) B) := by
+  intro A hA
+  obtain ⟨h0, h1⟩ := hB A hA
+  refine ⟨fun s hs => ?_, fun σ hσ => ?_⟩
+  · have hc : cycZ F Ω l s = 1 := by
+      refine Units.ext (PadicInt.ext_of_toZModPow.mp fun m => ?_)
+      rw [cycZ_toZModPow_eq hw hA (q := 1) (fun x hx => by simpa using hs.2 x hx) m]
+      simp
+    have hc' : cycBar F Ω l s = 1 := by
+      rw [cycBar, MonoidHom.comp_apply, hc, map_one]
+    apply Units.ext
+    rw [tw_val, coe_dualRep, map_inv, h0 s hs, MonoidHom.zpow_apply, hc']
+    simp
+  have h2 : ((cycBar F Ω l σ : (Qbar l)ˣ) : Qbar l) = (normV w : ℕ) := by
+    change algebraMap ℚ_[l] (Qbar l) (PadicInt.Coe.ringHom ((cycZ F Ω l σ : ℤ_[l]ˣ) : ℤ_[l])) = _
+    rw [cycZ_of_isFrob hw hA hσ, map_natCast, map_natCast]
+  have hq0 : normV w ≠ 0 := by
+    intro h0
+    rw [h0, Nat.cast_zero] at h2
+    exact Units.ne_zero _ h2
+  have hqR : (0 : ℝ) < normV w := by exact_mod_cast Nat.pos_of_ne_zero hq0
+  set d : ℂ := ((((normV w : ℕ) : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) with hd
+  have hd0 : d ≠ 0 := by
+    rw [hd]; exact_mod_cast (Real.rpow_pos_of_pos hqR _).ne'
+  have hdd : d * d = (normV w : ℂ) ^ ((n : ℤ) - 1) := by
+    rw [hd, ← Complex.ofReal_mul, ← Real.rpow_add hqR, add_halves,
+      show ((n : ℝ) - 1) = (((n : ℤ) - 1 : ℤ) : ℝ) by push_cast; ring, Real.rpow_intCast]
+    push_cast
+    rfl
+  have h4 : ι.toRingHom (((cycBar F Ω l ^ (1 - (n : ℤ))) σ⁻¹ : (Qbar l)ˣ) : Qbar l) = d * d := by
+    change ι _ = _
+    rw [MonoidHom.zpow_apply, map_inv (cycBar F Ω l),
+      Units.val_zpow_eq_zpow_val, Units.val_inv_eq_inv_val, h2, map_zpow₀, map_inv₀, map_natCast, hdd, inv_zpow',
+      neg_sub]
+  have hS : ∀ B : Multiset ℂˣ, algSat n (normV w) B = B.map fun α : ℂˣ => d * (α : ℂ) := fun B => by
+    simp only [algSat, ← hd, Multiset.bind_def, Multiset.pure_def, Multiset.bind_singleton, Multiset.map_map,
+      Function.comp_def]
+  rw [tw_val, coe_dualRep, map_inv r σ⁻¹, eig_dual _ _ _ _ (h1 σ hσ), h4, hS, hS]
+  simp only [Multiset.map_map, Function.comp_def]
+  refine congrArg Multiset.prod (Multiset.map_congr rfl fun a _ => ?_)
+  congr 2
+  rw [Units.val_inv_eq_inv_val]
+  have := a.ne_zero
+  field_simp
+
+theorem UpperTheory.twistedDual_frobenius_compatibility :
+    IsoOfFrob → PolOfFrob := by
+  intro H E Ω _ _ _ _ _ _ l _ ι n r hr hs hF c hc
+  have hL := isLift_conj hc
+  have h0 : Ideal.span {((l : ℕ) : 𝓞 E)} ≠ 0 := by
+    rw [Ne, Ideal.zero_eq_bot, Ideal.span_singleton_eq_bot]
+    exact_mod_cast (Fact.out : l.Prime).ne_zero
+  have hl : ∀ᶠ v : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ((l : ℕ) : 𝓞 E) ∉ v.asIdeal :=
+    (Ideal.finite_factors h0).subset fun v hv => Ideal.dvd_span_singleton.mpr (not_not.1 hv)
+  have hsurj : Function.Surjective (conjGal hL) := fun g =>
+    ⟨conjGal hL.symm g, AlgEquiv.ext fun x => by simp [UpperTheory.V.conjGal_apply]⟩
+  have hχ : Continuous (cycBar E Ω l ^ (1 - (n : ℤ)) : G E Ω →* (Qbar l)ˣ) :=
+    (cont_cycBar E Ω l).zpow (1 - (n : ℤ))
+  obtain ⟨P, hP⟩ := H E Ω l ι n (r.comp (conjGal hL)) (tw (dualRep r) (cycBar E Ω l ^ (1 - (n : ℤ))))
+    (hr.comp (continuous_conjGal hL)) (cont_twDual r _ hr hχ) (ss_comp r _ hsurj hs)
+    (ss_tw _ _ (ss_dual _ _ _ r hs)) (by
+      filter_upwards [hF, hl] with w ⟨B, hB, hB'⟩ hw
+      exact ⟨_, frob_conj hL hB', frob_twDual hw hB⟩)
+  refine ⟨P, fun s s' hs' => ?_⟩
+  have e : s' = conjGal hL s := AlgEquiv.ext fun x => DFunLike.congr_fun hs' x
+  have h1 := congrArg (fun g : GL (Fin n) (Qbar l) => ((g * P : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l))) (hP s)
+  simp only [inv_mul_cancel_right, Units.val_mul, tw_val, coe_dualRep, MonoidHom.comp_apply] at h1
+  rw [e, Matrix.mul_assoc, ← h1, Matrix.smul_mul, Matrix.mul_smul, ← Matrix.mul_assoc, ← Matrix.transpose_mul,
+    ← Units.val_mul, ← map_mul, inv_mul_cancel, map_one, Units.val_one, Matrix.transpose_one, Matrix.one_mul]
+
+
+[GUA_SRC_CHEBOTAREV] Density of degree-one Frobenius classes and continuous coefficient/Brauer-Nesbitt consumer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TIsoOfFrob.lean#L11-L41
+    Continuous fun M : Matrix (Fin n) (Fin n) K => M.charpoly.coeff i := by
+  have h : (fun M : Matrix (Fin n) (Fin n) K => M.charpoly.coeff i) =
+      fun M => MvPolynomial.eval (fun ij : Fin n × Fin n => M ij.1 ij.2)
+        ((Matrix.charpoly.univ K (Fin n)).coeff i) := by
+    funext M
+    exact (Matrix.charpoly.univ_coeff_eval₂Hom (Fin n) (RingHom.id K) (fun ij : Fin n × Fin n => M ij.1 ij.2) i).symm
+  rw [h]
+  exact (MvPolynomial.continuous_eval _).comp
+    (continuous_pi fun ij => (continuous_apply ij.2).comp (continuous_apply ij.1))
+theorem UpperTheory.V.Af.iso_of_frobenius_of_printed_results :
+    _root_.UpperTheory.V.Af.Hypotheses' → UpperTheory.V.Af.IsoOfFrob := by
+  intro _ F Ω _ _ _ _ _ l _ ι n r r' hr hr' hs hs' hw
+  have hD := GlobalTheory.Published.ChebotarevDegreeOne.dense (F := F) (Ω := Ω) GlobalTheory.Published.chebotarevDegreeOne'
+    (Filter.eventually_cofinite.1 hw)
+  have hc : ∀ g : G F Ω, (r g⁻¹ : Matrix (Fin n) (Fin n) (Qbar l)).charpoly =
+      (r' g⁻¹ : Matrix (Fin n) (Fin n) (Qbar l)).charpoly := by
+    intro g
+    ext i
+    have h1 : Continuous fun g : G F Ω => (r g⁻¹ : Matrix (Fin n) (Fin n) (Qbar l)).charpoly.coeff i :=
+      (contCoeff n i).comp (Units.continuous_val.comp (hr.comp continuous_inv))
+    have h2 : Continuous fun g : G F Ω => (r' g⁻¹ : Matrix (Fin n) (Fin n) (Qbar l)).charpoly.coeff i :=
+      (contCoeff n i).comp (Units.continuous_val.comp (hr'.comp continuous_inv))
+    refine congrFun (Continuous.ext_on hD h1 h2 ?_) g
+    rintro σ ⟨v, hv, -, A, hA, hσ⟩
+    obtain ⟨B, hB, hB'⟩ := not_not.1 hv
+    have h := ((hB A hA).2 σ hσ).trans ((hB' A hA).2 σ hσ).symm
+    have h' := Polynomial.map_injective ι.toRingHom ι.injective h
+    simp only [h']
+  obtain ⟨P, hP⟩ := Formalism.MainNotions.SumRepresentations.brauerNesbitt_matrix r r' hs hs' (fun g => by simpa using hc g⁻¹)
+  exact ⟨P⁻¹, fun s => by rw [hP s, inv_inv]⟩
+end
+
+
+[GUA_SRC_IRR_CASE] All six cuspidal output fields, including every unramified and split local place
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/GuIrrCaseT.lean#L15-L43
+  simp [spehInf]
+private theorem satTot_one {E : Type} [Field E] [NumberField E] (w : HeightOneSpectrum (𝓞 E)) (S : Fin 1 → Multiset ℂˣ) :
+    satTot w (fun _ => 1) S = S 0 := by
+  simp [satTot, GlobalTheory.WeilDeligne.qPow_zero]
+theorem UpperTheory.V.Z.Win.Gu.irrCaseT_alt :
+    _root_.UpperTheory.V.Af.HypothesesH' → IrrCaseT := by
+  intro PH E Ω _ _ _ _ _ _ l _ ι n hn1 π hπ c a d hn P ρ m σ H hsp hsplit hun hc hd r hr hF
+  subst hc
+  obtain rfl : d = fun _ => 1 := funext hd
+  obtain rfl : a = fun _ => n := funext fun i => by
+    rw [Subsingleton.elim i 0]
+    simpa using hn
+  have hw : ∀ φ lam, HasWeightAt π φ lam → (P 0).HasInfChar φ (infOfWeight lam) := fun φ lam h => by
+    have e := H.weight φ lam h
+    rw [Fin.sum_univ_one, spehInf_one'] at e
+    exact e ▸ H.inf 0 φ
+  refine ⟨P 0, (GlobalTheory.CuspRep.CG.isRegAlg_iff _).2 fun τ => ?_, GlobalTheory.LocGlobDual.Model.dualIsConj_of_isCsd (PH.toClassicalTheorems.litN.aut.gk E _ (P 0)) (H.csd 0),
+    ⟨hr, hF.mono fun w ⟨S, h1, h2⟩ => ⟨S 0, h1 0, satTot_one w S ▸ h2⟩⟩, hw, fun w h => hun w h 0, fun w hs τ hτ => ?_⟩
+  · obtain ⟨lam, hl⟩ := GlobalTheory.T.exists_algebraicWeight_of_automorphic_definiteUnitary E _ hn1 π hπ τ
+    rw [CG.HasInfChar.infChar_eq (π := CG.mk (P 0)) (hw τ lam hl)]
+    refine ⟨nodup_infOfWeight lam, fun z hz => ?_⟩
+    rw [infOfWeight, Multiset.mem_map] at hz
+    obtain ⟨j, -, rfl⟩ := hz
+    exact ⟨lam.w j - (j : ℕ), by push_cast; ring⟩
+  · obtain ⟨e₁⟩ := PositivityTheory.AutomorphicGaloisHodgeTate.SaturatedBaseChange.oneFactor E w n hn (ρ 0 w) (σ · w) (hsp 0 w)
+    obtain ⟨e₂⟩ := LocUniq.isLocComp_unique (P 0) w _ _ (H.loc 0 w) hτ
+    exact GlobalTheory.BaseChangeBridge.isCompAlong_of_equiv (e₁.trans e₂).toLinearEquiv
+      (fun g x => LinearMap.congr_fun ((e₁.trans e₂).toIntertwiningMap.isIntertwining' g) x) τ.irred (hsplit w hs)
+end
+
+
+[GUA_SRC_ASSEMBLY] Original complete assembly_s, including strong all-unramified spherical input
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/Assemble.lean#L20-L75
+    exact_mod_cast (Fact.out : l.Prime).ne_zero
+  exact (Ideal.finite_factors h0).subset fun v hv => Ideal.dvd_span_singleton.mpr (not_not.1 hv)
+theorem UpperTheory.V.Z.Win.Gu.assemble_s (H : _root_.UpperTheory.V.Af.HypothesesH') (hB : GlobalTheory.BcSpeh.BcSpeh) (hFam : SumFamG) (hHalf : HalfG) (hStr : Strings)
+    (hUni : CompUnique) (hRec : RecTotT) (hFrob : FrobTotT) (hPol : PolOfFrob) (hLink : SatLink) (hConj : SatConj)
+    (hIrr : IrrCaseT) (hPl : PlainGd) : GalUnitaryT := by
+  intro E Ω _ _ _ _ _ _ hE l _ _ ι n hn π hπ
+  obtain ⟨c, a, d, hsum, P, ρ, m, σ, hP, hS, hsplit⟩ := hB E hE n hn π hπ
+  have hc : 1 ≤ c := by
+    rcases c with _ | c
+    · simp at hsum; omega
+    · omega
+  have hint : ∀ i (k : Fin (d i)) τ, (m i τ).Nodup ∧ ∀ z ∈ m i τ, ∃ j : ℤ, z + (ex n (d i) k : ℂ) / 2 = j := fun i k τ => by
+    obtain ⟨lam, hl⟩ := GlobalTheory.T.exists_algebraicWeight_of_automorphic_definiteUnitary E n hn π hπ τ
+    exact (hStr n c d (m · τ) lam (hP.weight τ lam hl)).1 i k
+  choose r₀ HT₀ h₀ hw₀ using fun i (k : Fin (d i)) =>
+    hHalf E Ω l ι (a i) (hP.pos i).1 (P i) (hP.csd i) (ρ i) (hP.loc i) (m i) (hP.inf i) (ex n (d i) k) (hint i k)
+  choose r₁ h₁ hi₁ using fun i => hFam E Ω l ι (d i) (hP.pos i).2 (fun _ => a i) (fun _ => (hP.pos i).1) (d i * a i) (by simp)
+    (r₀ i) _ (HT₀ i) (h₀ i)
+  obtain ⟨r, hr, hi⟩ := hFam E Ω l ι c hc (fun i => d i * a i) (fun i => Nat.mul_pos (hP.pos i).2 (hP.pos i).1) n hsum r₁ _ _ h₁
+  have hpar : ∀ w, ParAtT ι r w (totPar n d (ρ · w)) := hr.par
+  have hF : ∀ w : HeightOneSpectrum (𝓞 E), ((l : ℕ) : 𝓞 E) ∉ w.asIdeal → ∀ S : Fin c → Multiset ℂˣ,
+      (∀ i, (CG.mk (P i)).HasSat w (S i)) → FrobEig ι r w (algSat n (normV w) (satTot w d S)) := fun w hw S hS =>
+    hFrob E Ω l ι n c a d r hr.cont w hw (ρ · w) S (fun i => ((hLink E _ (P i)).1 w _ (hP.loc i w) _).1 (hS i)) (hpar w)
+  have hev : ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ((l : ℕ) : 𝓞 E) ∉ w.asIdeal ∧
+      ∃ S : Fin c → Multiset ℂˣ, ∀ i, (CG.mk (P i)).HasSat w (S i) := by
+    filter_upwards [ev_notMem (K := E) l, Filter.eventually_all.2 fun i => (hLink E _ (P i)).2] with w h1 h2
+    exact ⟨h1, Classical.skolem.1 h2⟩
+  have hsph : ∀ w, IsUnramU π w → ∀ i, ∃ B, GlobalTheory.LFun.HasSatGL w (ρ i w).ρ B := fun w hu i =>
+    (_root_.UpperTheory.V.Af.satake_local_of_printed_results H.toClassicalTheorems E (a i) w (ρ i w)).1 (by
+      obtain ⟨x, hx, h0⟩ := (Submodule.ne_bot_iff _).1
+        (GlobalTheory.SphBC.isSpherical_of_isUnramU E hE n π hπ c a d hsum P ρ m σ hP hS hsplit w hu i (ρ i w) (hP.loc i w))
+      exact ⟨x, h0, GlobalTheory.LGrp.mem_fixed.1 hx⟩)
+  refine ⟨r, fun τ => ∑ i, ∑ k, HT₀ i k τ, hr.cont, hr.ss, fun w hw hu A hA => ?_, fun τ lam hl => ?_, fun w hw τ hτ => ?_, ?_, fun hirr => ?_⟩
+  · choose S hSat using hsph w hu
+    exact (hFrob E Ω l ι n c a d r hr.cont w hw (ρ · w) S hSat (hpar w) A hA).1
+  · rw [← (hStr n c d (m · (ι.toRingHom.comp τ)) lam (hP.weight _ lam hl)).2]
+    simp only [← hw₀]
+    simp only [← Multiset.coe_mapAddMonoidHom, map_sum]
+  · have e := hRec E Ω n c a d hsum P w (ρ · w) (σ · w) hP.pos (hP.loc · w) (hS · w) τ
+      (hUni E n π hπ w hw _ _ _ _ hτ (hsplit w hw))
+    refine ⟨fun A h rc hrc => e A h rc hrc ▸ hpar w A h rc hrc, fun hp => hr.ht w fun A h rc hrc => ?_⟩
+    have g := hPl E Ω A w h rc hrc n τ hp
+    rw [← e A h rc hrc] at g
+    exact g
+  · refine hPol E Ω l ι n r hr.cont hr.ss ?_
+    filter_upwards [hev, (conjSrc_injective (IsCMField.complexConj E).toRingEquiv).tendsto_cofinite.eventually hev]
+      with w ⟨hw, _⟩ ⟨hw', S, hS'⟩
+    refine ⟨satTot (Bc.cPl w) d S, ?_, hF _ hw' S hS'⟩
+    rw [← (hConj E w).2 c d S]
+    exact hF w hw _ fun i => (hConj E w).1 _ (P i) (hP.csd i) _ (hS' i)
+  · refine hIrr E Ω l ι n hn π hπ c a d hsum P ρ m σ hP (fun i w => (hS i w).2.2) hsplit
+      (fun w hu i => (hsph w hu i).imp fun B hB => ((hLink E _ (P i)).1 w _ (hP.loc i w) B).2 hB) (hi hirr).1 (fun i => (hi₁ i ((hi hirr).2 i)).1) r hr.ss ?_
+    filter_upwards [hev] with w ⟨hw, S, hS'⟩
+    exact ⟨S, hS', hF w hw S hS'⟩
+end
+end
+
+
+[GUA_SRC_GAL_WRAPPER] Original half/recTotal wrappers and GalUnitaryT assembly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/GalUnitaryT.lean#L18-L43
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.Assemble
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.GuSumTwoG
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.GuFrobTotT
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.TIsoOfFrob
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.SatakeGaloisCompatibilityOfHeckeEigensystem
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.GuIrrCaseT
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.GuProdT
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.GuSpehT
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.GuPolG
+
+set_option maxHeartbeats 800000
+set_option synthInstance.maxHeartbeats 200000
+
+section
+open UpperTheory.V.Af UpperTheory.V.Af.Gu
+namespace UpperTheory.V.Z.Win.Gu
+theorem half_alt (H : _root_.UpperTheory.V.Af.HypothesesH') (hR : RowT) : HalfG := halfG UpperTheory.twist_local_components_compatible (_root_.UpperTheory.V.Z.Win.Gu.polG_of_printsH_of_rT H hR)
+theorem recTotT_of_printsH (H : _root_.UpperTheory.V.Af.HypothesesH') : RecTotT := recTotT (_root_.UpperTheory.V.Z.Win.Gu.prodT_alt H extraV) (_root_.UpperTheory.V.Z.Win.Gu.spehT_alt H extraV)
+theorem galUnitaryT_of_printsH_of_bcSpeh_of_rT (H : _root_.UpperTheory.V.Af.HypothesesH') (hB : GlobalTheory.BcSpeh.BcSpeh) (hR : RowT) : GalUnitaryT :=
+  _root_.UpperTheory.V.Z.Win.Gu.assemble_s H hB (sumFamG (_root_.UpperTheory.V.Z.Win.Gu.sumTwoG_of_printsH_gdLaws_sumAway_sumHTAt H gdLaws UpperTheory.galoisRep_direct_sum_away_from_places sumHTAt) UpperTheory.finiteSum_reduction) (_root_.UpperTheory.V.Z.Win.Gu.half_alt H hR) UpperTheory.speh_parameter_strings UpperTheory.building_component_uniqueness
+    (_root_.UpperTheory.V.Z.Win.Gu.recTotT_of_printsH H) (_root_.UpperTheory.V.Z.Win.Gu.frobTotT_alt H extraV gdLaws) (UpperTheory.twistedDual_frobenius_compatibility (_root_.UpperTheory.V.Af.iso_of_frobenius_of_printed_results H.toClassicalTheorems)) (_root_.UpperTheory.satake_galois_link_of_printed_hida H) UpperTheory.satake_parameters_complex_conjugate
+    (_root_.UpperTheory.V.Z.Win.Gu.irrCaseT_alt H) plainGd
+theorem endShapeT' (H : _root_.UpperTheory.V.Af.HypothesesH') (hB : GlobalTheory.BcSpeh.BcSpeh) (hR : RowT) :
+    type_of% (endShape_of hB (_root_.UpperTheory.satake_galois_link_of_printed_hida H) (_root_.UpperTheory.V.Z.Win.Gu.half_alt H hR) (_root_.UpperTheory.V.Z.Win.Gu.recTotT_of_printsH H) (_root_.UpperTheory.V.Z.Win.Gu.frobTotT_alt H extraV gdLaws) (frobTwT extraV gdLaws)) :=
+  endShape_of hB (_root_.UpperTheory.satake_galois_link_of_printed_hida H) (_root_.UpperTheory.V.Z.Win.Gu.half_alt H hR) (_root_.UpperTheory.V.Z.Win.Gu.recTotT_of_printsH H) (_root_.UpperTheory.V.Z.Win.Gu.frobTotT_alt H extraV gdLaws) (frobTwT extraV gdLaws)
+end UpperTheory.V.Z.Win.Gu
+
+
+[GUA_SRC_GUWRAP] Original spehOf_alt, galUnitaryT_of_printsH and separately retained endShape endpoint
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/GuWrap.lean#L18-L24
+namespace UpperTheory.V.Z.Win.Gu
+theorem spehOf_alt (H : _root_.UpperTheory.V.Af.HypothesesH') : GlobalTheory.BcSpeh.BcSpeh :=
+  _root_.UpperTheory.BaseChangeIdentities.bcSpeh_alt (_root_.UpperTheory.BaseChangeIdentities.bridge H.litN.aut.bc H.litN.loc.bern)
+theorem galUnitaryT_of_printsH : _root_.UpperTheory.V.Af.HypothesesH' → GalUnitaryT := fun H => _root_.UpperTheory.V.Z.Win.Gu.galUnitaryT_of_printsH_of_bcSpeh_of_rT H (_root_.UpperTheory.V.Z.Win.Gu.spehOf_alt H) (_root_.UpperTheory.Gal.SV.rowOf' H.litN.aut.gal)
+theorem endShape'_alt :
+    _root_.UpperTheory.V.Af.HypothesesH' → ∀ (E Ω : Type) [Field E] [NumberField E] [IsCMField E] [Field Ω] [Algebra E Ω] [IsAlgClosure E Ω], (∀ w : HeightOneSpectrum (𝓞 E), Algebra.IsUnramifiedAt (𝓞 (maximalRealSubfield E)) w.asIdeal) → ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (ι : Qbar l ≃+* ℂ) (n : ℕ), 1 ≤ n → ∀ σ : Submodule ℂ (UA E n → ℂ), IsAutRepU σ → ∀ ρ : G E Ω →* GL (Fin n) (Qbar l), Continuous ρ → IsSSRep ρ → (∀ w, IsSplitAt w → ∀ τ : SmIrr (GL (Fin n) (w.adicCompletion E)), IsCompAlong σ (locU n w) ((cLoc w).comp (locU n w).subtype) τ.ρ → LocGlobT ι ρ w τ) → ∃ (a : ℕ) (d m : Fin a → ℕ) (ρ' : ∀ i, G E Ω →* GL (Fin (d i)) (Qbar l)), (∀ i, 1 ≤ d i ∧ 1 ≤ m i ∧ Continuous (ρ' i)) ∧ (∀ g, (UpperTheory.V.W.mat ρ g).charpoly = ∏ i, ∏ j ∈ Finset.range (m i), (UpperTheory.V.W.mat (UpperTheory.V.Af.tw (ρ' i) (cycBar E Ω l ^ (-(j : ℤ)))) g).charpoly) ∧ ((∀ i, m i = 1) → ∀ᶠ w : HeightOneSpectrum (𝓞 E) in Filter.cofinite, ∀ b : Multiset ℂ, UpperTheory.V.Af.FrobEig ι ρ w b → ∀ z ∈ b, ∀ z' ∈ b, ‖z‖ < (normV w : ℝ) * ‖z'‖) :=
+  fun H => _root_.UpperTheory.V.Z.Win.Gu.endShapeT' H (_root_.UpperTheory.V.Z.Win.Gu.spehOf_alt H) (_root_.UpperTheory.Gal.SV.rowOf' H.litN.aut.gal)
+
+
+[GUA_SRC_ROW_IDENTITY] rowOf' is the identity on RowT
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/Foundations/GaloisRepresentations/RankTwoPatching/GaloisRepExistsTotallyRealGL2.lean#L60-L60
+theorem rowOf' (h : RowT) : RowT := h

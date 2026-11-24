@@ -1,0 +1,370 @@
+QUOTIENT SUPPLIERS: FOCUSED NEXT-SOURCE HANDOFF AFTER BST/BSE v0.51
+Date: 2026-11-23
+Source pin: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Read-only checkout: /workspace/scratch/249d32c24541/formal_source
+Repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+
+This is a next-work handoff, not a new proof packet or a closure claim.
+The mathematical route below was checked against the pinned source. No
+v0.51 proof claim is added by this file. BST and BSE main.tex stay frozen.
+
+Path convention
+---------------
+L = src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/LaplaceOperators/
+DS = src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/
+Every filename below is relative to the indicated prefix.
+
+1. EXACT REMAINING ENDPOINTS
+---------------------------
+Read L/LaplaceEstimates/PsiDatumStatement.lean:
+  lines 197--224: def QuotPStatement
+  lines 226--253: def QuotMStatement
+The actual producers are:
+  L/LaplaceEstimates/QuotP.lean:20, theorem quotP : QuotPStatement
+  L/LaplaceEstimates/QuotM.lean:19, theorem quotM : QuotMStatement.
+
+The input is the full arbitrary derived datum of EvalP/EvalM, together with
+an ARBITRARY tuple x in the specified Euler eigenspace, and existence of
+some g in G_H at which the actual tensor period of x is nonzero.
+It is not restricted to the complementary-minor tuples constructed in BSE.
+The shifted parameter lambda' = lambda +/- e_s must itself be HC and have
+GapAtLeast epsilon lambda' h, with the SAME h.
+
+Write S=genSub(E,V), A+=tensV(E), A-=tensVd(E),
+Omega+=eeV(E), Omega-=eeVd(E),
+theta_s+=lambda_s-(n-1)/2, theta_s-=-lambda_s-(n-1)/2.
+Then X+=S^n intersect ker(Omega+-theta_s+) and similarly X-.
+Use L+=tMap or L-=tMapD with the original xJ(P,z), x0 and w.
+
+Each endpoint constructs actual spaces
+  Wf <= {complex-valued functions on ambient matrices},
+  W' <= smD(epsilon,rreg(epsilon)),
+with ALL of the following:
+  (a) Every F in Wf is literally L+/-(y) for some y in X+/-.
+  (b) For every smooth L2 vector v,
+        v in W' iff there exists F in Wf with v=toL2(F).
+      This is an equality of the actual image, in both directions.
+  (c) W' is the compact irreducible highest-weight type
+        lowK(epsilon,lambda +/- e_s).
+  (d) The Casimir on W' is casVal(lambda +/- e_s).
+  (e) W' is stable under the ACTUAL compact group in the right regular
+      representation, not merely under its derived Lie algebra.
+  (f) If F in Wf has zero prescribed period at EVERY g in G_H, then
+      F vanishes at EVERY g in U(J_epsilon).
+
+The full two endpoints, combined with reviewed BSP/BST and BSE, imply
+StepStatement. BNV23 then gives BesselNVGap and the original setting only
+on its retained supplied-Forms0 scope. That last conditional boundary
+must remain explicit until these two endpoints are actually reconstructed.
+
+2. WORK THAT IS ALREADY AVAILABLE
+--------------------------------
+Do not redo the evaluated periods:
+  BSE7 and BSE8 prove exact EvalP/EvalM, preserving every original datum.
+Do not redo the smooth tensor calculus or complementary algebra:
+  BST3--BST5 give generated coefficients, all derivative words, exact
+  tensor intertwining, decay and every L2 derivative.
+  BST8--BST10 give the two ordered complementary expansions, eigenspace
+  membership of the actual minors, and exact shifted Casimir scalars.
+  BSP3 gives the full Capelli polynomial on S.
+  BSP5 gives convergence and differentiation of the actual period.
+  BSP1 gives the exact numerical inequalities from StepGap.
+  BSP2 supplies the exact coefficient/lowest-type identification for
+  arbitrary original unitary derived data when that broader link is needed.
+
+There is no remaining analytic nonzero-evaluation premise to guess.
+The difficulty is extracting an appropriate actual compact type from the
+unitary tensor image and separating it from the kernel of all periods.
+
+3. FIRST BOUNDED ALGEBRAIC TARGET: THE WHOLE EULER POLYNOMIAL
+-----------------------------------------------------------
+Exact target definitions are in
+  L/KTypeLemma/QuotientHighestWeightTensorStandard.lean:
+    LowestKTypeEulerTensorStandard and LowestKTypeEulerTensorDual.
+Their conclusions, on EVERY f in S^n, are
+  product_t (Omega+ - theta_t+) f = 0,
+  product_t (Omega- - theta_t-) f = 0.
+Their original datum does not include a chosen Psi coefficient
+identification, so retain the full datum-to-kernel link when claiming
+their original scope.
+
+Entry points:
+  L/KTypeLemma/K1V.lean:8, k1V
+  L/KTypeLemma/StandardKTypeOfCentralChar.lean:25,
+      standardKType_of_centralChar
+  L/KTypeLemma/ProdShiftEeVOfCapelli.lean:271,
+      prodShift_eeV_of_capelli
+  same file:330, prodShift_eeV_of_capelli'
+  L/KTypeLemma/DualKTypeOfStandardKType.lean:13,
+      dualKType_of_standardKType
+  same file:37, k1Vd.
+
+Recommended simplification to verify and write:
+Use BSP3 and BST8 directly instead of rebuilding the entire source
+central-character package. The first complementary expansion gives
+  (Omega+ + t I) U(t) = p_lambda(t) I
+on S^n, where U(t) is a monic matrix polynomial of degree n-1 and
+p_lambda(t)=product_i(t+theta_i+).
+Comparing coefficients recursively expresses U's coefficients as
+polynomials in Omega+ with scalar coefficients; the final coefficient
+identity is the desired characteristic polynomial at -Omega+.
+The second complementary expansion gives the same argument for
+  (-Omega- + (t-(n-1))I) V(t) = p_lambda(t) I,
+with the dual roots theta_i-.
+This is a proposed human simplification supported by the exact source
+adjugate-to-polynomial theorem, not a new v0.51 proof claim.
+
+StrictAnti lambda makes the roots distinct. Thus ordinary Lagrange
+polynomials in Omega+/- project onto each X+/- and commute with the
+tensor action. The source often uses the unnormalized polynomial
+P_s=product_{t!=s}(Omega-theta_t), whose eigenvalue on X_s is nonzero,
+rather than dividing by that eigenvalue. Either convention is acceptable
+if kept consistent.
+
+4. DEEPEST REPRESENTATION-THEORETIC TARGET: THE FULL K2 CONE AND LINE
+-----------------------------------------------------------------
+Exact target definitions in
+  L/KTypeLemma/QuotientHighestWeightTensorStandard.lean:
+    EigenspaceWeightConeStandard, EigenspaceWeightConeDual.
+They say:
+  Every nonzero compact highest vector f in X_s+/- of weight nu has
+    nu-lowK(epsilon,lambda +/- e_s)
+  in the NONNEGATIVE INTEGRAL cone of roots e_a-e_b with a<b.
+  Any two highest vectors in X_s+/- of exactly the shifted lowest weight
+  are linearly dependent.
+The root cone is the full ordered gl_n positive-root cone, not merely
+the compact-root cone. Both conclusions are required downstream.
+
+Actual producers:
+  L/KTypeLemma/K2V.lean:15, k2V
+  L/KTypeLemma/K2Vd.lean:6, k2Vd
+  L/KTypeLemma/DualLowestKTypeOfStandard.lean:123,
+      dualLowestKType_of_standard.
+
+The standard proof splits into independently reviewable pieces:
+
+  A. Pure generated lowest-weight module.
+     L/KTypeLemma/VermaProductIdentity.lean:163,
+         verma_product_identity
+     L/KTypeLemma/VermaCone.lean:61, verma_cone
+     L/KTypeLemma/VermaConeB.lean:15, vc_cone_core
+     with VermaConeA.lean and VermaConeC.lean for its filtration.
+     A cyclic module generated by phi with lower units killing phi and
+     diagonal weight lambda+rho has a filtration of its standard/dual
+     tensor module generated by e_t tensor phi. Omega acts on successive
+     quotients by the distinct theta_t. Project to the selected factor.
+     Ordered positive-root monomials give the cone and the unique
+     extremal weight line. The source target is any such generated
+     module, not only an irreducible Verma module.
+
+  B. Transfer from the original lowest compact type to that model.
+     L/KTypeLemma/RightHolPowerDetDiag.lean:13,
+         LowestKTypeLink; :28 k2vLink_of; :36 k2vLink.
+     L/KTypeLemma/IndicatorRholMem.lean:157, k2vM.
+     These construct the right-holomorphic principal-minor module with
+     cyclic vector Phi_mu, lower-unit annihilation and diagonal
+     weight lambda+rho. BSP2/DC may supply the coefficient link, but
+     the trace transfer itself must still be proved.
+
+  C. The actual trace-kernel transfer, the critical logical bridge.
+     L/KTypeLemma/TensorActionApplyDual.lean defines the formal word
+       space KS, its evaluation sT, its scalar-model evaluation sTheta,
+       the Euler word operator sES and the compact action sA.
+     L/KTypeLemma/SACommSES.lean gives the exact intertwining identities.
+     L/KTypeLemma/LowestKTypeVectorExists.lean:86,
+         lowestKType_trace_integral; :200 lowestKType_trace.
+     For EVERY compact-stable word subspace W,
+       sTheta|W=0 implies sT|W=0.
+     This is proved using the exact averaged Psi coefficient, its
+     differentiated trace integral and unitarity. It cannot be replaced
+     by an abstract statement that a matching highest weight occurs.
+
+  D. Lift and join.
+     L/KTypeLemma/LiftHighestWeightVector.lean:113,
+         lift_highestWeightVector
+     L/KTypeLemma/LowestKTypeLink.lean:15 is the public wrapper.
+     L/KTypeLemma/MemEigenTensorSpaceIff.lean:24,
+         lowestKType_tensor_lift
+     Lift a compact highest vector to a finite compact-stable word
+     space; apply the Lagrange polynomial; use the model's cone/line;
+     then use the trace-kernel implication to return to the actual
+     generated module. K2V.lean is the final join.
+
+The dual proof uses conjugation and index reversal. Track
+epsilon -> epsilon composed with Fin.rev and lambda -> -lambda composed
+with Fin.rev, together with the conjugate Hilbert space and its actual
+derived operators. A bare transposition of the final weight formula
+does not establish the full dual statement.
+
+5. K3: LOWEST TYPE IN EVERY NONZERO UNITARY IMAGE
+----------------------------------------------
+Exact targets:
+  QuotientHighestWeightTensorStandard and
+  QuotientHighestWeightTensorDual
+in L/KTypeLemma/QuotientHighestWeightTensorStandard.lean.
+
+For EVERY linear map phi:D^n -> N into an arbitrary infinitesimally
+unitary inner-product module, intertwining on S^n, and every x in X_s
+with phi(x)!=0,
+construct W<=phi(X_s) with the exact shifted compact highest type and
+shifted Casimir. The target N need not be complete, and no ambient
+irreducibility is assumed.
+
+Actual producers:
+  L/KTypeLemma/ThreeAddLeGapBound.lean:100, k3V
+  L/KTypeLemma/CasimirValueSubSingle.lean:37, k3Vd.
+Supporting entry points:
+  L/KTypeLemma/SingleSmulFin.lean:78, gen_statement
+  L/KTypeLemma/ExistsCommutingProjectionImage.lean:
+      eigenspace_K_finite, image_eigenspace_K_finite,
+      image_weights_in_root_cone, exists_commuting_projection_image
+  L/KTypeLemma/SchmidCas.lean:86, schmid_casimir
+  L/KTypeLemma/ConeNorm.lean:40, cone_norm.
+
+Source route:
+The polynomial projection and tensor generation show that a nonzero
+unitary image is already nonzero on the projection of the finite space
+V^n. Compact highest-vector lifting supplies a coordinate/partial-sum
+upper bound, while K2 supplies the root-cone lower bound.
+Choose a compact highest type with minimal integral root-cone height.
+If its negative first noncompact layer survives, the compact tensor
+calculation produces a type of smaller height, a contradiction.
+Thus the Schmid relation vanishes on that type.
+The Schmid-Casimir result identifies its Casimir with the parameter
+nu+rhoC-rhoN. The tensor Casimir is already the scalar for lambda+/-e_s.
+Finally
+  ||lambda' + beta||^2 = ||lambda'||^2,
+  lambda' antitone, beta in the positive-root cone
+forces beta=0, since 2<lambda',beta>+||beta||^2=0.
+This pins the actual compact highest weight, not just its Casimir.
+
+Track the source's h-2 gap and integrality argument. The intermediate
+parameter differs coordinatewise by a vector whose partial sums lie
+in [0,1] in the standard case or [-1,0] in the dual case; hence
+coordinate differences change by at most two. The precise numerical
+margin is used in SchmidCas. BST10's Casimir equality alone does not
+replace this extraction.
+
+6. COMMON GENERIC QUOTIENT EXTRACTION, SUITABLE FOR A PARALLEL AGENT
+-----------------------------------------------------------------
+Read L/LaplaceEstimates/ImageLeClosGen.lean:
+  :105 image_le_closGen
+  :153 quot_generic.
+This branch can be reconstructed while the K2/K3 suppliers remain
+explicit premises; that is a genuine complete original conditional
+source theorem and a useful bounded endpoint.
+
+Exact generic input:
+  A complex module Y with operators A_ab; subspaces X<=G<=Y;
+  lambda' satisfying the literal StdGap;
+  phi:Y -> smD(epsilon,rreg) intertwining A_ab on G;
+  every nonzero image psi(x), x in X, for EVERY such intertwiner psi
+    contains a lowest compact type W of lambda' and its Casimir;
+  ONE ys in X such that, for EVERY such psi, every highest vector
+    of the target lowest weight in psi(X) is c psi(ys);
+  every x in X lies in a finite-dimensional compact-stable S<=X;
+  Z<=X stable under every A_ab;
+  saturation: y in X, z in Z, phi(y)=phi(z) implies y in Z;
+  some x in X outside Z.
+The original theorem does not require a separate global bracket
+assumption on A; do not silently add one when claiming its whole scope.
+
+Output:
+  Y'<=X, W=phi(Y'), Y' intersect Z=0,
+  W the exact lowest compact type with the exact Casimir, and W stable
+  under the actual compact group in the right regular representation.
+
+Source argument:
+Choose W using the nonzero-image supplier. Its highest line forces
+phi(ys) into W. Let C be the Hilbert closure of the generated module
+of W. Projection to C-perp commutes with the group and all derivatives.
+Apply the universal nonzero-image supplier to this projected map:
+its highest vector would be a multiple of the projected phi(ys)=0.
+Therefore phi(X)<=C.
+Finite compact stability plus the exact compact-finite closure theorem
+puts phi(x) in the algebraic generated module of W.
+If W intersects phi(Z), compact irreducibility forces W<=phi(Z);
+full Lie stability then forces phi(x) in phi(Z), contradicting saturation.
+Finally choose an algebraic complement to ker(phi) in
+X intersect phi^-1(W). Its image is W and it avoids Z.
+
+Do not skip the compact-finite closure step. Its precise source is
+  DS/DiscreteSeriesExistence/PropsKfin.lean:296, data_kfin_le.
+The closure invariance uses
+  DS/AnalyticVectors/Closure.lean, closure_genSub_stable;
+actual compact stability uses
+  DS/DiscreteSeriesExistence/BridgeExpK.lean,
+      kStable_of_isKStableSub.
+DC8--DC10 contain the relevant human PBW/closure arguments, but check
+their numerical scope before importing the entire original generic
+StdGap theorem (StdGap only requires h>n*p*q+1).
+
+7. SPECIALIZATION TO THE ACTUAL PERIOD: KEEP ALL DATA COMMON
+-----------------------------------------------------------
+The period quotient is not obtained by taking an arbitrary abstract
+irreducible quotient. The source chooses
+  Z={y in X: for every g in G_H, per(L(y),xi,g)=0}
+for the ONE fixed Bessel datum, x0,w,xi and Cayley matrix P.
+
+The smooth lift is
+  L/LaplaceEstimates/QuotMA.lean:29, exists_lin.
+It maps the literal functions L(y) to their actual smooth L2 classes,
+intertwining every matrix unit on G=S^n. The source extends from G to
+the entire ambient tuple space by an algebraic complement; no
+continuity of that arbitrary extension is required.
+
+Use
+  L/LaplaceEstimates/ToL2CongrOnUnitaryBis.lean:
+    per_congr, eabB_zero, per_add, per_smul,
+    eqOn_unitary_of_toL2_eq, toL2_add_smooth, toL2_smul_smooth.
+BST5+BSP5 give linearity/integrability and show Z is Lie-stable.
+If two smooth L2 classes agree, continuity and full support of Haar
+make their functions agree everywhere on G, so their actual periods
+agree. This supplies the saturation condition.
+
+Compact-finite hulls and the one common highest line are supplied by
+  L/LaplaceEstimates/QuotPA.lean:43,
+      exists_kStable_finiteDimensional_submodule_of_mem_Xs;
+  same file:74, line_V;
+  L/LaplaceEstimates/QuotMA.lean:96, line.
+The line proof is short once K2's one-dimensional extremal line is
+known: lift highest vectors through finite compact-unitary modules,
+then use that line for every possible target intertwiner.
+
+Apply quot_generic to obtain Y',W'. Set Wf=L(Y') with the ORIGINAL
+matrix-function map L. The full image equivalence follows from the
+smooth lift. If F=L(y) has all periods zero, then y lies in Y' intersect
+Z, hence y=0 and F vanishes. This is the actual injectivity conclusion.
+
+Common data that must not change at any join:
+  k,r,n,epsilon,lambda,h,s and the exact shifted lambda';
+  sigma,D,E,V,T,mu,iota and their coefficient identity;
+  z and every original nonzero character coefficient c_a;
+  the original compact representation pi of type u;
+  BOTH given weak Haar measures with their original normalizations;
+  P satisfying IsCayley (Euclidean unitarity is not assumed);
+  x0, w and the fixed target vector xi;
+  xJ(P,z), the exact standard/dual tensor map, and its ordered Euler
+    operator with eigenvalue theta_s+ or theta_s-;
+  the actual period kernel at every point of G_H.
+The witness point for the nonzero period may be existential; the
+definition of Z always quantifies over ALL points.
+
+8. RECOMMENDED PARALLEL ORDER
+----------------------------
+Start simultaneously:
+  Agent A: full Euler polynomials and Lagrange projectors from the
+           existing Capelli identities; then pure Verma cone/line.
+  Agent B: exact trace-kernel transfer and compact highest-vector lifts
+           into the principal-minor model.
+  Agent C: full generic quotient extraction and actual period-kernel
+           specialization, retaining K2/K3 at their exact scope.
+After A+B, prove full K2 and the exact dual transport.
+Then complete K3 by the minimal-type/Schmid/Casimir argument.
+Finally discharge the retained K2/K3 inputs in C and produce literal
+QuotPStatement+QuotMStatement. Only then promote the conditional
+BST11/BSE9/BNV23 joins to the full original Step/Bessel theorem.
+
+This order keeps the difficult new representation-theoretic suppliers
+visible and avoids repeating the convergent integral, Capelli-minor
+calculus and nonzero-evaluation work already completed in v0.51.

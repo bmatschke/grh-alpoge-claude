@@ -1,0 +1,1157 @@
+% Version 0.27.  Actual arithmetic data and the complete level comparison.
+% Pinned Lean source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+\section{The actual symplectic arithmetic data}
+\label{sec:symplectic-arithmetic-data}
+
+\status{AX1--AX10 close the arithmetic construction behind G1.
+They prove the literal \texttt{dataEx}, all of \texttt{facts},
+\texttt{levOf}, the ordinary specialization theorem \texttt{spPtL},
+and the level, duality and safety assertions on the actual points.
+The final admissible class uses the explicitly retained
+\texttt{SymplecticFourImageDense} hypothesis to supply its common
+automorphic embedding, \texttt{Fin0} and \texttt{NoEnd}.  None of those
+three assertions is inferred from the character construction.}
+
+\subsection{The original objects and their conditions}
+
+Fix the source algebraic closure $\Omega/\mathbb Q$ and put
+$G=\operatorname{Gal}(\Omega/\mathbb Q)$.  Let $\ell$ be an odd prime,
+let $O\subset\overline{\mathbb Q}_\ell$ be the original coefficient
+DVR, finite over $\mathbb Z_\ell$, and let $k=O/\mathfrak m_O$.
+Write $c:G\to\mathbb Z_\ell^\times\subset O^\times$ for the
+cyclotomic character, $\omega$ for its Teichm\"uller part, and a bar
+for reduction to $k$.  A Dirichlet character is evaluated on $G$
+through the cyclotomic action at its specified level.  Characters of
+different levels are multiplied after inflation to a common multiple;
+all displayed identities involving them mean identities on units.
+
+Keep the host of HV1: a primitive character $\chi$ of conductor $q$
+and order $o$, an integer $s\ge2$, and the original prime pair $q_1,d$.
+Put
+\[
+ N=\operatorname{lcm}(2^{s+2},q)q_1d,
+ \qquad H\le(\mathbb Z/N)^\times
+ \tag{AX.1}
+\]
+with exactly the four defining conditions in HV1.  A host character
+$\psi$ is trivial on $H$.  Membership in $h.X(O,e)$ also requires
+$\psi(-1)=(-1)^e$.  Throughout, $\operatorname{clog}_2(x)$ is the
+least $n\ge0$ with $x\le2^n$ for the positive integers used below.
+
+For a finite-order character, let $\operatorname{comp}_p$ denote its
+CRT component supported at $p$.  Split
+\[
+ \psi=\psi_2\theta\kappa,
+ \quad \psi_2=\operatorname{comp}_2\psi,
+ \quad \kappa=\psi_{\ell\text{-primary}},
+ \quad \theta=\psi_{\ell'}(\operatorname{comp}_2\psi_{\ell'})^{-1}.
+ \tag{AX.2}
+\]
+Also put $\psi_P=\psi_{\ell'}
+(\operatorname{comp}_\ell\psi_{\ell'})^{-1}$,
+$c_2=v_2(\operatorname{cond}\psi_2)$,
+$f_0=\operatorname{ord}_{\operatorname{lcm}(4,\operatorname{ord}\theta)}(\ell)$,
+and $n_0=v_2(\ell^{f_0}-1)$.  These are the literal source
+\texttt{psi2}, \texttt{th1}, \texttt{kap}, \texttt{chiP},
+\texttt{c2}, \texttt{f0} and \texttt{n0}.
+The two prescribed dyadic levels are
+\[
+\begin{split}
+ n_{\rm II}&=\operatorname{clog}_2\max
+  \{\ell N4^{n_0},\ 2^{c_2+6}o\ell^3q^2\},\\
+ n_{\rm III}&=\operatorname{clog}_2\max
+  \{\ell q p_{\!1}4^{n_0},\ 8\ell^2\}.
+\end{split}\tag{AX.3}
+\]
+Here $p_{\!1}=\mathtt{pOne}(\chi)$ is the fixed prime congruent to
+$1$ modulo the odd part of $o$ and coprime to $2qp_K$.  It does not
+vary with the host.  The exceptional set is the same
+$\mathcal B_\chi$ as in HV1.  In the two cases,
+\[
+\begin{array}{ll}
+\mathrm{II}:&e\ge2,\quad \operatorname{ord}(\psi_P)\text{ even},
+ \quad[\ell\in\mathcal B_\chi\ \text{or}\ \ell-1\mid2e],\\
+\mathrm{III}:&\ell\notin\mathcal B_\chi,\quad\ell-1\mid2e,
+ \quad\operatorname{ord}(\psi)\text{ odd},\quad\psi\ne1.
+\end{array}\tag{AX.4}
+\]
+
+A source \texttt{Raw} datum $D$ consists of $S,e,\psi,\xi,\omega$,
+a complex conjugation $\mathrm{cc}$, a place $A_p$ and an element
+$\sigma_p$ for every rational prime $p$, and $\phi,g_0,s_0$.
+The same symbol $\psi$ will denote its associated Galois character.
+The derived characters and four weights are
+\[
+ \begin{gathered}
+ \Psi=c^e\psi,\quad \alpha=c\omega^{-1}\xi,
+ \quad\beta=\Psi\alpha^{-1},\quad\vartheta=\alpha\Psi,\\
+ (p_0,p_1,p_2,p_3)=(\vartheta,\Psi,\alpha,1),
+ \quad(w_0,w_1,w_2,w_3)=(e+1,e,1,0).
+ \end{gathered}
+ \tag{AX.5}
+\]
+Here the subscripts on $p_i$ denote characters, not rational primes.
+Let $r_0=\operatorname{diag}(p_i)$ and $\bar r_0=\overline{r_0}$.
+The source local sets are
+\[
+ S_b=\{p\in S:p\ne\ell,
+       \ \ell\mid|\psi(I_{A_p})|\},\qquad T=\{\ell\}\cup S_b.
+ \tag{AX.6}
+\]
+The condition $\operatorname{UnrT}(z,0)$ says that $z(g)=0$ for
+$g\in I_A\cap\ker\bar r_0$ whenever $A$ is away from $T$.
+The condition $X\!\operatorname{Van}(\gamma)$ says that a locally
+constant $k(\bar\gamma)$-cocycle with this property and locally a
+coboundary on each $G_{A_v}$, $v\in T$, is a global coboundary.
+
+For clarity, the full \texttt{Good} condition has the following
+content.  The set $S$ contains $2,\ell$ and consists of primes;
+$e\ge2$; the selected $A_p$ lie over $p$; and $\mathrm{cc}$ is a
+complex conjugation.  The character $\psi$ has open kernel, is
+unramified outside $S$, and $\Psi(\mathrm{cc})=1$.
+One has $\omega^{\ell-1}=1$, $\bar\omega=\bar c$.
+The character $\xi$ has open kernel and order prime to $\ell$,
+is unramified outside $S$ and at all $v\in T$, and is odd.
+The elements $\sigma_v$ are arithmetic Frobenius lifts for $v\in T$,
+$c(\sigma_\ell)=1$, and
+\[
+ \overline{\xi\Psi^i}(\sigma_v)\ne1
+       \quad(v\in T,\ i\in\mathbb Z).
+ \tag{AX.7}
+\]
+Both $X\!\operatorname{Van}(\gamma)$ and
+$X\!\operatorname{Van}(\gamma^{-1})$ hold for
+$\gamma=\alpha,\beta,\vartheta$.  Finally,
+\[
+ \begin{gathered}
+ \sigma_\ell^{\ell^{n!}}\longrightarrow\phi,
+ \qquad\bar\alpha(g_0)\ne1,\quad\bar\Psi(g_0)\ne1,\\
+ \qquad s_0\in I_{A_\ell}\cap\ker\psi\cap\ker\omega,
+ \quad c(s_0)\text{ has infinite order}.
+ \end{gathered}
+ \tag{AX.8}
+\]
+This list includes every field of the source record; no stronger
+goodness assumption will be added later.
+
+\paragraph{Classical boundary.}
+We use the elementary finite cyclotomic and local-field facts in
+Milne, \href{https://www.jmilne.org/math/CourseNotes/ANT.pdf}
+{\emph{Algebraic Number Theory}}, v3.08, Sections 6--8: the
+cyclotomic Galois group, extension and conjugacy of places, the
+decomposition-group comparison with the local completion, and the
+wild/tame inertia description.  The exact consequences used below
+are proved from these finite statements.  The norm on a finite
+extension of $\mathbb Q_\ell$ is its unique extension, as in RV1.
+The one commutative-algebra fact used in AX8 is that a finite algebra
+over a Henselian local ring is a product of Henselian local rings
+(\href{https://stacks.math.columbia.edu/tag/04GH}{Stacks, Tag 04GH});
+a domain is therefore local.  Completeness implies Henselianity by
+successive lifting of simple roots
+(\href{https://stacks.math.columbia.edu/tag/04GM}{Tag 04GM}).
+BR7 supplies the full
+residual vanishing theorem, with its already recorded classical
+inputs.  There is no automorphy, crystalline-period, image-density,
+or rigidity input before AX10.
+
+\subsection{Finite characters with the prescribed conductors}
+
+\begin{proposition}[AX1: exact host arithmetic and the two cases]
+\label{prop:ax-host}
+For a host character the decomposition (AX.2) holds.  Its dyadic
+component has conductor $2^{c_2}$ and order dividing $2^{c_2}$;
+$\kappa$ has $\ell$-power order; and $\theta$ has odd conductor,
+prime-to-$\ell$ order dividing $2o$.
+In particular $f_0>0$, $4\mid\ell^{f_0}-1$,
+$\theta^{\ell^{f_0}-1}=1$, and $\ell-1\mid\ell^{f_0}-1$.
+
+Put $T_b=\{\ell\}\cup\{p\mid N:p\ne\ell,
+\operatorname{comp}_p\kappa\ne1\}$.  Every $p\in T_b\setminus\{\ell\}$
+is odd, divides $q$, and is congruent to $1$ modulo $\ell$.
+Every $v\in T_b$ divides $\ell q$.
+For any places chosen over the rational primes, the actual set
+$T$ in (AX.6), with $D.\psi=\psi$ and prime-valued $S$, lies in $T_b$.
+
+In Case II, $\psi_P\ne1$ and $n_{\rm II}\ge c_2+6$.
+In Case III, under the original $h.\mathtt{Big}(t)$ and
+$0<e<t$, one has
+\[
+ \begin{gathered}
+ e\ge2,\quad\ell\nmid oN,\quad\ell\ne p_{\!1},
+ \quad\psi_2=\kappa=1,\quad\theta=\psi_P=\psi,\\
+ \quad\operatorname{cond}\psi\mid q,\quad T_b=\{\ell\},
+ \quad\operatorname{ord}\psi\mid\operatorname{oddpart}(o),
+ \quad n_{\rm III}\ge3.
+ \end{gathered}
+ \tag{AX.9}
+\]
+\end{proposition}
+
+\begin{proof}
+The finite unit group modulo $N$ is the product of its prime-power
+unit groups.  Projection to a factor gives
+$\operatorname{comp}_p$, so the components commute, their product
+is the original character, and their orders divide the original
+order.  Splitting a finite cyclic character image into its
+$\ell$-primary and prime-to-$\ell$ factors commutes with every
+component.  The group of units modulo a power of $2$ is a $2$-group;
+thus $\operatorname{comp}_2\kappa=1$.  Removing the remaining dyadic
+component gives (AX.2), odd conductor for $\theta$, and the asserted
+dyadic order bound by the size of the unit group.
+
+For each unit $u$ modulo $N$, the power $u^{2^{s+1}o}$ lies in $H$:
+it is $1$ modulo $2^{s+2}$, is killed by $\chi$, and is a square
+at the two auxiliary primes.  Hence
+$\operatorname{ord}\psi\mid2^{s+1}o$.  More precisely, for an odd
+prime $p\mid q$ the $p$-supported unit raised to $o$ lies in $H$,
+so $\operatorname{ord}(\operatorname{comp}_p\psi)\mid o$.
+For an odd prime $p\nmid q$ its square lies in $H$, so this
+component has order dividing $2$.  Consequently every odd
+component, and then their product after taking prime-to-$\ell$
+parts, has order dividing $2o$.  The unit $\ell$ modulo
+$\operatorname{lcm}(4,\operatorname{ord}\theta)$ has finite positive
+order $f_0$, which gives its stated divisibilities.  The last one
+also follows directly from $\ell^f-1=(\ell-1)(1+\cdots+\ell^{f-1})$.
+
+A nontrivial $\ell$-primary component at an odd prime $p\ne\ell$
+cannot occur at either auxiliary prime: there the character has
+order dividing $2$.  Thus $p\mid q$.  On
+$(\mathbb Z/p^a)^\times$ the kernel of reduction modulo $p$ is
+a $p$-group, so an $\ell$-primary character factors through
+$(\mathbb Z/p)^\times$ and its nontrivial order divides $p-1$.
+This proves the assertions about $T_b$.  Inertia on roots of unity
+of order prime to $p$ is trivial.  Therefore the restriction of
+$\psi$ to $I_{A_p}$ equals the restriction of its $p$-component.
+If the former image has order divisible by $\ell$, so does the
+latter.  This is equivalent to
+$\operatorname{comp}_p\kappa\ne1$, proving $T\subset T_b$ without
+changing the selected places.
+
+Even order makes $\psi_P$ nontrivial.  The second term in the
+maximum defining $n_{\rm II}$ is at least $2^{c_2+6}$, so its
+claimed lower bound follows.  For Case III, an odd-order character
+has trivial dyadic component and trivial components at the two
+auxiliary primes, hence conductor dividing $q$ and order dividing
+the odd part of $o$.  Since $\ell\notin\mathcal B_\chi$, the
+prime $\ell$ is at least $5$, does not divide $oq$, and differs
+from $p_{\!1}$.  Also $\ell-1\mid2e$ gives
+$\ell\le2e+1<2t+1<q_1,d$.  Thus $\ell\nmid N$ and $e\ge2$.
+The $\ell$-primary and $\ell$-local components of $\psi$ vanish,
+which proves all identifications in (AX.9).  Finally $8\ell^2$
+in (AX.3) gives $n_{\rm III}\ge3$.
+
+Only the fixed defining property of $p_{\!1}$ is used here.
+Its existence in the stated class can even be seen without an
+analytic progression theorem.  For $m>1$, choose an integer $a$
+divisible by $m$ and any prescribed finite excluded set, with
+$a\ge3$.  Any prime divisor $p$ of $\Phi_m(a)$ is outside that
+set and does not divide $m$, since $\Phi_m(a)\equiv1\pmod a$.
+The reduction of $X^m-1$ is separable at $p$, so a root of
+$\Phi_m$ has order exactly $m$, and $p\equiv1\pmod m$.
+The inequality $|\Phi_m(a)|\ge(a-1)^{\varphi(m)}>1$ supplies a
+prime divisor.  For $m=1$ use the usual Euclidean construction.
+Taking $m=\operatorname{oddpart}(o)$ and excluding primes dividing
+$2qp_K$ proves that the least such prime has precisely the
+properties used above.  The earlier fixed definitions of $p_K$
+and $\mathcal B_\chi$ retain their meanings.
+\end{proof}
+
+\begin{proposition}[AX2: primitive dyadic characters and quantitative separation]
+\label{prop:ax-dyadic}
+If $n\ge3$ and $O$ contains all $2^n$-th roots of unity, there is a
+primitive odd character $\xi_*\pmod{2^n}$.
+Twisting a primitive character modulo $2^n$ by a character of
+conductor $2^c$ with $c<n$ preserves primitivity.
+For every primitive $\xi_*\pmod{2^n}$, odd $v>1$, odd positive $u$,
+and $a\ge0$,
+\[
+ \xi_*(v)^{2^a u}=1\quad\Longrightarrow\quad
+                     2^n<v^2 2^a.
+ \tag{AX.10}
+\]
+
+Suppose $p$ is odd (allow $p=1$), $d>0$,
+$4\mid\ell^d-1$, and $\omega_0,\theta_0,\xi_0$ have respective
+levels $\ell,N,p$, with odd conductor for $\theta_0$ and orders
+dividing $\ell^d-1$.  Let $\chi_2$ have conductor $2^c$, $c<n$.
+If the product $\omega_0\chi_2\theta_0\xi_0\xi_*$ is odd and
+\[
+       p\ell\operatorname{cond}(\theta_0)
+                  4^{v_2(\ell^d-1)}\le2^n,
+ \tag{AX.11}
+\]
+then it equals $\operatorname{prodX}(\varphi,\xi_1)$ on units
+of the common level, for literal $X\!\operatorname{Data}
+(\ell,d,\varphi,\xi_1)$, with
+$\operatorname{cond}(\varphi)\mid p\ell N$.
+\end{proposition}
+
+\begin{proof}
+The standard generators give
+$(\mathbb Z/2^n)^\times=\langle-1\rangle\times\langle5\rangle$,
+where $5$ has order $2^{n-2}$.  To check the order, repeated squaring
+shows $v_2(5^{2^j}-1)=j+2$; the subgroup $1+4\mathbb Z/2^n$
+has exactly $2^{n-2}$ elements.  Send $-1$ to $-1$ and $5$ to
+a primitive $2^{n-2}$-th root in $O$.  The resulting character is
+odd and is nontrivial on $1+2^{n-1}$, the kernel of reduction to
+level $2^{n-1}$, so it is primitive.  Conversely every primitive
+character must be nontrivial on this order-two kernel, and takes
+the value $-1$ there.  A lower-conductor twist is trivial on that
+kernel; this proves the twisting assertion.
+
+For (AX.10), the assertion for $n\le1$ is immediate from $v\ge3$.
+For $n\ge2$, put $b=v_2(v^2-1)\ge3$.  Odd powering preserves
+$v_2(x-1)$ for $x\equiv1\pmod4$, and each subsequent squaring
+increases it by one.  Indeed
+$(1+2^b t)^2-1=2^{b+1}(t+2^{b-1}t^2)$ with the parenthesis odd;
+the odd-power statement follows from the geometric sum modulo $2$.
+Thus
+$v_2(v^{2u2^a}-1)=b+a$.
+If $b+a<n$, further squaring produces a power of $v^{2^a u}$
+congruent to $1+2^{n-1}$ modulo $2^n$.  Its character value is
+$1$ under the assumed equality, contradicting primitivity.
+Therefore $n\le b+a$, and
+$2^n\le2^{b+a}<v^2 2^a$, as $2^b\le v^2-1$.
+
+Take the product of $\omega_0,\theta_0,\xi_0$ at a common level
+and pass to its primitive inducing character $\varphi$.  Its
+conductor $f$ divides $p\ell\operatorname{cond}(\theta_0)$,
+is odd, and its order divides $\ell^d-1$.  These assertions follow
+directly by quotienting the finite unit group by the character
+kernel: removing a redundant level preserves its image and order.
+Inflate $\chi_2$ to $2^n$ and multiply by $\xi_*$ to obtain the
+primitive $\xi_1$.  The conductors, the original parity equality,
+and $f4^{v_2(\ell^d-1)}\le2^n$ now give every clause of the
+$X\!\operatorname{Data}$ record in BR7.  Evaluation on a Galois
+element is compatible with this identity: choose its one
+cyclotomic residue modulo $p\ell N2^n$, represented by an integer
+coprime to that level, and reduce the same integer at every factor.
+This also proves the source \texttt{dirX} and \texttt{dirVal}
+compatibility at the original $\Omega$.
+\end{proof}
+
+\subsection{Choices on the original algebraic closure}
+
+\begin{proposition}[AX3: Frobenius choices and the prime-to-$\ell$ limit]
+\label{prop:ax-choices}
+For each rational prime choose a place $A_p$ of the original
+$\Omega$ and an arithmetic Frobenius $\sigma_p$.  They may be
+chosen so that $c(\sigma_\ell)=1$.  For any finite character
+$\psi:G\to O^\times$ with open kernel there is
+$s_0\in I_{A_\ell}\cap\ker\psi\cap\ker\omega$
+with $c(s_0)$ of infinite order.
+
+If $G_0$ is any profinite group, $g\in G_0$ and $\ell$ is prime,
+the sequence $g^{\ell^{n!}}$ converges to an element $g^{(\ell')}$.
+For any adically continuous lift $\rho$ of a finite-residue
+representation, of any finite matrix size, suppose
+$\bar\rho(g)^m=1$ with $(m,\ell)=1$.  Then
+\[
+ \bar\rho(g^{(\ell')})=\bar\rho(g),
+ \qquad \rho(g^{(\ell')})^m=1
+ \tag{AX.12}
+\]
+in its source complete Noetherian local coefficient algebra.
+The residual continuity needed here follows from the lift.
+Finally, any two nontrivial group
+characters to groups have an element at which both are nontrivial.
+These choices supply the literal \texttt{rawEx} output whenever
+the two required residual characters are nontrivial.
+\end{proposition}
+
+\begin{proof}
+Finite separable local extensions identify the chosen decomposition
+group with the Galois group of $\mathbb Q_p$; the quotient by inertia
+is $\widehat{\mathbb Z}$ with arithmetic Frobenius generator.  Choose
+a lift.  At $\ell$, inertia maps onto
+$\operatorname{Gal}(\mathbb Q_\ell(\mu_{\ell^r})/\mathbb Q_\ell)
+\simeq(\mathbb Z/\ell^r)^\times$ for every $r$: the polynomial
+$\Phi_{\ell^r}(1+X)$ is Eisenstein, so the finite cyclotomic
+extension is totally ramified and has exactly that degree.
+The nested closed fibers in the compact inertia group show that
+$c(I_{A_\ell})=\mathbb Z_\ell^\times$, with the full inverse-limit
+target, not only each separate quotient.  Multiply the chosen
+Frobenius by an inertia element of cyclotomic value
+$c(\sigma_\ell)^{-1}$.  This changes no residue Frobenius and gives
+the asserted cyclotomic value.  At $p\ne\ell$, roots of unity of
+order prime to $p$ lift from unramified residue extensions by
+Hensel's lemma, so inertia fixes them and arithmetic Frobenius
+acts by $\zeta\mapsto\zeta^p$.
+
+Choose $u\in I_{A_\ell}$ with $c(u)=1+\ell$.
+The open kernel of $\psi$ has finite index $b$; its image is
+therefore finite of order $b$.  Then
+$s_0=u^{b(\ell-1)}$ kills both $\psi$ and $\omega$.
+The rational integer $1+\ell$ has infinite order in
+$\mathbb Z_\ell^\times$ (injectivity of $\mathbb Z\to\mathbb Z_\ell$
+would otherwise give $(1+\ell)^a=1$ in $\mathbb Z$ for some $a>0$).
+Its indicated positive power still has infinite order.
+Teichm\"uller lifting is the unique lifting of every element of
+$\mathbb F_\ell^\times$ to a root of $X^{\ell-1}-1$ in
+$\mathbb Z_\ell$; uniqueness proves multiplicativity.  This gives
+$\omega^{\ell-1}=1$, $\bar\omega=\bar c$, and its factorization
+through the cyclotomic action modulo $\ell$.
+Complex conjugation extends from the algebraic real closure to
+$\Omega$ and has cyclotomic value $-1$; all these choices are
+made in the initially specified $G$.
+
+In a finite quotient, write the order of $g$ as $\ell^a b$ with
+$(b,\ell)=1$.  For all sufficiently large $n$, $\ell^{n!}$ is
+$0$ modulo $\ell^a$ and $1$ modulo $b$, by Euler's theorem and
+$\varphi(b)\mid n!$.  Thus the image of the sequence is eventually
+constant in every finite quotient.  The constants are compatible,
+so give an element of the profinite inverse limit and prove
+convergence.  This proves the existence assertion without a
+first-countability assumption on the group.
+
+To prove the lift assertion let $\mathfrak m$ be the maximal ideal
+of its coefficient algebra and $X=\rho(g)^m$.  Then
+$X\equiv1\pmod{\mathfrak m}$ and $\ell\in\mathfrak m$.
+The identity
+\[
+ X^\ell-1=(X-1)\left(\ell\,1+
+                   \sum_{j=0}^{\ell-1}(X^j-1)\right)
+ \tag{AX.13}
+\]
+shows that entrywise divisibility $X-1\in M_\nu(\mathfrak m^a)$,
+$a\ge1$, implies $X^\ell-1\in M_\nu(\mathfrak m^{a+1})$
+for any finite matrix size $\nu$.
+Hence $X^{\ell^j}\equiv1\pmod{\mathfrak m^{j+1}}$.
+Continuity modulo each $\mathfrak m^b$ and the convergence just
+proved give $\rho(g^{(\ell')})^m\equiv1$ modulo every such power.
+The ring is separated, proving (AX.12).  The residual identity
+uses $\ell^{n!}\equiv1\pmod m$ and continuity of the finite
+residual representation.
+
+For the final assertion choose $x$ nontrivial under the first
+character and $y$ nontrivial under the second.  If neither already
+works, the first character is $1$ at $y$ and the second is $1$
+at $x$, so $xy$ works.  Applied to $\bar\alpha,\bar\Psi$, this
+chooses the same $g_0$ for both inequalities in (AX.8).
+\end{proof}
+
+\begin{proposition}[AX4: the residual local conditions and the generic good datum]
+\label{prop:ax-generic}
+Assume $e\ge2$, $\psi\in h.X(O,e)$ and $\psi_P\ne1$.
+Let $p$ be odd, allowing $p=1$, and choose an even character
+$\xi_0\pmod p$ and a primitive odd character $\xi_*\pmod{2^n}$.
+Suppose
+\[
+\begin{gathered}
+ v\nmid p\quad(v\in T_b),\qquad
+ \xi_0^{\ell^{f_0}-1}=1,\qquad c_2<n,\\
+ p\ell\operatorname{cond}(\theta)4^{n_0}\le2^n,
+ \qquad u\text{ odd},\quad
+ \psi^{2^a u}=\xi_0^{2^a u}=1,\qquad
+ v^2 2^a\le2^n\quad(v\in T_b).
+\end{gathered}\tag{AX.14}
+\]
+Then, using BR7, there is an actual $D$ on the original $\Omega,O$
+with $D.\mathtt{Good}$ and
+\[
+ D.e=e,\quad D.\psi=\operatorname{dirG}\psi,\quad
+ D.S=\operatorname{primeFactors}(2\ell Np),\quad
+ D.\xi=\operatorname{dirG}\xi_0\operatorname{dirG}\xi_*.
+ \tag{AX.15}
+\]
+It has the literal $\mathtt{OfChar}(e,\psi,n,p,
+\operatorname{ord}\xi_0)$ witnesses.
+\end{proposition}
+
+\begin{proof}
+Take the character data and the original-field choices of AX3.
+For now postpone only $g_0$; AX1 already gives $T\subset T_b$.
+Reduction kills $\kappa$, since $k^\times$ has order prime to
+$\ell$.  With $\omega$ also read as the Dirichlet character
+modulo $\ell$, one has
+\[
+ \bar\alpha=\overline{\xi_0\xi_*},\qquad
+ \bar\Psi=\overline{\omega^e\psi_2\theta}.
+ \tag{AX.16}
+\]
+For every $v\in T$, $\bar\omega(\sigma_v)=1$.
+At $\ell$ this is AX3; at every other $v$ it follows from
+$v\equiv1\pmod\ell$ and the Frobenius rule.
+If $\overline{\xi\Psi^i}(\sigma_v)=1$, raise the equality to
+$2^a u$.  The factors $\psi$ and $\xi_0$ disappear by (AX.14),
+and the remaining cyclotomic residue is $1$.  Thus
+$\overline{\xi_*(v)^{2^a u}}=1$.
+Reduction is injective on roots of unity of order prime to $\ell$:
+if $z\equiv1$ and $z^m=1$, $(m,\ell)=1$, then
+$1+z+\cdots+z^{m-1}$ is a unit, so
+$(z-1)(1+\cdots+z^{m-1})=0$ forces $z=1$.
+The dyadic root in question therefore equals $1$ in $O$.
+AX2 gives $2^n<v^2 2^a$, a contradiction.  This proves the full
+integer-parameter condition (AX.7), including negative $i$.
+
+We next verify the six residual vanishing conditions, with their
+actual local subgroups.  The prime-to-$\ell$ residual diagonal
+character group has order dividing $(|k|-1)^4$; consequently
+$K=\ker\bar r_0$ is normal of finite index prime to $\ell$.
+Let $z$ satisfy the defining conditions of $X\!\operatorname{Van}
+(\gamma)$, where $\bar\gamma$ is a character covered by BR7.
+At a place away from $T$, choose $H_A=K$ in BR7's
+$\operatorname{UnrEv}$.  Its relative index in
+$I_A\cap\ker\bar\gamma$ divides $[G:K]$, since $K$ is normal,
+and the required vanishing is exactly $\operatorname{UnrT}$.
+At a place above $v\in T$, conjugate inertia into the selected
+$I_{A_v}$.  The local coboundary is zero on the kernel of
+$\bar\gamma$.  For such an inertia element $x$, the cocycle
+identity gives, explicitly,
+\[
+ z(g^{-1}xg)=\bar\gamma(g)^{-1}z(x)
+       \quad\text{if }\bar\gamma(x)=1.
+ \tag{AX.17}
+\]
+Thus $z$ vanishes on $I_A\cap\ker\bar\gamma$ and one may take
+$H_A=G$.  This verifies the original relative-index condition at
+every valuation subring.  BR7 gives the global coboundary in the
+original field $k$.  Applying the same argument to the inverse
+character gives its inverse case as well.
+
+To apply it, use AX2 with the following three rows:
+\[
+\begin{array}{c|ccccc}
+\gamma&\omega_0&\chi_2&\theta_0&\text{prime character}&
+                 \text{dyadic character}\\ \hline
+\alpha&1&1&1&\xi_0&\xi_*\\
+\beta&\omega^e&\psi_2&\theta&\xi_0^{-1}&\xi_*^{-1}\\
+\vartheta&\omega^e&\psi_2&\theta&\xi_0&\xi_*
+\end{array}\tag{AX.18}
+\]
+Take $d=f_0$ in all rows.  AX1 and (AX.14) give the order and
+conductor inequalities; for the first row use
+$1\le\operatorname{cond}\theta$.  The parity of
+$\omega^e\psi_2\theta$ is even, because
+$\kappa(-1)=1$ and $\psi(-1)=(-1)^e$.
+Each row is therefore odd.  Formula (AX.16), its inverse, and
+the common-residue comparison in AX2 identify the residual
+characters exactly.  All six applications use the same $D$, $K$
+and originally chosen places; no new residual coefficient field
+has appeared.
+
+For $g_0$, (AX.7) with $v=\ell$ and $i=0$ proves
+$\bar\alpha\ne1$.  Also $\bar\Psi\ne1$.  Here is the needed
+argument rather than an assumption of that fact.  The prime-to-$\ell$
+part of $\psi$ is the product of $\psi_P$, unramified at $\ell$,
+and an $\ell$-local character.  The latter factors through
+$(\mathbb Z/\ell)^\times$, since its restriction to the
+principal-unit $\ell$-group is trivial.  It is some power
+$\omega^b$.  If $\bar\Psi=1$, injectivity of reduction on
+prime-to-$\ell$ roots gives $\omega^{e+b}\psi_P=1$ in $O$.
+Restriction to $I_{A_\ell}$ and cyclotomic surjectivity force
+$\omega^{e+b}=1$.  Hence $\psi_P=1$, contrary to hypothesis.
+The finite cyclotomic action on the original $G$ is surjective,
+so this last conclusion is also an equality of the original
+Dirichlet characters.  AX3 now provides $g_0$.
+
+It remains to check the other fields of \texttt{Good}.
+The set in (AX.15) contains $2,\ell$ and only primes; its data
+have the stated $e$, selected places and complex conjugation.
+Finite Dirichlet characters have open kernel and are unramified
+away from the primes in their levels, by AX3.
+The order of $\xi_0\xi_*$ divides
+$(\ell^{f_0}-1)\varphi(2^n)$, which is prime to $\ell$.
+No prime of $T$ divides $p2^n$, so $\xi$ is also unramified
+there.  Its parity is odd, whereas $\Psi(\mathrm{cc})=1$.
+The Teichm\"uller, Frobenius, limit and $s_0$ clauses are exactly
+AX3.  Together with (AX.7), (AX.17)--(AX.18) and the chosen $g_0$,
+these are all the fields listed above.  Finally $\xi_*,\xi_0$
+themselves witness \texttt{OfChar}, with precisely their original
+levels and $\operatorname{ord}\xi_0$.
+\end{proof}
+
+\begin{proposition}[AX5: literal dataEx in both original host cases]
+\label{prop:ax-dataex}
+Let $h.\mathtt{Big}(t)$, $0<e<t$, $\ell\ne2$ and
+$\psi\in h.X(O,e)$.  Suppose Case II or Case III holds and the
+original $O$ contains all roots of unity of orders
+$2^{n_{\rm II}}$ and $2^{n_{\rm III}}$.  Then there is
+$D:\mathtt{Raw}(\Omega,O)$ with $D.\mathtt{Good}$ and the literal
+$\mathtt{OfCase}(D,h,e,\psi)$.  More precisely, the parameters
+$(n',p,m_0)$ in \texttt{OfChar} may be taken as
+\[
+ (n_{\rm II},1,1)\quad\text{in Case II},\qquad
+ (n_{\rm III},p_{\!1},\operatorname{ord}\psi)
+                         \quad\text{in Case III}.
+ \tag{AX.19}
+\]
+\end{proposition}
+
+\begin{proof}
+In Case II choose the primitive odd dyadic character at the
+prescribed $n=n_{\rm II}$ by AX2, set $p=1$, $\xi_0=1$, and write
+$\kappa^{\ell^b}=1$.  Use
+\[
+ a=c_2+1+v_2(o),\qquad u=\operatorname{oddpart}(o)\ell^b.
+ \tag{AX.20}
+\]
+The integer $u$ is odd and
+$2^a u=2^{c_2}(2o)\ell^b$ kills every factor of (AX.2).
+It also kills $\xi_0$.  The first maximum in (AX.3) gives
+$\ell\operatorname{cond}(\theta)4^{n_0}\le2^n$.
+For $v\in T_b$, AX1 gives $v\le\ell q$; hence
+\[
+ v^2 2^a\le\ell^2q^2\,2^{c_2+1}o
+            \le2^{c_2+6}o\ell^3q^2\le2^n.
+ \tag{AX.21}
+\]
+All other conditions of (AX.14) follow from AX1 or $p=1$.
+AX4 supplies the first parameter choice in (AX.19).
+
+In Case III, (AX.9) applies.  Put $p=p_{\!1}$ and
+$m=\operatorname{ord}\psi$.  Since $m\mid\operatorname{oddpart}(o)$
+and $p\equiv1\pmod{\operatorname{oddpart}(o)}$, choose a character
+$\xi_0$ of $(\mathbb Z/p)^\times$ of order exactly $m$.
+There is already a root of order $m$ in $O$: the finite image of
+$\psi$ in the multiplicative group of a field is cyclic of order
+$m$.  Send a generator of $(\mathbb Z/p)^\times$ to that root.
+Thus no extra roots are required.  The order $m$ is odd, so
+$\xi_0(-1)=1$.  Choose the primitive odd dyadic character at
+$n=n_{\rm III}$; set $a=0,u=m$.  Then $T_b=\{\ell\}$,
+$\ell\ne p$, and
+\[
+ p\ell\operatorname{cond}(\theta)4^{n_0}
+ \le p\ell q4^{n_0}\le2^n,
+ \qquad \ell^2\le8\ell^2\le2^n.
+ \tag{AX.22}
+\]
+The order of $\xi_0$ divides $\ell^{f_0}-1$, because
+$\theta=\psi$.  All conditions of AX4 now hold, giving the second
+case with $m_0=m$.  This is the full quantified \texttt{dataEx}
+implication with BR7 installed, on the original $\Omega,O$.
+\end{proof}
+
+\subsection{All local facts for any good datum}
+
+\begin{proposition}[AX6: literal facts and the normalization unit]
+\label{prop:ax-facts}
+For every actual $D:\mathtt{Raw}(\Omega,O)$, $D.\mathtt{Good}$
+implies all clauses of \texttt{facts} in \texttt{LMemMax}:
+\begin{enumerate}
+\item If $p\in S_b$, then $p$ is prime, $p\ne\ell$,
+$\ell\mid p-1$, and $\omega|_{G_{A_p}}=1$.
+\item For $v\in T$, $\sigma_v\in G_{A_v}$,
+$\bar\omega(\sigma_v)=1$, and
+$\bar p_i(\sigma_v)\ne\bar p_j(\sigma_v)$ whenever
+$\lambda_i\ne\lambda_j$, where $\lambda=(1,0,1,0)$.
+\item $\operatorname{UnrT}(p_i,1)$ holds for all $i$.  On
+$I_{A_\ell}\cap\ker\psi\cap\ker\omega$ one has $p_i=c^{w_i}$.
+For $p\in S_b$ and $u\in I_{A_p}$,
+$\alpha(u)=1$ and $\Psi(u)=\vartheta(u)=\psi(u)$.
+\item $p_i p_{3-i}=\vartheta$, the four values $p_i(s_0)$ are
+distinct, and $\alpha(\mathrm{cc})=\beta(\mathrm{cc})=
+\vartheta(\mathrm{cc})=-1$.
+\item $\phi\in G_{A_\ell}$ and
+$\bar r_0(\phi)=\bar r_0(\sigma_\ell)$.  Each $p_i$ is adically
+continuous; $\ker\bar r_0$ and $\ker\omega$ are open.
+Each $p_i$ is unramified outside $S$.
+\end{enumerate}
+In addition the characters $\alpha,\beta,\vartheta$ on the common
+inertia subgroup in item 3 have positive weights $1,e-1,e+1$.
+For every actual complete-local lift $\rho$ of $\bar r_0$, put
+\[
+ H(\rho)=\rho(g_0)+\vartheta(g_0)\rho(g_0^{-1}).
+\]
+Then $H(\rho)_{00}-H(\rho)_{22}$ is a unit, with exact residue
+\[
+ \overline{H(\rho)_{00}-H(\rho)_{22}}
+       =(\bar\alpha(g_0)-1)(\bar\Psi(g_0)-1).
+ \tag{AX.23}
+\]
+Every algebraic specialization of this unit is nonzero.
+\end{proposition}
+
+\begin{proof}
+This proposition uses only \texttt{Good}, so also applies when
+$D$ was not constructed by AX5.  First $\omega$ is the unique
+Teichm\"uller character: its values and those of the character
+in AX3 are prime-to-$\ell$ roots with identical reductions.
+The injectivity argument in AX4 proves their equality.  In
+particular it is unramified away from $\ell$ and has open kernel.
+
+The open kernel of $\psi$ gives a finite abelian image.  In a
+finite abelian extension of $\mathbb Q_p$, the prime-to-$p$ part
+of inertia has exponent dividing $p-1$.  Here is the precise local
+fact needed.  Wild inertia is pro-$p$.  In the tame quotient inertia
+is generated topologically by compatible roots of a uniformizer;
+arithmetic Frobenius conjugates a tame generator $\tau$ to
+$\tau^p$.  This identity follows by lifting the action
+$\zeta\mapsto\zeta^p$ on the prime-to-$p$ roots of unity used in
+$\tau(\pi^{1/m})=\zeta_m\pi^{1/m}$.  After passing to an abelian
+finite quotient it gives $\tau^{p-1}=1$.  Thus an $\ell$-divisor
+of its inertia order with $p\ne\ell$ divides $p-1$.
+Applying this to the actual image of $\psi|_{G_{A_p}}$ proves
+$\ell\mid p-1$ for $p\in S_b$.
+The Teichm\"uller character is trivial on $I_{A_p}$ and takes
+the value $1$ at Frobenius because $p\equiv1\pmod\ell$.
+Inertia and a Frobenius lift generate a dense subgroup of the
+decomposition group, so $\omega=1$ on all of $G_{A_p}$.
+
+The second assertion follows from the Frobenius clause of
+\texttt{Good}, the preceding paragraph, and $c(\sigma_\ell)=1$.
+Put $a=\bar\xi(\sigma_v)$ and $b=\bar\Psi(\sigma_v)$.
+The four residual values are $(ab,b,a,1)$; condition (AX.7) says
+$ab^j\ne1$ for every integer $j$.  The four cross-$\lambda$
+comparisons are $ab\ne b$, $ab\ne1$, $a\ne b$ and $a\ne1$.
+They follow respectively from $j=0,1,-1,0$.  This lists every
+comparison, including their reverses.
+
+For $\operatorname{UnrT}$, a place away from $T$ is away from
+$\ell$.  There $c=\omega=1$ on inertia, so
+$\alpha=\xi$ and $\Psi=\psi$.  The residual-kernel condition
+gives $\bar\xi=\bar\psi=1$.  The order of $\xi$ is prime to
+$\ell$, so $\xi=1$ by AX4.  If the place is away from $S$,
+$\psi=1$ directly.  Otherwise it lies above some $p\in S$
+with $p\notin S_b$; conjugacy of places identifies the inertia
+image with the selected one, whose order is prime to $\ell$.
+Thus $\psi=1$ there as well.  All $p_i$ equal $1$.
+On the common inertia subgroup above $\ell$, both $\psi$ and
+$\omega$ are $1$, and $\xi=1$ by \texttt{Good}; substitution in
+(AX.5) gives the weights, including the three positive ones.
+For $p\in S_b$, $\xi$ is unramified and the preceding
+$c=\omega=1$ identities give item 3.
+
+The pairing identities $p_i p_{3-i}=\vartheta$ follow from
+(AX.5).  Distinctness at $s_0$ follows from the infinite order
+of $c(s_0)$ and the four distinct weights for $e\ge2$.
+Complex conjugation has $c=\omega=-1$, while $\xi=-1$ and
+$\Psi=1$, proving the three oddness assertions.
+The closed decomposition group contains all powers of
+$\sigma_\ell$, hence their limit $\phi$.
+Reduction modulo any power of $\mathfrak m_O$ of a cyclotomic
+character is locally constant: a sufficiently deep cyclotomic
+principal subgroup maps into that ideal power.  The finite
+characters have open kernels.  Products and powers therefore
+give the asserted adic continuity of all $p_i$, and reduction
+of the diagonal representation has open kernel.
+Its image at $\sigma_\ell$ has order dividing $|k|-1$.
+AX3 proves $\bar r_0(\phi)=\bar r_0(\sigma_\ell)$.
+Outside $S$, the finite characters and the cyclotomic character
+are all unramified, since $\ell\in S$.  This finishes every
+clause of the literal source \texttt{facts}.
+
+Finally write $a=\bar\alpha(g_0)$ and $b=\bar\Psi(g_0)$.
+The diagonal entries $0,2$ of the residual $H$ are respectively
+$ab+1$ and $a+b$.  Their difference is $(a-1)(b-1)$, which is
+nonzero by \texttt{Good}.  An element of a local ring with
+nonzero residue is a unit.  Ring maps carry units to units,
+so its image in $\overline{\mathbb Q}_\ell$ is nonzero.  This
+proves (AX.23), with no extra normalization premise on $\rho$.
+\end{proof}
+
+\begin{proposition}[AX7: the literal common level and exponent]
+\label{prop:ax-level-integer}
+Suppose the same good $D$ has
+$\mathtt{OfChar}(e,\psi,n',p,m_0)$, with $c_2\le n'$ and $m_0\mid o$.
+Define
+\[
+             L=\ell 2^{n'}Np,
+             \qquad k_0=(\ell-1)2^{n'}(2o).
+             \tag{AX.24}
+\]
+Then $L,k_0>0$, each of $D.\psi,D.\xi,D.\omega$ has $k_0$-th
+power one, and each satisfies the literal
+$\operatorname{KillsMu}(L)$: it is $1$ on every $g$ fixing all
+$L$-th roots of unity in $\Omega$.  For the data of AX5,
+$D.S=\operatorname{primeFactors}(2\ell Np)$ has exactly the
+prime support required by G1, and the parameters are (AX.19).
+\end{proposition}
+
+\begin{proof}
+The levels $N,p,2^{n'}$ divide $L$.  Their cyclotomic actions
+are therefore trivial whenever the action on $\mu_L$ is trivial.
+The Teichm\"uller character factors through $\mu_\ell$, also
+contained in $\mu_L$.  This proves all three \texttt{KillsMu}
+assertions on the same $G$.
+
+The dyadic component of $\psi$ has order dividing $2^{c_2}$,
+and every odd component has order dividing $2o$, by the CRT
+argument of AX1.  Hence $\psi^{2^{n'}(2o)}=1$.
+The prime factor $\xi_0$ has order $m_0\mid o$ and the dyadic
+factor has order dividing $\varphi(2^{n'})\mid2^{n'}$.
+Thus $\xi^{2^{n'}o}=1$.  Finally $\omega^{\ell-1}=1$.
+Each exponent divides $k_0$, proving the literal \texttt{levOf}
+claims.  Positivity follows from $\ell>2$, $o,N,p>0$.
+AX5 supplies $m_0=1$ in Case II and
+$m_0=\operatorname{ord}\psi\mid\operatorname{oddpart}(o)$ in
+Case III, together with the required $c_2\le n'$.
+The assertion about $S$ is the exact equality (AX.15).
+\end{proof}
+
+\subsection{Ordinary flags on the component containing the diagonal point}
+
+The source's local condition is a polynomial condition, whose
+meaning matters under specialization.  For scalars $a_i$ put
+\[
+ P_i(X)=\prod_{j\ne i}(X-a_j1),\qquad
+                  d_i=\prod_{j\ne i}(a_i-a_j).
+ \tag{AX.25}
+\]
+The condition $\operatorname{Ord}(I,(p_i),s_0,r)$ says that
+$r(s_0)$ has characteristic polynomial $\prod_i(T-p_i(s_0))$,
+that $P_j(r(s_0))r(g)P_i(r(s_0))=0$ for $i<j$, and that
+$P_i(r(s_0))(r(u)-p_i(u)1)P_i(r(s_0))=0$ for $u\in I$.
+These are exactly the three source fields, with unnormalized
+projectors, so they make sense even before $d_i$ is invertible.
+
+An actual point of the ordinary component is a specialization
+of a lift $\rho:G_{A_\ell}\to M_4(B)$, where $B$ is a source
+complete Noetherian local $O$-algebra which is a domain,
+$\rho$ satisfies the similitude and ordinary equations, and there
+is an $O$-algebra map $x:B\to O$ carrying $\rho$ to
+$r_0|_{G_{A_\ell}}$.  A second map
+$y:B\to\overline{\mathbb Q}_\ell$ gives the point.
+An intervening coefficient algebra in \texttt{PtOn}/\texttt{OnComp}
+is absorbed by composing its map with $y$; the domain $B$ and
+the base point $x$ are retained.
+
+\begin{proposition}[AX8: the full ordinary specialization theorem]
+\label{prop:ax-ordinary}
+Let $D$ be good.  For every actual
+$r:G_{A_\ell}\to M_4(\overline{\mathbb Q}_\ell)$ on the source
+ordinary component, there is a basis making every $r(g)$ upper
+triangular with diagonal continuous characters $\kappa_i$, such
+that
+\[
+\begin{gathered}
+ \kappa_i(u)=p_i(u)\quad(u\in I_{A_\ell}),\qquad
+ |\kappa_i(g)-p_i(g)|_\ell<1\quad(g\in G_{A_\ell}),\\
+ \kappa_0\kappa_3=\kappa_1\kappa_2=\vartheta.
+\end{gathered}\tag{AX.26}
+\]
+For every open subgroup $U\le G_{A_\ell}$ containing
+$\sigma_\ell$ and every $i\ne j$, there is $g\in U$ with
+$\kappa_i(g)\ne c(g)\kappa_j(g)$.  The same nonidentity holds
+on $G_{A_\ell}$ also for $i=j$.  These assertions supply the
+literal \texttt{spPtL} interface, including its uniformity over
+all such open subgroups.
+\end{proposition}
+
+\begin{proof}
+We first prove the specialization estimate used in the argument.
+Let $R$ be a local $O$-algebra with $\mathfrak m_O R\subset
+\mathfrak m_R$, and let $y:R\to\overline{\mathbb Q}_\ell$ be an
+$O$-algebra map.  Then
+\[
+ |y(a)|_\ell\le1\ (a\in R),\qquad
+ |y(a)|_\ell<1\ (a\in\mathfrak m_R).
+ \tag{AX.27}
+\]
+For the first assertion, if $|y(a)|>1$, the inverse of $y(a)$
+has a monic minimal polynomial over $\operatorname{Frac}(O)$
+whose nonleading coefficients lie in $\mathfrak m_O$.
+Indeed all conjugates have the same norm less than $1$, by
+uniqueness of the extension of the complete-field valuation;
+their elementary symmetric functions lie in $O$ and have norm
+less than $1$.  Multiplying the polynomial identity by a power
+of $y(a)$ gives $1+b_1y(a)+\cdots+b_ny(a)^n=0$ with
+$b_i\in\mathfrak m_O$.  The corresponding element
+$1+b_1a+\cdots+b_na^n$ of $R$ is a unit and cannot map to zero.
+If $a\in\mathfrak m_R$ and $|y(a)|=1$, instead use its monic
+minimal polynomial.  All coefficients are in $O$ and the constant
+coefficient is a unit.  Evaluating the polynomial at $a$ again
+gives a unit of $R$ mapping to zero.  This proves (AX.27).
+The arguments apply also to zero images, which already satisfy
+the asserted inequalities.
+
+If $R$ is Noetherian, choose generators $a_1,\ldots,a_b$ of
+$\mathfrak m_R$ and put $a=\max_i|y(a_i)|<1$; the zero ideal
+case is immediate.  Products of generators and (AX.27) give
+$|y(z)|\le a^n$ for $z\in\mathfrak m_R^n$.  Thus an adically
+continuous entry function becomes an ordinary continuous
+$\overline{\mathbb Q}_\ell$-valued function.  In particular all
+specialized matrix entries below are continuous.
+
+We also need the following precise divided-eigenvalue argument.
+Let $B$ be the domain above, $d\in O\setminus\{0\}$,
+$t\in B$, $x(t)=0$, and let $v=t/d\in\operatorname{Frac}(B)$
+be integral over $B$.  The base point $x$ is a retraction on
+$O$, so $O\to B$ is injective and this denominator is nonzero.
+The algebra $B[v]$ is finite over the
+Henselian local domain $B$.  It is a domain and hence a local
+ring by the stated finite-algebra theorem.  The maps $x,y$
+extend to the localization $B[1/d]$, with targets
+$\operatorname{Frac}(O)$ and $\overline{\mathbb Q}_\ell$.
+Restrict them to $B[v]\subset B[1/d]$.  The first sends $v$ to
+zero, so $v$ is not a unit and lies in the maximal ideal of
+$B[v]$.  Its maximal ideal contracts to that of $B$, since the
+extension is finite integral.  Applying (AX.27) to the second
+map proves
+\[
+                      |y(t)/d|_\ell<1.
+ \tag{AX.28}
+\]
+This is the point where the same domain component and its actual
+diagonal base point are used; a bare ordinary specialization
+would not justify the conclusion.
+
+Now set $a_i=p_i(s_0)$.  AX6 makes them distinct.  Over either
+$\operatorname{Frac}(B)$ or $\overline{\mathbb Q}_\ell$ the
+operators $d_i^{-1}P_i(r(s_0))$ are pairwise orthogonal rank-one
+idempotents summing to $1$.  This follows by evaluating the
+Lagrange interpolation identities modulo
+$\prod_i(T-a_i)$ and using the characteristic polynomial; each
+eigenspace is one-dimensional because its root is simple.
+Choose one vector from each eigenline, in index order.
+The stable equations imply that the sums of the first $i+1$
+lines are invariant under every $r(g)$.  The matrices are
+therefore upper triangular.  Their diagonal entries are
+characters $\kappa_i$, since multiplication of upper triangular
+matrices multiplies the diagonal entries, and their inverse
+values exist from $r(g^{-1})$.  The inertia equations give
+$\kappa_i(u)=p_i(u)$ exactly.  Moreover
+\[
+ d_i\kappa_i(g)=\operatorname{tr}\big(P_i(r(s_0))r(g)\big).
+ \tag{AX.29}
+\]
+
+Use the same argument first over $\operatorname{Frac}(B)$.
+Its diagonal value $v_i(g)$ is integral over $B$, since it is
+a root of the monic characteristic polynomial of $\rho(g)$.
+Write $t_i(g)=\operatorname{tr}(P_i(\rho(s_0))\rho(g))$.
+Then $d_i v_i(g)=t_i(g)$ and at the actual diagonal point
+$x(t_i(g))=d_i p_i(g)$.
+Apply (AX.28) to the integral element $v_i(g)-p_i(g)$,
+with numerator $t_i(g)-d_i p_i(g)$.  Equation (AX.29) after
+specialization identifies its image with
+$\kappa_i(g)-p_i(g)$, and proves the strict estimate in (AX.26).
+Continuity of $\kappa_i$ follows from continuity of the entries
+of $r$ after a fixed conjugation, or directly from (AX.29).
+
+The original alternating form is preserved up to $\vartheta$.
+In the chosen eigenbasis for $r(s_0)$ its matrix can have a
+nonzero entry at $(i,j)$ only if
+$a_i a_j=\vartheta(s_0)$.
+Since $a_i=c(s_0)^{w_i}$ with $c(s_0)$ of infinite order,
+this means $w_i+w_j=e+1$.
+For the four weights and $e\ge2$ this occurs precisely when
+$j=3-i$.  Nondegeneracy makes all four antidiagonal entries
+nonzero.  For an upper triangular $r(g)$, the $(i,3-i)$ entry
+of $r(g)^tJr(g)=\vartheta(g)J$ then gives
+$\kappa_i(g)\kappa_{3-i}(g)=\vartheta(g)$.
+This proves the exact two pairing identities in (AX.26).
+
+Finally suppose $\kappa_i=c\kappa_j$ on an open subgroup $U$
+containing $\sigma_\ell$.  The subgroup has finite index in
+the compact decomposition group, so $s_0^b\in U$ for some
+positive $b$.  Evaluation there, using inertia and infinite
+order, gives $w_i=w_j+1$.  This is impossible for $i=j$.
+For distinct indices the only pairs allowed by the four weights
+are $(0,1),(2,3)$ and, when $e=2$, $(1,2)$.
+Every such pair has $\lambda_i\ne\lambda_j$.
+Evaluation at $\sigma_\ell$ gives
+$\kappa_i(\sigma_\ell)=\kappa_j(\sigma_\ell)$ because
+$c(\sigma_\ell)=1$.  The strict estimates in (AX.26) imply
+$\bar p_i(\sigma_\ell)=\bar p_j(\sigma_\ell)$: the difference
+of their values has norm less than $1$, which is precisely
+membership in $\mathfrak m_O$.  This contradicts AX6.
+Thus the required element of $U$ exists for every pair.
+\end{proof}
+
+\subsection{The full admissible class on the same data}
+
+\begin{proposition}[AX9: literal level, dual twist and safety]
+\label{prop:ax-admissible}
+Let $D$ be any good datum and $M\ge1$.  Suppose
+$\operatorname{KillsMu}(M)$ holds for $\psi,\xi,\omega$.
+For every actual $D.\mathtt{EPt}$ representation $r$,
+\[
+ \mathtt{Level}\bigl(\ell,M,(e+1,e,1,0),r\bigr),
+ \qquad \mathtt{IsCycWt}(\ell,e+1,\vartheta),
+ \qquad \mathtt{DualTw}(r,\vartheta)
+ \tag{AX.30}
+\]
+hold, with the original coefficient embedding into
+$\overline{\mathbb Q}_\ell$.  Also $\ell\mid M$ and
+$r$ satisfies $\mathtt{UnlAll}$, hence the first alternative of
+the literal $\mathtt{SafeRA}$ condition.  This proves
+\texttt{level}, \texttt{spUnl}, \texttt{teichDvd}, and
+\texttt{safe4'} on their actual quantified inputs.
+\end{proposition}
+
+\begin{proof}
+An actual point is the image under $R\to\overline{\mathbb Q}_\ell$
+of an adically continuous lift over a source complete local
+$O$-algebra.  Formula (AX.27) and the finite-generator estimate
+in AX8 make its matrix entries continuous.  Since
+$r(g)^{-1}=r(g^{-1})$, this is also continuity as a
+general-linear-group representation.  Its similitude equations,
+the equality $r=1$ on the prescribed inertia kernel outside $T$,
+and its equations at every $p\in S_b$ survive specialization:
+they are matrix polynomial equalities.  For the \texttt{OnComp}
+local conditions, compose with the actual domain-component map.
+This explains the needed part of the source \texttt{ptIn}
+transport without assuming a representability theorem.
+
+We prove the away-from-$\ell$ part of \texttt{Level} with global
+characters, as its definition requires.  Let
+$\varphi=(\psi,\xi,\omega):G\to A$ with $A$ its actual finite
+abelian image.  Choose a place over a given rational prime
+$p\ne\ell$.  If it is away from $T$, then for
+$g\in I_A\cap\ker\varphi$ the cyclotomic character is $1$,
+so $\bar r_0(g)=1$ and the point's unramified condition gives
+$r(g)=1$.  If it lies above a member of $T$, that member is
+some $p\in S_b$; choose the specified $A_p$ instead.
+The point's actual $\mathtt{condP}$ equation gives
+$r=1$ on $I_{A_p}\cap\ker\psi$, in particular on
+$I_{A_p}\cap\ker\varphi$.
+
+Thus in either case the inertia representation factors through
+the finite abelian subgroup $\varphi(I_A)\le A$.
+Every representing matrix has finite order and is diagonalizable
+in characteristic zero, since its minimal polynomial divides a
+separable polynomial $T^m-1$.  Commuting diagonalizable matrices
+have a common eigenbasis: split into eigenspaces of one nonscalar
+matrix and induct on their dimensions; if all are scalar the
+claim is immediate.  The diagonal characters of $\varphi(I_A)$
+extend to $A$.  Explicitly, when adjoining one generator $a$ to
+a subgroup and its coset has order $b$, choose in the algebraic
+closure a $b$-th root of the already specified value at $a^b$;
+the rule on $ha^j$ is then well-defined and multiplicative.
+Iterate through generators of the finite group.  Compose the
+four extended characters with $\varphi$ to obtain four global
+characters on the original $G$, diagonalizing inertia.  They
+are all trivial on $\ker\varphi$, hence satisfy
+$\operatorname{KillsMu}(M)$.  This is the complete
+$\mathtt{LevelAway}$ assertion; it does not merely produce
+local inertia characters.
+
+At $\ell$, AX8 supplies the actual ordinary flag and characters
+$\kappa_i$.  Define the following global finite characters:
+\[
+ (\chi_0,\chi_1,\chi_2,\chi_3)
+       =(\omega^{-1}\xi\psi,\psi,\omega^{-1}\xi,1).
+ \tag{AX.31}
+\]
+They all satisfy $\operatorname{KillsMu}(M)$, and
+$p_i=c^{w_i}\chi_i$.  The inertia formula in (AX.26) is
+therefore exactly the formula in $\mathtt{LevelAt}$.
+The last part of AX8 gives
+$\kappa_i\ne c\kappa_j$ for every pair, so we use the first
+alternative of that definition.  No potentially crystalline
+alternative is needed.  Over $\mathbb Q$ there is only one
+finite place above $\ell$, and the chosen $A_\ell$ lies above
+it; the comparison with the source prime ideal is just
+$\mathcal O_{\mathbb Q}=\mathbb Z$ and its ideal $(\ell)$.
+This proves $\mathtt{Level}$.
+
+The multiplier is
+$\vartheta=c^{e+1}(\omega^{-1}\xi\psi)$, whose finite part
+satisfies $\operatorname{KillsMu}(M)$.  This is the actual
+$\mathtt{IsCycWt}$ witness with the same $M$.
+For the duality witness take the fixed matrix
+\[
+ J=\begin{pmatrix}0&0&0&1\\0&0&1&0\\0&-1&0&0\\-1&0&0&0\end{pmatrix},
+ \qquad J^{-1}=-J.
+ \tag{AX.32}
+\]
+The source adjoint is $J^{-1}X^tJ$; its similitude equation is
+therefore exactly $r(g)^tJr(g)=\vartheta(g)J$.
+This supplies the original $\mathtt{DualTw}$, with no change of
+Frobenius or cyclotomic convention.
+
+To see that $\ell\mid M$, suppose the contrary.  Inertia at
+$A_\ell$ fixes $\mu_M$, so $\omega=1$ there by
+$\operatorname{KillsMu}(M)$.  But AX3 supplies an inertia element
+with $c=-1$, whose Teichm\"uller value is $-1$.  Since $\ell$
+is odd this is a contradiction.  The noncritical ordinary flag
+just proved holds for every place above $\ell$, not only the
+selected one: if $A'=gA_\ell$, transport the flag by $r(g)$
+and the characters by $u\mapsto g^{-1}ug$.
+The global cyclotomic character is invariant under conjugation,
+so all inequalities $\kappa_i\ne c\kappa_j$ are preserved.
+The transport map on decomposition groups is an isomorphism,
+so no nonidentity is lost.  This is precisely
+$\mathtt{UnlAll}$.  Combining it with $\ell\mid M$ proves
+the first clause of $\mathtt{SafeRA}$, and hence the literal
+\texttt{safe4'} conclusion.
+\end{proof}
+
+\begin{proposition}[AX10: the complete G1 implication]
+\label{prop:ax-g1}
+Assume the image-density hypothesis, with the literal
+\texttt{SymplecticFourImageDense} statement.
+For every original host and original Case II or Case III
+character in AX5, adjoining the roots already allowed by SP8
+produces an actual $D$ satisfying every clause of G1 in SP10.
+Its parameters and level are exactly (AX.19) and (AX.24).
+Moreover $D.\mathtt{Fin0}$ and $D.\mathtt{NoEnd}$ hold, and there
+is one embedding
+$\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C$, chosen before
+the varying point, such that every actual irreducible
+$D.\mathtt{EPt}$ representation belongs to
+\[
+ \mathtt{AdmRAlt}\bigl(\iota,L,(e+1,e,1,0),e+1\bigr).
+ \tag{AX.33}
+\]
+There is no remaining construction, character, residue-field,
+level, duality, ordinary-specialization or safety premise in
+this implication.  The actual image-density supplier itself
+remains an arithmetic obligation.
+\end{proposition}
+
+\begin{proof}
+First suppose the original $O$ already has the two required
+sets of dyadic roots.  AX5 constructs $D$ on its original
+$\Omega,O$ and the exact \texttt{OfCase}.  AX1 and AX5 provide
+$c_2\le n'$ and $m_0\mid o$, so AX7 gives the common $L,k_0$
+and all three $\mathtt{KillsMu}$ and power assertions.
+AX9 applies to every actual point of this same $D$, giving
+its level, multiplier of weight $e+1$, dual twist and safety.
+Now apply \texttt{SymplecticFourImageDense} to this $D$, with
+the same host, $t,e,\psi$ and original \texttt{Good}/\texttt{OfCase}
+witnesses.  Its conclusion is exactly
+\[
+ D.\mathtt{Fin0}\ \wedge\ D.\mathtt{NoEnd}\ \wedge\
+ \exists\iota\ \forall r\in D.\mathtt{EPt},\quad
+ \mathtt{Irr}(r)\Longrightarrow\mathtt{IsAutQA}(\iota,r).
+ \tag{AX.34}
+\]
+Here $\mathtt{Irr}$ has the source meaning that the linear span
+of the matrices $r(g)$ is all of $M_4$.  It implies the
+$\mathtt{Af.IsIrr}$ field of the admissible record: an invariant
+subspace would be invariant under every matrix, and a nonzero
+vector can be carried to every vector by suitable matrices.
+Thus the subspace is the whole vector space.  This is the exact
+direction used for the actual points in SP10.
+The quantifiers in (AX.34), rather than separately chosen
+embeddings for each point, supply the common $\iota$.
+Irreducibility, the stated automorphy assertion, and the four
+clauses already proved are precisely the fields of
+$\mathtt{AdmRAlt}$ in (AX.33).
+
+For a coefficient DVR initially lacking the roots, use the
+finite extension allowed in SP8 and RV1.  Its integral closure
+inside the same $\overline{\mathbb Q}_\ell$ is a finite
+coefficient DVR containing the two finite sets of roots.
+The injective coefficient map preserves the original
+character's kernel, order, conductor, CRT components, parity,
+$f_0,n_0,c_2$, and hence both integers in (AX.3).
+These facts can also be read directly: equality of two
+character values is unchanged by an injective ring map,
+so every finite quotient through which it factors is unchanged.
+Construct $D$ over this allowed extension and perform the
+preceding argument there.  This does not assert that the
+new $D$ is a datum over the smaller coefficient ring.
+The final normalized Selmer-length comparison is returned to
+the original coefficient ring by the exact ramification-factor
+cancellation already proved in RV1 and SP8.  The global field,
+host, character case and integer bounds have stayed fixed.
+Thus the conditional G1 statement used by SP10 is completely
+supplied, with its original coefficient-return mechanism.
+\end{proof}
+
+\paragraph{The resulting boundary.}
+AX5 and AX6 are unconditional arithmetic suppliers relative to
+the explicitly listed classical facts and the reconstructed BR7.
+AX7--AX9 are implications on any actual good datum, with no
+image-density premise.  AX10 uses
+\texttt{SymplecticFourImageDense} exactly once for (AX.34).
+It does not supply the automorphic catalogue, actual model
+construction, geometric point comparison or rigidity.  Those
+are the separately recorded G2 and catalogue chains.  In
+particular the source formulas that later produce
+\texttt{SymplecticFourImageDense} from automorphic hypotheses
+are continuation targets, not classical consequences of
+the elementary construction above.

@@ -1,0 +1,657 @@
+INITIAL SYMBOL MEMBERSHIP: IN1--IN9
+RH readable reconstruction, version 0.6 companion
+
+Pinned source: CocoSgt/riemann-hypothesis-lean,
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+Purpose and result
+==================
+
+This note proves the initial-symbol half of incoming MemAt. Under the
+literal DataII hypotheses and C >= 1, every actual symbol symP(B_b)
+satisfies MemAtG(0,1/8). It therefore proves the mathematical content of
+TwistedSubstitution/MemRed.Lemma5aAt. The independent WT reconstruction
+transports this result through the permitted operator words to
+MemAtG(1/8,3/8), which is the source MemAt. The PG and DT notes then apply
+to the selected normal projection and digit block.
+
+The proof below follows the actual closed source branch through
+PlanePairsOnBlocksAt, RestT, RestN, RestTh, RestPl, RestSP and
+RestArithStep. It does not assume any of those propositions as an
+unproved estimate. Ordinary characteristic-zero complete reducibility
+and highest-weight theory are background, as in the PG/IW notes; their
+specialized projector/weight application is proved in IN3. No integral
+semisimplicity, new denominator estimate, or equivariance of the map
+X -> X^(p^g) in characteristic zero is assumed.
+
+A significant scope distinction: Lemma5aGeneratorProductsAt is a stronger
+unblocked statement quantified over arbitrary pair products. The closed
+archive route does not use a proof of that stronger statement. It uses
+PlanePairsOnBlocksAt, which keeps the actual total-degree constraint on
+the chosen digit block. We prove that exact route. The degree constraint
+is essential for the link-loss estimate, even though individual product
+summands in a span expansion need not themselves have the prescribed
+total degree. Claiming the stronger unblocked statement from this proof
+would be unjustified.
+
+The exact source ranges and hashes appear in provenance.json. Every
+cited working-tree file is byte-checked against the pinned git blob by
+regenerate_provenance.py. No Lean compilation or independent verification
+of the entire claimed RH proof is asserted.
+
+
+IN1. Precise objects, signs, and endpoint
+=======================================
+
+Let O be the discrete valuation ring in DataII, and let Kf=Frac(O).
+The unramified quadratic setting implies characteristic zero. Write
+k=r+K for the total coordinate dimension: coordinates 0,...,r-1 are
+plane coordinates, and r,...,r+K-1 are normal coordinates. The actual
+hypotheses include p >= 13, r >= 2, K > 0 and even n'. The proof below
+uses p >= 3 and r,K >= 1 wherever the weaker hypotheses suffice.
+
+Frames are indexed cyclically by j in Z/J, using integer lifts with
+fr(j+J,i)=fr(j,i)+n'. The entries fr(j,0)<...<fr(j,r-1) are even, and
+z_j=fr(j,r-1). The selected letters in segment j consist of the preceding
+frame, the intermediate letters LL_j, and the current frame. There are
+no selected letters between consecutive entries within a frame. All
+frame letters are vectors. An intermediate letter is a vector if its
+integer position is even and a covector if its position is odd; even n'
+makes this independent of the periodic lift.
+
+Let n_j=#LL_j. Enumerate the nonpreceding-frame letters increasingly as
+
+  x_(j,u)=the u-th intermediate position             (0 <= u < n_j),
+  x_(j,u)=fr(j,u-n_j)                               (n_j <= u < n_j+r).
+
+The actual true-letter type TL uses a reversed index on the frames:
+frame(j,m) represents fr(j,r-1-m), for 0 <= m < r. This reversal matters
+in the link formula below. Let q_x=p^(z_j-pos(x)) for a true letter in
+segment j. The prefix N_(j,u) consists of the first u true letters in
+this increasing-position order. It contains no preceding-frame letters.
+
+For a signed-letter polynomial F and subset S, v_S(F) is the minimum
+Laurent exponent after applying the generic conjugate
+g diag(1,...,1,t) g^(-1) to the vector variables in S and its inverse
+transpose to the covectors in S. The source lam1S, denoted L_S here, is
+the maximum exponent for g diag(t,1,...,1) g^(-1). A generic coordinate
+permutation identifies the two choices of torus coordinate. Set
+v_S(0)=+infinity and L_S(0)=-infinity. For nonzero polynomials over the
+domain Kf, the usual Laurent support rules give
+
+  v_S(FG)=v_S(F)+v_S(G),
+  v_S(F+G)>=min(v_S(F),v_S(G)),
+  L_S(FG)=L_S(F)+L_S(G).
+
+Every true multidegree or model multidegree is preserved by the twist.
+Therefore extracting homogeneous components, or filtering by any
+predicate on complete letter-degree vectors, cannot decrease v_S or
+increase L_S. Also v_S(F)>=0 if all variables of F lying in S are vector
+variables. These assertions follow directly from the generic twist:
+vector matrix entries have only t-exponents 0,1; covector entries only
+0,-1; the coefficient ring obtained by inverting det(g) is a domain.
+
+At each normal prefix N_(j,u) use the canonical GL_K isotypic projector
+for a dominant integer weight kappa_(j,u). The source allows any e
+satisfying IsJProj(normE,{kappa}); IN3 proves that it is necessarily the
+product of the canonical individual projectors on each finite
+multidegree component.
+
+Write d=flatDeg(lambda_0). For x=x_(j,u), define
+
+  y=oldest(j,x) = the r-th most recent even selected letter strictly
+                  before x,
+  B_(j,u)=d(y mod n')/p^(z_j-y),
+  s_(j,u)=floor(B_(j,u)/(Y k^2)).
+
+All floors in this display are integer floors. The source pair gap uses
+m_*+Nat.floor(B/(k^2 Y)); this is at least m_*+s and equals it when B>=0.
+Here m_* is exactly SourceCleaning.mStar, with the source parameters:
+
+  c'=cStar+r N c0+2r n' cpp,
+  Q=p^G',
+  m_*=(N1+1)[(2Q+3)c'+kQ+c' alphaMax+3c'].
+
+Its precise size is inherited from the symbol construction; the initial
+membership proof only uses the defining pair gap m_*+s. The thresholds
+are the source thStar, namely the maximum of the following present terms:
+
+  B_(j,u)/2;
+  kappa_(j,u+1),1 + m_* + s_(j,u)        if x_(j,u) is even;
+  kappa_(j,u-1),1 + m_* + s_(j,u)        if u>0 and x_(j,u-1) is odd.
+                                                          (IN1.1)
+
+The odd-predecessor term uses u-1, not u. Its normal upper bound is on
+the strict prefix preceding the odd letter, while its plane lower bound
+includes that odd letter.
+
+Let a physical digit block retain residues rho at every selected
+physical coordinate modulo q_x, divide exponents by q_x, and retain
+plane and normal letter multidegrees dP,dN. This is levImg. It is a
+polynomial in plane variables with polynomial normal coefficients.
+For every such block, every joint projector e, and every normal monomial
+nu, set
+
+  H=[Z^nu](1 tensor e) levImg_(rho,dP,dN)(symP(B_b)).     (IN1.2)
+
+The desired conclusion consists of exactly these three clauses:
+
+  (a) H has plane letter multidegree dP.
+  (b) For every frame residue sigma and every 0<=i<=n_j,
+      v_(C_(j,i))(Fdig_sigma H)>=theta_(j,i).
+  (c) For 0<=m<r with m+2<=r, put u=n_j+r-1-m. Then
+      v_(T_(j,m))(H)>=theta_(j,u)-s_(j,u)/8.
+                                                          (IN1.3)
+
+C_(j,i) is the model chain consisting of all preceding-frame model
+variables wc(j-1,m), and the first i intermediate letters of segment j.
+T_(j,m) consists of all true intermediate letters of segment j and the
+true frame letters frame(j,m') with m'>m. Thus T_(j,m) is the true
+strict prefix before x_(j,n_j+r-1-m), with the preceding frame removed.
+The source XX definition with these cutoffs is exactly X_D(0,1/8).
+
+
+IN2. Expand actual symbols while retaining degree blocks
+======================================================
+
+By definition, each actual B_b belongs to Gen for a common degree
+d0=G2d(F,d,E'). Thus
+
+  B_b = [product_(j=0,...,J-1) phSeg_j(P_j)] X^l,
+  P_j belongs to symbolSpaces_j,
+  every monomial of B_b has physical multidegree d0.
+
+Here d0(t)=d(t)-E'(t) in natural-number subtraction on selected positions,
+and d0(t)=0 elsewhere. In particular 0<=d0(t)<=d(t). The label l satisfies
+l_(x,c)<q_x on every nonpreceding-frame selected letter and coordinate.
+
+The pair span underlying symbolSpaces consists of P_j=A_j G_j, where
+A_j uses plane variables from the full segment, G_j uses normal
+variables only from the segment after its preceding frame, and for each
+such position x there is an integer M_j(x) with
+
+  x even:  L_(<=x)(G_j)<=M_j(x),
+           v_(<x)(A_j)>=M_j(x)+m_*+Nat.floor(B_x/(k^2Y));
+  x odd:   L_(<x)(G_j)<=M_j(x),
+           v_(<=x)(A_j)>=M_j(x)+m_*+Nat.floor(B_x/(k^2Y));
+  always:  v_(<x)(A_j)>=B_x/2.                         (IN2.1)
+
+The additional order-degree restrictions in symbolSpaces are stronger
+input conditions but are not needed for this initial membership lemma.
+Likewise linear independence and a complemented integral span of the
+B_b family are unnecessary for membership of each B_b.
+
+The actual symbol symP(B_b) is the coefficient-field image of B_b times
+SPR, with the harmless coordinate identification k=r+K. The multiplier
+SPR is a product of powers of frame and moving-window determinants.
+Each matrix entry is a nonnegative power of a first-r coordinate at an
+even selected position. All rows used in the moving-window determinant
+are even by the frame/window conditions. Consequently every monomial
+gamma of SPR is supported only on plane vector variables. This proves
+RestSP directly; no coefficient valuation or determinant nonvanishing
+is needed here.
+
+Fix one gamma, and put dd(t)=d0(t)+sum_c gamma(t,c). The polynomial
+B_b X^gamma has this physical multidegree. For any of its nonzero
+digit/degree blocks, division of each exponent into quotient and
+remainder implies
+
+  sum_c rho(x,c)+q_x[dP(x)+dN(x)]=dd(pos(x)).           (IN2.2)
+
+This is exactly BlockDeg. If (IN2.2) fails, the levImg block of B_b
+X^gamma is zero.
+
+Now fix dd as above and prove the desired estimate only on blocks
+satisfying (IN2.2). Such a property is a Kf-linear subspace of physical
+polynomials, because every operation levImg, 1 tensor e, normal
+coefficient extraction, and every valuation cutoff is linear. Expand
+each P_j into its integral pair span. Multilinearity then reduces to
+products of literal pairs A_j G_j, with the same fixed dd used only in
+the block condition. The product summands need not have physical degree
+dd. After proving the compatible-block assertion for them, sum, and
+finally invoke the actual homogeneity to discard incompatible blocks.
+This is precisely MemAtB -> MemAtG and avoids any unsupported stronger
+unblocked pair-generator assertion.
+
+For a product of pairs and a fixed label/monomial, write F for its
+physical polynomial. Every exponent coming from phSeg is divisible by
+the corresponding q_x. If x is in the preceding frame for segment j,
+its exponent after division by the q_x of segment j-1 acquires the
+additional factor p^(z_j-z_(j-1)); otherwise quotienting simply renames
+the variable. Therefore all residues of F equal those of l+gamma. Let
+
+  b_(x,a)=floor((l_(x,a)+gamma_(x,a))/q_x), a<r.
+
+The normal part of gamma is zero, and l_(x,r+c)<q_x, so its normal
+quotients vanish. If rho does not equal the residue of l+gamma, the
+whole block is zero. Otherwise exponent division yields the exact
+tensor factorization
+
+  levImg_(rho,dP,dN) F = A_* tensor G_*,
+  A_*=[dP] levP(zPl),
+  G_*=[dN] product_j rename_j(G_j),                   (IN2.3)
+
+where zPl is the plane product including l and gamma. Neither factorial
+factors nor binomial coefficients occur. In particular
+
+  [Z^nu](1 tensor e)(A_* tensor G_*)
+       = coeff_nu(eG_*) A_*.                         (IN2.4)
+
+This identity isolates the entire normal projector from the plane
+filtration estimate. If eG_*=0, the result is zero and all lower bounds
+hold automatically.
+
+
+IN3. Selected joint normal types inherit the actual prefix bounds
+================================================================
+
+Work in a fixed finite normal multidegree. Its polynomial representation
+is a finite-dimensional rational GL_K representation over Kf. Standard
+characteristic-zero complete reducibility gives its canonical isotypic
+projectors P_(S,lambda). They are uniquely characterized as identity on
+the lambda-isotypic component and zero on the other components. This
+is a rational/field decomposition, not an integral direct sum.
+
+For S subset T, P_(S,lambda) commutes with the diagonal GL_K action on T:
+that action is the product of its actions on S and on T\S. It commutes
+with the S-action by construction, and with the disjoint T\S action
+because the latter is an S-intertwiner. Hence P_(S,lambda) preserves
+every T-isotypic subspace and commutes with every P_(T,mu). Disjoint
+subsets give the same conclusion directly. The normal prefixes in one
+segment are nested, and the prefixes in distinct segments are disjoint.
+Their canonical projectors therefore commute pairwise.
+
+Resolve an arbitrary vector by the finitely many individual
+decompositions successively. Commutation ensures that the resulting
+pieces are joint-isotypic vectors. They span the whole finite-degree
+space. An operator satisfying the literal IsJProj conditions is fixed
+on each such piece; therefore it is uniquely the product
+
+  e_kappa = product_(j,u) P_(N_(j,u),kappa_(j,u)).      (IN3.1)
+
+Thus e_kappa G_* != 0 implies
+P_(N_(j,u),kappa_(j,u)) G_* != 0 for every (j,u).
+
+For completeness, L_S on a nonzero isotypic vector of dominant highest
+weight lambda is lambda_1. All coordinate weights in that irreducible
+representation are <=lambda_1, and lambda_1 occurs. The orbit of any
+nonzero vector generates an irreducible factor, so its component at
+that extremal weight is nonzero after a generic change of basis. A
+multiplicity-space functional reduces the isotypic case to the
+irreducible one. Conversely canonical projections commute with the
+generic twist, so different types cannot cancel to remove the maximal
+Laurent exponent. This is the maximum-weight counterpart of the
+minimum-weight argument already used in PG.
+
+The product expression in (IN2.3) has disjoint segment variables.
+For N_(j,u), every factor except G_j is outside the selected set and has
+torus exponent zero. Renaming preserves signs because n' is even.
+The set N_(j,u) is exactly the supported strict prefix <x_(j,u) of G_j;
+N_(j,u+1) is its supported prefix <=x_(j,u). Extracting dN commutes with
+the twist and cannot increase L. Therefore eG_* != 0 gives
+
+  L_(<x_(j,u))(G_j)<=M  => kappa_(j,u),1<=M,
+  L_(<=x_(j,u))(G_j)<=M => kappa_(j,u+1),1<=M.         (IN3.2)
+
+This proves RestN, including its quantification over arbitrary selected
+joint projectors. No denominator bound enters, so the universal
+projector-lattice estimate IW4 is not needed again here.
+
+
+IN4. Recover the exact plane threshold, including the odd predecessor
+====================================================================
+
+Assume eG_* != 0. The always clause of (IN2.1) gives the B/2 term of
+(IN1.1). If x_(j,u) is even, combine the first implication of the even
+pair clause with the <=x implication in (IN3.2); the original integer
+gap is at least m_*+s. This yields the even term of (IN1.1).
+
+If u>0 and x'=x_(j,u-1) is odd, the odd pair clause gives
+
+  v_(<=x')(A_j)>=M_j(x')+m_*+s_(j,u-1),
+  kappa_(j,u-1),1<=M_j(x').
+
+There is no selected letter between the consecutive positions x' and
+x_(j,u). On the supported letters of A_j, <=x' and <x_(j,u) therefore
+coincide. The selected even letters strictly before x' and strictly
+before x_(j,u) also coincide, because x' is odd. Their r-th most recent
+member, and hence B and s, are identical. We obtain the odd-predecessor
+term with s_(j,u). Taking the maximum proves
+
+  v_(<x_(j,u))(A_j)>=theta_(j,u)  for 0<=u<n_j+r.      (IN4.1)
+
+The argument works for zero polynomials with the +infinity convention.
+
+
+IN5. Elementary substitution and degree-filter calculus
+======================================================
+
+Introduce a model polynomial ring over Kf with independent letters
+
+  ll(j,l): intermediate letters of segment j, with their original sign;
+  lab(j,m): current-frame labels, all vectors;
+  wc(j,m): preceding-frame model letters, all vectors.
+
+The full source ML also contains tangent letters tp. None occurs in
+this initial construction. Let chi_j be the literal letter renaming
+on the support of A_j:
+
+  its intermediate position l -> ll(j,l),
+  fr(j,r-1-m)                 -> lab(j,m),
+  fr(j-1,r-1-m)               -> wc(j-1,m).
+
+Frame geometry guarantees this is unambiguous. For a fixed chain
+C_(j,i)={wc(j-1,m)} union {ll(j,l):l<i}, the chi_j preimage on supported
+letters is exactly the strict prefix <x_(j,i), for 0<=i<=n_j, with the
+same vector/covector signs. Other chi_j' factors have support outside
+this chain: distinct labels have distinct constructors, and their wc
+letters have different cyclic segment indices. DataII implies J>=2;
+the arithmetic justification is given in IN8.
+
+The following generic-twist substitution rule justifies the transport
+in this paragraph and later in IN7. Suppose a substitution sends each
+supported letter inside S to a single letter inside T with the same
+sign, and sends the remaining supported letters to polynomials involving
+only variables outside T. Then twisting after substitution equals
+substituting the untwisted outside images after twisting the source.
+This is verified on each polynomial variable. The substitution on
+Laurent coefficients has no torus dependence; it cannot create lower
+torus exponents. Thus v_T(image F)>=v_S(F). The analogous maximum
+inequality holds. There is no requirement that unrelated letters be
+mapped injectively, although the principal renamings here are injective.
+
+Put Pi=product_j chi_j(A_j), after the coefficient-field map. By (IN4.1)
+and the support observation,
+
+  v_(C_(j,i))(Pi)>=theta_(j,i).                        (IN5.1)
+
+Define phi by
+
+  phi(ll(j,l,a))=X_(ll(j,l),a),
+  phi(lab(j,m,a))=X_(frame(j,m),a),
+  phi(wc(j,m,a))=X_(frame(j,m),a)^P_j,
+  P_j=p^(z_(j+1)-z_j).
+
+It is crucial that phi is a polynomial substitution, NOT a claimed
+GL_r intertwiner in characteristic zero. Exact exponent division in
+the physical polynomial gives
+
+  levP(zPl)=X^b phi(Pi).                              (IN5.2)
+
+For a model letter-degree vector delta, the degree of its phi-image is
+
+  true ll: delta_ll;
+  true frame(j,m): delta_lab(j,m)+P_j delta_wc(j,m).
+
+Consequently the identity
+
+  [dP](X^b phi(Pi)) = X^b phi(Pi')                    (IN5.3)
+
+holds, where Pi' keeps precisely the model multidegree vectors for which
+deg(b)+phiDegree(delta)=dP. This remains true if different model monomials
+have the same phi-image: the equality is monomial by monomial, before
+combining equal images. Since the filter commutes with every generic
+twist, Pi' still satisfies (IN5.1), and has no tangent variables.
+
+
+IN6. Exact frame digit extraction: zero chain loss
+=================================================
+
+The source Fdig_sigma extracts the residues sigma of each frame
+coordinate modulo P_j, removes those residues, divides its exponent by
+P_j, and renames that coordinate as wc(j,m,a). True intermediate
+coordinates are unchanged and are renamed ll. It is a Kf-linear map.
+
+First suppose Q uses only ll and wc, and beta is a true-coordinate
+monomial exponent. A term X^beta phi(X^mu) has intermediate exponent
+beta_ll+mu_ll, and frame exponent beta_frame+P_j mu_wc. Hence
+
+  Fdig_sigma(X^beta phi(Q)) =
+    0,                                      if beta_frame mod P != sigma;
+    X^(lift(floor(beta/P))) Q,                otherwise.              (IN6.1)
+
+In the second line, division is by P_j on each frame coordinate and by
+1 on intermediate coordinates; lift renames frame variables to wc and
+intermediate variables to ll. The residue condition is only on the
+frame coordinates. This is an exact identity over Kf; neither an
+approximation nor a positive-characteristic Frobenius argument is used.
+
+Expand Pi' in the independent lab variables:
+
+  Pi'=sum_M lab^M Q_M(ll,wc).                         (IN6.2)
+
+Since all lab variables lie outside every chain C_(j,i), coefficient
+extraction in them commutes with the chain twist. Therefore
+v_(C_(j,i))(Q_M)>=theta_(j,i). The image phi(lab^M) is a true frame
+monomial, say X^eta_M. Apply (IN6.1) to beta=b+eta_M.
+
+The extra monomial in (IN6.1) has only vector variables inside the chain.
+All wc variables are vectors. At a covector intermediate letter, gamma
+has exponent zero, while the label exponent is <q; hence b=0 there.
+The lab monomial contributes only true frame variables, so eta_M has
+no intermediate exponents. Thus no negative intermediate factor is
+introduced. The generic minimum of that extra monomial is >=0.
+
+Each nonzero summand of Fdig_sigma(A_*) therefore has minimum chain
+weight at least theta_(j,i), and sums preserve the inequality. We obtain
+
+  v_(C_(j,i))(Fdig_sigma A_*)>=theta_(j,i)             (IN6.3)
+
+for every frame residue sigma. This proves the full RestChain content,
+with exactly zero chain loss.
+
+
+IN7. Link loss is bounded by the preceding-frame degree
+======================================================
+
+Fix j and m with m+2<=r, and set u=n_j+r-1-m. Let W be the preceding
+frame, S the original supported prefix <x_(j,u), and T=T_(j,m). We have
+W subset S, all W letters are vectors, and T is the image of S\W under
+the non-W part of Phi_j=phi chi_j.
+
+First prove an elementary deletion lemma. If all monomials of A have
+total W-degree <=d_W, and v_(S)(A)>=h, then each coefficient A_M after
+expanding A in the W variables satisfies
+
+  v_(S\W)(A_M)>=h-d_W.                               (IN7.1)
+
+Indeed apply the inverse vector twist to the W variables in the generic
+S-twist of A. The two twists cancel on W and leave the S\W twist.
+The inverse vector matrix has Laurent exponents 0,-1. Since twisting
+does not change W-degree, it lowers every Laurent exponent by at most
+d_W. Extracting a W coefficient commutes with the remaining S\W twist.
+This proves (IN7.1), including arbitrary cancellations.
+
+Under Phi_j, W variables become positive powers of frame variables in
+segment j-1, outside the target set T because J>=2. Other supported
+variables are renamed degree-one, preserving signs and membership in
+the target prefix. Apply the substitution rule of IN5 to the
+coefficients in (IN7.1). The W monomial images have T-weight zero.
+Thus
+
+  v_T(Phi_j A)>=h-d_W.                               (IN7.2)
+
+The other factors Phi_j'(A_j') can meet T only at true frame variables:
+their intermediate variables lie in different segments. Since every
+true frame variable is a vector, they have T-order >=0. The base
+monomial X^b also has T-order >=0 by the absence of covector exponents
+proved in IN6.
+
+To use the sharpest relevant degree, decompose A_j into its letter
+multihomogeneous components A_(j,delta). They retain (IN4.1), because
+degree extraction commutes with the generic twist. Every monomial of
+Phi_j A_(j,delta) has true degree
+
+  P_(j-1) delta(fr(j-1,r-1-m'))
+
+at frame(j-1,m'). Let beta_(j-1,m')=deg_(frame(j-1,m')) b. If for some
+m' this number plus beta_(j-1,m') exceeds dP(frame(j-1,m')), the final
+[dP] extraction of the whole product is zero: all other degrees are
+nonnegative. Otherwise
+
+  P_(j-1) delta(fr(j-1,r-1-m'))
+       <= dP(frame(j-1,m'))-beta_(j-1,m').            (IN7.3)
+
+The total W-degree d_W of this component is the sum of these delta
+values. Define
+
+  Delta_j = sum_(m'=0,...,r-1)
+    max(dP(frame(j-1,m'))-beta_(j-1,m'),0)/P_(j-1).
+                                                          (IN7.4)
+
+This is precisely the source dwB: its natural-number subtraction is
+the positive part in (IN7.4), and P_(j-1)=p^(z_j-z_(j-1)) is independent
+of the frame row. Equation (IN7.3) gives d_W<=Delta_j on every surviving
+piece. Apply (IN7.2), multiply by the other nonnegative-order factors,
+extract dP, and sum. Real thresholds may be rounded up to integers
+before (IN7.1); rounding back only strengthens the conclusion. We have
+
+  v_(T_(j,m))(A_*)>=theta_(j,u)-Delta_j.              (IN7.5)
+
+This proves RestLink before numerical specialization. The loss is a
+degree of the removed preceding frame, not the total degree of the
+plane polynomial and not a sum over all segments.
+
+
+IN8. The actual degree and frame hypotheses give Delta_j<=s/8
+================================================================
+
+We now use the compatible-block condition (IN2.2). Fix a true letter x.
+Write l_c and gamma_c for its physical exponents, q=q_x, and
+beta_x=sum_(a<r) floor((l_a+gamma_a)/q). Because gamma has no normal
+variables and l_normal<q, beta_x is the entire quotient degree of the
+base monomial l+gamma. Its residue sum is
+
+  sum_c rho(x,c)=sum_c(l_c+gamma_c)-q beta_x.
+
+Substitute this into (IN2.2), where dd=d0+deg gamma. Cancellation of the
+actual gamma degree gives the equality of integers
+
+  q(dP(x)+dN(x)-beta_x)=d0(pos(x))-sum_c l_c.         (IN8.1)
+
+If dP(x)>=beta_x, discard the nonnegative dN and label terms. If
+dP(x)<beta_x, its positive part is zero. In both cases
+
+  q max(dP(x)-beta_x,0)<=d0(pos(x))<=d(pos(x)).       (IN8.2)
+
+This cancellation explains why the fixed physical degree must remain
+visible throughout the proof. A large localizer monomial gamma causes
+no uncontrolled extra loss; it is removed by the base-degree term in
+Delta_j. The source lemma Ar.deg_le proves exactly (IN8.2).
+
+Put g=z_j-z_(j-1), and
+t_m=z_(j-1)-fr(j-1,r-1-m). The t_m are distinct nonnegative integers,
+because frame positions are strictly increasing. For the corresponding
+previous true-frame letter q=p^t_m and P_(j-1)=p^g. The actual flat-degree
+bounds on selected positions are a<=d(t)<=2a. Thus (IN8.2) implies
+
+  Delta_j <= (2a/p^g) sum_m p^(-t_m)
+           <= (2a/p^g)/(1-1/p)
+           <= 3a/p^g,                               (IN8.3)
+
+using p>=3. There is no factor r here: the distinct frame positions
+give a subseries of the geometric series.
+
+Let y=oldest(j,x_(j,u)) at the link position, D=z_j-y, and B=d(y)/p^D.
+The first r intermediate selected letters in segment j are vectors.
+The first one lies more than L1 after z_(j-1), by the defining gap
+condition. They all precede every current-frame position. Consequently
+the r-th most recent vector before the link lies at or after that first
+intermediate vector, so
+
+  y>z_(j-1)+L1,  hence D+L1+1<=g.                    (IN8.4)
+
+The lower flat-degree bound gives a<=B p^D. The upper bound on a whole
+segment in FramesOK gives D<=G', and Q=p^G'. The actual numerical
+hypotheses include, writing N=#TT,
+
+  Y>=r>=2,   N>=1,   cStar>=1,
+  256 k^2 N Y^2 <= p^(L1-1),
+  C k^3 r^2 N Q^5 (cStar+rN c0+2r n' cpp) Y <= a.  (IN8.5)
+
+For C>=1, every omitted factor in the last expression is >=1 or
+nonnegative, so Y k^2 Q<=a. Combining this with a<=B p^D and p^D<=Q
+gives B/(Y k^2)>=1. For s=floor(B/(Y k^2)), therefore
+
+  1<=s,   B/(Y k^2)<s+1<=2s.                        (IN8.6)
+
+The middle inequality in (IN8.5), Y>=2 and N>=1 also imply
+48Yk^2<=p^(L1+1). Finally,
+
+  Delta_j <= 3a/p^g
+           <= 3B/p^(L1+1)
+           <= B/(16Yk^2)
+           <= s/8.                                 (IN8.7)
+
+All constants 3,48,16 and 1/8 match the source arithmetic. The initial
+step permits C1=1, independent of CLa. Stronger C restrictions in the
+word-transport or global construction are separate.
+
+For clarity, the required J>=2 also follows from DataII. If J=1,
+periodicity gives fr(1,r-1)=fr(0,r-1)+n'. The FramesOK segment-width
+bound at j=1 would yield n'<G', since fr(0,r-1)>=fr(0,0), contradicting
+the orbit hypotheses G'<n'. Thus the cyclic previous frame is genuinely
+a different segment throughout the support and link arguments.
+
+
+IN9. Full assembly and exact interface with WT/PG/DT
+==================================================
+
+For one pair-product and one gamma in SPR, work on a block satisfying
+BlockDeg. If its residue disagrees with l+gamma, the block is zero.
+Otherwise IN2 gives A_* tensor G_*. If eG_*=0, the selected plane
+coefficient is zero. If eG_*!=0, IN3 and IN4 establish every original
+prefix lower bound theta. IN5--IN6 prove the chain clauses without
+loss. IN7--IN8 prove each link clause with loss at most s/8. The plane
+multidegree clause is immediate from [dP]. Scalar multiplication by
+coeff_nu(eG_*) preserves the three clauses, including scalar zero.
+
+Thus every literal pair product satisfies MemAtB(0,1/8) for the fixed
+degree dd=d0+deg gamma. The defining pair-span inclusion and finite
+multilinearity extend it to the actual segment factors P_j. Their
+assembled B_b X^gamma has physical degree dd; IN2 then makes all
+incompatible blocks zero and gives MemAtG(0,1/8) for that polynomial.
+Summing with the actual coefficients of SPR proves
+
+  MemAtG(0,1/8)(symP(B_b)) for every b.                (IN9.1)
+
+The property is a Kf-linear subspace, so it holds on the entire Kf-span
+of the actual symbols. This is the precise input expected by WT. The
+word branch then yields MemAtG(1/8,3/8), and MemLin.tied_iff identifies
+that with the source MemAt. This closes the incoming membership premise
+previously retained in PG and DT, jointly with WT. We do not repeat or
+assume the outgoing detector construction, which was proved separately
+in DT and uses different test polynomials.
+
+Source route and completed/retained distinctions
+-----------------------------------------------
+
+Completed here:
+
+  IN1: exact definition and index normalization;
+  IN2: supported localizer monomials, compatible degree blocks, exact
+       plane/normal tensor factorization, and span reduction;
+  IN3: the selected normal-prefix type bound, including uniqueness for
+       every operator satisfying the literal IsJProj predicate;
+  IN4: all thStar terms, including the u-1 odd-predecessor term;
+  IN5: model substitution and homogeneous filtering;
+  IN6: exact Fdig identity and zero chain loss;
+  IN7: link loss Delta_j via vector untwisting and surviving degrees;
+  IN8: Delta_j<=s/8 with C>=1 and the exact archive constants;
+  IN9: assembly to the actual Lemma5aAt endpoint.
+
+Retained as explicit hypotheses, not falsely generated by this lemma:
+the actual DataII arithmetic/frame/symbol construction, the existence
+of the actual family B_b with its declared symbol-space membership and
+degree, and the universal characteristic-zero representation facts
+already used throughout PG/IW. The specialized consequences of these
+hypotheses are proved above. The initial proof needs neither the
+family's independence/complement nor the order-degree part of its
+symbol-space restriction. Constructing that family belongs to the
+other source branches, not to incoming membership.
+
+No claim is made here that the stronger arbitrary-pair statement
+Lemma5aGeneratorProductsAt is established. The exact blocked statement
+is proved and is sufficient for the actual archive route. No additional
+specialized unresolved initial-membership lemma remains in this note.
+

@@ -1,0 +1,152 @@
+\section{Good-orbit estimates for the actual biased selection}
+\label{sec:biased-orbits}
+
+\status{This proves the nonconstant Bernoulli estimate needed by the
+arithmetic top-set construction. It allows an arbitrary inclusion profile
+between $3\delta/4$ and $\delta$, keeps the actual parity and forced-point
+conditions, and supplies the weighted expectation used in the subsequent
+finite selection. It does not construct an arithmetic host.}
+
+Fix $\epsilon>0$ and real constants $C_o,L_b$. Put
+\[
+\begin{gathered}
+ \theta=\epsilon/8,\quad h=2+8\epsilon,\quad
+ K=\lceil(h+2)/\theta\rceil_{\mathbb N},\quad r=K+1,
+ \quad\delta=x^{-\theta},\\
+ u=\lceil\delta^{-1}\rceil_{\mathbb N},\quad
+ \ell=(6r+1)u,\quad\pi_0=10^{-(6r+1)},\\
+ M=\lceil(h+3)\log x/\pi_0\rceil_{\mathbb N},\quad
+ G=(M+5)\ell,\\
+ N=\left\lceil\max\{6eG\delta,(h+3)\log_2x\}\right\rceil_{\mathbb N}+1.
+\end{gathered}                                                   \tag{BO.1}
+\]
+These are the literal \texttt{KE}, \texttt{rE}, \texttt{goodU},
+\texttt{orbitSmallMultiplicity}, \texttt{goodG'} and
+\texttt{orbitWindowCount}. Choose each coordinate independently, with
+probability $q_i\in[3\delta/4,\delta]$.
+
+\paragraph{BO1: the finite product law and count tails.}
+On a finite set $S$, a subset $U$ has weight
+$\prod_{i\in U}q_i\prod_{i\in S\setminus U}(1-q_i)$.
+Summing over any unused coordinates multiplies by
+$\prod_i(q_i+1-q_i)=1$. Consequently conditioning on a selected
+coordinate $i_0$ leaves the other coordinates independent with their
+original probabilities. Events on disjoint sets still factor.
+
+For count tails, compare each coordinate with a Bernoulli($\delta$)
+coordinate using joint states $(0,0),(0,1),(1,1)$ of probabilities
+$1-\delta,\delta-q_i,q_i$. Padding to $g$ coordinates gives, for
+$|S|\le g$,
+\[
+ \Pr(|U|\ge b)\le {g\choose b}\delta^b,
+ \qquad
+ \Pr(|U|\ge b)\le
+ B(g,\delta,b):=\sum_{j=b}^{g}{g\choose j}\delta^j(1-\delta)^{g-j}.
+                                                               \tag{BO.2}
+\]
+The first bound also follows by counting selected $b$-subsets. This
+comparison is used only for increasing count events, not for marked tiles.
+
+\paragraph{BO2: the biased marked-tile probability.}
+A complete tile has $6r+1$ consecutive cells of length $u$. Its
+odd-numbered cells must be empty; every even-numbered cell must contain
+exactly one selected point, whose \emph{coordinate} is even.
+Any such cell contains at least $\lfloor u/2\rfloor$ even coordinates.
+The corresponding event probabilities are therefore at least
+\[
+ A_0=(1-\delta)^u,\qquad
+ A_1=\lfloor u/2\rfloor\frac{3\delta}{4}(1-\delta)^{u-1}.
+\]
+The singleton events are disjoint, and all cells are disjoint, so the
+actual marked probability is at least the source's
+\[
+ \pi=A_0^{3r+1}A_1^{3r}=\texttt{markedLow}(\delta,r,u).
+                                                               \tag{BO.3}
+\]
+If $0<\delta\le1/100$, then $1\le u\delta\le1+\delta$ and
+$\log(1-\delta)\ge-\delta/(1-\delta)$ give
+$A_0\ge e^{-103/100}>3/10$. Also
+$\lfloor u/2\rfloor\delta\ge99/200$, whence
+$A_1\ge891/8000>1/10$. Thus
+\[
+ 0\le\pi_0\le\pi\le1.                                        \tag{BO.4}
+\]
+This is the additional calculation needed for the biased law.
+
+\paragraph{BO3: all three failures, with one point forced.}
+Use the source's cyclic windows
+$W(i,L)=\{(i+j)\bmod n:0\le j<L\}$. A set is good when all
+$L_2$-windows contain at most $K$ points, every $M+1$ successive
+complete tiles contains a marked tile, and all $G$-windows contain at
+most $N$ points. Complete tile indices are read modulo
+$t=\lfloor n/\ell\rfloor$.
+
+Assume $(M+1)\ell\le n$ and force $i_0<n$ to be selected. A failed
+short window still contains at least $K$ unforced selected points.
+For each starting tile, its $M+1$ tiles are distinct; remove the at most
+one containing $i_0$. At least $M$ independent, unaffected tiles remain.
+If $i_0$ is in the incomplete remainder, none is removed. A failed
+long window implies at least $N-1$ unforced selected points. Union bounds
+over the $n$ starts, using $t\le n$, prove the exact source bound
+\[
+ \Pr(\mathrm{bad}\mid i_0\text{ selected})\le
+ n{L_2\choose K}\delta^K+n(1-\pi)^M+nB(G,\delta,N-1).
+                                                               \tag{BO.5}
+\]
+The long-window threshold is deliberately weakened to the source's
+$N-1$. No cyclic rotation of the parity condition is used.
+
+\paragraph{BO4: one explicit uniform threshold.}
+Set
+\[
+\begin{gathered}
+ C_1=(h+3)/\pi_0+2,\quad C_*=2(6r+1)C_1,\\
+ x_0=\exp\max\{1,\,4C_*/\theta^2,\,\log(100)/\theta\},\qquad
+ C_b=(|C_o|+1)\bigl((\max\{L_b,1\})^K+2\bigr).
+\end{gathered}                                                   \tag{BO.6}
+\]
+For $x\ge x_0$, writing $y=\log x$ gives
+$C_*(y+1)\le2C_*y\le(\theta y)^2/2\le e^{\theta y}$.
+The exact ceiling bounds now yield
+\[
+ (M+1)\ell\le C_*(\log x+1)x^\theta
+             \le x^{2\theta}.                                  \tag{BO.7}
+\]
+Hence the tile condition holds whenever
+$x^{\epsilon/4}\le n\le C_ox^h$. If $L_2\le L_b$, the three terms
+in (BO.5) are respectively at most
+\[
+ (|C_o|+1)(\max\{L_b,1\})^Kx^{-2},\qquad
+ (|C_o|+1)x^{-3},\qquad (|C_o|+1)x^{-3}.                         \tag{BO.8}
+\]
+Indeed $\theta K\ge h+2$ and $\pi_0M\ge(h+3)\log x$.
+For the last term put $b=N-1$. The factorial estimate
+$b!\ge(b/e)^b$ and (BO.2) give
+$B(G,\delta,b)\le6^{-b}\le e^{-b}$, since $b\ge6eG\delta$;
+also $b\ge(h+3)\log_2x\ge(h+3)\log x$. The empty tail is harmless.
+Consequently the conditional probability is at most $C_bx^{-2}$,
+uniformly over every allowed length, profile, base and forced point.
+
+\paragraph{BO5: the literal ambient-orbit and weighted statement.}
+Let $A$ be a finite abelian group and choose its points independently
+with probabilities $q(a)\in[3\delta/4,\delta]$. Fix a step $v$ of
+order $n$, a point $a$, and any base $b$ with $a=b+i_0v$.
+The map $i\mapsto b+iv$, $0\le i<n$, is injective. Marginalizing
+outside its image and then factoring out $q(a)$ proves exactly
+\[
+ \Pr(a\in T\text{ and its based orbit is bad})
+ =q(a)\Pr(\mathrm{bad}\mid i_0\text{ selected})
+ \le\delta C_bx^{-2}.                                          \tag{BO.9}
+\]
+The base may depend on both the step and $a$, as the source's
+$\mathrm{bs}(v,a)$ does. For a finite set of steps $v_p$ satisfying
+the length bounds and arbitrary nonnegative weights $\omega_p$,
+linearity gives
+\[
+ \mathbb E\sum_p\omega_p
+   \#\{a\in T:\text{the prescribed based orbit is bad}\}
+ \le \delta |A|C_bx^{-2}\sum_p\omega_p.                         \tag{BO.10}
+\]
+No independence between the different bad-orbit events is required.
+This supplies the probability input to the simultaneous coset selection;
+that selection and arithmetic realization are separate steps.

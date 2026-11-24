@@ -1,0 +1,839 @@
+\section{The actual finite isotropic averaging operator}
+\label{sec:finite-isotropic-average-v033}
+
+\status{FIA1--FIA8 reconstruct the finite cancellation needed by the
+original definite theta lift.  Under the five literal hypotheses in
+the source's averaging theorem, they produce its vanishing sum on
+every original polynomial kernel and every original adelic translate.
+No additional character, finite model, or averaging hypothesis is
+retained.  The hypotheses concern the supplied original real datum;
+their existence and the later smooth cuspidal extension are separate
+producer obligations.  These are category B proofs, with no new
+published-theorem application and no new Lean replay.}
+
+Fix the original host \(D\), with totally real field \(F\), CM field
+\(E\), conjugation \(z\mapsto\bar z\), and nonzero purely imaginary
+\(\xi_0=D.\mathrm{host}.\mathrm{xi0}\).  Write
+\(\mathbb A_E=\mathbb A_F\otimes_F E\), with the source's
+identification of its finite part with
+\(E\otimes_F\mathbb A_{F,f}\).  Its integral finite ring is
+\(\widehat{\mathcal O}_E\).  All inclusions, finite projections,
+and residue maps below are the original
+\texttt{incA}, \texttt{toEAf}, and \texttt{resS}.
+
+Let \(S,T\) be the original Hermitian coordinate spaces, of ranks
+\(n,m\), with Gram matrices \(G_S,G_T\).  The oriented space is
+\[
+ X=\operatorname{Mat}_{m\times n}(\mathbb A_E),\qquad
+ t^\dagger=G_S^{-1}\bar t^{\,t}G_T,\qquad
+ B(x,y)=\operatorname{Tr}_{\mathbb A_E/\mathbb A_F}
+                  \bigl(\xi_0\operatorname{tr}(y^\dagger x)\bigr).
+ \tag{FIA.1}
+\]
+Thus \(B=\texttt{symplO}\), whereas the source's raw Heisenberg
+operator uses its half:
+\[
+ b=B/2,\qquad H_y f(x)=\psi(b(x,y))f(x+y).
+ \tag{FIA.2}
+\]
+The distinction is essential: the opposite-half modulation law in
+\texttt{IsPlaceModel} uses \(\psi(B(t,y))\), not
+\(\psi(b(t,y))\).  We preserve both normalizations throughout.
+For actual finite frames \(\beta_S,\beta_T\), put
+\[
+ {\cal F}(t)=\beta_S^{-1}(t^\dagger)_f\beta_T
+       =\texttt{frMapAdj}(S,T,\beta_S,\beta_T,t).
+ \tag{FIA.3}
+\]
+The subscript \(f\) includes the source's tensor-factor interchange.
+Rows and columns in all matrix identities below have these orders.
+
+% BEGIN FIA1
+\paragraph{FIA1: every local character is nontrivial and has an edge.}
+\label{claim:FIA1}
+Suppose \(\psi\) satisfies the literal \texttt{IsCharAF}:
+it is a continuous additive character of \(\mathbb A_F\), has
+absolute value one, is one on the diagonal \(F\), and is not
+identically one.  For every finite place \(v\), its restriction
+\(\psi_v\) to the single \(F_v\)-component is nontrivial.
+Moreover there is \(x_v\in F_v\) such that
+\[
+ \psi_v(x_v)\ne1,\qquad
+ |y|_v<|x_v|_v\ \Longrightarrow\ \psi_v(y)=1.
+ \tag{FIA.4}
+\]
+Here \(|\cdot|_v\) denotes any multiplicative normalization of
+the discrete valuation; only its ordering is used.
+
+\emph{Proof of local nontriviality.}
+We give the character argument because a nontrivial character of
+an arbitrary product need not be nontrivial on every factor.
+On \(F_\infty\simeq\mathbb R^{[F:\mathbb Q]}\), a continuous unitary
+additive character has the form
+\(\exp(2\pi iL(x))\), with \(L\) real linear.
+For completeness, on a real line take the continuous argument in
+a small arc around \(1\).  The additive law makes its argument
+additive on a smaller interval, since the integer ambiguity is
+continuous and zero at the origin.  Continuity and rational
+approximation make it linear there; subdivision gives the result
+on the whole line.  Multiplying the coordinate restrictions proves
+the assertion in finitely many dimensions.
+
+The finite restriction of \(\psi\) kills \(N\widehat{\mathcal O}_F\)
+for some positive integer \(N\).  Indeed, continuity gives a
+compact open additive subgroup whose image lies in
+\(\{z\in\mathbb C:|z|=1,\ \operatorname{Re}z>0\}\).
+A subgroup of the circle contained in this arc is trivial:
+every nonidentity point has some integral power outside the arc.
+A sufficiently divisible positive integer multiple of
+\(\widehat{\mathcal O}_F\) lies in this open subgroup, by the
+restricted-product topology.  Rational triviality now gives
+\[
+            L(Nr)\in\mathbb Z\qquad(r\in\mathcal O_F).
+ \tag{FIA.5}
+\]
+An integral basis therefore makes \(L|_F\) rational valued.
+The nondegenerate rational trace pairing produces \(a\in F\)
+with \(L(r)=\operatorname{Tr}_{F/\mathbb Q}(ar)\) for \(r\in F\).
+One can check nondegeneracy directly: the matrix of embeddings
+of a rational basis is invertible for a separable number field,
+and the trace matrix is its transpose times itself.  Since an
+integral basis is a real basis of \(F_\infty\), the same trace
+formula holds on \(F_\infty\).
+
+Here is a concrete standard global character.  On \(\mathbb A_\mathbb Q\)
+put
+\[
+ \Psi_\mathbb Q((u_\infty,u_p)_p)
+   =\exp\!\left(2\pi i
+             \left(u_\infty-\sum_p\{u_p\}_p\right)\right),
+ \qquad
+ \Psi_F=\Psi_\mathbb Q\circ
+                  \operatorname{Tr}_{\mathbb A_F/\mathbb A_\mathbb Q}.
+ \tag{FIA.6}
+\]
+The \(p\)-adic fractional part is represented in
+\(\mathbb Z[1/p]\cap[0,1)\); its class modulo \(\mathbb Z\) is
+additive, and only finitely many terms in the sum are nonzero.
+For a rational number \(q\), the difference
+\(q-\sum_p\{q\}_p\) is integral.  To see this, its denominator
+has no prime divisor: at every \(p\), the \(p\)-fractional part
+removes the entire negative-valuation part and the other
+fractional parts are \(p\)-integral.  This proves rational
+triviality, continuity, and the additive law of (FIA.6).
+Applying the field trace proves the corresponding assertions
+for \(\Psi_F\).
+
+The characters \(\psi\) and \(z\mapsto\Psi_F(az)\) agree at
+infinity and on \(F\).  Their quotient is consequently a
+continuous character of \(\mathbb A_{F,f}\) trivial on \(F\).
+The diagonal \(F\) is dense in \(\mathbb A_{F,f}\).  An explicit
+approximation proves this last assertion.  Given finitely many
+local targets and congruence precisions, choose a positive rational
+integer \(M\) that clears their denominators.  At every prime
+dividing \(M\) not in the target set, impose divisibility by \(M\);
+at target primes prescribe the desired residues of \(M\) times
+the target, to the requested precision after division by \(M\).
+The Chinese remainder theorem in \(\mathcal O_F\) gives a
+numerator \(r\).  Then \(r/M\) has all required approximations
+and is integral at every other place.  Thus the quotient character
+is one, and
+\[
+                    \psi(z)=\Psi_F(az).
+ \tag{FIA.7}
+\]
+The original nontriviality implies \(a\ne0\).
+For \(v\mid p\), the local restriction is the nontrivial standard
+character of \(\mathbb Q_p\) applied to
+\(\operatorname{Tr}_{F_v/\mathbb Q_p}(a\,z)\).
+This trace map is onto: the trace of \(1\) is the positive degree,
+which is invertible in \(\mathbb Q_p\).  Multiplication by
+the nonzero image of \(a\) is onto as well.  Hence \(\psi_v\)
+is nontrivial.  This establishes the precise local assertion
+needed here without invoking the stronger conductor-product
+formula.
+
+\emph{Proof of the edge.}
+The same small-arc argument makes the kernel of \(\psi_v\)
+contain \(\varpi^d\mathcal O_v\) for some integer \(d\).
+The integers \(r\) for which \(\psi_v\) is one on
+\(\varpi^r\mathcal O_v\) form a nonempty upper ray, with a lower
+bound because \(\psi_v\) is not identically one.  Let \(d_0\)
+be its least element.  Choose
+\(x_v\in\varpi^{d_0-1}\mathcal O_v\) with
+\(\psi_v(x_v)\ne1\).  Its valuation is exactly \(d_0-1\).
+Any \(y\) with \(|y|_v<|x_v|_v\) has valuation at least \(d_0\),
+so (FIA.4) follows.  In particular \(x_v\ne0\).
+This proves the original \texttt{ThetaSupport.exists\_edge}.
+% END FIA1
+
+% BEGIN FIA2
+\paragraph{FIA2: split charts and residue precision.}
+\label{claim:FIA2}
+Let \(e\) satisfy the original
+\(\texttt{IsIdemAt}(e,\mathfrak P)\).  There is a finite place
+\(v\) of \(F\) and a surjective ring homomorphism
+\(\pi:\mathbb A_E\to F_v\) such that
+\[
+ \begin{gathered}
+ \pi(z)=0\ \Longleftrightarrow\ ez=0,\qquad
+ \pi(e)=1,\qquad e_\infty=0,\\
+ \pi(\iota_F(y))=y_v,\qquad
+ \operatorname{Tr}_{\mathbb A_E/\mathbb A_F}(ez)
+       =\operatorname{single}_v(\pi(z)).
+ \end{gathered}                                                   \tag{FIA.8}
+\]
+The single component on the last line has zero infinite part.
+The chart factors through the original finite projection as
+\(\pi=\phi\circ\texttt{toEAf}\), with
+\(\phi:E\otimes_F\mathbb A_{F,f}\to F_v\).
+For an integral finite element \(u\),
+\[
+ |\phi(u)|_v\le1,\qquad
+ \operatorname{res}_{\mathfrak P}(u)=0
+       \ \Longrightarrow\ |\phi(u)|_v<1.
+ \tag{FIA.9}
+\]
+
+\emph{Proof.}
+The literal split-idempotent conditions say that
+\(e^2=e\), \(e\bar e=0\), and \(e+\bar e\) is the identity at
+one finite \(F\)-place and zero elsewhere.  Multiplying the last
+identity by \(e\) shows that \(e\) is zero at every other place,
+including infinity.  At the indicated place the quadratic
+algebra \(E\otimes_F F_v\) has the two nonzero orthogonal
+idempotents \(e,\bar e\).  Its two factors have dimensions adding
+to two, so each is one dimensional over \(F_v\).
+Consequently this algebra is \(F_v\times F_v\), with
+\(e=(1,0)\) after choosing the first factor.  Projection to this
+factor is the source's chart \(\pi\); a single finite scalar
+times \(e\) gives every value, proving surjectivity.
+Multiplication, the kernel assertion, and the trace identity
+are now coordinate identities.  In particular the source
+\texttt{SplitChart.comp} is this projection: its defining
+equation \(ez=\operatorname{single}_v(\pi(z))e\) determines it
+uniquely.  It annihilates the infinite component and therefore
+factors through the indicated finite tensor ring.
+
+The integral ring of the split quadratic algebra is
+\(\mathcal O_v\times\mathcal O_v\).  This is also the image of
+the original completed integral ring: completion of the finite
+\(\mathcal O_F\)-module \(\mathcal O_E\), and then projection to
+the two primes over \(v\), gives precisely these two local
+integer rings.  Equivalently, integral elements are characterized
+by their monic equations over \(\mathcal O_v\) in each factor.
+It follows that \(\phi\) sends integral elements into
+\(\mathcal O_v\).
+
+For a nonzero \(r\in\mathcal O_E\), the second clause of
+\texttt{IsIdemAt} says
+\[
+ r\in\mathfrak P
+ \ \Longleftrightarrow\
+       (er^{-1})_f\notin\widehat{\mathcal O}_E
+ \ \Longleftrightarrow\ |\pi(r^{-1})|_v>1
+ \ \Longleftrightarrow\ |\pi(r)|_v<1.
+ \tag{FIA.10}
+\]
+The same conclusion is true for \(r=0\).
+Thus the selected local prime is exactly \(\mathfrak P\),
+not its conjugate.  The kernel of the original residue map is
+\(\mathfrak P\widehat{\mathcal O}_E\): the source defines it by
+the quotient by this extended ideal, identifying that quotient
+with \(\mathcal O_E/\mathfrak P\).
+This identification follows directly by completion and the
+Chinese remainder theorem.  At every other prime
+\(\mathfrak P\) becomes the unit ideal, while at \(\mathfrak P\)
+completion preserves the residue field.
+Every element of the extended ideal is a finite sum of
+integral multiples of elements of \(\mathfrak P\).
+Equation (FIA.10), integrality of \(\phi\), and the
+nonarchimedean triangle inequality prove (FIA.9).
+In particular
+\[
+       \psi\!\left(\operatorname{Tr}(ez)\right)=\psi_v(\pi(z)).
+ \tag{FIA.11}
+\]
+No rescaling of the character, trace, or residue homomorphism
+has occurred.
+% END FIA2
+
+% BEGIN FIA3
+\paragraph{FIA3: the constant phase on the original top block.}
+\label{claim:FIA3}
+Assume \(m\le n\), \(\texttt{IsCharAF}(\psi)\), and
+\(\texttt{IsIdemAt}(e,\mathfrak P)\).
+Let \(c\in\mathbb A_E^m\) with \(ec_j\ne0\) for some \(j\).
+The frames \(\beta_S,\beta_T\) are the actual invertible finite
+matrices; no change of them is made.  Put
+\[
+                         q_{\mathfrak P}
+                            =\#(\mathcal O_E/\mathfrak P)>0.
+ \tag{FIA.12}
+\]
+There exist \(l\in\mathbb A_E^n\) and \(\zeta\in\mathbb C\)
+such that
+\[
+ el=l,\qquad \zeta\ne1,\qquad \zeta^{q_{\mathfrak P}}=1,
+ \tag{FIA.13}
+\]
+and, for every \(t\in X\),
+\[
+ \begin{split}
+ {\cal F}(t)\in\operatorname{Mat}_{n\times m}
+                      (\widehat{\mathcal O}_E),\qquad
+ \operatorname{top}_m(\operatorname{res}_{\mathfrak P}{\cal F}(t))=I_m\\
+ \Longrightarrow\quad
+            \psi\bigl(B(t,c\,l^t)\bigr)=\zeta .
+ \end{split}                                                       \tag{FIA.14}
+\]
+This proves \texttt{ThetaSupport.exists\_const}, with its positive
+period specified explicitly.
+
+\emph{Proof.}
+Take the chart \(\pi,\phi\) of FIA2 and the edge \(x=x_v\)
+of FIA1.  Define
+\[
+ d=\phi(\beta_T^{-1})\,\pi(c),\qquad
+ u=\pi(\xi_0).
+ \tag{FIA.15}
+\]
+The vector \(\pi(c)\) is nonzero, and the finite matrix
+\(\phi(\beta_T)\) is invertible, so \(d\ne0\).
+Choose \(j<m\) with \(|d_j|_v\) maximal.  It is nonzero.
+The composite \(E\to\mathbb A_E\to F_v\) is a unital
+field homomorphism and hence injective, so \(u\ne0\).
+Set
+\[
+ s=-\frac{x}{u\,d_j},\qquad
+ \pi(l_{0,a})=s\,\phi((\beta_S^{-1})_{ja}),\qquad
+ l_a=e\,l_{0,a},\qquad \zeta=\psi_v(x).
+ \tag{FIA.16}
+\]
+Surjectivity of \(\pi\) supplies every \(l_{0,a}\);
+the row \(j\) is valid in the \(n\)-row frame because \(m\le n\).
+These choices depend on \(c\), the selected place, character,
+and frames, and not on \(t\).
+
+Let \(U={\cal F}(t)\) satisfy the two conditions in (FIA.14).
+Its \(j\)-th row, after applying \(\phi\), satisfies
+\[
+          |\phi(U_{ja})-\delta_{ja}|_v<1
+                             \qquad(0\le a<m),                  \tag{FIA.17}
+\]
+by (FIA.9).  Put \(z=\sum_{a<m}\phi(U_{ja})d_a\).
+Every term of
+\[
+                  z-d_j=\sum_{a<m}
+                         (\phi(U_{ja})-\delta_{ja})d_a
+ \tag{FIA.18}
+\]
+has absolute value strictly smaller than \(|d_j|_v\);
+the finite ultrametric triangle inequality therefore gives
+\(|z-d_j|_v<|d_j|_v\).
+The actual matrix identity
+\[
+       \phi(U)=\phi(\beta_S^{-1})\,\pi(t^\dagger)\,
+                    \phi(\beta_T)
+ \tag{FIA.19}
+\]
+and (FIA.15)--(FIA.16) yield
+\(\pi(l_0^t t^\dagger c)=s z\).
+
+We check the orientation and sign directly.
+From (FIA.1),
+\(\operatorname{tr}(t^\dagger c\,l_0^t)
+=l_0^t t^\dagger c\).
+Hermitian symmetry, \(\bar\xi_0=-\xi_0\), and invariance
+of the quadratic trace under conjugation give
+\[
+ B(t,c(e l_0)^t)
+   =\operatorname{Tr}
+          \bigl(e(-\xi_0\,l_0^t t^\dagger c)\bigr).
+ \tag{FIA.20}
+\]
+Applying (FIA.11), its character value is
+\(\psi_v(-u\,s z)\).  The chosen negative sign in \(s\)
+is exactly what makes
+\[
+             -u\,s z=x+x\frac{z-d_j}{d_j}.
+ \tag{FIA.21}
+\]
+The error term has absolute value \(<|x|_v\), so FIA1
+annihilates it.  Additivity proves (FIA.14).
+
+Finally \(q_{\mathfrak P}\in\mathfrak P\): the additive group
+of the finite residue field is killed by its cardinality.
+Consequently \(|q_{\mathfrak P}|_v<1\) by (FIA.10), and
+\[
+ \zeta^{q_{\mathfrak P}}
+   =\psi_v(q_{\mathfrak P}x)=1
+ \tag{FIA.22}
+\]
+by the same edge inequality.  Nontriviality of \(\zeta\)
+was built into the choice of \(x\).
+Its order need only divide \(q_{\mathfrak P}\); no primitive-root
+claim or new choice of residue character is required.
+% END FIA3
+
+% BEGIN FIA4
+\paragraph{FIA4: the actual finite half-datum meets the model's guards.}
+\label{claim:FIA4}
+Let \(\Lambda_S,\Lambda_T\) be full
+\(\mathcal O_E\)-lattices.  In the application they are the
+original self-dual lattices.  Write
+\[
+ \Lambda=\texttt{latO}(S,T,\Lambda_S,\Lambda_T,\mathrm{True}).
+ \tag{FIA.23}
+\]
+It contains the actual fractional-ideal factor
+\(\mathfrak A=D.\mathrm{host}.\mathrm{AA}\).  In the self-dual
+case it is
+\[
+ \widehat{\mathfrak A}\,
+ \operatorname{Hom}_{\widehat{\mathcal O}_E}
+  (\widehat\Lambda_S,\widehat\Lambda_T).
+\]
+Replacing it by the unweighted Hom lattice would be incorrect.
+
+Let \(P_g,Q\) be the finite sets in
+\texttt{IsThPVecOf}, and let \(e_\Sigma\) be its supplied
+sum of split idempotents over \(P_g\cup Q\).
+Set \(a=\bar e_\Sigma\).  The actual finite function is
+\[
+ \Phi(t)=
+ \begin{cases}
+ \Omega_K(P_g,\operatorname{res}{\cal F}(t))\,
+ \Omega_Q(Q,m,\chi,-1,\operatorname{res}{\cal F}(t)),
+       &at=t,\ {\cal F}(t)\text{ integral},\\
+ 0,&\text{otherwise}.
+ \end{cases}                                                     \tag{FIA.24}
+\]
+Here \(\chi=\texttt{xiR}\) is the stored family of residue
+characters.  The first factor is one exactly when, at each
+\(\mathfrak P\in P_g\), the upper \(m\times m\) block is the
+identity and all rows below it are zero; otherwise it is zero.
+The second factor is zero unless its indicated lower rows
+vanish and top determinants at \(Q\) are units, and otherwise
+is the product of the stored inverse determinant characters.
+Only its dependence on the residues at \(Q\) is used.
+
+Then \(\Phi\) satisfies the exact \texttt{IsSBHalf} guard:
+its support lies in \(aX\), and there is an integer \(K>0\)
+such that
+\[
+ \begin{gathered}
+ au=u,\ u\in\Lambda
+       \quad\Longrightarrow\quad
+       \Phi(t+Ku)=\Phi(t)\quad(t\in X),\\
+ \Phi(t)\ne0\quad\Longrightarrow\quad Kt\in\Lambda .
+ \end{gathered}                                                     \tag{FIA.25}
+\]
+\emph{Proof.}
+We first justify uniform lattice denominators.
+The source's lattice \(\Lambda\) is generated over the finite
+integral \(F\)-adeles by the matrices
+\[
+           A\,v\,\bar w^{\,t}G_S,\qquad
+ A\in\mathfrak A,\quad v\in\Lambda_T,\quad w\in\Lambda_S.
+ \tag{FIA.26}
+\]
+The fractional ideal and both lattices are finitely generated
+over their integer rings.  Their rational spans are \(E\)
+and the two full coordinate spaces.  Since \(G_S\) is invertible,
+these matrices span \(\operatorname{Mat}_{m\times n}(E)\).
+Take finite \(\mathcal O_E\)-generating families in (FIA.26)
+and multiply the resulting matrix generators by an integral
+\(\mathbb Z\)-basis of \(\mathcal O_E\).
+Their \(\mathbb Z\)-span is a full finitely generated
+lattice.  Clearing the coefficients of its generators and of
+expressions for the rational matrix units gives positive integer
+inclusions in both directions between \(\Lambda\) and the
+standard integral finite matrix lattice.
+This also proves that every element of \(\Lambda\) has zero
+infinite part.
+
+On the finite matrix space, \({\cal F}\) is the composition of
+conjugate transpose with left and right multiplication by
+invertible finite-adelic matrices.  Its inverse is of the same
+form.  Entries of those matrices and their inverses are integral
+away from finitely many places; one positive rational integer
+clears their finitely many remaining denominators.
+Combined with the preceding lattice inclusions, this gives
+positive integers \(M,J\) such that
+\[
+ M{\cal F}(\Lambda)\subset
+                   \operatorname{Mat}(\widehat{\mathcal O}_E),
+ \qquad
+ t_\infty=0,\ {\cal F}(t)\text{ integral}
+                       \ \Longrightarrow\ Jt\in\Lambda .
+ \tag{FIA.27}
+\]
+This is the content of the source's
+\texttt{frMapAdj\_up/down} and lattice-denominator lemmas,
+proved here for the actual fractional lattice.
+
+Put \(q=\prod_{\mathfrak P\in P_g\cup Q}q_{\mathfrak P}\)
+and \(K=JMq>0\); the empty product is \(1\).
+For \(u\in\Lambda\), the increment
+\({\cal F}(Ku)=Jq\,M{\cal F}(u)\) is integral and is zero
+modulo every \(\mathfrak P\in P_g\cup Q\).
+Thus integrality of \({\cal F}(t)\) is unchanged by this
+increment, all relevant residue matrices are unchanged,
+and the half condition is unchanged when \(au=u\).
+Every branch of (FIA.24), including its zero branch,
+is therefore invariant.  If \(\Phi(t)\ne0\), then \(at=t\).
+Since \(a_\infty=0\), we have \(t_\infty=0\); the second
+inclusion in (FIA.27) gives \(Jt\in\Lambda\), and hence
+\(Kt\in\Lambda\).  This proves all guards in (FIA.25).
+% END FIA4
+
+% BEGIN FIA5
+\paragraph{FIA5: a genuine eigencharacter of the stored finite vector.}
+\label{claim:FIA5}
+Suppose \(m\le n\), the original lattices are self-dual,
+\(\mathfrak P\in P_g\), and
+\[
+ \texttt{IsThPVecOf}
+   (\psi,\theta,S,T,s_S,s_T,\Lambda_S,\Lambda_T,
+         \beta_S,\beta_T,P_g,Q,\chi,f_0,f)
+ \tag{FIA.28}
+\]
+holds for the actual vector \(f\).
+Assume \(c\in\mathbb A_E^m\) has nonzero projection at every
+split idempotent, exactly as in \texttt{exists\_eigen}.
+There exist \(l,\zeta\) with \(\zeta\ne1\),
+\(\zeta^{q_{\mathfrak P}}=1\), such that, for all integers
+\(k\ge0\),
+\[
+        (c(kl)^t)_\infty=0,\qquad
+        H_{c(kl)^t}f=\zeta^k f .
+ \tag{FIA.29}
+\]
+
+\emph{Proof.}
+Unpack (FIA.28).  It contains a standard vacuum \(f_0\),
+a supplied sum \(e_\Sigma=\sum_{\mathfrak R\in P_g\cup Q}
+e_{\mathfrak R}\), and the exact
+\(\texttt{IsThetaAt}\) assertion for the half \(a=\bar e_\Sigma\)
+and finite function (FIA.24).
+The single-prime idempotents are pairwise orthogonal.
+Indeed FIA2 identifies each with the characteristic idempotent
+of its \(\mathfrak R\)-component; distinct primes give disjoint
+components.  Thus
+\[
+            e_{\mathfrak P}e_\Sigma=e_{\mathfrak P}.
+ \tag{FIA.30}
+\]
+The vacuum's \texttt{IsStdChar} field implies the precise
+\texttt{IsCharAF} hypothesis used in FIA1 and FIA3.
+Apply FIA3 at \(e_{\mathfrak P}\) to obtain \(l,\zeta\).
+It has \(e_{\mathfrak P}l=l\), so (FIA.30) gives
+\(e_\Sigma c(kl)^t=c(kl)^t\).  This proves its zero
+infinite component and makes it an element of the half
+opposite to \(a=\bar e_\Sigma\).
+
+The literal \texttt{IsThetaAt} is an \texttt{AllSome}:
+at least one linear model \(T_a\) satisfies
+\texttt{IsPlaceModel}, and \emph{every} such model sends
+the finite function \(\Phi\) to the same supplied vector \(f\).
+Choose one of those models.  FIA4 has verified the guard
+needed for its modulation axiom, which gives
+\[
+ H_{c(kl)^t}f
+   =T_a\!\left(t\longmapsto
+           \psi(B(t,c(kl)^t))\,\Phi(t)\right).
+ \tag{FIA.31}
+\]
+For \(\Phi(t)\ne0\), its \(\Omega_K\) factor forces the
+top identity block at \(\mathfrak P\); its integrality guard
+also holds.  FIA3 and additivity of \(B\) in its second
+argument show that the character in (FIA.31) is \(\zeta^k\).
+For \(\Phi(t)=0\), the equality of the two multiplied
+functions holds automatically.  Linearity of the
+\emph{chosen actual} model therefore gives
+\(H_{c(kl)^t}f=T_a(\zeta^k\Phi)=\zeta^k f\).
+This is an equality of the stored functions, not a replacement
+of \(f\) by a newly normalized vector.  Neither a scalar
+uniqueness theorem for Weil representations nor the existence
+of a new model is needed.
+% END FIA5
+
+% BEGIN FIA6
+\paragraph{FIA6: the original good-prime set is nonempty.}
+\label{claim:FIA6}
+If \(L:\texttt{LevCh}(D,T_0)\) and \(L.\texttt{Is}(\mu_0)\),
+then \(L.P_g\ne\varnothing\).  Moreover the supplied
+\(L.\beta_V(i)\), \(L.\beta_W(i)\) have the full self-dual
+lattices required by FIA4--FIA5.
+
+\emph{Proof.}
+The original character frame contains
+\(\texttt{PiBar.pb}(0)=\mathfrak p_0\), a nonzero prime of
+\(\mathcal O_{K_0}\), where
+\(K_0=D.\mathrm{host}.K\subset E\).
+It also records that the positive rational prime
+\(D.\mathrm{host}.g(0)\) belongs to \(\mathfrak p_0\).
+There is a prime \(\mathfrak P\) of \(\mathcal O_E\) over
+\(\mathfrak p_0\).  Here is a short proof of this particular
+lying-over assertion.  Localize the finite torsion-free
+\(\mathcal O_{K_0}\)-module \(\mathcal O_E\) at
+\(\mathfrak p_0\).  Over the resulting discrete valuation
+ring it is free of positive rank.  Its reduction modulo
+the maximal ideal is consequently a nonzero finite-dimensional
+algebra over \(k(\mathfrak p_0)\).  A maximal ideal of that
+algebra pulls back to a prime of the localization and then
+of \(\mathcal O_E\); its contraction is \(\mathfrak p_0\),
+because the residue-field scalar map is injective.
+The pulled-back prime is nonzero, as it contains
+\(D.\mathrm{host}.g(0)\ne0\); in the Dedekind ring
+\(\mathcal O_E\) it is a height-one prime.
+
+By definition this says \(L.C.P.\texttt{Div}(0,\mathfrak P)\).
+The literal field \(L.\texttt{Is}.P_g\) is the equivalence
+\[
+       \mathfrak P\in L.P_g
+          \quad\Longleftrightarrow\quad
+       \exists k\in\{0,1\},\ L.C.P.\texttt{Div}(k,\mathfrak P).
+ \tag{FIA.32}
+\]
+It proves \(\mathfrak P\in L.P_g\).
+This independent argument reaches the exact
+\texttt{exists\_mem\_Pg} conclusion and avoids the source's
+longer Galois-conjugacy detour.
+Splitting at the selected \(\mathfrak P\) is supplied when
+the actual \texttt{IsThPVecOf} is unpacked; it has not
+been inferred from lying over alone.
+
+Finally, the two level fields give
+\(\texttt{IsSDFrame}(V,\beta,\Lambda,1)\).
+This means \(\texttt{IsBaseFrame}(V,\beta,\Lambda,1^c)\)
+for some \(c\).  Its two lattice inclusions identify
+\(\Lambda\) with the coordinates of the original full
+standard lattice \(V.L0\), and its duality field is
+\(\Lambda^\vee=\Lambda\).  Hence \(\Lambda\) is finitely
+generated, spans \(V\), and has precisely the
+\texttt{IsSelfDualC} property used in FIA5.
+All these facts concern the stored lattice and frame.
+% END FIA6
+
+% BEGIN FIA7
+\paragraph{FIA7: finite Heisenberg shifts commute with the original creation words.}
+\label{claim:FIA7}
+Suppose \(\theta\) is the supplied \texttt{IsInfFam}, and
+\(u\in X\) has zero infinite part.  For the original
+\texttt{pureTensorO} and any polynomial \(P\),
+\[
+ \operatorname{pureTensorO}(H_u f)(P)
+       =H_u\bigl(\operatorname{pureTensorO}(f)(P)\bigr).
+ \tag{FIA.33}
+\]
+All Cartan involutions, bases, and scaling factors in this
+formula are the same on the two sides.  The operation is also
+homogeneous in its seed:
+\[
+       \operatorname{pureTensorO}(z f)(P)
+          =z\,\operatorname{pureTensorO}(f)(P)
+                         \qquad(z\in\mathbb C).
+ \tag{FIA.34}
+\]
+These statements apply to every actual polynomial kernel.
+
+\emph{Proof.}
+Let \(v(r)=\texttt{lineAt}(\theta,\tau,Z)(r)\) be any
+one of the real lines used to define \(\texttt{dRho}\).
+The defining property of \(\texttt{IsInfFam}\) identifies
+the infinite tensor algebra with its archimedean components;
+the line has prescribed component \(rZ\) at \(\tau\), zero
+at the other infinite places, and zero finite part.
+Its existence and uniqueness follow by taking these
+components and the zero finite component.  Thus it is the
+source's chosen \texttt{lineAt}.
+Since finite and infinite adele components multiply to zero,
+\[
+                B(u,v(r))=B(v(r),u)=0.
+ \tag{FIA.35}
+\]
+The explicit formula (FIA.2) gives the Heisenberg composition
+law
+\[
+           H_xH_y=\psi(b(x,y))H_{x+y}.
+ \tag{FIA.36}
+\]
+Equation (FIA.35) therefore gives
+\(H_{v(r)}H_u=H_uH_{v(r)}\).
+For a fixed evaluation point \(w\), the right side is
+\[
+     \psi(b(w,u))\,(H_{v(r)}f)(w+u),
+ \tag{FIA.37}
+\]
+whose prefactor is constant in the real variable \(r\).
+Differentiating at \(r=0\) proves
+\[
+       \mathrm d\rho(Z)\,H_u f
+           =H_u\,\mathrm d\rho(Z)f.
+ \tag{FIA.38}
+\]
+This is pointwise differentiation of an explicit formula.
+It does not pass a derivative through an arbitrary endomorphism
+of the space of all functions.
+It also agrees with the source's total \texttt{deriv} convention:
+the phase in (FIA.37) is nonzero, so differentiability of one
+side is equivalent to that of the other, and the zero value
+assigned at a nondifferentiable point respects the equality.
+
+Each creation operator is the prescribed scalar multiple of
+\(\mathrm d\rho(Z)-i\,\mathrm d\rho(JZ)\).
+Equation (FIA.38) and linearity of \(H_u\) give commutation
+with each such operator.  Induction through the exact ordered
+list defining \texttt{opPow} gives commutation for every
+monomial word.  Taking the finite linear combination of
+monomial words defining the polynomial proves (FIA.33);
+no reordering of creation operators is necessary.
+Constant multiplication in the same one-variable derivatives
+proves (FIA.34), first for each word and then for its finite
+polynomial sum.
+For the actual seed, the given
+\texttt{thP\_pt\_theta} at \(P=1\) also identifies it as
+the original theta function, since
+\(\operatorname{pureTensorO}(f)(1)=f\).
+% END FIA7
+
+% BEGIN FIA8
+\paragraph{FIA8: the uniform original averaging operator.}
+\label{claim:FIA8}
+Let \(R:\texttt{RealDat}(D,A,K_s)\) be the actual supplied
+datum.  Assume exactly
+\[
+ \begin{gathered}
+ R.\texttt{toLevCh.Is}(A.\mu_0),\qquad R.\texttt{models\_inf},
+ \qquad R.\texttt{thP\_}\omega_P,\\
+ R.\texttt{thP\_vP},\qquad R.\texttt{thP\_pt\_theta}.
+ \end{gathered}                                                    \tag{FIA.39}
+\]
+There is a single integer \(N_R>0\) such that for every
+original index \(i\), every tuple \(t\), every
+\(h\in G(V_c(i))(\mathbb A_F)\),
+\(g\in G(W_c(i))(\mathbb A_F)\), and every nonzero
+\(\xi\in E^{\operatorname{rank}W_c(i)}\), there is a list
+\[
+       a_0,\ldots,a_{N_R-1}\in
+                   \mathbb A_E^{\operatorname{rank}V_c(i)}
+ \tag{FIA.40}
+\]
+such that, simultaneously for every polynomial \(P\),
+\[
+ \sum_{k=0}^{N_R-1}
+ H_{\operatorname{along}(\xi,a_k)}
+       \left(R.\omega_P(i,t)(h,g)\,
+                        R.\mathrm{ptP}(i,t)(P)\right)=0 .
+ \tag{FIA.41}
+\]
+The equality is an equality of functions on the actual
+oriented matrix space.  Here
+\(\operatorname{along}(\xi,a)=\iota_E(\xi)a^t\)
+is literally the source's \texttt{along}.
+
+\emph{Proof.}
+FIA6 chooses one \(\mathfrak P\in R.P_g\), once for the
+whole datum; set \(N_R=q_{\mathfrak P}\).
+Fix \(i,t,h,g,\xi\ne0\), and abbreviate
+\(S=V_c(i)\), \(T=W_c(i)\).
+The original rank formulas give
+\(\operatorname{rank}T=r\le\operatorname{rank}S\);
+the required self-dual lattice statements were checked in FIA6.
+Let \(M_S(h),M_T(g)\) denote the actual coordinate matrices
+\texttt{mt}.  Put
+\[
+                   c=M_T(g^{-1})\,\iota_E(\xi).
+ \tag{FIA.42}
+\]
+For every split chart \(\pi\), the matrix \(\pi(M_T(g))\)
+is invertible, while \(\pi(\iota_E(\xi))\ne0\):
+the composite \(E\to F_v\) is injective.
+Therefore \(\pi(c)\ne0\), exactly the nonvanishing condition
+in FIA5.
+Apply that claim to the \emph{stored}
+\(f=R.vP(i,t)\) and its supplied \texttt{IsThPVecOf}
+to obtain \(l,\zeta\) with period \(N_R\).
+
+Define the averaging row vector by the literal formula
+\[
+                         a_k^t=(kl)^t M_S(h^{-1})
+                          \qquad(0\le k<N_R).
+ \tag{FIA.43}
+\]
+Its construction precedes the choice of a polynomial.
+Matrix multiplication gives
+\[
+ \begin{aligned}
+ \operatorname{along}(\xi,a_k)
+   &=M_T(g)\,c(kl)^tM_S(h^{-1})\\
+   &=\operatorname{actO}(S,T,h,g)\bigl(c(kl)^t\bigr).
+ \end{aligned}                                                     \tag{FIA.44}
+\]
+By FIA7 and (FIA.29),
+\[
+     H_{c(kl)^t}\,R.\mathrm{ptP}(i,t)(P)
+                =\zeta^k R.\mathrm{ptP}(i,t)(P).
+ \tag{FIA.45}
+\]
+The supplied \texttt{thP\_pt\_theta} makes each polynomial
+vector a theta function, so the \emph{original action's}
+\texttt{IsWeilDatumO.om\_heis} applies to precisely that
+vector.  Its covariance and linearity, with (FIA.44), yield
+\[
+ \begin{split}
+ H_{\operatorname{along}(\xi,a_k)}
+   \bigl(R.\omega_P(i,t)(h,g)\,R.\mathrm{ptP}(i,t)(P)\bigr)
+   =\zeta^k
+       R.\omega_P(i,t)(h,g)\,R.\mathrm{ptP}(i,t)(P).
+ \end{split}                                                       \tag{FIA.46}
+\]
+Summing this finite identity proves (FIA.41), because
+\[
+       \sum_{k=0}^{N_R-1}\zeta^k
+                   =\frac{\zeta^{N_R}-1}{\zeta-1}=0 .
+ \tag{FIA.47}
+\]
+There is no convergence or exchange-of-integrals issue in this
+step.
+
+The source's \(\texttt{IsoVec}(T,\xi)\) is the conjunction
+of \(\xi\ne0\) with its Hermitian norm being zero.
+Only its first clause has been used.  Restricting (FIA.41)
+to such vectors proves the exact
+\texttt{ThetaSupport.\allowbreak sum\_heisO\_\allowbreak along\_eq\_zero} and its
+wrapper
+\texttt{fock\_vectors\_\allowbreak killed\_\allowbreak
+heisenberg\_\allowbreak average\_\allowbreak isotropic}.
+Our quantifiers are slightly stronger: \(N_R\) is independent
+of \(i,t,h,g,\xi,P\), and the list is independent of \(P\).
+No independence of the list from \(i,t,h,g,\xi\) is asserted.
+The case of a zero-dimensional target has no nonzero \(\xi\),
+so it causes no exception.
+% END FIA8
+
+\paragraph{What has been supplied to the cuspidal-extension branch.}
+FIA8 closes the finite \texttt{hsupp} premise on every original
+tuple, including the base tuple.  It uses the original level
+data, actual half-datum, original creation operators and original
+Weil covariance, all coupled as in (FIA.39).
+The same nonzero field embedding and the same residue kernel
+are used in the frame computation and the transported-vector
+computation.  The construction contains no unconstrained
+auxiliary root of unity, replacement of a stored vector, or
+new theta action.  BTH13--BTH15's scalar-normalization argument
+is compatible with this calculation but is not a dependency:
+only the already supplied covariance field is used.
+
+The constant-term invariance under \(\operatorname{along}\),
+its measure normalization, and the implication from those
+constant terms to cuspidality are the next separate arguments.
+The original smooth multiplicity-space extension still also
+requires its analytic and representation-theoretic producers.
+FIA8 makes no assertion of moderate growth, lowering
+annihilation, bounded holomorphic realization, simultaneous
+\texttt{ioP} existence, or original geometric/rational reading.
+In particular a published rapid-decay theorem is neither used
+nor certified by this component.

@@ -1,0 +1,408 @@
+# Actual Gram estimates: v0.3 reconstruction
+
+## Result and limits
+
+This contribution descends from the completed GF1–GF9 frame argument into the actual period kernels. It reconstructs the four-part kernel decomposition, the scalar-pair quadratic form, its Bessel integrals and coordinate weights, the role of differing binary words, the lattice Fourier decay step, the level recurrence, and the final quantitative assembly. It does **not** claim to have reconstructed the entire local representation theory or the arithmetic counting needed for RH.
+
+The strongest new complete lemma is an elementary proof of the ideal-lattice decay estimate. With the exact complex-place and fractional-ideal norm conventions used here, the proof gives
+
+\[
+\sum_{0\ne z\in\mathfrak a}
+\prod_{\nu=1}^{f}\min\{1,(x_\nu/|\sigma_\nu z|)^K\}
+\le (384\Theta^{-(K-1/2)})^f,
+\quad
+\prod_\nu x_\nu\le \sqrt{N\mathfrak a}/\Theta^f.
+\]
+
+It holds for real \(K\ge3\), \(\Theta\ge1\), and a totally complex field of degree \(2f\). The archive only needs the weaker power \(K-5/2\). This derived alternative can replace that one step in a human proof. It has not been inserted into Lean, and no improvement of the final prime-sum or RH exponent is inferred from it.
+
+The other complete short argument is the recurrence producing the leading constant \(1\) in the mixed norm estimate, once the precise local Fourier/positivity and arithmetic kernel bounds are supplied. The mixed coefficient is not merely bounded by some unspecified constant; this distinction is crucial to the frame argument.
+
+Files:
+
+- actual_gram_section.tex: main reconstruction, suitable for insertion before the abstract frame section.
+- actual_gram_appendix.tex: complete packing/layer-cake proof and precise local spectral scales/hypotheses.
+- actual_gram_provenance.json and actual_gram_provenance.md: stable AG1–AG10 source ledger, pinned commit, full-file and byte-range SHA-256.
+- build_provenance.py: reproducible extraction of the ledger.
+
+All archive citations are to commit 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4 of CocoSgt/riemann-hypothesis-lean. Reading a theorem declaration or a proof body does not amount to rerunning its full Lean dependency graph.
+
+## AG1. Exact normalization and dimensions
+
+The full complex source space is the archive's Cu u; its dimension is D.duS u. The full target is HH, of dimension Dall. These are the dimensions occurring in LinkS. The source restriction used later in the slope argument has a smaller rank; no retained-column dimension is substituted here.
+
+The period map is Pu u, and
+
+\[
+c_u=\frac{\operatorname{vol}N_u\operatorname{vol}H_u}{\dim\pi_u},
+\qquad
+A_u=c_u^{-1/2}P_u,
+\qquad
+K_{uv}=A_u^*A_v.
+\]
+
+This follows directly from RelevantZeroGramTerms.c0 and Kmat. Since the volumes and representation dimensions are positive, the source's scalar \((c_uc_v)^{-1/2}\) is exactly the normalization induced by \(A_u=c_u^{-1/2}P_u\).
+
+The reference dimension \(D_*\) is a mass/formal-degree expression and need not be an integer. It must not be identified with the actual target dimension without the separate count estimate. Under the dimension balance proviso,
+
+\[
+\frac{D_*}{C_0\Gamma^2}\le n_u
+\le \frac{C_0D_*}{\Gamma^2}.
+\]
+
+The upper bound is what turns a coarse diagonal error \(\Gamma n_u^2/D_*\) into a small error \(C_0n_u/\Gamma\). The lower bound and the number of words enter the later full-frame proof.
+
+## AG2. The geometric expansion and the zero-determinant terms
+
+An absolutely norm-summable family of operators \(a_t\) expands \(K_{uv}\). Divide it into four disjoint parts:
+
+1. identity terms;
+2. nonidentity terms with Gterm t = 0;
+3. nonidentity, nonzero-determinant, nongeneric terms;
+4. nonidentity, nonzero-determinant, generic terms.
+
+The source theorem kernel_matrix_decomposition proves this decomposition by disjoint summation. The identity cell contributes \(I\) on the diagonal. Off the diagonal, all zero-determinant terms vanish.
+
+The last assertion is representation theoretic after a geometric reduction. For a zero-determinant relevant term, its amplitude \(J\) obeys
+
+\[
+\rho(h)J=J\rho'(\theta^{-1}h\theta).
+\]
+
+Thus \(J\rho'(\theta^{-1})\) is an honest intertwiner. Distinct irreducible compact types have no nonzero intertwiners, so \(J=0\). The source proves this elementary twisted Schur argument in KappaEndpoints.tj_schur_off. Its off_diagonal_amplitude_zero then applies the geometric amplitude covariance and the no-intertwiner hypothesis. The tie from zero amplitude to zero geometric summand is separately recorded as ATie.
+
+This reconstruction uses the elementary Schur implication and records exactly the geometry and normalization it requires. It does not infer amplitude covariance from the formal shape of the term data.
+
+The diagonal zero-determinant remainder \(Z_{uu}\) does not vanish. Its bound is
+
+\[
+\|Z_{uu}\|_{\rm HS}^2\le n_u e^{-kf\log k}.
+\]
+
+This is a separate arithmetic/analytic input. TheoremK2PairBound is a pair-trace statement; kernel_second_part_of_pair_bound merely transports it to the squared norm. KappaEndpoints.pair_bound_of_steps_word descends further to labelled pair bounds and a minor-coset sum, but those numerical bounds are not proved in the present human section. It would be misleading to call this diagonal estimate a direct consequence of Schur's lemma.
+
+## AG3. Trace identity and actual Bessel integral
+
+For a saturated set \(\Phi\) of nonzero-determinant geometric terms, the source uses
+
+\[
+\|K_\Phi\|_{\rm HS}^2
+\le F\,\gamma_G\operatorname{Re}
+\sum_{p\in {\rm pairs}(\Phi)}p_{\rm val},
+\qquad
+F=\prod_{\mathfrak p\ {\rm typed}}(1+3/N\mathfrak p).
+\]
+
+This is c2aG. Although the name ArchimedeanSignatureMatching appears in one interface, it names this trace inequality there; it is not a proof from signature matching alone. The factor \(F\) comes from finite places.
+
+For generic terms the pair set is a disjoint union of scalar pairs and loops. A scalar pair has defect \(s_0=1\) and the source's scalarPair relation. A loop has \(s_0\ge2\), or is generic with \(s_0=1\) and is nonscalar. The integer \(s_0\) is a codimension \(k-\dim_E W_p\) of a matching subspace, not an unspecified matrix rank. FlagEEqHyperbolic.s0_eq and IsPrimitiveSub.s0 give this interpretation.
+
+The finite loop sum estimate is
+
+\[
+\gamma_G\sum_{\rm loop}|p_{\rm val}|
+\le e^{-c_Lkf\log k}\frac{n_un_v}{D_*}.
+\]
+
+Absolute summability extends it to the infinite sum. Therefore
+
+\[
+\|G_{uv}\|_{\rm HS}^2
+\le F e^{-c_Lkf\log k}X_{uv}+S_{uv},
+\quad
+S_{uv}=F\gamma_G\operatorname{Re}\sum_{\rm scalar}p_{\rm val},
+\quad X_{uv}=n_un_v/D_*.
+\]
+
+The archimedean amplitude is the actual double Bessel average
+
+\[
+J F(g)=\int
+\psi(n)\overline{\psi'(n')}\,
+\pi(w)F(w^{-1}n^{-1}gn'w')\pi'(w'^{-1})
+\,dw\,dn\,dw'\,dn'.
+\]
+
+Here \(w,w'\) lie in compact stabilizers and \(n,n'\) in unipotent groups; the source's fixed measures occur in StatementBF.besselJ. The displayed formula is used under the needed convergence hypotheses. On the big cell, a section supplies the remaining \(U(k,1)\) matrix coordinate. With indices \(a=1,\ldots,r\), the Lebesgue weight is
+
+\[
+\left(\prod_{a=1}^{r}|z_a|^{2(2(r-a)+k+1)}\right)
+(|z|^2-T_uT_v)_+^{k-1}.
+\]
+
+The product of the \(f\) local weighted Hilbert–Schmidt energies is divided by \(\kappa^{r+1}\), where \(\kappa\) is the common covolume of the block-dependent scaled arithmetic lattices. It is not the character parameter \(\kappa_\nu=2\pi/|\sigma_\nu(g_0g_1)|\).
+
+The formal-degree identity behind normalization is ordinary discrete-series Schur orthogonality:
+
+\[
+\int_G \langle w,\sigma(g)v\rangle
+ \overline{\langle w',\sigma(g)v'\rangle}\,dg
+=d_\sigma^{-1}\langle v',v\rangle\langle w,w'\rangle.
+\]
+
+ExpansionFromLemmaB.schurH transports this formula to the chosen matrix-coordinate Haar measure. Its inner_int expands a matrix-valued coefficient in orthonormal bases and integrates each term. That calculation is elementary once the discrete-series orthogonality and integrability are known. The Bessel averaging, quotient measures, and archimedean mass factors require additional identities, retained here rather than silently inferred from the displayed Schur formula.
+
+## AG4. Binary separation and the spectral cut
+
+The archive has an injective map from Word into binary strings of length \(k-2\). Every letter is shared across all places. A differing letter gives, at a common position, the two values
+
+\[
+v_{\nu\ell}-\tfrac12-\Delta,\quad v_{\nu\ell}-\tfrac12.
+\]
+
+The interval
+
+\[
+I_\nu=[5/2-v_{\nu\ell},\Delta/2-v_{\nu\ell}]
+\]
+
+has width \((\Delta-5)/2\). Its distances from the two negative parameters are at least \(2\) when \(\Delta\ge5\). This checks IsCutS exactly. A difference at one position suffices; the mixed bound in theorem_S_of_numerical_inequalities uses letter_inj to find that position and never invokes a Hamming-distance lower bound.
+
+The source also chooses
+
+\[
+I_{\nu,1}=[5/2-v_{\nu\ell},N^3-v_{\nu\ell}],
+\qquad N=20(r+1),
+\]
+
+and makes \(\Delta\) large enough that this lies inside \(I_\nu\), has width at least \(N^3/2\), and the full cut width dominates
+
+\[
+C[kN(r+1)^2+N^2(r+1)^2+N^3].
+\]
+
+This is a direct inequality from \(\Delta\ge(kfL)^{C_\ell}\), \(C_\ell>2\), \(f\ge m^4\), \(m=2r+2\), and sufficiently large \(k\). The exact sufficient thresholds in separation_numerics are \(k\ge2(1030C+3)\) and \(k\ge3000\).
+
+The cut is an analytic device for positivity and spectral differentiation. Distinct binary words are not assumed to generate orthogonal period images.
+
+## AG5. Differential words, weights, and the remaining local theorem
+
+There are two notions of word. The binary words index the original compact types. The auxiliary differential words are finite lists of signs and real spectral parameters inside a cut interval. They are not binary and their ambient set is infinite.
+
+For a differential word, the normalizing bracket is
+
+\[
+\operatorname{brk}(w)=
+\prod_\nu\prod_{Y\in w_\nu}|P_{\lambda_\nu}(Y)|,
+\qquad P_\lambda(Y)=\prod_j(Y+\lambda_j).
+\]
+
+Positivity and the common energy identity hold after dividing by this bracket. With a smooth cutoff away from singular strata, the zero Fourier mode of the next-level diagonal form is **exactly** the preceding-level form. Nonzero Fourier modes satisfy a product profile
+
+\[
+\left|\widehat{\mathcal N}_w(\xi)\right|
+\le \prod_\nu\min\{1,(X_{i\nu}/|\xi_\nu|)^K\}
+\sum_{w'}\theta_A(w')\mathcal E_{w'},
+\]
+
+where \(\theta_A\) is a finitely supported probability distribution; its support extends the word by at most \(K\) letters, and \(A\) records the places at which the frequency exceeds the spectral scale. The probability distribution is independent of the point set and the positive coefficient kernel.
+
+For two distinct points the analogous profile uses \(t_\nu^{-1}-(t'_\nu)^{-1}\). At most \(3^f\) place patterns indicate whether the large inverse difference is charged to the first or second point or neither. The two-word averages are again probabilities. This accounts for a constant raised to \(f\), not a factor equal to the total number of differential words.
+
+The precise sizes are given in the LaTeX appendix, using
+
+\[
+B_\nu(Y)=\kappa_\nu^{-(2r+1)}
+\sqrt{\left|
+\frac{P_{\lambda_\nu}(Y)P_{\lambda_\nu}(Y+1)}
+{-T_uT_v\prod_j(Y+\frac12+u_{\nu j})(Y+\frac12+v_{\nu j})}
+\right|}.
+\]
+
+They are suprema of \(B_\nu\) times powers of the inverse cut width. The third type contains a square root and \((T_uT_v)^{-1/2}\); dropping it would lose the correct top-block estimate.
+
+The local hypothesis includes:
+
+- discrete-series and compact representations of the indicated Harish–Chandra types;
+- interlacing of both compact parameters with the discrete-series parameter and a common parameter one rank lower;
+- the cut and width inequalities;
+- gaps between spectral parameters of opposite signature at least \(C m^{9/2}(NR^2+R^3)\);
+- smooth finite-type coefficient functions and a smooth compatible big-cell section;
+- positivity of the intermediate forms and the differential-word identities.
+
+GapAtLeast is a noncompact-root gap: its definition only quantifies over pairs of different signature signs. It should not be paraphrased as every adjacent gap of the ordered parameter.
+
+The archive reaches these local estimates through Capelli eigenvalues, raising/lowering and duality identities, interpolation, integration by parts, and positivity. XiBound.xi_bound gives an explicit cubic wave-decay inequality from interpolation coefficients and positive quadratic forms. It illustrates the mechanism but does not itself prove the full K-fold, all-level estimate. The human reconstruction retains SingleLevelGramEstimate, BlockLiftEstimate, LargeBlockLiftEstimate and common-energy/positivity statements as specific unresolved spectral inputs. Labeling a wrapper theorem IntegralityFromMetric or a hypothesis admitted does not alter this status.
+
+## AG6. Complete replacement of the lattice-sum step
+
+The detailed proof is in actual_gram_appendix.tex. It uses the following facts only.
+
+For nonzero \(z\in\mathfrak a\), \((z)\mathfrak a^{-1}\) is an integral ideal, so \(|N_{E/\mathbb Q}z|\ge N\mathfrak a\). With exactly one embedding per conjugate pair this gives \(\prod_\nu|\sigma_\nu z|\ge\sqrt{N\mathfrak a}\). After dividing by the radii \(x_\nu\), distinct points have product distance at least \(\Theta^f\).
+
+A polydisc of radii \(R_\nu\ge1\), product \(P\), contains no nonzero points if \(P<\Theta^f\). Otherwise let \(q=P^{1/f}/\Theta\ge1\). A product of planar grids with common subdivision parameter \(h=\lceil2q\rceil\) has at most \((8q)^{2f}\) cells. Two points in one cell would have product distance at most \(2^{-f/2}\Theta^f\), a contradiction. Hence the count is at most \(64^fP^2/\Theta^{2f}\).
+
+Layer-cake integration at exponent \(3\) gives \(384^f\Theta^{-5f/2}\). Multiplication by \(\Theta^{-(K-3)f}\), valid pointwise because the product of the truncated coordinate magnitudes is at least \(\Theta^f\), proves the claimed exponent \(K-1/2\). All sums and integrals are nonnegative, so Tonelli applies without an unproved absolute-convergence interchange.
+
+The additional \(\Theta^{-2f}\) factor in the packing count is real and is retained by the integral. The improved exponent does not result from forgetting that a complex place has two real coordinates. Independent review by the readable_sources agent checked the ideal norm, field degree, box count, layer-cake exponent, and boundary-bin convention.
+
+The original sufficient estimate appears in OscillatoryIntegralBounds.latSum_of_core. The new proof is explicitly an alternative derivation, not a translation of that theorem's proof and not a claim about existing Lean validation of the stronger statement.
+
+## AG7. Poisson summation, finite extensions, and the recurrence
+
+The spectral profiles apply to an arithmetic lattice or a containing fractional ideal. For a nonnegative continuous diagonal form \(\phi\) with the source's decay, Poisson summation gives
+
+\[
+\operatorname{covol}(\Lambda)\sum_{z\in\Lambda}\phi(t+z)
+\le |\widehat\phi(0)|+\sum_{0\ne\xi\in\Lambda^*}|\widehat\phi(\xi)|.
+\]
+
+The zero mode is the preceding energy. The nonzero-mode sum is controlled by AG6. For off-diagonal pairs, kernel support places the inverse difference in the specified arithmetic lattice. At the final scalar block the kernel support forces \(t=t'\), so that block has no off-diagonal contribution at all. Blocks of size at least two use the separate local block estimate.
+
+The source builds a finite set of auxiliary words containing the initial empty word and closed under the supports required by the bounded iteration. This is not finiteness of all interval-valued words. There are finitely many levels, block sizes, and place patterns, each probability support is finite, and nontrivial extensions increase the total word length. The total permitted length is bounded. BlockEstimateWords.exists_closed and exists_wordset implement this finite branching argument.
+
+On this finite set, take the largest level energy subject to the remaining word-length budget. The positive Gram form splits by its last block, and the triangle inequality for a square root of a positive quadratic form gives
+
+\[
+x_i\le(1+\varepsilon)\sqrt{1+e_i}\,x_{i-1}
++\sum_{s=2}^i a^{s-1}x_{i-s},
+\quad a=(C/\Theta)^f.
+\]
+
+The lattice profiles give \(\varepsilon=(C_0\Theta^{-(K-5/2)})^f\); with \(K=5,\Theta\ge1\) and a suitable fixed \(C\), \(\varepsilon\le a\). The block volumes supply \(a^{2(s-1)}\) at the squared-norm level. This explains the exponents in the recurrence.
+
+The main fragment proves a convenient explicit sufficient bound:
+
+\[
+x_n^2\le [1+(e^6-1)na]\prod_{i=1}^n(1+e_i)x_0^2
+\quad(a\le1/2,\ na\le1).
+\]
+
+If \(x_0=0\), all energies vanish by induction; otherwise the displayed divisions are legal. Since the application assumes the stronger \((r+1)(C/\Theta)^f\le b^{-7}\), the condition \(na\le1\), \(n=r+1\), is available. Increasing the fixed threshold on \(\Theta\) gives \(a\le1/2\).
+
+The smooth-cutoff limit is taken over a finite word set with a common limiting energy, so a maximum commutes with the limit. PSD domination and absolute convergence then pass from finite point sets and finite rows to the required row sum. No factor for the number of rows or the number of words enters. This elementary passage is the reason the main constant remains \(1\).
+
+## AG8. The scalar-pair trace, row kernel, and mass normalization
+
+SpectralWeightsCM identifies
+
+\[
+\gamma_G\sum_{\rm scalar}p_{\rm val}
+=\frac{n_u}{\dim\pi_u}
+\sum_{h,h'}K_{\rm scalar}(h,h')
+\prod_\nu
+\langle V_\nu(h),V_\nu(h')\rangle_{\rm HS}.
+\]
+
+The exact source formula is complex-valued before real parts are taken. The Bessel-value map \(V_\nu\) includes the coordinate/gauge identifications. It must not be replaced by an arbitrary test function with a convenient norm.
+
+ColumnDominationBound produces coefficient rows \(c_\rho(h)\) dominated by an arithmetic PSD kernel, and
+
+\[
+\operatorname{Re}\sum_{h,h'}K_{\rm scalar}(h,h')
+\prod_\nu\langle V_\nu(h),V_\nu(h')\rangle
+\le c_W\sum_\rho\left\|
+\sum_h c_\rho(h)\sqrt{w(h)}\bigotimes_\nu V_\nu(h)
+\right\|^2.
+\]
+
+The constant \(c_W>0\) is fixed by the exact identity
+\(n_0(h)\phi(h)^2=c_W w(h)\). This is where the point weights are tied to the arithmetic kernel. The row inequality is not justified merely by pointwise inequalities of kernel entries; it is a PSD-order statement.
+
+The block argument bounds the right side by
+
+\[
+c_W[1+C(r+1)(C/\Theta)^f]\prod_{i=1}^{r+1}(1+e_i)\,\mathcal J.
+\]
+
+In the application, \(e_i=0\) below the top and \(1+e_{r+1}=D_{\rm sup}\). The local density construction gives \(D_{\rm sup}\le1+e_{\rm loc,0}\).
+
+The mass/formal-degree calculation, separately retained, supplies
+
+\[
+\frac{n_u}{\dim\pi_u}c_W\mathcal J
+\le e^{8q_S}\frac{n_un_v}{D_*},
+\qquad q_S=\sum_{\mathfrak p}(N\mathfrak p)^{-k}.
+\]
+
+The source's ParamsBound exposes the required mass, Jacobian, volume, level, column, index, and local density identities. Its constant_bound_of_massDataBound is the algebraic assembly of those identities. None of these inputs is proved merely by introducing the name Dstar.
+
+After combining \(D_{\rm sup}e^{8q_S}\le1+e_{\rm loc}\), the scalar-pair bound is
+
+\[
+S_{uv}\le
+[1+C(r+1)(C/\Theta)^f](1+e_{\rm loc})F\,X_{uv}.
+\]
+
+The **leading coefficient \(1\)** is a joint consequence of the zero Fourier mode, the probability normalization, the PSD kernel domination, and the mass identities.
+
+## AG9. Quantitative assembly
+
+The source uses \(b=e^L\), \(m=2r_S+2\), \(f\ge m^4\), and \(k\ge C'm^5fL\), with \(C'\ge8C_\Gamma\). Its \(\Gamma\) is \(\exp(C_\Gamma m^5fL)\).
+
+The relevant errors before simplification are:
+
+| Term | Bound |
+|---|---|
+| Generic loop pairs | \(E=\exp(-c_Lkf\log k)\) |
+| Nongeneric squared norm divided by \(X_{uv}\) | \(\exp(-c_Nkf\log k)+2^{-(k-2r_S-5)}\exp(C_Nm^5fL)\) |
+| Generic diagonal scalar sum divided by \(n_u^2/D_*\) | \(\exp(C_Em^5fL)\) |
+| Diagonal zero-determinant squared norm divided by \(n_u\) | \(\exp(-kf\log k)\) |
+| Local density error | \(e_{\rm loc}=C_e\sum_{\mathfrak p}(N\mathfrak p)^{-(k-2r_S-3)}\) |
+| Auxiliary-prime factor | \(F=((1+3/g_0)(1+3/g_1))^f\) |
+| Cut/threshold error | \((r_S+1)(C/\Theta)^f\) |
+
+The loop bound is reduced further in FamilyPacketOfEquivalentStatement.row_bound_of_rows_hypotheses to nondegenerate, degenerate and defect-one row bounds. Those depend on Hermitian lattice counting and Bessel size estimates. The nongeneric estimate splits at defect \(s_0=2\); its defect-one part carries the factor \(2^{-(k-2r_S-5)}\). The diagonal scalar sum is deliberately allowed to be coarse, because dimension balance makes its eventual operator error small.
+
+For sufficiently large parameters, put \(\delta=b^{-7}\). Then \(F\le1+\delta\), \(E\le\delta\), \(e_{\rm loc}\le\delta\), the nongeneric squared error is at most \(\delta^3X_{uv}\), and \((r_S+1)(C/\Theta)^f\le\delta\). The first inequality follows from \(g_i\ge(kb)^8\) and \(f\le k\); the source gives a direct exponential-product proof.
+
+Weighted Cauchy–Schwarz gives
+
+\[
+\|N+G\|^2\le(1+\delta)\|G\|^2+(1+\delta^{-1})\|N\|^2.
+\]
+
+Substitution yields at most
+
+\[
+[(1+\delta)\{F E+(1+C\delta)(1+e_{\rm loc})F\}
++(1+\delta^{-1})\delta^3]X_{uv}.
+\]
+
+For \(0<\delta\le1\), this is at most \([1+(13+8C)\delta]X_{uv}\). To check the constant, replace \(F,E,e_{\rm loc}\) by \(1+\delta,\delta,\delta\). Expansion gives
+
+\[
+1+4\delta+6\delta^2+3\delta^3+
+C\delta+3C\delta^2+3C\delta^3+C\delta^4
+\le1+(13+8C)\delta.
+\]
+
+Taking \(b\ge13+8C\) gives \(1+b^{-6}\), exactly the LinkS mixed error.
+
+On the diagonal choose the Cauchy–Schwarz parameter equal to \(1\), absorb the coarse scalar sum and the nongeneric error into \(\Gamma n_u^2/D_*\), and add the zero-determinant remainder. Dimension balance gives
+
+\[
+e_0=\frac{2C_0}{\Gamma}+2e^{-kf\log k}.
+\]
+
+Thus the actual full diagonal and mixed LinkS errors are \(e_0\) and \(\eta_0=b^{-6}\).
+
+## AG10. Uniformity, dimension count, and ordinary RH
+
+The actual-target comparison is a separate theorem:
+
+\[
+D_{\rm all}\le(1+\eta_1)D_*,
+\qquad \eta_1=e^{-c_7Rf\log R},
+\]
+
+where \(R=D.R.r\) is the total rank. It is **not** \(r_S\), the number of unipotent levels used in the block argument. StandingHypothesesHoldFamily.linkS_concl applies that input after the period estimates. The present contribution does not reconstruct the automorphic count proving it.
+
+For the family's global variable \(x\), \(L=x^\epsilon\), put \(y=x^{\epsilon/8}\). Then \(L=y^8\). Since \(\log\Gamma=C_\Gamma m^5fL\ge C_\Gamma L\), \(k\ge8\log\Gamma\), and \(R\ge k\), the displayed errors eventually satisfy
+
+\[
+\eta_0,\eta_1,\sqrt{e_0}\le e^{-y}.
+\]
+
+All constants are selected before the eventual threshold. The threshold is uniform in the auxiliary family index and in both words, because the standing inequalities and the local theorem are uniform. The source's linkS_of_standing_hypotheses states that order of quantifiers. If the rank-balance proviso Win fails, LinkS_at is an implication with false antecedent; this is a vacuous branch rather than an estimate outside the proviso.
+
+For ordinary RH, the earlier analytic endpoint simplifies substantially because only the zeta function and its functional equation are required. This does **not** automatically simplify the present archimedean construction. The auxiliary CM field, large degree \(f\), large unitary ranks, many words, and the mixed estimate remain part of this source route even when the original arithmetic character is trivial. Setting \(f=1\), using a single word, or setting \(r_S=0\) would discard standing hypotheses and the frame redundancy. No such specialization has been justified here.
+
+The next useful human-proof targets are therefore concrete:
+
+1. Prove the compact-support local word/positivity theorem furnishing AG.6 and its block analogues, with the exact cut-width and gap constants.
+2. Reconstruct the arithmetic PSD kernel and mass/formal-degree identities in AG8.
+3. Translate the loop, defect-one nongeneric, and diagonal zero-determinant bounds, retaining their uniformity.
+4. Reconstruct the independent automorphic dimension count.
+
+The completed lattice lemma, recurrence, and numerical assembly can be reused unchanged when those inputs are supplied.

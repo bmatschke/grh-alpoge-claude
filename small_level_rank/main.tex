@@ -1,0 +1,539 @@
+\section{Small-level projection and identification of the base theta map}
+\label{sec:small-level-rank}
+
+\status{SLR1--SLR9 reconstruct the original level projection and the finite
+rank argument.  The projection is onto on every supplied
+\texttt{Bundle}, with an explicit right inverse and no additional size
+threshold.  For the original selected row family, the remaining sufficient
+input is its base row realization together with its theta comparison at
+its base tuple.  From these inputs we prove the literal
+\texttt{SmallLevelRankEq} conclusion, including the quantifiers of
+\texttt{Closed}.  We do not claim to have constructed those actual row
+and theta inputs.  This replaces the former opaque projection question
+by an explicit, narrower producer boundary.}
+
+The target is an equality of complex dimensions for the original record:
+\[
+ \exists x_0\in\mathbb R\ \forall x\ge x_0\ \forall i\in\mathcal F.I_x\
+ \ \forall j\in\{1,\ldots,(\mathcal F.D_{x,i}).R.m\},\qquad
+       dZ_0(j)=D_0.                                      \tag{SLR.1}
+\]
+Here $dZ_0(j)=\dim_{\mathbb C}Z_j(\mu_0)$ and
+$Z_j(\mu)=\operatorname{im}\theta_{\mu,j}^{*}$, with
+$\theta_{\mu,j}:M_t(\mu,j)\to M_j$ the actual map stored in
+$D.\texttt{what}_2$.  The superscript $*$ in this expression means
+Hilbert-space adjoint.  Matrix conjugate transpose will also be denoted
+by $*$; their roles will always be specified.  The separate source
+symbol \texttt{lZ0} denotes a coefficient matrix, not the complex
+space $Z_j$.
+
+All source references below use the pinned revision.  The accompanying
+\texttt{provenance.json} gives exact paths, ranges and hashes.  The principal target references are S01--S03, S27
+and S37--S38.  Existing CR, CS and TD arguments remain conditional on
+their stated actual data; an abstract rank equality does not supply
+that data.
+
+\subsection{The coefficient projection has an explicit right inverse}
+
+% BEGIN SLR1
+\paragraph{SLR1: the actual level and good spaces are nested.}
+\label{claim:SLR1}
+Let $K$ be the coefficient number field, let $\sigma:K\hookrightarrow
+\mathbb C$ be its selected embedding, and assume the coefficient
+involution satisfies $\sigma(\bar a)=\overline{\sigma(a)}$.  Let a
+finite group $G$ act on a finite-dimensional $K$-space.  For a subgroup
+$P$ and a character $\psi:P\to K^{\times}$, set
+\[
+ e=\frac1{|P|}\sum_{h\in P}\psi(h^{-1})[h],\qquad
+ C=\sum_{\chi\in X}\frac{\chi(1)}{|G|}
+                  \sum_{g\in G}\chi(g^{-1})[g],
+ \qquad a=Ce.                                           \tag{SLR.2}
+\]
+The finite set $X$ consists of characters of absolutely irreducible
+representations, as in the source's \texttt{IsAbsIrrChar}.  Each such
+character is constant on conjugacy classes: over the algebraic closure
+it is a matrix trace, and conjugation replaces its representing matrix
+by a similar matrix.  Injectivity of $K\to\overline K$ brings this
+equality back to $K$.  Therefore $C$ is central in $K[G]$.
+
+For $u\in P$, the coefficient of $[u]$ in $e^2$ is
+\[
+ \frac1{|P|^2}\sum_{h\in P}
+          \psi(h^{-1})\psi((h^{-1}u)^{-1})
+       =\frac1{|P|}\psi(u^{-1});
+\]
+there are no coefficients outside $P$.  Thus $e^2=e$, and centrality
+gives $e(Ce)=Ce$.  Applying the group action shows
+\[
+           \operatorname{im}\rho(a)\subseteq
+                         \operatorname{im}\rho(e).       \tag{SLR.3}
+\]
+This argument uses neither character orthogonality nor any equality of
+integral lattices.  It also works when either space is zero.
+\emph{Source: S04, S05, S07.}
+% END SLR1
+
+% BEGIN SLR2
+\paragraph{SLR2: the matrices defining \texttt{lPrj} are onto.}
+\label{claim:SLR2}
+Use the original coefficient basis of the finite form space, of
+dimension $n$, and let $H$ be its Hermitian matrix.  At $\sigma$ it is
+positive definite.  Let $L\in M_{n,\ell}(K)$ have as columns the source's
+chosen basis of $\operatorname{im}\rho(e)$, and let
+$V\in M_{n,v}(K)$ have as columns its chosen basis of
+$\operatorname{im}\rho(a)$.  For the original subspace $Z$ of forms,
+let $U\in M_{v,d}(K)$ be the chosen basis matrix of the inverse image
+of $Z$ under $V$.  These three matrices have full column rank by their
+definitions as subspace basis matrices.  Define
+\[
+ \begin{aligned}
+ L^+&=(L^*HL)^{-1}L^*H,&
+ V^+&=(V^*HV)^{-1}V^*H,\\
+ H_V&=|P|^{-1}V^*HV,&
+ Q&=(U^*H_VU)^{-1}U^*H_V,\\
+ E&=L^+VU,& \Pi&=QV^+L.
+ \end{aligned}                                             \tag{SLR.4}
+\]
+These are precisely \texttt{lvlPr}, \texttt{vPr}, \texttt{HV},
+\texttt{Pq}, \texttt{lE} and \texttt{lPr} of the source.
+
+For clarity, all inverses in (SLR.4) exist over $K$.  If a matrix $A$
+has full column rank, some maximal minor is nonzero in $K$, hence also
+at $\sigma$.  Thus $\sigma(A)$ is injective.  Positivity of $\sigma(H)$
+makes $\sigma(A)^*\sigma(H)\sigma(A)$ positive definite, hence
+nonsingular.  Its determinant is the image of
+$\det(A^*HA)$, so this determinant is nonzero in $K$.  The same argument
+applies to $H_V$, since $|P|^{-1}>0$ at $\sigma$.  The empty matrix
+case has determinant $1$ and causes no exception.
+
+Multiplying out gives $L^+L=1$, $V^+V=1$ and $QU=1$.
+By (SLR.3), every column of $V$ lies in the image of $L$;
+consequently $LL^+V=V$.  Therefore
+\[
+             LE=VU,\qquad
+             \Pi E=QV^+LL^+VU=QV^+VU=QU=1.              \tag{SLR.5}
+\]
+The map $y\mapsto Ey$ is an explicit right inverse to $x\mapsto\Pi x$.
+This proves surjectivity, not just equality of source and target ranks.
+
+There is also an exact orthogonal projection identity.  Put
+$H_L=|P|^{-1}L^*HL$.  From $LE=VU$ we get
+\[
+ E^*H_LE=U^*H_VU,
+ \qquad
+ E^*H_L=|P|^{-1}U^*V^*HL.
+\]
+After cancelling the nonzero factor $|P|^{-1}$ in (SLR.4), this yields
+\[
+             \Pi=(E^*H_LE)^{-1}E^*H_L.                  \tag{SLR.6}
+\]
+In particular $E^*H_L(x-E\Pi x)=0$ for every $x$.  Thus $E\Pi$ is
+projection onto the columns of $E$ along their $H_L$-orthogonal
+complement.  This verifies the normalization by $|P|$ as well as the
+right inverse.
+\emph{Source: S04--S08.}
+% END SLR2
+
+% BEGIN SLR3
+\paragraph{SLR3: the precise lattice consequence and its limit.}
+\label{claim:SLR3}
+For an $\mathcal O_K$-submodule $N\subset K^n$, write
+$\operatorname{cut}_A(N)=\{u:Au\in N\}$.  Let $N$ be the actual
+full coefficient lattice of forms, and let $N'\subseteq N$ be the
+source's smaller lattice.  With (SLR.4), the source's level and lift
+lattices are
+\[
+ N_L=\operatorname{cut}_L(N),\qquad
+ T=\Pi N_L,\qquad
+ N_Z=\operatorname{cut}_{VU}(N),\qquad
+ N'_Z=\operatorname{cut}_{VU}(N').                       \tag{SLR.7}
+\]
+The exact identity $LE=VU$ gives
+$\operatorname{cut}_E(N_L)=N_Z$.  If $z\in N_Z$, then $Ez\in N_L$
+and $\Pi Ez=z$.  Hence
+\[
+                         N'_Z\subseteq N_Z\subseteq T.   \tag{SLR.8}
+\]
+
+Here $N_L$, $N_Z$, $N'_Z$ (when $N'$ is full), and $T$ are full
+lattices in their respective coefficient spaces.  One elementary
+verification is as follows.  If $A:K^d\hookrightarrow K^n$ is
+injective, choose a $K$-linear left inverse $B$.  Then
+$\operatorname{cut}_A(N)\subseteq B(N)$; the latter is finitely
+generated over $\mathcal O_K$, and its submodule is finitely generated
+because $\mathcal O_K$ is Noetherian.  A common nonzero denominator
+sends each vector $Ae_r$ into $N$, so the cut contains a nonzero scalar
+multiple of every coordinate vector.  It spans $K^d$.
+Images of finite generating sets generate $\Pi N_L$, and
+$K(\Pi N_L)=\Pi(KN_L)=K^d$ by (SLR.5).  These observations prove the
+assertions.
+
+The surjectivity in SLR2 is over $K$.  We have not proved that $E$
+preserves any independently specified integral lattice, or that
+$N_Z=T$.  The map $N_L\to T$ is onto because $T$ is its image by
+definition.  No stronger integral assertion enters (SLR.1).
+\emph{Source: S05, S08.}
+% END SLR3
+
+\subsection{The finite type decomposition and the base dimension}
+
+% BEGIN SLR4
+\paragraph{SLR4: the actual types give the needed direct sums.}
+\label{claim:SLR4}
+We give the finite-dimensional argument because the source's type
+spaces are sums of joint \emph{generalized} eigenspaces.  No
+semisimplicity assumption is necessary.
+
+Let $T_\alpha$ be a commuting family of endomorphisms of a finite
+$K$-space $F$, each split over $K$.  Their generated unital algebra
+is a finite-dimensional subspace of $\operatorname{End}_K(F)$.
+Choose a basis of that algebra made from finitely many products of
+operators; the finitely many operators occurring in those products
+already generate the entire algebra.  For one such operator, its
+minimal polynomial is a product of coprime powers $(X-a)^r$.
+Bezout's identity, applied to these factors, supplies polynomial
+idempotents that sum to $1$ and project onto their kernels.  All the
+other operators preserve those kernels because they commute.  Applying
+this construction successively to the finite generating family gives
+\[
+          F=\bigoplus_{\lambda\in\Lambda}F_\lambda,
+          \qquad |\Lambda|<\infty,                      \tag{SLR.9}
+\]
+with polynomial projections $p_\lambda$ in the operators.
+On a resulting block each generator is its scalar eigenvalue plus a
+nilpotent operator.  The nilpotent parts commute; their generated ideal
+is nilpotent, since a sufficiently long monomial contains a power at
+least the nilpotence exponent of one generator.  It follows that every
+operator of the original family has a single generalized eigenvalue
+on that block.  Blocks with distinct scalar data are disjoint.  Thus
+(SLR.9) is precisely the decomposition by the source's intersections
+of maximal generalized eigenspaces.  If $F=0$, it is the empty direct
+sum.
+
+Every subspace stable under the operators is stable under the
+$p_\lambda$.  If the operators commute with the $G$-action, these
+projections also commute with $\rho(Ce)$.  Consequently
+$Z\cap\operatorname{im}\rho(Ce)$ is the direct sum of its
+intersections with $F_\lambda$, whenever $Z$ is stable.
+Pulling back under the injective coefficient map $VU$ preserves this
+direct-sum decomposition.
+
+We now check the source's labels.  A type $p$ consists of residual
+polynomials $p_1(P_0)$ and inert eigenvalues $p_2(I_0,y)$.  A joint
+system $\lambda$ has that type if, at each actual Hecke place $P$,
+\[
+ H_P(\lambda;X)=p_1(\operatorname{pl}P;X)B_P(X),\qquad
+ B_P(X)=\prod_{\nu\in\texttt{bl}}\prod_{c=0}^{t-1}
+                      (1-\nu(P)q_P^cX),                 \tag{SLR.10}
+\]
+and its inert eigenvalues are the specified $p_2$ values.
+The polynomial $B_P$ has constant term $1$, so it is nonzero.
+Hence the residual polynomial, when it exists, is unique by cancellation
+in $K[X]$.  The labels are normalized to $1$ at unused Hecke places
+and to $0$ at unused inert places.  The place maps are injective, so
+these assignments are well defined.  Two distinct normalized labels
+therefore differ at an actual place, and cannot label the same
+$\lambda$.  Since there are only finitely many occurring $\lambda$,
+there are only finitely many occurring labels.  Thus the finite type
+set \texttt{ixFin3} really is that set; its conditional definition does
+not select its fallback empty set here.
+
+At the base tuple, $Z$ is contained in the prescribed block sum by
+\texttt{Zs.InBlock}.  Each nonzero primary component in
+$Z\cap\operatorname{im}\rho(Ce)$ therefore satisfies the divisibility
+in (SLR.10), and gives an occurring normalized type.  It also belongs
+to the full good space used to define \texttt{ixFin3}: the image of
+$\rho(Ce)$ is contained in the image of $\rho(C)$, and every
+$p_\lambda$ preserves both images.  The nonzero component witnesses
+that its type occurs there.  The preceding projections consequently
+give
+\[
+        K^{dQ(t_0)}=\bigoplus_{p\in I}Q_p(t_0).           \tag{SLR.11}
+\]
+For the lift spaces, distinct transformed labels are different at an
+actual lift place by \texttt{TypesSep3}.  The same cancellation and
+primary-space argument prove independence of their inverse-image
+spaces $Z_{k,p}(t_0)$.  Their spanning is exactly the \texttt{types}
+field of the supplied base \texttt{IndefRows} record.  Thus
+\[
+        K^{dZ(k,t_0)}=\bigoplus_{p\in I}Z_{k,p}(t_0).      \tag{SLR.12}
+\]
+All hypotheses just used are fields of \texttt{RowsHold0\_3}: stable
+and block-contained subspaces, some \texttt{fam3.Ok3 s}, the common
+base \texttt{IndefRows}, and type separation.  We have proved the
+three pieces of \texttt{WF} needed for dimension transport; its metric
+and lattice clauses need not be imported into this argument.
+\emph{Source: S09--S14.}
+% END SLR4
+
+% BEGIN SLR5
+\paragraph{SLR5: the rational lift rank equals the original $D_0$.}
+\label{claim:SLR5}
+Fix the original selected row family $P$, and a base row witness
+$R_0$ with $R_0.\texttt{toIndefData}=P.S_0$ as in
+\texttt{RowsHold0\_3}.  Write $D_r=P.S_0.D$ and
+$d_k=P.S_0.\texttt{dW}(k)$.  The \texttt{l1c} field gives bijections
+\[
+ \iota_0:K^{dQ(t_0)}\longrightarrow K^{D_r},\qquad
+ \vartheta_{k,0}:K^{dZ(k,t_0)}\longrightarrow K^{d_k}.
+                                                               \tag{SLR.13}
+\]
+The \texttt{l1a} field says these maps carry the summands in
+(SLR.11)--(SLR.12) onto $E_p$ and $W_{k,p}$, respectively.
+Therefore these latter spaces are direct sums of their indicated
+summands.  The \texttt{l1d} field says
+$\dim_KW_{k,p}=\dim_KE_p$ for every $p$.  Taking a basis of each
+summand and concatenating these bases proves
+\[
+ d_k=\sum_{p\in I}\dim_KW_{k,p}
+       =\sum_{p\in I}\dim_KE_p=D_r.                     \tag{SLR.14}
+\]
+There is no exchange of an infinite sum or choice of unrelated type
+sets in this equality.
+
+The equality $D_r=D_0$ follows directly from data already in the
+original \texttt{RowSideFamily}.  Its $P.I.\texttt{eRR0}$ is an
+isomorphism
+\[
+                 K^{D_r}\simeq_K (\texttt{ex.p0.s.RR}).V.
+\]
+The latter rational space has a specified basis $b_a$, indexed by the
+finite set $A_0$.  The field \texttt{ex.p0.s.jEE\_basis} states that
+the images $j_{EE}(b_a)$ form a complex basis of the original
+$EE_0$.  Finally, \texttt{onb0} is a complex orthonormal basis of
+that same $EE_0$, indexed by $\{1,\ldots,D_0\}$.  Counting these
+bases gives
+\[
+          D_r=\dim_K(\texttt{ex.p0.s.RR}).V
+              =|A_0|=\dim_{\mathbb C}EE_0=D_0.           \tag{SLR.15}
+\]
+This uses no isometry between newly chosen spaces.  In particular the
+separate \texttt{RowsHoldLam3} predicate is unnecessary for this
+numerical comparison.
+
+The \texttt{li} and \texttt{span} fields of
+$P.\texttt{tied.div.th}$ assert that the vectors
+$j_{W,k}(e_r)$ form a complex basis of the original $M_{k+1}$,
+where $r=1,\ldots,d_k$.  Thus (SLR.14)--(SLR.15) imply
+\[
+                      \dim_{\mathbb C}M_{k+1}=D_0.       \tag{SLR.16}
+\]
+\emph{Source: S13--S19.}
+% END SLR5
+
+\subsection{The exact theta comparison needed for the rank conclusion}
+
+% BEGIN SLR6
+\paragraph{SLR6: a base-tuple square makes the actual theta map onto.}
+\label{claim:SLR6}
+For this paragraph the additional input is the following equality on
+the same selected $P$, at its single base tuple $t_0=P.A_3.A.\mu_0$:
+\[
+ \theta_{P.I.\mathrm{tup}(t_0),\,k+1}
+       \bigl(j_{Mt}(e_{Mt,k,t_0}(x))\bigr)
+     =j_{W,k}\bigl(\vartheta_{k,0}(\Pi_{k,t_0}x)\bigr)
+       \quad\text{for every }k,x.                       \tag{SLR.17}
+\]
+Here $\Pi_{k,t_0}$ is the original \texttt{lPrj} matrix,
+$e_{Mt,k,t_0}=P.I.\texttt{eMt}(k,t_0)$, and the maps $j_{Mt}$ and
+$j_{W,k}$ are the actual embeddings in the original record.  Equation
+(SLR.17) is the base-tuple restriction of \texttt{thTheta}, not a
+consequence of the basis assertions \texttt{li/span} alone.
+
+For each coordinate vector $e_r\in K^{d_k}$ choose its unique
+preimage $z_r=\vartheta_{k,0}^{-1}e_r$ under (SLR.13), and put
+$x_r=E_{k,t_0}z_r$.  By SLR2,
+$\Pi_{k,t_0}x_r=z_r$.  Substitution in (SLR.17) shows that the range
+of the actual theta map contains every $j_{W,k}(e_r)$.  These vectors
+are a complex basis by SLR5; its range is a complex subspace, so the
+map is onto.  In fact (SLR.17) only needs to be checked at this finite
+list of $x_r$ for each $k$.  We retain its all-$x$ base-tuple version
+as a convenient sufficient contract.
+
+For completeness, if a linear map $A:V\to W$ between finite
+complex inner-product spaces is onto and $A^*w=0$, choose $v$ with
+$Av=w$.  The adjoint identity gives
+$\langle w,w\rangle=\langle Av,w\rangle
+=\langle v,A^*w\rangle=0$, hence $w=0$.
+Thus $A^*:W\to V$ is injective and its image has dimension
+$\dim_{\mathbb C}W$.  Apply this to the actual theta map and use
+(SLR.16).  Since $P.\texttt{tied.div.tup.mu0}$ identifies
+$P.I.\mathrm{tup}(t_0)$ with the original $\mu_0$, we obtain
+\[
+       \dim_{\mathbb C}Z_{k+1}(\mu_0)=D_0.               \tag{SLR.18}
+\]
+If there are no lifts, the requested family of equalities is empty.
+Otherwise every $1\le j\le m$ is uniquely $k+1$ with
+$k=j-1\in\{0,\ldots,m-1\}$, so (SLR.18) covers exactly the source's
+\texttt{SizeData}\textsubscript{2}\texttt{.lifts}.
+\emph{Source: S01--S03, S17--S22.}
+% END SLR6
+
+% BEGIN SLR7
+\paragraph{SLR7: what is still required to identify the actual square.}
+\label{claim:SLR7}
+The source separates \texttt{DivDef3}, already inside $P.\texttt{tied}$,
+from \texttt{DivRows3}.  Its \texttt{ThDef3} contains linear
+independence, complex spanning and a lattice tie; it contains no
+assertion (SLR.17).  The latter is a field of \texttt{DivRows3}, and
+its used-tuple version is a field of \texttt{DivRows3G}.  Since
+\[
+ \texttt{Used0}(D,\mu)\ \Longleftrightarrow\
+       \mu=\mu_0\ \text{or}\ \mu=\texttt{muAt}(w)\text{ for some }w,
+                                                               \tag{SLR.19}
+\]
+the base tuple is used by its first alternative.  Therefore a supplied
+\texttt{DivRows3G} for this $P$ proves (SLR.17) directly.  There is no
+need to prove \texttt{TupAllUsed}, or to upgrade every other tuple to
+\texttt{DivRows3}, for the argument above.
+
+A more detailed reading of the actual theta proof reveals a narrower
+analytic boundary.  At an actual realization let $\Theta$ be its
+analytic theta map on level forms and let $\epsilon_W:M_{k+1}\to H_W$
+be the stored injective reading into the analytic model.  Write
+$J(x)$ for the actual level form represented by the rational
+coordinates $x$, and $g(y)$ for the actual good form with coordinates
+$y$.  The needed comparisons are
+\[
+ \begin{split}
+ \epsilon_W\theta\bigl(j_{Mt}(e_{Mt}x)\bigr)&=\Theta J(x),\\
+ \epsilon_W j_W(y)&=g(y),\\
+ \Theta J(Ey)&=g(\vartheta y),\\
+ E^*H_Lx=0&\Longrightarrow\Theta J(x)=0.
+ \end{split}                                             \tag{SLR.20}
+\]
+These formulas use the same realization, coefficient embedding and
+level character as the matrices.  The source's phase is $1$ by its
+\texttt{Pins.phs} condition; its possible conjugate scalar model is
+transported back before the equalities in (SLR.20) are compared.
+
+Once (SLR.20) is available the remaining implication is elementary.
+By (SLR.6), $x-E\Pi x$ is orthogonal to every column of $E$, so the
+last line of (SLR.20), together with additivity, gives
+$\Theta J(x)=\Theta J(E\Pi x)=g(\vartheta\Pi x)$.
+The first two lines and injectivity of $\epsilon_W$ then give
+(SLR.17).  This proves the projection-factorization step completely.
+
+We do not label all of (SLR.20) elementary.  In the pinned proof the
+first line is the Hilbert-model/lowest-$K$-type reading, whose proof
+uses restriction to lowest $K$-types and uniqueness there.  The last
+line uses the actual rational adjoint-image and level compatibility.
+The third line uses the actual rational theta matrix.  TD proves useful
+finite and rational consequences from explicit analytic inputs, but
+does not by itself supply all these identifications on the selected
+record.  This is a precise remaining human reconstruction obligation.
+The proof of \texttt{thTheta} is obtained before the extra pairing
+and column fields of full \texttt{DivRows3}; those extra fields are
+not hypotheses of the rank implication established here.
+\emph{Source: S19--S23, S30--S34.}
+% END SLR7
+
+\subsection{Specialization to the selected family and closure}
+
+% BEGIN SLR8
+\paragraph{SLR8: the projection certificate is pointwise on the literal bundle.}
+\label{claim:SLR8}
+Let $b$ be the original \texttt{Bundle} at $(D,O,c)$ and put $P=b.P$.
+Its column-compatibility field $b.C.\texttt{ok1}$ includes
+$P.A_3.\texttt{fam3.Ok3}(1)$.  Consequently the lift block at any
+$k,t$ has: the stated coefficient involution at its selected embedding,
+the irreducible character data of SLR1, and the positive Hermitian
+matrix used in SLR2.  The exact lift level is
+\[
+ \begin{aligned}
+ B&=P.A_3.A.\mathrm{fam}.L(k,t),\\
+ \ell&=P.A_3.A.\mathrm{fam}.\mathrm{lvlA}(P.P_0,P.\psi_0)
+          =(X,P.P_0,P.\psi_0^{-1}),\\
+ Z&=P.Z_s.Z_l(k,t).
+ \end{aligned}                                           \tag{SLR.21}
+\]
+By definition \texttt{lZ0}$=E$ and \texttt{lPrj}$=\Pi$ for these
+objects.  Notice the inverse character on the lift level; replacing
+it by the base-level character would change the objects.
+SLR2 proves the actual projection surjective, in particular at $t_0$.
+The appearance of \texttt{FormsTie} in one source wrapper is not an
+extra need for this proof: that wrapper uses only the family
+\texttt{Ok} data in its proof body.
+
+A raw bundle selector $\sigma$ gives
+$\operatorname{selP}(\mathcal F,h_c,x,h_x,h,i).1
+=(\sigma\mathcal F h_c x h_x i).P$ and likewise obtains the columns
+and realization from the corresponding $C$ and $B$ fields of this
+same bundle.  Its selection threshold is $\mathcal F.x_1$.
+Thus all occurrences of $P$, $\Pi$, $E$, $j_W$, and $e_{Mt}$ above
+refer to the same literal selection.  The realization used by
+\texttt{selIOf} is $(\sigma\mathcal F h_c x h_x i).B.Q$.
+There is no second existential choice to reconcile.
+
+For the original \texttt{H\_zL} predicate choose its additional
+threshold $x_r=0$.  Choose $\varepsilon_1=1$ and all four components
+of its \texttt{Closed} bound $K$ equal to zero.  For every allowed
+$\varepsilon,\mathcal F,CH$ the pointwise argument just given proves
+the required surjectivity; the largeness premise is unused.  This is
+the exact closure of the projection obligation.  No period
+admissibility input or new uniform arithmetic bound is required.
+\emph{Source: S06, S07, S24--S29, S35--S36.}
+% END SLR8
+
+% BEGIN SLR9
+\paragraph{SLR9: a narrower sufficient producer cut closes the original rank predicate.}
+\label{claim:SLR9}
+Fix a class $\mathcal A$ and the original compatible selectors.  It
+suffices that, for each allowed family $\mathcal F\in\mathcal A$,
+there is a real number $a_{\mathcal F}$ such that every selected
+$P$ at $x\ge a_{\mathcal F}$ with $x>\mathcal F.x_1$ has both:
+\begin{enumerate}
+\item \texttt{RowsHold0\_3} for this $P$;
+\item the base-tuple equality (SLR.17) for this same $P$.
+\end{enumerate}
+Here $a_{\mathcal F}$ is also taken at least the selector threshold;
+if the two inputs initially have different eventual thresholds,
+replace them by their maximum.  This is one common-family contract,
+not two assertions that possibly use different row realizations.
+The source obtains these inputs from the stronger hypotheses
+\texttt{PrimAll} and pointwise \texttt{DivRows3G}, with their original
+common selector.  SLR7 proves the restriction of the latter to the
+base tuple.  On the row side, the primitive-row construction that turns
+\texttt{PrimAll} into an \texttt{IndefRows} witness remains part of
+the producer boundary here.  Once that witness has been supplied, its
+transport uses the realization's actual equalities of $Z_s$ and $S_0$:
+substitute the first equality in the type of the witness, then the
+second in its underlying data.  The resulting witness has exactly
+$P.S_0$ as underlying data.  No isomorphism of unrelated abstract row
+spaces is substituted for these equalities.
+
+Choose
+\[
+              x_0=\max\{a_{\mathcal F},\mathcal F.x_1+1\}.
+                                                               \tag{SLR.22}
+\]
+If $x\ge x_0$, the strict condition $x>\mathcal F.x_1$ holds.
+Every index $i\in\mathcal F.I_x$ has the same compatible objects
+as in SLR8, the two producer inputs hold, and SLR4--SLR6 give
+(SLR.18) for every $j\in\{1,\ldots,m\}$.  This proves (SLR.1) for
+the original family, with one threshold for all $i,j$.
+
+It also proves the source's
+$\texttt{Closed}(D3\ 3\ \mathcal A)\,
+(\mathcal F,CH\mapsto\texttt{SmallLevelRankEq}\,\mathcal F)$.
+Indeed, choose $\varepsilon_1=1$ and the zero bound $K$ before
+$\mathcal F,CH$ are supplied.  Membership in $D3\ 3\ \mathcal A$
+forgets to membership in $\mathcal A$; apply the preceding argument.
+The only family-dependent threshold is $x_0$ inside the existential
+quantifier of \texttt{SmallLevelRankEq}, exactly where the definition
+permits it.  No threshold is moved in front of a family quantifier.
+
+\emph{Audit consequence.}  The logical implication from this common
+producer cut to the original \texttt{GLOBAL\_SMALL\_RANK} target is
+now completely reconstructed.  Its projection premise is discharged
+by SLR1--SLR3 and SLR8, and its finite rank and threshold arguments by
+SLR4--SLR6 and this paragraph.  The actual base row and theta producer
+remains open in the human reconstruction.  Its arithmetic and analytic
+construction is shared with the actual row/period program; such a
+shared work relationship is not itself a logical proof of either
+input.  The construction of the bundle/family also remains an input.
+In particular, this chapter supplies the rank input to
+\texttt{topDesWin} conditionally on the displayed actual producer;
+it does not close every other input of that theorem.
+\emph{Source: S01, S15, S20--S29, S35--S39.}
+% END SLR9

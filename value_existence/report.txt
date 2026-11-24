@@ -1,0 +1,417 @@
+COMPARISON VALUES OVER THE COEFFICIENT FIELD — VE1–VE11
+Version 0.14; 21 November 2026
+
+Purpose and current status
+==========================
+This component reconstructs the value-existence portion of the actual
+global/local comparison. Version 0.13 proved exact integral span conditional
+on supplied ValEx. We now prove ValEx from the supplied global form, common
+frame, level and coefficient-character data. This is a mathematical
+construction of the rational polynomials and their independence of all
+representatives. It is not an unconditional construction of the global
+forms or the geometric true-column input.
+FC19 supplies the necessary Forms0/level joins from the actual true-column
+record; DR1–DR3 supply its initial decorated-point realization. VE11 therefore
+constructs the concrete integral comparison from the supplied arithmetic
+host and TC.Ok/Pins/Laws/Later without an extra realizability hypothesis.
+
+Source: CocoSgt/riemann-hypothesis-lean, commit
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+Every original declaration and inclusive range is in provenance.json and
+source_locators.txt. The builder checks original bytes against pinned Git
+blobs. No Lean build or kernel replay is claimed.
+
+Notation and exact interfaces
+=============================
+E/F is the CM extension and sigma is its involution. The coefficient field
+L has a fixed embedding j into C and embeddings t_tau:E->L such that
+j*t_tau is the original complex embedding. The coefficient DVR O lies in K,
+and e:L->K is the specified local coefficient embedding. The frame B is
+the same global matrix used in SF, with B* J B=I. The LI position map is
+retained, including the involution at odd Frobenius positions.
+
+The source's Frames(G) is a tuple of invertible complex matrices. Although
+G is a Gram-matrix label, this type does not impose orthonormality or an
+equation involving G. This point is important for the elementary polynomial
+evaluation-injectivity proof below.
+
+A supplied Forms0 datum gives the coefficient-field vector space V, its
+integer lattice, its complex value functions f_(x,c), its rational value
+description and its adelic function-space realization. We use these literal
+fields; the new CV/FC components reconstruct significant parts of their
+actual suppliers. It is not legitimate to infer such a Forms0 datum from
+a numerical dimension equality alone.
+
+For an away component i and a full local lattice tuple L_tuple, IsVal(x,i,
+L_tuple,Q) means (i) Q lies in the source polynomial tensor space VtupR over
+L; and (ii) for every tuple of bases g of L_tuple and every presentation
+a=gamma*y_c*kappa having the specified local/away components, its complex
+evaluation is chi(kappa) f_(x,c)(z') whenever z=gamma_infinity*z'. ValEx is
+existence of such a Q for each full tuple. ValUniq is uniqueness. On tuples
+which are not full lattices the actual comparison is extended by zero.
+
+VE1. Rationality of one block, with all signs
+==========================================
+Take k=m_loc+1 and a decreasing integral weight lambda. Set e=lambda_k,
+lambda*=(-lambda_k,...,-lambda_1), e*=-lambda_1, and epsilon=det R_k, where
+R_k reverses columns. Let T(Y)=Y^(-transpose) R_k. Then T(T(Y))=Y and
+det T(Y)=epsilon/det Y.
+
+The independent integral duality CS2, proved by complementary minors and
+divided-power row operators, gives for every f in Delta_nu(lambda)(Z) a
+polynomial f* in Delta_nu(lambda*)(Z) with
+
+  f*(X)=epsilon^(lambda_k) det(X)^(lambda_1-lambda_k) f(T(X))
+
+on invertible matrices. This expression is polynomial on the stated Weyl
+space: for the highest polynomial the minor denominators cancel, and each
+divided-power word transports by the signed transposed row operators.
+Applying the two duality maps gives the identity, since the epsilon powers
+cancel. Substituting T(Y) into the displayed formula gives
+
+  det(Y)^e f(Y)=det(T(Y))^e* f*(T(Y)).                 (1)
+
+Let M0 be any invertible matrix over L and M=j(M0). There is no integrality
+requirement on M0 or det M0. The actual coordinates are Z=MY at an even
+position and Z=T(MY) at an odd position. Define
+
+  F_even(X)=det(M0)^(-e) f(M0^(-1) X),
+  F_odd(X)=det(M0)^e* f*(M0^transpose X).              (2)
+
+Both have coefficients in L. At an even position, substitution immediately
+cancels det(M)^e. At an odd position,
+
+  T(MY)=M^(-transpose) T(Y),  M^transpose Z=T(Y),
+
+so det Z^e* times F_odd(Z) equals the right side of (1). These are exactly
+the block evaluation identities required by BlockRational.
+
+Membership in the required block space is also proved, not just an equality
+of evaluations. The highest minor product has the prescribed column degrees
+and is invariant under adding an earlier column to a later column. Row
+operators commute with these column operations, and extracting their formal
+parameter coefficients preserves both properties. Thus every integral Weyl
+generator lies in the dual-Weyl coefficient space. A row substitution by an
+arbitrary matrix again commutes with column operations and preserves column
+degrees. Hence (2) belongs to the appropriate dual-Weyl space after extension
+to L. This argument uses Delta subset nabla, not equality over the integers.
+
+The weight tie says the position weight is lambda for even s and lambda*
+for odd s. The negative reversal of a decreasing weight is decreasing.
+Thus the conditional definition of blkMod selects precisely the displayed
+spaces, never the zero branch. This proves BlockRationalityField. In the
+actual record, M0=t_tau(B^(-1)), so BlockRationalityAtPlace follows with the
+original coefficient embeddings. No new field extension is introduced.
+
+VE2. Tensor and additive closure give representative rationality
+===============================================================
+By the supplied rational-value description, f_(x,c) is represented by a
+polynomial in the additive subgroup generated by
+
+  j(r) tensor_product_tau f_tau,
+
+where r is in L and each f_tau is in the integral Weyl lattice. Its frame
+value includes the determinant shifts attached to lambda_tau. For one
+generator use (2) independently at every position. Rename each block into
+its own variables, multiply all blocks, and multiply by r. This is an
+explicit VtupR generator times an L scalar. Evaluation is a product, and
+the bijection (v,s)<->tau matches every determinant factor and Weyl block.
+
+Every element of the additive subgroup is a finite sum of these generators
+and their negatives. Add or negate the constructed polynomials. This gives
+a Q_c in VtupR whose frame evaluation is exactly f_(x,c). It proves
+evRat_gen, evRat_of_blocks and evRatRep_rec. The passage is finite algebra;
+there is no completion, density argument or interchange of infinite sums.
+
+VE3. Transport a rational value by a rational unitary and a level element
+========================================================================
+Put H=B^(-1) gamma B. From gamma*J gamma=J and B*J B=I, H*H=I. Hence
+bar(H)=H^(-transpose). At an even position use h=t_tau(H); at an odd one
+use h=t_tau(bar(H)). The latter is exactly the inverse-transpose frame
+change. This is the source blkLL formula, including tPos's sigma factor.
+
+For the tuple h of these matrices, the natural action on polynomials is
+
+  rho(h) Q(X)= product_(v,s) det(h_(v,s))^(-e_(v,s))
+                       * Q((h_(v,s)^(-1) X_(v,s))_(v,s)).
+
+It preserves VtupR because each row substitution preserves the dual-Weyl
+block. To check tensor realization directly, substitution commutes with
+renaming one block into the full variable set, and sends a product to the
+product of the substituted factors. The determinant scalar is the product
+of the individual block scalars. Linearity proves preservation of the span.
+
+If z=gamma_infinity*z', the block coordinates satisfy Z(z)=h Z(z'). For
+even positions this is ordinary multiplication. At odd positions it is
+T(HY)=H^(-transpose)T(Y), exactly as above. Therefore the determinant twists
+and substitutions cancel to give
+
+  ev_C(j rho(h)Q)(z)=ev_C(j Q)(z').                    (3)
+
+The coefficient-character premise LevelZeroCharacterRational lifts each
+level-zero local psi0 value to L. The actual level character is a product
+of their inverses; the possible higher-block chiB products are empty at
+level zero. The image j(L) is a subfield, so all products and inverses lie
+in it. Finite-product support is part of the actual level character
+construction; no unjustified convergence argument is used. Thus every
+kappa in U has a scalar r_kappa in L with j(r_kappa)=chi(kappa).
+
+Given Q_c from VE2, the polynomial
+
+  r_kappa rho(h) Q_c                                  (4)
+
+lies in VtupR and evaluates to chi(kappa) f_(x,c)(z'). This proves EvRatPt.
+It needs coefficient-field rationality, not integrality of r_kappa; the
+integral unit character is supplied separately by LI8 when used by CS.
+
+VE4. Exact adelic point existence, all classes, and away correction
+==================================================================
+Above p the CM algebra is split, with sigma interchanging the factors.
+The nondegenerate Hermitian equation identifies the unitary group with
+GL_k(F_v): the first component is arbitrary and the second is its
+Gram-conjugated inverse transpose. LI proves this for the actual places.
+
+Given a tuple g_v of local matrices, insert the unitary elements whose
+first components are B_v g_v B_v^(-1) at every place above p. Use identity
+at all remaining places. There are only finitely many places above p, so
+this is a legitimate finite adele and its inverse is also integral almost
+everywhere. The unitary equation is checked componentwise. Denote it j_p(g).
+The away representative y_i is normalized to be the identity above p.
+Consequently a=y_i j_p(g) has all the required IsPt components.
+
+The supplied y_c enumerate the unitary double quotient by rational points
+and U. Therefore a=gamma*y_c*kappa for some c, rational unitary gamma,
+and kappa in U. This proves PtEx without requiring rational approximation.
+
+For precision, the further point properties used in the existing comparison
+also follow from the same insertion. If b is any unitary adele, let s(b)
+be the section of its first components above p. Then u=s(b)^(-1)b is
+identity above p: projection to the first factor is injective on the
+split unitary group. Away from p, u=b. If b is in the level away from p,
+then u belongs to U, since its remaining local components are identities.
+
+For PtAll, take an away decomposition y_c=gamma*y_i*b with b in the level
+away from p. Choose g from the first components of b in the common frame.
+Set u=s(b)^(-1)b in U and kappa=u^(-1). Then
+
+  gamma^(-1) y_c kappa=y_i s(b)=y_i j_p(g).
+
+This is the required presentation of every class. For AwayEx, start with
+b=y_i^(-1) gamma y_i for a gamma in the away stabilizer. The same u has
+identity at p and the prescribed conjugate components elsewhere. These
+are the exact PtAll and IsAway formulas in EqOneOfPh/TiePtRec.
+
+VE5. Different bases and presentations differ by character-kernel level
+======================================================================
+Suppose a and a' describe the same away component i and the same full
+lattice tuple, using g and g'. The quotient kappa0=a^(-1)a' is identity
+away from p. In the common frame its first component at v|p is
+g_v^(-1)g'_v. Equality of column spans says that matrix preserves W_v^k,
+and the reverse equality says its inverse does too. Equivalently both
+matrices have integral entries, so it lies in GL_k(W_v).
+
+The actual good-prime condition excludes T and the auxiliary level primes.
+Self-duality and LI's integral splitting identify GL_k(W_v) with the actual
+local level subgroup, as established in CR3 and SF. The equality with the
+forms' local group is supplied by Joint0.Uloc_eq. Thus kappa0 lies in U.
+The character is supported at the bad auxiliary places; p is not below
+any of them. Since kappa0 is identity away from p, the StepLevel chi_triv
+condition gives chi(kappa0)=1. Hence
+
+  a'=a*kappa0,  kappa0 in U,  chi(kappa0)=1.           (5)
+
+This is PtOne. It is stronger than merely saying a and a' have the same
+class, and it is exactly the strength required for representative-independent
+polynomial values. Its proof does not assume stabilizer triviality or divide
+by a stabilizer order; it uses lattice-basis integrality and character support.
+
+VE6. Gluing the values and proving ValEx
+======================================
+The supplied Forms0 rationality field first places f_x in the actual
+complex form space. The field identifying that form space with restricted
+adelic functions supplies F_x with F_x(y_c,z)=f_(x,c)(z) and covariance
+
+  F_x(gamma*y_c*kappa,z)=chi(kappa) f_(x,c)(z')
+  whenever z=gamma_infinity*z'.                       (6)
+
+This is adExt_rec. It unpacks the actual global form realization; it is not
+obtained merely by prescribing arbitrary values on an unrelated class set.
+
+Fix x,i,L_tuple. Choose bases and one presentation by VE4. Construct Q by
+(4). For every z take z'=gamma_infinity^(-1)z; it is again an invertible
+frame. Equation (3) and covariance (6) show ev_C(jQ)(z)=F_x(a,z).
+
+Now take any other bases and presentation a'=gamma'*y_c'*kappa'. VE5 gives
+(5); adelic covariance with rational element 1 gives
+F_x(a',z)=chi(kappa0)F_x(a,z)=F_x(a,z). Applying (6) to a' proves the full
+IsVal identity for the same polynomial Q. All universal quantifiers over
+bases, c', gamma', kappa' and frames are satisfied. This proves valEx_of,
+valEx_of_rep' and ex_C_blk with their exact data.
+
+VE7. Evaluation injectivity, uniqueness, and the semilinear comparison
+=====================================================================
+Given arbitrary invertible block matrices Z, the even coordinate inverse
+is Y=M^(-1)Z. For odd blocks the inverse is Y=M^(-1)(Z R_k)^(-transpose).
+Thus every invertible block tuple occurs as a frame's block coordinates.
+All determinant factors in ev_C are nonzero.
+
+Suppose a complex polynomial Q has zero ev_C. It vanishes at all invertible
+block tuples. Let D be the product of the generic determinants of all the
+blocks. For every tuple of matrices, QD evaluates to zero: either every
+block is invertible or D itself is zero. Over C, a polynomial that vanishes
+at every point is zero, by induction on the finite number of variables and
+the univariate root bound. The polynomial D is nonzero because its value
+at the identity tuple is 1. Since the polynomial ring is a domain, Q=0.
+This also handles an empty block index set, where D=1.
+
+If Q,Q' satisfy IsVal for the same x,i,L_tuple, choose one presentation by
+VE4. Their evaluations agree for all frames, so Q=Q' after applying j and
+therefore over L, since coefficient mapping by a field embedding is
+injective. This is ValUniq. Additivity and L-linearity of f_(x,c) show that
+Q_x+Q_y and aQ_x satisfy the value conditions for x+y and ax. Uniqueness
+therefore makes the chosen values linear. Mapping coefficients by e:L->K
+and assigning zero to non-full tuples gives the source's cmpL, semilinear
+for e. The definition by a chosen witness is consequently independent of
+that choice on all full tuples.
+
+VE8. Exact actual comparison hypotheses, without a residual ValEx
+================================================================
+For the recursion recC with the supplied common global forms, frames and
+level/character data, the pieces now have the following owners:
+
+  CmpHyp0P.ex       VE1–VE6
+  CmpHyp0P.evInj    VE7
+  CmpHyp0P.ptEx     VE4
+  CmpHyp0P.ptAll    VE4, with Joint0.Uloc_eq
+  CmpHyp0P.chi      LI8 and the exact away correction of VE4
+  CmpHyp0P.latM     CR and CS1–CS9, using the ValEx just proved
+
+Position compatibility remains the original LI compatibility, including
+sigma at odd s. CS constructs ValIntRec from that compatibility and the
+proved value polynomials, integral duality, local Gram inverses and the
+integral character. Its rational dimension bridge explicitly uses the
+forms' emb_basis and Fi_zero records. This supplies comparison_statements
+and hence exists_isConcrete.
+
+There is no dependency cycle. VE1 uses only CS2's independent complementary-
+minor integral duality, not any comparison map, ValEx, ValIntRec or span
+conclusion. VE2–VE7 use this algebra and the supplied forms/level realization.
+Only after their existence theorem is proved does VE8 invoke CS's later
+integrality/span results.
+
+VE9. Concrete comparison from the stated global record
+=======================================================
+Here is the precise conditional existence conclusion matching the pinned
+source. Supply D7, levels L0, forms T_u, StdTied, Joint0 for every u,
+LevelZeroCharacterRational for every u, and an ideal a_u for every u with
+
+  L_(b,u) + a_u L_(b,u)# = Lambda0.
+
+For any supplied scale sc, LI constructs the actual local places, original
+coefficient embeddings and their position identities. LI8 gives the integral
+inverse away characters. Choose the common standard B using SF, and replace
+the local frames using the companion ideal identity. This replacement
+retains all the embeddings, positions and normalization data. CR supplies
+the literal rank equality; its unused Joint0 rank argument causes no issue
+because Joint0 remains needed by VE5 and the comparison.
+
+The resulting recursion is recC with Ce=1, exactly the constant in the
+source exists_concrete_of_record. Transport Forms0 to that recursion without
+altering its underlying form spaces or characters. VE8 supplies the concrete
+comparison record and CS gives O-span(c(global integer lattice))=M at every
+good coefficient place. Neither block rationality nor ValEx is an extra
+remaining premise of this conditional theorem.
+
+Boundary of VE1–VE9
+=============================
+The global form and level data must still come from the same arithmetic
+geometry. The actual TC.Ok/Pins/Laws/Later, chart and carrier construction,
+and higher-level up/down/terminal compatibility have not been manufactured
+by the preceding conditional argument. CV/FC address their own exact
+portions. Metric/isometric transport, spectral and mass estimates,
+cohomological windows and the global prime-sum window remain independent
+tasks unless a separate component explicitly proves them.
+
+The source's optional IsRecCEv interface is not imposed: VE9 follows the
+actual exists_concrete_of_record route. No analytic approximation, averaging
+over finite stabilizers, integral semisimplicity, or re-choice of coefficient
+embeddings is used in the value-existence argument.
+
+VE10: actual true-column concrete comparison from the direct Forms0
+==================================================================
+This added corollary specializes VE9 to D=I.rec7(l,Z), where the actual
+true-column data I.Ok, Pins, Laws and Later are supplied. The initial
+unitary finite-adelic realization of the valid framed decorated points
+used in the charts and moves remains an explicit hypothesis.
+
+FC19 now constructs every field of Forms0 directly: atT, the single
+step-zero chart and its actual representatives, val0, the common GLoc
+and its coefficient-subfield uniformizers, glev0, the quotient level,
+residue isomorphisms, up/down naturality, norm and Bw. In particular,
+this construction does not call the still-incomplete FormsTiedSym
+constructor. NB7/NB8 provide the genuine neighbor clauses; CV9 provides
+the actual complex/rational/integral values, and FC supplies the other
+specified fields. The all-prime intersection argument provides the
+global integral clause of val0 without an extra freeness assumption.
+
+The matching level L0(u) is constructed from only cls0, gl and glev0.
+Its base lattice, every local group, global group, class matrices and
+stabilizer matrices satisfy literal SameCar/Joint0 identities under
+the one rank reindexing. The split and local frame are the same ones.
+SF2 supplies StdTied on the actual spaces, FC16 supplies h0, and the
+companion ideal is (conjugate(pi_u)). Its companion identity is FC.41.
+Thus every global-record premise of VE9 has a supplier for the same
+I.rec7 record. Applying VE9 proves the concrete comparison for every
+supplied scale with Ce=1. More precisely the constructed record is
+recC(D,sc,1,L0,I_loc,psi,hd), with its unchanged transported forms and
+concrete comparison. Its O_w-integral image spans the actual
+target lattice at every good place, with the original embeddings,
+odd positions and valuation normalizations.
+
+The graph is noncircular: FC19 uses primitive FC/CV/NB/SF results,
+but does not use VE9 or VE10. VE10 uses FC19 and VE9. The terminal
+row/symmetric-column records are not premises of Forms0 and therefore
+are not inserted into this corollary's hypothesis list. Initial
+decorated-point realization, the arithmetic true-column laws, and
+all independent metric/spectral/cohomological/window suppliers remain.
+
+VE11: remove the initial-realizer premise using the actual CM data
+================================================================
+The preceding VE10 is the conditional bridge. DR now supplies its final
+independent geometric premise. The actual CMData.cmUnram field says that
+at each maximal ideal there is theta with theta-conjugate(theta) a unit.
+DR1 proves from this exact condition that the completed integral algebra
+is split or unramified quadratic, proves norm surjectivity on units by
+successive residue-trace corrections (also at residue characteristic two),
+and produces an integral orthonormal basis for every self-dual local
+Hermitian lattice. DR2 assembles these into an actual unitary finite-adelic
+matrix whose globLat is the specified self-dual global lattice.
+
+DR3 then adjusts rational local bases at all type, auxiliary and twist
+primes simultaneously. It uses AD4 with their finite union, which contains
+no conjugate pair. For the actual true-column data, type primes divide
+T_u and the auxiliary/twist primes do not; (pi_u,conjugate(pi_u))=O orients
+the type primes, and the supplied split-level and disjointness clauses
+handle the remaining union. These are exactly the source's
+exists_ptOf_twists checks. Inverse-coordinate reductions give the original
+type functionals and auxiliary residue bases; the twist frames agree
+as actual matrices. All five fields of IsPtOf hold.
+
+The proved genus assertion is the actual adelic Col.UnimodGenus used by
+the point constructor. Similarly named rational-semilocal genus predicates
+are not required by this direct route. It assumes neither global freeness
+of a projective integer lattice nor rational unitary strong approximation.
+
+Apply VE10 with these realizers. For every supplied scale sc, the recursion
+recC(I.rec7(l,Z),sc,1,L0,I_loc,psi,hd) has the concrete comparison, and at
+every good coefficient place w:
+
+    O_w-span(c_(u,w)(global integer forms lattice)) = M_(u,w),  Ce=1.
+
+All embeddings, odd-position involutions and valuation normalizations are
+unchanged. The construction of an initial decorated realizer is no longer
+an extra premise. DR depends only on primitive CM algebra, local duality,
+lattice recovery and frame modification, not on any comparison claim.
+The literal supplied arithmetic host and TC.Ok/Pins/Laws/Later, the full
+terminal/symmetric-column constructions and the independent global branches
+retain their stated boundaries.

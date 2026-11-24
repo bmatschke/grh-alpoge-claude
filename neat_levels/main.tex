@@ -1,0 +1,698 @@
+\section{The original neat levels for every auxiliary level}
+\label{sec:neat-levels}
+
+This chapter proves the full predicate \texttt{UpperTheory.V.Hi.neatU}.
+Its conclusion concerns the actual frame and level subgroups used to
+construct ordinary automorphic forms.  The integral representation
+\(\tau _0\) is arbitrary.  Neither a type theorem nor an ordinary Hecke
+axiom is an input to the proof.
+
+Here and below the source is pinned to commit
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+For source references put
+\[
+ \mathsf H=\texttt{HeckeAlgebras/},\qquad
+ \mathsf O=\texttt{HeckeAlgebras/OrdinaryHeckeCharacters/},
+\]
+under
+\texttt{src/Development/AutomorphicArithmetic/AutomorphicVarieties/}.
+The main source is \(\mathsf O\)\texttt{NtExpand.lean}; precise companion
+definitions and inclusive source ranges are recorded with every claim
+in the accompanying provenance file.  The Lean proof is accepted as
+correct.  The arguments below establish the human mathematical endpoint
+independently of invoking that proof.
+
+\subsection{The datum and the exact conclusion}
+
+Let \(\ell\) be a prime, let \(L\) be a CM number field with real subfield
+\(F=L^+\), and write \(c_L\) for its complex conjugation.  Fix the original
+algebraic closure \(\Omega\) and the original
+\(s:\texttt{HidaSetting}\ \ell\ L\ \Omega\).  Among its fields are a
+choice \(w(v)\) of a place of \(L\) above each finite place \(v\) of \(F\),
+a finite set \(S_t\) of places away from \(\ell\), and a distinguished
+place \(v_0\notin S_t\).  Its auxiliary rational prime \(p=s.p\) satisfies
+\begin{equation}\label{eq:ntl-aux-data}
+ p\text{ is prime},\quad p\ne2,\quad p\ne\ell,\quad
+ p\nmid\operatorname{disc}(L),\quad
+ \#(\mathcal O_F/v_0)=p.
+\end{equation}
+This is the prime already stored in \(s\).  It is not a prime selected
+as a function of the matrix rank.
+
+Put
+\(S=\{v:v\mid\ell\}\cup S_t\cup\{v_0\}\).
+Fix \(n\ge1\), an original \(V:s.\texttt{Lev}\), and
+\(Q:\texttt{QData}\ V\).  Thus \(Q\) has a finite index set, places
+\(w_q\) of \(L\), and distinct underlying places
+\(v_q=w_q\cap\mathcal O_F\), with
+\begin{equation}\label{eq:ntl-Q}
+ v_q\notin S,\qquad V.S'=S\cup\{v_q:q\in Q\}.
+\end{equation}
+Write \(G_w=\operatorname{GL}_n(L_w)\),
+\(K_w^{\max}=\operatorname{GL}_n(\mathcal O_{L_w})\), viewed in \(G_w\),
+and
+\[
+ C_w(1)=\ker\bigl(\operatorname{GL}_n(\mathcal O_{L_w})
+       \longrightarrow\operatorname{GL}_n(k_w)\bigr),
+\]
+again viewed in \(G_w\).  These are the source \texttt{KO} and
+\texttt{Kc}\ \(1\), respectively.
+
+The source group \(G^a\) is the image of the adelic definite unitary
+group under all its projections at places of \(L\) away from \(\ell\).
+For every place \(w\), its homomorphism \(\operatorname{cmp}_w\) is that
+coordinate when \(w\nmid\ell\), and is the trivial map otherwise.
+Its subgroup \(U_b\) imposes membership in \(K_{w(u)}^{\max}\) for
+\(u\in S_t\), and in \(C_{w(v_0)}(1)\) at the distinguished place.
+The coefficient representation is any homomorphism
+\[
+ \tau _0:\prod_{u\in S_t}K_{w(u)}^{\max}
+                  \longrightarrow\operatorname{GL}_m(\mathcal O),
+ \qquad \mathcal O=c.\mathcal O
+\]
+for the original \(c:\texttt{Coef}\ \ell\) and any \(m\ge0\).
+Its value does not enter the group argument.
+
+Let \(H=\texttt{hset}\ Q\ \tau _0\), \(X=H.X\), and
+\(\Gamma=\texttt{ratU}\ L\ n\).  The frame has
+\(G^\ell=\prod_{v\mid\ell}G_{w(v)}\) and the original rational map
+\(\operatorname{glob}:\Gamma\longrightarrow G^a\times G^\ell\).
+For each family of compact open subgroups \(K=(K_q)_{q\in Q}\),
+the actual level is
+\begin{equation}\label{eq:ntl-level}
+ U(K)=U_Q\vee\bigvee_{q\in Q}\operatorname{sec}_{w_q}(K_q)
+                  \quad\text{inside }U_b.
+\end{equation}
+Here \(U_Q\) is integral outside \(V.S'\) and has trivial \(w_q\)
+coordinate for every \(q\).  The sections in this formula are exactly
+the source sections, including their trivial-map fallback.
+
+The desired \texttt{Neat} assertion is the following implication:
+\begin{equation}\label{eq:ntl-neat}
+ \begin{gathered}
+ g\in G^a\times G^\ell,\quad\gamma\in\Gamma,\quad
+ u\in U(K),\quad b\in X.I.\operatorname{Iw}(0),\\
+ \operatorname{glob}(\gamma)g=g(u,b)
+       \quad\Longrightarrow\quad u=1\text{ and }b=1.
+ \end{gathered}
+\end{equation}
+Every object in this formula is the original one.  In particular,
+\texttt{Neat} is used in its displayed source sense; no stronger
+definition involving all eigenvalue-generated subgroups is substituted.
+
+\subsection{Torsion in the actual principal congruence subgroup}
+
+% BEGIN NTL1
+\paragraph{NTL1. A third-order identity in a possibly noncommutative ring.}
+\label{claim:NTL1}
+For every unital ring \(R\), every \(Y\in R\), and every integer
+\(a\ge0\), there is \(W\in R\) such that
+\begin{equation}\label{eq:ntl-expand}
+ (1+Y)^a=1+aY+\binom a2Y^2+Y^3W.
+\end{equation}
+Only powers of the single element \(Y\) occur, so their usual binomial
+expansion is valid without commutativity of \(R\).  Alternatively,
+start with \(W=0\) for \(a=0\).  Multiplication by \(1+Y\) changes the
+remainder to \(W(1+Y)+\binom a2\), and
+\(\binom{a+1}2=a+\binom a2\) gives the formula at the next exponent.
+This proves the identity also for matrix rings of every size.
+\emph{Source:} \texttt{nt\_expand}, lines 12--24.
+% END NTL1
+
+% BEGIN NTL2
+\paragraph{NTL2. One extra power of the auxiliary prime.}
+\label{claim:NTL2}
+Let \(R\) be a commutative local domain, and let \(p\) be an odd
+rational prime whose image in \(R\) is nonzero and is not a unit.
+For any rational prime \(q\), any \(k\ge0\), and any matrix \(Z\),
+\[
+ (1+p^{k+1}Z)^q=1\quad\Longrightarrow\quad
+                    Z\in p\operatorname{Mat}_n(R).
+\]
+Apply NTL1 and cancel the nonzero central scalar \(p^{k+1}\)
+entry by entry.  If \(q\ne p\), Bezout's identity for \(q,p\) shows
+that \(q\) is a unit in the local ring: \(p\) belongs to the maximal
+ideal, so \(q\) cannot belong to it.  The resulting identity is
+\[
+ qZ=-p\left(\binom q2p^kZ^2+p^{2k+1}Z^3W\right),
+\]
+which proves the assertion.  If \(q=p\), write
+\(\binom p2=pc\) with \(c=(p-1)/2\in\mathbb Z\).
+Cancel \(p^{k+2}\) in the original expansion to obtain
+\[
+ Z=-p\left(cp^kZ^2+p^{2k}Z^3W\right).
+\]
+This proves the second case.  No coefficient depending on the rank,
+and no factor \(n!\), is inverted.
+\emph{Source:} \texttt{nt\_step}, lines 28--60.
+% END NTL2
+
+% BEGIN NTL3
+\paragraph{NTL3. Torsion-freeness over a Noetherian local domain.}
+\label{claim:NTL3}
+Under the hypotheses of NTL2, assume in addition that \(R\) is
+Noetherian.  Every finite-order matrix in
+\(1+p\operatorname{Mat}_n(R)\) is the identity.
+
+First, \(\bigcap_{a\ge0}p^aR=0\).  To see this directly, if a nonzero
+\(x\) belongs to every \(p^aR\), put \(z_a=x/p^a\in R\), using the
+fraction field.  The ideals \((z_a)\) form an increasing chain because
+\(z_a=pz_{a+1}\).  At a stationary pair,
+\(z_{a+1}=r z_a\) for some \(r\in R\), whence
+\(z_a=prz_a\).  Cancellation gives \(pr=1\), a contradiction.
+
+Suppose now that \(A=1+pZ\) satisfies \(A^q=1\) for a prime \(q\).
+Repeated application of NTL2 writes \(A-1\) in
+\(p^{k+1}\operatorname{Mat}_n(R)\) for every \(k\ge0\).
+The preceding separation argument makes all its entries zero.
+For a general positive exponent \(a\) with \(A^a=1\), induct on \(a\).
+If \(a=1\), there is nothing to prove.  Otherwise choose a prime
+\(q\mid a\) and put \(a=qd\).  The matrix \(A^d\) is still congruent
+to \(1\) modulo \(p\); its \(q\)-th power is \(1\), so the prime case
+gives \(A^d=1\).  Since \(d<a\), induction finishes the proof.
+\emph{Source:} \texttt{nt\_prime} and \texttt{nt\_mat}, lines 62--99.
+% END NTL3
+
+% BEGIN NTL4
+\paragraph{NTL4. Why the stored discriminant condition makes \(p\) a uniformizer.}
+\label{claim:NTL4}
+Let \(E\) be a number field, let \(p\) be a rational prime with
+\(p\nmid\operatorname{disc}(E)\), and let \(w\mid p\).  Then
+\[
+ p\mathcal O_{E_w}=\mathfrak m_{E_w},
+ \qquad p\notin w^2\subset\mathcal O_E.
+\]
+Here is a trace-form proof of the discriminant step.  Choose an integral
+basis of \(\mathcal O_E\).  Its trace-pairing matrix has determinant
+\(\operatorname{disc}(E)\), so its reduction modulo \(p\) is
+nondegenerate on the finite-dimensional commutative algebra
+\(A=\mathcal O_E/p\mathcal O_E\).  This is the trace pairing for the
+regular representation of \(A\): multiplication matrices reduce
+coefficientwise modulo \(p\).  If \(x\in A\) is nilpotent, then
+\(xy\) is nilpotent for every \(y\in A\), and the multiplication
+operator by \(xy\) is nilpotent.  Its trace is zero.  Nondegeneracy
+therefore forces \(x=0\).
+
+A finite reduced commutative algebra over a finite field is a product
+of fields.  Indeed it is Artinian; its finitely many maximal ideals
+are pairwise comaximal, and their intersection is its nilradical,
+which is zero.  The Chinese remainder map is consequently an
+isomorphism onto the product of its residue fields.  Localizing at
+the maximal ideal corresponding to \(w\) now shows that
+\(\mathcal O_{E,w}/p\mathcal O_{E,w}\) is a field.  Hence
+\(p\mathcal O_{E,w}\) is its maximal ideal.  The local ring is a
+discrete valuation ring, so the valuation of \(p\) is exactly one.
+Completion preserves this equality of the maximal ideal with
+\((p)\), and membership of a global element in \(w^2\) would give
+local valuation at least two, proving the assertions.
+
+The elementary number-field structure used here does not conceal a
+prime-selection theorem.  In particular, finiteness of
+\(\mathcal O_E\) as a free \(\mathbb Z\)-module can be seen by taking
+an integral \(\mathbb Q\)-basis \(e_i\) of \(E\).  For
+\(x\in\mathcal O_E\), the numbers \(\operatorname{Tr}(xe_i)\) are
+integers; the invertible rational trace matrix therefore puts every
+such \(x\) in the dual of one fixed lattice.  This bounds denominators
+and gives a finite free integral basis.
+
+For completeness, the local discrete-valuation assertion also has
+an elementary algebraic proof.  The ring of integers is Noetherian
+by this finiteness, and is integrally closed by transitivity of
+integrality.  Every nonzero prime contracts to a nonzero prime of
+\(\mathbb Z\): a nonzero element in it has a monic integer equation
+with nonzero constant coefficient, which puts that coefficient in
+the contraction.  Its quotient is a finite integral domain, hence
+a field.  Thus a nonzero-prime localization \(R\) is a Noetherian
+normal local domain of dimension one.  Choose \(0\ne a\in\mathfrak m\).
+There is \(r\ge1\) with \(\mathfrak m^r\subseteq(a)\), since
+\(\sqrt{(a)}=\mathfrak m\) and \(\mathfrak m\) is finitely generated.
+Take the least such \(r\).  If \(r=1\), then \(\mathfrak m=(a)\).
+Otherwise choose \(b\in\mathfrak m^{r-1}\setminus(a)\), and put
+\(t=b/a\).  Then \(t\notin R\) and \(t\mathfrak m\subseteq R\).
+If \(t\mathfrak m\subseteq\mathfrak m\), express multiplication
+by \(t\) on a finite generating list of \(\mathfrak m\).
+The adjugate identity gives a monic polynomial \(P\in R[T]\) with
+\(P(t)\mathfrak m=0\), hence \(P(t)=0\) in the fraction field
+because \(\mathfrak m\ne0\).  Normality would
+give \(t\in R\), a contradiction.  Therefore \(t\mathfrak m\)
+contains a unit.  After rescaling its preimage, there is
+\(x\in\mathfrak m\) with \(tx=1\), and every
+\(y\in\mathfrak m\) is \(x(ty)\).  Thus \(\mathfrak m=(x)\).
+The increasing-principal-ideal argument in NTL3, with \(x\) in
+place of \(p\), shows \(\bigcap_jx^jR=0\); every nonzero element
+is consequently a unit times a finite power of \(x\).  This is the
+discrete valuation description.  All uses here are at the already
+supplied \(w\mid p\).
+\emph{Source:} \texttt{nt\_sq}, lines 115--136, and the valuation
+translation in \texttt{nt\_free}, lines 140--176.
+% END NTL4
+
+% BEGIN NTL5
+\paragraph{NTL5. The exact local \texttt{Kc}\ \(1\) has no nontrivial torsion.}
+\label{claim:NTL5}
+Let \(E,p,w\) satisfy NTL4, assume \(p\ne2\), and let
+\(g\in G_w\) lie in the original \(C_w(1)\).
+If \(g\) has finite order, then \(g=1\).
+
+The definition of \(C_w(1)\) gives a matrix
+\(x\in\operatorname{GL}_n(\mathcal O_{E_w})\) mapping to \(g\) and
+reducing to the identity modulo \(\mathfrak m_{E_w}\).
+By NTL4, this is exactly the condition \(x=1+pZ\) for a matrix
+\(Z\) over \(\mathcal O_{E_w}\).  The inclusion of the integral
+matrix group into \(G_w\) is injective, so a positive exponent killing
+\(g\) also kills \(x\).  The ring \(\mathcal O_{E_w}\) is a
+Noetherian local domain, its element \(p\) is nonzero, and \(p\) is
+not a unit.  NTL3 applies and gives \(x=1\), hence \(g=1\).
+This treats precisely reduction modulo the maximal ideal; it would
+not be justified by replacing that ideal with \((p)\) without NTL4.
+\emph{Source:} \texttt{nt\_free}, lines 138--203; the definition of
+\texttt{Kc} is \(\mathsf H\)\texttt{TcAnti.lean}, lines 69--71.
+% END NTL5
+
+\subsection{From local compactness to finite order over the CM field}
+
+% BEGIN NTL6
+\paragraph{NTL6. A positive power of any compact-level element is integral.}
+\label{claim:NTL6}
+If \(K\) is a compact subgroup of \(\operatorname{GL}_n(E_w)\) and
+\(g\in K\), then there is an integer \(e>0\) such that
+\(g^e\in K_w^{\max}\).
+
+The subgroup \(K_w^{\max}\) is open: a sufficiently small perturbation
+of an integral invertible matrix is again integral with unit
+determinant, as is seen by reduction modulo the maximal ideal.
+Consequently \(K\cap K_w^{\max}\) is open in the compact group \(K\).
+Its left cosets form an open cover, so only finitely many occur.
+Two of the cosets represented by \(1,g,g^2,\ldots\) coincide.  If
+their indices are \(a<b\), then \(g^{b-a}\in K\cap K_w^{\max}\).
+This is a coset argument; no normality of \(K\cap K_w^{\max}\) is
+needed.  The exponent may depend on this element and this compact
+subgroup, exactly as in the source.
+\emph{Source:} \texttt{nt\_pow}, lines 205--212.
+% END NTL6
+
+% BEGIN NTL7
+\paragraph{NTL7. Integral local conjugates give integral characteristic coefficients.}
+\label{claim:NTL7}
+Let \(M\in\operatorname{GL}_n(E)\), and suppose that for some
+\(g_w\in\operatorname{GL}_n(E_w)\),
+\[
+ g_w^{-1}M_wg_w\in K_w^{\max}.
+\]
+Every coefficient of \(\det(T-M)\) is integral at \(w\).  Indeed the
+displayed conjugate is represented by a matrix over
+\(\mathcal O_{E_w}\); its characteristic coefficients are polynomials
+with integral coefficients in its entries.  Characteristic
+polynomials are unchanged by conjugation and commute with the field
+map \(E\longrightarrow E_w\).  Thus the image of every coefficient
+belongs to \(\mathcal O_{E_w}\), which is precisely the asserted
+nonnegative valuation in \(E\).  The same statement applies to
+\(M^{-1}\) with the same conjugating matrix, because
+\(K_w^{\max}\) is a group.
+\emph{Source:} \texttt{nt\_char}, lines 214--231.
+% END NTL7
+
+% BEGIN NTL8
+\paragraph{NTL8. One place above each real-field place, with conjugation, is enough.}
+\label{claim:NTL8}
+For each finite place \(v\) of \(F=L^+\), choose any place \(T(v)\)
+of \(L\) above \(v\).  If \(x\in L\) and both \(x\) and
+\(c_L(x)\) are integral at every chosen \(T(v)\), then \(x\) is
+an algebraic integer.
+
+First, if \(y\in F\) is integral at every \(T(v)\), then it is
+integral at every \(v\).  The restriction of the normalized valuation
+at \(T(v)\) multiplies the valuation at \(v\) by a positive integer:
+write an element of \(F^\times\) as a power of a local uniformizer
+times a local unit.  The unit stays a unit upstairs, and the
+uniformizer has positive valuation because the prime upstairs
+contracts to \(v\).  The sign of the valuation is therefore unchanged.
+Integrality at every finite place says \(y\in\mathcal O_F\).
+For clarity, the local-to-global assertion follows directly from
+\(\mathcal O_F=\bigcap_v(\mathcal O_F)_v\): if \(y\notin\mathcal O_F\),
+the proper denominator ideal
+\(I=\{a\in\mathcal O_F:ay\in\mathcal O_F\}\) lies in a maximal
+ideal \(v\); an expression \(y=b/s\) in \((\mathcal O_F)_v\)
+would give \(s\in I\) and \(s\notin v\), a contradiction.
+
+Now \(a=x+c_L(x)\) and \(b=xc_L(x)\) are fixed by \(c_L\), hence
+belong to \(F\).  They are integral at each \(T(v)\), by the ring
+property of local integers, so the preceding paragraph gives
+\(a,b\in\mathcal O_F\).  The element \(x\) satisfies
+\(T^2-aT+b=0\).  It is therefore integral over \(\mathcal O_F\)
+and hence over \(\mathbb Z\).  Transitivity here can also be read
+from the finite \(\mathbb Z\)-module
+\(\mathcal O_F+\mathcal O_Fx\), stable under multiplication by \(x\):
+the characteristic polynomial of this multiplication is monic
+with integer coefficients and kills \(x\).
+\emph{Source:} \texttt{nt\_int}, lines 239--261.
+% END NTL8
+
+% BEGIN NTL9
+\paragraph{NTL9. Bounded algebraic integers in a fixed number field form a finite set.}
+\label{claim:NTL9}
+Fix a number field \(E\) of degree \(d\) and a real number \(C\ge0\).
+There are only finitely many \(x\in\mathcal O_E\) such that
+\(\lvert\varphi(x)\rvert\le C\) for every embedding
+\(\varphi:E\hookrightarrow\mathbb C\).
+
+The minimal polynomial of such an \(x\) has degree \(r\le d\) and
+integer coefficients.  Every embedding of \(\mathbb Q(x)\) into
+\(\mathbb C\) extends to one of \(E\), so all \(r\) roots have
+absolute value at most \(C\).  Its coefficient at \(T^{r-j}\)
+has absolute value at most \(\binom rj C^j\), by its elementary
+symmetric expression in those roots.  For each of the finitely
+many possible degrees, these bounds leave only finitely many integer
+coefficient lists.  Each resulting nonzero polynomial has finitely
+many roots.  Their finite union contains all the possible \(x\).
+This proves the finiteness used below without a covolume or
+geometry-of-numbers estimate.
+\emph{Source match:} the bounded-integral-entry step in
+\texttt{nt\_fin}, lines 270--299, where the source uses
+\texttt{Embeddings.finite\_of\_norm\_le}.
+% END NTL9
+
+% BEGIN NTL10
+\paragraph{NTL10. Integral characteristic coefficients and definite unitarity force finite order.}
+\label{claim:NTL10}
+Suppose \(M\in\operatorname{GL}_n(L)\) has integral characteristic
+coefficients and
+\begin{equation}\label{eq:ntl-unitary-powers}
+ c_L(M^a)^{\mathsf t}M^a=1\qquad(a\ge0).
+\end{equation}
+Then \(M\) has finite order.
+
+Cayley--Hamilton expresses every nonnegative power of \(M\) as an
+\(\mathcal O_L\)-linear combination of
+\(1,M,\ldots,M^{n-1}\).  Choose a positive integer \(D\) clearing
+the denominators of the entries of these finitely many matrices.
+Such an integer exists for each algebraic number: after clearing
+the rational coefficients of a monic polynomial over \(\mathbb Q\),
+a suitable integer multiple of its root satisfies a monic polynomial
+over \(\mathbb Z\).  Thus all entries of \(DM^a\), for all \(a\),
+are algebraic integers.
+
+For an embedding \(\varphi:L\hookrightarrow\mathbb C\), the CM
+identity \(\varphi\circ c_L=\overline{\varphi}\) turns
+\eqref{eq:ntl-unitary-powers} into ordinary complex unitarity of
+\(\varphi(M^a)\).  Each entry has absolute value at most one: the
+sum of squared absolute values in its column is one.  Every conjugate
+of each entry of \(DM^a\) is therefore bounded by \(D\).
+NTL9 leaves only finitely many values for each entry.  Since the
+matrix has finitely many entries, \(\{M^a:a\ge0\}\) is finite.
+Choose \(a<b\) with \(M^a=M^b\) and cancel \(M^a\).  Then
+\(M^{b-a}=1\), with \(b-a>0\), as required.
+\emph{Source:} \texttt{nt\_fin}, lines 263--302.
+% END NTL10
+
+% BEGIN NTL11
+\paragraph{NTL11. A compact conjugate at one place above every \(v\) suffices.}
+\label{claim:NTL11}
+Let \(M\in\operatorname{GL}_n(L)\) satisfy
+\eqref{eq:ntl-unitary-powers}.  Suppose that, for each finite place
+\(v\) of \(F\), there are a place \(T(v)\mid v\) and a matrix
+\(g_v\in G_{T(v)}\) for which
+\[
+ g_v^{-1}M_{T(v)}g_v\in K_{T(v)}^{\max}.
+\]
+Then \(M\) has finite order.
+
+Let \(a_i\) be a characteristic coefficient of \(M\).  NTL7 makes
+\(a_i\) integral at every \(T(v)\).  The case \(a=1\) of
+\eqref{eq:ntl-unitary-powers} gives
+\(M^{-1}=c_L(M)^{\mathsf t}\).  The characteristic coefficients of
+this matrix are \(c_L(a_i)\), because transpose preserves the
+characteristic polynomial and field automorphisms act on its
+coefficients.  The inverse of the displayed compact conjugate lies
+in the same \(K_{T(v)}^{\max}\), so NTL7 also makes
+\(c_L(a_i)\) integral at every \(T(v)\).  NTL8 gives
+\(a_i\in\mathcal O_L\).  Apply NTL10.
+
+The choice \(T(v)\) need not be the original \(w(v)\) at every place.
+This matters at the added places, where the original datum gives
+\(w_q\) rather than an equality \(w_q=w(v_q)\).
+\emph{Source:} \texttt{nt\_ord}, lines 304--322.
+% END NTL11
+
+\subsection{Literal frame and level identities}
+
+% BEGIN NTL12
+\paragraph{NTL12. Extracting the rational matrix from the original \(\Gamma\).}
+\label{claim:NTL12}
+For every \(\gamma\in\Gamma=\texttt{ratU}\ L\ n\), there is a
+matrix \(M\in\operatorname{GL}_n(L)\) whose rational adelic image
+is the underlying element of \(\gamma\), such that
+\eqref{eq:ntl-unitary-powers} holds and, for every finite place \(w\),
+\begin{equation}\label{eq:ntl-rational-coordinate}
+ \operatorname{cLoc}_w(\gamma)=M_w.
+\end{equation}
+Existence of \(M\) is the definition of \texttt{ratU}: it is the
+intersection of the rational matrix image with the adelic unitary
+subgroup for the identity Hermitian matrix.  The latter condition
+is \(\operatorname{conjAd}(\gamma)^{\mathsf t}\gamma=1\).
+Adelic conjugation on an element of \(L\) is the image of \(c_L\).
+Since the diagonal map from \(L\) into its adeles is injective,
+the adelic equality descends entrywise to
+\(c_L(M)^{\mathsf t}M=1\).  Its powers satisfy the same identity:
+\(c_L(M^a)^{\mathsf t}=(c_L(M)^{\mathsf t})^a=(M^{-1})^a\).
+Projection of the rational adelic image to the completion gives
+\eqref{eq:ntl-rational-coordinate} by the definitions of
+\texttt{ratGL} and \texttt{cLoc}.
+\emph{Source:} \texttt{nt\_rat}, lines 334--351; the underlying
+\texttt{UA}, \texttt{cLoc}, and \texttt{ratU} are defined in
+\texttt{BaseChangeDefiniteUnitary.lean}, lines 66--84.
+% END NTL12
+
+% BEGIN NTL13
+\paragraph{NTL13. Both required level inclusions, including the section fallback.}
+\label{claim:NTL13}
+For the actual \(U(K)\) in \eqref{eq:ntl-level}, the following hold:
+\begin{align}
+ v(w)\notin V.S'&\quad\Longrightarrow\quad
+           \operatorname{cmp}_w(U(K))\subseteq K_w^{\max},
+                 \label{eq:ntl-level-out}\\
+ q\in Q&\quad\Longrightarrow\quad
+           \operatorname{cmp}_{w_q}(U(K))\subseteq K_q.
+                 \label{eq:ntl-level-Q}
+\end{align}
+Here \(v(w)=w\cap\mathcal O_F\).  To verify the inclusions on the
+literal generators, recall that \(\operatorname{locA}_w\) is the
+intersection of the kernels of all \(\operatorname{cmp}_{w'}\)
+with \(v(w')\ne v(w)\).  By definition,
+\(\operatorname{sec}_w\) is the inverse of the own-place projection
+on this subgroup when that projection is bijective, and the trivial
+homomorphism otherwise.  Hence for every \(x\in G_w\),
+\begin{equation}\label{eq:ntl-sec}
+ \begin{gathered}
+ \operatorname{sec}_w(x)\in\operatorname{locA}_w,\\
+ \operatorname{cmp}_w(\operatorname{sec}_w(x))=x
+        \quad\hbox{or}\quad
+ \operatorname{cmp}_w(\operatorname{sec}_w(x))=1.
+ \end{gathered}
+\end{equation}
+If \(v(w)\notin V.S'\), the \(U_Q\) generator is integral at \(w\)
+by definition; each \(\operatorname{sec}_{w_q}(K_q)\) has trivial
+\(w\)-coordinate because \(v_q\in V.S'\).  This proves
+\eqref{eq:ntl-level-out} on every generator.  For
+\eqref{eq:ntl-level-Q}, the \(U_Q\) coordinate is trivial.
+The generator at the same \(q\) has coordinate in \(K_q\) by
+\eqref{eq:ntl-sec}, in both alternatives.  A generator at \(q'\ne q\)
+has trivial coordinate, because the underlying places are distinct
+by the original \(Q.\texttt{inj}\) condition.  Since the targets
+\(K_w^{\max}\) and \(K_q\) are subgroups, both inclusions persist
+under the subgroup joins.  This proves them on all of \(U(K)\).
+No assertion of bijectivity for the source section was used.
+\emph{Source:} \texttt{nt\_sec}, \texttt{nt\_out}, and
+\texttt{nt\_Q}, lines 363--399; \(\mathsf H\)\texttt{IsTheta.lean},
+lines 84--102 and 117--139.
+% END NTL13
+
+% BEGIN NTL14
+\paragraph{NTL14. The original Iwahori subgroup is integral in every coefficient-prime coordinate.}
+\label{claim:NTL14}
+For the actual product Iwahori datum of \(H\),
+\[
+ X.I.\operatorname{Iw}(0)
+             \ \subseteq\ \prod_{v\mid\ell}K_{w(v)}^{\max}.
+\]
+The source defines \(\operatorname{Iw}(0)\) as the subgroup generated
+by \(N,T,N_m(0)\).  In each local factor, the defining formulas give
+\(N=\operatorname{unipB}\cap K^{\max}\), so \(N\) is integral.
+The subgroup \(T\) consists of diagonal matrices whose entries are
+units of the local integer ring; the inverse diagonal matrix is
+also integral.  Finally, \(N_m(0)\) is an intersection with
+\(C_w(1)\), which lies in \(K^{\max}\) by its defining image from
+the integral matrix group.  Thus all three local subgroups lie in
+\(K^{\max}\).  The product definitions of \texttt{piData} and
+\texttt{piIwa} give the same assertion coordinatewise, and the
+product of the \(K^{\max}\)'s is a subgroup.  Taking the join proves
+the assertion.  Full Iwahori factorization and the ordinary Hecke
+operator identities are unnecessary for this inclusion.
+\emph{Source:} \texttt{nt\_Iw}, lines 403--410; literal subgroup
+fields in \(\mathsf H\)\texttt{TcAnti.lean}, lines 55--71 and 94--100,
+and \texttt{Distinct.lean}, lines 21--24.
+% END NTL14
+
+% BEGIN NTL15
+\paragraph{NTL15. The distinguished coordinate has the required prime and is away from \(\ell\).}
+\label{claim:NTL15}
+Put \(w_0=w(v_0)\).  Then \(w_0\mid p\), \(w_0\nmid\ell\),
+and for every \(u\in U(K)\),
+\[
+ \operatorname{cmp}_{w_0}(u)\in C_{w_0}(1).
+\]
+First, \(w(v)\cap\mathcal O_F=v\) for every \(v\).  The two
+original fields \(s.\texttt{hw}\ v\) and \(s.\texttt{hA}\ v\)
+say that the same valuation subring of \(\Omega\) lies over
+\(w(v)\) and \(v\); pulling back its maximal ideal along
+\(\mathcal O_F\to\mathcal O_L\to\Omega\) proves the equality.
+The residue field at \(v_0\) has cardinality \(p\) by
+\eqref{eq:ntl-aux-data}; its characteristic is therefore \(p\),
+so \(p\in v_0\), and hence \(p\in w_0\).
+If \(\ell\) also belonged to \(w_0\), Bezout's identity for the
+distinct rational primes \(p,\ell\) would put \(1\) in \(w_0\).
+Thus \(w_0\nmid\ell\).
+
+All of \(U(K)\) is, by construction, a subgroup of \(U_b\).
+The second defining condition of \(U_b\) is exactly the displayed
+membership in \(C_{w_0}(1)\), independently of \(K\).
+Moreover \(s.p\) satisfies the oddness and discriminant hypotheses
+of NTL5.  This checks all its local hypotheses at the precise
+coordinate used by the original construction.
+\emph{Source:} \texttt{nt\_under} and \texttt{nt\_nat}, lines
+324--332; auxiliary-place calculation in \texttt{neatU}, lines
+434--448; original setting fields in
+\texttt{WeilGroupCharacters/}\allowbreak\texttt{ContinuousResP.lean},
+lines 73--100.
+% END NTL15
+
+% BEGIN NTL16
+\paragraph{NTL16. The full stabilizer relation forces its rational matrix to have finite order.}
+\label{claim:NTL16}
+Assume the antecedent of \eqref{eq:ntl-neat}, and let \(M\) be the
+matrix of NTL12.  Then \(M\) has finite order.
+
+Write \(g=(g_a,(g_v)_{v\mid\ell})\) and
+\(b=(b_v)_{v\mid\ell}\).  At every \(w\nmid\ell\), projection
+of the stabilizer equality and NTL12 give
+\[
+ M_w\operatorname{cmp}_w(g_a)
+   =\operatorname{cmp}_w(g_a)\operatorname{cmp}_w(u).
+\]
+At a place \(v\mid\ell\), its second coordinate gives
+\(M_{w(v)}g_v=g_vb_v\).  Taking powers preserves the conjugation
+identities, so for every integer \(k\ge0\),
+\begin{equation}\label{eq:ntl-local-conj}
+ \begin{aligned}
+ \operatorname{cmp}_w(g_a)^{-1}(M^k)_w
+       \operatorname{cmp}_w(g_a)&=\operatorname{cmp}_w(u)^k
+                              &&(w\nmid\ell),\\
+ g_v^{-1}(M^k)_{w(v)}g_v&=b_v^k &&(v\mid\ell).
+ \end{aligned}
+\end{equation}
+By NTL13, \(\operatorname{cmp}_{w_q}(u)\in K_q\).
+Apply NTL6 to each of the finitely many \(q\), obtaining
+\(e_q>0\) with
+\(\operatorname{cmp}_{w_q}(u)^{e_q}\in K_{w_q}^{\max}\).
+Put \(N=\prod_{q\in Q}e_q>0\), with empty product \(1\).
+Every \(e_q\) divides \(N\).
+
+For every finite place \(v\) of \(F\), we now exhibit a place
+\(T(v)\mid v\) at which \(M^N\) is conjugate into the integral
+matrix group.  If \(v\mid\ell\), take \(T(v)=w(v)\).  NTL14
+and the second equality in \eqref{eq:ntl-local-conj} apply.
+For \(v\nmid\ell\), consider the remaining alternatives in
+\eqref{eq:ntl-Q}.
+Every place above such a \(v\) is also away from \(\ell\), by
+contraction of the rational integer \(\ell\).
+If \(v\in S_t\), take \(T(v)=w(v)\): membership of \(u\) in
+\(U_b\) gives integrality, and the first equality in
+\eqref{eq:ntl-local-conj} applies.
+If \(v=v_0\), use \(T(v)=w_0\) and NTL15, noting
+\(C_{w_0}(1)\subseteq K_{w_0}^{\max}\).
+If \(v=v_q\), use \(T(v)=w_q\).  This place is away from
+\(\ell\), since \(v_q\notin S\), and the definition of \(N\)
+makes \(\operatorname{cmp}_{w_q}(u)^N\) integral.
+Finally, if \(v\notin V.S'\), take \(T(v)=w(v)\) and use
+\eqref{eq:ntl-level-out}.  These alternatives exhaust all places.
+All chosen places really lie over \(v\): for \(w(v)\) this is
+NTL15's pullback check; for \(w_q\) it is the definition of \(v_q\).
+
+The matrix \(M^N\) still satisfies the unitarity identity for all
+its powers.  NTL11 therefore gives a positive exponent \(a\) with
+\((M^N)^a=1\).  Since \(Na>0\), this proves that \(M\) has finite
+order.  The finitely many exponents \(e_q\) were chosen for this
+stabilizer relation.  No uniform exponent over all \(K\), all \(g\),
+or all stabilizers is asserted or needed.
+\emph{Source:} the coordinate identities and place-by-place argument
+in \texttt{neatU}, lines 417--477.
+% END NTL16
+
+% BEGIN NTL17
+\paragraph{NTL17. Full original \texttt{neatU}, for every original auxiliary level.}
+\label{claim:NTL17}
+For every set of source arguments
+\[
+ \ell,L,\Omega,s,n\ge1,V,Q,c,m,\tau _0,
+ \qquad K:(\texttt{hset}\ Q\ \tau _0).\texttt{Lev},
+\]
+with exactly the structures and hypotheses stated at the beginning
+of this chapter, one has
+\[
+ (\texttt{hset}\ Q\ \tau _0).X.\texttt{Neat}
+            \bigl((\texttt{hset}\ Q\ \tau _0).\texttt{lev}\ K\bigr).
+\]
+In particular this holds for every integral \(\tau _0\), every
+\(m\ge0\), and every family of original compact open \(K_q\).
+
+To prove it, take any stabilizer relation
+\eqref{eq:ntl-neat}.  By NTL16 its rational matrix \(M\) has finite
+order.  NTL15 puts \(\operatorname{cmp}_{w_0}(u)\) in the exact
+principal congruence group to which NTL5 applies.  It too has finite
+order: the first equality of \eqref{eq:ntl-local-conj}, valid at
+\(w_0\nmid\ell\), expresses it as a conjugate of \(M_{w_0}\).
+Thus \(\operatorname{cmp}_{w_0}(u)=1\).  The same equality at
+exponent one now gives \(M_{w_0}=1\).  The field map
+\(L\longrightarrow L_{w_0}\) is injective, so entrywise \(M=1\).
+Its rational adelic image is \(\gamma\), whence \(\gamma=1\).
+Cancelling \(g\) in the original stabilizer equality gives
+\((u,b)=(1,1)\), which is exactly the required conclusion.
+
+The proof has used the fixed auxiliary prime \(s.p\), the actual
+groups and maps of \(\texttt{hset}\), and the same input \(K\).
+No smoothness or \texttt{TypeForAlt} property of \(\tau _0\), no
+\(H.\texttt{Ax}\), and no ordinary module or ideal is presumed.
+The source restriction \(n\ge1\) is retained.  The prime hypothesis
+\(\ell\ne2\) is already part of \(s\); no inequality between
+\(\ell\) and \(n\) has entered.  In particular the permitted
+rank-four case \(\ell=3\) is included.
+\emph{Source:} \texttt{UpperTheory.V.Hi.neatU}, lines 412--487;
+the exact predicate is \(\mathsf H\)\texttt{ContinuousTorusCharacter.lean},
+lines 165--166.
+% END NTL17
+
+\subsection{What this removes from the Count-II frontier}
+
+NTL17 is an unconditional supplier of the original neatness predicate
+from its printed original datum.  Its universal quantifier over
+\(K\) is suitable for constructing one torus character before proving
+the \texttt{Free} condition at every level.  The character construction
+and the elementary implication from \texttt{Neat} to \texttt{Free}
+are handled by the companion ordinary-weight chapter; neither has
+been smuggled into an assumption here.
+
+No original ideal \(J\) is replaced by this result.  Both rank-four
+Links can use NTL17 for their own original data, after the same fixed
+\(\iota\) and within the same eventual coefficient range.  There is
+no new lower bound on the coefficient prime and no new eventual
+threshold.  The existential powers used inside NTL16 depend only
+on an individual stabilizer calculation and do not alter any outer
+quantifier in the Count-II contract.
+
+The integral type supplier, the remaining original \(H.\texttt{Ax}\)
+fields, ordinary modules and control, arithmetic fibers, the four
+remaining Hida endpoints, and all-level \texttt{HasAut} on the same
+ideal remain separate obligations.  NTL17 closes the full neat-level
+producer, not the compound \texttt{COUNT\_II\_SUPPORT} leaf.  Every
+claim above is an independently reconstructed elementary or moderate
+argument; no published theorem is used as a new class-A import.

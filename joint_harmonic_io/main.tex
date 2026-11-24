@@ -1,0 +1,1457 @@
+\section{One original joint-harmonic map for every parameter}
+\label{sec:joint-harmonic-io}
+
+This chapter reconstructs the simultaneous producer
+\texttt{GlobalTheory.JointHarm.exists\_ioP} at source commit
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+The formal source is taken as correct; no Lean replay is asserted.
+Every assertion below is a human proof on the stated original inputs.
+In particular, constructing the map does not construct the original
+\(R\), its coefficient tie, its discrete-series models or its Weil data.
+
+We keep the source's conventions.  Inner products are conjugate-linear
+in the first argument.  For a sign function
+\(\epsilon:\{0,\ldots,m-1\}\to\{+,-\}\), put
+\[
+ J_\epsilon=\operatorname{diag}(\epsilon_a),\qquad
+ K_\epsilon=\{k:k^*k=1,\ kJ_\epsilon=J_\epsilon k\},\qquad
+ K_\epsilon^{\mathbb C}=\{g\in\operatorname{GL}_m(\mathbb C):
+                         gJ_\epsilon=J_\epsilon g\}.
+ \tag{JIO.1}
+\]
+Thus the last two groups are the compact and complex block groups,
+including empty blocks.  A holomorphic representation in this chapter
+means exactly the source's \texttt{IsHolRep}: a sesquilinear form \(B\)
+with \(B(x,x)=0\Rightarrow x=0\), the representation identities on
+\(K_\epsilon^{\mathbb C}\), the adjoint identity
+\(B(\pi(g)x,y)=B(x,\pi(g^*)y)\), and holomorphy of every scalar
+coefficient \(B(x,\pi(g)y)\) there.  A bottom vector of weight \(\mu\)
+is fixed by every lower-unitriangular matrix in this block group and
+has diagonal unitary character
+\(\exp(i\sum_a\mu_a\theta_a)\).
+The words \texttt{IsHolFam} and \texttt{IsBotFam} mean the corresponding
+product-group identities and one-place conditions.
+
+Write \(I=D.\mathrm{what}_2.\mathrm{Tau}\).  All products over \(I\)
+are finite.  In the polynomial construction \(m=W.\mathrm{rank}\),
+\(n=V.\mathrm{rank}\), and
+\(\mathcal P=\mathbb C[X_{\tau,a,b}:\tau\in I,a<m,b<n]\)
+is the literal \texttt{PolF D m n}.  Later \(V\) and \(W\) are the
+stored \(\mathrm{Vc}(D,i)\), \(\mathrm{Wc}(D,i)\), with their original
+frames.  No change of an underlying polynomial or coefficient space
+is implicit.
+
+% BEGIN JIO1
+\paragraph{JIO1: linear substitution and the exact factorial adjoint.}
+\label{claim:JIO1}
+For any finite variable set \(E\), define
+\[
+ B_F(P,Q)=\sum_{\alpha}\overline{P_\alpha}Q_\alpha\alpha!,
+ \quad \alpha!=\prod_{e\in E}\alpha_e!,
+ \qquad L(A)X_e=\sum_f A_{fe}X_f .
+ \tag{JIO.2}
+\]
+Then \(B_F\) is positive definite,
+\(L(AA')=L(A)L(A')\), and
+\[
+                  B_F(L(A)P,Q)=B_F(P,L(A^*)Q).
+ \tag{JIO.3}
+\]
+These statements hold on all polynomials, with no completion.
+
+\emph{Proof.}
+The sum in \(B_F(P,P)\) consists of the nonnegative real terms
+\(|P_\alpha|^2\alpha!\), and every \(\alpha!\) is positive.  Thus
+vanishing forces every coefficient to vanish.  Substitution on the
+generators proves the multiplication identity.  On monomials,
+\[
+       B_F(X_eP,Q)=B_F(P,\partial_eQ).
+ \tag{JIO.4}
+\]
+The chain rule gives
+\(\partial_eL(A^*)Q=\sum_f\overline{A_{fe}}L(A^*)\partial_fQ\).
+Induct on the degree of \(P\).  The constant case uses preservation
+of the constant coefficient.  For \(P=X_eP_0\), expand \(L(A)X_e\),
+move each \(X_f\) across the form using (JIO.4), and apply the
+induction hypothesis to \(P_0\) and \(\partial_fQ\).  The resulting
+sum is exactly the chain rule just displayed.  Addition and scalar
+multiplication finish the induction.
+% END JIO1
+
+% BEGIN JIO2
+\paragraph{JIO2: both original Fock actions are holomorphic product representations.}
+\label{claim:JIO2}
+For \(k_\tau\in K_{\epsilon_\tau}^{\mathbb C}\) and
+\(u_\tau\in\operatorname{GL}_n(\mathbb C)\), define the actual
+substitution by
+\[
+ X_{\tau,i,j}\longmapsto
+ \begin{cases}
+ \displaystyle\sum_{a,b}(k_\tau)_{ai}(u_\tau^{-1})_{jb}X_{\tau,a,b},
+                                           &\epsilon_\tau(i)=+,\\
+ \displaystyle\sum_{a,b}(k_\tau^{-1})_{ia}(u_\tau)_{bj}X_{\tau,a,b},
+                                           &\epsilon_\tau(i)=-.
+ \end{cases}
+ \tag{JIO.5}
+\]
+Call it \(f_{\rm sub}(k,u)\).  Put \(P_\pm=(1\pm J_\epsilon)/2\),
+\(d_\pm(k)=\det(P_\pm k+P_\mp)\), and, for arbitrary integer-valued
+\(x_1,x_2,x_3\), put
+\[
+ \begin{split}
+ c(k,u)&=\prod_\tau d_+(k_\tau)^{x_{1,\tau}}
+                      d_-(k_\tau)^{x_{2,\tau}}
+                      \det(u_\tau)^{x_{3,\tau}},\\
+ F(k,u)&=c(k,u)f_{\rm sub}(k,u),\\
+ F_K(g)&=F(g^{-\mathsf t},1),\qquad F_U(u)=F(1,u).
+ \end{split}
+ \tag{JIO.6}
+\]
+These are the source's \texttt{fchar}, \texttt{fact},
+\texttt{factK}, \texttt{factU}.  Both \(F_K\) and \(F_U\) satisfy
+\texttt{IsHolFam} for \(B_F\), with sign families respectively
+\(\epsilon\) and the all-positive sign.  Moreover \(F_U(u)\)
+commutes with \(F_K(g)\) for every allowed \(u,g\).
+
+\emph{Proof.}
+Commutation with \(J_\epsilon\) says \(k_{ai}=0\) whenever the
+two signs differ, and gives the same assertion for \(k^{-1}\).
+Consequently the two cases in (JIO.5) compose separately.
+In the positive block the coefficients of the composite are
+\((kk')_{ai}((uu')^{-1})_{jb}\); in the negative block they are
+\(((kk')^{-1})_{ia}(uu')_{bj}\).  Thus \(f_{\rm sub}\) is the
+linear substitution \(L(A(k,u))\) of JIO1 and
+\[
+ A(kk',uu')=A(k,u)A(k',u'),\qquad
+ A(k,u)^*=A(k^*,u^*).
+ \tag{JIO.7}
+\]
+For the second equality, for example, the conjugate transpose of
+the positive coefficient \(k_{ai}(u^{-1})_{jb}\) is
+\((k^*)_{ai}((u^*)^{-1})_{jb}\); the negative coefficient is checked
+in the same order.
+
+In a basis ordered by the signs, \(d_+(k)\) and \(d_-(k)\) are the
+determinants of the two diagonal blocks.  They are nonzero, multiply
+under multiplication, conjugate under \(k\mapsto k^*\), and satisfy
+\(d_+(k)d_-(k)=\det k\).  Hence JIO1 proves
+\[
+ F(kk',uu')=F(k,u)F(k',u'),\qquad
+ B_F(F(k,u)P,Q)=B_F(P,F(k^*,u^*)Q).
+ \tag{JIO.8}
+\]
+The identity action is immediate.  Inverse transpose is a group
+automorphism of the complex block group and commutes with \(^{*}\).
+It follows that both restrictions in (JIO.6) have the required
+representation and adjoint identities.  The two factor groups
+commute, proving the last assertion.
+
+For any two fixed polynomials, all relevant coefficients are finite
+sums of products of matrix entries, inverse entries and integer
+powers of the three nonzero determinants.  The formula
+\(A^{-1}=\operatorname{adj}(A)/\det A\) proves that they are
+holomorphic on the prescribed block groups.  If the source's
+ambient-matrix formulation of differentiability is used, these
+same formulas are holomorphic on a neighborhood of each block
+matrix where the two block determinants and \(\det u\) remain
+nonzero.  Their restrictions give the stated differentiability.
+Finally JIO1 supplies the anisotropy condition.  This proves the
+complete two-family contract.
+% END JIO2
+
+% BEGIN JIO3
+\paragraph{JIO3: the original minor product and its triangular eigenvalues.}
+\label{claim:JIO3}
+Fix \(p+q=m\le n\), with the first \(p\) signs positive, and
+nonnegative sequences \(a^+_0\ge\cdots\ge a^+_{p-1}\),
+\(a^-_0\ge\cdots\ge a^-_{q-1}\).  Set \(a^+_p=a^-_q=0\).
+At one place define
+\[
+ \begin{split}
+ D^+_s&=\det(X_{\beta,\alpha})_{0\le\alpha,\beta<s},\\
+ D^-_s&=\det(X_{p+\beta,n-s+\alpha})_{0\le\alpha,\beta<s},\\
+ \Delta_\tau&=\prod_{s=1}^{p}(D^+_s)^{a^+_{s-1}-a^+_s}
+               \prod_{s=1}^{q}(D^-_s)^{a^-_{s-1}-a^-_s}.
+ \end{split}
+ \tag{JIO.9}
+\]
+The product \(\Delta=\prod_\tau\Delta_\tau\) is exactly
+\texttt{delta p q ap am}, and is nonzero.
+If \(k\) is upper triangular on the positive block, lower triangular
+on the negative block, and \(u\) is lower triangular, then
+\[
+ \begin{split}
+ f_{\rm sub}(k,u)D^+_s
+    &=\left(\prod_{a<s} k_{aa}u_{aa}^{-1}\right)D^+_s,\\
+ f_{\rm sub}(k,u)D^-_s
+    &=\left(\prod_{a<s} k_{p+a,p+a}^{-1}
+                                  u_{n-1-a,n-1-a}\right)D^-_s.
+ \end{split}
+ \tag{JIO.10}
+\]
+The resulting target-row exponents of \(\Delta_\tau\) are
+\(a^+_a\) on the positive block and \(-a^-_{a-p}\) on the
+negative block; its source-column exponents are
+\(-a^+_j\) for \(j<p\), \(+a^-_{n-1-j}\) for \(n-1-j<q\),
+and zero elsewhere.
+
+\emph{Proof.}
+For \(D^+_s\), upper triangularity of \(k\) makes the first \(s\)
+target rows stable under the coefficients \(k_{ai}\);
+lower triangularity of \(u^{-1}\) makes the first \(s\)
+source columns stable.  The transformed square matrix is the
+product of the corresponding triangular submatrices and the
+original minor matrix.  Its determinant gives the first formula.
+For \(D^-_s\), the first \(s\) rows of the negative block are
+stable under \(k^{-1}\), and the last \(s\) columns are stable
+under the coefficients \(u_{bj}\).  The same determinant
+multiplication proves the second formula, with the displayed
+last-column order.  Transposing a displayed minor does not
+change its determinant.
+
+For any nonzero \(z_0,\ldots,z_{r-1}\) and decreasing
+nonnegative \(a_0,\ldots,a_{r-1}\), the exponent of \(z_j\) in
+\[
+          \prod_{s=1}^{r}
+                (z_0\cdots z_{s-1})^{a_{s-1}-a_s}
+                  =\prod_{j=0}^{r-1}z_j^{a_j}
+ \tag{JIO.11}
+\]
+is the telescoping sum
+\(\sum_{s=j+1}^{r}(a_{s-1}-a_s)=a_j\).
+Apply this to (JIO.10), including inverses.
+All exponents in (JIO.9) are natural numbers by the assumed
+antitonicity, so the source's truncated natural subtraction
+agrees with ordinary subtraction.
+
+Every determinant in (JIO.9) is a nonzero polynomial: its diagonal
+monomial has coefficient \(1\) and occurs in no other permutation
+term.  Their product is nonzero in the polynomial domain.  This
+also covers \(p=0\), \(q=0\) and the empty products.  The inequality
+\(p+q\le n\) ensures that all specified minors have their original
+indices and sizes; no overlap or index truncation has been assumed
+away.
+% END JIO3
+
+% BEGIN JIO4
+\paragraph{JIO4: the negative-tail reversal gives the exact joint bottom vector.}
+\label{claim:JIO4}
+At each place let \(\kappa_\tau\) be the permutation matrix fixing
+the first \(p_\tau\) indices and reversing the last \(q_\tau\).
+It is real, unitary, sign-preserving and satisfies \(\kappa_\tau^2=1\).
+Put \(\Delta'=F(\kappa,1)\Delta\).  Then
+\[
+ F(\kappa,1)\Delta'=\Delta,\quad \Delta'\ne0,
+ \quad
+ \begin{cases}
+ \Delta'\text{ is bottom for }F_K\text{ of weight }-\mathrm{wtK},\\
+ \Delta'\text{ is bottom for }F_U\text{ of weight }\mathrm{wtU},
+ \end{cases}
+ \tag{JIO.12}
+\]
+where the literal integral weights are
+\[
+ \begin{split}
+ \mathrm{wtK}_a&=
+   \begin{cases}a^+_a+x_1,&a<p,\\
+                -a^-_{m-1-a}+x_2,&a\ge p,\end{cases}\\
+ \mathrm{wtU}_j&=-[j<p]\,a^+_j
+                  +[n-1-j<q]\,a^-_{n-1-j}+x_3 .
+ \end{split}
+ \tag{JIO.13}
+\]
+
+\emph{Proof.}
+If \(k\) is upper triangular in both sign blocks,
+\(\kappa k\kappa\) is upper triangular on the positive block
+and lower triangular on the negative block.  JIO2 and JIO3 give
+\[
+ F(k,u)\Delta'
+       =\left(\prod_a k_{aa}^{\mathrm{wtK}_a}
+                    \prod_j u_{jj}^{\mathrm{wtU}_j}\right)\Delta'
+ \tag{JIO.14}
+\]
+when \(u\) is lower triangular, with products also over places.
+Indeed the reversal changes the negative row exponent from
+\(-a^-_{a-p}\) to \(-a^-_{m-1-a}\).  The determinant characters
+are unchanged by this conjugation, and contribute exactly
+\(x_1,x_2,x_3\).
+
+For a lower-unitriangular \(g\), the matrix \(g^{-\mathsf t}\)
+is upper-unitriangular in the same blocks.  Formula (JIO.14)
+therefore gives \(F_K(g)\Delta'=\Delta'\).  On
+\(g=\operatorname{diag}(e^{i\theta_a})\), inverse transpose changes
+the angles to \(-\theta_a\), giving the weight \(-\mathrm{wtK}\).
+The \(F_U\) statement follows directly from lower-unitriangular
+and diagonal \(u\) in (JIO.14).  One-place specialization gives
+the full \texttt{IsBotFam} predicates.  Finally JIO2 implies
+\(F(\kappa,1)^2=1\); hence both the equality and nonvanishing in
+(JIO.12) follow from JIO3.  The determinant of the reversal may
+be \(-1\), but its integer powers occur twice in the square, so
+no unrecorded sign remains.
+% END JIO4
+
+% BEGIN JIO5
+\paragraph{JIO5: an explicit holomorphic extension of the compact action.}
+\label{claim:JIO5}
+Let \(\pi:K_\epsilon\to\operatorname{End}_{\mathbb C}(S)\)
+be a continuous unitary representation on a finite-dimensional
+Hilbert space.  There is a holomorphic matrix-valued function
+\(\tau\) on \(\operatorname{GL}_m(\mathbb C)\), equal to \(\pi\)
+on \(K_\epsilon\), whose restriction to \(K_\epsilon^{\mathbb C}\)
+is a representation and satisfies \(\tau(g)^*=\tau(g^*)\).
+Thus this restriction is an \texttt{IsHolRep}.
+
+\emph{Proof.}
+Use probability Haar measure on the compact block group and put
+\[
+ p(k)=1+2m+2\Re\operatorname{tr}k,\quad
+ c_N=\int_Kp(k)^N\,dk,\quad
+ A_N=\int_Kp(k)^N\pi(k)\,dk .
+ \tag{JIO.15}
+\]
+For unitary \(k\),
+\(\operatorname{tr}((k+1)^*(k+1))=2m+2\Re\operatorname{tr}k\)
+is nonnegative.  Hence \(p(k)\ge1\).  Also
+\(p(1)-p(k)=\operatorname{tr}((k-1)^*(k-1))\), so \(1\)
+is its unique maximum.  The probability measures
+\(c_N^{-1}p(k)^N\,dk\) concentrate at \(1\).
+For completeness, outside any neighborhood \(U\) of \(1\) the
+maximum is \(r<p(1)\); choose \(r<r'<p(1)\) and an open
+neighborhood \(V\) on which \(p>r'\).  Haar measure of \(V\)
+is positive (finitely many translates cover \(K\)), and the
+mass outside \(U\) is at most
+\(\mu(V)^{-1}(r/r')^N\).  This tends to zero.
+Uniform continuity of \(\pi\) gives \(c_N^{-1}A_N\to1\) in
+operator norm.  Choose \(N\) so close that its distance to \(1\)
+is less than \(1\).  The convergent Neumann series makes \(A_N\)
+invertible.
+
+Define, for \(g\in\operatorname{GL}_m(\mathbb C)\),
+\[
+ \tau(g)=
+ \left(\int_K
+ [1+2m+\operatorname{tr}(g^{-1}k)+\operatorname{tr}(k^*g)]^N
+                       \pi(k)\,dk\right)A_N^{-1}.
+ \tag{JIO.16}
+\]
+Expanding the finite power shows directly that this is a finite
+sum of holomorphic functions of entries of \(g,g^{-1}\), with
+constant operator coefficients.  For \(g\in K\) the bracket is
+\(p(g^{-1}k)\); left invariance of Haar measure and the group law
+give the integral \(\pi(g)A_N\).  Thus \(\tau(g)=\pi(g)\).
+
+We need the following uniqueness fact, including its justification.
+A holomorphic function on the complex block group which vanishes
+on \(K\) vanishes everywhere.  For \(y\) in the complex block
+group, take the positive Hermitian logarithm
+\(H=\log(y^*y)\), obtained by diagonalizing its two positive
+Hermitian blocks.  It commutes with \(J_\epsilon\), and
+\(u=y e^{-H/2}\) belongs to \(K\).  The entire curve
+\(z\mapsto u e^{zH}\) lies in the complex block group and lies
+in \(K\) when \(z\) is imaginary.  The one-variable identity
+theorem, applied to matrix entries, gives vanishing at
+\(z=1/2\), namely at \(y\).
+
+Apply this uniqueness fact first in one variable and then the
+other to
+\(\tau(ab)-\tau(a)\tau(b)\).  Its vanishing on \(K\times K\)
+extends to the whole product of complex block groups.
+The same fact applied entrywise to
+\(\tau(g)-\tau(g^*)^*\), a holomorphic function because the two
+conjugations cancel, extends the adjoint identity from \(K\).
+The original positive inner product is anisotropic, completing
+the claimed contract.  The construction uses no unproved
+complexification or algebraic-representation existence assertion.
+% END JIO5
+
+% BEGIN JIO6
+\paragraph{JIO6: the conjugated compact type has its required bottom vector.}
+\label{claim:JIO6}
+Let \(S\) satisfy the original
+\(\mathrm{IsKTypeOf}(\epsilon,\sigma,\lambda,S)\): it is finite
+dimensional, compact-stable and irreducible, has a nonzero
+weight-\(\lambda\) vector, and every occurring weight \(\mu\)
+satisfies the source's compact dominance
+\(\lambda-\mu=\sum_{a<b,\epsilon_a=\epsilon_b}c_{ab}(e_a-e_b)\)
+with \(c_{ab}\in\mathbb N\).
+Choose a unit vector \(w\in S\) of weight \(\lambda\).
+There is an \texttt{IsHolRep} \(\tau\) on \(S\) such that
+\[
+       \tau(k)s=\sigma(\overline{k})s\quad(k\in K_\epsilon),
+       \qquad
+       w\text{ is bottom of weight }-\lambda.
+ \tag{JIO.17}
+\]
+
+\emph{Proof.}
+Complex conjugation preserves the compact block group and its
+group law.  Apply JIO5 to \(k\mapsto\sigma(\overline{k})|_S\).
+Its compact invariant subspaces are exactly those of \(\sigma\),
+so irreducibility is unchanged.  On the diagonal torus,
+conjugation reverses all angles, giving weight \(-\lambda\)
+for \(w\).
+
+Let \(D\) be the complex derivative of \(\tau\) at \(1\).
+For \(a>b\) in the same sign block, differentiating
+\[
+ t(1+zE_{ab})t^{-1}
+      =1+e^{i(\theta_a-\theta_b)}zE_{ab},
+ \qquad t=\operatorname{diag}(e^{i\theta_j}),
+ \tag{JIO.18}
+\]
+shows that \(D(E_{ab})w\), if nonzero, has \(\tau\)-weight
+\(-\lambda+e_a-e_b\).  Its \(\sigma\)-weight is therefore
+\(\lambda-(e_a-e_b)\).  Compact dominance would express
+\(e_a-e_b\) as a nonnegative integral combination of roots
+\(e_c-e_d\) with \(c<d\) in equal-sign blocks.
+Apply the functional \(v\mapsto\sum_j jv_j\):
+the left side is \(a-b>0\), whereas every summand on the right
+is nonpositive.  This is impossible.  Thus \(D(E_{ab})w=0\).
+
+For the one-parameter subgroup \(1+zE_{ab}\), \(E_{ab}^2=0\).
+Differentiating its group law at any \(z\) now gives derivative
+\(\tau(1+zE_{ab})D(E_{ab})w=0\).  Hence it fixes \(w\)
+for every complex \(z\).  Ordinary elimination, starting with
+the bottom row and moving upward, writes every lower-unitriangular
+matrix in each sign block as a product of these elementary
+matrices.  They all fix \(w\), so their product fixes \(w\).
+This proves the full bottom condition in (JIO.17), including
+all lower-unitriangular matrices rather than only their tangent
+directions.
+% END JIO6
+
+% BEGIN JIO7
+\paragraph{JIO7: a bottom matrix coefficient depends only on its weight.}
+\label{claim:JIO7}
+Let \((P,B,\pi)\) and \((P',B',\pi')\) be two
+\texttt{IsHolRep}s for the same sign group.  If \(x,y\) and
+\(x',y'\) are bottom vectors of the same real weight \(\mu\), then
+for every \(k\in K_\epsilon\),
+\[
+ B(x,\pi(k)y)\,B'(x',y')
+             =B(x,y)\,B'(x',\pi'(k)y').
+ \tag{JIO.19}
+\]
+No finite-dimensionality of \(P\) or \(P'\) is required.
+
+\emph{Proof.}
+First the unitary diagonal law extends to positive diagonal
+matrices:
+\[
+ \pi(\operatorname{diag}(e^{s_a}))y
+                         =e^{\sum_a\mu_as_a}y,\quad s_a\in\mathbb R.
+ \tag{JIO.20}
+\]
+Indeed take scalar coefficients against any fixed \(z\) along
+\(\operatorname{diag}(e^{i\zeta s_a})\).
+Both sides are entire in \(\zeta\) and agree for real \(\zeta\).
+They agree at \(\zeta=-i\).  If their vector difference is \(v\),
+test with \(z=v\); anisotropy of \(B\) makes the difference zero.
+The same proof works for every bottom vector and for \(B'\).
+
+A lower triangular block matrix \(b\) with positive diagonal
+is the product of its positive diagonal part and a lower
+unipotent.  Thus it acts on every bottom vector by the same
+positive number
+\(r(b,\mu)=\exp(\sum_a\mu_a\log b_{aa})\).
+For any \(g\in K_\epsilon^{\mathbb C}\), Gram--Schmidt on its
+columns in reverse order, separately in the two blocks, gives
+\(g=kb\) with \(k\) unitary and \(b\) lower triangular with
+positive diagonal.  At each step the vector to be normalized
+is nonzero because the remaining columns are independent.
+Adjointness and the group law then give
+\[
+             B(x,\pi(g^*g)y)=r(b,\mu)^2B(x,y).
+ \tag{JIO.21}
+\]
+The same scalar appears for \(B',\pi'\).
+
+Finally diagonalize the two unitary blocks of \(k\).  Choosing
+real arguments of their eigenvalues gives \(k=e^{iH}\) with
+\(H=H^*\) commuting with \(J_\epsilon\).
+Along \(e^{zH}\), the difference between the two sides of
+(JIO.19) is entire.  For real \(z=t\),
+\(e^{tH}=(e^{tH/2})^*e^{tH/2}\), so (JIO.21) makes that
+difference zero.  The identity theorem gives zero at \(z=i\),
+which is exactly (JIO.19).  The proof uses neither division by
+\(B(x,y)\) nor any assertion that this coefficient is nonzero.
+% END JIO7
+
+% BEGIN JIO8
+\paragraph{JIO8: the product orbit map is constructed from its Gram relations.}
+\label{claim:JIO8}
+Let two \texttt{IsHolFam}s have the same sign family and
+bottom weights \(\mu_\tau\).  If \(x\in P\), \(x'\in P'\) are
+common bottom vectors and \(x'\ne0\), there exists a linear
+\(\Psi:P'\to P\) such that for every compact tuple \(u\),
+\[
+                    \Psi(\pi'(u)x')=\pi(u)x.
+ \tag{JIO.22}
+\]
+The assertion is the exact \texttt{exists\_orbit\_map} contract;
+it does not claim equivariance on an arbitrary complement.
+
+\emph{Proof.}
+Since \(B'(x',x')\ne0\), JIO7 gives, for each one-place compact
+element \(k\), a scalar
+\[
+        c_\tau(k)=
+          \frac{B'(x',\pi'(\operatorname{single}_\tau k)x')}
+               {B'(x',x')}
+ \tag{JIO.23}
+\]
+which computes the coefficient on any pair of bottom vectors
+at that place, for either representation.
+Operators at distinct places commute.  Applying an operator at
+one place preserves all bottom laws at the other places.
+The one-place adjoint identities also give the adjoint identity
+for a whole tuple by writing it as the finite product of its
+one-place tuples.
+Successively apply JIO7 to obtain the product coefficient
+\(\prod_\tau c_\tau(u_\tau)\).
+Adjointness gives the resulting orbit Gram identity
+\[
+ \begin{split}
+ &B\!\left(\sum_j a_j\pi(u_j)x,\sum_l b_l\pi(v_l)x\right)
+                         B'(x',x')\\
+ &\hspace{5mm}=
+ B(x,x)\,
+ B'\!\left(\sum_j a_j\pi'(u_j)x',
+                         \sum_l b_l\pi'(v_l)x'\right).
+ \end{split}
+ \tag{JIO.24}
+\]
+Here the one-place argument is applied to \(u_j^{-1}v_l\);
+the inverse is its conjugate transpose.
+
+If a finite linear relation between source orbit vectors is zero,
+use the same relation on both sides of (JIO.24).  The target
+vector has zero \(B\)-square and therefore is zero.  Thus (JIO.22)
+defines a well-defined linear map on the span of the source
+orbit.  Extend a basis of that span to a basis of \(P'\) and put
+the map equal to zero on the added basis vectors.  This is the
+required linear map.  If \(x=0\), the same argument simply gives
+the zero map on the orbit span.
+% END JIO8
+
+% BEGIN JIO9
+\paragraph{JIO9: a universal finite-type operator, with its operator-span control.}
+\label{claim:JIO9}
+Let \(S,\sigma,\lambda\) be as in JIO6 and let
+\((P,B,\pi)\) be any \texttt{IsHolRep} for the same signs.
+There are a unit vector \(w\in S\) and a linear map
+\(T:S\to\operatorname{End}_{\mathbb C}(P)\) such that
+\[
+ \begin{gathered}
+ T(s)\in\operatorname{span}_{\mathbb C}\{\pi(k):k\in K_\epsilon\},
+ \\
+ T(w)y=y,\qquad
+ T(\sigma(k)s)y=\pi(\overline{k})T(s)y
+ \quad\text{for every bottom }y\text{ of weight }-\lambda .
+ \end{gathered}
+ \tag{JIO.25}
+\]
+The same \(T\) works for every such \(y\).
+
+\emph{Proof.}
+Use the holomorphic representation \(\tau\) of JIO6.
+On the free vector space of finitely supported complex functions
+on \(K_\epsilon\), define
+\[
+       \Phi(a)=\sum_k a_k\tau(k)w,\qquad
+       \Upsilon(a)=\sum_k a_k\pi(k).
+ \tag{JIO.26}
+\]
+The range of \(\Phi\) is nonzero and compact-stable.  Irreducibility
+therefore makes it all of \(S\).  Choose a linear right inverse
+\(R\) by choosing preimages of a basis of \(S\), and set
+\(T=\Upsilon R\).  This immediately gives the operator-span
+assertion.
+
+For every bottom \(y\), JIO7 and \(\|w\|=1\) give
+\[
+ B(\Upsilon(a)y,\Upsilon(b)y)
+                      =B(y,y)\langle\Phi(a),\Phi(b)\rangle .
+ \tag{JIO.27}
+\]
+Thus \(\Phi(a)=0\) implies \(\Upsilon(a)y=0\), by anisotropy.
+Consequently
+\(\Upsilon(R\Phi(a))y=\Upsilon(a)y\), simultaneously for all
+bottom \(y\).
+Take \(a\) to be the identity basis vector to get \(T(w)y=y\).
+Left translation of \(a\) by \(k\) gives
+\(T(\tau(k)s)y=\pi(k)T(s)y\).
+Replace \(k\) by \(\overline{k}\) and use
+\(\tau(\overline{k})s=\sigma(k)s\), obtaining (JIO.25).
+The chosen right inverse depends on \(S,\tau,w\), not on \(y\),
+which is the needed simultaneous quantifier.
+% END JIO9
+
+% BEGIN JIO10
+\paragraph{JIO10: the operator acts on the whole original \(\mathrm{LowT}(M)\).}
+\label{claim:JIO10}
+For any original \(\mathrm{DSModel}\ M\) and any
+\texttt{IsHolFam} \((P,B,\varpi)\) with signs \(M.\epsilon\),
+there is
+\(\mathfrak m:\mathrm{LowT}(M)\to\operatorname{End}_{\mathbb C}(P)\)
+with all three conclusions of \texttt{lowest\_types\_act}:
+it commutes with every operator commuting with all compact
+\(\varpi\)-operators; for every compact tuple \(\kappa\) there are
+nonzero \(v_\tau\in\mathrm{lowT}(M,\tau)\) with
+\[
+ \mathfrak m(\otimes_\tau v_\tau)y
+                  =\varpi(\overline{\kappa})y
+       \quad\text{for every common bottom }y
+                \text{ of weight }-\mathrm{lowK}(M);
+ \tag{JIO.28}
+\]
+and replacement of \(v_\tau\) by \(\sigma_\tau(k)v_\tau\)
+changes the value to
+\(\varpi(\operatorname{single}_\tau\overline{k})
+          \mathfrak m(\otimes v)y\).
+
+\emph{Proof.}
+HCU8 gives, at every place, a finite-dimensional smooth subspace
+\(S_\tau\) satisfying the original lowest \(\mathrm{IsKTypeOf}\).
+It is contained in the original \(\mathrm{lowKSub}\), since the
+latter is the supremum of \emph{all} subspaces of that type.
+Let \(P_\tau\) be the orthogonal projection from \(M.H_\tau\)
+to \(S_\tau\).  It commutes with \(\sigma_\tau(k)\):
+unitarity preserves both \(S_\tau\) and its orthogonal complement,
+so the two components of a vector are carried to the corresponding
+two components of its translate.
+
+Apply JIO9 to \(S_\tau\) and the one-place representation.
+Precompose its \(T_\tau\) with \(P_\tau\) and with the literal
+inclusion
+\(\mathrm{lowT}(M,\tau)\subset M.\mathrm{sm}_\tau\subset M.H_\tau\).
+Call the resulting operator-valued map \(U_\tau\).
+Each \(U_\tau(v)\) belongs to the span of one-place compact
+\(\varpi\)-operators.  Hence \(U_\tau(v)\) and \(U_\rho(w)\)
+commute if \(\tau\ne\rho\), by the product-group law and
+bilinearity of commutation.  Therefore
+\[
+          \mathfrak m(\otimes_\tau v_\tau)
+                           =\prod_\tau U_\tau(v_\tau)
+ \tag{JIO.29}
+\]
+is multilinear and defines the asserted linear map on the
+algebraic tensor product.  The product is independent of the
+chosen ordering because its factors commute.
+The operator-span assertion also proves the commutant conclusion.
+
+Choose \(v_\tau=\sigma_\tau(\kappa_\tau)w_\tau\) from JIO9,
+regarded as an element of the original \(\mathrm{lowT}\).
+It lies there because \(S_\tau\) is smooth, compact-stable and
+contained in \(\mathrm{lowKSub}\); its norm is \(1\), so it is
+nonzero.  JIO9 gives
+\(U_\tau(v_\tau)y=
+ \varpi(\operatorname{single}_\tau\overline{\kappa_\tau})y\).
+Multiplying these equalities, commuting the other-place factors
+at each step, gives (JIO.28).
+For an arbitrary updated tuple, projection equivariance and
+the last equality in (JIO.25) give the one-place replacement
+law; the remaining factors commute past that one-place operator.
+This proves the full original contract on \(\mathrm{LowT}(M)\).
+It has not replaced that space by \(S_\tau\), nor required
+HolShape or multiplicity one.
+% END JIO10
+
+% BEGIN JIO11
+\paragraph{JIO11: the literal coefficient polynomial is a nonzero bottom vector.}
+\label{claim:JIO11}
+For original dominant integral weights \(\lambda_\tau\), put
+\(d_\tau=\lambda_\tau.\mathrm{detShift}\) and
+\(\nu_{\tau,j}=\lambda_{\tau,j}-d_\tau\in\mathbb N\).
+On the source's square-matrix polynomial space define
+\[
+ V_\lambda(u)=
+       \left(\prod_\tau\det(u_\tau)^{-d_\tau}\right)
+                    \operatorname{blockAct}(u^{-1}),\qquad
+ e_\lambda=\prod_\tau
+            \prod_{s=1}^{n}
+        \det(X_{\tau,a,b})_{a,b<s}^{\,\nu_{\tau,s-1}-\nu_{\tau,s}},
+ \quad \nu_{\tau,n}=0.
+ \tag{JIO.30}
+\]
+Then \(V_\lambda\) is an \texttt{IsHolFam} for the all-positive
+sign and the factorial form.  The vector \(e_\lambda\) is nonzero,
+belongs to the literal \(\mathrm{VV}(\mathbb C,\lambda)\), and
+is a common bottom vector of weight \(-\lambda\).
+These are precisely the four conclusions of
+\texttt{vact\_isHolFam\_isBotFam}.
+
+\emph{Proof.}
+The last entry of a decreasing integral weight is its minimum,
+so \(\nu_{\tau,j}\ge0\) and is decreasing; for \(n=0\) the
+source chooses \(d_\tau=0\) and all products are empty.
+The displayed polynomial is exactly the source's tensor of
+the \texttt{extremal} polynomials.
+
+The substitution \(X_{ij}\mapsto\sum_a(u^{-1})_{ia}X_{aj}\)
+has the group law in this order.  JIO1, now with all rows as
+variables, gives its adjoint under \(u\mapsto u^*\).
+The determinant twist has the same adjoint rule.
+Inverse entries and integer determinant powers are holomorphic
+on the invertible matrices, proving all family conditions as
+in JIO2.
+
+For a lower triangular \(u\), its inverse is lower triangular;
+the first \(s\) rows of the leading minor are stable.  The
+minor scales by \(\prod_{a<s}u_{aa}^{-1}\).
+JIO3's telescoping identity gives row exponent \(-\nu_j\);
+the determinant twist adds \(-d\), giving \(-\lambda_j\).
+Thus lower unipotents fix \(e_\lambda\), and the diagonal
+unitary character is the required one.
+
+For membership, the source defines \(\mathrm{dualWeyl}(\nu)\)
+as the column-multihomogeneous polynomials of degree \(\nu\)
+fixed by every operation adding an earlier column to a later
+one, even with a formal indeterminate as coefficient.
+Every leading determinant is fixed by such an operation:
+either the later column is absent, or both columns are present
+and determinant alternation cancels the new term.
+Telescoping gives column degree \(\nu\).
+Consequently each factor lies in its literal
+\(\mathrm{nablaSq}\), and their tensor product lies in the
+defining span \(\mathrm{VV}\).
+Evaluating every square matrix at the identity makes every
+leading determinant \(1\), so \(e_\lambda\ne0\).
+This establishes the complete original polynomial contract.
+% END JIO11
+
+% BEGIN JIO12
+\paragraph{JIO12: the parameter-free map and its exact unit-vector normalization.}
+\label{claim:JIO12}
+Take all the original inputs of \texttt{exists\_io\_poly}:
+\(D,V,W,\theta,M,c,\lambda,c_0,B_S,p,q,a^+,a^-,x_1,x_2,x_3\);
+\(\theta\) is an \(\mathrm{IsInfFam}\), \(c\) satisfies \(c.\mathrm{Is}\),
+and the same \(c_0\) satisfies
+\(\mathrm{Bridge.CoefMapTie}(V,c,c_0,\rho_{V,r})\).
+Assume \(B_{S,\tau}\) is invertible, \(m\le n\), \(p_\tau+q_\tau=m\),
+the ordered sign condition, both antitonicity conditions of JIO3,
+and the exact two weight identities
+\[
+       \mathrm{lowK}(M)_{\tau,a}=\mathrm{wtK}_{\tau,a},
+              \qquad \mathrm{wtU}_{\tau,j}=-\lambda_{\tau,j}.
+ \tag{JIO.31}
+\]
+Then there is one bilinear map
+\[
+           \mathrm{io}:\mathrm{LowT}(M)\times c.W
+                                  \longrightarrow\mathcal P
+ \tag{JIO.32}
+\]
+satisfying both polynomial covariance laws in the source
+\texttt{exists\_io\_poly}, and taking one tuple of unit lowest
+vectors and one unit coefficient vector to the \emph{exact}
+polynomial \(\Delta\).
+
+\emph{Proof.}
+Use CFB5 with this same \(c_0,B_S\).
+It supplies a linear map \(j:c.W\to\operatorname{Pol}\) with
+\(\operatorname{range}j=\mathrm{VV}(\mathbb C,\lambda)\) and
+\[
+ j(c.\rho(u)w)=V_\lambda(u_B)j(w),\qquad
+ (u_B)_\tau=B_{S,\tau}^{-1}
+                     \operatorname{compAt}_\tau(\mathrm{mt}(u))
+                       B_{S,\tau}
+ \tag{JIO.33}
+\]
+for every original \(u\in G_\infty(V)\).
+CFB6 also proves that the compact \(V_\lambda\)-orbit of
+\(e_\lambda\) spans this exact \(\mathrm{VV}\).
+These are explicit proved coefficient interfaces, not an
+unspecified intertwiner premise.
+
+JIO2, JIO4, JIO11 and the second identity in (JIO.31) allow
+JIO8 to construct
+\(\Psi:\operatorname{Pol}\to\mathcal P\) with
+\[
+             \Psi(V_\lambda(u)e_\lambda)=F_U(u)\Delta'
+                      \quad(u\text{ compact}).
+ \tag{JIO.34}
+\]
+On \(\mathrm{VV}\) this implies two facts:
+\(\Psi(F)\) is bottom for \(F_K\) of weight
+\(-\mathrm{lowK}(M)\), and
+\(\Psi(V_\lambda(u)F)=F_U(u)\Psi(F)\) for compact \(u\).
+For orbit generators the first follows from commutation of
+\(F_U\) and \(F_K\), and the second from the group law.
+Both properties extend to their span by linearity.
+No assertion is made about equivariance on the chosen complement.
+
+Let \(\mathfrak m\) be JIO10 for \(F_K\).
+Choose its nonzero tuple \(v^0\) for the reversal \(\kappa\).
+Choose \(w^0\) with \(j(w^0)=e_\lambda\); it is nonzero because
+\(e_\lambda\ne0\).  Equation (JIO.34) at \(u=1\) gives
+\(\Psi(jw^0)=\Delta'\).
+Write the positive numbers
+\[
+ N_\tau=\|v^0_\tau\|,\quad N_0=\|w^0\|,\quad
+ C=N_0\prod_\tau N_\tau,\qquad
+          \mathrm{io}(x,w)=C\,\mathfrak m(x)\Psi(jw).
+ \tag{JIO.35}
+\]
+All norms here are the original Hilbert and coefficient norms.
+They are nonzero, and the expression is complex-bilinear.
+
+If \(u\in G_\infty(V)\) and all \(u_B\) are unitary,
+(JIO.33)--(JIO.34) and the commutant property of \(\mathfrak m\)
+give
+\[
+                  F(1,u_B)\mathrm{io}(x,w)
+                             =\mathrm{io}(x,c.\rho(u)w).
+ \tag{JIO.36}
+\]
+For \(k\in K_{\epsilon_\tau}\) and an original updated lowest
+vector \(v'_\tau=\sigma_\tau(k)v_\tau\), JIO10 gives the
+operator \(F_K(\operatorname{single}_\tau\overline{k})\).
+Unitarity implies
+\(((\overline{k})^{-1})^{\mathsf t}=k\); therefore
+\[
+ F(\operatorname{single}_\tau k,1)\mathrm{io}(\otimes v,w)
+                 =\mathrm{io}(\otimes(v[\tau\mapsto v'_\tau]),w).
+ \tag{JIO.37}
+\]
+This checks the otherwise delicate inverse-transpose convention.
+
+Finally put \(v_\tau=N_\tau^{-1}v^0_\tau\) and
+\(w=N_0^{-1}w^0\).  Their norms are \(1\).
+Tensor multilinearity and (JIO.28) show
+\[
+ \begin{split}
+ \mathrm{io}(\otimes v,w)
+   &=C\left(\prod_\tau N_\tau^{-1}\right)N_0^{-1}
+                         F_K(\overline{\kappa})\Delta'\\
+   &=F(\kappa,1)\Delta'=\Delta.
+ \end{split}
+ \tag{JIO.38}
+\]
+The scalar cancels to \(1\), with no phase or unspecified
+normalization factor.  This proves the entire parameter-free
+source conclusion.
+% END JIO12
+
+% BEGIN JIO13
+\paragraph{JIO13: the stored place-model value is an actual theta vacuum.}
+\label{claim:JIO13}
+For the original standard character and infinity family, suppose
+\(\mathrm{IsThetaAt}(\psi,e,\Lambda,c,f_0,\Phi,f)\) holds and
+\(f_0\) is an original theta function.  Then \(f\) is an original
+theta function.  Consequently the original
+\(R.\mathrm{thP}_{vP}\), together with \(R.\mathrm{IsModels}\),
+gives, for every \(i,t\), the theta property of \(R.vP(i,t)\).
+The stored vacuum reading and the original creators then give
+\[
+ \begin{gathered}
+ f_{i,t}=R.vP(i,t)\text{ is Fock-vacuum at every real place},\\
+ \mathrm{pt}_{i,t}(P)=
+ \mathrm{pureTensorO}\bigl(\psi,\theta,V,W,1,\mathrm{cart}(M),
+                    R.BV(i),\mathrm{onb}(M),f_{i,t},P\bigr)\\
+ \text{ is a theta function for every }P .
+ \end{gathered}
+ \tag{JIO.39}
+\]
+Here \(M=R.MW(i,\mathrm{sg0})\) and all objects are the stored ones.
+
+\emph{Proof.}
+Let \(\Theta\) be the vector subspace of original theta functions.
+It is a subspace because sums use the intersection of their open
+finite levels, and the continuity, quasi-periodicity and smoothness
+conditions are linear.  Every original Heisenberg operator \(H_w\)
+preserves it: use the Heisenberg multiplication formula for
+quasi-periodicity, and shrink the finite level to the kernel of
+the extra pairing character with the fixed finite part of \(w\).
+This is an open level: on a sufficiently small compact open
+additive subgroup, continuity puts the character in an arc of
+the circle containing no nontrivial subgroup, so its image is
+trivial.  Translating the defining real orbit proves smoothness.
+This is also the theta-space calculation of CW12.
+
+Let \(\ell\) be any algebraic linear functional annihilating
+\(\Theta\), and define a linear operator on all functions by
+\[
+                       (Ag)(w)=\ell(H_wg).
+ \tag{JIO.40}
+\]
+The Heisenberg cocycle identity says
+\(AH_u=H_uA\): at \(w\), both sides are the same phase times
+\(\ell(H_{w+u}g)\).  Since \(H_wf_0\in\Theta\), \(Af_0=0\).
+Choose a place model \(T_0\) supplied by the existential part of
+\(\mathrm{IsThetaAt}\).  The map \(T_0+AT_0\) is another place
+model for the identical \(e,\Lambda,c,f_0\): the two finite
+half-translation laws follow from commutation, and its value at
+the vacuum is unchanged because \(Af_0=0\).
+The universal \(\mathrm{AllSome}\) clause gives
+\[
+                 f=T_0\Phi=(T_0+AT_0)\Phi=f+Af.
+ \tag{JIO.41}
+\]
+Thus \(Af=0\), and evaluation at \(w=0\) gives \(\ell(f)=0\).
+Every vector outside a subspace is separated by an algebraic
+linear functional, as follows by adjoining that vector to a
+basis of the subspace and extending to a basis.  Therefore
+\(f\in\Theta\).
+
+The original \(\mathrm{IsThPVecOf}\) record supplies precisely
+this initial theta vacuum and this \(\mathrm{IsThetaAt}\)
+condition.  Its place model acts only in finite directions.
+The original vacuum argument in TAE9, now with the theta property
+just proved, gives its Fock-vacuum equations at every real place:
+extend a real annihilation functional algebraically to all
+curves, perturb the same place model as in (JIO.41), and use
+commutation with the finite Heisenberg action and annihilation
+of \(f_0\).
+
+CW12 proves that real Heisenberg derivatives of theta functions
+are again theta functions, with genuine Banach derivatives.
+The original scaled creators are fixed complex linear
+combinations of two such derivatives.  They therefore preserve
+\(\Theta\).  Their mutual commutation follows from the
+Heisenberg commutator and the positive Cartan complex structure:
+the two scalar commutators in
+\([D_z-iD_{Jz},D_w-iD_{Jw}]\) cancel, including the cross terms.
+Equivalently this is TAE3's Heisenberg calculus.
+The finite monomial definition of \(\mathrm{pureTensorO}\)
+therefore remains in \(\Theta\), proving every assertion of
+(JIO.39).  In particular this proves the whole
+\(R.\mathrm{thP}_{\mathrm{pt\_theta}}\) predicate; it is not
+retained as a new input to the simultaneous construction.
+% END JIO13
+
+% BEGIN JIO14
+\paragraph{JIO14: the original splitting characters have the same exponents for every \(t\).}
+\label{claim:JIO14}
+Let \(L\) be the original level-character data and assume
+\(L.\mathrm{Is}(\mu_0)\).  For every \(i,t,\tau\), the characters
+in the original pair
+\(\mathrm{chrTh}(L.\mathrm{mu}(t),L.\eta,i+1)\) satisfy
+\[
+ \mathrm{HasInfExp}(\chi_V,\tau,-e_{i,\tau}),\qquad
+ \mathrm{HasInfExp}(\chi_W,\tau,-e_{i,\tau}-\tfrac12).
+ \tag{JIO.42}
+\]
+This is the exact \texttt{InfTypesAt} input needed below,
+with no restriction on \(t\).
+
+\emph{Proof.}
+We first justify the actual character-model transport, rather
+than identifying infinity exponents merely by name.
+Suppose \(\mathrm{ChrEq}(c,\chi)\) and \(\chi\) has the
+specified integral phase exponents \(n_\tau=2a_\tau\).
+The definition of \(\mathrm{ChrEq}\) says that \(c\) is continuous
+and trivial on principal ideles, and that its value on the
+single finite-place principal element \(k\in E^\times\)
+equals the original \(\chi.\mathrm{locK}_w(k)\).
+
+These comparisons determine the real component as follows.
+The finite tensor algebra
+\(\mathbb A_{F,f}\otimes_F E\) has its usual components
+\(\prod_{w\mid v}E_w\) over a place \(v\) of \(F\).
+Indeed write \(E=F[\alpha]\); factoring its separable minimal
+polynomial over \(F_v\) and applying the Chinese remainder
+theorem gives this decomposition.  Outside the finite set
+dividing its index and discriminant the corresponding integral
+lattices agree, so the decompositions respect the restricted
+product topology.  They give the original one-place idempotents
+and the real/finite decomposition used in \(\mathrm{ChrEq}\).
+The real tensor algebra is similarly
+\(\prod_{\tau\in I}\mathbb C\), with the specified CM-type
+embeddings; HCU14 proves this original coordinate realization.
+
+For a fixed \(k\in E^\times\), multiply its one-place finite
+principal elements over finite sets of places.  This net
+converges to the purely finite component of the principal
+idele: any restricted-product neighborhood specifies only
+finitely many components, and \(k,k^{-1}\) are integral outside
+a finite set.  The same net in the ordinary adelic model of
+\(\chi\) has the same local values by \(\mathrm{ChrEq}\).
+Continuity equates the two finite-component values.
+Both full characters are trivial on the principal idele, so
+their purely real values on \(k\) agree.  The latter is
+\[
+           \prod_\tau
+              \left(\frac{\tau(k)}{|\tau(k)|}\right)^{n_\tau}
+ \tag{JIO.43}
+\]
+by the original \(\mathrm{HasInfQ}\) condition.
+
+The image of \(E\) in \(\prod_\tau\mathbb C\) is dense:
+combine an \(F/\mathbb Q\) basis with the \(E/F\) basis
+\(1,\delta\), where \(\overline\delta=-\delta\ne0\).
+Their images form a real basis by the CM real tensor
+isomorphism, and rational coordinates are dense in real
+coordinates.  Restricting to the open subset
+where all components are nonzero gives density of \(E^\times\).
+Thus continuity extends (JIO.43) to every real idele.
+Every infinity family \(\theta\) satisfying
+\(\mathrm{IsInfFam}\) gives these same coordinates, since it
+agrees on \(E\) and is continuous; equivalently apply the
+same density argument to its component maps.
+Taking a real idele supported at \(\tau\) proves the literal
+\(\mathrm{HasInfExp}(c,\tau,a_\tau)\), including its universal
+infinity-family clause and its existence clause.
+The required coordinate family itself is supplied by the
+real tensor decomposition just described.
+
+Apply this to \(L.\mathrm{mu0}\) and \(L.\eta\) through the
+actual fields \(h_L.\mathrm{mu0}\) and \(h_L.\eta\).
+Their stored character-frame readings give exponents
+\(-e_{i,\tau}\) and \(1/2\), respectively; reindexing the
+CM type uses the specified bijection \(D.eTau\).
+For \(L.\xi(t)\), the original field \(\xi_{\rm fin}\)
+says that its Hecke model has finite order.  The real ideles
+form the connected group \(\prod_\tau\mathbb C^\times\).
+A continuous character of finite order has image in a finite
+root-of-unity group, so is \(1\) there.  Hence its infinity
+exponent is \(0\), and the same transport proves this for
+the actual \(L.\xi(t)\).
+
+The definition \(L.\mathrm{mu}(t)=\mathrm{tup}
+(L.\mathrm{mu0},L.\xi(t))\) multiplies these two characters.
+Multiplying and inverting their phase formulas adds and
+negates the exponents; the integer phase exponents are
+respectively added and negated as well.
+Finally the actual pair is
+\(\chi_V=L.\mathrm{mu}(t)_{i+1}\) and
+\(\chi_W=L.\mathrm{mu}(t)_{i+1}L.\eta^{-1}\).
+This gives (JIO.42) for every \(t\).  The finite order used
+here may depend on \(t\); its only consequence is the exact
+zero real exponent, so no parameter-dependent weight is
+introduced.
+% END JIO14
+
+% BEGIN JIO15
+\paragraph{JIO15: real determinant roots and their character values.}
+\label{claim:JIO15}
+For any original real-supported unitary \(g\) on a nondegenerate
+Hermitian space \(S\), there is an idele \(x\), with finite
+component \(1\), satisfying the actual determinant-root equation
+\[
+                  x=\det(\mathrm{mt}(g))\,\overline{x}.
+ \tag{JIO.44}
+\]
+For every character \(\nu\) with integral infinity exponents
+\(c_\tau\in\mathbb Z\), this same root can be chosen so that
+\[
+                         \nu(x)=\prod_\tau\det(g_\tau)^{c_\tau}.
+ \tag{JIO.45}
+\]
+
+\emph{Proof.}
+The relation \(g_\tau^*H_\tau g_\tau=H_\tau\), and
+\(\det H_\tau\ne0\), imply \(|\det g_\tau|=1\).
+Choose \(z_\tau\in\mathbb C\) with
+\(z_\tau^2=\det g_\tau\) and \(|z_\tau|=1\), for example by
+halving an argument.  The real tensor chart of HCU14 constructs
+the idele whose real components are \(z_\tau\) and whose finite
+component is \(1\); the same construction with \(z_\tau^{-1}\)
+is its inverse.  Since \(z_\tau/\overline{z_\tau}=z_\tau^2\),
+the root equation holds in every component and hence in the
+actual tensor algebra.
+
+Decompose this idele into the finite product of its one-place
+real factors.  By definition \(\mathrm{HasInfExp}(\nu,\tau,c_\tau)\)
+evaluates that factor as \(z_\tau^{2c_\tau}\).
+The factor of two is essential: the source records twice the
+rational infinity exponent as its integral phase exponent.
+Multiplication gives
+\(\prod_\tau z_\tau^{2c_\tau}
+ =\prod_\tau(\det g_\tau)^{c_\tau}\).
+Replacing a chosen square root by its negative does not change
+this value, since \(2c_\tau\) is even.  This proves both the
+original root contract and its simultaneous evaluation property.
+% END JIO15
+
+% BEGIN JIO16
+\paragraph{JIO16: the exact scalar of the actual Weil vacuum.}
+\label{claim:JIO16}
+Let \(S,T,\psi,\theta,\omega,\chi_S,\chi_T\) be the original
+objects satisfying \(\mathrm{IsWeilDatumO}\) and
+\(\mathrm{IsInfFam}\), with the original
+\(S.\mathrm{SigOK}\) and \(T.\mathrm{SigOK}\).
+Suppose \(S\) has Cartan involution \(1\),
+\(s_\tau\) is a Cartan involution on \(T\) with positive and
+negative dimensions \(p_\tau,q_\tau\), and
+\[
+ \begin{gathered}
+ \mathrm{HasInfExp}(\chi_S,\tau,a_\tau),\quad
+ \mathrm{HasInfExp}(\chi_T,\tau,b_\tau),\\
+ x_{1,\tau}=a_\tau+n/2,\qquad
+ x_{2,\tau}=a_\tau-n/2,\qquad
+ x_{3,\tau}=-(b_\tau+(p_\tau-q_\tau)/2)
+                       \quad\text{are integers}.
+ \end{gathered}
+ \tag{JIO.46}
+\]
+For every original theta function \(f\) which is a Fock vacuum
+for \(J_\tau z=i s_\tau z\) at every real place, and every
+real-supported \(g,h\) with \(h_\tau s_\tau=s_\tau h_\tau\),
+\[
+ \omega(g,h)f=
+ \left(\prod_\tau A_\tau^{x_{1,\tau}}
+                     B_\tau^{x_{2,\tau}}
+                     G_\tau^{x_{3,\tau}}\right)f ,
+ \quad
+ \begin{cases}
+ A_\tau=\det(P_{+,\tau}h_\tau+P_{-,\tau}),\\
+ B_\tau=\det(P_{-,\tau}h_\tau+P_{+,\tau}),\\
+ G_\tau=\det g_\tau.
+ \end{cases}
+ \tag{JIO.47}
+\]
+This is the actual \texttt{vacuum\_character} scalar, not a
+scalar inferred from covariance alone.
+
+\emph{Proof.}
+Use the explicit auxiliary character \(\eta_0\) and action
+\(\omega_0\) constructed in CW24 on these same Hermitian
+spaces and theta functions.  Its real exponent is \(1/2\);
+its restriction to the base-field ideles is the particular
+quadratic character of HF9, and HF11 constructs its Hecke
+extension.  CW24 proves
+exactly the operator construction needed here without assuming
+that this auxiliary character satisfies the universal
+\(\mathrm{IsEtaTilde}\) restriction.
+The two supplied \(\mathrm{ResEta}\) fields can be tested
+against that particular quadratic character.  Consequently
+\[
+          \nu_S=\chi_S\eta_0^{-n},\qquad
+          \nu_T=\chi_T\eta_0^{-m}
+ \tag{JIO.48}
+\]
+are trivial on all base-field ideles.  CW24's determinant-root
+construction therefore gives a full Weil datum
+\[
+       \omega'(g,h)=\widetilde{\nu_T}(g)^{-1}
+                          \widetilde{\nu_S}(h)\omega_0(g,h)
+ \tag{JIO.49}
+\]
+with the prescribed original \(\chi_S,\chi_T\).
+Here the tildes are evaluated on any roots in (JIO.44);
+root independence, continuity, rational triviality and the
+crossed finite splitting factor are proved in CW24 through
+its explicit determinant-root argument.
+BTH14 then identifies \(\omega'\) and the supplied \(\omega\)
+on the whole original theta space.  This step uses two full
+data with the same characters, and so fixes the actual action
+normalization.
+
+For a real-supported pair, the finite part of \(\omega_0\)
+is the identity.  CW11--CW13 compute its scalar on the entire
+vacuum space as the positive-Cartan determinant for the Hom
+matrix \(h_\tau\otimes(g_\tau^{-1})^{\mathsf t}\).
+Since \(S\) is positive, the positive subspace of that Hom
+space is \(T_{\tau,+}\otimes S_\tau^*\).
+The determinant on this subspace, with the identity on its
+complement, is
+\[
+                          A_\tau^{\,n}G_\tau^{-p_\tau}.
+ \tag{JIO.50}
+\]
+One can check this without choosing a new frame: conjugate
+the idempotent \(P_+\) to \(\operatorname{diag}(1_{p},0_q)\).
+The nonidentity block and its determinant are
+\[
+ h_+\otimes(g^{-1})^{\mathsf t},
+ \qquad \det(h_+)^n\det(g^{-1})^p.
+\]
+The same block decomposition gives \(\det h=A_\tau B_\tau\).
+All these determinants are nonzero.
+
+The infinity exponents of the two characters in (JIO.48) are
+\[
+           a_\tau-n/2=x_{2,\tau},\qquad
+           b_\tau-m/2=-x_{3,\tau}-p_\tau ,
+ \tag{JIO.51}
+\]
+which are integers.  Evaluate the determinant roots by JIO15.
+Multiplying their values with (JIO.50) gives at every place
+\[
+ G_\tau^{\,x_{3,\tau}+p_\tau}
+       (A_\tau B_\tau)^{x_{2,\tau}}
+       A_\tau^nG_\tau^{-p_\tau}
+       =A_\tau^{x_{1,\tau}}B_\tau^{x_{2,\tau}}G_\tau^{x_{3,\tau}},
+ \tag{JIO.52}
+\]
+since \(x_1=x_2+n\).
+This proves (JIO.47).  The inverse factor evaluates
+\(\nu_T\) on the source determinant root, while the direct
+factor evaluates \(\nu_S\) on the target determinant root,
+exactly as in (JIO.49).
+The argument applies simultaneously to every vacuum \(f\);
+it does not select a scalar separately for each vector.
+No identification of \(\eta_0\) with the stored level
+character \(L.\eta\) has been used.
+% END JIO16
+
+% BEGIN JIO17
+\paragraph{JIO17: the original orthonormal-frame substitution.}
+\label{claim:JIO17}
+Let \(B_S^*H_SB_S=1\), let
+\(B_T=\mathrm{onb}(M)=M.\mathrm{fr}^{-1}\), and let
+\(s=\mathrm{cart}(M)=B_TJ_\epsilon B_T^{-1}\).
+For \(k_\tau\in K_{\epsilon_\tau}\), \(u_\tau\in U(n)\)
+and every theta function \(f\),
+\[
+ \mathrm{pt}_{B_Su,B_Tk}(f,P)
+              =\mathrm{pt}_{B_S,B_T}(f,f_{\rm sub}(k,u)P).
+ \tag{JIO.53}
+\]
+All creators have the original scale
+\(2\sqrt{2\pi|\tau(\xi_0)|}\).
+
+\emph{Proof.}
+Write \(D_z\) for the real Heisenberg derivative and
+\[
+       C_J(z)=
+        [2\sqrt{2\pi|\tau(\xi_0)|}]^{-1}(D_z-iD_{Jz}).
+ \tag{JIO.54}
+\]
+The chosen host element \(\xi_0\ne0\) has nonzero image under
+every embedding, so this scale is a fixed positive number.
+The derivative is real-linear in \(z\), by CW12 or the explicit
+Heisenberg calculus of TAE3.
+If \(Jz=i\epsilon z\), direct expansion of
+\(c=\Re c+i\Im c\) gives
+\[
+             C_J(cz)=
+                  \begin{cases}c\,C_J(z),&\epsilon=+,\\
+                                \overline c\,C_J(z),&\epsilon=-.
+                   \end{cases}
+ \tag{JIO.55}
+\]
+Indeed \(J(iz)=iJz\); substituting into (JIO.54) leaves \(c\)
+in the positive case and \(\overline c\) in the negative one.
+
+The exact original unit direction is
+\(\mathrm{unitMap}(B_S,B_T;i,j)=B_TE_{ij}B_S^{-1}\).
+Matrix multiplication gives
+\[
+ \mathrm{unitMap}(B_Su,B_Tk;i,j)
+       =\sum_{a,b} k_{ai}(u^{-1})_{jb}
+                      \mathrm{unitMap}(B_S,B_T;a,b).
+ \tag{JIO.56}
+\]
+The latter direction has Cartan eigenvalue \(i\epsilon_a\).
+If the coefficient is nonzero, sign preservation of \(k\)
+gives \(\epsilon_a=\epsilon_i\).
+For the negative case, unitarity converts
+\(\overline{k_{ai}(u^{-1})_{jb}}\) to
+\((k^{-1})_{ia}u_{bj}\).
+Thus (JIO.55)--(JIO.56) produce exactly the two coefficients
+of (JIO.5), with the same scale on both sides.
+
+By JIO13 the creators preserve theta functions and commute
+there.  Their polynomial evaluation is therefore independent
+of a monomial's chosen ordering and satisfies
+\(\mathrm{pt}(X_vP)=C_J(v)\mathrm{pt}(P)\).
+Induct on a polynomial: the constant case is scalar
+multiplication of \(f\), addition is linear, and the case
+\(X_vP\) uses (JIO.56) with (JIO.55) and the induction
+hypothesis.  This proves (JIO.53) on the actual pointwise
+functions, without any completion or comparison scalar.
+% END JIO17
+
+% BEGIN JIO18
+\paragraph{JIO18: the full actual compact Weil law for every polynomial.}
+\label{claim:JIO18}
+Under the original hypotheses of JIO16, use the orthonormal
+source frames and model frames of JIO17.  Suppose \(g,h\)
+are real-supported and
+\[
+       k_\tau=M.\mathrm{fr}_\tau\,h_\tau M.\mathrm{fr}_\tau^{-1}
+                         \in K_{\epsilon_\tau},\qquad
+       u_\tau=B_{S,\tau}^{-1}g_\tau B_{S,\tau}.
+ \tag{JIO.57}
+\]
+Then every \(u_\tau\) is unitary and
+\[
+             \omega(g,h)\mathrm{pt}(f,P)
+                           =\mathrm{pt}(f,F(k,u)P)
+                   \quad\text{for every }P\in\mathcal P.
+ \tag{JIO.58}
+\]
+This is the complete original
+\texttt{om\_pureTensorO\_eq\_fact} contract.
+
+\emph{Proof.}
+The identity \(B_S^*H_SB_S=1\) makes \(B_S\) invertible
+and gives \(H_S=(B_S^{-1})^*B_S^{-1}\).
+Substitute this into \(g^*H_Sg=H_S\) to get \(u^*u=1\).
+It also proves that \(1\) is a positive Cartan on \(S\).
+The condition on \(k\) says that \(h\) commutes with
+\(s=B_TJ_\epsilon B_T^{-1}\).  Its trace is
+\(p-q\), so JIO16 applies to the same Cartan as the creators.
+
+We check differentiation through the actual Weil operator.
+Its Heisenberg covariance is
+\[
+              \omega(g,h)H_z=H_{hzg^{-1}}\omega(g,h).
+\]
+On theta functions, CW12 proves convergence of the Heisenberg
+difference quotients in the Banach norm and hence in the
+original compact-quotient \(L^2\) norm.  The original
+\(\mathrm{om\_unit}\) makes \(\omega(g,h)\) an isometry for
+that norm.  Passing to the difference-quotient limit proves
+\[
+             \omega(g,h)D_zf
+                            =D_{hzg^{-1}}\omega(g,h)f .
+ \tag{JIO.59}
+\]
+Both sides are theta functions.  Equality in \(L^2\) gives
+pointwise equality: a nonzero continuous difference has
+nonzero absolute value on an open set of positive Haar
+measure on the compact additive quotient.
+This argument does not assume continuity of the source's
+ambient algebraic endomorphism on all functions.
+
+Because \(h\) commutes with \(s\), the linear map
+\(z\mapsto hzg^{-1}\) commutes with the Hom Cartan complex
+structure.  Thus (JIO.59) intertwines the creators with
+source frame \(gB_S=B_Su\) and target frame \(hB_T=B_Tk\).
+Induction on monomials, each time using theta preservation,
+gives
+\[
+ \omega(g,h)\mathrm{pt}_{B_S,B_T}(f,P)
+              =\mathrm{pt}_{B_Su,B_Tk}(\omega(g,h)f,P).
+ \tag{JIO.60}
+\]
+Use JIO17, then JIO16.  Conjugation by the stored frames
+identifies the two target determinants in (JIO.47) with
+\(d_+(k_\tau)\) and \(d_-(k_\tau)\); the source determinant
+is \(\det u_\tau=\det g_\tau\).
+The right side of (JIO.60) is consequently
+\[
+          c(k,u)\,\mathrm{pt}_{B_S,B_T}
+                              (f,f_{\rm sub}(k,u)P)
+                         =\mathrm{pt}_{B_S,B_T}(f,F(k,u)P),
+ \tag{JIO.61}
+\]
+using linearity in the initial function and in \(P\).
+This proves the exact formula, including all determinant
+twists and every polynomial degree.
+% END JIO18
+
+% BEGIN JIO19
+\paragraph{JIO19: the full simultaneous producer.}
+\label{claim:JIO19}
+Fix one original
+\(R:\mathrm{RealDat}(D,A,K_s)\), on the selected Bundle if
+one has been selected, and assume exactly
+\[
+ R.\mathrm{toLevCh}.\mathrm{Is}(A.\mu_0),\quad
+ R.\mathrm{IsFam},\quad R.\mathrm{IsModels},\quad
+ R.\mathrm{thP}_{\omega P},\quad R.\mathrm{thP}_{vP}.
+ \tag{JIO.62}
+\]
+Then \(R.\mathrm{thP}_{\mathrm{pt\_theta}}\) holds, and
+\[
+ \begin{split}
+ \forall i\ \exists\,\mathrm{io}_i\ \forall t:\quad
+ \mathrm{IsIoW}\bigl(&R.\theta,\ R.MW(i,\mathrm{sg0}),\
+        R.cV(i),\ R.\omega P(i,t),\\
+                   &R.\mathrm{ptP}(i,t),\
+                     \mathrm{RealDat}.\Delta(i),\
+                     \mathrm{io}_i\bigr).
+ \end{split}
+ \tag{JIO.63}
+\]
+Equivalently a replacement field \(\mathrm{io}\) satisfies
+\((\{R\text{ with ioP}:=\mathrm{io}\}).\mathrm{thP}_{\mathrm{ioP}}\).
+This is the full original \texttt{JointHarm.exists\_ioP}.
+
+\emph{Proof.}
+JIO13 already proves the first conclusion.
+Fix \(i\), but do not choose \(t\).
+CFB13 installs on this same \(R,i\) the exact original
+\(M=R.MW(i,\mathrm{sg0})\), \(c=R.cV(i)\), \(c_0=c_{0L,i}\),
+\(B_S=R.BV(i)\), the literal coefficient weights and the
+original \(p,q,a^+,a^-\).  Its arithmetic gives
+\(m\le n\), \(p+q=m\), the ordered signs and both
+antitonicity conditions.  Its integer twists satisfy both
+identities (JIO.31) and all three equalities
+\[
+ x_{1,\tau}=-e_{i,\tau}+n/2,\qquad
+ x_{2,\tau}=-e_{i,\tau}-n/2,\qquad
+ x_{3,\tau}=-\bigl((p_\tau-q_\tau)/2-e_{i,\tau}-1/2\bigr).
+ \tag{JIO.64}
+\]
+This installation uses the original \(\mathrm{IsFam.tie.mapL}\)
+and \(\mathrm{IsModels.BV}\), and the exact base identity
+\(\mathrm{sg0}=\mathrm{embLL}\).  No HolShape claim at another
+coefficient embedding is involved.
+Apply JIO12 once to obtain \(\mathrm{io}_i\), with the exact
+unit-vector normalization.  It depends on \(i\) and the
+stored data; no \(t\) has yet appeared.
+
+Now let \(t\) be arbitrary.  JIO14 gives the two exponents
+\(a=-e_i\), \(b=-e_i-1/2\) for the actual characters of
+\(R.\omega P(i,t)\).  Equations (JIO.64) are exactly the
+three integer equalities of JIO16.  JIO13 gives the theta
+vacuum \(f=R.vP(i,t)\).  Hence JIO18 applies to the actual
+\(\mathrm{ptP}(i,t)\).
+
+For the first \(\mathrm{IsIoW}\) law, take an arbitrary
+\(g\in G_\infty(V)\) and \(h=1\).
+Then \(k_\tau=1\), and JIO18 makes every \(u_\tau\) unitary.
+Use (JIO.36) in (JIO.58) to obtain
+\[
+ \omega(g,1)\mathrm{ptP}(i,t)(\mathrm{io}_i(x,w))
+       =\mathrm{ptP}(i,t)(\mathrm{io}_i(x,c.\rho(g)w)).
+ \tag{JIO.65}
+\]
+For the second law, fix \(\tau\) and \(k\in K_{\epsilon_\tau}\).
+The matrix \(M.\mathrm{fr}_\tau^{-1}kM.\mathrm{fr}_\tau\)
+preserves the original target Gram form.  HCU14's one-place
+real lift is exactly the original
+\[
+ h=\mathrm{atTau}\bigl(\theta,W,\tau,
+                M.\mathrm{fr}_\tau^{-1}kM.\mathrm{fr}_\tau\bigr).
+ \tag{JIO.66}
+\]
+It is real-supported; its \(\tau\)-component is the displayed
+matrix and all other components are \(1\).
+In (JIO.57), therefore, the entire \(k\)-tuple is
+\(\operatorname{single}_\tau k\).  Taking \(g=1\) gives
+the entire \(u\)-tuple \(1\).
+JIO18 and (JIO.37) yield the original target compact
+intertwining identity on the updated lowest tensor.
+This verifies the frame inverses and both component
+identities explicitly.
+
+The third \(\mathrm{IsIoW}\) law is (JIO.38); it contains
+no \(t\), so its same witnesses work for every \(t\).
+We have proved \(\exists\mathrm{io}_i\,\forall t\), in that
+order.  Choosing these maps for all \(i\) gives the
+replacement field in the statement.
+
+Finally, if the original \(R\) has the weak stored-choice
+law
+\[
+ \forall i\ \mathrm{OrZero}\bigl(
+       \mathrm{PIoP}(i),R.\mathrm{ioP}(i)\bigr),\qquad
+            \mathrm{PIoP}(i,y)\equiv\forall t\
+                            \mathrm{IsIoW}(\ldots,t,\ldots,y),
+ \tag{JIO.67}
+\]
+then (JIO.63) activates its first implication and proves
+the strong predicate for the \emph{stored} \(R.\mathrm{ioP}(i)\).
+The rule is existence followed by the given weak-choice
+implication; it asserts no equality between the constructed
+map and the stored map.
+% END JIO19
+
+\paragraph{Application boundary.}
+Thus the simultaneous \(\mathrm{ioP}\) supplier is closed on
+the exact original premises (JIO.62).  Combined with HCU20
+and the inherited TAE13 packet, this removes that supplier
+from the analytic extension interface for the same \(R\).
+It does not supply the remaining bounded extremal form,
+the actual target finite-volume pair, or the pointwise
+smooth/Sobolev realization after Hilbert completion.
+It also does not construct the selected Bundle, the original
+coefficient tie, readings or rational tests; their own
+producer contracts remain separate.

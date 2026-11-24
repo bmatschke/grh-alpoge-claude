@@ -1,0 +1,2687 @@
+[CNC_SRC_ABELIAN_SCHEME_DEFINITION] Original IsAbelianScheme and semiabelian geometric fields
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/BlockTheory/AbelianSchemeLaw/SemiAbelianSchemes.lean#L1-L43
+import Mathlib
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.SemiabelianSchemes.SplitTori.SplitTorusAff
+
+universe u
+
+open CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj AlgebraicGeometry
+open scoped CategoryTheory.Obj
+
+namespace GlobalTheory.IndefiniteRowSideFullHecke.SemiAbelianSchemes
+
+open ReciprocityTheory.ChartRestriction.G.Semi
+
+structure IsAbelianScheme {S : Scheme.{u}} (A : Over S) [GrpObj A] : Prop where
+  smooth : Smooth A.hom
+  proper : IsProper A.hom
+  geometricallyConnected : GeometricallyConnected A.hom
+  comm : IsCommMonObj A
+
+structure IsShortExact {S : Scheme.{u}} {T G B : Over S} [GrpObj T] [GrpObj G] [GrpObj B]
+    (i : T ⟶ G) (q : G ⟶ B) : Prop where
+  isMonHom_i : IsMonHom i
+  isMonHom_q : IsMonHom q
+  isKernel : IsPullback i (toUnit T) q (η : 𝟙_ (Over S) ⟶ B)
+  flat : Flat q.left
+  surjective : Surjective q.left
+  finitePresentation : LocallyOfFinitePresentation q.left
+
+def IsTorusExtension {k : Type u} [Field k] (G : Over (Spec (CommRingCat.of k))) [GrpObj G] :
+    Prop :=
+  IsCommMonObj G ∧
+    ∃ (X : Type u) (_ : AddCommGroup X) (_ : Module.Free ℤ X) (_ : Module.Finite ℤ X)
+      (B : Over (Spec (CommRingCat.of k))) (_ : GrpObj B)
+      (i : splitTorus (Spec (CommRingCat.of k)) X ⟶ G) (q : G ⟶ B),
+      IsAbelianScheme B ∧ IsShortExact i q
+
+structure IsSemiAbelianScheme {S : Scheme.{u}} (G : Over S) [GrpObj G] : Prop where
+  smooth : Smooth G.hom
+  separated : IsSeparated G.hom
+  locallyOfFiniteType : LocallyOfFiniteType G.hom
+  quasiCompact : QuasiCompact G.hom
+  comm : IsCommMonObj G
+  geometricFibre : ∀ (k : Type u) [Field k] [IsAlgClosed k] (s : Spec (CommRingCat.of k) ⟶ S),
+    IsTorusExtension ((Over.pullback s).obj G)
+
+
+[CNC_SRC_HOST_AND_SAB] Original host involution, w0, datum, level and all SAB line data
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L14-L84
+structure Host (E : Type) [Field E] [NumberField E] [IsCMField E] where
+  d : ℕ
+  d_mod : d % 16 = 7
+  d_prime : d.Prime
+  rt : 𝓞 E
+  rt_sq : rt ^ 2 = -(d : 𝓞 E)
+  w0 : 𝓞 E
+  two_weight_eq_one_add_root : 2 * w0 = 1 + rt
+  bar : 𝓞 E ≃+* 𝓞 E
+  bar_eq : ∀ a : 𝓞 E, ((bar a : 𝓞 E) : E) = IsCMField.complexConj E (a : E)
+  unram : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)
+  rt0 : ℂ
+  sqrt_neg_disc_sq : rt0 ^ 2 = -(d : ℂ)
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E]
+
+structure Datum (H : Host E) where
+  La : Type
+  [acg : AddCommGroup La]
+  [mod : Module (𝓞 E) La]
+  fin : Module.Finite (𝓞 E) La
+  proj : Module.Projective (𝓞 E) La
+  EF : LinearMap.BilinForm ℤ La
+  alt : ∀ x, EF x x = 0
+  unimod : Function.Bijective EF
+  adj : ∀ (a : 𝓞 E) x y, EF (a • x) y = EF x (H.bar a • y)
+  p : ℕ
+  q : ℕ
+  rank : Module.finrank (𝓞 E) La = p + q
+  dom : ∃ J : ℝ ⊗[ℤ] La →ₗ[ℝ] ℝ ⊗[ℤ] La, (∀ x, J (J x) = -x) ∧
+    (∀ x y, EF.baseChange ℝ (J x) (J y) = EF.baseChange ℝ x y) ∧
+    (∀ x, x ≠ 0 → 0 < EF.baseChange ℝ (J x) x) ∧
+    ∀ (a : 𝓞 E) (A : ℝ ⊗[ℤ] La →ₗ[ℝ] ℝ ⊗[ℤ] La) (t : ℂ), (∀ x : La, A (1 ⊗ₜ x) = 1 ⊗ₜ (a • x)) →
+      t = ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
+        ((p : ℂ) * τ (a : E) + (q : ℂ) * starRingEnd ℂ (τ (a : E))) →
+      J ∘ₗ A = A ∘ₗ J ∧ LinearMap.trace ℝ _ A = 2 * t.re ∧ LinearMap.trace ℝ _ (J ∘ₗ A) = -2 * t.im
+
+attribute [instance] Datum.acg Datum.mod
+
+structure Level (H : Host E) where
+  M : ℕ
+  three_le : 3 ≤ M
+  odd : Odd M
+  Mb : Ideal (𝓞 E)
+  fromK : Mb = Ideal.span {a | a ∈ Mb ∧ a ∈ Algebra.adjoin ℤ {H.w0}}
+  prod : Mb * Mb.map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {(M : 𝓞 E)}
+  coprime : Mb ⊔ Mb.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤
+  A : ℕ
+  A_pos : 0 < A
+
+def Level.M' {H : Host E} (l : Level H) : ℕ := Nat.lcm l.M l.A
+
+def Level.Dvd {H : Host E} (l l₂ : Level H) : Prop := l.M ∣ l₂.M ∧ l₂.Mb ≤ l.Mb ∧ l.A ∣ l₂.A
+
+def Level.GoodAt {H : Host E} (l : Level H) (p : ℕ) : Prop := 3 ≤ l.M / p ^ l.M.factorization p
+
+variable {S : Scheme.{0}}
+
+structure SAB (H : Host E) (S : Scheme.{0}) where
+  G : Over S
+  [grp : GrpObj G]
+  [comm : IsCommMonObj G]
+  semi : IsSemiAbelian G
+  act : OAct (𝓞 E) G
+  PP : RigLB G
+  cub : CubicalStr G PP
+  sym : PP.IsSymmetric
+  adj : ∀ a, LBIso (cubeLB G ![fst G G ≫ act.act a, snd G G] PP.L) (cubeLB G ![fst G G, snd G G ≫ act.act (H.bar a)] PP.L)
+  prim : LBIso PP.L (cubeLB G ![𝟙 G, act.act H.w0] PP.L)
+
+attribute [instance] SAB.grp SAB.comm
+
+
+[CNC_SRC_PROPER_ORIGINAL_OBJECT] Original Obj properness and actual universal object
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L144-L162
+structure Obj {H : Host E} (D : Datum H) (l : Level H) {B : Type} [CommRing B] (b : Base l B) (s : S ⟶ Sp B) where
+  t : SAB H S
+  proper : IsProper t.G.hom
+  ample : Out.RelAmple t.G t.PP.L
+  ktriv : Out.KTriv t.G t.PP.L
+  eta : D.La → (𝟙_ (Over S) ⟶ t.G)
+  eta_add : ∀ a c, eta (a + c) = eta a * eta c
+  eta_ker : ∀ a ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La), eta a = 1
+  etaA : D.La → (𝟙_ (Over S) ⟶ t.G)
+  etaA_add : ∀ a c, etaA (a + c) = etaA a * etaA c
+  etaA_ker : ∀ a, etaA (l.A • a) = 1
+  geom : ∀ (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ S) (β : B →+* k), x ≫ s = spMap β →
+    DetCond D t.act x (β b.ρ) ∧
+    ∃ I : TateIso D k (Over.mk x ⟶ t.G) (fun a g => g ≫ t.act.act a)
+        (fun n g g' c => Out.WeilIs t.G t.PP.L n g g' (unitOn c)),
+      (I.ζ l.A : k) = β b.ζ ∧ (∀ a, toUnit _ ≫ etaA a = I.ev l.A a) ∧
+      ∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ eta a = I.ev l.M a
+
+structure ObjMap {H : Host E} {D : Datum H} {l : Level H} {B B' : Type} [CommRing B] [CommRing B'] {b : Base l B}
+
+
+[CNC_SRC_MODULI_AND_COEFFICIENT_FIELD] Literal Moduli and Coeff with every conjugate inside c.F
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/PushInvertible.lean#L29-L46
+structure Moduli (D : Datum H) (l : Level H) where
+  X : Scheme.{0}
+  s : X ⟶ Sp (KA l)
+  qproj : IsQProjOver s
+  smooth : SmoothOfRelativeDimension D.dim s
+  univ : Obj D l (baseKA l) s
+  rep : ∀ (S : Scheme.{0}) (s' : S ⟶ Sp (KA l)), IsReduced S → ∀ o : Obj D l (baseKA l) s',
+    ∃! f : S ⟶ X, f ≫ s = s' ∧ Nonempty (ObjMap o univ f)
+  unram : ∀ (k : Type) [Field k] (x : Sp (DualNumber k) ⟶ X) (o : Obj D l (baseKA l) (x ≫ s)),
+    Nonempty (ObjMap o univ x) → Nonempty (ObjMap o univ (constPt x)) → x = constPt x
+
+structure Coeff (l : Level H) where
+  F : IntermediateField ℚ ℂ
+  fin : FiniteDimensional ℚ F
+  conj : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F
+  zeta_mem : zeta l.M' ∈ F
+  le : KA l ≤ F
+
+
+
+[CNC_SRC_ACTUAL_ABELIAN_FAMILY] Original ObjDim.isAbelianScheme, rigidified and symmetric line
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ObjIsAbelianSchemeDimRigidifiedSym.lean#L232-L239
+theorem isAbelianScheme (o : Obj D l b s) : IsAbelianScheme o.t.G :=
+  ⟨o.t.semi.comm, o.t.semi.smooth, o.proper, o.t.semi.geomConnected⟩
+
+theorem rigidified {t : SAB H S} : Out.Rigidified t.G t.PP.L := ⟨t.PP.rig, t.PP.rigGen⟩
+
+theorem sym {t : SAB H S} : Out.Sym t.G t.PP.L := by
+  obtain ⟨-, w, hw, -⟩ := t.sym
+  exact fun _ => ⟨⊤, trivial, gen_of_iso ((isGen_iff w).1 hw) _⟩
+
+
+[CNC_SRC_UNIVERSAL_POLARIZED_OBJECT] Original universal polarized abelian object; reducedness of X is not imposed on S
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/IsLocallyNoetherian.lean#L21-L59
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
+
+def pol (Xo : Moduli D l) : PolAV Xo.X := GlobalTheory.Obj.toPolAV Xo.univ
+
+@[simp] theorem pol_A (Xo : Moduli D l) : (pol Xo).A = Xo.univ.t.G := rfl
+
+@[simp] theorem pol_L (Xo : Moduli D l) : (pol Xo).L = Xo.univ.t.PP.L := rfl
+
+@[simp] theorem pol_g (Xo : Moduli D l) : (pol Xo).g = Module.finrank ℚ E / 2 * (D.p + D.q) := rfl
+
+theorem smooth (Xo : Moduli D l) : Smooth Xo.s :=
+  haveI := Xo.smooth
+  SmoothOfRelativeDimension.smooth D.dim Xo.s
+
+theorem isLocallyNoetherian (Xo : Moduli D l) : IsLocallyNoetherian Xo.X := by
+  haveI := smooth Xo
+  exact LocallyOfFiniteType.isLocallyNoetherian Xo.s
+
+theorem isReduced (Xo : Moduli D l) : IsReduced Xo.X := by
+  haveI := smooth Xo
+  exact GlobalTheory.isReduced_of_smooth_of_isReduced Xo.s
+
+theorem isUnit_natCast (Xo : Moduli D l) (n : ℕ) (hn : 0 < n) : IsUnit (n : Γ(Xo.X, ⊤)) := by
+  have hK : IsUnit (n : KA l) := by
+    haveI : CharZero (KA l) := (RingHom.charZero_iff (algebraMap (KA l) ℂ).injective).2 inferInstance
+    exact (isUnit_iff_ne_zero).2 (Nat.cast_ne_zero.2 hn.ne')
+  have hΓ := hK.map ((Scheme.ΓSpecIso (CommRingCat.of (KA l))).inv.hom)
+  have hX := hΓ.map Xo.s.appTop.hom
+  simpa using hX
+
+end UnivPol
+
+theorem moduli_univ_polAV :
+    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l), IsLocallyNoetherian Xo.X ∧ IsReduced Xo.X ∧ (∀ n : ℕ, 0 < n → IsUnit (n : Γ(Xo.X, ⊤))) ∧ IsAbelianScheme Xo.univ.t.G ∧ ∀ (p : ∀ (A : Over Xo.X) [GrpObj A] [IsCommMonObj A], LB A.left → ℕ → Prop), (∀ P : PolAV Xo.X, p P.A P.L P.g) → p Xo.univ.t.G Xo.univ.t.PP.L (Module.finrank ℚ E / 2 * (Dw.p + Dw.q)) := by
+  intro E _ _ _ H Dw l Xo
+  exact ⟨UnivPol.isLocallyNoetherian Xo, UnivPol.isReduced Xo, UnivPol.isUnit_natCast Xo,
+    ObjDim.isAbelianScheme Xo.univ, fun p h => h (UnivPol.pol Xo)⟩
+
+end GlobalTheory
+
+
+[CNC_SRC_GLOBAL_FUNCTIONS_CONTRACT] Literal GlobalFnsSt for arbitrary schemes
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ExtensionDescent/GlobalSectionsRankAlgClosed.lean#L150-L153
+def GlobalFnsSt : Prop :=
+  ∀ (S : Scheme.{0}) (A : Over S) [GrpObj A], IsAbelianScheme A →
+    Function.Bijective A.hom.appTop.hom
+
+
+
+[CNC_SRC_GLOBAL_FUNCTIONS_PRODUCER] Original globalFns_holds endpoint replaced by the matched classical foundation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/AbelianSchemeLawProofs/GlobalFnsHolds.lean#L19-L22
+
+theorem rigidity_holds : RigiditySt :=
+  rigidity_of_local_rigidity globalFns_holds local_rigidity
+
+
+
+[CNC_SRC_FRAMED_POINT] Original FrPt full tangent eigenbasis and section generator
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/IsCombAt.lean#L67-L77
+structure FrPt (S : Type) [CommRing S] [Algebra c.F S] : Type where
+  x : Sp S ⟶ Xo.X
+  x_over : x ≫ Xo.s = sOf c S
+  u : ∀ τ : E →+* ℂ, Fin (Dw.mult τ) → (Sp (DualNumber S) ⟶ Xo.univ.t.G.left)
+  tan : ∀ τ i, IsTanAt x (u τ i)
+  eig : ∀ τ i, IsEigAt c τ (u τ i)
+  basis : ∀ τ w, IsTanAt x w → IsEigAt c τ w → ∃! a : Fin (Dw.mult τ) → S, IsCombAt x (u τ) a w
+  s : LB.Sec (PPx x)
+  gen : ∀ s' : LB.Sec (PPx x), ∃! a : S, ∀ i, s'.f i = scal x a i * s.f i
+
+variable {Xo c}
+
+
+[CNC_SRC_TANGENT_DECOMPOSITION] Exact global eigenbasis algebra over arbitrary coefficient ring
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/GlobalBasisAlgebra.lean#L22-L184
+theorem global_basis_algebra {E : Type} [Field E] [NumberField E] {K S M : Type} [Field K] [CharZero K]
+    [CommRing S] [Algebra K S] [AddCommGroup M] [Module S M] {J : Type} [Fintype J] [DecidableEq J]
+    (χ : J → (E →+* K)) (hχ : Function.Injective χ)
+    (hcard : Fintype.card J = Module.finrank ℚ E) (ρ : 𝓞 E →+* Module.End S M) {mult : J → ℕ}
+    (U : (Σ σ, Fin (mult σ)) → M)
+    (hU : ∀ σ i (a : 𝓞 E), ρ a (U ⟨σ, i⟩) = algebraMap K S (χ σ (a : E)) • U ⟨σ, i⟩)
+    (hb : ∀ σ (W : M), (∀ a : 𝓞 E, ρ a W = algebraMap K S (χ σ (a : E)) • W) →
+      ∃! c : Fin (mult σ) → S, ∑ i, c i • U ⟨σ, i⟩ = W)
+    (W : M) : ∃! a : (Σ σ, Fin (mult σ)) → S, ∑ ℓ, a ℓ • U ℓ = W := by
+  classical
+  have hcardI : Fintype.card (Module.Free.ChooseBasisIndex ℤ (𝓞 E)) = Fintype.card J := by
+    rw [hcard, ← RingOfIntegers.rank, Module.finrank_eq_card_chooseBasisIndex]
+  let b : Module.Basis J ℤ (𝓞 E) := (RingOfIntegers.basis E).reindex (Fintype.equivOfCardEq hcardI)
+  let κ : K →+* S := algebraMap K S
+  let χ' : J → (𝓞 E →+* K) := fun σ => (χ σ).comp (algebraMap (𝓞 E) E)
+  have hχ' : ∀ σ (y : 𝓞 E), χ' σ y = χ σ (y : E) := fun σ y => rfl
+  let A : Matrix J J K := fun σ j => χ' σ (b j)
+
+  have hA : IsUnit A.det := by
+    rw [isUnit_iff_ne_zero]
+    intro hdet
+    obtain ⟨c, hc0, hc⟩ := Matrix.exists_vecMul_eq_zero_iff.mpr hdet
+    refine hc0 ?_
+    have hψ : Function.Injective fun σ => ((χ' σ : 𝓞 E →+* K) : 𝓞 E →* K) := by
+      intro σ τ h
+      apply hχ
+      apply IsLocalization.ringHom_ext (nonZeroDivisors (𝓞 E))
+      ext y
+      exact DFunLike.congr_fun h y
+    have hli := (linearIndependent_monoidHom (𝓞 E) K).comp _ hψ
+    rw [Fintype.linearIndependent_iff] at hli
+    have hcj : ∀ j, ∑ σ, c σ * χ' σ (b j) = 0 := fun j => by
+      simpa [Matrix.vecMul, dotProduct, A] using congrFun hc j
+    have hsum : ∀ y : 𝓞 E, ∑ σ, c σ * χ' σ y = 0 := by
+      intro y
+      calc ∑ σ, c σ * χ' σ y = ∑ σ, c σ * χ' σ (∑ j, b.repr y j • b j) := by rw [b.sum_repr y]
+        _ = ∑ j, (b.repr y j : K) * ∑ σ, c σ * χ' σ (b j) := by
+            simp only [map_sum, zsmul_eq_mul, map_mul, map_intCast, Finset.mul_sum]
+            rw [Finset.sum_comm]
+            exact Finset.sum_congr rfl fun j _ => Finset.sum_congr rfl fun σ _ => by ring
+        _ = 0 := by simp [hcj]
+    funext σ
+    refine hli c ?_ σ
+    funext y
+    simpa [Finset.sum_apply] using hsum y
+  let B : Matrix J J K := A⁻¹
+  have hAB : ∀ σ τ, ∑ k, A σ k * B k τ = if σ = τ then 1 else 0 := fun σ τ => by
+    have := congrFun (congrFun (Matrix.mul_nonsing_inv A hA) σ) τ
+    simpa [Matrix.mul_apply, Matrix.one_apply] using this
+  have hBA : ∀ j k, ∑ τ, B j τ * A τ k = if j = k then 1 else 0 := fun j k => by
+    have := congrFun (congrFun (Matrix.nonsing_inv_mul A hA) j) k
+    simpa [Matrix.mul_apply, Matrix.one_apply] using this
+
+  let P : J → M → M := fun σ V => ∑ j, κ (B j σ) • ρ (b j) V
+  have hPadd : ∀ τ (F : J → M), P τ (∑ σ, F σ) = ∑ σ, P τ (F σ) := by
+    intro τ F
+    simp only [P, map_sum, Finset.smul_sum]
+    exact Finset.sum_comm
+  have hρ : ∀ (y : 𝓞 E) (V : M), ρ y V = ∑ τ, κ (χ' τ y) • P τ V := by
+    intro y V
+    have e1 : ∀ τ, χ' τ y = ∑ k, (b.repr y k : K) * A τ k := fun τ => by
+      conv_lhs => rw [← b.sum_repr y]
+      simp only [map_sum, zsmul_eq_mul, map_mul, map_intCast, A]
+    have hy : ∀ j, ∑ τ, χ' τ y * B j τ = (b.repr y j : K) := by
+      intro j
+      calc ∑ τ, χ' τ y * B j τ = ∑ τ, ∑ k, (b.repr y k : K) * (B j τ * A τ k) := by
+            simp only [e1, Finset.sum_mul]
+            exact Finset.sum_congr rfl fun τ _ => Finset.sum_congr rfl fun k _ => by ring
+        _ = ∑ k, (b.repr y k : K) * ∑ τ, B j τ * A τ k := by
+            rw [Finset.sum_comm]
+            simp only [Finset.mul_sum]
+        _ = (b.repr y j : K) := by
+            simp only [hBA, mul_ite, _root_.mul_one, mul_zero, Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    calc ρ y V = ρ (∑ j, b.repr y j • b j) V := by rw [b.sum_repr y]
+      _ = ∑ j, κ (b.repr y j : K) • ρ (b j) V := by
+          simp only [map_sum, map_zsmul, LinearMap.sum_apply, LinearMap.smul_apply,
+            map_intCast, Int.cast_smul_eq_zsmul]
+      _ = ∑ j, κ (∑ τ, χ' τ y * B j τ) • ρ (b j) V := by simp only [hy]
+      _ = ∑ τ, κ (χ' τ y) • P τ V := by
+          simp only [P, Finset.smul_sum, smul_smul, map_sum, Finset.sum_smul, map_mul]
+          exact Finset.sum_comm
+  have hPeig : ∀ σ V (a : 𝓞 E), ρ a (P σ V) = algebraMap K S (χ σ (a : E)) • P σ V := by
+    intro σ V a
+    calc ρ a (P σ V) = ∑ k, κ (B k σ) • ρ (a * b k) V := by
+          simp only [P, map_sum, map_smul, map_mul, Module.End.mul_apply]
+      _ = ∑ k, ∑ ν, κ (B k σ * (χ' ν a * A ν k)) • P ν V := by
+          simp only [hρ, Finset.smul_sum, smul_smul, ← map_mul, A]
+      _ = ∑ ν, κ (χ' ν a * ∑ k, A ν k * B k σ) • P ν V := by
+          rw [Finset.sum_comm]
+          refine Finset.sum_congr rfl fun ν _ => ?_
+          rw [Finset.mul_sum, map_sum, Finset.sum_smul]
+          exact Finset.sum_congr rfl fun k _ => by congr 2; ring
+      _ = algebraMap K S (χ σ (a : E)) • P σ V := by
+          rw [Finset.sum_eq_single σ]
+          · rw [hAB, if_pos rfl, _root_.mul_one]
+            rfl
+          · intro ν _ hν
+            rw [hAB, if_neg hν, mul_zero, map_zero, zero_smul]
+          · intro h
+            exact absurd (Finset.mem_univ σ) h
+  have hPZ : ∀ σ τ (Z : M), (∀ a : 𝓞 E, ρ a Z = algebraMap K S (χ σ (a : E)) • Z) →
+      P τ Z = if σ = τ then Z else 0 := by
+    intro σ τ Z hZ
+    calc P τ Z = ∑ j, κ (A σ j * B j τ) • Z := by
+          simp only [P, hZ, smul_smul]
+          exact Finset.sum_congr rfl fun j _ => by rw [mul_comm, map_mul]; rfl
+      _ = κ (∑ j, A σ j * B j τ) • Z := by rw [map_sum, Finset.sum_smul]
+      _ = if σ = τ then Z else 0 := by
+          rw [hAB]; split_ifs <;> simp
+  have hPsum : ∑ τ, P τ W = W := by
+    have := hρ 1 W
+    simp only [map_one, Module.End.one_apply, one_smul] at this
+    exact this.symm
+  have hYeig : ∀ (a : (Σ σ, Fin (mult σ)) → S) σ (c : 𝓞 E),
+      ρ c (∑ i, a ⟨σ, i⟩ • U ⟨σ, i⟩) = algebraMap K S (χ σ (c : E)) • ∑ i, a ⟨σ, i⟩ • U ⟨σ, i⟩ := by
+    intro a σ c
+    rw [map_sum, Finset.smul_sum]
+    exact Finset.sum_congr rfl fun i _ => by rw [map_smul, hU, smul_comm]
+  have hproj : ∀ (a : (Σ σ, Fin (mult σ)) → S), ∑ ℓ, a ℓ • U ℓ = W →
+      ∀ τ, ∑ i, a ⟨τ, i⟩ • U ⟨τ, i⟩ = P τ W := by
+    intro a ha τ
+    rw [← ha, Fintype.sum_sigma, hPadd, Finset.sum_eq_single τ]
+    · rw [hPZ τ τ _ (hYeig a τ), if_pos rfl]
+    · intro σ _ hστ
+      rw [hPZ σ τ _ (hYeig a σ), if_neg hστ]
+    · intro h
+      exact absurd (Finset.mem_univ τ) h
+  have hex : ∀ σ, ∃! c : Fin (mult σ) → S, ∑ i, c i • U ⟨σ, i⟩ = P σ W := fun σ => hb σ (P σ W) (hPeig σ W)
+  choose c hc using fun σ => (hex σ).exists
+  refine ⟨fun ℓ => c ℓ.1 ℓ.2, ?_, ?_⟩
+  · show ∑ ℓ, c ℓ.1 ℓ.2 • U ℓ = W
+    rw [Fintype.sum_sigma]
+    simp only [hc]
+    exact hPsum
+  · intro a' ha'
+    funext ℓ
+    obtain ⟨σ, i⟩ := ℓ
+    have := (hex σ).unique (hproj a' ha' σ) (hc σ)
+    exact congrFun this i
+
+end Alg
+
+theorem spMap_comp' {A B C : Type} [CommRing A] [CommRing B] [CommRing C] (f : A →+* B) (g : B →+* C) :
+    spMap g ≫ spMap f = spMap (g.comp f) := by
+  exact (Spec.map_comp _ _).symm
+
+theorem spec_ext_two {R A : Type} [CommRing R] [CommRing A] (p1 p2 : R →+* A)
+    (hs : Function.Surjective p1) (hn : ∀ x, p1 x = 0 → x * x = 0)
+    (hk : ∀ x, p1 x = 0 → p2 x = 0 → x = 0) {X : Scheme.{0}} (f g : Sp R ⟶ X)
+    (h1 : spMap p1 ≫ f = spMap p1 ≫ g) (h2 : spMap p2 ≫ f = spMap p2 ≫ g) : f = g := by
+  classical
+  have hinj : Function.Injective (p1.prod p2) := by
+    intro a b hab
+    have e1 : p1 a = p1 b := congrArg Prod.fst hab
+    have e2 : p2 a = p2 b := congrArg Prod.snd hab
+    exact sub_eq_zero.mp (hk (a - b) (by rw [map_sub, e1, sub_self]) (by rw [map_sub, e2, sub_self]))
+  have : IsSchemeTheoreticallyDominant (spMap (p1.prod p2)) := by
+    refine ⟨le_bot_iff.mp (Scheme.IdealSheafData.le_of_isAffine ?_)⟩
+    refine ((spMap (p1.prod p2)).ideal_ker_le _).trans fun z hz => ?_
+    have hz' : (Spec.map (CommRingCat.ofHom (p1.prod p2))).appTop.hom z = 0 := RingHom.mem_ker.mp hz
+    have e := congrArg (fun h => h.hom z) (Scheme.ΓSpecIso_naturality (CommRingCat.ofHom (p1.prod p2)))
+    simp only [CommRingCat.hom_comp, RingHom.comp_apply, CommRingCat.hom_ofHom, hz', map_zero] at e
+    have h0 : (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom z = 0 :=
+
+
+[CNC_SRC_FRAMED_TANGENT_BASIS] Original frame_tangent_basis on every FrPt
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/GlobalBasisAlgebra.lean#L512-L566
+theorem frame_tangent_basis : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (S : Type) [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) (w : Sp (DualNumber S) ⟶ Xo.univ.t.G.left), IsTanAt y.x w → ∃! a : Lt1 Dw → S, IsCombAt y.x (m := Fintype.card (Lt1 Dw)) (fun i => y.u ((Fintype.equivFin (Lt1 Dw)).symm i).1 ((Fintype.equivFin (Lt1 Dw)).symm i).2) (fun i => a ((Fintype.equivFin (Lt1 Dw)).symm i)) w := by
+  intro E _ _ _ H Dw l Xo c S _ _ y w hw
+  classical
+  let U : Lt1 Dw → TanM y.x Xo.univ.t.G := fun ℓ => mkT (ovT (y.tan ℓ.1 ℓ.2)) (smT_zero_ovT _)
+  let ρ : 𝓞 E →+* Module.End S (TanM y.x Xo.univ.t.G) := actL Xo.univ.t.act
+  have hinj : Function.Injective fun τ : E →+* ℂ => embF c τ := by
+    intro τ τ' h
+    ext x
+    exact congrArg (fun f : E →+* c.F => ((f x : c.F) : ℂ)) h
+  have hcard : Fintype.card (E →+* ℂ) = Module.finrank ℚ E := NumberField.Embeddings.card E ℂ
+  have hU : ∀ σ i (a : 𝓞 E), ρ a (U ⟨σ, i⟩) = algebraMap c.F S (embF c σ (a : E)) • U ⟨σ, i⟩ := by
+    intro σ i a
+    apply tv_injective
+    rw [tv_actL, tv_smul, tv_mkT]
+    exact (isEigAt_iff σ (ovT (y.tan σ i))).mp (y.eig σ i) a
+  have hb : ∀ σ (V : TanM y.x Xo.univ.t.G), (∀ a : 𝓞 E, ρ a V = algebraMap c.F S (embF c σ (a : E)) • V) →
+      ∃! c' : Fin (Dw.mult σ) → S, ∑ i, c' i • U ⟨σ, i⟩ = V := by
+    intro σ V hV
+    have htan : IsTanAt y.x (tv V).left := isTanAtG_of (tv V) (tv_zero' V)
+    have heig : IsEigAt c σ (tv V).left := (isEigAt_iff σ (tv V)).mpr fun a => by
+      have h := congrArg tv (hV a)
+      rwa [tv_actL, tv_smul] at h
+    obtain ⟨c', hc', huniq⟩ := y.basis σ _ htan heig
+    refine ⟨c', ?_, fun c'' hc'' => huniq c'' ?_⟩
+    · apply tv_injective
+      rw [tv_comb]
+      apply Over.OverMorphism.ext
+      exact (isCombAtG_iff (t := Xo.univ.t) (x0 := y.x) (fun i => ovT (y.tan σ i)) c' (tv V).left).mp hc'
+    · refine (isCombAtG_iff (t := Xo.univ.t) (x0 := y.x) (fun i => ovT (y.tan σ i)) c'' (tv V).left).mpr ?_
+      exact congrArg Over.Hom.left ((tv_comb (fun i => U ⟨σ, i⟩) c'').symm.trans (congrArg tv hc''))
+  have hiff : ∀ a : Lt1 Dw → S,
+      IsCombAt y.x (m := Fintype.card (Lt1 Dw))
+        (fun i => y.u ((Fintype.equivFin (Lt1 Dw)).symm i).1 ((Fintype.equivFin (Lt1 Dw)).symm i).2)
+        (fun i => a ((Fintype.equivFin (Lt1 Dw)).symm i)) w ↔
+      ∑ ℓ, a ℓ • U ℓ = mkT (ovT hw) (smT_zero_ovT hw) := by
+    intro a
+    have hprod : tv (∑ ℓ, a ℓ • U ℓ) = ∏ i : Fin (Fintype.card (Lt1 Dw)),
+        smT y.x (a ((Fintype.equivFin (Lt1 Dw)).symm i))
+          (ovT (y.tan ((Fintype.equivFin (Lt1 Dw)).symm i).1 ((Fintype.equivFin (Lt1 Dw)).symm i).2)) := by
+      rw [tv_comb]
+      exact (Equiv.prod_comp (Fintype.equivFin (Lt1 Dw)).symm (fun ℓ => smT y.x (a ℓ) (ovT (y.tan ℓ.1 ℓ.2)))).symm
+    refine (isCombAtG_iff (t := Xo.univ.t) (x0 := y.x)
+      (fun i => ovT (y.tan ((Fintype.equivFin (Lt1 Dw)).symm i).1 ((Fintype.equivFin (Lt1 Dw)).symm i).2))
+      (fun i => a ((Fintype.equivFin (Lt1 Dw)).symm i)) w).trans ⟨fun h => ?_, fun h => ?_⟩
+    · apply tv_injective
+      rw [tv_mkT, hprod]
+      exact Over.OverMorphism.ext h
+    · have h' := congrArg (fun V => (tv V).left) h
+      simp only [hprod, tv_mkT] at h'
+      exact h'
+  obtain ⟨a, ha, huniq⟩ := global_basis_algebra (fun τ : E →+* ℂ => embF c τ) hinj hcard ρ U hU hb
+    (mkT (ovT hw) (smT_zero_ovT hw))
+  exact ⟨a, (hiff a).mpr ha, fun a' ha' => huniq a' ((hiff a').mp ha')⟩
+
+end GlobalTheory.FrameTangent
+
+
+[CNC_SRC_FRAMED_FORMAL_CHART] Original universal formal chart with prescribed Lie basis
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/ExistsIsUnivChartOfIsLieBasis.lean#L1-L28
+import Mathlib
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.ChartPullbacks.UniversalCharts.IsUnivChart
+import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ExistsJetPointsOfIsLieBasis
+import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.JetChartCoordinatesUniqueCommGroupStatement
+import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.ExistsJetChartCoordinatesNilpotentStatement
+
+open CategoryTheory Limits AlgebraicGeometry MonoidalCategory CartesianMonoidalCategory MonObj ReciprocityTheory.ChartRestriction.G.Chart
+open scoped CategoryTheory.MonObj
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor (Sp epsR IsTangent IsLieComb IsLieBasis)
+attribute [local instance] Over.cartesianMonoidalCategory
+
+namespace GlobalTheory
+
+theorem exists_isUnivChart_of_isLieBasis :
+    ∀ (R : Type) [CommRing R] (G : Over (Spec (CommRingCat.of R))) [GrpObj G] [IsCommMonObj G],
+      Smooth G.hom → ∀ (d : ℕ) (v : Fin d → (epsR R ⟶ G)), IsLieBasis v →
+      ∃ (x : ∀ m : ℕ, sp (R₀ := R) (JetR R (Fin d) m) ⟶ G), IsUnivChart G d x ∧
+        (∀ j, spMap (dualLift (Pi.single j (1 : R))) ≫ x 1 = v j) := by
+  intro R _ G _ _ hG d v hv
+  obtain ⟨x, h₁, h₂, h₃⟩ := GlobalTheory.exists_jetPoints_of_isLieBasis R G hG d v hv
+  refine ⟨x, ⟨h₁, h₂, ?_⟩, h₃⟩
+  intro A _ _ aug m hm y hy
+  obtain ⟨ψ, hψ, hyψ⟩ := GlobalTheory.T.exists_jetChart_coordinates_nilpotent R G hG d v hv x h₁ h₂ h₃ A aug m hm y hy
+  refine ⟨ψ, ⟨hψ, hyψ⟩, ?_⟩
+  rintro ψ' ⟨hψ', hyψ'⟩
+  exact GlobalTheory.T.jetChart_coordinates_unique_commGroup R G hG d v hv x h₁ h₂ h₃ A aug m hm ψ' ψ hψ' hψ (hyψ'.symm.trans hyψ)
+
+end GlobalTheory
+
+
+[CNC_SRC_ACTUAL_CHART_PRODUCER] Exact chart from the entire original tangent basis
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/ExistsIsChartGOfBasis.lean#L1-L146
+import Mathlib
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.IntChartCut
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsPtJ
+
+noncomputable section
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+attribute [local instance] Over.cartesianMonoidalCategory
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (FGLaw)
+open scoped CategoryTheory.Obj
+
+namespace GlobalTheory.ChartData
+
+open GlobalTheory.ChartJet (Q gen sq_gen)
+
+theorem mk_psTrunc {S : Type} [CommRing S] {κ : Type} [Fintype κ] [DecidableEq κ] (m : ℕ) (f : MvPowerSeries κ S)
+    (hf : MvPowerSeries.constantCoeff f = 0) :
+    ChartJet.pj m f = Ideal.Quotient.mk _ (psTrunc m f - MvPolynomial.C (MvPolynomial.constantCoeff (psTrunc m f))) := by
+  have co : ∀ e : κ →₀ ℕ, e.degree < m + 1 → (psTrunc m f).coeff e = MvPowerSeries.coeff e f := fun e he => by
+    have hm : e ∈ degLE m := Finset.mem_filter.2 ⟨Finset.mem_image.2
+      ⟨fun i => ⟨e i, lt_of_le_of_lt (Finsupp.le_degree i e) he⟩, Finset.mem_univ _, by ext i; simp⟩, Nat.le_of_lt_succ he⟩
+    rw [psTrunc, MvPolynomial.coeff_sum, Finset.sum_eq_single e (fun b _ hb => by rw [MvPolynomial.coeff_monomial, if_neg hb])
+      (fun h => absurd hm h), MvPolynomial.coeff_monomial, if_pos rfl]
+  have c0 : MvPolynomial.constantCoeff (psTrunc m f) = 0 := (co 0 (by simp)).trans hf
+  rw [c0, map_zero, sub_zero]
+  exact ChartJet.pj_eq_mk.2 fun e he => (co e he).symm
+
+theorem jetMap_zR {S : Type} [CommRing S] {κ κ' : Type} (m : ℕ) (φ : κ → MvPolynomial κ' S) (h) (s : κ) :
+    (jetMap φ h : Jet S κ m →ₐ[S] Jet S κ' m) (Ideal.Quotient.mk _ (MvPolynomial.X s)) = Ideal.Quotient.mk _ (φ s) := by
+  show Ideal.Quotient.mkₐ S _ (MvPolynomial.aeval φ (MvPolynomial.X s)) = _
+  rw [MvPolynomial.aeval_X]; rfl
+
+theorem subst_zR {S : Type} [CommRing S] {d n : ℕ} (m : ℕ) (p : Q S d n) (s : Fin 1 × Fin d) :
+    jetSubstP m (fun s : Fin 1 × Fin d => psTrunc m (p.1 s.2)) (Chart.zR m s) = ChartJet.pj m (p.1 s.2) :=
+  (jetMap_zR m _ _ s).trans (mk_psTrunc m _ (p.2 _)).symm
+
+theorem copy_zR {S : Type} [CommRing S] {d n : ℕ} (m : ℕ) (i : Fin n) (s : Fin 1 × Fin d) :
+    jetCopy (S := S) d m i (Chart.zR m s) = ChartJet.pj m ((gen i : Q S d n).1 s.2) :=
+  (jetMap_zR m _ _ s).trans (ChartJet.pj_X m (i, s.2)).symm
+
+set_option maxHeartbeats 1600000 in
+
+theorem exists_isChartG_of_basis : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X0 : Scheme.{0}) (t : SAB H X0) (S : Type) [CommRing S] (x0 : Sp S ⟶ X0) (κ : Type) [Fintype κ] (tg : κ → (Sp (DualNumber S) ⟶ t.G.left)), (∀ ℓ, IsTanAtG t x0 (tg ℓ)) → (∀ w, IsTanAtG t x0 w → ∃! a : κ → S, IsCombAtG t x0 (m := Fintype.card κ) (fun i => tg ((Fintype.equivFin κ).symm i)) (fun i => a ((Fintype.equivFin κ).symm i)) w) → ∃ (d : ℕ) (G : FGLaw S d) (A : Germ.OAct (𝓞 E) G) (uvec : κ → Fin d → S) (x : ∀ m, jOG x0 d m 1 ⟶ t.G), d = Fintype.card κ ∧ (∀ ℓ (j : Fin d), uvec ℓ j = if (j : ℕ) = (Fintype.equivFin κ ℓ : ℕ) then 1 else 0) ∧ IsChartG t x0 d G.F A.act tg uvec x := by
+  classical
+  intro E _ _ _ H X0 t S _ x0 κ _ tg htan hb
+  have hp := isGrpPullback_pullback t.G x0
+  have := t.semi.smooth
+  have : Smooth ((Over.pullback x0).obj t.G).hom :=
+    smooth_isStableUnderBaseChange.of_isPullback (IsPullback.of_hasPullback _ _) this
+  let φ := pullback.fst t.G.hom x0
+  let up : ∀ w : Sp (DualNumber S) ⟶ t.G.left, w ≫ t.G.hom = spMap (algebraMap S (DualNumber S)) ≫ x0 →
+      (epsR S ⟶ (Over.pullback x0).obj t.G) := fun w h => Over.homMk (pullback.lift w _ h) (pullback.lift_snd _ _ _)
+  have hup : ∀ w h, (up w h).left ≫ φ = w := fun w h => pullback.lift_fst _ _ _
+  have inj : ∀ {T : Over (Sp S)} {u v : T ⟶ (Over.pullback x0).obj t.G}, u.left ≫ φ = v.left ≫ φ → u = v := fun h =>
+    Over.OverMorphism.ext (pullback.hom_ext h ((Over.w _).trans (Over.w _).symm))
+  have one : ∀ T : Over (Sp S), (1 : T ⟶ (Over.pullback x0).obj t.G).left ≫ φ = (1 : Over.mk (T.hom ≫ x0) ⟶ t.G).left :=
+    fun T => congrArg (fun q => q.left) (map_one (pushHom hp T))
+  have tan : ∀ w : epsR S ⟶ (Over.pullback x0).obj t.G, IsTangent w ↔ IsTanAtG t x0 (w.left ≫ φ) := fun w => by
+    have e : (1 : Chart.sp (R₀ := S) S ⟶ (Over.pullback x0).obj t.G).left ≫ φ = (1 : Over.mk x0 ⟶ t.G).left :=
+      (one _).trans (congrArg (· ≫ (η[t.G]).left) (show Spec.map (CommRingCat.ofHom (RingHom.id S)) ≫ x0 = x0 by simp))
+    rw [← Chart.isTan_iff]
+    refine ⟨fun h => ⟨Over.w (pushPt hp.1.w w), ?_⟩, fun h => inj ?_⟩
+    · exact (Category.assoc _ _ _).symm.trans ((congrArg (fun q => q.left ≫ φ) h).trans e)
+    · exact (Category.assoc _ _ _).trans (h.2.trans e.symm)
+  have pr : ∀ {n} (u : Fin n → (epsR S ⟶ (Over.pullback x0).obj t.G)), (List.ofFn u).prod.left ≫ φ =
+      (List.ofFn fun i => (pushPt hp.1.w (u i) : tEpsG x0 ⟶ t.G)).prod.left := fun u =>
+    congrArg (fun q => q.left) ((map_list_prod (pushHom hp (epsR S)) _).trans (by rw [List.map_ofFn]; rfl))
+  have comb : ∀ {n} (c : Fin n → S) (v : Fin n → (epsR S ⟶ (Over.pullback x0).obj t.G)) w,
+      IsLieComb c v w ↔ IsCombAtG t x0 (fun i => (v i).left ≫ φ) c (w.left ≫ φ) := fun c v w => by
+    constructor
+    · rintro ⟨u, hu, rfl⟩
+      exact ⟨fun i => pushPt hp.1.w (u i), fun i => (congrArg (· ≫ φ) (hu i)).trans (Category.assoc _ _ _), (pr u).symm⟩
+    · rintro ⟨u, hu, hw⟩
+      refine ⟨fun i => up (u i).left (Over.w _), fun i => pullback.hom_ext ?_ ?_, inj (hw.symm.trans (Eq.trans ?_ (pr _).symm))⟩
+      · exact (hup _ _).trans ((hu i).trans (Category.assoc _ _ _).symm)
+      · refine (Over.w (up (u i).left (Over.w _))).trans (Eq.trans ?_ (Category.assoc _ _ _).symm)
+        refine Eq.trans ?_ (congrArg (spMap (epsScaleR (c i)) ≫ ·) (Over.w (v i))).symm
+        exact (Over.w (Chart.spMap (Chart.scaleD (c i)))).symm
+      · have : u = fun i => (pushPt hp.1.w (up (u i).left (Over.w _)) : tEpsG x0 ⟶ t.G) :=
+          funext fun i => Over.OverMorphism.ext (hup (u i).left (Over.w _)).symm
+        exact congrArg (fun q : _ → (tEpsG x0 ⟶ t.G) => (List.ofFn q).prod.left) this
+  let e := Fintype.equivFin κ
+  let v : Fin (Fintype.card κ) → (epsR S ⟶ (Over.pullback x0).obj t.G) := fun i => up (tg (e.symm i)) (htan _).1
+  have hv : (fun i => (v i).left ≫ φ) = fun i => tg (e.symm i) := funext fun i => hup _ _
+  have hB : IsLieBasis v := ⟨fun i => (tan _).2 (by rw [hup]; exact htan _), fun w hw => by
+    obtain ⟨a, ha, hu⟩ := hb _ ((tan w).1 hw)
+    refine ⟨fun i => a (e.symm i), (comb _ _ _).2 (hv ▸ ha), fun c hc => ?_⟩
+    have := hu (fun l => c (e l)) (by simpa only [e, Equiv.apply_symm_apply] using hv ▸ (comb _ _ _).1 hc)
+    funext i; rw [← this]; simp⟩
+  obtain ⟨x, hx, hxv'⟩ := GlobalTheory.exists_isUnivChart_of_isLieBasis S ((Over.pullback x0).obj t.G) this _ v hB
+  have hxv := fun j => (hxv' j).symm
+  obtain ⟨F, A, hF, hA⟩ := ChartJet.exists_series hx (OAct.pullback x0 t.G t.act)
+  have sub : ∀ {n} m (p : Q S (Fintype.card κ) n) (g : Jet S (Fin 1 × Fin (Fintype.card κ)) m →ₐ[S] Jet S (Fin n × _) m),
+      (∀ s, g (Chart.zR m s) = ChartJet.pj m (p.1 s.2)) →
+      homAt x0 g ≫ pushPt hp.1.w (ChartJet.ptJ x m (gen 0)) = pushPt hp.1.w (ChartJet.ptJ x m p) := fun m p g hg => by
+    have e₁ : g = ChartJet.jQ m ![p] := Chart.jet_ext fun s => (hg s).trans (by
+      obtain ⟨i, j⟩ := s
+      obtain rfl := Subsingleton.elim i 0
+      exact (ChartJet.jS_zR m (fun s : Fin 1 × _ => ((![p] : Fin 1 → _) s.1).1 s.2) (fun s => ((![p] : Fin 1 → _) s.1).2 s.2)
+        (0, j)).symm)
+    have e₂ := ChartJet.ptJ_sq x m ![p] (gen 0)
+    rw [sq_gen, ← e₁] at e₂
+    exact Over.OverMorphism.ext ((Category.assoc _ _ _).symm.trans (congrArg (fun q => q.left ≫ φ) e₂))
+  have sp := fun {n} m (p : Q S (Fintype.card κ) n) => subst_zR m p
+  have cp : ∀ {n} m (i : Fin n), jptG t x0 _ (fun m => pushPt hp.1.w (ChartJet.ptJ x m (gen 0))) m i =
+      pushPt hp.1.w (ChartJet.ptJ x m (gen i)) := fun m i => sub m (gen i) _ (copy_zR m i)
+  refine ⟨_, F, A, fun l => Pi.single (e l) 1, fun m => pushPt hp.1.w (ChartJet.ptJ x m (gen 0)), rfl,
+    fun l j => by simp only [Pi.single_apply, Fin.ext_iff, e], fun m => ?_, fun m => ?_,
+    fun m => ?_, fun m a => ?_, fun l => ?_, fun w => ?_⟩
+  · exact Over.OverMorphism.ext ((Category.assoc _ _ _).symm.trans
+      ((congrArg (fun q => q.left ≫ φ) (ChartJet.ptJ_aug hx m (gen 0))).trans (one _)))
+  · exact Over.OverMorphism.ext ((Category.assoc _ _ _).symm.trans
+      (congrArg (fun q => q.left ≫ φ) (ChartJet.ptJ_trunc hx m (gen 0))))
+  · rw [cp, cp]
+    exact (sub m ⟨F.F, F.const⟩ _ (sp m _)).trans ((congrArg _ (hF m)).trans (map_mul (pushHom hp _) _ _))
+  · refine Eq.trans ?_ ((sub m ⟨A.act a, A.const a⟩ _ (sp m _)).trans (congrArg _ (hA a m))).symm
+    exact Over.OverMorphism.ext ((Category.assoc _ _ _).trans ((congrArg (_ ≫ ·)
+      (pullback.lift_fst _ _ _ : ((OAct.pullback x0 t.G t.act).act a).left ≫ φ = φ ≫ (t.act.act a).left).symm).trans
+      (Category.assoc _ _ _).symm))
+  · have h := (comb _ _ _).1 (ChartJet.comb_single hx hxv (e l))
+    rw [hup, Equiv.symm_apply_apply] at h
+    convert h using 2 with j
+    let T : Chart.JetR S (Fin 1 × Fin (Fintype.card κ)) 1 →ₐ[S] DualNumber S := (jetTan ((0 : Fin 1), j) :
+      Jet S (Fin 1 × Fin (Fintype.card κ)) (0 + 1) →ₐ[S] DualNumber S)
+    have e₁ : T.comp (ChartJet.jP 1 (gen 0 : Q S _ 1)) = Chart.dualLift (Pi.single j 1) := Chart.jet_ext fun i => by
+      rw [AlgHom.comp_apply, ChartJet.jP_zR, Chart.dualLift_zR]
+      refine (congrArg T (ChartJet.pj_X 1 ((0 : Fin 1), i))).trans ?_
+      show MvPolynomial.aeval (fun i => if i = ((0 : Fin 1), j) then (DualNumber.eps : DualNumber S) else 0)
+        (MvPolynomial.X ((0 : Fin 1), i)) = _
+      rw [MvPolynomial.aeval_X]
+      by_cases hij : i = j
+      · subst hij; rw [if_pos rfl, Pi.single_eq_same]; rfl
+      · rw [if_neg (fun h => hij (Prod.ext_iff.1 h).2), Pi.single_eq_of_ne hij, TrivSqZeroExt.inr_zero]
+    have e₂ : Chart.spMap T ≫ ChartJet.ptJ x 1 (gen 0) = v j := by
+      rw [hxv, ← e₁, ← Chart.spMap_comp, Category.assoc]; rfl
+    exact (Category.assoc _ _ _).symm.trans (congrArg (fun q => q.left ≫ φ) e₂)
+  · refine ⟨fun l => w (e l), fun j => ?_, fun a ha => funext fun l => ?_⟩
+    · rw [Finset.sum_eq_single (e.symm j) (fun b _ hb => by
+        rw [Pi.single_eq_of_ne (fun h => hb (by rw [h, Equiv.symm_apply_apply])), mul_zero]) (by simp)]
+      simp
+    · rw [← ha, Finset.sum_eq_single l (fun b _ hb => by
+        rw [Pi.single_eq_of_ne (fun h => hb (e.injective h).symm), mul_zero]) (by simp)]
+      simp
+
+end GlobalTheory.ChartData
+
+
+[CNC_SRC_CHART_AND_FRAME_CONTRACT] All IsChart and IsFrame fields, exact partial law order and adjoint direction
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/ThGerm.lean#L43-L152
+abbrev jO (m n : ℕ) : Over Xo.X := overAt y.x (Jet S (Fin n × Fin d) m)
+
+def jetCopy {n : ℕ} (m : ℕ) (i : Fin n) : Jet S (Fin 1 × Fin d) m →ₐ[S] Jet S (Fin n × Fin d) m :=
+  jetMap (fun p => X (i, p.2)) fun _ => X_mem_orig _
+
+def jetSubstP {κ κ' : Type} (m : ℕ) (φ : κ → MvPolynomial κ' S) : Jet S κ m →ₐ[S] Jet S κ' m :=
+  jetMap (fun i => φ i - C (MvPolynomial.constantCoeff (φ i))) fun _ => sub_const_mem_orig _
+
+def psIn {n n' : ℕ} (m : ℕ) (r : Fin n → Fin n') (f : MvPowerSeries (Fin n × Fin d) S) :
+    MvPolynomial (Fin n' × Fin d) S :=
+  MvPolynomial.rename (fun p => (r p.1, p.2)) (psTrunc m f)
+
+def jpt (x : ∀ m, jO y d m 1 ⟶ Xo.univ.t.G) {n : ℕ} (m : ℕ) (i : Fin n) : jO y d m n ⟶ Xo.univ.t.G :=
+  homAt y.x (jetCopy d m i) ≫ x m
+
+structure IsChart (F : Fin d → MvPowerSeries (Fin 2 × Fin d) S)
+    (act : 𝓞 E → Fin d → MvPowerSeries (Fin 1 × Fin d) S) (uvec : Lt1 Dw → Fin d → S)
+    (x : ∀ m, jO y d m 1 ⟶ Xo.univ.t.G) : Prop where
+  zero : ∀ m, homAt y.x (jetAug : Jet S (Fin 1 × Fin d) m →ₐ[S] S) ≫ x m = 1
+  trunc : ∀ m, homAt y.x (jetTrunc : Jet S (Fin 1 × Fin d) (m + 1) →ₐ[S] Jet S (Fin 1 × Fin d) m) ≫ x (m + 1) = x m
+  law : ∀ m, homAt y.x (jetSubstP m fun p : Fin 1 × Fin d => psTrunc m (F p.2)) ≫ x m =
+    jpt y d x m (0 : Fin 2) * jpt y d x m (1 : Fin 2)
+  act : ∀ m (a : 𝓞 E), x m ≫ Xo.univ.t.act.act a =
+    homAt y.x (jetSubstP m fun p : Fin 1 × Fin d => psTrunc m (act a p.2)) ≫ x m
+  tan : ∀ ℓ : Lt1 Dw, IsCombAt y.x
+    (fun j : Fin d => (homAt y.x (jetTan ((0 : Fin 1), j) : Jet S (Fin 1 × Fin d) (0 + 1) →ₐ[S] DualNumber S) ≫ x 1).left) (uvec ℓ)
+    (y.u ℓ.1 ℓ.2)
+
+  basis : ∀ v : Fin d → S, ∃! a : Lt1 Dw → S, ∀ j, ∑ ℓ, a ℓ * uvec ℓ j = v j
+
+end Chart
+
+section Frame
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable {Xo : Moduli Dw l} {c : Coeff l}
+
+def cφ {T : Over Xo.X} {n : ℕ} (xs : Fin n → (T ⟶ Xo.univ.t.G)) :
+    ULift (Finset (Fin n)) → (T.left ⟶ Xo.univ.t.G.left) :=
+  fun I => (psum Xo.univ.t.G xs I.down).left
+
+def cε (n : ℕ) : ULift (Finset (Fin n)) → ℤ := fun I => (-1) ^ (n - I.down.card)
+
+def scaleGen {Y : Scheme.{0}} {K : Type} [Fintype K] (φ : K → (Y ⟶ Xo.univ.t.G.left)) (ε : K → ℤ)
+    (u : Γ(Y, ⊤)ˣ) (g : LB.Gen (LB.LinComb Xo.univ.t.PP.L φ ε)) :
+    LB.Gen (LB.LinComb Xo.univ.t.PP.L φ ε) :=
+  ⟨fun j => res le_top u * g.s j⟩
+
+def genPow {Y : Scheme.{0}} {K : Type} [Fintype K] (φ : K → (Y ⟶ Xo.univ.t.G.left)) (ε : K → ℤ)
+    (g : LB.Gen (LB.LinComb Xo.univ.t.PP.L φ ε)) (k : ℕ) :
+    LB.Gen (LB.LinComb Xo.univ.t.PP.L φ fun i => (k : ℤ) * ε i) :=
+  ⟨fun j => g.s j ^ k⟩
+
+def unitΓ {A : Type} [CommRing A] (u : Aˣ) : Γ(Sp A, ⊤)ˣ := Units.map (toΓ A).toMonoidHom u
+
+variable {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) (d : ℕ)
+variable (x : ∀ m, jO y d m 1 ⟶ Xo.univ.t.G)
+
+abbrev FrTy (m : ℕ) : Type :=
+  LB.Gen (cubeLB Xo.univ.t.G ![jpt y d x m (0 : Fin 2), jpt y d x m (1 : Fin 2)] Xo.univ.t.PP.L)
+
+def pe (e : ∀ m, FrTy y d x m) (m : ℕ) {n' : ℕ} (φ : Fin 2 → Fin d → MvPolynomial (Fin n' × Fin d) S) :=
+  LB.pullGen Xo.univ.t.PP.L (cφ ![jpt y d x m (0 : Fin 2), jpt y d x m (1 : Fin 2)]) (cε 2) (e m)
+    (homAt y.x (jetSubstP m fun p : Fin 2 × Fin d => φ p.1 p.2)).left
+
+structure IsFrame (F : Fin d → MvPowerSeries (Fin 2 × Fin d) S)
+    (act : 𝓞 E → Fin d → MvPowerSeries (Fin 1 × Fin d) S)
+    (ph1 ph2 : MvPowerSeries (Fin 3 × Fin d) S) (sy : MvPowerSeries (Fin 2 × Fin d) S)
+    (ad : 𝓞 E → MvPowerSeries (Fin 2 × Fin d) S) (e : ∀ m, FrTy y d x m) : Prop where
+  gen : ∀ m, (e m).IsGen
+  ph1 : ∀ m, ∃ u : (Jet S (Fin 3 × Fin d) m)ˣ, (u : Jet S (Fin 3 × Fin d) m) = psJet m ph1 ∧
+    LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _
+      (LB.pullGen Xo.univ.t.PP.L (thφ Xo.univ.t.G (x3 Xo.univ.t.G)) thε Xo.univ.t.cub.t
+        (lift (jpt y d x m (0 : Fin 3)) (lift (jpt y d x m (1 : Fin 3)) (jpt y d x m (2 : Fin 3)))).left)
+      (scaleGen _ _ (unitΓ u) (LB.mulGen Xo.univ.t.PP.L _ _ _ _
+        (pe y d x e m ![fun j => psIn d m ![0, 1] (F j), fun j => X ((2 : Fin 3), j)])
+        (LB.mulGen Xo.univ.t.PP.L _ _ _ _
+          (LB.invGen Xo.univ.t.PP.L _ _ (pe y d x e m ![fun j => X ((0 : Fin 3), j), fun j => X ((2 : Fin 3), j)]))
+          (LB.invGen Xo.univ.t.PP.L _ _ (pe y d x e m ![fun j => X ((1 : Fin 3), j), fun j => X ((2 : Fin 3), j)])))))
+  ph2 : ∀ m, ∃ u : (Jet S (Fin 3 × Fin d) m)ˣ, (u : Jet S (Fin 3 × Fin d) m) = psJet m ph2 ∧
+    LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _
+      (LB.pullGen Xo.univ.t.PP.L (thφ Xo.univ.t.G (x3 Xo.univ.t.G)) thε Xo.univ.t.cub.t
+        (lift (jpt y d x m (1 : Fin 3)) (lift (jpt y d x m (2 : Fin 3)) (jpt y d x m (0 : Fin 3)))).left)
+      (scaleGen _ _ (unitΓ u) (LB.mulGen Xo.univ.t.PP.L _ _ _ _
+        (pe y d x e m ![fun j => X ((0 : Fin 3), j), fun j => psIn d m ![1, 2] (F j)])
+        (LB.mulGen Xo.univ.t.PP.L _ _ _ _
+          (LB.invGen Xo.univ.t.PP.L _ _ (pe y d x e m ![fun j => X ((0 : Fin 3), j), fun j => X ((1 : Fin 3), j)]))
+          (LB.invGen Xo.univ.t.PP.L _ _ (pe y d x e m ![fun j => X ((0 : Fin 3), j), fun j => X ((2 : Fin 3), j)])))))
+  sy : ∀ m, ∃ u : (Jet S (Fin 2 × Fin d) m)ˣ, (u : Jet S (Fin 2 × Fin d) m) = psJet m sy ∧
+    LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _ (e m)
+      (scaleGen _ _ (unitΓ u⁻¹) (pe y d x e m ![fun j => X ((1 : Fin 2), j), fun j => X ((0 : Fin 2), j)]))
+  ad : ∀ a : 𝓞 E, ∃ wL : LB.Gen (LB.LinComb Xo.univ.t.PP.L
+      (Sum.elim (cφ ![fst Xo.univ.t.G Xo.univ.t.G, snd Xo.univ.t.G Xo.univ.t.G ≫ Xo.univ.t.act.act (H.bar a)])
+        (cφ ![fst Xo.univ.t.G Xo.univ.t.G ≫ Xo.univ.t.act.act a, snd Xo.univ.t.G Xo.univ.t.G]))
+      (Sum.elim (cε 2) fun I => -cε 2 I)), wL.IsGen ∧
+    ∀ m, ∃ u : (Jet S (Fin 2 × Fin d) m)ˣ, (u : Jet S (Fin 2 × Fin d) m) = psJet m (ad a) ∧
+      LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _
+        (LB.mulGen Xo.univ.t.PP.L _ _ _ _
+          (LB.pullGen Xo.univ.t.PP.L _ _ wL (lift (jpt y d x m (0 : Fin 2)) (jpt y d x m (1 : Fin 2))).left)
+          (pe y d x e m ![fun j => psIn d m ![0] (act a j), fun j => X ((1 : Fin 2), j)]))
+        (scaleGen _ _ (unitΓ u)
+          (pe y d x e m ![fun j => X ((0 : Fin 2), j), fun j => psIn d m ![1] (act (H.bar a) j)]))
+
+end Frame
+
+section Germ
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable {Xo : Moduli Dw l} {c : Coeff l}
+variable {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) (d : ℕ)
+
+
+[CNC_SRC_PRIMITIVE_AND_GERM_CONTRACT] Original PrimTy, IsPrim, eL and all IsGerm truncation witnesses
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/ThGerm.lean#L153-L187
+variable (x : ∀ m, jO y d m 1 ⟶ Xo.univ.t.G)
+
+def jBase (m n : ℕ) : jO y d m n ⟶ ptO Xo y.x :=
+  Over.homMk (spMap (algebraMap S (Jet S (Fin n × Fin d) m))) rfl
+
+abbrev PrimTy (H : Host E) (Xo : Moduli Dw l) : Type :=
+  LB.Gen (LB.LinComb Xo.univ.t.PP.L
+    (Sum.elim (fun _ : Fin 1 => 𝟙 Xo.univ.t.G.left) (cφ ![𝟙 Xo.univ.t.G, Xo.univ.t.act.act H.w0]))
+    (Sum.elim (fun _ => 1) fun I => -cε 2 I))
+
+def IsPrim (wP : PrimTy H Xo) : Prop :=
+  wP.IsGen ∧ LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _
+    (LB.pullGen Xo.univ.t.PP.L _ _ wP (eSec Xo.univ.t.G)) Xo.univ.t.PP.rig
+
+def eL (act : 𝓞 E → Fin d → MvPowerSeries (Fin 1 × Fin d) S) (e : ∀ m, FrTy y d x m) (wP : PrimTy H Xo)
+    (m : ℕ) :=
+  LB.mulGen Xo.univ.t.PP.L _ _ _ _ (LB.pullGen Xo.univ.t.PP.L _ _ wP (x m).left)
+    (pe y d x e m ![fun j => X ((0 : Fin 1), j), fun j => psIn d m ![0] (act H.w0 j)])
+
+def IsGerm (act : 𝓞 E → Fin d → MvPowerSeries (Fin 1 × Fin d) S) (e : ∀ m, FrTy y d x m)
+    (wP : PrimTy H Xo) (k : ℕ)
+    (F : LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x))) (f : MvPowerSeries (Fin 1 × Fin d) S) :
+    Prop :=
+  ∀ m, ∃ (F' : LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (jO y d m 1)))
+    (τ : LB.Gen (LB.LinComb Xo.univ.t.PP.L (K := Fin 1) (fun _ => (x m).left) fun _ => (k : ℤ))),
+    IsPullSec Xo.univ.t.G Xo.univ.t.PP.L k (jBase y d m 1 ▷ Xo.univ.t.G) (whiskerRight_snd _ _) F F' ∧
+    LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _ τ (genPow _ _ (eL y d x act e wP m) k) ∧
+    IsValueAt Xo.univ.t.G Xo.univ.t.PP.L k F' (x m) τ (toΓ _ (psJet m f))
+
+end Germ
+
+section Pin
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+variable (Xo : Moduli Dw l) (c : Coeff l)
+
+
+[CNC_SRC_CHARTAT_AND_ISNAB] Literal ChartAt and IsNab including every coefficient algebra and every germ
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/ThGerm.lean#L189-L221
+structure ChartAt [StarRing (𝓞 E)] {S : Type} [CommRing S] [Algebra c.F S] [Algebra ℚ S]
+    (y : FrPt Xo c S) where
+  d : ℕ
+  B : Germ.FB S d (𝓞 E)
+  uvec : Lt1 Dw → Fin d → S
+  x : ∀ m, jO y d m 1 ⟶ Xo.univ.t.G
+  e : ∀ m, FrTy y d x m
+  wP : PrimTy H Xo
+  h : Germ.PS S 2 d
+  chart : IsChart y d B.G.F B.A.act uvec x
+  frame : IsFrame y d x B.G.F B.A.act B.ph1 B.ph2 B.sy B.ad e
+  prim : IsPrim wP
+  gauge : B.IsCanonGauge S h
+
+  rig0 : LB.Gen.Corr Xo.univ.t.PP.L _ _ _ _
+    (LB.pullGen Xo.univ.t.PP.L _ _ (eL y d x B.A.act e wP 0)
+      (homAt y.x (jetAug : Jet S (Fin 1 × Fin d) 0 →ₐ[S] S)).left)
+    (rigT Xo.univ.t.G Xo.univ.t.PP.L Xo.univ.t.PP.rig (overAt y.x S) 1)
+
+def IsNab [StarRing (𝓞 E)] (nab : NabV Xo c) : Prop :=
+  (∀ a : 𝓞 E, star a = H.bar a) ∧
+  ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S),
+    ∃ C : ChartAt Xo c y,
+      (∀ (k : ℕ) (F : LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x))),
+        ∃ f, IsGerm y C.d C.x C.B.A.act C.e C.wP k F f) ∧
+      ∀ (k : ℕ) (F : LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x)))
+        (f : MvPowerSeries (Fin 1 × Fin C.d) S),
+        IsGerm y C.d C.x C.B.A.act C.e C.wP k F f →
+          ∀ α : Lt1 Dw →₀ ℕ, nab y k F α = C.B.nabVal S C.h H.w0 k f C.uvec (MvPolynomial.monomial α 1)
+
+end Pin
+
+end Formalism.L2.Pj
+
+
+[CNC_SRC_COMPATIBLE_FRAME_GENERATORS] Actual nilpotent generator lifts and normalized cube-defect frame
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/ExistsFramesCubeDefectAlongChartOverRing.lean#L1-L228
+import Mathlib
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermCut
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermBGen
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermBFr
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsGenLiftOfIsNilpotent
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+attribute [local instance] Over.cartesianMonoidalCategory
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS Pt ev pt comp1 FGLaw)
+open MvPolynomial (X)
+open Formalism.MainNotions.ModuliIntegralCharts.H1.GermD Formalism.MainNotions.ModuliIntegralCharts.H1.GermB
+
+noncomputable section
+
+namespace GlobalTheory.ChartFrames
+
+section Alg
+
+variable {S Ix : Type} [CommRing S]
+
+theorem nilpotent_of_le (m : ℕ) (I : Ideal (Jet S Ix m))
+    (h : ∀ p : MvPolynomial Ix S, Ideal.Quotient.mk _ p ∈ I → p ∈ orig S Ix) : IsNilpotent I := by
+  refine ⟨m + 1, le_bot_iff.1 ?_⟩
+  have h1 : I ≤ Ideal.map (Ideal.Quotient.mk (orig S Ix ^ (m + 1))) (orig S Ix) := by
+    intro a ha
+    obtain ⟨p, rfl⟩ := Ideal.Quotient.mk_surjective a
+    exact Ideal.mem_map_of_mem _ (h p ha)
+  refine (Ideal.pow_right_mono h1 _).trans ?_
+  rw [← Ideal.map_pow, Ideal.map_quotient_self]
+
+theorem trunc_surj (m : ℕ) :
+    Function.Surjective ((jetTrunc : Jet S Ix (m + 1) →ₐ[S] Jet S Ix m) : Jet S Ix (m + 1) →+* Jet S Ix m) := by
+  intro a
+  obtain ⟨p, rfl⟩ := Ideal.Quotient.mk_surjective a
+  exact ⟨Ideal.Quotient.mk _ p, rfl⟩
+
+theorem trunc_nil (m : ℕ) : IsNilpotent
+    (RingHom.ker ((jetTrunc : Jet S Ix (m + 1) →ₐ[S] Jet S Ix m) : Jet S Ix (m + 1) →+* Jet S Ix m)) :=
+  nilpotent_of_le _ _ fun p hp => by
+    have : Ideal.Quotient.mk (orig S Ix ^ (m + 1)) p = 0 := hp
+    exact Ideal.pow_le_self (Nat.succ_ne_zero m) (Ideal.Quotient.eq_zero_iff_mem.1 this)
+
+theorem aug_surj (m : ℕ) : Function.Surjective ((jetAug : Jet S Ix m →ₐ[S] S) : Jet S Ix m →+* S) :=
+  fun a => ⟨algebraMap S _ a, (jetAug : Jet S Ix m →ₐ[S] S).commutes a⟩
+
+theorem aug_nil (m : ℕ) : IsNilpotent (RingHom.ker ((jetAug : Jet S Ix m →ₐ[S] S) : Jet S Ix m →+* S)) :=
+  nilpotent_of_le _ _ fun p hp => by
+    have h1 : MvPolynomial.aeval (fun _ => (0 : S)) p = 0 := hp
+    have h2 : MvPolynomial.constantCoeff p = 0 := by simpa using h1
+    simpa [h2] using sub_const_mem_orig p
+
+variable (d : ℕ)
+
+theorem aug_axis0 (m : ℕ) : (jetAug : Jet S (Fin 1 × Fin d) m →ₐ[S] S).comp (axis0 d m) = jetAug := by
+  apply jet_hom_ext
+  rintro ⟨i, j⟩
+  fin_cases i <;> simp [jetSubstP, jetMap_mk, jetAug_X]
+
+theorem aug_axis1 (m : ℕ) : (jetAug : Jet S (Fin 1 × Fin d) m →ₐ[S] S).comp (axis1 d m) = jetAug := by
+  apply jet_hom_ext
+  rintro ⟨i, j⟩
+  fin_cases i <;> simp [jetSubstP, jetMap_mk, jetAug_X]
+
+theorem trunc_axis0 (m : ℕ) : (jetTrunc : Jet S (Fin 1 × Fin d) (m + 1) →ₐ[S] _).comp (axis0 d (m + 1)) =
+    (axis0 d m).comp (jetTrunc : Jet S (Fin 2 × Fin d) (m + 1) →ₐ[S] _) := by
+  apply jet_hom_ext
+  intro p
+  rfl
+
+theorem trunc_axis1 (m : ℕ) : (jetTrunc : Jet S (Fin 1 × Fin d) (m + 1) →ₐ[S] _).comp (axis1 d (m + 1)) =
+    (axis1 d m).comp (jetTrunc : Jet S (Fin 2 × Fin d) (m + 1) →ₐ[S] _) := by
+  apply jet_hom_ext
+  intro p
+  rfl
+
+theorem aug_trunc (m : ℕ) : (jetAug : Jet S Ix m →ₐ[S] S).comp (jetTrunc : Jet S Ix (m + 1) →ₐ[S] _) = jetAug := by
+  apply jet_hom_ext
+  intro p
+  rfl
+
+theorem cancel₀ {U : Type} [CommGroup U] (a b : U) : a * b⁻¹ * a⁻¹ * b = 1 := by
+  rw [mul_right_comm a, mul_inv_cancel, _root_.one_mul, inv_mul_cancel]
+
+theorem cancel₁ {U : Type} [CommGroup U] (a b : U) : a * a⁻¹ * b⁻¹ * b = 1 := by
+  rw [mul_inv_cancel, _root_.one_mul, inv_mul_cancel]
+
+end Alg
+
+section Geo
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {X0 : Scheme.{0}} (t : SAB H X0)
+
+theorem exists_norm {T : Over X0} (p q : T ⟶ t.G) (s₁ s₂ s₀ : T ⟶ T)
+    (h₁ : s₁ ≫ (p * q) = p) (h₂ : s₂ ≫ (p * q) = q) (h₀ : s₀ ≫ (p * q) = 1)
+    (g₁ : LB.Gen (LB.LinComb t.PP.L (fun _ : PUnit.{1} => (p * q).left) (fun _ => 1))) (hg₁ : g₁.IsGen) :
+    ∃ e : LB.Gen (LB.LinComb t.PP.L (cφG t ![p, q]) (cε 2)), e.IsGen ∧
+      ∀ (Z : Scheme.{0}) (r : Z ⟶ T.left) (z : Z) (J), Good t.PP.L z J →
+        val e r z J = val g₁ r z J * (val g₁ (r ≫ s₁.left) z J)⁻¹ * (val g₁ (r ≫ s₂.left) z J)⁻¹ *
+          val g₁ (r ≫ s₀.left) z J := by
+  obtain ⟨e, he, hv⟩ := exists_gen t.PP.isLB (φ' := cφG t ![p, q]) (ε' := cε 2) (fun U _ h => by
+      have hc := prod_cube2 t.G (fun w : T ⟶ t.G => h w.left) ![p, q]
+      refine Eq.trans ?_ hc.symm
+      simp only [Fintype.prod_sum_type, Fintype.prod_unique, Sum.elim_inl, Sum.elim_inr, ← Over.comp_left, h₁, h₂, h₀,
+        Matrix.cons_val_zero, Matrix.cons_val_one, _root_.mul_one, zpow_neg, zpow_one]
+      ac_rfl)
+    (LB.mulGen t.PP.L _ _ _ _ (LB.mulGen t.PP.L _ _ _ _ (LB.mulGen t.PP.L _ _ _ _ g₁
+      (LB.invGen t.PP.L _ _ (LB.pullGen t.PP.L _ _ g₁ s₁.left))) (LB.invGen t.PP.L _ _ (LB.pullGen t.PP.L _ _ g₁ s₂.left)))
+      (LB.pullGen t.PP.L _ _ g₁ s₀.left))
+    (DVR.mulGen_isGen _ _ _ _ _ _ _ (DVR.mulGen_isGen _ _ _ _ _ _ _ (DVR.mulGen_isGen _ _ _ _ _ _ _ hg₁
+      (DVR.invGen_isGen _ _ _ _ (DVR.pullGen_isGen _ _ _ _ hg₁ _)))
+      (DVR.invGen_isGen _ _ _ _ (DVR.pullGen_isGen _ _ _ _ hg₁ _))) (DVR.pullGen_isGen _ _ _ _ hg₁ _))
+  refine ⟨e, he, fun Z r z J hJ => (hv Z r z J hJ).trans ?_⟩
+  rw [val_mul hJ, val_mul hJ, val_mul hJ, val_inv, val_inv, val_pull hJ, val_pull hJ, val_pull hJ]
+
+variable {S : Type} [CommRing S] (x0 : Sp S ⟶ X0)
+
+theorem exists_tower {Ix : Type} (P : ∀ m, overAt x0 (Jet S Ix m) ⟶ t.G)
+    (h0 : Formalism.L2.Pj.homAt x0 (jetAug : Jet S Ix 0 →ₐ[S] S) ≫ P 0 = 1)
+    (htr : ∀ m, Formalism.L2.Pj.homAt x0 (jetTrunc : Jet S Ix (m + 1) →ₐ[S] Jet S Ix m) ≫ P (m + 1) = P m) :
+    ∃ g₁ : ∀ m, LB.Gen (LB.LinComb t.PP.L (fun _ : PUnit.{1} => (P m).left) (fun _ => 1)), (∀ m, (g₁ m).IsGen) ∧
+      ∀ m (Z : Scheme.{0}) (r : Z ⟶ (overAt x0 (Jet S Ix m)).left) (z : Z) (J), Good t.PP.L z J →
+        val (g₁ (m + 1)) (r ≫ (Formalism.L2.Pj.homAt x0 (jetTrunc : Jet S Ix (m + 1) →ₐ[S] Jet S Ix m)).left) z J =
+          val (g₁ m) r z J := by
+  obtain ⟨g0, hg0, -⟩ := GlobalTheory.NilGen.exists_gen_lift_of_isNilpotent t.G.left t.PP.L t.PP.isLB (Jet S Ix 0) S _ (aug_surj 0) (aug_nil 0)
+    PUnit.{1} (fun _ => (P 0).left) (fun _ => 1) PUnit.{1} (fun _ => (overAt x0 S).hom ≫ eSec t.G) (fun _ => 1)
+    (LB.pullGen t.PP.L (fun _ : PUnit.{1} => eSec t.G) (fun _ => 1) t.PP.rig (overAt x0 S).hom)
+    (DVR.pullGen_isGen _ _ _ _ t.PP.rigGen _) (fun U _ h => by
+      have := congrArg Over.Hom.left h0
+      exact Finset.prod_congr rfl fun k _ => congrArg (fun w => h w ^ (1 : ℤ)) this)
+  have step := fun m (g : LB.Gen (LB.LinComb t.PP.L (fun _ : PUnit.{1} => (P m).left) (fun _ => 1))) (hg : g.IsGen) =>
+    GlobalTheory.NilGen.exists_gen_lift_of_isNilpotent t.G.left t.PP.L t.PP.isLB (Jet S Ix (m + 1)) (Jet S Ix m) _ (trunc_surj m) (trunc_nil m)
+      PUnit.{1} (fun _ => (P (m + 1)).left) (fun _ => 1) PUnit.{1} (fun _ => (P m).left) (fun _ => 1) g hg
+      (fun U _ h => by
+        have := congrArg Over.Hom.left (htr m)
+        exact Finset.prod_congr rfl fun k _ => congrArg (fun w => h w ^ (1 : ℤ)) this)
+  choose f hf hc using step
+  let g₁ : ∀ m, {g : LB.Gen (LB.LinComb t.PP.L (fun _ : PUnit.{1} => (P m).left) (fun _ => 1)) // g.IsGen} :=
+    fun m => Nat.rec ⟨g0, hg0⟩ (fun m g => ⟨f m g.1 g.2, hf m g.1 g.2⟩) m
+  refine ⟨fun m => (g₁ m).1, fun m => (g₁ m).2, fun m Z r z J hJ => ?_⟩
+  exact (val_pull hJ _ _ _).symm.trans (val_corr hJ (hc m (g₁ m).1 (g₁ m).2) r)
+
+end Geo
+
+theorem exists_frames : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X0 : Scheme.{0}) (t : SAB H X0) (S : Type) [CommRing S] (x0 : Sp S ⟶ X0) (d : ℕ) (F : Fin d → MvPowerSeries (Fin 2 × Fin d) S) (act : 𝓞 E → Fin d → MvPowerSeries (Fin 1 × Fin d) S) (κ : Type) [Fintype κ] (tg : κ → (Sp (DualNumber S) ⟶ t.G.left)) (uvec : κ → Fin d → S) (x : ∀ m, jOG x0 d m 1 ⟶ t.G), (∀ j, MvPowerSeries.constantCoeff (F j) = 0) → (∀ a j, MvPowerSeries.constantCoeff (act a j) = 0) → IsChartG t x0 d F act tg uvec x → ∃ e : ∀ m, FrTyG t x0 d x m, (∀ m, (e m).IsGen) ∧ FrTrunc t x0 d x e ∧ FrAxes t x0 d x e := by
+  intro E _ _ _ H X0 t S _ x0 d F act κ _ tg uvec x _ _ hch
+
+  let c : ∀ m, Fin 2 → (jOG x0 d m 2 ⟶ jOG x0 d m 1) := fun m i => Formalism.L2.Pj.homAt x0 (jetCopy d m i)
+  let a0 : ∀ m, jOG x0 d m 1 ⟶ jOG x0 d m 2 := fun m => Formalism.L2.Pj.homAt x0 (axis0 d m)
+  let a1 : ∀ m, jOG x0 d m 1 ⟶ jOG x0 d m 2 := fun m => Formalism.L2.Pj.homAt x0 (axis1 d m)
+  let o : ∀ m n, overAt x0 S ⟶ jOG x0 d m n := fun m n => Formalism.L2.Pj.homAt x0 jetAug
+  let u : ∀ m n, jOG x0 d m n ⟶ overAt x0 S := fun m n => Formalism.L2.Pj.homAt x0 (Algebra.ofId S _)
+  let tr : ∀ m n, jOG x0 d m n ⟶ jOG x0 d (m + 1) n := fun m n => Formalism.L2.Pj.homAt x0 jetTrunc
+  have a0c0 : ∀ m, a0 m ≫ c m 0 = u m 1 ≫ o m 1 := fun m => by
+    simp only [a0, c, u, o, homAt_comp, first_axis_at_first_copy]
+  have a0c1 : ∀ m, a0 m ≫ c m 1 = 𝟙 _ := fun m => by
+    simp only [a0, c, homAt_comp, first_axis_at_second_copy, homAt_id]
+  have a1c0 : ∀ m, a1 m ≫ c m 0 = 𝟙 _ := fun m => by
+    simp only [a1, c, homAt_comp, second_axis_at_first_copy, homAt_id]
+  have a1c1 : ∀ m, a1 m ≫ c m 1 = u m 1 ≫ o m 1 := fun m => by
+    simp only [a1, c, u, o, homAt_comp, second_axis_at_second_copy]
+  have oa0 : ∀ m, o m 1 ≫ a0 m = o m 2 := fun m => by
+    simp only [a0, o, homAt_comp, aug_axis0]
+  have oa1 : ∀ m, o m 1 ≫ a1 m = o m 2 := fun m => by
+    simp only [a1, o, homAt_comp, aug_axis1]
+  have oc : ∀ m i, o m 2 ≫ c m i = o m 1 := fun m i => by
+    simp only [c, o, homAt_comp, aug_copy]
+  have a0u : ∀ m, a0 m ≫ u m 2 = u m 1 := fun m => by
+    simp only [a0, u, homAt_comp, Algebra.comp_ofId]
+  have a1u : ∀ m, a1 m ≫ u m 2 = u m 1 := fun m => by
+    simp only [a1, u, homAt_comp, Algebra.comp_ofId]
+  have tru : ∀ m, tr m 2 ≫ u (m + 1) 2 = u m 2 := fun m => by
+    simp only [tr, u, homAt_comp, Algebra.comp_ofId]
+  have otr : ∀ m, o m 2 ≫ tr m 2 = o (m + 1) 2 := fun m => by
+    simp only [tr, o, homAt_comp, aug_trunc]
+  have trc : ∀ m i, tr m 2 ≫ c (m + 1) i = c m i ≫ tr m 1 := fun m i => by
+    simp only [tr, c, homAt_comp, copy_trunc]
+  have tra0 : ∀ m, tr m 1 ≫ a0 (m + 1) = a0 m ≫ tr m 2 := fun m => by
+    simp only [tr, a0, homAt_comp, trunc_axis0]
+  have tra1 : ∀ m, tr m 1 ≫ a1 (m + 1) = a1 m ≫ tr m 2 := fun m => by
+    simp only [tr, a1, homAt_comp, trunc_axis1]
+  have ox : ∀ m, o m 1 ≫ x m = 1 := hch.zero
+  have trx : ∀ m, tr m 1 ≫ x (m + 1) = x m := hch.trunc
+  have hj : ∀ m i, jptG t x0 d x m i = c m i ≫ x m := fun _ _ => rfl
+  obtain ⟨g₁, hg₁, hg₁t⟩ := exists_tower t x0
+    (fun m => jptG t x0 d x m (0 : Fin 2) * jptG t x0 d x m (1 : Fin 2))
+    (by
+      change o 0 2 ≫ _ = _
+      simp only [hj, MonObj.comp_mul, reassoc_of% (oc 0), ox, _root_.mul_one])
+    (fun m => by
+      change tr m 2 ≫ _ = _
+      simp only [hj, MonObj.comp_mul, reassoc_of% (trc m), trx])
+  have key := fun m => exists_norm t (jptG t x0 d x m (0 : Fin 2)) (jptG t x0 d x m (1 : Fin 2))
+    (c m 0 ≫ a1 m) (c m 1 ≫ a0 m) (u m 2 ≫ o m 2)
+    (by simp only [hj, MonObj.comp_mul, Category.assoc, reassoc_of% (a1c0 m), reassoc_of% (a1c1 m), ox,
+      MonObj.comp_one, _root_.mul_one])
+    (by simp only [hj, MonObj.comp_mul, Category.assoc, reassoc_of% (a0c0 m), reassoc_of% (a0c1 m), ox,
+      MonObj.comp_one, _root_.one_mul])
+    (by simp only [hj, MonObj.comp_mul, Category.assoc, reassoc_of% (oc m), ox, MonObj.comp_one, _root_.mul_one])
+    (g₁ m) (hg₁ m)
+  choose e he hv using key
+  refine ⟨e, he, fun m => corr_of_val t.PP.isLB fun y J hJ => ?_, fun m => ⟨corr_of_val t.PP.isLB fun y J hJ => ?_,
+    corr_of_val t.PP.isLB fun y J hJ => ?_⟩⟩
+  · refine (val_pull hJ _ _ _).trans ((hv (m + 1) _ _ y J hJ).trans (Eq.trans ?_ (hv m _ _ y J hJ).symm))
+    have e1 : ∀ (s : jOG x0 d m 2 ⟶ jOG x0 d m 2) (s' : jOG x0 d (m + 1) 2 ⟶ jOG x0 d (m + 1) 2),
+        tr m 2 ≫ s' = s ≫ tr m 2 →
+        val (g₁ (m + 1)) ((𝟙 _ ≫ (tr m 2).left) ≫ s'.left) y J = val (g₁ m) (𝟙 _ ≫ s.left) y J := by
+      intro s s' hs
+      rw [Category.assoc, ← Over.comp_left, hs, Over.comp_left, ← Category.assoc]
+      exact hg₁t m _ _ y J hJ
+    refine congrArg₂ (· * ·) (congrArg₂ (· * ·) (congrArg₂ (· * ·) (hg₁t m _ _ y J hJ)
+      (congrArg _ (e1 _ _ ?_))) (congrArg _ (e1 _ _ ?_))) (e1 _ _ ?_)
+    · simp only [Category.assoc, reassoc_of% (trc m), tra1]
+    · simp only [Category.assoc, reassoc_of% (trc m), tra0]
+    · simp only [Category.assoc, reassoc_of% (tru m), otr]
+  · refine (val_pull hJ _ _ _).trans ((hv m _ _ y J hJ).trans (Eq.trans ?_ (val_one _).symm))
+    change val (g₁ m) (𝟙 _ ≫ (a0 m).left) y J * (val (g₁ m) ((𝟙 _ ≫ (a0 m).left) ≫ _) y J)⁻¹ *
+      (val (g₁ m) ((𝟙 _ ≫ (a0 m).left) ≫ _) y J)⁻¹ * val (g₁ m) ((𝟙 _ ≫ (a0 m).left) ≫ _) y J = 1
+    simp only [Category.id_comp, ← Over.comp_left, reassoc_of% (a0c0 m), reassoc_of% (a0c1 m), reassoc_of% (a0u m), oa1]
+    exact cancel₀ _ _
+  · refine (val_pull hJ _ _ _).trans ((hv m _ _ y J hJ).trans (Eq.trans ?_ (val_one _).symm))
+    change val (g₁ m) (𝟙 _ ≫ (a1 m).left) y J * (val (g₁ m) ((𝟙 _ ≫ (a1 m).left) ≫ _) y J)⁻¹ *
+      (val (g₁ m) ((𝟙 _ ≫ (a1 m).left) ≫ _) y J)⁻¹ * val (g₁ m) ((𝟙 _ ≫ (a1 m).left) ≫ _) y J = 1
+    simp only [Category.id_comp, ← Over.comp_left, reassoc_of% (a1c0 m), reassoc_of% (a1c1 m), reassoc_of% (a1u m), oa0]
+    exact cancel₁ _ _
+
+end GlobalTheory.ChartFrames
+
+
+[CNC_SRC_NORMALIZED_PRIMITIVE_AND_ADJOINT] Actual global wP and wL from original SAB.prim and SAB.adj
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/GermBPrim.lean#L130-L213
+
+theorem exists_wP : ∃ wP : PrimTyG t, IsPrimG t wP := by
+  have hL := t.PP.isLB
+  obtain ⟨w, hw⟩ := t.prim
+  let w1 : PrimTyG t := divLinB t.PP.L _ _ w
+  have hw1 : w1.IsGen := divLinB_isGen t.PP.L _ _ w hw
+  have hpt : ∀ I : ULift.{0} (Finset (Fin 2)), eSec t.G ≫ cφG t ![𝟙 t.G, t.act.act H.w0] I =
+      (psum t.G ![1, η[t.G] ≫ t.act.act H.w0] I.down).left := by
+    intro I
+    simp only [cφG, eSec, ← Over.comp_left]
+    refine congrArg Over.Hom.left ((psum_hom (preHom _) _ I.down).trans ?_)
+    refine congrArg (fun f => psum t.G f I.down) (funext fun i => ?_)
+    fin_cases i
+    · exact (Category.comp_id _).trans (eta_one t.G)
+    · rfl
+  obtain ⟨u, hu⟩ := exists_ratio t.PP.L hL (φ' := fun _ : PUnit => eSec t.G) (ε' := fun _ => 1)
+    (fun U _ h => by
+      rw [Fintype.prod_sum_type]
+      simp only [Sum.elim_inl, Sum.elim_inr, Fin.prod_univ_one, Category.comp_id, zpow_neg, Finset.prod_inv_distrib,
+        hpt, Fintype.prod_unique]
+      rw [cube_one_left t (fun p => h p.left), inv_one, _root_.mul_one])
+    (LB.pullGen t.PP.L _ _ w1 (eSec t.G)) (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen _ _ _ _ hw1 _) t.PP.rig t.PP.rigGen
+  have hes : eSec t.G ≫ t.G.hom = 𝟙 _ := Over.w η[t.G]
+  refine ⟨scaleGenG t _ _ (pullU t.G.hom ⊤ u⁻¹) w1, scale_isGen t _ _ _ w1 hw1, corr_of_val hL fun y J hJ => ?_⟩
+  refine (val_pull hJ _ _ _).trans ((val_scale t _ _ _ _ _ y J hJ).trans ?_)
+  refine (congrArg₂ (· * ·) ((gm_pull (𝟙 _ ≫ eSec t.G) t.G.hom y ⊤ trivial u⁻¹).trans
+    (congrArg (fun r => gm r y ⊤ u⁻¹) (by rw [Category.assoc, hes, Category.comp_id])))
+    ((val_pull hJ w1 _ _).symm.trans (hu _ (𝟙 _) y J hJ))).trans ?_
+  rw [map_inv, inv_mul_cancel_left]
+
+theorem exists_wL (a : 𝓞 E) : ∃ wL : LB.Gen (LB.LinComb t.PP.L
+      (Sum.elim (cφG t ![fst t.G t.G, snd t.G t.G ≫ t.act.act (H.bar a)]) (cφG t ![fst t.G t.G ≫ t.act.act a, snd t.G t.G]))
+      (Sum.elim (cε 2) fun I => -cε 2 I)), wL.IsGen ∧
+    ∀ (Z : Scheme.{0}) (r : Z ⟶ (𝟙_ (Over X0)).left) (z : Z) (J : (Z ⟶ t.G.left) → t.PP.L.ι), Good t.PP.L z J →
+      val wL (r ≫ (zz t).left) z J = 1 := by
+  have hL := t.PP.isLB
+  obtain ⟨w, hw⟩ := t.adj a
+  let w2 := divLin t.PP.L (cφG t ![fst t.G t.G, snd t.G t.G ≫ t.act.act (H.bar a)]) (cε 2)
+    (cφG t ![fst t.G t.G ≫ t.act.act a, snd t.G t.G]) (cε 2) w
+  have hw2 : w2.IsGen := divLin_isGen t.PP.L _ _ _ _ w hw
+  have hp1 : ∀ I : ULift.{0} (Finset (Fin 2)), (zz t).left ≫ cφG t ![fst t.G t.G, snd t.G t.G ≫ t.act.act (H.bar a)] I =
+      (psum t.G ![1, η[t.G] ≫ t.act.act (H.bar a)] I.down).left := by
+    intro I
+    simp only [cφG, ← Over.comp_left]
+    refine congrArg Over.Hom.left ((psum_hom (preHom _) _ I.down).trans ?_)
+    refine congrArg (fun f => psum t.G f I.down) (funext fun i => ?_)
+    fin_cases i
+    · show zz t ≫ fst t.G t.G = 1
+      exact (lift_fst _ _).trans (eta_one t.G)
+    · show zz t ≫ (snd t.G t.G ≫ t.act.act (H.bar a)) = η[t.G] ≫ t.act.act (H.bar a)
+      exact lift_snd_assoc _ _ _
+  have hp2 : ∀ I : ULift.{0} (Finset (Fin 2)), (zz t).left ≫ cφG t ![fst t.G t.G ≫ t.act.act a, snd t.G t.G] I =
+      (psum t.G ![η[t.G] ≫ t.act.act a, 1] I.down).left := by
+    intro I
+    simp only [cφG, ← Over.comp_left]
+    refine congrArg Over.Hom.left ((psum_hom (preHom _) _ I.down).trans ?_)
+    refine congrArg (fun f => psum t.G f I.down) (funext fun i => ?_)
+    fin_cases i
+    · show zz t ≫ (fst t.G t.G ≫ t.act.act a) = η[t.G] ≫ t.act.act a
+      exact lift_fst_assoc _ _ _
+    · show zz t ≫ snd t.G t.G = 1
+      exact (lift_snd _ _).trans (eta_one t.G)
+  obtain ⟨s, -, hv⟩ := exists_gen hL (K' := PEmpty) (φ' := PEmpty.elim) (ε' := PEmpty.elim) (fun U _ h => by
+      rw [Fintype.prod_sum_type]
+      simp only [Sum.elim_inl, Sum.elim_inr, zpow_neg, Finset.prod_inv_distrib, hp1, hp2, Fintype.prod_empty]
+      rw [cube_one_left t (fun p => h p.left), cube_one_right t (fun p => h p.left), inv_one, _root_.mul_one])
+    (LB.pullGen t.PP.L _ _ w2 (zz t).left) (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen _ _ _ _ hw2 _)
+  have le : (⊤ : ((𝟙_ (Over X0)).left).Opens) ≤ LB.wchart t.PP.L (PEmpty.elim : PEmpty → (_ ⟶ t.G.left)) PEmpty.elim :=
+    fun _ _ => Set.mem_iInter.2 fun k => k.elim
+  let u := res le (s.s PEmpty.elim)
+  have hz : (zz t).left ≫ (t.G ⊗ t.G).hom = 𝟙 _ := Over.w (zz t)
+  refine ⟨scaleGenG t _ _ (pullU (t.G ⊗ t.G).hom ⊤ u⁻¹) w2, scale_isGen t _ _ _ w2 hw2, fun Z r z J hJ => ?_⟩
+  refine (val_scale t _ _ _ _ _ z J hJ).trans ?_
+  have e1 : val w2 (r ≫ (zz t).left) z J = gm r z ⊤ u := by
+    refine (val_pull hJ w2 _ _).symm.trans ((hv Z r z J hJ).symm.trans ?_)
+    rw [val_of s r z J PEmpty.elim (fun k => k.elim)]
+    exact (gm_res r z le trivial _).symm
+  refine (congrArg₂ (· * ·) ((gm_pull (r ≫ (zz t).left) (t.G ⊗ t.G).hom z ⊤ trivial u⁻¹).trans
+    (congrArg (fun q => gm q z ⊤ u⁻¹) (by rw [Category.assoc, hz, Category.comp_id]))) e1).trans ?_
+  rw [map_inv, inv_mul_cancel]
+
+end Prim
+
+end Formalism.MainNotions.ModuliIntegralCharts.H1.GermB
+
+
+[CNC_SRC_COMPLETE_FRAME_PRODUCER] Original exists_frames_of_chart over every S, including FrTrunc and axes
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/ExistsFramesOfFormalChart.lean#L23-L44
+theorem exists_frames_of_chart : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (X0 : Scheme.{0}) (t : SAB H X0) (S : Type) [CommRing S] (x0 : Sp S ⟶ X0) (d : ℕ) (G : FGLaw S d) (A : Germ.OAct (𝓞 E) G) (κ : Type) [Fintype κ] (tg : κ → (Sp (DualNumber S) ⟶ t.G.left)) (uvec : κ → Fin d → S) (x : ∀ m, jOG x0 d m 1 ⟶ t.G), IsChartG t x0 d G.F A.act tg uvec x → ∃ (e : ∀ m, FrTyG t x0 d x m) (wP : PrimTyG t) (ph1 ph2 : PS S 3 d) (sy : PS S 2 d) (ad : 𝓞 E → PS S 2 d), IsFrameG t x0 d x G.F A.act ph1 ph2 sy ad e ∧ IsPrimG t wP ∧ FrTrunc t x0 d x e ∧ FrAxes t x0 d x e ∧ (∀ a, MvPowerSeries.constantCoeff (ad a) = 1) ∧ Rig0G t x0 d x A.act e wP := by
+  intro E _ _ _ H X0 t S _ x0 d G A κ _ tg uvec x hc
+
+  obtain ⟨e, hgen, htr, hax⟩ :=
+    GlobalTheory.T.exists_frames_cubeDefect_along_chart_over_ring E H X0 t S x0 d G.F A.act κ tg uvec x G.const A.const hc
+
+  obtain ⟨ph1, h1⟩ :=
+    GlobalTheory.T.exists_firstPartialLaw_series_of_frames_alt E H X0 t S x0 d G.F A.act κ tg uvec x G.const A.const hc e hgen htr hax
+  obtain ⟨ph2, h2⟩ :=
+    GlobalTheory.T.exists_second_partial_law_alt E H X0 t S x0 d G.F A.act κ tg uvec x G.const A.const hc e hgen htr hax
+
+  obtain ⟨sy, hsy⟩ :=
+    GlobalTheory.T.exists_symmetry_series_of_frames_alt E H X0 t S x0 d G.F A.act κ tg uvec x G.const A.const hc e hgen htr hax
+
+  obtain ⟨ad, hadc, had⟩ :=
+    GlobalTheory.T.exists_adjointness_series_of_frames E H X0 t S x0 d G.F A.act κ tg uvec x G.const A.const hc e hgen htr hax
+
+  obtain ⟨wP, hP⟩ := Formalism.MainNotions.ModuliIntegralCharts.H1.GermB.exists_wP t
+  exact ⟨e, wP, ph1, ph2, sy, ad, ⟨hgen, h1, h2, hsy, had⟩, hP, htr, hax, hadc,
+    GlobalTheory.T.frame_rigidification_of_canonical_axes E H X0 t S x0 d G.F A.act κ tg uvec x G.const A.const hc e hgen htr hax wP hP⟩
+
+end GlobalTheory
+
+
+[CNC_SRC_FRAME_RATIOS] Exact first/second partial, symmetry and adjoint scalar dictionaries
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/FrameBiextDictionarySecondPartialLaw.lean#L191-L257
+theorem frame_biext_dictionary_first_partial_law (u v w : Q S d n) : VV m y (E3 ph1 u v w) = (cubV t.cub y J (PP m x u) (PP m x v) (PP m x w) *
+    (ee x e y J (op (FQ G) u v) w)⁻¹ * ee x e y J u w * ee x e y J v w).val := by
+  obtain ⟨U, hU, h⟩ := hf.ph1 m
+  have hc := gm_unit (y := y) U ![u, v, w]
+  have e₀ := val_peG x hJ e ![u, v, w] ![fun j => psIn d m ![0, 1] (G.F j), fun j => MvPolynomial.X ((2 : Fin 3), j)] (op (FQ G) (gen 0) (gen 1)) (gen 2)
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [hF 0 1 j, hX 2 j])
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [(cc_psIn d m _ _).trans (G.const j), MvPolynomial.constantCoeff_X _ _])
+  rw [sq_op, sq_gen, sq_gen, sq_gen] at e₀
+  have k := (val_th hJ ![u, v, w] 0 1 2).symm.trans ((val_corr hJ h _).trans ((val_scale hJ _ _ _).trans (congrArg₂ (· * ·) rfl
+    ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) e₀ ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·)
+      ((val_inv _ _).trans (congrArg (·⁻¹) (peXX hJ _ 0 2))) ((val_inv _ _).trans (congrArg (·⁻¹) (peXX hJ _ 1 2))))))))))
+  refine (hc _ hU).symm.trans (congrArg Units.val (Additive.ofMul.injective ?_))
+  have k' := congrArg Additive.ofMul k
+  simp only [ofMul_mul, ofMul_inv, Matrix.cons_val] at k' ⊢
+  linear_combination (norm := abel) -k'
+
+theorem frame_biext_dictionary_second_partial_law (u v w : Q S d n) : VV m y (E3 ph2 u v w) = (cubV t.cub y J (PP m x u) (PP m x v) (PP m x w) *
+    (ee x e y J u (op (FQ G) v w))⁻¹ * ee x e y J u v * ee x e y J u w).val := by
+  obtain ⟨U, hU, h⟩ := hf.ph2 m
+  have hc := gm_unit (y := y) U ![u, v, w]
+  have C := isCub_cubV t.cub hJ
+  have e₀ := val_peG x hJ e ![u, v, w] ![fun j => MvPolynomial.X ((0 : Fin 3), j), fun j => psIn d m ![1, 2] (G.F j)] (gen 0) (op (FQ G) (gen 1) (gen 2))
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [hX 0 j, hF 1 2 j])
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [MvPolynomial.constantCoeff_X _ _, (cc_psIn d m _ _).trans (G.const j)])
+  rw [sq_op, sq_gen, sq_gen, sq_gen] at e₀
+  have k := (val_th hJ ![u, v, w] 1 2 0).symm.trans ((val_corr hJ h _).trans ((val_scale hJ _ _ _).trans (congrArg₂ (· * ·) rfl
+    ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) e₀ ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·)
+      ((val_inv _ _).trans (congrArg (·⁻¹) (peXX hJ _ 0 1))) ((val_inv _ _).trans (congrArg (·⁻¹) (peXX hJ _ 0 2))))))))))
+  rw [C.s12, C.s01] at k
+  refine (hc _ hU).symm.trans (congrArg Units.val (Additive.ofMul.injective ?_))
+  have k' := congrArg Additive.ofMul k
+  simp only [ofMul_mul, ofMul_inv, Matrix.cons_val] at k' ⊢
+  linear_combination (norm := abel) -k'
+
+theorem dict_sy (u v : Q S d n) : VV m y (E2 sy u v) = (ee x e y J v u * (ee x e y J u v)⁻¹).val := by
+  obtain ⟨U, hU, h⟩ := hf.sy m
+  have hc := gm_unit (y := y) U ![u, v]
+  generalize hq : gm (homAt x0 (jQ m ![u, v])).left y ⊤ (unitΓ U) = c at hc
+  have k : ee x e y J u v = c⁻¹ * ee x e y J v u := (val_corr hJ h _).trans ((val_scale hJ _ _ _).trans (congrArg₂ (· * ·)
+    (((congrArg _ (map_inv (Units.map (toΓ _).toMonoidHom) U)).trans (map_inv _ _)).trans (congrArg (·⁻¹) hq)) (peXX hJ _ 1 0)))
+  refine (hc _ hU).symm.trans (congrArg Units.val ?_)
+  rw [k, mul_inv, inv_inv, mul_comm c, mul_inv_cancel_left]
+
+omit hf in
+theorem dict_ad (a : 𝓞 E) {K : Type} [Fintype K] {φ : K → ((t.G ⊗ t.G).left ⟶ t.G.left)} {ε : K → ℤ}
+    (wL : LB.Gen (LB.LinComb t.PP.L φ ε)) (U : (Jet S (Fin 2 × Fin d) m)ˣ) (hU : (U : Jet S (Fin 2 × Fin d) m) = psJet m (ad a))
+    (h : LB.Gen.Corr t.PP.L _ _ _ _ (LB.mulGen t.PP.L _ _ _ _
+      (LB.pullGen t.PP.L _ _ wL (lift (jptG t x0 d x m (0 : Fin 2)) (jptG t x0 d x m (1 : Fin 2))).left)
+      (peG t x0 d x e m ![fun j => psIn d m ![0] (A.act a j), fun j => MvPolynomial.X ((1 : Fin 2), j)]))
+      (scaleGenG t _ _ (unitΓ U) (peG t x0 d x e m ![fun j => MvPolynomial.X ((0 : Fin 2), j), fun j => psIn d m ![1] (A.act (H.bar a) j)])))
+    (u v : Q S d n) : VV m y (E2 (ad a) u v) = (val₂ wL y J (PP m x u) (PP m x v) * ee x e y J (ac (AQ A a) u) v *
+      (ee x e y J u (ac (AQ A (H.bar a)) v))⁻¹).val := by
+  have hc := gm_unit (y := y) U ![u, v]
+  have e₀ := val_peG x hJ e ![u, v] ![fun j => psIn d m ![0] (A.act a j), fun j => MvPolynomial.X ((1 : Fin 2), j)] (ac (AQ A a) (gen 0)) (gen 1)
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [hA a 0 j, hX 1 j])
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [(cc_psIn d m _ _).trans (A.const _ j), MvPolynomial.constantCoeff_X _ _])
+  have e₁ := val_peG x hJ e ![u, v] ![fun j => MvPolynomial.X ((0 : Fin 2), j), fun j => psIn d m ![1] (A.act (H.bar a) j)] (gen 0) (ac (AQ A (H.bar a)) (gen 1))
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [hX 0 j, hA _ 1 j])
+    (by rintro ⟨l, j⟩; fin_cases l; exacts [MvPolynomial.constantCoeff_X _ _, (cc_psIn d m _ _).trans (A.const _ j)])
+  rw [sq_ac, sq_gen, sq_gen] at e₀ e₁
+  have e₂ := val_ros wL (homAt x0 (jQ m ![u, v])) hJ (jptG t x0 d x m (0 : Fin 2)) (jptG t x0 d x m (1 : Fin 2))
+  simp only [PP_gen, PP_sq, sq_gen] at e₂
+  have k := ((val_mul hJ _ _ _).trans (congrArg₂ (· * ·) (by simpa only [PP_gen] using e₂) e₀)).symm.trans
+    ((val_corr hJ h _).trans ((val_scale hJ _ _ _).trans (congrArg₂ (· * ·) rfl e₁)))
+  exact (hc _ hU).symm.trans (congrArg Units.val (eq_mul_inv_of_mul_eq k.symm))
+
+omit hf in
+
+
+[CNC_SRC_FORMAL_FRAME_IDENTITIES] Actual fbId including every adjoint law
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/FrameBiextDictionarySecondPartialLaw.lean#L315-L572
+theorem fbId : FBIdSt := by
+  intro E _ _ _ H X0 t hPow _ hs S _ x0 d G A κ _ tg uvec x e ph1 ph2 sy ad hc hf ha had
+  have hL := t.PP.isLB
+  have hp := (hPow 3).2
+  have := t.act.hom
+  choose wL hw hU using hf.ad
+  have hW : ∀ a {T : Over X0} (p q : T ⟶ t.G) (U : Type) [CommGroup U] (h : (T.left ⟶ t.G.left) → U),
+      ∏ i, h ((lift p q).left ≫ Sum.elim (cφG t ![fst t.G t.G, snd t.G t.G ≫ t.act.act (H.bar a)])
+        (cφG t ![fst t.G t.G ≫ t.act.act a, snd t.G t.G]) i) ^ Sum.elim (cε 2) (fun I => -cε 2 I) i =
+      h (p * (q ≫ t.act.act (star a))).left * (h p.left)⁻¹ * (h (q ≫ t.act.act (star a)).left)⁻¹ *
+        ((h ((p ≫ t.act.act a) * q).left)⁻¹ * h (p ≫ t.act.act a).left * h q.left) := fun a T p q U _ h => by
+    refine (prod_sum₂ (K := ULift.{0} (Finset (Fin 2))) (K' := ULift.{0} (Finset (Fin 2))) (U := U) _
+      (prod_cube₂ _ _ fun r => h ((lift p q).left ≫ r)) (prod_neg _ _ (prod_cube₂ _ _ fun r => h ((lift p q).left ≫ r)))).trans ?_
+    simp only [← Over.comp_left, MonObj.comp_mul, MonObj.comp_one, lift_fst, lift_snd, lift_fst_assoc, lift_snd_assoc, hs]
+    apply Additive.ofMul.injective
+    simp only [ofMul_mul, ofMul_inv]
+    abel
+  have dA : ∀ {n m} {y : (jOG x0 d m n).left} {J}, Good t.PP.L y J → ∀ a (u v : Q S d n), VV m y (E2 (ad a) u v) =
+      (val₂ (wL a) y J (PP m x u) (PP m x v) * ee x e y J (ac (AQ A a) u) v * (ee x e y J u (ac (AQ A (star a)) v))⁻¹).val :=
+    fun {n m y J} hJ a u v => by
+      obtain ⟨U, h₁, h₂⟩ := hU a m
+      rw [hs]; exact dict_ad hJ a (wL a) U h₁ h₂ u v
+  have h1 : ∀ {n m} {y : (jOG x0 d m n).left} {J}, Good t.PP.L y J → ∀ a, val₂ (wL a) y J (1 : jOG x0 d m n ⟶ t.G) 1 = 1 :=
+    fun {n m y J} hJ a => by
+      have k := dA hJ a 0 0
+      have z : E2 (ad a) (0 : Q S d n) 0 = 1 := by
+        have e := GlobalTheory.FormalLog.ev_zeroFam (n := n) (ad a)
+        rw [had, map_one] at e
+        exact ((sb_apply _ _).trans (congrArg (ev · (ad a)) (funext fun j => by fin_cases j <;> rfl))).trans e
+      rw [z, VV_one, ac0, ac0, mul_inv_cancel_right, PP_zero hc] at k
+      exact Units.ext k.symm
+  have g2 : ∀ f : PS S 2 d, ev (n := 2) ![pt S d 0, pt S d 1] f = f := fun f => (formalSeriesValueAtTwoPoints_eq_ev f (gen 0) (gen 1)).symm.trans (formalSeriesValueAtTwoPoints_genericPoints f)
+  have g3 : ∀ f : PS S 3 d, ev (n := 3) ![pt S d 0, pt S d 1, pt S d 2] f = f := fun f =>
+    (formalSeriesValueAtThreePoints_eq_ev f (gen 0) (gen 1) (gen 2)).symm.trans (formalSeriesValueAtThreePoints_genericPoints f)
+  have op0' : ∀ {n} (u : Q S d n), op (FQ G) u 0 = u := fun u => by rw [opc, op0]
+  refine ⟨⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩, ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩⟩
+  · have : E3 ph1 (0 : Q S d 2) (gen 0) (gen 1) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph1 (gen 0 : Q S d 2) 0 (gen 1) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph1 (gen 0 : Q S d 2) (gen 1) 0 = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph2 (0 : Q S d 2) (gen 0) (gen 1) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph2 (gen 0 : Q S d 2) 0 (gen 1) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph2 (gen 0 : Q S d 2) (gen 1) 0 = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E2 sy (0 : Q S d 1) (gen 0) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E2 sy (gen 0 : Q S d 1) 0 = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · exact had
+  · intro a
+    have : E2 (ad a) (0 : Q S d 1) (gen 0) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (cubical_law_left t.cub hp t.act wL hw hW hJ (h1 hJ) a 1 1 (PP m x (gen 0)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      simp only [_root_.mul_one, MonObj.one_comp, C.face, ofMul_one] at f0
+      linear_combination (norm := abel) -f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · intro a
+    have : E2 (ad a) (gen 0 : Q S d 1) 0 = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (cubical_law_right t.cub hp t.act wL hw hW hJ (h1 hJ) a (PP m x (gen 0)) 1 1)
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      simp only [_root_.mul_one, MonObj.one_comp, C.face₂, ofMul_one] at f0
+      linear_combination (norm := abel) -f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph1 (gen 0 : Q S d 4) (gen 1) (gen 3) * E3 ph1 (op (FQ G) (gen 0) (gen 1)) (gen 2) (gen 3) = E3 ph1 (gen 1) (gen 2) (gen 3) * E3 ph1 (gen 0) (op (FQ G) (gen 1) (gen 2)) (gen 3) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (C.coc (PP m x (gen 0)) (PP m x (gen 1)) (PP m x (gen 2)) (PP m x (gen 3)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph1 (gen 1) (gen 0 : Q S d 3) (gen 2) = E3 ph1 (gen 0) (gen 1) (gen 2) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (C.s01 (PP m x (gen 1)) (PP m x (gen 0)) (PP m x (gen 2)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      rw [opc (gen 1)]
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g3] using this
+  · have : E3 ph2 (gen 0 : Q S d 4) (gen 1) (gen 2) * E3 ph2 (gen 0) (op (FQ G) (gen 1) (gen 2)) (gen 3) = E3 ph2 (gen 0) (gen 2) (gen 3) * E3 ph2 (gen 0) (gen 1) (op (FQ G) (gen 2) (gen 3)) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (C.coc (PP m x (gen 1)) (PP m x (gen 2)) (PP m x (gen 3)) (PP m x (gen 0)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      simp only [C.s12 _ _ (PP m x (gen 0)), C.s01 _ (PP m x (gen 0))] at f0
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E3 ph2 (gen 0 : Q S d 3) (gen 2) (gen 1) = E3 ph2 (gen 0) (gen 1) (gen 2) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (C.s12 (PP m x (gen 0)) (PP m x (gen 2)) (PP m x (gen 1)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      rw [opc (gen 2)]
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g3] using this
+  · have : E3 ph1 (gen 0 : Q S d 4) (gen 1) (gen 2) * E3 ph1 (gen 0) (gen 1) (gen 3) * E3 ph2 (op (FQ G) (gen 0) (gen 1)) (gen 2) (gen 3) = E3 ph2 (gen 0) (gen 2) (gen 3) * E3 ph2 (gen 1) (gen 2) (gen 3) * E3 ph1 (gen 0) (gen 1) (op (FQ G) (gen 2) (gen 3)) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (C.compat (PP m x (gen 0)) (PP m x (gen 1)) (PP m x (gen 2)) (PP m x (gen 3)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E2 sy (gen 0 : Q S d 2) (gen 1) * E2 sy (gen 1) (gen 0) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at ⊢
+      abel
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g2] using this
+  · have : E3 ph2 (gen 0 : Q S d 3) (gen 1) (gen 2) * E2 sy (gen 0) (gen 1) * E2 sy (gen 0) (gen 2) = E2 sy (gen 0) (op (FQ G) (gen 1) (gen 2)) * E3 ph1 (gen 1) (gen 2) (gen 0) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul ((C.s01 (PP m x (gen 0)) (PP m x (gen 1)) (PP m x (gen 2))).trans (C.s12 _ _ _))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g3] using this
+  · intro a
+    have : E3 ph1 (ac (AQ A a) (gen 0 : Q S d 3)) (ac (AQ A a) (gen 1)) (gen 2) * E2 (ad a) (op (FQ G) (gen 0) (gen 1)) (gen 2) = E2 (ad a) (gen 0) (gen 2) * E2 (ad a) (gen 1) (gen 2) * E3 ph1 (gen 0) (gen 1) (ac (AQ A (star a)) (gen 2)) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (cubical_law_left t.cub hp t.act wL hw hW hJ (h1 hJ) a (PP m x (gen 0)) (PP m x (gen 1)) (PP m x (gen 2)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · intro a
+    have : E3 ph2 (ac (AQ A a) (gen 0 : Q S d 3)) (gen 1) (gen 2) * E2 (ad a) (gen 0) (op (FQ G) (gen 1) (gen 2)) = E2 (ad a) (gen 0) (gen 1) * E2 (ad a) (gen 0) (gen 2) * E3 ph2 (gen 0) (ac (AQ A (star a)) (gen 1)) (ac (AQ A (star a)) (gen 2)) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (cubical_law_right t.cub hp t.act wL hw hW hJ (h1 hJ) a (PP m x (gen 0)) (PP m x (gen 1)) (PP m x (gen 2)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero] using this
+  · have : E2 (ad 1) (gen 0 : Q S d 2) (gen 1) = 1 := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (adv_one t.cub hp t.act wL hw hW hJ (h1 hJ) (PP m x (gen 0)) (PP m x (gen 1)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g2] using this
+  · intro a b
+    have : E2 (ad (a * b)) (gen 0 : Q S d 2) (gen 1) = E2 (ad a) (ac (AQ A b) (gen 0)) (gen 1) * E2 (ad b) (gen 0) (ac (AQ A (star a)) (gen 1)) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (adv_mul t.cub hp t.act wL hw hW hJ (h1 hJ) a b (PP m x (gen 0)) (PP m x (gen 0)) (PP m x (gen 1)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g2] using this
+  · intro a b
+    have : E3 ph1 (ac (AQ A a) (gen 0 : Q S d 2)) (ac (AQ A b) (gen 0)) (gen 1) * E2 (ad (a + b)) (gen 0) (gen 1) = E2 (ad a) (gen 0) (gen 1) * E2 (ad b) (gen 0) (gen 1) * E3 ph2 (gen 0) (ac (AQ A (star a)) (gen 1)) (ac (AQ A (star b)) (gen 1)) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (adv_add t.cub hp t.act wL hw hW hJ (h1 hJ) a b (PP m x (gen 0)) (PP m x (gen 0)) (PP m x (gen 1)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g2] using this
+  · intro a
+    have : E2 (ad a) (gen 0 : Q S d 2) (gen 1) * E2 (ad (star a)) (gen 1) (gen 0) * E2 sy (ac (AQ A a) (gen 0)) (gen 1) = E2 sy (gen 0) (ac (AQ A (star a)) (gen 1)) := VV_ext hL fun m y J hJ => by
+      have C := isCub_cubV t.cub (T := jOG x0 d m _) hJ
+      simp only [VV_mul, VV_one, frame_biext_dictionary_first_partial_law hJ hf, frame_biext_dictionary_second_partial_law hJ hf, dict_sy hJ hf, dA hJ, ← Units.val_mul]
+      refine (congrArg Units.val (Additive.ofMul.injective ?_)).trans (by first | exact Units.val_one | rfl)
+      have f0 := congrArg Additive.ofMul (adv_sy t.cub hp t.act wL hw hW hJ (h1 hJ) a (PP m x (gen 0)) (PP m x (gen 0)) (PP m x (gen 1)))
+      simp only [PP_op hc, PP_ac hc, PP_zero hc, op0, op0', opa, ac0, ac_op, ac_add, ac_one, star_add, star_one, star_star, star_mul, ac_mul, (dict_ax hJ ha _).1, (dict_ax hJ ha _).2, C.face, C.face₂, C.face₃, ofMul_mul,
+        ofMul_inv, ofMul_one] at f0 ⊢
+      linear_combination (norm := abel) f0
+    simpa only [formalSeriesValueAtTwoPoints_eq_ev, formalSeriesValueAtThreePoints_eq_ev, op_val, ac_val, gen_val, ZeroMemClass.coe_zero, g2] using this
+
+end GlobalTheory.FrameBiextId
+
+
+[CNC_SRC_FORMAL_FB_CONTRACT] Formal group, O action, invariant operators and every FB field
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/CocycleRightZeroThd.lean#L12-L163
+
+abbrev Pt (R : Type) [CommRing R] (n d : ℕ) : Type := Fin d → PS R n d
+
+variable {R : Type} [CommRing R] {d : ℕ}
+
+def pt (R : Type) [CommRing R] {n : ℕ} (d : ℕ) (j : Fin n) : Pt R n d := fun i => X (j, i)
+
+def ev {m n : ℕ} (a : Fin m → Pt R n d) (f : PS R m d) : PS R n d :=
+  MvPowerSeries.subst (fun p : Fin m × Fin d => a p.1 p.2) f
+
+def comp1 {n : ℕ} (φ : Pt R 1 d) (a : Pt R n d) : Pt R n d := fun i => ev ![a] (φ i)
+
+def addOf {n : ℕ} (F : Fin d → PS R 2 d) (a b : Pt R n d) : Pt R n d := fun i => ev ![a, b] (F i)
+
+def Dof (F : Fin d → PS R 2 d) (u : Fin d → R) (f : PS R 1 d) : PS R 1 d :=
+  ∑ j : Fin d, (∑ i : Fin d, C (u i) * ev (n := 1) ![pt R d 0, 0] (pderiv R ((1 : Fin 2), i) (F j))) *
+    pderiv R ((0 : Fin 1), j) f
+
+def DmonOf (F : Fin d → PS R 2 d) {ι : Type} [Fintype ι] (u : ι → Fin d → R) (m : ι →₀ ℕ)
+    (f : PS R 1 d) : PS R 1 d :=
+  (Finset.univ : Finset ι).toList.foldr (fun l g => (Dof F (u l))^[m l] g) f
+
+def DpolyOf (F : Fin d → PS R 2 d) {ι : Type} [Fintype ι] (u : ι → Fin d → R)
+    (P : MvPolynomial ι R) (f : PS R 1 d) : PS R 1 d :=
+  ∑ m ∈ P.support, C (P.coeff m) * DmonOf F u m f
+
+@[simp] lemma ev_one {m n : ℕ} (a : Fin m → Pt R n d) : ev a (1 : PS R m d) = 1 := by
+  have H : ∃ p : MvPolynomial (Fin m × Fin d) R, (p : MvPowerSeries (Fin m × Fin d) R) = 1 :=
+    ⟨1, MvPolynomial.coe_one⟩
+  have hc : Classical.choose H = 1 := by
+    have h := (Classical.choose_spec H).trans MvPolynomial.coe_one.symm
+    first
+    | exact MvPolynomial.coe_inj.mp h
+    | exact MvPolynomial.coe_injective _ _ h
+    | exact MvPolynomial.coe_injective _ h
+  first
+  | (simp [ev]; done)
+  | (simp only [ev, MvPowerSeries.subst, MvPowerSeries.eval₂];
+      rw [dif_pos H, hc];
+      exact MvPolynomial.eval₂_one _ _)
+  | (unfold ev MvPowerSeries.subst MvPowerSeries.eval₂;
+      rw [dif_pos H, hc];
+      exact MvPolynomial.eval₂_one _ _)
+  | (simp only [ev, MvPowerSeries.subst, MvPowerSeries.eval₂, dif_pos H, hc, MvPolynomial.eval₂_one])
+
+structure FGLaw (R : Type) [CommRing R] (d : ℕ) where
+  F : Fin d → PS R 2 d
+  const : ∀ i, constantCoeff (F i) = 0
+  unit : ∀ i, ev (n := 1) ![0, pt R d 0] (F i) = (X ((0 : Fin 1), i) : PS R 1 d)
+  comm : ∀ i, ev (n := 2) ![pt R d 1, pt R d 0] (F i) = F i
+  assoc : ∀ i,
+    ev (n := 3) ![fun l => ev (n := 3) ![pt R d 0, pt R d 1] (F l), pt R d 2] (F i) =
+      ev (n := 3) ![pt R d 0, fun l => ev (n := 3) ![pt R d 1, pt R d 2] (F l)] (F i)
+
+namespace FGLaw
+
+variable (G : FGLaw R d)
+
+abbrev add {n : ℕ} (a b : Pt R n d) : Pt R n d := addOf G.F a b
+
+def mapF {S : Type} [CommRing S] (φ : R →+* S) : Fin d → PS S 2 d :=
+  fun i => MvPowerSeries.map φ (G.F i)
+
+end FGLaw
+
+structure OAct (O : Type) [CommRing O] (G : FGLaw R d) where
+  act : O → Pt R 1 d
+  const : ∀ a i, constantCoeff (act a i) = 0
+  hom : ∀ a, comp1 (act a) (G.add (pt R (n := 2) d 0) (pt R (n := 2) d 1)) =
+    G.add (comp1 (act a) (pt R (n := 2) d 0)) (comp1 (act a) (pt R (n := 2) d 1))
+  add_act : ∀ a b, act (a + b) = G.add (act a) (act b)
+  mul_act : ∀ a b, act (a * b) = comp1 (act a) (act b)
+  one_act : act 1 = pt R d 0
+
+structure FB (R : Type) [CommRing R] (d : ℕ) (O : Type) [CommRing O] [StarRing O] where
+  G : FGLaw R d
+  A : OAct O G
+  ph1 : PS R 3 d
+  ph2 : PS R 3 d
+  sy : PS R 2 d
+  ad : O → PS R 2 d
+  cocycleLeft_zero_fst : ev (n := 2) ![0, pt R d 0, pt R d 1] ph1 = 1
+  cocycleLeft_zero_snd : ev (n := 2) ![pt R d 0, 0, pt R d 1] ph1 = 1
+  cocycleLeft_zero_thd : ev (n := 2) ![pt R d 0, pt R d 1, 0] ph1 = 1
+  cocycleRight_zero_fst : ev (n := 2) ![0, pt R d 0, pt R d 1] ph2 = 1
+  cocycleRight_zero_snd : ev (n := 2) ![pt R d 0, 0, pt R d 1] ph2 = 1
+  cocycleRight_zero_thd : ev (n := 2) ![pt R d 0, pt R d 1, 0] ph2 = 1
+  symmetry_zero_fst : ev (n := 1) ![0, pt R d 0] sy = 1
+  symmetry_zero_snd : ev (n := 1) ![pt R d 0, 0] sy = 1
+  adjoint_zero_fst : ∀ a, ev (n := 1) ![0, pt R d 0] (ad a) = 1
+  adjoint_zero_snd : ∀ a, ev (n := 1) ![pt R d 0, 0] (ad a) = 1
+
+  cocycleLeft_assoc :
+    ev (n := 4) ![pt R d 0, pt R d 1, pt R d 3] ph1 *
+        ev (n := 4) ![G.add (pt R d 0) (pt R d 1), pt R d 2, pt R d 3] ph1 =
+      ev (n := 4) ![pt R d 1, pt R d 2, pt R d 3] ph1 *
+        ev (n := 4) ![pt R d 0, G.add (pt R d 1) (pt R d 2), pt R d 3] ph1
+
+  cocycleLeft_comm : ev (n := 3) ![pt R d 1, pt R d 0, pt R d 2] ph1 = ph1
+
+  cocycleRight_assoc :
+    ev (n := 4) ![pt R d 0, pt R d 1, pt R d 2] ph2 *
+        ev (n := 4) ![pt R d 0, G.add (pt R d 1) (pt R d 2), pt R d 3] ph2 =
+      ev (n := 4) ![pt R d 0, pt R d 2, pt R d 3] ph2 *
+        ev (n := 4) ![pt R d 0, pt R d 1, G.add (pt R d 2) (pt R d 3)] ph2
+
+  cocycleRight_comm : ev (n := 3) ![pt R d 0, pt R d 2, pt R d 1] ph2 = ph2
+
+  interchange :
+    ev (n := 4) ![pt R d 0, pt R d 1, pt R d 2] ph1 * ev (n := 4) ![pt R d 0, pt R d 1, pt R d 3] ph1 *
+        ev (n := 4) ![G.add (pt R d 0) (pt R d 1), pt R d 2, pt R d 3] ph2 =
+      ev (n := 4) ![pt R d 0, pt R d 2, pt R d 3] ph2 * ev (n := 4) ![pt R d 1, pt R d 2, pt R d 3] ph2 *
+        ev (n := 4) ![pt R d 0, pt R d 1, G.add (pt R d 2) (pt R d 3)] ph1
+
+  sy_inv : sy * ev (n := 2) ![pt R d 1, pt R d 0] sy = 1
+
+  sy_law :
+    ph2 * ev (n := 3) ![pt R d 0, pt R d 1] sy * ev (n := 3) ![pt R d 0, pt R d 2] sy =
+      ev (n := 3) ![pt R d 0, G.add (pt R d 1) (pt R d 2)] sy * ev (n := 3) ![pt R d 1, pt R d 2, pt R d 0] ph1
+
+  adjoint_compat_left : ∀ a : O,
+    ev (n := 3) ![comp1 (A.act a) (pt R d 0), comp1 (A.act a) (pt R d 1), pt R d 2] ph1 *
+        ev (n := 3) ![G.add (pt R d 0) (pt R d 1), pt R d 2] (ad a) =
+      ev (n := 3) ![pt R d 0, pt R d 2] (ad a) * ev (n := 3) ![pt R d 1, pt R d 2] (ad a) *
+        ev (n := 3) ![pt R d 0, pt R d 1, comp1 (A.act (star a)) (pt R d 2)] ph1
+
+  adjoint_compat_right : ∀ a : O,
+    ev (n := 3) ![comp1 (A.act a) (pt R d 0), pt R d 1, pt R d 2] ph2 *
+        ev (n := 3) ![pt R d 0, G.add (pt R d 1) (pt R d 2)] (ad a) =
+      ev (n := 3) ![pt R d 0, pt R d 1] (ad a) * ev (n := 3) ![pt R d 0, pt R d 2] (ad a) *
+        ev (n := 3) ![pt R d 0, comp1 (A.act (star a)) (pt R d 1),
+          comp1 (A.act (star a)) (pt R d 2)] ph2
+  ad_one : ad 1 = 1
+
+  ad_mul : ∀ a b : O, ad (a * b) =
+    ev (n := 2) ![comp1 (A.act b) (pt R d 0), pt R d 1] (ad a) *
+      ev (n := 2) ![pt R d 0, comp1 (A.act (star a)) (pt R d 1)] (ad b)
+
+  ad_add : ∀ a b : O,
+    ev (n := 2) ![comp1 (A.act a) (pt R d 0), comp1 (A.act b) (pt R d 0), pt R d 1] ph1 * ad (a + b) =
+      ad a * ad b *
+        ev (n := 2) ![pt R d 0, comp1 (A.act (star a)) (pt R d 1), comp1 (A.act (star b)) (pt R d 1)] ph2
+
+  ad_sy : ∀ a : O,
+    ad a * ev (n := 2) ![pt R d 1, pt R d 0] (ad (star a)) *
+        ev (n := 2) ![comp1 (A.act a) (pt R d 0), pt R d 1] sy =
+      ev (n := 2) ![pt R d 0, comp1 (A.act (star a)) (pt R d 1)] sy
+
+namespace FB
+
+variable {O : Type} [CommRing O] [StarRing O] (B : FB R d O)
+
+
+
+[CNC_SRC_GAUGE_AND_VALUE_CONTRACT] Literal IsCanonGauge, hL and nabVal with original signs
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/CocycleRightZeroThd.lean#L164-L197
+variable (k : Type) [CommRing k] [Algebra ℚ k] [Algebra R k]
+
+abbrev toK {n : ℕ} (f : PS R n d) : PS k n d := MvPowerSeries.map (algebraMap R k) f
+
+def expS {n : ℕ} (f : PS k n d) : PS k n d := PowerSeries.subst f (PowerSeries.exp k)
+
+def actK (a : O) : Pt k 1 d := fun i => MvPowerSeries.map (algebraMap R k) (B.A.act a i)
+
+def FK : Fin d → PS k 2 d := B.G.mapF (algebraMap R k)
+
+structure IsCanonGauge (h : PS k 2 d) : Prop where
+  ax0 : ev (n := 1) ![0, pt k d 0] h = 0
+  ax1 : ev (n := 1) ![pt k d 0, 0] h = 0
+  ph1 : toK k B.ph1 = expS k (ev (n := 3) ![pt k d 0, pt k d 2] h + ev (n := 3) ![pt k d 1, pt k d 2] h -
+    ev (n := 3) ![addOf (B.FK k) (pt k d 0) (pt k d 1), pt k d 2] h)
+  ph2 : toK k B.ph2 = expS k (ev (n := 3) ![pt k d 0, pt k d 1] h + ev (n := 3) ![pt k d 0, pt k d 2] h -
+    ev (n := 3) ![pt k d 0, addOf (B.FK k) (pt k d 1) (pt k d 2)] h)
+  sy : toK k B.sy = expS k (ev (n := 2) ![pt k d 1, pt k d 0] h - h)
+  ad : ∀ a : O, toK k (B.ad a) = expS k (ev (n := 2) ![comp1 (B.actK k a) (pt k d 0), pt k d 1] h -
+    ev (n := 2) ![pt k d 0, comp1 (B.actK k (star a)) (pt k d 1)] h)
+
+def hL (h : PS k 2 d) (w0 : O) : PS k 1 d := ev (n := 1) ![pt k d 0, comp1 (B.actK k w0) (pt k d 0)] h
+
+def nabVal (h : PS k 2 d) (w0 : O) (m : ℕ) (f : PS k 1 d) {ι : Type} [Fintype ι]
+    (u : ι → Fin d → k) (P : MvPolynomial ι k) : k :=
+  constantCoeff (DpolyOf (B.FK k) u P (f * expS k ((m : k) • B.hL k h w0)))
+
+end FB
+
+def FB.triv {O : Type} [CommRing O] [StarRing O] (G : FGLaw R d) (A : OAct O G) : FB R d O where
+  G := G
+  A := A
+  ph1 := 1
+  ph2 := 1
+
+
+[CNC_SRC_FORMAL_LOGARITHM] Original logarithm from closed invariant one-forms
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/PderivSecondEvFirstPointEqZero.lean#L51-L118
+
+theorem pderiv_second_ev_first_point_eq_zero (h : PS k 1 d) (b : Fin d) : pderiv k ((1 : Fin 2), b) (ev (n := 2) ![pt k d 0] h) = 0 :=
+  pderiv_ev_zero czX _ _ (fun j l => by fin_cases j; simp [pderiv_pt])
+
+variable [Algebra ℚ k]
+
+def logOf (i : Fin d) : PS k 1 d := prim (fun v : Fin 1 × Fin d => Om G i v.2)
+
+theorem pderiv_logOf (i a : Fin d) : pderiv k ((0 : Fin 1), a) (logOf G i) = Om G i a := by
+  have hcl : ∀ v w : Fin 1 × Fin d, pderiv k w (Om G i v.2) = pderiv k v (Om G i w.2) := by
+    rintro ⟨v1, v⟩ ⟨w1, w⟩
+    obtain rfl : v1 = 0 := Subsingleton.elim _ _
+    obtain rfl : w1 = 0 := Subsingleton.elim _ _
+    exact om_closed G i v w
+  exact pderiv_prim _ hcl ((0 : Fin 1), a)
+
+theorem logOf_add (i : Fin d) :
+    ev (n := 2) ![G.F] (logOf G i) = ev (n := 2) ![pt k d 0] (logOf G i) + ev (n := 2) ![pt k d 1] (logOf G i) := by
+  rw [← sub_eq_zero]
+  set g := ev (n := 2) ![G.F] (logOf G i) - (ev (n := 2) ![pt k d 0] (logOf G i) + ev (n := 2) ![pt k d 1] (logOf G i))
+  have hd : ∀ v, pderiv k v g = 0 := by
+    rintro ⟨j, c⟩
+    fin_cases j
+    · simp only [Fin.zero_eta]
+      simp only [g, map_sub, map_add, d_evF, pderiv_logOf, pderiv_first_ev_second_point_eq_zero, d_evX]
+      rw [om_P G i c]; ring
+    · simp only [Fin.mk_one]
+      simp only [g, map_sub, map_add, d_evF, pderiv_logOf, pderiv_second_ev_first_point_eq_zero, d_evY]
+      have := om_Q G i c
+      simp only [Ar] at this
+      rw [this]; ring
+  have hc : constantCoeff g = 0 := by
+    simp only [g, map_sub, map_add, cc_ev (czFF G), cc_ev czX, cc_ev czY, logOf, constantCoeff_prim]
+    ring
+  rw [eq_C_of_pderiv_zero hd, hc, map_zero]
+
+theorem addPt : (![G.add (pt k (n := 2) d 0) (pt k d 1)] : Fin 1 → Pt k 2 d) = ![G.F] := by
+  funext j c
+  fin_cases j
+  show ev (n := 2) ![pt k d 0, pt k d 1] (G.F c) = G.F c
+  have e : (![pt k (n := 2) d 0, pt k d 1] : Fin 2 → Pt k 2 d) = fun j => pt k (n := 2) d j := by
+    funext j; fin_cases j <;> rfl
+  rw [e, ev_pt]
+
+theorem logSt : LogSt := by
+  intro k _ _ d G
+  refine ⟨fun i => logOf G i, fun i => constantCoeff_prim _, ?_, ?_⟩
+  · refine Matrix.ext fun i j => ?_
+    show coeff (Finsupp.single ((0 : Fin 1), j) 1) (logOf G i) = (1 : Matrix (Fin d) (Fin d) k) i j
+    have h := congrArg constantCoeff (pderiv_logOf G i j)
+    rw [← coeff_zero_eq_constantCoeff_apply, coeff_pderiv, zero_add] at h
+    have h2 := congrFun (congrFun (cc_om G) i) j
+    simp only [Matrix.map_apply] at h2
+    simpa [h2] using h
+  · funext i
+    show ev (n := 2) ![G.add (pt k d 0) (pt k d 1)] (logOf G i) =
+      ev (n := 2) ![pt k d 0] (logOf G i) + ev (n := 2) ![pt k d 1] (logOf G i)
+    rw [addPt]
+    exact logOf_add G i
+
+omit [Algebra ℚ k] in
+theorem ez_y (h : PS k 1 d) : ev (n := 1) ![pt k d 0, 0] (ev (n := 2) ![pt k d 1] h) = C (constantCoeff h) := by
+  rw [ev_ev cz1 czY]
+  have e : (fun j c => ev (n := 1) ![pt k d 0, 0] ((![pt k (n := 2) d 1] : Fin 1 → Pt k 2 d) j c)) =
+      fun (_ : Fin 1) (_ : Fin d) => (0 : PS k 1 d) := by
+    funext j c; fin_cases j; simp [pt_apply, ev_X cz1]
+  rw [e, ev_zeroFam]
+
+
+
+[CNC_SRC_FORMAL_ACTION_LINEAR] Original endomorphisms become linear in logarithmic coordinates
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/FormalGroupLogEndomorphismLinear.lean#L64-L93
+theorem formalGroup_log_endomorphism_linear :
+    ∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (G : FGLaw k d) (ℓ α : Pt k 1 d),
+      (∀ i, MvPowerSeries.constantCoeff (ℓ i) = 0) → dLin ℓ = 1 →
+      comp1 ℓ (G.add (pt k (n := 2) d 0) (pt k (n := 2) d 1)) =
+        comp1 ℓ (pt k (n := 2) d 0) + comp1 ℓ (pt k (n := 2) d 1) →
+      (∀ i, MvPowerSeries.constantCoeff (α i) = 0) →
+      comp1 α (G.add (pt k (n := 2) d 0) (pt k (n := 2) d 1)) =
+        G.add (comp1 α (pt k (n := 2) d 0)) (comp1 α (pt k (n := 2) d 1)) →
+      ∀ i, comp1 ℓ α i = ∑ j, MvPowerSeries.C (dLin α i j) * ℓ j := by
+  intro k _ _ d G ℓ α _ h1 hadd hα hhom i
+  have hS : GP (G.add (pt k (n := 2) d 0) (pt k (n := 2) d 1)) :=
+    gp_addOf _ G.const _ _ (gp_pt _) (gp_pt _)
+  have hev (a : Pt k 2 d) (ha : GP a) :
+      ev ![a] (comp1 ℓ α i - ∑ j, C (dLin α i j) * ℓ j) =
+        comp1 ℓ (comp1 α a) i - ∑ j, C (dLin α i j) * comp1 ℓ a j := by
+    rw [gt_ev_sub _ (single_point_zero_constant ha), ev_sum_C_mul _ (single_point_zero_constant ha), ← gt_comp1_comp1 ℓ α hα a ha]
+    rfl
+  rw [← sub_eq_zero]
+  refine eq_zero_of_additive G _ ?_ fun l => ?_
+  · rw [hev _ hS, hev _ (gp_pt _), hev _ (gp_pt _), hhom, hadd,
+      germ_comp_additive_at_points G ℓ hadd _ _ (gp_comp1 α _ hα (gp_pt _)) (gp_comp1 α _ hα (gp_pt _))]
+    simp only [Pi.add_apply, mul_add, Finset.sum_add_distrib]
+    ring
+  · have h2 : dLin (comp1 ℓ α) i l = (dLin α * dLin ℓ) i l := by
+      rw [dLin_comp1 ℓ α hα, h1, one_mul, mul_one]
+    rw [map_sub, map_sum, sub_eq_zero]
+    simp only [coeff_C_mul]
+    exact h2
+
+end GlobalTheory.LogLinear
+
+
+[CNC_SRC_FIRST_COCYCLE_GAUGE] Source first partial cocycle gauge
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/ExistsGaugeFirstLaw.lean#L42-L111
+theorem exists_gauge_first_law :
+    (∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (G : FGLaw k d) (c : PS k 3 d), ev (n := 2) ![0, pt k d 0, pt k d 1] c = 0 → ev (n := 3) ![pt k d 1, pt k d 0, pt k d 2] c = c → ev (n := 4) ![pt k d 0, pt k d 1, pt k d 3] c + ev (n := 4) ![addOf G.F (pt k d 0) (pt k d 1), pt k d 2, pt k d 3] c = ev (n := 4) ![pt k d 1, pt k d 2, pt k d 3] c + ev (n := 4) ![pt k d 0, addOf G.F (pt k d 1) (pt k d 2), pt k d 3] c → ∃ h : PS k 2 d, ev (n := 1) ![0, pt k d 0] h = 0 ∧ (∀ i, ev (n := 1) ![0, pt k d 0] (pderiv k ((0 : Fin 2), i) h) = 0) ∧ c = (ev (n := 3) ![pt k d 0, pt k d 2] h + ev (n := 3) ![pt k d 1, pt k d 2] h - ev (n := 3) ![addOf G.F (pt k d 0) (pt k d 1), pt k d 2] h)) → (∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (G : FGLaw k d) (q : ℕ) (g : PS k (q + 1) d), ev (n := q + 2) (Fin.cons (addOf G.F (pt k d 0) (pt k d 1)) (fun j : Fin q => pt k d j.succ.succ)) g = ev (n := q + 2) (Fin.cons (pt k d 0) (fun j : Fin q => pt k d j.succ.succ)) g + ev (n := q + 2) (Fin.cons (pt k d 1) (fun j : Fin q => pt k d j.succ.succ)) g → (∀ i, ev (n := q) (Fin.cons 0 (fun j : Fin q => pt k d j)) (pderiv k ((0 : Fin (q + 1)), i) g) = 0) → g = 0) → ∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (O : Type) [CommRing O] [StarRing O] (B : FB k d O), ∃ h : PS k 2 d, (ev (n := 1) ![0, pt k d 0] h = 0 ∧ ev (n := 1) ![pt k d 0, 0] h = 0) ∧ B.ph1 = FB.expS k (ev (n := 3) ![pt k d 0, pt k d 2] h + ev (n := 3) ![pt k d 1, pt k d 2] h - ev (n := 3) ![addOf B.G.F (pt k d 0) (pt k d 1), pt k d 2] h) := by
+  intro H1 H2 k _ _ d O _ _ B
+  have hp : ∀ {n : ℕ} (j : Fin n), GP (pt k (n := n) d j) := fun j => gp_pt j
+  have hz : ∀ {n : ℕ}, GP (0 : Pt k n d) := gp_zero₂
+  have hA : ∀ {n : ℕ} (i j : Fin n), GP (addOf B.G.F (pt k (n := n) d i) (pt k d j)) :=
+    fun i j => gp_addOf _ B.G.const _ _ (hp i) (hp j)
+  have h1 : constantCoeff B.ph1 = 1 := by
+    have := congrArg constantCoeff B.cocycleLeft_zero_fst
+    rwa [gt_const_ev_eq _ (triple_points_zero_constant hz (hp 0) (hp 1)), map_one] at this
+  obtain ⟨c, hc0, hc⟩ : ∃ c : PS k 3 d, constantCoeff c = 0 ∧ B.ph1 = FB.expS k c :=
+    ⟨_, constantCoeff_logS h1, (exp_log h1).symm⟩
+  have E : ∀ {n : ℕ} (V : Fin 3 → Pt k n d), (∀ j, GP (V j)) →
+      ev V B.ph1 = FB.expS k (ev V c) ∧ constantCoeff (ev V c) = 0 := by
+    intro n V hV
+    exact ⟨by rw [hc, gt_ev_expS V hV c hc0], gt_const_ev V hV c hc0⟩
+  have a0 : ev (n := 2) ![0, pt k d 0, pt k d 1] c = 0 := by
+    obtain ⟨e, e0⟩ := E (n := 2) _ (triple_points_zero_constant hz (hp 0) (hp 1))
+    refine expS_inj e0 (map_zero _) ?_
+    rw [← e, B.cocycleLeft_zero_fst, expS_zero]
+  have a2 : ev (n := 2) ![pt k d 0, pt k d 1, 0] c = 0 := by
+    obtain ⟨e, e0⟩ := E (n := 2) _ (triple_points_zero_constant (hp 0) (hp 1) hz)
+    refine expS_inj e0 (map_zero _) ?_
+    rw [← e, B.cocycleLeft_zero_thd, expS_zero]
+  have cm : ev (n := 3) ![pt k d 1, pt k d 0, pt k d 2] c = c := by
+    obtain ⟨e, e0⟩ := E (n := 3) _ (triple_points_zero_constant (hp 1) (hp 0) (hp 2))
+    refine expS_inj e0 hc0 ?_
+    rw [← e, B.cocycleLeft_comm, hc]
+  have as : ev (n := 4) ![pt k d 0, pt k d 1, pt k d 3] c +
+      ev (n := 4) ![addOf B.G.F (pt k d 0) (pt k d 1), pt k d 2, pt k d 3] c =
+      ev (n := 4) ![pt k d 1, pt k d 2, pt k d 3] c +
+      ev (n := 4) ![pt k d 0, addOf B.G.F (pt k d 1) (pt k d 2), pt k d 3] c := by
+    obtain ⟨e1, f1⟩ := E (n := 4) _ (triple_points_zero_constant (hp 0) (hp 1) (hp 3))
+    obtain ⟨e2, f2⟩ := E (n := 4) _ (triple_points_zero_constant (hA 0 1) (hp 2) (hp 3))
+    obtain ⟨e3, f3⟩ := E (n := 4) _ (triple_points_zero_constant (hp 1) (hp 2) (hp 3))
+    obtain ⟨e4, f4⟩ := E (n := 4) _ (triple_points_zero_constant (hp 0) (hA 1 2) (hp 3))
+    refine expS_inj (by rw [map_add, f1, f2, add_zero]) (by rw [map_add, f3, f4, add_zero]) ?_
+    rw [gt_expS_add _ _ f1 f2, gt_expS_add _ _ f3 f4, ← e1, ← e2, ← e3, ← e4]
+    exact B.cocycleLeft_assoc
+  obtain ⟨h, hx0, hd, hch⟩ := H1 k d B.G c a0 cm as
+  refine ⟨h, ⟨hx0, ?_⟩, by rw [hc, hch]⟩
+  have hV : ∀ j, GP ((![pt k d 0, pt k d 1, 0] : Fin 3 → Pt k 2 d) j) := triple_points_zero_constant (hp 0) (hp 1) hz
+  rw [hch, gt_ev_sub _ hV, gt_ev_add _ hV, gt_ev_ev' _ _ hV (pair_points_zero_constant (hp 0) (hp 2)),
+    gt_ev_ev' _ _ hV (pair_points_zero_constant (hp 1) (hp 2)), gt_ev_ev' _ _ hV (pair_points_zero_constant (hA 0 1) (hp 2)),
+    eval_pair_points, eval_pair_points, eval_pair_points, evP_addOf _ hV _ _ _ (hp 0) (hp 1),
+    evP_pt _ hV, evP_pt _ hV, evP_pt _ hV] at a2
+  have cons1 : ∀ {n : ℕ} (a : Pt k n d) (r : Fin 0 → Pt k n d),
+      (Fin.cons a r : Fin (0 + 1) → Pt k n d) = ![a] := by
+    intro n a r
+    funext j
+    fin_cases j
+    rfl
+  refine H2 k d B.G 0 (ev (n := 1) ![pt k d 0, 0] h) ?_ ?_
+  · rw [cons1, cons1, cons1]
+    have t0 := ev_axis (pt k (n := 2) d 0) (hp 0) h
+    have t1 := ev_axis (pt k (n := 2) d 1) (hp 1) h
+    have t2 := ev_axis _ (hA (n := 2) 0 1) h
+    refine t2.trans (Eq.trans ?_ (congrArg₂ (· + ·) t0 t1).symm)
+    exact (sub_eq_zero.1 a2).symm
+  · intro i
+    rw [cons1]
+    have hZ : ∀ j, GP ((![0] : Fin 1 → Pt k 0 d) j) := single_point_zero_constant hz
+    have e := congrArg (ev (n := 0) ![0]) (hd i)
+    rw [gt_ev_ev' _ _ hZ (pair_points_zero_constant hz (hp 0)), eval_pair_points, evP_zero _ hZ, evP_pt _ hZ,
+      gt_ev_zero _ hZ] at e
+    refine (congrArg (ev (n := 0) ![0]) (pderiv_axis h i)).trans ?_
+    rw [ev_axis _ hz]
+    exact e
+
+end GlobalTheory.GaugeFirstLaw
+
+
+[CNC_SRC_REGAUGE_CONTRACT] Original regauge signs for all four units
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/GermEvRegaugedSecondLawFamily.lean#L154-L164
+def ph1 : PS k 3 d := B.ph1 * expR (ev (n := 3) ![addOf B.G.F (pt k d 0) (pt k d 1), pt k d 2] h -
+  ev (n := 3) ![pt k d 0, pt k d 2] h - ev (n := 3) ![pt k d 1, pt k d 2] h)
+
+def ph2 : PS k 3 d := B.ph2 * expR (ev (n := 3) ![pt k d 0, addOf B.G.F (pt k d 1) (pt k d 2)] h -
+  ev (n := 3) ![pt k d 0, pt k d 1] h - ev (n := 3) ![pt k d 0, pt k d 2] h)
+
+def sy : PS k 2 d := B.sy * expR (ev (n := 2) ![pt k d 0, pt k d 1] h - ev (n := 2) ![pt k d 1, pt k d 0] h)
+
+def ad (a : O) : PS k 2 d := B.ad a * expR (ev (n := 2) ![pt k d 0, comp1 (B.A.act (star a)) (pt k d 1)] h -
+  ev (n := 2) ![comp1 (B.A.act a) (pt k d 0), pt k d 1] h)
+
+
+
+[CNC_SRC_REGAUGE_ENDPOINT] Exact original exists_regauge conclusion
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/GermEvRegaugedSecondLawFamily.lean#L342-L359
+theorem exists_regauge : ∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (O : Type) [CommRing O] [StarRing O] (B : FB k d O) (h : PS k 2 d), (ev (n := 1) ![0, pt k d 0] h = 0 ∧ ev (n := 1) ![pt k d 0, 0] h = 0) → ∃ B' : FB k d O, B'.G.F = B.G.F ∧ B'.A.act = B.A.act ∧ B.ph1 = B'.ph1 * FB.expS k (ev (n := 3) ![pt k d 0, pt k d 2] h + ev (n := 3) ![pt k d 1, pt k d 2] h - ev (n := 3) ![addOf B.G.F (pt k d 0) (pt k d 1), pt k d 2] h) ∧ B.ph2 = B'.ph2 * FB.expS k (ev (n := 3) ![pt k d 0, pt k d 1] h + ev (n := 3) ![pt k d 0, pt k d 2] h - ev (n := 3) ![pt k d 0, addOf B.G.F (pt k d 1) (pt k d 2)] h) ∧ B.sy = B'.sy * FB.expS k (ev (n := 2) ![pt k d 1, pt k d 0] h - h) ∧ ∀ a : O, B.ad a = B'.ad a * FB.expS k (ev (n := 2) ![comp1 (B.A.act a) (pt k d 0), pt k d 1] h - ev (n := 2) ![pt k d 0, comp1 (B.A.act (star a)) (pt k d 1)] h) := by
+  intro k _ _ d O _ _ B h ⟨h0, h1⟩
+  have hc : constantCoeff h = 0 := by
+    have := congrArg constantCoeff h0
+    rwa [gt_const_ev_eq _ (pair_points_zero_constant gp_zero₂ (gp_pt 0)), map_zero] at this
+  have hcc : ∀ {n : ℕ} {a b : Pt k n d}, GP a → GP b → constantCoeff (ev ![a, b] h) = 0 :=
+    fun ha hb => gt_const_ev _ (pair_points_zero_constant ha hb) h hc
+  refine ⟨regauge B h h0 h1, rfl, rfl, ?_, ?_, ?_, fun a => ?_⟩
+  · refine eq_mul_expS _ _ _ ?_ (by ring)
+    simp (maxDischargeDepth := 4) only [map_sub, map_add, hcc, gp_pt, gp_add, add_zero, sub_zero]
+  · refine eq_mul_expS _ _ _ ?_ (by ring)
+    simp (maxDischargeDepth := 4) only [map_sub, map_add, hcc, gp_pt, gp_add, add_zero, sub_zero]
+  · refine eq_mul_expS _ _ _ ?_ (by rw [ev_pt_two]; ring)
+    simp (maxDischargeDepth := 4) only [map_sub, hcc, hc, gp_pt, sub_zero]
+  · refine eq_mul_expS _ _ _ ?_ (by ring)
+    simp (maxDischargeDepth := 4) only [map_sub, hcc, gp_pt, gp_act, sub_zero]
+
+end GlobalTheory
+
+
+[CNC_SRC_INNER_DERIVATION] Exact separability inner derivation for reduced finite orders
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/DerivationInnerOfSeparabilityElement.lean#L10-L58
+theorem derivation_inner_of_separability_element (O : Type) [CommRing O] (N : ℕ)
+    (e : TensorProduct ℤ O O) (hN : 0 < N) (he : Algebra.TensorProduct.lmul' ℤ e = (N : O))
+    (hc : ∀ c : O, (TensorProduct.tmul ℤ c (1 : O) - TensorProduct.tmul ℤ (1 : O) c) * e = 0)
+    (V : Type) [AddCommGroup V] [Module ℚ V] (l r : O →+* Module.End ℚ V)
+    (hlr : ∀ a b, Commute (l a) (r b)) (δ : O →+ V)
+    (hδ : ∀ a b, δ (a * b) = l b (δ a) + r a (δ b)) :
+    ∃ v : V, ∀ a, δ a = l a v - r a v := by
+  let Φ : TensorProduct ℤ O O →ₗ[ℤ] V := TensorProduct.lift
+    (LinearMap.mk₂ ℤ (fun a b => l a (δ b))
+      (fun a a' b => by simp) (fun n a b => by simp)
+      (fun a b b' => by simp) (fun n a b => by rw [map_zsmul, map_zsmul]))
+  have hΦ : ∀ a b, Φ (TensorProduct.tmul ℤ a b) = l a (δ b) := fun a b => TensorProduct.lift.tmul a b
+  have h1 : ∀ (c : O) (t : TensorProduct ℤ O O),
+      Φ (TensorProduct.tmul ℤ c (1 : O) * t) = l c (Φ t) := by
+    intro c t
+    induction t using TensorProduct.induction_on with
+    | zero => simp
+    | tmul a b => simp [Algebra.TensorProduct.tmul_mul_tmul, hΦ]
+    | add x y hx hy => simp [mul_add, hx, hy]
+  have h2 : ∀ (c : O) (t : TensorProduct ℤ O O),
+      Φ (TensorProduct.tmul ℤ (1 : O) c * t)
+        = l (Algebra.TensorProduct.lmul' ℤ t) (δ c) + r c (Φ t) := by
+    intro c t
+    induction t using TensorProduct.induction_on with
+    | zero => simp
+    | tmul a b =>
+      have h := LinearMap.congr_fun (hlr a c).eq (δ b)
+      simp only [Module.End.mul_apply] at h
+      simp [Algebra.TensorProduct.tmul_mul_tmul, hΦ, hδ, h]
+    | add x y hx hy =>
+      simp only [mul_add, map_add, hx, hy, LinearMap.add_apply]
+      abel
+  have hN' : (N : ℚ) ≠ 0 := by exact_mod_cast hN.ne'
+  refine ⟨(N : ℚ)⁻¹ • Φ e, fun c => ?_⟩
+  have h := congrArg Φ (hc c)
+  rw [sub_mul, map_sub, h1, h2, he, map_zero, map_natCast, Module.End.natCast_apply] at h
+  have h' : l c (Φ e) - r c (Φ e) = (N : ℚ) • δ c := by
+    rw [Nat.cast_smul_eq_nsmul]
+    rw [sub_eq_zero] at h
+    rw [h]; abel
+  rw [map_smul, map_smul, ← smul_sub, h', smul_smul, inv_mul_cancel₀ hN', one_smul]
+
+theorem derivation_inner_of_reduced_order :
+    (∀ (O : Type) [CommRing O] [Module.Free ℤ O] [Module.Finite ℤ O] [IsReduced O], ∃ (N : ℕ) (e : TensorProduct ℤ O O), 0 < N ∧ Algebra.TensorProduct.lmul' ℤ e = (N : O) ∧ ∀ c : O, (TensorProduct.tmul ℤ c (1 : O) - TensorProduct.tmul ℤ (1 : O) c) * e = 0) → ∀ (O : Type) [CommRing O] [Module.Free ℤ O] [Module.Finite ℤ O] [IsReduced O] (V : Type) [AddCommGroup V] [Module ℚ V] (l r : O →+* Module.End ℚ V), (∀ a b, Commute (l a) (r b)) → ∀ δ : O →+ V, (∀ a b, δ (a * b) = l b (δ a) + r a (δ b)) → ∃ v : V, ∀ a, δ a = l a v - r a v := by
+  intro H O _ _ _ _ V _ _ l r hlr δ hδ
+  obtain ⟨N, e, hN, he, hc⟩ := H O
+  exact derivation_inner_of_separability_element O N e hN he hc V l r hlr δ hδ
+
+end GlobalTheory
+
+
+[CNC_SRC_ADJOINT_GAUGE] Source logarithmic bilinear adjoint cocycle and simultaneous gauge
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/ExistsActionGauge.lean#L241-L334
+theorem logAd_const (a : O) : constantCoeff (logAd B a) = 0 := constantCoeff_logS (ad_const B a)
+
+theorem expS_logAd (a : O) : FB.expS k (logAd B a) = B.ad a := exp_log (ad_const B a)
+
+theorem expS_ev_logAd (c : O) {n : ℕ} (a b : Pt k n d) (ha : GP a) (hb : GP b) :
+    FB.expS k (ev ![a, b] (logAd B c)) = ev ![a, b] (B.ad c) := by
+  rw [← gt_ev_expS _ (pair_points_zero_constant ha hb) _ (logAd_const B c), expS_logAd]
+
+theorem ev_logAd_const (c : O) {n : ℕ} (a b : Pt k n d) (ha : GP a) (hb : GP b) :
+    constantCoeff (ev ![a, b] (logAd B c)) = 0 :=
+  gt_const_ev _ (pair_points_zero_constant ha hb) _ (logAd_const B c)
+
+theorem logAd_mem (h1 : B.ph1 = 1) (h2 : B.ph2 = 1) (c : O) : logAd B c ∈ biadd B.G := by
+  refine ⟨fun n b hb => ?_, fun n a ha => ?_, fun n a a' b ha ha' hb => ?_,
+    fun n a b b' ha hb hb' => ?_⟩
+  · refine eq_zero_of_exp_eq_one (ev_logAd_const B c _ _ gp_zero₂ hb) ?_
+    refine (expS_ev_logAd B c _ _ gp_zero₂ hb).trans ?_
+    have h := congrArg (ev ![b]) (B.adjoint_zero_fst c)
+    rw [ev_ev_two _ (single_point_zero_constant hb) _ _ gp_zero₂ (gp_pt 0), evP_zero _ (single_point_zero_constant hb),
+      evP_pt _ (single_point_zero_constant hb), ev_one] at h
+    exact h
+  · refine eq_zero_of_exp_eq_one (ev_logAd_const B c _ _ ha gp_zero₂) ?_
+    refine (expS_ev_logAd B c _ _ ha gp_zero₂).trans ?_
+    have h := congrArg (ev ![a]) (B.adjoint_zero_snd c)
+    rw [ev_ev_two _ (single_point_zero_constant ha) _ _ (gp_pt 0) gp_zero₂, evP_zero _ (single_point_zero_constant ha),
+      evP_pt _ (single_point_zero_constant ha), ev_one] at h
+    exact h
+  · have hs := gp_addOf _ B.G.const _ _ ha ha'
+    have hV := triple_points_zero_constant ha ha' hb
+    refine expS_inj (ev_logAd_const B c _ _ hs hb)
+      (by rw [map_add, ev_logAd_const B c _ _ ha hb, ev_logAd_const B c _ _ ha' hb, add_zero]) ?_
+    rw [gt_expS_add _ _ (ev_logAd_const B c _ _ ha hb) (ev_logAd_const B c _ _ ha' hb),
+      expS_ev_logAd B c _ _ hs hb, expS_ev_logAd B c _ _ ha hb, expS_ev_logAd B c _ _ ha' hb]
+    have h := B.adjoint_compat_left c
+    rw [h1, ev_one, ev_one, one_mul, mul_one] at h
+    have h' := congrArg (ev ![a, a', b]) h
+    rw [gt_ev_mul _ hV,
+      ev_ev_two _ hV _ _ (gp_addOf _ B.G.const _ _ (gp_pt 0) (gp_pt 1)) (gp_pt 2),
+      ev_ev_two _ hV _ _ (gp_pt 0) (gp_pt 2), ev_ev_two _ hV _ _ (gp_pt 1) (gp_pt 2),
+      evP_addOf _ hV _ _ _ (gp_pt 0) (gp_pt 1), evP_pt _ hV, evP_pt _ hV,
+      evP_pt _ hV] at h'
+    exact h'
+  · have hs := gp_addOf _ B.G.const _ _ hb hb'
+    have hV := triple_points_zero_constant ha hb hb'
+    refine expS_inj (ev_logAd_const B c _ _ ha hs)
+      (by rw [map_add, ev_logAd_const B c _ _ ha hb, ev_logAd_const B c _ _ ha hb', add_zero]) ?_
+    rw [gt_expS_add _ _ (ev_logAd_const B c _ _ ha hb) (ev_logAd_const B c _ _ ha hb'),
+      expS_ev_logAd B c _ _ ha hs, expS_ev_logAd B c _ _ ha hb, expS_ev_logAd B c _ _ ha hb']
+    have h := B.adjoint_compat_right c
+    rw [h2, ev_one, ev_one, one_mul, mul_one] at h
+    have h' := congrArg (ev ![a, b, b']) h
+    rw [gt_ev_mul _ hV,
+      ev_ev_two _ hV _ _ (gp_pt 0) (gp_addOf _ B.G.const _ _ (gp_pt 1) (gp_pt 2)),
+      ev_ev_two _ hV _ _ (gp_pt 0) (gp_pt 1), ev_ev_two _ hV _ _ (gp_pt 0) (gp_pt 2),
+      evP_addOf _ hV _ _ _ (gp_pt 1) (gp_pt 2), evP_pt _ hV, evP_pt _ hV,
+      evP_pt _ hV] at h'
+    exact h'
+
+theorem logAd_add (h1 : B.ph1 = 1) (h2 : B.ph2 = 1) (a b : O) :
+    logAd B (a + b) = logAd B a + logAd B b := by
+  refine expS_inj (logAd_const B _) (by rw [map_add, logAd_const, logAd_const, add_zero]) ?_
+  rw [gt_expS_add _ _ (logAd_const B a) (logAd_const B b), expS_logAd, expS_logAd, expS_logAd]
+  have h := B.ad_add a b
+  rwa [h1, h2, ev_one, ev_one, one_mul, mul_one] at h
+
+theorem logAd_mul (a b : O) : logAd B (a * b) =
+    ev ![comp1 (B.A.act b) (pt k (n := 2) d 0), pt k (n := 2) d 1] (logAd B a) +
+      ev ![pt k (n := 2) d 0, comp1 (B.A.act (star a)) (pt k (n := 2) d 1)] (logAd B b) := by
+  have hx : GP (comp1 (B.A.act b) (pt k (n := 2) d 0)) :=
+    gp_comp1 _ _ (B.A.const b) (gp_pt 0)
+  have hz : GP (comp1 (B.A.act (star a)) (pt k (n := 2) d 1)) :=
+    gp_comp1 _ _ (B.A.const _) (gp_pt 1)
+  have c1 := ev_logAd_const B a _ _ hx (gp_pt 1)
+  have c2 := ev_logAd_const B b _ _ (gp_pt 0) hz
+  refine expS_inj (logAd_const B _) (by rw [map_add, c1, c2, add_zero]) ?_
+  rw [gt_expS_add _ _ c1 c2, expS_logAd, expS_ev_logAd B a _ _ hx (gp_pt 1),
+    expS_ev_logAd B b _ _ (gp_pt 0) hz, B.ad_mul]
+
+end Log
+
+theorem exists_action_gauge :
+    (∀ (O : Type) [CommRing O] [Module.Free ℤ O] [Module.Finite ℤ O] [IsReduced O] (V : Type) [AddCommGroup V] [Module ℚ V] (l r : O →+* Module.End ℚ V), (∀ a b, Commute (l a) (r b)) → ∀ δ : O →+ V, (∀ a b, δ (a * b) = l b (δ a) + r a (δ b)) → ∃ v : V, ∀ a, δ a = l a v - r a v) → ∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (O : Type) [CommRing O] [StarRing O] [Module.Free ℤ O] [Module.Finite ℤ O] [IsReduced O] (B : FB k d O), B.ph1 = 1 → B.ph2 = 1 → ∃ h : PS k 2 d, (ev (n := 1) ![0, pt k d 0] h = 0 ∧ ev (n := 1) ![pt k d 0, 0] h = 0) ∧ (ev (n := 3) ![pt k d 0, pt k d 2] h + ev (n := 3) ![pt k d 1, pt k d 2] h - ev (n := 3) ![addOf B.G.F (pt k d 0) (pt k d 1), pt k d 2] h) = 0 ∧ (ev (n := 3) ![pt k d 0, pt k d 1] h + ev (n := 3) ![pt k d 0, pt k d 2] h - ev (n := 3) ![pt k d 0, addOf B.G.F (pt k d 1) (pt k d 2)] h) = 0 ∧ ∀ a : O, B.ad a = FB.expS k (ev (n := 2) ![comp1 (B.A.act a) (pt k d 0), pt k d 1] h - ev (n := 2) ![pt k d 0, comp1 (B.A.act (star a)) (pt k d 1)] h) := by
+  intro H k _ _ d O _ _ _ _ _ B h1 h2
+  let δ : O →+ biadd B.G := AddMonoidHom.mk' (fun a => ⟨logAd B a, logAd_mem B h1 h2 a⟩)
+    (fun a b => Subtype.ext (logAd_add B h1 h2 a b))
+  obtain ⟨v, hv⟩ := H O (biadd B.G) (leftHom B.A) ((rightHom B.A).comp (starRingEnd O))
+    (fun a b => left_right_commute B.A a (star b)) δ (fun a b => Subtype.ext (logAd_mul B a b))
+  refine ⟨v, ⟨v.2.1 _ _ (gp_pt 0), v.2.2.1 _ _ (gp_pt 0)⟩, ?_, ?_, fun a => ?_⟩
+  · rw [v.2.2.2.1 _ _ _ _ (gp_pt 0) (gp_pt 1) (gp_pt 2), sub_self]
+  · rw [v.2.2.2.2 _ _ _ _ (gp_pt 0) (gp_pt 1) (gp_pt 2), sub_self]
+  · rw [← expS_logAd B a]
+    exact congrArg (FB.expS k) (congrArg Subtype.val (hv a))
+
+end GlobalTheory.ActionGauge
+
+
+[CNC_SRC_SYMMETRY_GAUGE] Exact antisymmetric half correction
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/ExistsGaugeOfSymmetry.lean#L30-L112
+theorem exists_gauge_of_symmetry :
+    ∀ (k : Type) [CommRing k] [Algebra ℚ k] (d : ℕ) (O : Type) [CommRing O] [StarRing O] (B : FB k d O), B.ph1 = 1 → B.ph2 = 1 → (∀ a, B.ad a = 1) → ∃ h : PS k 2 d, (ev (n := 1) ![0, pt k d 0] h = 0 ∧ ev (n := 1) ![pt k d 0, 0] h = 0) ∧ (ev (n := 3) ![pt k d 0, pt k d 2] h + ev (n := 3) ![pt k d 1, pt k d 2] h - ev (n := 3) ![addOf B.G.F (pt k d 0) (pt k d 1), pt k d 2] h) = 0 ∧ (ev (n := 3) ![pt k d 0, pt k d 1] h + ev (n := 3) ![pt k d 0, pt k d 2] h - ev (n := 3) ![pt k d 0, addOf B.G.F (pt k d 1) (pt k d 2)] h) = 0 ∧ (∀ a : O, (ev (n := 2) ![comp1 (B.A.act a) (pt k d 0), pt k d 1] h - ev (n := 2) ![pt k d 0, comp1 (B.A.act (star a)) (pt k d 1)] h) = 0) ∧ B.sy = FB.expS k (ev (n := 2) ![pt k d 1, pt k d 0] h - h) := by
+  intro k _ _ d O _ _ B h1 h2 had
+  have hp : ∀ {n : ℕ} (j : Fin n), GP (pt k (n := n) d j) := fun j => gp_pt j
+  have hz : ∀ {n : ℕ}, GP (0 : Pt k n d) := gp_zero₂
+  have hF : ∀ i, constantCoeff (B.G.F i) = 0 := B.G.const
+  have hsy1 : constantCoeff B.sy = 1 := by
+    have := congrArg constantCoeff B.symmetry_zero_fst
+    rwa [gt_const_ev_eq _ (pair_points_zero_constant hz (hp 0)), map_one] at this
+  obtain ⟨s, hs0, hs⟩ : ∃ s : PS k 2 d, constantCoeff s = 0 ∧ FB.expS k s = B.sy :=
+    ⟨_, constantCoeff_logS hsy1, exp_log hsy1⟩
+  have E : ∀ {n : ℕ} (a b : Pt k n d), GP a → GP b → ev ![a, b] B.sy = FB.expS k (ev ![a, b] s) := by
+    intro n a b ha hb
+    rw [← hs, gt_ev_expS _ (pair_points_zero_constant ha hb) _ hs0]
+  have c0 : ∀ {n : ℕ} (a b : Pt k n d), GP a → GP b → constantCoeff (ev ![a, b] s) = 0 :=
+    fun a b ha hb => gt_const_ev _ (pair_points_zero_constant ha hb) _ hs0
+
+  have anti0 : s + ev (n := 2) ![pt k d 1, pt k d 0] s = 0 := by
+    have e := B.sy_inv
+    rw [E _ _ (hp 1) (hp 0)] at e
+    refine expS_inj (by rw [map_add, hs0, c0 _ _ (hp 1) (hp 0), add_zero]) (map_zero _) ?_
+    rw [gt_expS_add _ _ hs0 (c0 _ _ (hp 1) (hp 0)), hs, e, expS_zero]
+  have anti : ∀ {n : ℕ} (a b : Pt k n d), GP a → GP b → ev ![b, a] s = - ev ![a, b] s := by
+    intro n a b ha hb
+    have hV := pair_points_zero_constant ha hb
+    have e := congrArg (ev ![a, b]) anti0
+    rw [gt_ev_add _ hV, gt_ev_zero _ hV, gt_ev_ev' _ _ hV (pair_points_zero_constant (hp 1) (hp 0)), eval_pair_points,
+      evP_pt _ hV, evP_pt _ hV] at e
+    exact eq_neg_of_add_eq_zero_right e
+
+  have add0 : ev (n := 3) ![pt k d 0, pt k d 1] s + ev (n := 3) ![pt k d 0, pt k d 2] s =
+      ev (n := 3) ![pt k d 0, addOf B.G.F (pt k d 1) (pt k d 2)] s := by
+    have hA := gp_addOf _ hF _ _ (hp (n := 3) 1) (hp (n := 3) 2)
+    have e := B.sy_law
+    rw [h1, h2, ev_one, one_mul, mul_one, E _ _ (hp 0) (hp 1), E _ _ (hp 0) (hp 2), E _ _ (hp 0) hA] at e
+    refine expS_inj (by rw [map_add, c0 _ _ (hp 0) (hp 1), c0 _ _ (hp 0) (hp 2), add_zero])
+      (c0 _ _ (hp 0) hA) ?_
+    rw [gt_expS_add _ _ (c0 _ _ (hp 0) (hp 1)) (c0 _ _ (hp 0) (hp 2)), e]
+  have add2 : ∀ {n : ℕ} (x y z : Pt k n d), GP x → GP y → GP z →
+      ev ![x, y] s + ev ![x, z] s = ev ![x, addOf B.G.F y z] s := by
+    intro n x y z hx hy hz'
+    have hA := gp_addOf _ hF _ _ (hp (n := 3) 1) (hp (n := 3) 2)
+    have hV := triple_points_zero_constant hx hy hz'
+    have e := congrArg (ev ![x, y, z]) add0
+    rw [gt_ev_add _ hV, gt_ev_ev' _ _ hV (pair_points_zero_constant (hp 0) (hp 1)), gt_ev_ev' _ _ hV (pair_points_zero_constant (hp 0) (hp 2)),
+      gt_ev_ev' _ _ hV (pair_points_zero_constant (hp 0) hA), eval_pair_points, eval_pair_points, eval_pair_points,
+      evP_addOf _ hV _ _ _ (hp 1) (hp 2), evP_pt _ hV, evP_pt _ hV, evP_pt _ hV] at e
+    exact e
+  obtain ⟨c, hc⟩ : ∃ c : k, (C c : PS k 2 d) * 2 = -1 := by
+    refine ⟨algebraMap ℚ k (-1 / 2), ?_⟩
+    have e : algebraMap ℚ k (-1 / 2) * 2 = -1 := by
+      rw [← map_ofNat (algebraMap ℚ k) 2, ← map_mul]
+      norm_num
+    have := congrArg (C (σ := Fin 2 × Fin d) (R := k)) e
+    rwa [map_mul, map_neg, map_one, map_ofNat] at this
+  refine ⟨C c * s, ⟨?_, ?_⟩, ?_, ?_, ?_, ?_⟩
+  · have e := B.symmetry_zero_fst
+    rw [E _ _ hz (hp 0), ← expS_zero] at e
+    rw [ev_C_mul _ (pair_points_zero_constant hz (hp 0)), expS_inj (c0 _ _ hz (hp 0)) (map_zero _) e, mul_zero]
+  · have e := B.symmetry_zero_snd
+    rw [E _ _ (hp 0) hz, ← expS_zero] at e
+    rw [ev_C_mul _ (pair_points_zero_constant (hp 0) hz), expS_inj (c0 _ _ (hp 0) hz) (map_zero _) e, mul_zero]
+  · have hA := gp_addOf _ hF _ _ (hp (n := 3) 0) (hp (n := 3) 1)
+    rw [ev_C_mul _ (pair_points_zero_constant (hp 0) (hp 2)), ev_C_mul _ (pair_points_zero_constant (hp 1) (hp 2)), ev_C_mul _ (pair_points_zero_constant hA (hp 2)),
+      anti _ _ (hp 2) (hp 0), anti _ _ (hp 2) (hp 1), anti _ _ (hp 2) hA,
+      ← add2 _ _ _ (hp 2) (hp 0) (hp 1)]
+    ring
+  · have hA := gp_addOf _ hF _ _ (hp (n := 3) 1) (hp (n := 3) 2)
+    rw [ev_C_mul _ (pair_points_zero_constant (hp 0) (hp 1)), ev_C_mul _ (pair_points_zero_constant (hp 0) (hp 2)), ev_C_mul _ (pair_points_zero_constant (hp 0) hA),
+      ← add0]
+    ring
+  · intro a
+    have hx := gp_comp1 _ _ (B.A.const a) (hp (n := 2) 0)
+    have hy := gp_comp1 _ _ (B.A.const (star a)) (hp (n := 2) 1)
+    have e := B.ad_sy a
+    rw [had, had, ev_one, one_mul, one_mul, E _ _ hx (hp 1), E _ _ (hp 0) hy] at e
+    rw [ev_C_mul _ (pair_points_zero_constant hx (hp 1)), ev_C_mul _ (pair_points_zero_constant (hp 0) hy),
+      expS_inj (c0 _ _ hx (hp 1)) (c0 _ _ (hp 0) hy) e, sub_self]
+  · rw [ev_C_mul _ (pair_points_zero_constant (hp 1) (hp 0)), ← hs]
+    congr 1
+    linear_combination (-C c) * anti0 + s * hc
+
+end GlobalTheory.SymGauge
+
+
+[CNC_SRC_FULL_GAUGE_CONTRACT] Full original CanonGaugeSt including arbitrary source ring and rational coefficient algebra
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/TaylorDiscriminants/ConnectionKillsSeries.lean#L63-L67
+    nabla k B h m ξ.1 ξ.2 (nabla k B h m η.1 η.2 G) - nabla k B h m η.1 η.2 (nabla k B h m ξ.1 ξ.2 G) =
+      C ((m : k) * betaH k ξ η) * G
+
+def ConnectionKillsSeries : Prop :=
+  ∀ (R : Type) [CommRing R] (d : ℕ) (O : Type) [CommRing O] [StarRing O] (k : Type) [CommRing k] [Algebra ℚ k]
+
+
+[CNC_SRC_GAUGE_ASSEMBLY] Source four-step canonical-gauge assembly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/CanonGaugeOfLog.lean#L21-L31
+theorem canonGauge_of_log : LogSt → CanonGaugeSt := fun hlog =>
+  have hcob := FormalCocycle.exists_coboundary_of_symm_cocycle hlog ChartInv.exists_isInvPair
+  have huniq := AdditiveSeries.eq_zero_of_additive_of_pderiv
+  canonGauge_of_steps exists_formalBiext_map exists_regauge
+    (GaugeFirstLaw.exists_gauge_first_law hcob huniq)
+    (SecondLawGauge.exists_gauge_second_law hcob huniq)
+    (ActionGauge.exists_action_gauge
+      (derivation_inner_of_reduced_order SepIdem.exists_separability_element))
+    SymGauge.exists_gauge_of_symmetry
+
+end GlobalTheory
+
+
+[CNC_SRC_FULL_GAUGE_ENDPOINT] Literal canonGauge_exists endpoint
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/CanonGaugeExists.lean#L1-L14
+import Mathlib
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.ChartChg
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.WickVanishing.WickOperatorVanishing
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.TaylorDiscriminants.WickVanishing.GEWick
+import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.CanonGaugeOfLog
+import Development.AbelianVarietyTheory.Proofs.FormalGroupCharts.PderivSecondEvFirstPointEqZero
+open MvPowerSeries ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ ReciprocityTheory.ChartRestriction.G.TB
+
+namespace GlobalTheory
+
+theorem canonGauge_exists : CanonGaugeSt :=
+  canonGauge_of_log FormalLog.logSt_and_logDerivSt.1
+
+end GlobalTheory
+
+
+[CNC_SRC_GERM_PRODUCER] Compatible eL jets and all-section germ producer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/GermDPf.lean#L111-L235
+theorem val_eL_trunc (hch : IsChartG t x0 d F act tg uvec x) (e : ∀ m, FrTyG t x0 d x m) (wP : PrimTyG t)
+    (htr : FrTrunc t x0 d x e) (m : ℕ) (y : (jOG x0 d m 1).left) (J : ((jOG x0 d m 1).left ⟶ t.G.left) → t.PP.L.ι)
+    (hJ : Good t.PP.L y J) :
+    val (eLG t x0 d x act e wP (m + 1)) (ρT x0 d m).left y J = val (eLG t x0 d x act e wP m) (𝟙 _) y J := by
+  have hx : (ρT x0 d m).left ≫ (x (m + 1)).left = (x m).left := by
+    rw [← Over.comp_left, hch.trunc m]
+  have hs : (ρT x0 d m).left ≫ (homAt x0 (sL (m + 1) (act H.w0))).left =
+      (homAt x0 (sL m (act H.w0))).left ≫ (homAt x0 (jetTrunc : Jet S (Fin 2 × Fin d) (m + 1) →ₐ[S] _)).left := by
+    rw [← Over.comp_left, ← Over.comp_left, homAt_comp, homAt_comp, sL_trunc]
+  refine (val_mul hJ _ _ _).trans (Eq.trans (congrArg₂ (· * ·) ?_ ?_) (val_mul hJ _ _ _).symm)
+  · exact (val_pull hJ wP _ _).trans ((congrArg (fun r => val wP r y J) (hx.trans (Category.id_comp _).symm)).trans
+      (val_pull hJ wP _ _).symm)
+  · exact (val_pull hJ (e (m + 1)) _ _).trans ((congrArg (fun r => val (e (m + 1)) r y J) hs).trans
+      ((val_pull hJ (e (m + 1)) _ _).symm.trans ((val_corr hJ (htr m) _).trans
+        ((congrArg (fun r => val (e m) r y J) (Category.id_comp _).symm).trans (val_pull hJ (e m) _ _).symm))))
+
+theorem ptSec_trunc (hch : IsChartG t x0 d F act tg uvec x) (m : ℕ) :
+    (ptSecT t.G (x m)).left ≫ (jBaseG x0 d m 1 ▷ t.G).left =
+      (ρT x0 d m).left ≫ (ptSecT t.G (x (m + 1))).left ≫ (jBaseG x0 d (m + 1) 1 ▷ t.G).left := by
+  unfold ptSecT
+  rw [← Over.comp_left, ← Over.comp_left, ← Over.comp_left]
+  congr 1
+  simp only [lift_whiskerRight, comp_lift, Category.id_comp, jBase_trunc]
+  rw [show ρT x0 d m ≫ x (m + 1) = x m from hch.trunc m]
+
+end GermD
+
+open GermD in
+
+theorem germSt_holds : GermSt := by
+  intro E _ _ _ H X0 t S _ x0 d F act κ _ tg uvec x ph1 ph2 sy ad e wP hch hfr hpr htr k Fs
+  have hL := t.PP.isLB
+  have heL : ∀ m, (eLG t x0 d x act e wP m).IsGen := fun m =>
+    ReciprocityTheory.ChartRestriction.G.DVR.mulGen_isGen t.PP.L _ _ _ _ _ _ (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen t.PP.L _ _ _ hpr.1 _)
+      (ReciprocityTheory.ChartRestriction.G.DVR.pullGen_isGen t.PP.L _ _ _ (hfr.gen m) _)
+  have hτ : ∀ m, ∃ τ : LB.Gen (LB.LinComb t.PP.L (Y := (jOG x0 d m 1).left) (K := Fin 1) (fun _ => (x m).left)
+      fun _ => (k : ℤ)), τ.IsGen ∧ ∀ (Z : Scheme.{0}) (r : Z ⟶ (jOG x0 d m 1).left) (z : Z)
+        (J : (Z ⟶ t.G.left) → t.PP.L.ι), Good t.PP.L z J →
+          val τ r z J = val (genPowG t _ _ (eLG t x0 d x act e wP m) k) r z J := by
+    intro m
+    refine exists_gen hL ?_ _ (genPowG_isGen t _ _ _ (heL m) k)
+    intro U _ hU
+    simp only [Fintype.prod_sum_type, Sum.elim_inl, Sum.elim_inr, Fin.prod_univ_one, Category.comp_id, _root_.mul_one,
+      formEq_eL hch m]
+    rw [_root_.mul_assoc, ← Finset.prod_mul_distrib]
+    simp only [← zpow_add, _root_.mul_neg, neg_add_cancel, zpow_zero, Finset.prod_const_one, _root_.mul_one]
+  choose τ hτg hτv using hτ
+  have hcorr : ∀ m, LB.Gen.Corr t.PP.L _ _ _ _ (τ m) (genPowG t _ _ (eLG t x0 d x act e wP m) k) :=
+    fun m => corr_of_val hL fun y J hJ => hτv m _ (𝟙 _) y J hJ
+  choose F' hF' using fun m =>
+    exists_pullSec t.G t.PP.L (k : ℤ) (jBaseG x0 d m 1 ▷ t.G) (whiskerRight_snd _ _) Fs
+  choose v hv using fun m => exists_value t.G t.PP.L hL (k : ℤ) (F' m) (x m) (τ m) (hτg m)
+  have hvc : ∀ m, v m = (ρT x0 d m).left.appTop.hom (v (m + 1)) := by
+    intro m
+    refine fn_ext (V := ⊤) fun y _ => ?_
+    obtain ⟨i, hi⟩ := exists_chart hL ((x m).left y)
+    have hρx : (ρT x0 d m).left ≫ (x (m + 1)).left = (x m).left := by
+      rw [← Over.comp_left, hch.trunc m]
+    have hm : (𝟙 _ : (jOG x0 d m 1).left ⟶ _) y ∈ LB.wchart t.PP.L (fun _ : Fin 1 => (x m).left) (fun _ => i) :=
+      Set.mem_iInter.2 fun _ => hi
+    have app_eq : ∀ {A B C : Scheme.{0}} (f : A ⟶ B) (g : B ⟶ C) (h : A ⟶ C), f ≫ g = h → ∀ a, g (f a) = h a :=
+      fun f g h e a => congrArg (fun q => q a) e
+    have hps0 : (𝟙 _ ≫ (ptSecT t.G (x m)).left) ≫ (snd (jOG x0 d m 1) t.G).left = (x m).left := by
+      rw [Category.id_comp, ← Over.comp_left, ptSecT, lift_snd]
+    have hps1 : ((ρT x0 d m).left ≫ (ptSecT t.G (x (m + 1))).left) ≫ (snd (jOG x0 d (m + 1) 1) t.G).left =
+        (x m).left := by
+      rw [Category.assoc, ← Over.comp_left, ptSecT, lift_snd, hρx]
+    have hm1 : (ρT x0 d m).left y ∈ LB.wchart t.PP.L (fun _ : Fin 1 => (x (m + 1)).left) (fun _ => i) := by
+      refine Set.mem_iInter.2 fun _ => ?_
+      show (x (m + 1)).left ((ρT x0 d m).left y) ∈ (t.PP.L.U i : Set t.G.left)
+      rw [app_eq _ _ _ hρx]
+      exact hi
+    have mem0 : (𝟙 _ ≫ (ptSecT t.G (x m)).left) y ∈ (LPow t.G t.PP.L (k : ℤ) (jOG x0 d m 1)).U (fun _ => i) := by
+      refine Set.mem_iInter.2 fun _ => ?_
+      show (snd (jOG x0 d m 1) t.G).left ((𝟙 _ ≫ (ptSecT t.G (x m)).left) y) ∈ (t.PP.L.U i : Set t.G.left)
+      rw [app_eq _ _ _ hps0]
+      exact hi
+    have mem1 : ((ρT x0 d m).left ≫ (ptSecT t.G (x (m + 1))).left) y ∈
+        (LPow t.G t.PP.L (k : ℤ) (jOG x0 d (m + 1) 1)).U (fun _ => i) := by
+      refine Set.mem_iInter.2 fun _ => ?_
+      show (snd (jOG x0 d (m + 1) 1) t.G).left (((ρT x0 d m).left ≫ (ptSecT t.G (x (m + 1))).left) y) ∈
+        (t.PP.L.U i : Set t.G.left)
+      rw [app_eq _ _ _ hps1]
+      exact hi
+    have e0 := value_stalk t.G t.PP.L hL (k : ℤ) (hv m) (𝟙 _) y (fun _ => i) hm
+    have e1 := value_stalk t.G t.PP.L hL (k : ℤ) (hv (m + 1)) (ρT x0 d m).left y (fun _ => i) hm1
+    have l0 := pullSec_stalk t.G t.PP.L (k : ℤ) (hF' m) (𝟙 _ ≫ (ptSecT t.G (x m)).left) y (fun _ => i) mem0
+    have l1 := pullSec_stalk t.G t.PP.L (k : ℤ) (hF' (m + 1)) ((ρT x0 d m).left ≫ (ptSecT t.G (x (m + 1))).left) y
+      (fun _ => i) mem1
+    have hmor : (𝟙 _ ≫ (ptSecT t.G (x m)).left) ≫ (jBaseG x0 d m 1 ▷ t.G).left =
+        ((ρT x0 d m).left ≫ (ptSecT t.G (x (m + 1))).left) ≫ (jBaseG x0 d (m + 1) 1 ▷ t.G).left := by
+      rw [Category.id_comp, ptSec_trunc hch m, Category.assoc]
+    obtain ⟨J, hJ, hJi⟩ := exists_good t.PP.L hL y (fun _ : Fin 1 => (x m).left) (fun _ => i) (fun _ _ _ => rfl)
+      (fun _ => hi)
+    have hunit : gm (𝟙 _) y (LB.wchart t.PP.L (fun _ : Fin 1 => (x m).left) (fun _ => i)) ((τ m).s (fun _ => i)) =
+        gm (ρT x0 d m).left y (LB.wchart t.PP.L (fun _ : Fin 1 => (x (m + 1)).left) (fun _ => i))
+          ((τ (m + 1)).s (fun _ => i)) :=
+      (val_of (τ m) (𝟙 _) y J (fun _ => i) (fun _ => by rw [Category.id_comp]; exact hJi 0)).symm.trans
+        ((hτv m _ (𝟙 _) y J hJ).trans ((val_genPowG t _ _ _ k _ y J).trans
+          ((congrArg (· ^ k) (val_eL_trunc hch e wP htr m y J hJ)).symm.trans
+            ((val_genPowG t _ _ _ k _ y J).symm.trans ((hτv (m + 1) _ _ y J hJ).symm.trans
+              (val_of (τ (m + 1)) _ y J (fun _ => i) (fun _ => by rw [hρx]; exact hJi 0)))))))
+    have hmain := e0.symm.trans (l0.trans ((congrArg (fun r => gs r y _ (Fs.f (fun _ => i))) hmor).trans
+      (l1.symm.trans e1)))
+    have h2 := (Units.mul_left_inj (gm (𝟙 _) y _ ((τ m).s (fun _ => i)))).1
+      (hmain.trans (congrArg (fun u => gs (ρT x0 d m).left y ⊤ (v (m + 1)) * (u : (_ : Type)ˣ).val) hunit.symm))
+    have h3 := gs_pull (𝟙 _) (ρT x0 d m).left y ⊤ (by trivial) (v (m + 1))
+    rw [Category.id_comp] at h3
+    exact h2.trans h3.symm
+  choose a ha using fun m => (⟨_, congrArg (fun f => CommRingCat.Hom.hom f (v m))
+    (Iso.hom_inv_id (Scheme.ΓSpecIso (CommRingCat.of (Jet S (Fin 1 × Fin d) m))))⟩ :
+      ∃ b, toΓ (Jet S (Fin 1 × Fin d) m) b = v m)
+  have hac : ∀ m, (jetTrunc : Jet S (Fin 1 × Fin d) (m + 1) →ₐ[S] _) (a (m + 1)) = a m := by
+    intro m
+    apply toΓ_injective
+    rw [ha m, hvc m, ← ha (m + 1)]
+    exact congrArg (fun f => CommRingCat.Hom.hom f (a (m + 1)))
+      (Scheme.ΓSpecIso_inv_naturality (CommRingCat.ofHom ((jetTrunc : Jet S (Fin 1 × Fin d) (m + 1) →ₐ[S] _) :
+        Jet S (Fin 1 × Fin d) (m + 1) →+* Jet S (Fin 1 × Fin d) m)))
+  obtain ⟨f, hf⟩ := exists_ps_of_jets a hac
+  refine ⟨f, fun m => ⟨F' m, τ m, hF' m, hcorr m, ?_⟩⟩
+  rw [hf m, ha m]
+  exact hv m
+
+end Formalism.MainNotions.ModuliIntegralCharts.H1
+
+
+[CNC_SRC_GERM_UNIQUENESS] Exact isGermFun_holds uniqueness by every truncation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/Divisibility/GeneratorPowers/GermFunPf.lean#L195-L225
+theorem psJet_inj {R ι : Type} [CommRing R] [Fintype ι] [DecidableEq ι] {f f' : MvPowerSeries ι R}
+    (h : ∀ m, psJet m f = psJet m f') : f = f' := by
+  ext e
+  have h0 := h e.degree
+  unfold psJet at h0
+  have h1 := Ideal.Quotient.eq.1 h0
+  have h2 := coeff_eq_zero_of_mem h1 (e := e) (Nat.lt_succ_self _)
+  rw [MvPolynomial.coeff_sub, coeff_psTrunc e.degree f e le_rfl,
+    coeff_psTrunc e.degree f' e le_rfl] at h2
+  exact sub_eq_zero.1 h2
+
+end GermFun
+
+open GermFun in
+theorem isGermFun_holds : IsGermFunStatement := by
+  unfold IsGermFunStatement
+  intro E _ _ _ H Dw l Xo c S _ _ y d x act e wP k F f f' h₁ h₂
+  have hL : Xo.univ.t.PP.L.IsLB := by
+    exact Xo.univ.t.PP.isLB
+  apply psJet_inj
+  intro m
+  obtain ⟨F₁, τ₁, hP₁, hC₁, hV₁⟩ := h₁ m
+  obtain ⟨F₂, τ₂, hP₂, hC₂, hV₂⟩ := h₂ m
+  have eF := pull_unique (h₁ := hP₁) (h₂ := hP₂)
+  subst eF
+  have eτ := gen_eq_of_corr (hL := hL) (h₁ := hC₁) (h₂ := hC₂)
+  subst eτ
+  have ev := value_unique (hL := hL) (h₁ := hV₁) (h₂ := hV₂)
+  exact toΓ_injective _ ev
+
+end Formalism.MainNotions.ModuliIntegralCharts.H1
+
+
+[CNC_SRC_COMPLETE_CHART_ENDPOINT] Actual ChartAt with compatible frames and all section germs
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/ExistsBiextensionChartWithGermsFramedPoint.lean#L26-L56
+    (hG : IsAbelianScheme G) (n : ℕ) :
+    Function.Bijective (ReciprocityTheory.ChartRestriction.G.Out.powObj G n).hom.appTop.hom := by
+  cases n with
+  | zero =>
+    show Function.Bijective (𝟙 S : S ⟶ S).appTop.hom
+    simp only [Scheme.Hom.id_appTop, CommRingCat.hom_id]
+    exact Function.bijective_id
+  | succ n => exact hGF _ _ (AbelianSchemeGerms.isAbelianScheme_powObj G hG n)
+
+set_option maxHeartbeats 1600000 in
+
+theorem exists_chartAt_with_germs : Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)], (∀ a : 𝓞 E, star a = H.bar a) → ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S), ∃ C : ChartAt Xo c y, FrTruncC y C ∧ ∀ (k : ℕ) (F : LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x))), ∃ f, IsGerm y C.d C.x C.B.A.act C.e C.wP k F f := by
+  intro hL E _ _ _ H Dw l Xo c _ hstar S _ _ _ y
+  obtain ⟨d, G, A, uvec, x, -, -, hchG⟩ :=
+    GlobalTheory.ChartData.exists_isChartG_of_basis E H Xo.X Xo.univ.t S y.x (Lt1 Dw) (fun ℓ => y.u ℓ.1 ℓ.2)
+      (fun ℓ => y.tan ℓ.1 ℓ.2) (fun w hw => GlobalTheory.FrameTangent.frame_tangent_basis E H Dw l Xo c S y w hw)
+  have hch := (isChart_iff y d G.F A.act uvec x).2 hchG
+  obtain ⟨e, wP, ph1, ph2, sy, ad, hfr, hpr, htr, hfa, had, hrig⟩ :=
+    GlobalTheory.exists_frames_of_chart E H Xo.X Xo.univ.t S y.x d G A (Lt1 Dw) _ uvec x hchG
+  have hPow := bijective_appTop_powObj hL.globalFns Xo.univ.t.G (GlobalTheory.moduli_univ_polAV E H Dw l Xo).2.2.2.1
+  obtain ⟨hax, hr⟩ := GlobalTheory.FrameBiextId.fbId E H Xo.X Xo.univ.t hPow hstar S y.x d G A (Lt1 Dw) _ uvec x e
+    ph1 ph2 sy ad hchG hfr hfa had
+  obtain ⟨h, hh⟩ := GlobalTheory.canonGauge_exists S d (𝓞 E) S (mkFB G A ph1 ph2 sy ad hax hr)
+  refine ⟨⟨d, mkFB G A ph1 ph2 sy ad hax hr, uvec, x, e, wP, h, hch,
+    (isFrame_iff y d x _ _ _ _ _ _ e).2 hfr, (isPrim_iff wP).2 hpr, hh, hrig⟩, htr, ?_⟩
+  intro k F
+  obtain ⟨f, hf⟩ := germSt_holds E H Xo.X Xo.univ.t S y.x d G.F A.act (Lt1 Dw) _ uvec x ph1 ph2 sy ad e wP
+    hchG hfr hpr htr k F
+  exact ⟨f, (isGerm_iff y d x _ e wP k F f).2 hf⟩
+
+end GlobalTheory.ChartRing
+
+
+[CNC_SRC_NABV_DEFINITION] Original all-integer NabV on every coefficient algebra
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/IsThRule.lean#L20-L28
+abbrev Lt1 (Dw : Datum H) : Type := Σ τ : E →+* ℂ, Fin (Dw.mult τ)
+
+abbrev ptO {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) : Over Xo.X := Over.mk x
+
+abbrev NabV : Type 1 :=
+  ∀ {S : Type} [CommRing S] [Algebra c.F S] (y : FrPt Xo c S) (k : ℤ),
+    LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x)) → (Lt1 Dw →₀ ℕ) → S
+
+section Vt
+
+
+[CNC_SRC_ISNAB_ENDPOINT] Original exists_isNab construction, negative integers zero and every-germ equality
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/ExistsIsNab.lean#L19-L45
+theorem exists_isNab : Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∃ (_ : StarRing (𝓞 E)) (nab : NabV Xo c), IsNab Xo c nab := by
+  intro hL E _ _ _ H Dw l Xo c
+  classical
+  letI : StarRing (𝓞 E) := H.starRing
+  have hs : ∀ a : 𝓞 E, star a = H.bar a := fun _ => rfl
+  have hC := GlobalTheory.T.exists_biextension_chart_with_germs_framed_point hL E H Dw l Xo c hs
+  choose C _hT hg using hC
+  choose g hg using hg
+  let val : ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S) (k : ℤ),
+      LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x)) → (Lt1 Dw →₀ ℕ) → S :=
+    fun S _ _ _ y k => match k with
+      | Int.ofNat k => fun F α =>
+          (C S y).B.nabVal S (C S y).h H.w0 k (g S y k F) (C S y).uvec (MvPolynomial.monomial α 1)
+      | Int.negSucc _ => fun _ _ => 0
+  let nab : NabV Xo c := fun {S} _ _ y k F α =>
+    if h : Nonempty (Algebra ℚ S) then @val S _ _ h.some y k F α else 0
+  refine ⟨inferInstance, nab, hs, ?_⟩
+  intro S _ _ iQ y
+  refine ⟨C S y, fun k F => ⟨_, hg S y k F⟩, ?_⟩
+  intro k F f hf α
+  have hne : Nonempty (Algebra ℚ S) := ⟨iQ⟩
+  have h1 : nab y k F α = @val S _ _ hne.some y k F α := dif_pos hne
+  have h2 : hne.some = iQ := Subsingleton.elim _ _
+  refine h1.trans ?_
+  rw [h2, isGermFun_holds E H Dw l Xo c S y _ _ _ _ _ k F f _ hf (hg S y k F)]
+
+end GlobalTheory.CanonConn
+
+
+[CNC_SRC_UNCONDITIONAL_ISNAB_ENDPOINT] Literal exists_isNab_uncond for every original moduli object
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FormalGroupCharts/ExistsIsNabUncond.lean#L19-L22
+theorem exists_isNab_uncond : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∃ (_ : StarRing (𝓞 E)) (nab : NabV Xo c), IsNab Xo c nab :=
+  GlobalTheory.CanonConn.exists_isNab GlobalTheory.firstFiveLaws.1
+
+end GlobalTheory.CanonConn
+
+
+[CNC_SRC_LATTICE_ROUTE_SOURCE] Original spanning route requiring same connection, geometric charts and short-rule inputs
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/BddMemSpanShortGen.lean#L1-L165
+import Mathlib
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.CuspFormsLeSpanShortThetaSeries
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.UnfoldingConstantTermsAgreeAtGoodEmbeddings
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EmbeddingsDifferOnInteger
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
+open GlobalTheory.SW hiding Level
+open Formalism.L2.Pj Formalism.L2.PjFree
+open scoped ComplexConjugate Classical
+attribute [local instance] Over.cartesianMonoidalCategory
+open GlobalTheory.Dict
+
+namespace GlobalTheory.SupFull
+
+theorem isBddSec_smul {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} {X : Data E r} {la : Wt X.Ψ r}
+    {P : Frame X.Ψ r → ℂ} (t : ℂ) (h : X.IsBddSec la P) : X.IsBddSec la (t • P) := by
+  obtain ⟨⟨h1, h2, h3⟩, C, hC⟩ := h
+  refine ⟨⟨h1.const_smul t, fun x hx b hb => ?_, fun g hg x hx => ?_⟩, ‖t‖ * C, fun x hx => ?_⟩
+  · simp only [Pi.smul_apply, smul_eq_mul, h2 x hx b hb]; ring
+  · simp only [Pi.smul_apply, smul_eq_mul, h3 g hg x hx]; ring
+  · rw [Formalism.L2.PjFree.pnorm_smul]
+    exact mul_le_mul_of_nonneg_left (hC x hx) (norm_nonneg _)
+
+set_option maxHeartbeats 800000 in
+
+theorem bdd_mem_span_shortGen : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2 → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n) (σ : c.F →+* ℂ) (r : ℕ) (U : Formalism.L2.PjFree.Unf Xo c σ r), Formalism.L2.PjFree.GoodEmb c σ → Formalism.L2.PjFree.IsUnf U → 1 ≤ r → l.A = 1 → (∀ k k', (U.X k).Gm = (U.X k').Gm ∧ (U.X k).ξ0 = (U.X k').ξ0) → (∀ k, HasPrinc (U.X k) l.M) → d.IsLev → (∃ _ : StarRing (𝓞 E), IsNab d.Xo₂ d.c₂ d.nab₂) → UnitC d → ¬ 3 ∣ d.pd → (Dw.p + Dw.q ≤ n → ∃ ph ψ x₀, d.PhiPin ph ψ x₀) → ∀ (nab : NabV Xo c) (bad nV : ℕ) (a : (E →+* ℂ) × ℕ → ℕ), 0 < bad → Dom a n → 4 * (Module.finrank ℚ E * r) + 4 ≤ n → (∀ k, ChiOne (U.X k) (Formalism.L2.PjFree.laU U a n k)) → ShortValTot Xo c nab bad nV a n d → ∀ P : Formalism.L2.PjFree.FDSec U.X, (∀ k, (U.X k).IsBddSec (Formalism.L2.PjFree.laU U a n k) (P k)) → (∀ k x, x ∉ (U.X k).dom → P k x = 0) → P ∈ Submodule.span ℂ (Formalism.L2.PjFree.rdU U '' shortGen Xo c nab bad nV a n d) := by
+  intro hci E _ _ _ H Dw l Xo c n d σ r U hσ hU hr1 hA hG hpr hlev hnab huc h3 hpin nab bad nV a hbad hdom hbig
+    hchi htot P hP1 hP0
+  rcases isEmpty_or_nonempty U.Comp with hemp | ⟨⟨k₀⟩⟩
+  · have : P = 0 := funext fun k => (hemp.false k).elim
+    rw [this]
+    exact Submodule.zero_mem _
+  obtain ⟨W⟩ := nonempty_uw hU
+  have hrpq : r = Dw.p + Dw.q := hU.1
+  have hn : r ≤ n := by
+    have := Module.finrank_pos (R := ℚ) (M := E)
+    nlinarith
+  have hev : Even n := by
+    unfold Formalism.L2.Pj.Dom at hdom
+    tauto
+  have huw := GlobalTheory.T.uniformisation_component_lattices_markings E H Dw l Xo c σ r U hσ hU hr1 W
+  have hsame : ∀ k, SameSp (U.X k) (U.X k₀) := fun k =>
+    ⟨Finset.ext fun τ => ((hU.2.1 k).2 τ).trans ((hU.2.1 k₀).2 τ).symm, (hG k k₀).1,
+      (hU.2.1 k).1.trans (hU.2.1 k₀).1.symm, (hG k k₀).2, by rw [(huw k).1, (huw k₀).1, (hG k k₀).2]⟩
+  obtain ⟨ph, ψ, x₀, hph⟩ := hpin (hrpq ▸ hn)
+  obtain ⟨Dc, hDe, -⟩ := GlobalTheory.T.exists_letterRowWeightDictionary E H Dw l c σ r W.g n (U.X k₀) a W.e hσ hrpq (hU.2.1 k₀).1 (hU.2.1 k₀).2
+    (huw k₀).2.1 hdom
+  obtain ⟨D, hD⟩ := GlobalTheory.T.exists_classicalLevelData_coverSelfDual E H Dw l Xo c n d σ r (U.X k₀) hn hrpq (huw k₀).2.1 hlev h3 ph ψ x₀ hph
+  obtain ⟨v₀, mu, hv₀, hmu⟩ := GlobalTheory.SW.exists_vacua_and_multipliers E r (U.X k₀) W.g Dc.bas Dc.idx n Dc.sympl hev D
+  obtain ⟨x0, ga, δ, hadm, hset, hsep⟩ := GlobalTheory.T.exists_components_lattices_moved_to_level_family E H Dw l Xo c n d σ r U hσ hU hr1 hA hlev W k₀ hsame ph D hn hD
+  obtain ⟨u, hu, hread⟩ := GlobalTheory.T.short_series_readings_eq_classical_thetaSeries hci E H Dw l Xo c n d σ r U hσ hU hr1 hlev hnab huc ph ψ x₀ hph W (U.X k₀) a
+    hdom Dc D hn hDe hD v₀ hv₀ x0
+  choose C hC hrd using fun k => hread k (hsame k) (ga k) (δ k) (hset k).1 (hset k).2.1 (hset k).2.2.1
+    (hset k).2.2.2.1 (hset k).2.2.2.2
+  have hmu1 := GlobalTheory.T.vacuum_multiplier_eq_one_on_stabiliser E H Dw l Xo c n d σ r W.g (U.X k₀) Dc.bas Dc.idx D hn ph Dc.sympl hev hD
+    (W.F.Di (W.ik k₀)) (W.emb k₀) (huw k₀).2.2.2.1 (huw k₀).2.2.2.2.1 (huw k₀).2.2.2.2.2.1 (huw k₀).2.2.2.2.2.2
+    v₀ hv₀ mu hmu
+  have hgrp := (GlobalTheory.SW.level_laws E r (U.X k₀) W.g Dc.bas Dc.idx n Dc.sympl hev D hn).2.2.1
+  have hpull := fun k => GlobalTheory.T.isStabiliserInvariant_pull_bounded_section E r (U.X k) (U.X k₀) (hsame k) (ga k) (Formalism.L2.PjFree.laU U a n k)
+    (wtOf (U.X k₀) Dc.hr Dc.k Dc.k' n) D.grp l.M ((C k)⁻¹ • P k) (hset k).1
+    (fun τ i => by
+      rw [Dc.wt_eq]
+      simp only [wtX, Formalism.L2.PjFree.laU, (hsame k).p0])
+    (fun g' hg' => ⟨((hgrp g').1 hg').1, fun hfix => (hmu1 _ (hset k).2.1 g' hg' hfix).2⟩)
+    (hpr k) (hchi k) (isBddSec_smul _ (hP1 k))
+  have hM2 : 0 < d.l₂.M := lt_of_lt_of_le (by norm_num) d.l₂.three_le
+  have hMm : ((2 * bad * d.l₂.M : ℕ) : 𝓞 E) ∈ D.𝔪 := by
+    rw [hD.m, Nat.cast_mul]
+    refine Ideal.mul_mem_left _ _ ?_
+    have h1 : (d.l₂.M : 𝓞 E) ∈ d.l₂.Mb * d.l₂.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := by
+      rw [d.l₂.prod]
+      exact Ideal.mem_span_singleton_self _
+    unfold Mfr
+    exact (Submodule.mem_inf.1 (Ideal.mul_le_inf h1)).2
+  obtain ⟨m, Λ, Pj, hΛ, hQ⟩ := GlobalTheory.T.stableForms_eq_sum_thetaSeries_freeLowerRows E r (U.X k₀) W.g Dw.p Dc.hr Dc.bas Dc.idx n Dc.sympl hev hbig D hn
+    (2 * bad * d.l₂.M) (Mfr l) (Jd d) (by positivity) hMm hD.prod hD.cop v₀ hv₀ mu hmu Dc.k Dc.k' U.Comp
+    (fun k => mapL (ga k) (U.X k).Λ) _ (fun k => (hset k).2.1) hsep
+    (fun k g' hg' hfix => (hmu1 _ (hset k).2.1 g' hg' hfix).1) (fun k => (hpull k).1)
+  have hgl := fun j => GlobalTheory.Dict.GenLatCmp.genLat_vset E n (Λ j)
+  have hg1 := fun j => (hgl j).1 bad d.l₂.M hbad d.l₂.odd (hΛ j).1
+  choose N hN using fun j => (hg1 j).2.2.2
+  have hV : ∀ j, Λ j ∈ Vset E n d.l₂.M := fun j => (hgl j).2.2.1 _ _ (Dvd.intro_left _ rfl) (hΛ j).1
+  choose mj t R hR hPj using fun j => GlobalTheory.T.harmonicRowHighest_eq_span_integral_harmonic E H Dw l c σ r W.g Dw.p n (U.X k₀) a Dc (Λ j) (N j)
+    (hN j).1.pos ((hN j).2.2.trans inf_le_left) (Pj j) (hΛ j).2
+  choose f hf hfr using fun j i => (htot ⟨Λ j⟩ (N j) x0 (R j i) (hg1 j).1 (hg1 j).2.1 (hg1 j).2.2.1 (hN j)
+    (hadm _) (hR j i)).2
+  have hPe : P = ∑ j, ∑ i, (t j i * (u (Λ j) (N j))⁻¹) • Formalism.L2.PjFree.rdU U (f j i) := by
+    funext k x
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+    by_cases hx : x ∈ (U.X k).dom
+    · obtain ⟨hx1, hx2, -⟩ := ((hpull k).2 0 (differentiableOn_const 0) (by simp)).2 x hx
+      have e1 := hQ k _ hx1
+      rw [hx2, Pi.smul_apply, smul_eq_mul, inv_mul_eq_iff_eq_mul₀ (hC k)] at e1
+      rw [e1, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [hPj j, theta_sum_smul, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [hrd k (Λ j) (hV j) (N j) (hN j) (R j i) (hR j i).1 (f j i) (hf j i) (hfr j i) x hx]
+      have := hu (Λ j) (hV j) (N j) (hN j)
+      field_simp
+    · rw [hP0 k x hx]
+      refine (Finset.sum_eq_zero fun j _ => Finset.sum_eq_zero fun i _ => ?_).symm
+      have : Formalism.L2.PjFree.rdU U (f j i) k x = 0 := dif_neg hx
+      rw [this, mul_zero]
+  rw [hPe]
+  refine Submodule.sum_mem _ fun j _ => Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ ?_
+  exact Submodule.subset_span ⟨f j i, ⟨hf j i, ⟨Λ j⟩, N j, x0, R j i, (hg1 j).1, (hg1 j).2.1, (hg1 j).2.2.1, hN j,
+    hadm _, hR j i, hfr j i⟩, rfl⟩
+
+set_option maxHeartbeats 1000000 in
+
+theorem exists_datum_span : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (σ : c.F →+* ℂ) (U : Formalism.L2.PjFree.Unf Xo c σ r), 1 ≤ r → l.A = 1 → Formalism.L2.PjFree.GoodEmb c σ → Formalism.L2.PjFree.IsUnf U → (∀ k k', (U.X k).Gm = (U.X k').Gm ∧ (U.X k).ξ0 = (U.X k').ξ0) → (∀ k, HasPrinc (U.X k) l.M) → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), Dom a n → 4 * (Module.finrank ℚ E * r) + 4 ≤ n → (∀ k, ChiOne (U.X k) (Formalism.L2.PjFree.laU U a n k)) → ∃ (d : DeltaDat Xo c n) (nab : NabV Xo c), d.IsLev ∧ (∃ _ : StarRing (𝓞 E), IsNab d.Xo₂ d.c₂ d.nab₂) ∧ (∀ (k : Type) [Field k] [Algebra d.c₂.F k] (y₂ : FrPt d.Xo₂ d.c₂ k), evR d.Xo₂ d.c₂ d.cδ y₂ ^ 1 = 1) ∧ d.l₂ = l ∧ (∃ ph ψ x₀, d.PhiPin ph ψ x₀) ∧ ∀ f ∈ sec Xo c a n, (∀ k, (U.X k).IsBddSec (Formalism.L2.PjFree.laU U a n k) (Formalism.L2.PjFree.rdU U f k)) → f ∈ Submodule.span c.F (shortGen Xo c nab 1 0 a n d) := by
+  intro E _ _ _ H Dw l Xo c r σ U hr hA hσ hU hG hP a n hdom hn hχ
+  have hC : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2 := GlobalTheory.ChartFree.chartIndep
+  have hrk : r = Dw.p + Dw.q := hU.1
+  have h1 : 1 ≤ Dw.p + Dw.q := hrk ▸ hr
+  have hL : Out.Laws := GlobalTheory.firstFiveLaws.1
+  have hB : Out.SecBaseChangeSt := hL.secBaseChange
+  have hnr : Dw.p + Dw.q ≤ n := by
+    have h0 : 0 < Module.finrank ℚ E := Module.finrank_pos
+    have : r ≤ Module.finrank ℚ E * r := Nat.le_mul_of_pos_left r h0
+    omega
+  have hd : ∃ d : DeltaDat Xo c n, d.IsLev ∧ (∃ _ : StarRing (𝓞 E), IsNab d.Xo₂ d.c₂ d.nab₂) ∧ d.cδ = 1 ∧
+      d.pd = 1 ∧ d.l₂ = l ∧ ∃ ph x₀, d.PhiPin ph 1 x₀ := by
+    obtain ⟨d, e1, -, e2, -, -, hδ, hlev, hnab⟩ :=
+      GlobalTheory.LevelCover.exists_deltaDat_isLev E H Dw l Xo c h1 n 1 ⊤ l Xo c rfl
+        ⟨dvd_rfl, le_rfl, dvd_rfl⟩ (Nat.mul_one _).symm (Nat.coprime_one_left _) (Ideal.mul_top _).symm
+        (top_sup_eq _)
+    obtain ⟨f, ph, x₀, hpin⟩ := GlobalTheory.exists_phiPin_of_character E H Dw l Xo c n d hlev hnr 1
+    exact ⟨{ d with φδ := f }, hlev, hnab, hδ, e1, e2, ph, x₀, hpin⟩
+  obtain ⟨d, hlev, hnab, hδ, hpe, hle, ph, x₀, hpin⟩ := hd
+  have hAe : d.l₂.A = l.A := congrArg (·.A) hle
+  have hT : AllTest d.Xo₂ d.c₂ := GlobalTheory.Frames.allTest_of_secBaseChange hB E H Dw d.l₂ d.Xo₂ d.c₂
+  obtain ⟨_, nab, -⟩ := GlobalTheory.CanonConn.exists_isNab hL E H Dw l Xo c
+  have hunit : UnitC d := fun A y => by
+    have : evR d.Xo₂ d.c₂ d.cδ y = 1 := by
+      rw [hδ]
+      exact evalAt_one _ _ _ (hT _ _)
+    rw [this, norm_one]
+  have h3 : ¬ 3 ∣ d.pd := by rw [hpe]; decide
+  have htie : d.PsiTie 1 := by
+    intro k g ρ _ _ _ _ K _ _ _ y y' _
+    have h : ∀ z : FrPt d.Xo₂ d.c₂ K, evR d.Xo₂ d.c₂ d.cδ z = 1 := fun z => by
+      rw [hδ]
+      exact evalAt_one _ _ _ (hT _ _)
+    change evR d.Xo₂ d.c₂ d.cδ y' =
+      algebraMap d.c₂.F K (d.eF ((1 : c.Fˣ) : c.F)) * evR d.Xo₂ d.c₂ d.cδ y
+    rw [h y, h y']
+    simp
+  have htot : ShortValTot Xo c nab 1 0 a n d :=
+    GlobalTheory.shortValTot_of_pinned hL hC E H Dw l Xo c n d (GlobalTheory.levelMaps_closed hL E H Dw h1)
+      (GlobalTheory.Frames.algebraic_laws hB E H Dw l Xo c).2.2.1 (GlobalTheory.Frames.allTest_of_secBaseChange hB E H Dw l Xo c)
+      (GlobalTheory.Frames.algebraic_laws hB E H Dw _ _ _).2.2.1 hT hlev hAe hnab (fun _ => ⟨ph, 1, x₀, hpin, htie⟩)
+      nab 1 0 a
+  refine ⟨d, nab, hlev, hnab, fun k _ _ y => ?_, hle, ⟨ph, 1, x₀, hpin⟩, fun f hf hb => ?_⟩
+  · rw [pow_one, hδ]
+    exact evalAt_one _ _ _ (hT _ _)
+  · exact mem_span_of_map_mem_span_image (Formalism.L2.PjFree.rdU U) (sec Xo c a n)
+      (GlobalTheory.reading_linearIndependent_and_injective hB E H Dw l Xo c σ r U hU a n).1 _ (fun g hg => hg.1) hf
+      (bdd_mem_span_shortGen hC E H Dw l Xo c n d σ r U hσ hU hr hA hG hP hlev hnab hunit h3
+        (fun _ => ⟨ph, 1, x₀, hpin⟩) nab 1 0 a Nat.one_pos hdom hn hχ htot _ hb fun k x hx => dif_neg hx)
+
+end GlobalTheory.SupFull
+
+
+[CNC_SRC_LITERAL_LATTICE_ENDPOINTS] Actual all-row LatFull and both Boolean MLat endpoints; no whole closure inferred
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/IntegralCuspFormsFullLattice.lean#L11-L54
+
+theorem nV_pos (D : D7) : 0 < D.R.nV := by
+  have := D.R.three_m_lt_t
+  rw [Ranks.nV]
+  omega
+
+theorem fullLat {D : D7} (T : Core D) (hT : LawsM T) {j : ℕ} (hj : InR D j) (w : WeightFamilies.Wt D j) (hn : 0 < w.n) :
+    FullLat (T.cuspA j (wtA w) w.n) (valSet (T.Q.Xo j) T.Q.c (algCls (T.Q.Xo j) T.Q.c)) fun la => isVal_valSet la :=
+  (GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.supIn_full_iff _ _ _).1
+    (GlobalTheory.SupFull.fullAt_of_pins D T hT.pins j hj (hT.unf j hj _ T.good_σ₀) w hn)
+
+theorem integralCuspFormsFullLattice : GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.IntegralCuspFormsFullLattice := fun D hK hn T hT j hj => by
+  have h := GlobalTheory.SupFull.fullAt_of_pins D T hT.pins j hj (hT.unf j hj _ T.good_σ₀) (DIV.Cons.kaWt D hK hn j)
+    (by rw [DIV.Cons.kaWt_n]; exact nV_pos D)
+  have h' : GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.SupLatticeFullAt T j (GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.kappaExp D hK hn j) (DIV.Cons.kaWt D hK hn j).n := h
+  rwa [DIV.Cons.kaWt_n] at h'
+
+theorem mLat : GlobalTheory.IndefiniteRowSideFullHecke.GoodBasisCentralIdempotents.MLat :=
+  GlobalTheory.GoodLat.Road.mLat_of_fullLattice integralCuspFormsFullLattice
+
+section Real
+
+open Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links
+
+attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
+variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
+
+theorem latFull (T : CoreJ D) (hT : LawsJ T) {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)} (hκ : KapIs κ) :
+    LatFull T κ := fun i =>
+  fullLat T.toCore hT.toLawsM (inR i) (κ i) (by rw [(hκ i (D.eTau.symm 1)).2.2]; exact nV_pos D)
+
+variable {T : CoreJ D} [Algebra T.Q.c.F D.what₂.LL] {R : RealDat D A T.Q.c.F}
+  {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)} {v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec}
+
+theorem mkFull_of_tie (t : FWTie T R κ v₀) (i : Fin D.R.m) : (R.FW i).MKFull :=
+  GlobalTheory.GoodLat.mkFull_of_tie t (latFull T t.laws t.kap) i
+
+theorem mLat_of_tie (t : FWTie T R κ v₀) (F : Face D A) (b : Bool) : (R.toCx F).MLat b :=
+  GlobalTheory.GoodLat.mLat_of_tie t (latFull T t.laws t.kap) F b
+
+end Real
+
+end GlobalTheory.GoodLat.Obj

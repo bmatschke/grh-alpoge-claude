@@ -1,0 +1,2742 @@
+[HUF_SRC_HOST_DATUM] Original Host and integral projective Datum, positivity and exact trace identities
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L14-L49
+structure Host (E : Type) [Field E] [NumberField E] [IsCMField E] where
+  d : ℕ
+  d_mod : d % 16 = 7
+  d_prime : d.Prime
+  rt : 𝓞 E
+  rt_sq : rt ^ 2 = -(d : 𝓞 E)
+  w0 : 𝓞 E
+  two_weight_eq_one_add_root : 2 * w0 = 1 + rt
+  bar : 𝓞 E ≃+* 𝓞 E
+  bar_eq : ∀ a : 𝓞 E, ((bar a : 𝓞 E) : E) = IsCMField.complexConj E (a : E)
+  unram : Algebra.Unramified (𝓞 (maximalRealSubfield E)) (𝓞 E)
+  rt0 : ℂ
+  sqrt_neg_disc_sq : rt0 ^ 2 = -(d : ℂ)
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E]
+
+structure Datum (H : Host E) where
+  La : Type
+  [acg : AddCommGroup La]
+  [mod : Module (𝓞 E) La]
+  fin : Module.Finite (𝓞 E) La
+  proj : Module.Projective (𝓞 E) La
+  EF : LinearMap.BilinForm ℤ La
+  alt : ∀ x, EF x x = 0
+  unimod : Function.Bijective EF
+  adj : ∀ (a : 𝓞 E) x y, EF (a • x) y = EF x (H.bar a • y)
+  p : ℕ
+  q : ℕ
+  rank : Module.finrank (𝓞 E) La = p + q
+  dom : ∃ J : ℝ ⊗[ℤ] La →ₗ[ℝ] ℝ ⊗[ℤ] La, (∀ x, J (J x) = -x) ∧
+    (∀ x y, EF.baseChange ℝ (J x) (J y) = EF.baseChange ℝ x y) ∧
+    (∀ x, x ≠ 0 → 0 < EF.baseChange ℝ (J x) x) ∧
+    ∀ (a : 𝓞 E) (A : ℝ ⊗[ℤ] La →ₗ[ℝ] ℝ ⊗[ℤ] La) (t : ℂ), (∀ x : La, A (1 ⊗ₜ x) = 1 ⊗ₜ (a • x)) →
+      t = ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
+        ((p : ℂ) * τ (a : E) + (q : ℂ) * starRingEnd ℂ (τ (a : E))) →
+      J ∘ₗ A = A ∘ₗ J ∧ LinearMap.trace ℝ _ A = 2 * t.re ∧ LinearMap.trace ℝ _ (J ∘ₗ A) = -2 * t.im
+
+
+[HUF_SRC_LEVEL] Original odd M>=3, half-ideal product/coprimality, A>0 and N=lcm(M,A)
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L53-L66
+structure Level (H : Host E) where
+  M : ℕ
+  three_le : 3 ≤ M
+  odd : Odd M
+  Mb : Ideal (𝓞 E)
+  fromK : Mb = Ideal.span {a | a ∈ Mb ∧ a ∈ Algebra.adjoin ℤ {H.w0}}
+  prod : Mb * Mb.map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {(M : 𝓞 E)}
+  coprime : Mb ⊔ Mb.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤
+  A : ℕ
+  A_pos : 0 < A
+
+def Level.M' {H : Host E} (l : Level H) : ℕ := Nat.lcm l.M l.A
+
+def Level.Dvd {H : Host E} (l l₂ : Level H) : Prop := l.M ∣ l₂.M ∧ l₂.Mb ≤ l.Mb ∧ l.A ∣ l₂.A
+
+
+[HUF_SRC_SAB] Actual universal group, rigidified/cubical/symmetric line, adjoint and primitive identities
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L72-L82
+structure SAB (H : Host E) (S : Scheme.{0}) where
+  G : Over S
+  [grp : GrpObj G]
+  [comm : IsCommMonObj G]
+  semi : IsSemiAbelian G
+  act : OAct (𝓞 E) G
+  PP : RigLB G
+  cub : CubicalStr G PP
+  sym : PP.IsSymmetric
+  adj : ∀ a, LBIso (cubeLB G ![fst G G ≫ act.act a, snd G G] PP.L) (cubeLB G ![fst G G, snd G G ≫ act.act (H.bar a)] PP.L)
+  prim : LBIso PP.L (cubeLB G ![𝟙 G, act.act H.w0] PP.L)
+
+
+[HUF_SRC_LIE] Original dual-number Lie eigenspaces and determinant multiplicities
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L105-L120
+def epsScale (c : k) : DualNumber k →+* DualNumber k :=
+  (TrivSqZeroExt.map (c • (LinearMap.id : k →ₗ[k] k))).toRingHom
+
+def IsLieEigen {O : Type} [CommRing O] {G : Over S} [GrpObj G] (act : OAct O G) (t : Sp k ⟶ S) (τ : O →+* k)
+    (v : epsPt t ⟶ G) : Prop :=
+  spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ v.left = (1 : Over.mk t ⟶ G).left ∧
+    ∀ a, (v ≫ act.act a).left = spMap (epsScale (τ a)) ≫ v.left
+
+def LieMult {O : Type} [CommRing O] {G : Over S} [GrpObj G] (act : OAct O G) (t : Sp k ⟶ S) (τ : O →+* k)
+    (n : ℕ) : Prop :=
+  ∃ v : Fin n → (epsPt t ⟶ G), (∀ i, IsLieEigen act t τ (v i)) ∧ ∀ w, IsLieEigen act t τ w →
+    ∃! c : Fin n → k, ∃ u : Fin n → (epsPt t ⟶ G),
+      (∀ i, (u i).left = spMap (epsScale (c i)) ≫ (v i).left) ∧ w = (List.ofFn u).prod
+
+def DetCond {H : Host E} (D : Datum H) {G : Over S} [GrpObj G] (act : OAct (𝓞 E) G) (t : Sp k ⟶ S) (ρ : k) : Prop :=
+  ∀ τ : 𝓞 E →+* k, (τ H.rt = ρ → LieMult act t τ D.p) ∧ (τ H.rt ≠ ρ → LieMult act t τ D.q)
+
+
+[HUF_SRC_TATE_OBJ] All original TateIso and Obj fields, geometric marking, fixed root at A
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L132-L168
+    (e : ℕ → Q → Q → kˣ → Prop) where
+  ζ : ℕ → kˣ
+  ζ_prim : ∀ n, 0 < n → IsPrimitiveRoot (ζ n) n
+  ζ_pow : ∀ n m, 0 < n → 0 < m → ζ (n * m) ^ m = ζ n
+  ev : ℕ → D.La → Q
+  add : ∀ n a b, ev n (a + b) = ev n a * ev n b
+  lin : ∀ n (c : 𝓞 E) a, ev n (c • a) = act c (ev n a)
+  ker : ∀ n, 0 < n → ∀ a, ev n a = 1 ↔ ∃ b, a = n • b
+  onto : ∀ n, 0 < n → ∀ x, x ^ n = 1 ↔ ∃ a, ev n a = x
+  tower : ∀ n m, 0 < n → 0 < m → ∀ a, ev (n * m) a ^ m = ev n a
+  isom : ∀ n, 0 < n → ∀ a b, e n (ev n a) (ev n b) (ζ n ^ D.EF a b)
+
+structure Obj {H : Host E} (D : Datum H) (l : Level H) {B : Type} [CommRing B] (b : Base l B) (s : S ⟶ Sp B) where
+  t : SAB H S
+  proper : IsProper t.G.hom
+  ample : Out.RelAmple t.G t.PP.L
+  ktriv : Out.KTriv t.G t.PP.L
+  eta : D.La → (𝟙_ (Over S) ⟶ t.G)
+  eta_add : ∀ a c, eta (a + c) = eta a * eta c
+  eta_ker : ∀ a ∈ l.Mb • (⊤ : Submodule (𝓞 E) D.La), eta a = 1
+  etaA : D.La → (𝟙_ (Over S) ⟶ t.G)
+  etaA_add : ∀ a c, etaA (a + c) = etaA a * etaA c
+  etaA_ker : ∀ a, etaA (l.A • a) = 1
+  geom : ∀ (k : Type) [Field k] [IsAlgClosed k] (x : Sp k ⟶ S) (β : B →+* k), x ≫ s = spMap β →
+    DetCond D t.act x (β b.ρ) ∧
+    ∃ I : TateIso D k (Over.mk x ⟶ t.G) (fun a g => g ≫ t.act.act a)
+        (fun n g g' c => Out.WeilIs t.G t.PP.L n g g' (unitOn c)),
+      (I.ζ l.A : k) = β b.ζ ∧ (∀ a, toUnit _ ≫ etaA a = I.ev l.A a) ∧
+      ∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ eta a = I.ev l.M a
+
+structure ObjMap {H : Host E} {D : Datum H} {l : Level H} {B B' : Type} [CommRing B] [CommRing B'] {b : Base l B}
+    {b' : Base l B'} {S' : Scheme.{0}} {s' : S' ⟶ Sp B'} {s : S ⟶ Sp B} (o' : Obj D l b' s') (o : Obj D l b s)
+    (f : S' ⟶ S) extends SABMap o'.t o.t f where
+  eta : ∀ a, (o'.eta a).left ≫ cm.F = f ≫ (o.eta a).left
+  etaA : ∀ a, (o'.etaA a).left ≫ cm.F = f ≫ (o.etaA a).left
+
+end ReciprocityTheory.ChartRestriction.G.Geo.Tor
+
+
+[HUF_SRC_MODULI] Original base field, dimension, supplied representing Moduli record and coefficient field
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/PushInvertible.lean#L12-L44
+def zeta (n : ℕ) : ℂ := Complex.exp (2 * Real.pi * Complex.I / n)
+
+def KA (l : Level H) : IntermediateField ℚ ℂ := IntermediateField.adjoin ℚ {H.rt0, zeta l.A}
+
+def baseKA (l : Level H) : Base l (KA l) where
+  unit n hn := IsUnit.mk0 _ (Nat.cast_ne_zero.mpr hn.ne')
+  ρ := ⟨H.rt0, IntermediateField.subset_adjoin _ _ (by simp)⟩
+  ρ_sq := Subtype.ext (by simpa using H.sqrt_neg_disc_sq)
+  ζ := ⟨zeta l.A, IntermediateField.subset_adjoin _ _ (by simp)⟩
+  ζ_prim := IsPrimitiveRoot.of_map_of_injective (f := (KA l).val.toRingHom)
+    (Complex.isPrimitiveRoot_exp l.A l.A_pos.ne') Subtype.val_injective
+
+def Datum.dim (D : Datum H) : ℕ := Module.finrank ℚ E / 2 * D.p * D.q
+
+def constPt {k : Type} [Field k] {X : Scheme.{0}} (x : Sp (DualNumber k) ⟶ X) : Sp (DualNumber k) ⟶ X :=
+  spMap (algebraMap k (DualNumber k)) ≫ spMap (TrivSqZeroExt.fstHom k k k).toRingHom ≫ x
+
+structure Moduli (D : Datum H) (l : Level H) where
+  X : Scheme.{0}
+  s : X ⟶ Sp (KA l)
+  qproj : IsQProjOver s
+  smooth : SmoothOfRelativeDimension D.dim s
+  univ : Obj D l (baseKA l) s
+  rep : ∀ (S : Scheme.{0}) (s' : S ⟶ Sp (KA l)), IsReduced S → ∀ o : Obj D l (baseKA l) s',
+    ∃! f : S ⟶ X, f ≫ s = s' ∧ Nonempty (ObjMap o univ f)
+  unram : ∀ (k : Type) [Field k] (x : Sp (DualNumber k) ⟶ X) (o : Obj D l (baseKA l) (x ≫ s)),
+    Nonempty (ObjMap o univ x) → Nonempty (ObjMap o univ (constPt x)) → x = constPt x
+
+structure Coeff (l : Level H) where
+  F : IntermediateField ℚ ℂ
+  fin : FiniteDimensional ℚ F
+  conj : ∀ (τ : E →+* ℂ) (a : E), τ a ∈ F
+  zeta_mem : zeta l.M' ∈ F
+
+
+[HUF_SRC_PERIOD] Exact ordered IsTypeFn, IsPeriod, IsHolTo and IsHolPeriods
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/IsHolPeriods.lean#L13-L28
+def IsTypeFn (H : Host E) (p q : ℕ) {g : ℕ} (ty : Fin g → (E →+* ℂ)) : Prop :=
+  ∀ τ : E →+* ℂ, (τ (H.rt : E) = H.rt0 → Nat.card {i // ty i = τ} = p) ∧ (τ (H.rt : E) ≠ H.rt0 → Nat.card {i // ty i = τ} = q)
+
+def IsPeriod (D : Datum H) {g : ℕ} (ty : Fin g → (E →+* ℂ)) (P : D.La →+ (Fin g → ℂ)) : Prop :=
+  (∀ (a : 𝓞 E) x i, P (a • x) i = ty i (a : E) * P x i) ∧ Function.Injective P ∧ DiscreteTopology P.range ∧
+    Submodule.span ℝ (Set.range P) = ⊤ ∧
+    ∃ Hm : Matrix (Fin g) (Fin g) ℂ, Hm.IsHermitian ∧ (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) ∧
+      ∀ x y, (hermForm Hm (P x) (P y)).im = D.EF x y
+
+def IsHolTo {V : Type} [NormedAddCommGroup V] [NormedSpace ℂ V] {X : Scheme.{0}} (B : Set V) (y : V → (Sp ℂ ⟶ X)) : Prop :=
+  ∀ (U : X.Opens) (f : Γ(X, U)), IsOpen {b ∈ B | ⊤ ≤ y b ⁻¹ᵁ U} ∧
+    DifferentiableOn ℂ (fun b => valAt' (y b) U f) {b ∈ B | ⊤ ≤ y b ⁻¹ᵁ U}
+
+def IsHolPeriods (D : Datum H) {g m : ℕ} (ty : Fin g → (E →+* ℂ)) (B : Set (Fin m → ℂ))
+    (P : (Fin m → ℂ) → (D.La →+ (Fin g → ℂ))) : Prop :=
+  (∀ b ∈ B, IsPeriod D ty (P b)) ∧ ∀ x, DifferentiableOn ℂ (fun b => P b x) B
+
+
+[HUF_SRC_DERIVATIVE] The original every-open/every-function dual-number derivative predicate
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/IsHolPeriods.lean#L30-L35
+def IsDerivAt0 {g : ℕ} {X : Scheme.{0}} (e : (Fin g → ℂ) → (Sp ℂ ⟶ X)) (w : Fin g → ℂ) (v : Sp (DualNumber ℂ) ⟶ X) : Prop :=
+  spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v = e 0 ∧
+    ∀ (U : X.Opens) (h : ⊤ ≤ v ⁻¹ᵁ U) (f : Γ(X, U)),
+      TrivSqZeroExt.snd (show DualNumber ℂ from
+        (Scheme.ΓSpecIso (CommRingCat.of (DualNumber ℂ))).hom.hom ((v.appLE U ⊤ h).hom f)) =
+        fderiv ℂ (fun z => valAt' (e z) U f) 0 w
+
+
+[HUF_SRC_THETA_FRAME] Every IsThetaFrame field, transition orientation, rigidification, and per-fiber algebraic section
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/IsHolPeriods.lean#L37-L49
+def IsThetaFrame {g m : ℕ} {S : Scheme.{0}} {G : Over S} [GrpObj G] (L : RigLB G) (B : Set (Fin m → ℂ))
+    (y : (Fin m → ℂ) → (Sp ℂ ⟶ S)) (e : (Fin m → ℂ) → (Fin g → ℂ) → (Sp ℂ ⟶ G.left))
+    (θ : (Fin m → ℂ) → (Fin g → ℂ) → ℂ) : Prop :=
+  ∃ fr : L.L.ι → (Fin m → ℂ) × (Fin g → ℂ) → ℂ,
+    (∀ j, DifferentiableOn ℂ (fr j) {bz | bz.1 ∈ B ∧ ⊤ ≤ e bz.1 bz.2 ⁻¹ᵁ L.L.U j}) ∧
+    (∀ j b z, b ∈ B → ⊤ ≤ e b z ⁻¹ᵁ L.L.U j → fr j (b, z) ≠ 0) ∧
+    (∀ j j' b z, b ∈ B → ⊤ ≤ e b z ⁻¹ᵁ (L.L.U j ⊓ L.L.U j') →
+      fr j (b, z) = valAt' (e b z) (L.L.U j ⊓ L.L.U j') (L.L.g j j').val * fr j' (b, z)) ∧
+    (∀ j b, b ∈ B → ⊤ ≤ e b 0 ⁻¹ᵁ L.L.U j →
+      fr j (b, 0) = valAt' (y b) ((L.L.pull (eSec G)).U (fun _ => j)) (L.rig.s (fun _ => j)).val) ∧
+    ∀ b ∈ B, ∃ s : (L.L.pull (pullback.fst G.hom (y b))).Sec, ∀ j z (x : Sp ℂ ⟶ pullback G.hom (y b)),
+      x ≫ pullback.fst _ _ = e b z → x ≫ pullback.snd _ _ = 𝟙 _ → ⊤ ≤ e b z ⁻¹ᵁ L.L.U j →
+      valAt' x ((L.L.pull (pullback.fst G.hom (y b))).U (fun _ => j)) (s.f (fun _ => j)) = θ b z * fr j (b, z)
+
+
+[HUF_SRC_FAMILY] All literal FamilyUnif fields including total u/ex, finite disjoint family, holomorphy, theta and local lift
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/IsHolPeriods.lean#L51-L109
+structure FamilyUnif {D : Datum H} {l : Level H} (Xo : Moduli D l) (σ : KA l →+* ℂ) {g : ℕ}
+    (ty : Fin g → (E →+* ℂ)) where
+  n : ℕ
+  n_pos : 0 < n
+  Di : Fin n → Datum H
+  sig : ∀ i, (Di i).p = D.p ∧ (Di i).q = D.q
+
+  t : ∀ i, D.La →ₗ[𝓞 E] (Di i).La
+  t_inj : ∀ i a, (∃ b, t i a = l.M' • b) ↔ ∃ b, a = l.M' • b
+  t_surj : ∀ i b, ∃ a e, b = t i a + l.M' • e
+  u : ∀ i, ((Di i).La →+ (Fin g → ℂ)) → (Sp ℂ ⟶ Xo.X)
+  ex : ∀ i P, (Fin g → ℂ) → (Over.mk (u i P) ⟶ Xo.univ.t.G)
+  over_σ : ∀ i P, IsPeriod (Di i) ty P → u i P ≫ Xo.s = spMap σ
+  ex_add : ∀ i P, IsPeriod (Di i) ty P → ∀ z w, ex i P (z + w) = ex i P z * ex i P w
+  ex_onto : ∀ i P, IsPeriod (Di i) ty P → Function.Surjective (ex i P)
+  ex_ker : ∀ i P, IsPeriod (Di i) ty P → ∀ z, ex i P z = 1 ↔ z ∈ P.range
+  ex_lin : ∀ i P, IsPeriod (Di i) ty P → ∀ (a : 𝓞 E) z,
+    ex i P (fun k => ty k (a : E) * z k) = ex i P z ≫ Xo.univ.t.act.act a
+  ex_weil : ∀ i P, IsPeriod (Di i) ty P → ∀ (k : ℕ) (a b : (Di i).La) (c : ℂˣ), 0 < k →
+    (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * ((Di i).EF a b : ℂ) / k) →
+    Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (ex i P ((k : ℂ)⁻¹ • P a)) (ex i P ((k : ℂ)⁻¹ • P b)) (unitOn c)
+  ex_eta : ∀ i P, IsPeriod (Di i) ty P →
+    ∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La),
+      toUnit _ ≫ Xo.univ.eta a = ex i P ((l.M : ℂ)⁻¹ • P (t i a))
+  ex_etaA : ∀ i P, IsPeriod (Di i) ty P → ∀ a, toUnit _ ≫ Xo.univ.etaA a = ex i P ((l.A : ℂ)⁻¹ • P (t i a))
+  onto : ∀ y : Sp ℂ ⟶ Xo.X, y ≫ Xo.s = spMap σ → ∃ i P, IsPeriod (Di i) ty P ∧ u i P = y
+  disj : ∀ i j P P', IsPeriod (Di i) ty P → IsPeriod (Di j) ty P' → u i P = u j P' → i = j
+  fibre : ∀ i P P', IsPeriod (Di i) ty P → IsPeriod (Di i) ty P' → (u i P = u i P' ↔
+    ∃ (gam : (Di i).La ≃ₗ[𝓞 E] (Di i).La) (h : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ)),
+      (∀ a b, (Di i).EF (gam a) (gam b) = (Di i).EF a b) ∧
+      (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) (Di i).La), ∃ e, gam a = a + l.M • e) ∧
+      (∀ a, ∃ e, gam a = a + l.A • e) ∧ ∀ a, P' (gam a) = h (P a))
+
+  hol : ∀ i (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → ((Di i).La →+ (Fin g → ℂ))), IsOpen B →
+    IsHolPeriods (Di i) ty B P →
+    IsHolTo B (fun b => u i (P b)) ∧
+      IsHolTo (B ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (ex i (P bz.1) bz.2).left)
+
+  ex_diff : ∀ i P, IsPeriod (Di i) ty P →
+    (∀ w, ∃! v : epsPt (u i P) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (ex i P z).left) w v.left) ∧
+    ∀ v : epsPt (u i P) ⟶ Xo.univ.t.G,
+      spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (ex i P 0).left →
+      ∃! w, IsDerivAt0 (fun z => (ex i P z).left) w v.left
+
+  theta : ∀ i (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → ((Di i).La →+ (Fin g → ℂ)))
+    (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] (Di i).La) (sgn : ℤˣ) (h τ : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ),
+    IsOpen B → IsPreconnected B → IsHolPeriods (Di i) ty B P →
+    (∀ a b, (Di i).EF (bas a) (bas b) = sgn * omegaStd a b) →
+    (∀ b ∈ B, ((τ b).map Complex.im).PosDef ∧ ∀ k,
+      (h b).mulVec (P b (bas (Pi.single (.inl k) 1))) = Pi.single k 1 ∧
+      (h b).mulVec (P b (bas (Pi.single (.inr k) 1))) = (τ b).mulVec (Pi.single k 1)) →
+    ∃ c₁ c₂ : Fin g → ℂ, (∀ k, c₁ k = 0 ∨ c₁ k = 1 / 2) ∧ (∀ k, c₂ k = 0 ∨ c₂ k = 1 / 2) ∧
+      IsThetaFrame Xo.univ.t.PP B (fun b => u i (P b)) (fun b z => (ex i (P b) z).left)
+        (fun b z => thetaChar (τ b) c₁ c₂ ((h b).mulVec z))
+
+  lift : ∀ (m : ℕ) (B : Set (Fin m → ℂ)) (y : (Fin m → ℂ) → (Sp ℂ ⟶ Xo.X)), IsOpen B →
+    (∀ b ∈ B, y b ≫ Xo.s = spMap σ) → IsHolTo B y → ∀ b₀ ∈ B,
+    ∃ (B' : Set (Fin m → ℂ)) (i : Fin n) (P : (Fin m → ℂ) → ((Di i).La →+ (Fin g → ℂ))),
+      IsOpen B' ∧ b₀ ∈ B' ∧ B' ⊆ B ∧ IsHolPeriods (Di i) ty B' P ∧ ∀ b ∈ B', u i (P b) = y b
+
+
+[HUF_SRC_N1C] Whole original N1c quantifiers and conclusion
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/IsHolPeriods.lean#L111-L116
+def N1c : Prop :=
+  ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l)
+    (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 →
+    IsTypeFn H D.p D.q ty → Nonempty (FamilyUnif Xo σ ty)
+
+end ReciprocityTheory.ChartRestriction.G.Geo.Tor
+
+
+[HUF_SRC_RELAMPLE_KTRIV] Original relative-ampleness presentation and every-coefficient-ring KTriv
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ExtensionDescent/NonzeroLocus.lean#L28-L60
+  LB.LinComb L (K := Fin N) (fun _ => (A.hom ⁻¹ᵁ U).ι) (fun _ => 1)
+
+def nonzeroLocus {Y : Scheme.{0}} {M : LB Y} (s : LB.Sec M) : Y.Opens :=
+  ⨆ k, Y.basicOpen (s.f k)
+
+def RelAmple (L : LB A.left) : Prop :=
+  ∀ U : S.Opens, IsAffineOpen U →
+    ∃ N : ℕ, 1 ≤ N ∧ ∃ M : ℕ, ∃ s : Fin (M + 1) → LB.Sec (powOver A L U N),
+      (⨆ i, nonzeroLocus (s i) = ⊤) ∧
+      ∀ i, IsAffineOpen (nonzeroLocus (s i)) ∧
+        ∃ r : Fin (M + 1) → Γ((A.hom ⁻¹ᵁ U).toScheme, nonzeroLocus (s i)),
+          (∀ j k, ((A.hom ⁻¹ᵁ U).toScheme.presheaf.map (homOfLE (inf_le_right :
+              nonzeroLocus (s i) ⊓ (powOver A L U N).U k ≤ (powOver A L U N).U k)).op).hom
+                ((s j).f k) =
+            ((A.hom ⁻¹ᵁ U).toScheme.presheaf.map (homOfLE (inf_le_left :
+              nonzeroLocus (s i) ⊓ (powOver A L U N).U k ≤ nonzeroLocus (s i))).op).hom (r j) *
+            ((A.hom ⁻¹ᵁ U).toScheme.presheaf.map (homOfLE (inf_le_right :
+              nonzeroLocus (s i) ⊓ (powOver A L U N).U k ≤ (powOver A L U N).U k)).op).hom
+                ((s i).f k)) ∧
+          Function.Surjective (MvPolynomial.eval₂Hom
+            ((A.hom ∣_ U).appLE ⊤ (nonzeroLocus (s i)) le_top).hom r)
+
+def translDiff (L : LB A.left) {T : Over S} (x : T ⟶ A) : LB (T ⊗ A).left :=
+  LB.LinComb L (K := Fin 2) ![(lift (fst T A ≫ x) (snd T A) ≫ μ[A]).left, (snd T A).left] ![1, -1]
+
+def KTriv (L : LB A.left) : Prop :=
+  ∀ (R : Type) [CommRing R] (t : Spec (CommRingCat.of R) ⟶ S) (x : Over.mk t ⟶ A),
+    (∀ p : Spec (CommRingCat.of R), ∃ V : (Spec (CommRingCat.of R)).Opens, p ∈ V ∧
+      ∃ c : LB.Gen ((translDiff A L x).pull ((fst (Over.mk t) A).left ⁻¹ᵁ V).ι), c.IsGen) →
+    x = toUnit _ ≫ η[A]
+
+structure PolAV (S : Scheme.{0}) where
+
+
+
+[HUF_SRC_WEIL] Actual theta-line quotient and universally tested commutator/Weil relation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ExtensionDescent/ConstGen.lean#L17-L58
+
+def translPt {T : Over S} (x : T ⟶ A) : T ⊗ A ⟶ A := lift (fst T A ≫ x) (snd T A) ≫ μ[A]
+
+def translT {T : Over S} (x : T ⟶ A) : T ⊗ A ⟶ T ⊗ A := lift (fst T A) (translPt A x)
+
+def thetaLB (L : LB A.left) (k : ℤ) {T : Over S} (x : T ⟶ A) : LB (T ⊗ A).left :=
+  LB.LinComb L (K := Fin 2) ![(snd T A).left, (translPt A x).left] ![k, -k]
+
+structure ThetaGrp (L : LB A.left) (k : ℤ) (T : Over S) where
+
+  pt : T ⟶ A
+
+  φ : LB.Gen (thetaLB A L k pt)
+
+  isGen : φ.IsGen
+
+def constGen (L : LB A.left) {T : Over S} (c : Γ(T.left, ⊤)ˣ) :
+    LB.Gen (LB.LinComb L (Y := (T ⊗ A).left) (K := PEmpty) PEmpty.elim PEmpty.elim) where
+  s := fun _ => res le_top (Units.map (fst T A).left.appTop.hom.toMonoidHom c)
+
+def CommIsOf (L : LB A.left) (k : ℤ) {T : Over S} (θx θy : ThetaGrp A L k T)
+    (c : Γ(T.left, ⊤)ˣ) : Prop :=
+  LB.Gen.Corr L _ _ _ _
+    (LB.mulGen L _ _ _ _ θx.φ (LB.pullGen L _ _ θy.φ (translT A θx.pt).left))
+    (LB.mulGen L _ _ _ _
+      (LB.mulGen L _ _ _ _ θy.φ (LB.pullGen L _ _ θx.φ (translT A θy.pt).left))
+      (constGen A L c))
+
+abbrev overRes {T : Over S} (V : T.left.Opens) : Over S := Over.mk (V.ι ≫ T.hom)
+
+def overResι {T : Over S} (V : T.left.Opens) : overRes V ⟶ T := Over.homMk V.ι rfl
+
+def unitRes {T : Over S} (V : T.left.Opens) (c : Γ(T.left, ⊤)ˣ) : Γ((overRes V).left, ⊤)ˣ :=
+  Units.map V.ι.appTop.hom.toMonoidHom c
+
+def WeilIs (L : LB A.left) (k : ℤ) {T : Over S} (x y : T ⟶ A) (c : Γ(T.left, ⊤)ˣ) : Prop :=
+  ∀ p : T.left, ∃ V : T.left.Opens, p ∈ V ∧
+    (∃ θx θy : ThetaGrp A L k (overRes V), θx.pt = overResι V ≫ x ∧ θy.pt = overResι V ≫ y) ∧
+    ∀ θx θy : ThetaGrp A L k (overRes V), θx.pt = overResι V ≫ x → θy.pt = overResι V ≫ y →
+      CommIsOf A L k θx θy (unitRes V c)
+
+end ReciprocityTheory.ChartRestriction.G.Out
+
+
+[HUF_SRC_INGENUS_UNIF] Exact InGenus and pointwise Unif predicates
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/FamilyUnifOfParts.lean#L18-L40
+def InGenus (D : Datum H) (l : Level H) (σ : KA l →+* ℂ) (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) : Prop :=
+  D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ),
+    (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e) ∧
+    (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧
+    (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧
+    σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi * Complex.I) * (ν l.A : ℂ) / l.A) ∧ t = f l.M'
+
+def Unif {D : Datum H} {l : Level H} (Xo : Moduli D l) (σ : KA l →+* ℂ) {g : ℕ} (ty : Fin g → (E →+* ℂ))
+    (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P : D'.La →+ (Fin g → ℂ)) (y : Sp ℂ ⟶ Xo.X)
+    (e : (Fin g → ℂ) → (Over.mk y ⟶ Xo.univ.t.G)) : Prop :=
+  y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧ ((∀ z w, e (z + w) = e z * e w) ∧ Function.Surjective e ∧
+    IsHolTo Set.univ (fun z => (e z).left) ∧
+    (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧
+    (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e 0).left →
+      ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left)) ∧
+    (∀ z, e z = 1 ↔ z ∈ (P).range) ∧
+    (∀ (a : 𝓞 E) z, e (fun k => ty k (a : E) * z k) = e z ≫ Xo.univ.t.act.act a) ∧
+    (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k →
+      (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) →
+      Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e ((k : ℂ)⁻¹ • P a)) (e ((k : ℂ)⁻¹ • P a₂)) (unitOn c)) ∧
+    (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La),
+      toUnit _ ≫ Xo.univ.eta a = e ((l.M : ℂ)⁻¹ • P (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = e ((l.A : ℂ)⁻¹ • P (t a))
+
+
+[HUF_SRC_CLASS_TRANSPORT] Period transport, marking congruence transfer, classes, and equality
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/FamilyUnifOfParts.lean#L42-L163
+theorem isPeriod_transport {D' D'' : Datum H} {g : ℕ} {ty : Fin g → (E →+* ℂ)} (gam : D'.La ≃ₗ[𝓞 E] D''.La)
+    (hgam : ∀ a b, D''.EF (gam a) (gam b) = D'.EF a b) {P : D'.La →+ (Fin g → ℂ)} (hP : IsPeriod D' ty P) :
+    IsPeriod D'' ty (P.comp gam.symm.toLinearMap.toAddMonoidHom) := by
+  obtain ⟨h1, h2, h3, h4, Hm, h5, h6, h7⟩ := hP
+  have hr : (P.comp gam.symm.toLinearMap.toAddMonoidHom).range = P.range := by
+    ext z
+    constructor
+    · rintro ⟨a, rfl⟩; exact ⟨gam.symm a, rfl⟩
+    · rintro ⟨a, rfl⟩; exact ⟨gam a, by simp⟩
+  refine ⟨fun a x i => ?_, h2.comp gam.symm.injective, by rw [hr]; exact h3, ?_, Hm, h5, h6, fun x y => ?_⟩
+  · simpa using h1 a (gam.symm x) i
+  · rw [← h4, ← AddMonoidHom.coe_range, hr, AddMonoidHom.coe_range]
+  · have := hgam (gam.symm x) (gam.symm y)
+    simp only [LinearEquiv.apply_symm_apply] at this
+    rw [this, ← h7]; rfl
+
+theorem level_pos (l : Level H) : 0 < l.M' :=
+  Nat.lcm_pos (by have := l.three_le; omega) l.A_pos
+
+theorem exists_inGenus (D : Datum H) (l : Level H) (σ : KA l →+* ℂ)
+    (hs : ∀ (l : Level H) (N : ℕ) (ν : ℤ), 0 < N → IsCoprime ν (N : ℤ) → (l.A : ℤ) ∣ ν - 1 →
+      ∃ g : Sim D, (N : ℤ) ∣ g.ν N - ν) : ∃ t, InGenus D l σ D t := by
+  have hprim : IsPrimitiveRoot (σ (baseKA l).ζ) l.A := (baseKA l).ζ_prim.map_of_injective σ.injective
+  obtain ⟨i, -, hi, hζ⟩ := (Complex.isPrimitiveRoot_iff _ _ l.A_pos.ne').mp hprim
+  obtain ⟨s, c, hc⟩ := hs { l with A := 1, A_pos := one_pos } l.A (-(i : ℤ)) l.A_pos
+    (Nat.isCoprime_iff_coprime.mpr hi).neg_left (by simp)
+  refine ⟨s.f l.M', rfl, rfl, s.f, s.ν, fun n m hn hm a => ?_, fun n hn => ?_, s.mult, ?_, rfl⟩
+  · obtain ⟨b, hb⟩ := s.tower n m hn hm a
+    exact ⟨b, by rw [← hb]; abel⟩
+  · obtain ⟨g, hg⟩ := s.inv n hn
+    refine ⟨fun a => ⟨?_, ?_⟩, fun a' => ?_⟩
+    · rintro ⟨e, he⟩
+      obtain ⟨b, hb⟩ := (hg a).1
+      exact ⟨g e - b, by rw [smul_sub, ← hb, he, map_nsmul]; abel⟩
+    · rintro ⟨e, rfl⟩
+      exact ⟨s.f n e, map_nsmul _ _ _⟩
+    · obtain ⟨b, hb⟩ := (hg a').2
+      exact ⟨g a', -b, by rw [smul_neg, ← hb]; abel⟩
+  · have hA : (l.A : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr l.A_pos.ne'
+    have h1 : (s.ν l.A : ℂ) = -(i : ℂ) + l.A * c := by
+      have : s.ν l.A = -(i : ℤ) + l.A * c := by linarith
+      rw [this]; push_cast; ring
+    rw [← hζ, h1, Complex.exp_eq_exp_iff_exists_int]
+    exact ⟨c, by field_simp; ring⟩
+
+theorem triv_iff {D D' : Datum H} (l : Level H) (t : D.La →ₗ[𝓞 E] D'.La)
+    (ht : ∀ b, ∃ a e, b = t a + l.M' • e) (gam : D'.La ≃ₗ[𝓞 E] D'.La) (I : Ideal (𝓞 E)) (n : ℕ) (hn : n ∣ l.M') :
+    (∀ a ∈ I • (⊤ : Submodule (𝓞 E) D.La), ∃ x, gam (t a) = t a + n • x) ↔
+      ∀ a ∈ I • (⊤ : Submodule (𝓞 E) D'.La), ∃ x, gam a = a + n • x := by
+  obtain ⟨k, hk⟩ := hn
+  constructor
+  · intro h b hb
+    refine Submodule.smul_induction_on hb (fun c hc b' _ => ?_) ?_
+    · obtain ⟨a, e, rfl⟩ := ht b'
+      obtain ⟨x, hx⟩ := h (c • a) (Submodule.smul_mem_smul hc trivial)
+      refine ⟨x + k • (gam (c • e) - c • e), ?_⟩
+      rw [smul_add, ← t.map_smul, map_add, hx, smul_comm c, map_nsmul, smul_add, ← mul_smul, hk, smul_sub]
+      abel
+    · rintro x y ⟨u, hu⟩ ⟨v, hv⟩
+      exact ⟨u + v, by rw [map_add, hu, hv, smul_add]; abel⟩
+  · intro h a ha
+    refine h _ (Submodule.smul_induction_on ha (fun c hc a' _ => ?_) fun x y hx hy => ?_)
+    · rw [t.map_smul]; exact Submodule.smul_mem_smul hc trivial
+    · rw [map_add]; exact add_mem hx hy
+
+theorem triv_iff_top {D D' : Datum H} (l : Level H) (t : D.La →ₗ[𝓞 E] D'.La)
+    (ht : ∀ b, ∃ a e, b = t a + l.M' • e) (gam : D'.La ≃ₗ[𝓞 E] D'.La) (n : ℕ) (hn : n ∣ l.M') :
+    (∀ a, ∃ x, gam (t a) = t a + n • x) ↔ ∀ a, ∃ x, gam a = a + n • x := by
+  simpa using triv_iff l t ht gam ⊤ n hn
+
+theorem quasiCompact_str {D : Datum H} {l : Level H} (Xo : Moduli D l) : QuasiCompact Xo.s := by
+  obtain ⟨N, i, -, hi, h⟩ := Xo.qproj
+  have := isProper_str (KA l) N
+  rw [← h]
+  infer_instance
+
+def cls {D : Datum H} {l : Level H} (Xo : Moduli D l) (σ : KA l →+* ℂ) {g : ℕ} (ty : Fin g → (E →+* ℂ))
+    (y : Sp ℂ ⟶ Xo.X) : Set (Σ D' : Datum H, D.La →ₗ[𝓞 E] D'.La) :=
+  {x | InGenus D l σ x.1 x.2 ∧ ∃ P e, Unif Xo σ ty x.1 x.2 P y e}
+
+section Fixed
+
+variable {D : Datum H} {l : Level H} {Xo : Moduli D l} {σ : KA l →+* ℂ} {g : ℕ} {ty : Fin g → (E →+* ℂ)}
+  (perObj : ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P : D'.La →+ (Fin g → ℂ)), InGenus D l σ D' t →
+    IsPeriod D' ty P → ∃ y e, Unif Xo σ ty D' t P y e)
+  (upUniq : ∀ (D' D'' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (t' : D.La →ₗ[𝓞 E] D''.La) (P : D'.La →+ (Fin g → ℂ))
+    (P' : D''.La →+ (Fin g → ℂ)) (y y' : Sp ℂ ⟶ Xo.X) e e', Unif Xo σ ty D' t P y e → Unif Xo σ ty D'' t' P' y' e' →
+    (y = y' ↔ ∃ (gam : D'.La ≃ₗ[𝓞 E] D''.La) (h : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ)),
+      (∀ a b, D''.EF (gam a) (gam b) = D'.EF a b) ∧
+      (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), ∃ x, gam (t a) = t' a + l.M • x) ∧
+      (∀ a, ∃ x, gam (t a) = t' a + l.A • x) ∧ ∀ a, P' (gam a) = h (P a)))
+
+include upUniq in
+
+theorem point_eq {D' : Datum H} {t : D.La →ₗ[𝓞 E] D'.La} {P : D'.La →+ (Fin g → ℂ)} {y y' : Sp ℂ ⟶ Xo.X} {e e'}
+    (h : Unif Xo σ ty D' t P y e) (h' : Unif Xo σ ty D' t P y' e') : y = y' :=
+  (upUniq _ _ _ _ _ _ _ _ _ _ h h').mpr ⟨LinearEquiv.refl _ _, LinearEquiv.refl _ _, fun _ _ => rfl,
+    fun _ _ => ⟨0, by simp⟩, fun _ => ⟨0, by simp⟩, fun _ => rfl⟩
+
+include perObj upUniq in
+theorem cls_subset {y y' : Sp ℂ ⟶ Xo.X} {x} (hx : x ∈ cls Xo σ ty y) (hx' : x ∈ cls Xo σ ty y') :
+    cls Xo σ ty y ⊆ cls Xo σ ty y' := by
+  rintro x' ⟨hg', P', e', hu'⟩
+  obtain ⟨-, P, e, hu⟩ := hx
+  obtain ⟨-, P₂, e₂, hu₂⟩ := hx'
+  obtain ⟨gam, h, h1, h2, h3, -⟩ := (upUniq _ _ _ _ _ _ _ _ _ _ hu hu').mp rfl
+  obtain ⟨y'', e'', hu''⟩ := perObj _ _ _ hg' (isPeriod_transport gam h1 hu₂.2.1)
+  have : y' = y'' := (upUniq _ _ _ _ _ _ _ _ _ _ hu₂ hu'').mpr
+    ⟨gam, LinearEquiv.refl _ _, h1, h2, h3, fun a => by simp⟩
+  subst this
+  exact ⟨hg', _, _, hu''⟩
+
+include perObj upUniq in
+
+theorem cls_eq {y y' : Sp ℂ ⟶ Xo.X} {x} (hx : x ∈ cls Xo σ ty y) (hx' : x ∈ cls Xo σ ty y') :
+    cls Xo σ ty y = cls Xo σ ty y' :=
+  (cls_subset perObj upUniq hx hx').antisymm (cls_subset perObj upUniq hx' hx)
+
+end Fixed
+
+end GlobalTheory.UnifParts
+
+
+
+[HUF_SRC_FAMILY_ASSEMBLY] Original familyUnif_of_parts and its complete finite-family installation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/FamilyUnifOfParts.lean#L168-L422
+theorem familyUnif_of_parts : (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D
+    : Datum H) (g : ℕ) (ty : Fin g → (E →+*
+    ℂ)), IsTypeFn H D.p D.q ty → ∃ P, IsPeriod D ty P) → (∀ (E : Type) [Field E] [NumberField
+    E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g
+    : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA
+    l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ y : Sp ℂ ⟶ Xo.X, y ≫ Xo.s = spMap σ → ∃ (D'
+    : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P : D'.La →+ (Fin g → ℂ)) (e : (Fin g → ℂ) → (Over.mk y ⟶
+    Xo.univ.t.G)), (D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν
+    : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n *
+    m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n
+    : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧ σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi *
+    Complex.I) * (ν l.A : ℂ) / l.A) ∧ t = f l.M') ∧ (y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧
+    ((∀ z w, e (z + w) = e z * e w) ∧ Function.Surjective e ∧ IsHolTo Set.univ (fun z => (e z).left)
+    ∧ (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧
+    (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e
+    0).left → ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left)) ∧ (∀ z, e z = 1 ↔ z ∈ (P).range) ∧
+    (∀ (a : 𝓞 E) z, e (fun k => ty k (a : E) * z k) = e z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂
+    : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ)
+    / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e ((k : ℂ)⁻¹ • P a)) (e ((k : ℂ)⁻¹ • P
+    a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = e ((l.M : ℂ)⁻¹ • P (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = e ((l.A : ℂ)⁻¹ • P (t a)))) → (∀ (E : Type) [Field
+    E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ
+    : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA
+    l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P
+    : D'.La →+ (Fin g → ℂ)), (D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν
+    : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n *
+    m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n
+    : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧ σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi *
+    Complex.I) * (ν l.A : ℂ) / l.A) ∧ t = f l.M') → IsPeriod D' ty P → ∃ (y : Sp ℂ ⟶ Xo.X) (e : (Fin
+    g → ℂ) → (Over.mk y ⟶ Xo.univ.t.G)), (y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧ ((∀ z w, e (z +
+    w) = e z * e w) ∧ Function.Surjective e ∧ IsHolTo Set.univ (fun z => (e z).left) ∧
+    (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧
+    (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e
+    0).left → ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left)) ∧ (∀ z, e z = 1 ↔ z ∈ (P).range) ∧
+    (∀ (a : 𝓞 E) z, e (fun k => ty k (a : E) * z k) = e z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂
+    : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ)
+    / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e ((k : ℂ)⁻¹ • P a)) (e ((k : ℂ)⁻¹ • P
+    a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = e ((l.M : ℂ)⁻¹ • P (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = e ((l.A : ℂ)⁻¹ • P (t a)))) → (∀ (E : Type) [Field
+    E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ
+    : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA
+    l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' D'' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (t'
+    : D.La →ₗ[𝓞 E] D''.La) (P : D'.La →+ (Fin g → ℂ)) (P' : D''.La →+ (Fin g → ℂ)) (y y'
+    : Sp ℂ ⟶ Xo.X) (e : (Fin g → ℂ) → (Over.mk y ⟶ Xo.univ.t.G)) (e' : (Fin g → ℂ) → (Over.mk y' ⟶
+    Xo.univ.t.G)), (y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧ ((∀ z w, e (z + w) = e z * e w) ∧
+    Function.Surjective e ∧ IsHolTo Set.univ (fun z => (e z).left) ∧
+    (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧
+    (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e
+    0).left → ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left)) ∧ (∀ z, e z = 1 ↔ z ∈ (P).range) ∧
+    (∀ (a : 𝓞 E) z, e (fun k => ty k (a : E) * z k) = e z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂
+    : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ)
+    / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e ((k : ℂ)⁻¹ • P a)) (e ((k : ℂ)⁻¹ • P
+    a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = e ((l.M : ℂ)⁻¹ • P (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = e ((l.A : ℂ)⁻¹ • P (t a))) → (y' ≫ Xo.s = spMap σ ∧ IsPeriod
+    D'' ty P' ∧ ((∀ z w, e' (z + w) = e' z * e' w) ∧ Function.Surjective e' ∧ IsHolTo Set.univ
+    (fun z => (e' z).left) ∧ (∀ w, ∃! v : epsPt y' ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e'
+    z).left) w v.left) ∧ (∀ v : epsPt y' ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ
+    ℂ).toRingHom ≫ v.left = (e' 0).left → ∃! w, IsDerivAt0 (fun z => (e' z).left) w v.left)) ∧
+    (∀ z, e' z = 1 ↔ z ∈ (P').range) ∧ (∀ (a : 𝓞 E) z, e' (fun k => ty k (a
+    : E) * z k) = e' z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D''.La) (c : ℂˣ), 0 < k → (c
+    : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D''.EF a a₂ : ℂ) /
+    k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e' ((k : ℂ)⁻¹ • P' a)) (e' ((k : ℂ)⁻¹ • P'
+    a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = e' ((l.M : ℂ)⁻¹ • P' (t' a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = e' ((l.A : ℂ)⁻¹ • P' (t' a))) → (y = y' ↔ ∃ (gam : D'.La ≃ₗ[𝓞
+    E] D''.La) (h : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ)), (∀ a b, D''.EF (gam a) (gam
+    b) = D'.EF a b) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), ∃ x, gam (t a) = t' a + l.M • x) ∧ (∀ a, ∃ x, gam (t
+    a) = t' a + l.A • x) ∧ ∀ a, P' (gam a) = h (P a))) → (∀ (E : Type) [Field E] [NumberField
+    E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g
+    : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA
+    l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B
+    : Set (Fin m → ℂ)) (y : (Fin m → ℂ) → (Sp ℂ ⟶ Xo.X)) (b₀ : Fin m → ℂ) (P₀ : D'.La →+ (Fin g →
+    ℂ)) (e₀ : (Fin g → ℂ) → (Over.mk (y b₀) ⟶
+    Xo.univ.t.G)), IsOpen B → b₀ ∈ B → (∀ b ∈ B, y b ≫ Xo.s = spMap σ) → IsHolTo B y → ((y b₀) ≫
+    Xo.s = spMap σ ∧ IsPeriod D' ty P₀ ∧ ((∀ z w, e₀ (z + w) = e₀ z * e₀ w) ∧ Function.Surjective e₀
+    ∧ IsHolTo Set.univ (fun z => (e₀ z).left) ∧ (∀ w, ∃! v : epsPt (y
+    b₀) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e₀ z).left) w v.left) ∧ (∀ v : epsPt (y
+    b₀) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e₀
+    0).left → ∃! w, IsDerivAt0 (fun z => (e₀ z).left) w v.left)) ∧ (∀ z, e₀ z = 1 ↔ z ∈ (P₀).range)
+    ∧ (∀ (a : 𝓞 E) z, e₀ (fun k => ty k (a : E) * z k) = e₀ z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a
+    a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂
+    : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e₀ ((k : ℂ)⁻¹ • P₀ a)) (e₀ ((k : ℂ)⁻¹ • P₀
+    a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = e₀ ((l.M : ℂ)⁻¹ • P₀ (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = e₀ ((l.A : ℂ)⁻¹ • P₀ (t a))) → ∃ (B' : Set (Fin m → ℂ)) (P
+    : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶
+    Xo.univ.t.G)), IsOpen B' ∧ b₀ ∈ B' ∧ B' ⊆ B ∧ P b₀ = P₀ ∧ IsHolPeriods D' ty B' P ∧ IsHolTo (B'
+    ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left) ∧ ∀ b ∈ B', ((y b) ≫
+    Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧
+    Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y
+    b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y
+    b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b)
+    0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P
+    b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e
+    b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c
+    : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) /
+    k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ •
+    (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → (∀ (E : Type) [Field
+    E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ
+    : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA
+    l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B
+    : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (y : (Fin m → ℂ) → (Sp ℂ ⟶
+    Xo.X)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ Xo.univ.t.G)), (D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f
+    : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n *
+    m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n
+    : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧ σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi *
+    Complex.I) * (ν l.A : ℂ) /
+    l.A) ∧ t = f l.M') → IsOpen B → IsHolPeriods D' ty B P → (∀ b ∈ B, ((y b) ≫ Xo.s = spMap σ ∧
+    IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧
+    IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y
+    b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y
+    b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b)
+    0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P
+    b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e
+    b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c
+    : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) /
+    k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ •
+    (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → IsHolTo B y ∧ IsHolTo (B
+    ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left)) → (∀ (k : Type) [Field
+    k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (I : Type 1) (cls : (Sp ℂ ⟶
+    X) → I), SmoothOfRelativeDimension d s → QuasiCompact s → (∀ (B : Set (Fin d → ℂ)) (y : (Fin d →
+    ℂ) → (Sp ℂ ⟶
+    X)), IsOpen B → (∀ b ∈ B, y b ≫ s = spMap σ) → IsHolTo B y → ∀ b₀ ∈ B, ∀ᶠ b in nhds b₀, cls (y
+    b) = cls (y b₀)) → (cls '' {x | x ≫ s = spMap σ}).Finite) → (∀ (E : Type) [Field E] [NumberField
+    E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g
+    : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA
+    l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B
+    : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (y : (Fin m → ℂ) → (Sp ℂ ⟶
+    Xo.X)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ Xo.univ.t.G)) (bas : (Fin g ⊕ Fin g →
+    ℤ) ≃ₗ[ℤ] D'.La) (sgn : ℤˣ) (h τ : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ), (∀ b ∈ B, ((y b) ≫
+    Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧
+    Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y
+    b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y
+    b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b)
+    0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P
+    b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e
+    b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c
+    : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) /
+    k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ •
+    (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → (∀ a b, D'.EF (bas
+    a) (bas b) = sgn * omegaStd a b) → (∀ b ∈ B, ((τ b).map Complex.im).PosDef ∧ ∀ k, (h
+    b).mulVec (P b (bas (Pi.single (.inl k) 1))) = Pi.single k 1 ∧ (h b).mulVec (P b (bas (Pi.single
+    (.inr k) 1))) = (τ b).mulVec (Pi.single k
+    1)) → IsOpen B → IsPreconnected B → IsHolPeriods D' ty B P → IsHolTo B y → IsHolTo (B ×ˢ
+    Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1
+    bz.2).left) → ∃ c₁ c₂ : Fin g → ℂ, (∀ k, c₁ k = 0 ∨ c₁ k = 1 / 2) ∧ (∀ k, c₂ k = 0 ∨ c₂ k = 1 / 2) ∧ IsThetaFrame Xo.univ.t.PP B y (fun b z => (e
+    b z).left) (fun b z => thetaChar (τ b) c₁ c₂ ((h b).mulVec z))) → (∀ (E : Type) [Field
+    E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (N : ℕ) (ν
+    : ℤ), 0 < N → IsCoprime ν (N : ℤ) → (l.A : ℤ) ∣ ν - 1 → ∃ g : Sim D, (N : ℤ) ∣ g.ν N - ν ∧ (l.A
+    : ℤ) ∣ g.ν l.A - 1 ∧ (∀ a, g.f l.M a - a ∈ l.Mb • (⊤ : Submodule (𝓞
+    E) D.La)) ∧ ∀ a, D.ModN l.A (g.f l.A a - a)) → N1c := by
+  intro perExist ptUnif perObj upUniq locLift holU compFin thetaFam simMult E _ _ _ H D l Xo σ g ty h1 h2 h3
+  replace ptUnif : ∀ y : Sp ℂ ⟶ Xo.X, y ≫ Xo.s = spMap σ → ∃ x, x ∈ cls Xo σ ty y := fun y hy => by
+    obtain ⟨D', t, P, e, hg, hu⟩ := ptUnif E H D l Xo σ g ty h1 h2 h3 y hy
+    exact ⟨⟨D', t⟩, hg, P, e, hu⟩
+  replace perObj : ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P : D'.La →+ (Fin g → ℂ)), InGenus D l σ D' t →
+      IsPeriod D' ty P → ∃ y e, Unif Xo σ ty D' t P y e := perObj E H D l Xo σ g ty h1 h2 h3
+  replace upUniq := upUniq E H D l Xo σ g ty h1 h2 h3
+  replace locLift := locLift E H D l Xo σ g ty h1 h2 h3
+  replace holU := holU E H D l Xo σ g ty h1 h2 h3
+  replace thetaFam := thetaFam E H D l Xo σ g ty h1 h2 h3
+  have hfin : (cls Xo σ ty '' {x | x ≫ Xo.s = spMap σ}).Finite := by
+    refine compFin (KA l) σ Xo.X Xo.s D.dim _ (cls Xo σ ty) Xo.smooth (quasiCompact_str Xo)
+      fun B y hB hy hh b₀ hb₀ => ?_
+    obtain ⟨x, hg, P₀, e₀, hu⟩ := ptUnif _ (hy b₀ hb₀)
+    obtain ⟨B', P, e, hB', hb', -, -, -, -, hub⟩ := locLift x.1 x.2 _ B y b₀ P₀ e₀ hB hb₀ hy hh hu
+    filter_upwards [hB'.mem_nhds hb'] with b hb
+    exact cls_eq perObj upUniq (x := x) ⟨hg, _, _, hub b hb⟩ ⟨hg, _, _, hu⟩
+  have hne : (cls Xo σ ty '' {x | x ≫ Xo.s = spMap σ}).Nonempty := by
+    obtain ⟨t, ht⟩ := exists_inGenus D l σ fun l' N ν a b c =>
+      (simMult E H D l' N ν a b c).imp fun _ h => h.1
+    obtain ⟨P, hP⟩ := perExist E H D g ty h3
+    obtain ⟨y, e, hu⟩ := perObj D t P ht hP
+    exact ⟨_, y, hu.1, rfl⟩
+  obtain ⟨n, ⟨φ⟩⟩ := Finite.exists_equiv_fin _ (h := hfin.to_subtype)
+  have hn : 0 < n := Fin.pos (φ ⟨_, hne.some_mem⟩)
+  have hY : ∀ i, ∃ y : Sp ℂ ⟶ Xo.X, y ≫ Xo.s = spMap σ ∧ cls Xo σ ty y = φ.symm i := fun i => (φ.symm i).2
+  choose Y hYσ hY using hY
+  choose x hx using fun i => ptUnif _ (hYσ i)
+  have hue : ∀ i (P : (x i).1.La →+ (Fin g → ℂ)), ∃ (y : Sp ℂ ⟶ Xo.X)
+      (e : (Fin g → ℂ) → (Over.mk y ⟶ Xo.univ.t.G)),
+      IsPeriod (x i).1 ty P → Unif Xo σ ty (x i).1 (x i).2 P y e := fun i P => by
+    by_cases hP : IsPeriod (x i).1 ty P
+    · obtain ⟨y, e, h⟩ := perObj _ _ P (hx i).1 hP
+      exact ⟨y, e, fun _ => h⟩
+    · exact ⟨Y i, fun _ => 1, fun h => absurd h hP⟩
+  choose u ex hu using hue
+  have hcls : ∀ y : Sp ℂ ⟶ Xo.X, y ≫ Xo.s = spMap σ → ∃ i, x i ∈ cls Xo σ ty y := fun y hy => by
+    refine ⟨φ ⟨_, y, hy, rfl⟩, ?_⟩
+    have := hx (φ ⟨_, y, hy, rfl⟩)
+    rwa [hY, Equiv.symm_apply_apply] at this
+  have hts : ∀ i, (∀ a, (∃ b, (x i).2 a = l.M' • b) ↔ ∃ b, a = l.M' • b) ∧
+      ∀ b, ∃ a e, b = (x i).2 a + l.M' • e := fun i => by
+    obtain ⟨-, -, f, ν, -, hf, -, -, ht⟩ := (hx i).1
+    rw [ht]
+    exact hf _ (level_pos l)
+  have hhol : ∀ i (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → ((x i).1.La →+ (Fin g → ℂ))), IsOpen B →
+      IsHolPeriods (x i).1 ty B P → IsHolTo B (fun b => u i (P b)) ∧
+      IsHolTo (B ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (ex i (P bz.1) bz.2).left) :=
+    fun i m B P hB hP => holU _ _ m B P (fun b => u i (P b)) (fun b => ex i (P b)) (hx i).1 hB hP
+      fun b hb => hu i _ (hP.1 b hb)
+  refine ⟨{ n := n
+            n_pos := hn
+            Di := fun i => (x i).1
+            sig := fun i => ⟨(hx i).1.1, (hx i).1.2.1⟩
+            t := fun i => (x i).2
+            t_inj := fun i => (hts i).1
+            t_surj := fun i => (hts i).2
+            u := u
+            ex := ex
+            over_σ := fun i P hP => (hu i P hP).1
+            ex_add := fun i P hP => (hu i P hP).2.2.1.1
+            ex_onto := fun i P hP => (hu i P hP).2.2.1.2.1
+            ex_ker := fun i P hP => (hu i P hP).2.2.2.1
+            ex_lin := fun i P hP => (hu i P hP).2.2.2.2.1
+            ex_weil := fun i P hP => (hu i P hP).2.2.2.2.2.1
+            ex_eta := fun i P hP => (hu i P hP).2.2.2.2.2.2.1
+            ex_etaA := fun i P hP => (hu i P hP).2.2.2.2.2.2.2
+            onto := fun y hy => ?_
+            disj := fun i j P P' hP hP' h => ?_
+            fibre := fun i P P' hP hP' => ?_
+            hol := hhol
+            ex_diff := fun i P hP => (hu i P hP).2.2.1.2.2.2
+            theta := fun i m B P bas sgn h τ hB hc hP hb hτ =>
+              thetaFam _ _ m B P (fun b => u i (P b)) (fun b => ex i (P b)) bas sgn h τ
+                (fun b hb => hu i _ (hP.1 b hb)) hb hτ hB hc hP (hhol i m B P hB hP).1 (hhol i m B P hB hP).2
+            lift := fun m B y hB hy hh b₀ hb₀ => ?_ }⟩
+  · obtain ⟨i, -, P, e, h⟩ := hcls y hy
+    exact ⟨i, P, h.2.1, point_eq upUniq (hu i P h.2.1) h⟩
+  · have hi : cls Xo σ ty (Y i) = cls Xo σ ty (u i P) :=
+      cls_eq perObj upUniq (hx i) ⟨(hx i).1, _, _, hu i P hP⟩
+    have hj : cls Xo σ ty (Y j) = cls Xo σ ty (u j P') :=
+      cls_eq perObj upUniq (hx j) ⟨(hx j).1, _, _, hu j P' hP'⟩
+    apply φ.symm.injective
+    apply Subtype.ext
+    rw [← hY, ← hY, hi, hj, h]
+  · rw [upUniq _ _ _ _ _ _ _ _ _ _ (hu i P hP) (hu i P' hP')]
+    refine exists_congr fun gam => exists_congr fun h => ?_
+    rw [triv_iff l _ (hts i).2 gam _ l.M (Nat.dvd_lcm_left _ _),
+      triv_iff_top l _ (hts i).2 gam l.A (Nat.dvd_lcm_right _ _)]
+  · obtain ⟨i, -, P₀, e₀, h⟩ := hcls _ (hy b₀ hb₀)
+    obtain ⟨B', P, e, hB', hb', hsub, -, hP, -, hub⟩ := locLift _ _ m B y b₀ P₀ e₀ hB hb₀ hy hh h
+    exact ⟨B', i, P, hB', hb', hsub, hP, fun b hb => point_eq upUniq (hu i _ (hP.1 b hb)) (hub b hb)⟩
+
+end GlobalTheory
+
+
+[HUF_SRC_OBJ_DIMENSION] Actual abelian-scheme, dimension, rigidification and symmetry supplier
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ObjIsAbelianSchemeDimRigidifiedSym.lean#L207-L299
+theorem dim_eq_of_detCond {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D : Datum H)
+    {S : Scheme.{0}} {G : Over S} [GrpObj G] (act : OAct (𝓞 E) G) {k : Type} [Field k] [IsAlgClosed k] [CharZero k]
+    (x : Sp k ⟶ S) {r : k} (hr : r ^ 2 = -(H.d : k)) (hD : DetCond D act x r) {n : ℕ}
+    (hn : SmoothOfRelativeDimension n (pullback.snd G.hom x)) : n = Module.finrank ℚ E / 2 * (D.p + D.q) := by
+  obtain ⟨c, hc⟩ := univChart_of_relativeDimension ((Over.pullback x).obj G) hn
+  have : ∀ a, IsMonHom (act.act a) := act.hom
+  let ρ := tangentAction hc (fun a => (Over.pullback x).map (act.act a)) (by rw [act.one, CategoryTheory.Functor.map_id])
+    (fun a b => by rw [act.mul, Functor.map_comp]) (fun a b => by rw [act.add, Functor.map_mul])
+  have key : ∀ (τ : 𝓞 E →+* k) (N : ℕ), LieMult act x τ N → Module.finrank k (EigenSplit.eigenSub ρ τ) = N := by
+    intro τ N hN
+    have e : EigenSplit.eigenSub ρ τ =
+        Chart.eigLat hc (fun a => (Over.pullback x).map (act.act a)) (fun a => τ a) := by
+      ext v
+      rw [EigenSplit.mem_eigenSub, Chart.mem_eigLat_iff]
+      rfl
+    rw [e]
+    have : IsMonHom (Iso.refl G).hom := inferInstanceAs (IsMonHom (𝟙 G))
+    exact Chart.finrank_of_lieMult (isGrpPullback_of_iso (Iso.refl G)) (Category.comp_id x) hc act act.act
+      (fun a => by simp) _ (fun a => rfl) τ hN
+  have := finrank_eq_of_eigenSub H hr ρ fun τ => ⟨fun h => key τ _ ((hD τ).1 h), fun h => key τ _ ((hD τ).2 h)⟩
+  rwa [Module.finrank_fin_fun] at this
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H} {B : Type}
+  [CommRing B] {b : Base l B} {S : Scheme.{0}} {s : S ⟶ Sp B}
+
+theorem isAbelianScheme (o : Obj D l b s) : IsAbelianScheme o.t.G :=
+  ⟨o.t.semi.comm, o.t.semi.smooth, o.proper, o.t.semi.geomConnected⟩
+
+theorem rigidified {t : SAB H S} : Out.Rigidified t.G t.PP.L := ⟨t.PP.rig, t.PP.rigGen⟩
+
+theorem sym {t : SAB H S} : Out.Sym t.G t.PP.L := by
+  obtain ⟨-, w, hw, -⟩ := t.sym
+  exact fun _ => ⟨⊤, trivial, gen_of_iso ((isGen_iff w).1 hw) _⟩
+
+theorem smoothOfRelativeDimension (o : Obj D l b s) :
+    SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (D.p + D.q)) o.t.G.hom := by
+  have := o.t.semi.smooth
+  have := o.t.semi.geomConnected
+  choose n W hW hd using H1.exists_dim o.t.G.hom
+  have : IsZariskiLocalAtSource (@SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (D.p + D.q))) :=
+    HasRingHomProperty.instIsZariskiLocalAtSource
+  refine IsZariskiLocalAtSource.of_iSup_eq_top
+    (P := @SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (D.p + D.q))) W
+    (top_le_iff.1 fun y _ => TopologicalSpace.Opens.mem_iSup.2 ⟨y, hW y⟩) fun y => ?_
+  let k := AlgebraicClosure (o.t.G.left.residueField y)
+  let z : Sp k ⟶ o.t.G.left :=
+    Spec.map (CommRingCat.ofHom (algebraMap (o.t.G.left.residueField y) k)) ≫ o.t.G.left.fromSpecResidueField y
+  have hz : ∀ u, z u = y := fun u => Scheme.fromSpecResidueField_apply y _
+  let x : Sp k ⟶ S := z ≫ o.t.G.hom
+  let β : B →+* k := (Spec.preimage (x ≫ s)).hom
+  have hβ : x ≫ s = spMap β := (Spec.map_preimage (x ≫ s)).symm
+  have : CharZero k := charZero_of_inj_zero fun m hm => by
+    by_contra h0
+    have := (b.unit m (Nat.pos_of_ne_zero h0)).map β
+    rw [map_natCast, hm] at this
+    exact not_isUnit_zero this
+  have hr : β b.ρ ^ 2 = -(H.d : k) := by rw [← map_pow, b.ρ_sq, map_neg, map_natCast]
+  have : ConnectedSpace ↥(pullback o.t.G.hom x) :=
+    GeometricallyConnected.geometrically_connectedSpace (f := o.t.G.hom) x _ _ (IsPullback.of_hasPullback _ _)
+  let z' : Sp k ⟶ pullback o.t.G.hom x := pullback.lift z (𝟙 _) (Category.id_comp _).symm
+  obtain ⟨m, hm⟩ := exists_dim_of_preconnected (pullback.snd o.t.G.hom x) (z' (default : PrimeSpectrum k))
+  have e₁ : n y = m := H1.dim_base (IsPullback.of_hasPullback _ _) (hd y) hm (z' (default : PrimeSpectrum k)) (by
+    have e : z' ≫ pullback.fst o.t.G.hom x = z := pullback.lift_fst _ _ _
+    have e' := (congrArg (fun q : Sp k ⟶ o.t.G.left => q (default : PrimeSpectrum k)) e).trans (hz _)
+    exact (congrArg (fun u => u ∈ W y) e').mpr (hW y))
+  rw [← dim_eq_of_detCond D o.t.act x hr (o.geom k x β hβ).1 hm, ← e₁]
+  exact hd y
+
+end GlobalTheory.ObjDim
+
+namespace GlobalTheory
+
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+
+theorem obj_isAbelianScheme_dim_rigidified_sym :
+    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (B : Type) [CommRing B] (b : Base l B) (S : Scheme.{0}) (s : S ⟶ Sp B) (o : Obj D l b s), IsAbelianScheme o.t.G ∧ SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (D.p + D.q)) o.t.G.hom ∧ Out.Rigidified o.t.G o.t.PP.L ∧ Out.Sym o.t.G o.t.PP.L :=
+  fun _ _ _ _ _ _ _ _ _ _ _ _ o =>
+    ⟨ObjDim.isAbelianScheme o, ObjDim.smoothOfRelativeDimension o, ObjDim.rigidified, ObjDim.sym⟩
+
+def Obj.toPolAV {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {D : Datum H} {l : Level H}
+    {B : Type} [CommRing B] {b : Base l B} {S : Scheme.{0}} {s : S ⟶ Sp B} (o : Obj D l b s) : Out.PolAV S where
+  A := o.t.G
+  isAb := ObjDim.isAbelianScheme o
+  g := Module.finrank ℚ E / 2 * (D.p + D.q)
+  smoothDim := ObjDim.smoothOfRelativeDimension o
+  L := o.t.PP.L
+  isLB := o.t.PP.isLB
+  rigid := ObjDim.rigidified
+  sym := ObjDim.sym
+  ample := o.ample
+  ktriv := o.ktriv
+
+end GlobalTheory
+
+
+[HUF_SRC_SMOOTH_CHARTS] Holomorphic chart for a smooth scheme at a prescribed complex base embedding
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsHolomorphicChart.lean#L71-L172
+theorem exists_chart_algebra (d : ℕ) [Algebra.IsStandardSmoothOfRelativeDimension d k A]
+    (e : A →ₐ[k] ℂ) :
+    ∃ (W : Set (Fin d → ℂ)) (p : (Fin d → ℂ) → (A →ₐ[k] ℂ)) (n : ℕ) (r : Fin n → A) (ε : ℝ),
+      IsOpen W ∧ 0 ∈ W ∧ p 0 = e ∧ 0 < ε ∧ (∀ a, DifferentiableOn ℂ (fun w => p w a) W) ∧
+      Set.InjOn p W ∧ ∀ x : A →ₐ[k] ℂ, (∀ i, ‖x (r i) - e (r i)‖ < ε) → ∃ w ∈ W, x = p w := by
+  have hc : (algebraMap ℂ (ℂ ⊗[k] A)).IsStandardSmoothOfRelativeDimension d :=
+    (RingHom.isStandardSmoothOfRelativeDimension_algebraMap d).2 inferInstance
+  obtain ⟨φ, hφc, hφ, hφ0⟩ := HolChart.exists_etale_coords_vanishing _ hc (extPt e).toRingHom
+    (fun a => (extPt e).commutes a)
+  let _ : Algebra (MvPolynomial (Fin d) ℂ) (ℂ ⊗[k] A) := φ.toAlgebra
+  have _ : IsScalarTower ℂ (MvPolynomial (Fin d) ℂ) (ℂ ⊗[k] A) :=
+    IsScalarTower.of_algebraMap_eq' hφc.symm
+  have _ : Algebra.Etale (MvPolynomial (Fin d) ℂ) (ℂ ⊗[k] A) := hφ
+  obtain ⟨W, σ, n, f, ε, hW, hW0, hσ0, hε, hσd, hσt, hσs⟩ :=
+    exists_holomorphic_section_of_etale d (ℂ ⊗[k] A) (extPt e) hφ0
+  choose F hF hF' using fun j => exists_continuous_extPt (f j)
+  have hN : {u : A → ℂ | ∀ j, ‖F j u - extPt e (f j)‖ < ε} ∈ nhds (e : A → ℂ) := by
+    refine IsOpen.mem_nhds ?_ fun j => ?_
+    · rw [Set.setOf_forall]
+      exact isOpen_iInter_of_finite fun j =>
+        isOpen_lt (((hF j).sub continuous_const).norm) continuous_const
+    · rw [hF', sub_self, norm_zero]; exact hε
+  obtain ⟨m, r, δ, hδ, hr⟩ := exists_finite_test hN
+  refine ⟨W, fun w => resPt (σ w), m, r, δ, hW, hW0, ?_, hδ, fun a => hσd (1 ⊗ₜ a), ?_, ?_⟩
+  · show resPt (σ 0) = e
+    rw [hσ0, resPt_extPt]
+  · intro w hw w' hw' h
+    have h1 : σ w = σ w' := by
+      rw [← extPt_resPt (σ w), ← extPt_resPt (σ w')]
+      exact congrArg extPt h
+    funext i
+    rw [← hσt w hw i, h1, hσt w' hw' i]
+  · intro x hx
+    obtain ⟨w, hw, h⟩ := hσs (extPt x) fun j => by
+      rw [← hF']; exact hr x hx j
+    exact ⟨w, hw, (resPt_extPt x).symm.trans (congrArg resPt h)⟩
+
+end Ring
+
+theorem exists_holomorphic_chart :
+    ∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (y₀ : Sp ℂ ⟶ X), SmoothOfRelativeDimension d s → y₀ ≫ s = spMap σ → ∃ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (U : X.Opens) (f : Fin d → Γ(X, U)) (n : ℕ) (r : Fin n → Γ(X, U)), IsOpen B ∧ (0 : Fin d → ℂ) ∈ B ∧ y 0 = y₀ ∧ (∀ b ∈ B, y b ≫ s = spMap σ) ∧ IsHolTo B y ∧ Set.InjOn y B ∧ ⊤ ≤ y₀ ⁻¹ᵁ U ∧ ∃ ε : ℝ, 0 < ε ∧ ∀ x : Sp ℂ ⟶ X, x ≫ s = spMap σ → ⊤ ≤ x ⁻¹ᵁ U → (∀ i, ‖valAt' x U (r i) - valAt' y₀ U (r i)‖ < ε) → x ∈ y '' B := by
+  intro k _ σ X s d y₀ hX hy₀
+  obtain ⟨U₀, -, U, hU, hp, hle, hsm⟩ :=
+    hX.exists_isStandardSmoothOfRelativeDimension (y₀ (default : PrimeSpectrum ℂ))
+  have hU₀ : U₀ = ⊤ := by
+    refine eq_top_iff.2 fun y _ => ?_
+    have h1 : s (y₀ (default : PrimeSpectrum ℂ)) ∈ U₀ := hle hp
+    have h2 : y = s (y₀ (default : PrimeSpectrum ℂ)) :=
+      Subsingleton.elim (α := PrimeSpectrum k) _ _
+    rw [h2]; exact h1
+  subst hU₀
+  let c : k →+* Γ(X, U) :=
+    (s.appLE ⊤ U hle).hom.comp (Scheme.ΓSpecIso (CommRingCat.of k)).inv.hom
+  have hc : c.IsStandardSmoothOfRelativeDimension d :=
+    RingHom.isStandardSmoothOfRelativeDimension_respectsIso.2 (s.appLE ⊤ U hle).hom
+      (Scheme.ΓSpecIso (CommRingCat.of k)).symm.commRingCatIsoToRingEquiv hsm
+  let _ : Algebra k ℂ := σ.toAlgebra
+  let _ : Algebra k Γ(X, U) := c.toAlgebra
+  have _ : Algebra.IsStandardSmoothOfRelativeDimension d k Γ(X, U) := hc
+  let pt : (Γ(X, U) →+* ℂ) → (Sp ℂ ⟶ X) := fun e =>
+    Spec.map (CommRingCat.ofHom e : Γ(X, U) ⟶ CommRingCat.of ℂ) ≫ hU.fromSpec
+  have hptU : ∀ e, ⊤ ≤ pt e ⁻¹ᵁ U := fun e p _ => hU.range_fromSpec.le ⟨_, rfl⟩
+  have hptv : ∀ e f, valAt' (pt e) U f = e f := fun e f => by
+    rw [valAt', dif_pos (hptU e)]
+    exact congrArg (fun ψ => ψ.hom f)
+      (AffinePointValues.appLE_specMap_fromSpec hU (CommRingCat.ofHom e) (hptU e))
+  have hpts : ∀ e, pt e ≫ s = spMap (e.comp c) := fun e => by
+    simp only [pt]
+    rw [Category.assoc, AffinePointValues.fromSpec_comp hU s hle, ← Spec.map_comp]
+    rfl
+  have hsurj : ∀ x : Sp ℂ ⟶ X, x ≫ s = spMap σ → ⊤ ≤ x ⁻¹ᵁ U →
+      ∃ e : Γ(X, U) →ₐ[k] ℂ, pt e.toRingHom = x := by
+    intro x hxs hx
+    let e : Γ(X, U) →+* ℂ := (x.appLE U ⊤ hx ≫ (Scheme.ΓSpecIso (CommRingCat.of ℂ)).hom).hom
+    have he : pt e = x := AffinePointValues.specMap_appLE_fromSpec hU (R := CommRingCat.of ℂ) x hx
+    have h1 : spMap (e.comp c) = spMap σ := by rw [← hpts, he, hxs]
+    have h2 : e.comp c = σ := congrArg CommRingCat.Hom.hom (Spec.map_injective h1)
+    exact ⟨{ e with commutes' := fun a => RingHom.congr_fun h2 a }, he⟩
+  have hyU : ⊤ ≤ y₀ ⁻¹ᵁ U := ((valAt'_rules X y₀).1 U).2 hp
+  obtain ⟨e, rfl⟩ := hsurj y₀ hy₀ hyU
+  obtain ⟨W, p, n, r, ε, hW, hW0, hp0, hε, hpd, hpi, hps⟩ := exists_chart_algebra d e
+  refine ⟨W, fun w => pt (p w).toRingHom, U, fun _ => 0, n, r, hW, hW0, by simp only [hp0],
+    fun b _ => ?_, fun V f => ?_, fun w hw w' hw' h => hpi hw hw' ?_, hyU, ε, hε,
+    fun x hxs hx hxe => ?_⟩
+  · rw [hpts]
+    congr 2
+    exact RingHom.ext fun a => (p b).commutes a
+  · exact HolChart.hol_of_affine valAt'_rules hU hW (fun w => pt (p w).toRingHom)
+      (fun w _ => hptU _) (fun a => (hpd a).congr fun w _ => hptv _ a) V f
+  · refine AlgHom.ext fun a => ?_
+    have h1 := hptv (p w).toRingHom a
+    have h' : pt (p w).toRingHom = pt (p w').toRingHom := h
+    rw [h', hptv] at h1
+    exact h1.symm
+  · obtain ⟨e', rfl⟩ := hsurj x hxs hx
+    obtain ⟨w, hw, h⟩ := hps e' fun i => by
+      have := hxe i
+      rw [hptv, hptv] at this
+      exact this
+    exact ⟨w, hw, by rw [h]⟩
+
+end GlobalTheory.SubfieldChart
+
+
+[HUF_SRC_REVERSE_POINT] Literal reverse point uniformization at every given original moduli point
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsUniformisationAtPointClosed.lean#L18-L22
+theorem exists_uniformisation_at_point_closed : ThetaUnifAV → Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ y : Sp ℂ ⟶ Xo.X, y ≫ Xo.s = spMap σ → ∃ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P : D'.La →+ (Fin g → ℂ)) (e : (Fin g → ℂ) → (Over.mk y ⟶ Xo.univ.t.G)), (D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧ σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi * Complex.I) * (ν l.A : ℂ) / l.A) ∧ t = f l.M') ∧ (y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧ ((∀ z w, e (z + w) = e z * e w) ∧ Function.Surjective e ∧ IsHolTo Set.univ (fun z => (e z).left) ∧ (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧ (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e 0).left → ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left)) ∧ (∀ z, e z = 1 ↔ z ∈ (P).range) ∧ (∀ (a : 𝓞 E) z, e (fun k => ty k (a : E) * z k) = e z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e ((k : ℂ)⁻¹ • P a)) (e ((k : ℂ)⁻¹ • P a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = e ((l.M : ℂ)⁻¹ • P (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = e ((l.A : ℂ)⁻¹ • P (t a))) :=
+  fun hT hL => exists_uniformisation_at_point hT hL GlobalTheory.LiePull.lieMult_pull GlobalTheory.obj_pull
+    GlobalTheory.obj_isAbelianScheme_dim_rigidified_sym GlobalTheory.PeriodDatum.exists_datum
+
+end GlobalTheory.PointUnif
+
+
+[HUF_SRC_REVERSE_POINT_CORE] Original point extraction, integral period datum and Tate-marking assembly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsUniformisationAtPoint.lean#L16-L120
+
+theorem exists_uniformisation_at_point : ThetaUnifAV → Out.Laws → (∀ (O : Type) [CommRing O] (S S' : Scheme.{0}) (G : Over S) (G' : Over S') [GrpObj G] [GrpObj G'] (f : S' ⟶ S) (φ : G'.left ⟶ G.left) (a : OAct O G) (a' : OAct O G'), IsGrpPullback G' G f φ → (∀ c, (a'.act c).left ≫ φ = φ ≫ (a.act c).left) → ∀ (k : Type) [Field k] (x : Sp k ⟶ S') (τ : O →+* k) (n : ℕ), LieMult a' x τ n ↔ LieMult a (x ≫ f) τ n) → (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (B B' : Type) [CommRing B] [CommRing B'] (b : Base l B) (b' : Base l B') (j : B →+* B') (S S' : Scheme.{0}) (s : S ⟶ Sp B) (s' : S' ⟶ Sp B') (f : S' ⟶ S), j b.ρ = b'.ρ → j b.ζ = b'.ζ → f ≫ s = s' ≫ spMap j → ∀ o : Obj D l b s, ∃ o' : Obj D l b' s', Nonempty (ObjMap o' o f)) → (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (B : Type) [CommRing B] (b : Base l B) (S : Scheme.{0}) (s : S ⟶ Sp B) (o : Obj D l b s), IsAbelianScheme o.t.G ∧ SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (D.p + D.q)) o.t.G.hom ∧ Out.Rigidified o.t.G o.t.PP.L ∧ Out.Sym o.t.G o.t.PP.L) → (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (La : Type) [AddCommGroup La] [Module (𝓞 E) La] (EF : LinearMap.BilinForm ℤ La) (p q g : ℕ) (ty : Fin g → (E →+* ℂ)) (P : La →+ (Fin g → ℂ)) (Hm : Matrix (Fin g) (Fin g) ℂ), IsTypeFn H p q ty → Function.Bijective EF → (∀ (a : 𝓞 E) x y, EF (a • x) y = EF x (H.bar a • y)) → (∀ (a : 𝓞 E) x i, P (a • x) i = ty i (a : E) * P x i) → Function.Injective P → DiscreteTopology P.range → Submodule.span ℝ (Set.range P) = ⊤ → Hm.IsHermitian → (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) → (∀ x y, (hermForm Hm (P x) (P y)).im = EF x y) → ∃ (D' : Datum H) (e : D'.La ≃ₗ[𝓞 E] La), D'.p = p ∧ D'.q = q ∧ ∀ x y, D'.EF x y = EF (e x) (e y)) → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ y : Sp ℂ ⟶ Xo.X, y ≫ Xo.s = spMap σ → ∃ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P : D'.La →+ (Fin g → ℂ)) (e : (Fin g → ℂ) → (Over.mk y ⟶ Xo.univ.t.G)), (D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧ σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi * Complex.I) * (ν l.A : ℂ) / l.A) ∧ t = f l.M') ∧ (y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧ ((∀ z w, e (z + w) = e z * e w) ∧ Function.Surjective e ∧ IsHolTo Set.univ (fun z => (e z).left) ∧ (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧ (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e 0).left → ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left)) ∧ (∀ z, e z = 1 ↔ z ∈ (P).range) ∧ (∀ (a : 𝓞 E) z, e (fun k => ty k (a : E) * z k) = e z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e ((k : ℂ)⁻¹ • P a)) (e ((k : ℂ)⁻¹ • P a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = e ((l.M : ℂ)⁻¹ • P (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = e ((l.A : ℂ)⁻¹ • P (t a))) := by
+  intro hT _ _ hPull hPol hDat E _ _ _ H D l Xo σ g ty _ hσ hty y hy
+  let b' : Base l ℂ :=
+    { unit := fun n hn => IsUnit.mk0 _ (Nat.cast_ne_zero.2 hn.ne')
+      ρ := σ (baseKA l).ρ
+      ρ_sq := by rw [← map_pow, (baseKA l).ρ_sq, map_neg, map_natCast]
+      ζ := σ (baseKA l).ζ
+      ζ_prim := (baseKA l).ζ_prim.map_of_injective σ.injective }
+  obtain ⟨o, ⟨m⟩⟩ := hPull E H D l (KA l) ℂ (baseKA l) b' σ Xo.X (Sp ℂ) Xo.s (𝟙 _) y rfl rfl
+    (hy.trans (Category.id_comp _).symm) Xo.univ
+  obtain ⟨hab, hsm, hrig, hsym⟩ := hPol E H D l ℂ b' (Sp ℂ) (𝟙 _) o
+  obtain ⟨rig, hr⟩ := id hrig
+  obtain ⟨u, Hm, χ, Ef, hAH, -, h1, h2, hF, -, hE, hbij, hweil⟩ :=
+    hT { A := o.t.G, isAb := hab, g := _, smoothDim := hsm, L := o.t.PP.L, isLB := o.t.PP.isLB, rigid := hrig,
+         sym := hsym, ample := o.ample, ktriv := o.ktriv } rig hr
+  have hLiso : LBIso o.t.PP.L (Xo.univ.t.PP.L.pull m.cm.F) := by
+    obtain ⟨w, hw, -⟩ := m.lin
+    exact ⟨w, hw⟩
+  obtain ⟨Φ, hΦ, hΦW⟩ := exists_push m.cart (𝟙_ _)
+    (weilIs_grpPullback_of_comm _ _ _ _ y m.cm.F _ _ Xo.univ.t.PP.isLB o.t.PP.isLB m.cart hLiso _) y (Category.id_comp y)
+  have he₀ := isExp_push m.cart u h1 h2 Φ hΦ
+  have hker₀ : ∀ z, Φ (u.ex z) = 1 ↔ z ∈ u.Λ := fun z => (map_eq_one_iff Φ Φ.injective).trans (u.ker z)
+  obtain ⟨ρ, hρ⟩ := he₀.exists_rep Xo.univ.t.act u.Λ u.discrete hker₀ fun a => by
+    obtain ⟨F, hF⟩ := hF (o.t.act.act a) (o.t.act.hom a)
+    refine ⟨F, fun z => Over.OverMorphism.ext ?_⟩
+    rw [hΦ, hF, Over.comp_left, Over.comp_left, hΦ, Category.assoc, Category.assoc]
+    exact congrArg _ (m.act a)
+  obtain ⟨hdet, I, hζ, hA, hM⟩ := Xo.univ.geom ℂ y σ hy
+  obtain ⟨h, hh⟩ := exists_equiv_of_finrank_eq (isSplitting_embeddings (E := E)) (diagRep ty) ρ fun φ => by
+    rw [finrank_eigenSub_diagRep]
+    by_cases hφ : φ (H.rt : E) = H.rt0
+    · rw [(hty φ).1 hφ, he₀.finrank_eigenSub _ ρ hρ ((hdet _).1 (hφ.trans hσ.symm))]
+    · rw [(hty φ).2 hφ, he₀.finrank_eigenSub _ ρ hρ ((hdet _).2 fun h => hφ (h.trans hσ))]
+  have he := he₀.comp_equiv h
+  have hlin : ∀ (a : 𝓞 E) z, Φ (u.ex (h fun k => ty k (a : E) * z k)) = Φ (u.ex (h z)) ≫ Xo.univ.t.act.act a :=
+    fun a z => by rw [← hρ, ← hh, diagRep_apply]
+  have hst : ∀ a, ∀ x ∈ u.Λ, ρ a x ∈ u.Λ := fun a x hx => by
+    have := Xo.univ.t.act.hom a
+    rw [← hker₀, hρ, (hker₀ x).2 hx, MonObj.one_comp]
+  letI : SMul (𝓞 E) u.Λ := ⟨fun a x => ⟨ρ a x, hst a x x.2⟩⟩
+  have hsm : ∀ (a : 𝓞 E) (x : u.Λ), ((a • x : u.Λ) : _ → ℂ) = ρ a x := fun _ _ => rfl
+  letI : Module (𝓞 E) u.Λ := Module.ofMinimalAxioms
+    (fun a x y => Subtype.ext (by simp [hsm])) (fun a b x => Subtype.ext (by simp [hsm]))
+    (fun a b x => Subtype.ext (by simp [hsm])) (fun x => Subtype.ext (by simp [hsm]))
+  let P : u.Λ →+ (Fin g → ℂ) := h.symm.toLinearMap.toAddMonoidHom.comp u.Λ.subtype.toAddMonoidHom
+  have hP : ∀ x, h (P x) = x := fun x => h.apply_symm_apply _
+  have hrange : ∀ z, z ∈ P.range ↔ h z ∈ u.Λ := fun z =>
+    ⟨by rintro ⟨x, rfl⟩; rw [hP]; exact x.2, fun hz => ⟨⟨_, hz⟩, h.symm_apply_apply z⟩⟩
+  have hker : ∀ z, Φ (u.ex (h z)) = 1 ↔ z ∈ P.range := fun z => (hker₀ _).trans (hrange z).symm
+  have hPs : ∀ (a : 𝓞 E) x i, P (a • x) i = ty i (a : E) * P x i := fun a x => congrFun (h.injective (by
+    rw [hP, hsm, ← diagRep_apply, hh, hP]))
+  have hPi : Function.Injective P := h.symm.injective.comp Subtype.val_injective
+  have hPd : DiscreteTopology P.range := by
+    have := u.discrete
+    refine DiscreteTopology.of_continuous_injective (f := fun z : P.range => (⟨h z, (hrange _).1 z.2⟩ : u.Λ))
+      ((h.toLinearMap.continuous_of_finiteDimensional.comp continuous_subtype_val).subtype_mk _) fun z w hzw => ?_
+    exact Subtype.ext (h.injective (congrArg Subtype.val hzw))
+  have hPf : Submodule.span ℝ (Set.range P) = ⊤ := by
+    have e : Set.range P = (h.symm.toLinearMap.restrictScalars ℝ) '' u.Λ := by
+      ext z
+      exact ⟨by rintro ⟨x, rfl⟩; exact ⟨x, x.2, rfl⟩, by rintro ⟨x, hx, rfl⟩; exact ⟨⟨x, hx⟩, rfl⟩⟩
+    rw [e, ← Submodule.map_span, u.full, Submodule.map_top, LinearMap.range_eq_top]
+    exact h.symm.surjective
+  obtain ⟨Hm', hH', hH''⟩ := exists_hermForm_comp Hm hAH.1 h.toLinearMap
+  have hpos : ∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm' z z).re := fun z hz => by
+    rw [hH'']
+    exact hAH.2.1 _ (h.map_ne_zero_iff.2 hz)
+  have him : ∀ x x', (hermForm Hm' (P x) (P x')).im = Ef x x' := fun x x' => by
+    rw [hH'', hE]
+    exact congrArg₂ (fun a b => (hermForm Hm a b).im) (hP x) (hP x')
+  have hweil' : ∀ (k : ℕ) (a b : u.Λ) (c : ℂˣ), 0 < k →
+      (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (Ef a b : ℂ) / k) →
+      Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (Φ (u.ex (h ((k : ℂ)⁻¹ • P a)))) (Φ (u.ex (h ((k : ℂ)⁻¹ • P b))))
+        (unitOn c) := fun k a b c hk hc => by
+    rw [map_smul, map_smul, hP, hP]
+    exact hΦW _ _ _ _ (hweil k a b c hk hc)
+  obtain ⟨D', ε, hp, hq, hε⟩ := hDat E H u.Λ Ef D.p D.q g ty P Hm' hty hbij
+    (adj_of_tateIso Xo.univ.t.PP.isLB he hker hPs hlin hweil' I) hPs hPi hPd hPf hH' hpos him
+  let P' : D'.La →+ (Fin g → ℂ) := P.comp ε.toLinearMap.toAddMonoidHom
+  have hr' : P'.range = P.range := by
+    ext z
+    exact ⟨by rintro ⟨x, rfl⟩; exact ⟨ε x, rfl⟩,
+      by rintro ⟨x, rfl⟩; exact ⟨ε.symm x, congrArg P (ε.apply_symm_apply x)⟩⟩
+  have hper : IsPeriod D' ty P' := by
+    refine ⟨fun a x i => ?_, hPi.comp ε.injective, hr' ▸ hPd, ?_, Hm', hH', hpos, fun x x' => ?_⟩
+    · exact (congrArg (fun x => P x i) (map_smul ε a x)).trans (hPs a _ i)
+    · rw [← AddMonoidHom.coe_range, hr', AddMonoidHom.coe_range, hPf]
+    · rw [hε]; exact him _ _
+  have hker' : ∀ z, Φ (u.ex (h z)) = 1 ↔ z ∈ P'.range := hr' ▸ hker
+  have hweil'' : ∀ (k : ℕ) (a b : D'.La) (c : ℂˣ), 0 < k →
+      (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a b : ℂ) / k) →
+      Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (Φ (u.ex (h ((k : ℂ)⁻¹ • P' a)))) (Φ (u.ex (h ((k : ℂ)⁻¹ • P' b))))
+        (unitOn c) := fun k a b c hk hc => hweil' k (ε a) (ε b) c hk (by rw [hc, hε])
+  obtain ⟨f, ν, f1, f2, f3, f4, f5⟩ := similar_with_multiplier
+    (fun n x y c c' => weilIs_unique_fieldPoint _ _ _ Xo.univ.t.PP.isLB ℂ _ n x y c c') I
+    (expTateIso he hper hker' hlin hweil'')
+  have hM' : 0 < l.M' := Nat.lcm_pos (lt_of_lt_of_le (by norm_num) l.three_le) l.A_pos
+  refine ⟨D', f l.M', P', fun z => Φ (u.ex (h z)), ⟨hp, hq, f, ν, f1, f2, f3, ?_, rfl⟩, hy, hper, he, hker', hlin,
+    hweil'', fun a ha => (hM a ha).trans (f5 _ _ hM' (Nat.dvd_lcm_left _ _) a),
+    fun a => (hA a).trans (f5 _ _ hM' (Nat.dvd_lcm_right _ _) a)⟩
+  rw [← hζ, f4 _ l.A_pos]
+  exact expNegUnit_zpow_val _ _
+
+end GlobalTheory.PointUnif
+
+
+[HUF_SRC_TATE_LIFT] Exact projective lifting and genus_of_tateIso, with positive-level guards
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/PeriodLatticeInGenus.lean#L19-L91
+theorem ev_eq_iff (I : TateIso D k Q act e) {n : ℕ} (hn : 0 < n) (a b : D.La) :
+    I.ev n a = I.ev n b ↔ ∃ y, a = b + n • y := by
+  rw [tateIso_ev_eq_iff I hn]
+  unfold Datum.ModN
+  exact exists_congr fun y => sub_eq_iff_eq_add'
+
+theorem exists_lift (I' : TateIso D' k Q act e) (I : TateIso D k Q act e) {n : ℕ} (hn : 0 < n) :
+    ∃ f : D.La →ₗ[𝓞 E] D'.La, ∀ a, I.ev n a = I'.ev n (f a) := by
+  have hs : ∀ a, ∃ b, I'.ev n b = I.ev n a := fun a => (I'.onto n hn _).1 (tateIso_ev_pow I hn a)
+  choose s hs using hs
+  let N : Submodule (𝓞 E) D'.La := LinearMap.range (n • (LinearMap.id : D'.La →ₗ[𝓞 E] D'.La))
+  have hN : ∀ a b : D'.La, N.mkQ a = N.mkQ b ↔ I'.ev n a = I'.ev n b := by
+    intro a b
+    rw [tateIso_ev_eq_iff I' hn, Submodule.mkQ_apply, Submodule.mkQ_apply, Submodule.Quotient.eq]
+    constructor
+    · rintro ⟨c, hc⟩
+      exact ⟨c, hc.symm⟩
+    · rintro ⟨c, hc⟩
+      exact ⟨c, hc.symm⟩
+  let φ : D.La →ₗ[𝓞 E] D'.La ⧸ N :=
+    { toFun := fun a => N.mkQ (s a)
+      map_add' := fun a b => by
+        rw [← map_add, hN, I'.add, hs, hs, hs, I.add]
+      map_smul' := fun c a => by
+        rw [RingHom.id_apply, ← map_smul, hN, I'.lin, hs, hs, I.lin] }
+  have := D.proj
+  obtain ⟨f, hf⟩ := Module.projective_lifting_property N.mkQ φ N.mkQ_surjective
+  refine ⟨f, fun a => ?_⟩
+  have h : N.mkQ (f a) = N.mkQ (s a) := LinearMap.congr_fun hf a
+  rw [(hN _ _).1 h, hs]
+
+theorem genus_of_tateIso
+    (he : ∀ n x y c c', 0 < n → x ^ n = 1 → y ^ n = 1 → e n x y c → e n x y c' → c = c')
+    (I' : TateIso D' k Q act e) (I : TateIso D k Q act e) :
+    ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ),
+      ((∀ n m : ℕ, 0 < n → 0 < m → ∀ x, ∃ y, f (n * m) x = f n x + n • y) ∧
+      (∀ n : ℕ, 0 < n → (∀ x, (∃ y, f n x = n • y) ↔ ∃ y, x = n • y) ∧ ∀ x', ∃ x y, x' = f n x + n • y) ∧
+      ∀ n : ℕ, 0 < n → ∀ x x', (n : ℤ) ∣ D'.EF (f n x) (f n x') - ν n * D.EF x x') ∧
+      ∀ n, 0 < n → I.ζ n = I'.ζ n ^ ν n ∧ ∀ a, I.ev n a = I'.ev n (f n a) := by
+  have h1 : ∀ n : ℕ, ∃ f : D.La →ₗ[𝓞 E] D'.La, 0 < n → ∀ a, I.ev n a = I'.ev n (f a) := by
+    intro n
+    rcases Nat.eq_zero_or_pos n with h | h
+    · exact ⟨0, fun h' => absurd h h'.ne'⟩
+    · obtain ⟨f, hf⟩ := exists_lift I' I h
+      exact ⟨f, fun _ => hf⟩
+  have h2 : ∀ n : ℕ, ∃ ν : ℤ, 0 < n → I.ζ n = I'.ζ n ^ ν := by
+    intro n
+    rcases Nat.eq_zero_or_pos n with h | h
+    · exact ⟨1, fun h' => absurd h h'.ne'⟩
+    · have : NeZero n := ⟨h.ne'⟩
+      obtain ⟨i, -, hi⟩ := (I'.ζ_prim n h).eq_pow_of_mem_rootsOfUnity
+        ((mem_rootsOfUnity _ _).2 (I.ζ_prim n h).pow_eq_one)
+      exact ⟨i, fun _ => by rw [zpow_natCast, hi]⟩
+  choose f hf using h1
+  choose ν hν using h2
+  refine ⟨f, ν, ⟨?_, ?_, ?_⟩, fun n hn => ⟨hν n hn, hf n hn⟩⟩
+  · intro n m hn hm a
+    rw [← ev_eq_iff I' hn, ← hf n hn, ← I'.tower n m hn hm, ← hf (n * m) (Nat.mul_pos hn hm),
+      I.tower n m hn hm]
+  · intro n hn
+    refine ⟨fun x => ?_, fun x' => ?_⟩
+    · rw [← I'.ker n hn, ← I.ker n hn, hf n hn]
+    · obtain ⟨x, hx⟩ := (I.onto n hn _).1 (tateIso_ev_pow I' hn x')
+      refine ⟨x, (ev_eq_iff I' hn _ _).1 ?_⟩
+      rw [← hf n hn, hx]
+  · intro n hn a b
+    have e1 := I'.isom n hn (f n a) (f n b)
+    have e2 := I.isom n hn a b
+    rw [hf n hn a, hf n hn b] at e2
+    have h := he n _ _ _ _ hn (tateIso_ev_pow I' hn _) (tateIso_ev_pow I' hn _) e1 e2
+    rw [hν n hn, ← zpow_mul] at h
+    rw [← (I'.ζ_prim n hn).zpow_eq_one_iff_dvd, zpow_sub, h, mul_inv_cancel]
+
+
+
+[HUF_SRC_PERIOD_TATE] Original exponential Tate description and period_lattice_in_genus
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/PeriodLatticeInGenus.lean#L94-L205
+theorem unitOn_injective {R : Type} [CommRing R] : Function.Injective (unitOn (R := R)) := fun a b h => by
+  have h1 := congrArg (fun x : (Γ(Sp R, ⊤))ˣ => (Scheme.ΓSpecIso (CommRingCat.of R)).hom.hom x.val) h
+  apply Units.ext
+  simpa [unitOn] using h1
+
+noncomputable def expRoot (n : ℕ) : ℂˣ :=
+  Units.mk0 (Complex.exp (-(2 * Real.pi * Complex.I) / n)) (Complex.exp_ne_zero _)
+
+theorem expRoot_zpow (n : ℕ) (m : ℤ) :
+    ((expRoot n ^ m : ℂˣ) : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (m : ℂ) / n) := by
+  rw [Units.val_zpow_eq_zpow_val, expRoot, Units.val_mk0, ← Complex.exp_int_mul]
+  congr 1
+  ring
+
+theorem expRoot_prim {n : ℕ} (hn : 0 < n) : IsPrimitiveRoot (expRoot n) n := by
+  rw [← IsPrimitiveRoot.coe_units_iff]
+  have h := (Complex.isPrimitiveRoot_exp n hn.ne').inv
+  rw [← Complex.exp_neg] at h
+  rw [expRoot, Units.val_mk0, neg_div]
+  exact h
+
+theorem expRoot_pow {n m : ℕ} (hn : 0 < n) (hm : 0 < m) : expRoot (n * m) ^ m = expRoot n := by
+  apply Units.ext
+  rw [Units.val_pow_eq_pow_val, expRoot, expRoot, Units.val_mk0, Units.val_mk0, ← Complex.exp_nat_mul]
+  congr 1
+  have : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
+  have : (m : ℂ) ≠ 0 := by exact_mod_cast hm.ne'
+  push_cast
+  field_simp
+
+section
+
+variable {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ} (u : HolUnif A L g)
+
+theorem ex_zero : u.ex 0 = 1 := (u.ker 0).2 u.Λ.zero_mem
+
+theorem ex_nsmul (n : ℕ) (z : Fin g → ℂ) : u.ex ((n : ℂ) • z) = u.ex z ^ n := by
+  induction n with
+  | zero => simp [ex_zero]
+  | succ n ih => rw [Nat.cast_succ, add_smul, one_smul, u.ex_add, ih, pow_succ]
+
+end
+
+noncomputable def periodTateIso {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} (D' : Datum H)
+    {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ} (u : HolUnif A L g) (act : OAct (𝓞 E) A)
+    (Q : D'.La →+ (Fin g → ℂ)) (hQ : Function.Injective Q) (hΛ : ∀ z, z ∈ u.Λ ↔ z ∈ Q.range)
+    (hact : ∀ (a : 𝓞 E) (n : ℕ) x, u.ex ((n : ℂ)⁻¹ • Q (a • x)) = u.ex ((n : ℂ)⁻¹ • Q x) ≫ act.act a)
+    (hW : ∀ (n : ℕ) (a b : D'.La) (c : ℂˣ), 0 < n →
+      (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a b : ℂ) / n) →
+      Out.WeilIs A L n (u.ex ((n : ℂ)⁻¹ • Q a)) (u.ex ((n : ℂ)⁻¹ • Q b)) (unitOn c)) :
+    TateIso D' ℂ (𝟙_ (Over (Sp ℂ)) ⟶ A) (fun c y => y ≫ act.act c)
+      (fun n y y' c => Out.WeilIs A L n y y' (unitOn c)) where
+  ζ := expRoot
+  ζ_prim _ hn := expRoot_prim hn
+  ζ_pow _ _ hn hm := expRoot_pow hn hm
+  ev n x := u.ex ((n : ℂ)⁻¹ • Q x)
+  add n a b := by rw [map_add, smul_add, u.ex_add]
+  lin n c a := hact c n a
+  ker n hn a := by
+    have hn' : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
+    rw [u.ker, hΛ]
+    constructor
+    · rintro ⟨b, hb⟩
+      refine ⟨b, hQ ?_⟩
+      rw [map_nsmul, hb, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, mul_inv_cancel₀ hn', one_smul]
+    · rintro ⟨b, rfl⟩
+      refine ⟨b, ?_⟩
+      rw [map_nsmul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul, inv_mul_cancel₀ hn', one_smul]
+  onto n hn x := by
+    have hn' : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
+    constructor
+    · intro hx
+      obtain ⟨z, rfl⟩ := u.ex_onto x
+      rw [← ex_nsmul, u.ker, hΛ] at hx
+      obtain ⟨a, ha⟩ := hx
+      exact ⟨a, by rw [ha, smul_smul, inv_mul_cancel₀ hn', one_smul]⟩
+    · rintro ⟨a, rfl⟩
+      rw [← ex_nsmul, u.ker, hΛ, smul_smul, mul_inv_cancel₀ hn', one_smul]
+      exact ⟨a, rfl⟩
+  tower n m hn hm a := by
+    have hn' : (n : ℂ) ≠ 0 := by exact_mod_cast hn.ne'
+    have hm' : (m : ℂ) ≠ 0 := by exact_mod_cast hm.ne'
+    rw [← ex_nsmul, smul_smul]
+    congr 2
+    push_cast
+    field_simp
+  isom n hn a b := hW n a b _ hn (expRoot_zpow n _)
+
+theorem period_lattice_in_genus :
+    Out.Laws → Out.Laws2 → (∀ (S : Scheme.{0}) (P : Out.PolAV S) (M : LB P.A.left), M.IsLB → ∃ t : LB.Gen (Theta P.A M), t.IsGen) → ThetaUnifAV → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (D' : Datum H) (P : Out.PolAV (Sp ℂ)) (u : HolUnif P.A P.L P.g) (Hm : Matrix (Fin P.g) (Fin P.g) ℂ) (χ : u.Λ → ℂ) (act : OAct (𝓞 E) P.A) (Q : D'.La →+ (Fin P.g → ℂ)), D'.p = D.p → D'.q = D.q → u.IsAH Hm χ → Function.Injective Q → (∀ z, z ∈ u.Λ ↔ z ∈ Q.range) → (∀ x y, (hermForm Hm (Q x) (Q y)).im = D'.EF x y) → (∀ (a : 𝓞 E) (n : ℕ) x, u.ex ((n : ℂ)⁻¹ • Q (a • x)) = u.ex ((n : ℂ)⁻¹ • Q x) ≫ act.act a) → ∀ I : TateIso D ℂ (Over.mk (𝟙 (Sp ℂ)) ⟶ P.A) (fun c y => y ≫ act.act c) (fun n y y' c => Out.WeilIs P.A P.L n y y' (unitOn c)), ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ), (D'.p = D.p ∧ D'.q = D.q ∧ (∀ n m : ℕ, 0 < n → 0 < m → ∀ x, ∃ y, f (n * m) x = f n x + n • y) ∧ (∀ n : ℕ, 0 < n → (∀ x, (∃ y, f n x = n • y) ↔ ∃ y, x = n • y) ∧ ∀ x', ∃ x y, x' = f n x + n • y) ∧ ∀ n : ℕ, 0 < n → ∀ x x', (n : ℤ) ∣ D'.EF (f n x) (f n x') - ν n * D.EF x x') ∧ ∀ n : ℕ, 0 < n → (I.ζ n : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (ν n : ℂ) / n) ∧ ∀ x, (I.ev n x).left = (u.ex ((n : ℂ)⁻¹ • Q (f n x))).left := by
+  intro hL hL2 hT hU E _ _ _ H D D' P u Hm χ act Q hp hq hAH hQ hΛ hE hact I
+  obtain ⟨Ef, hEf, -, -, -, -, -, -, hW⟩ := GlobalTheory.T.appellHumbert_uniformisation_riemannForm hL hL2 hT hU P u Hm χ hAH
+  have hW' : ∀ (n : ℕ) (a b : D'.La) (c : ℂˣ), 0 < n →
+      (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a b : ℂ) / n) →
+      Out.WeilIs P.A P.L n (u.ex ((n : ℂ)⁻¹ • Q a)) (u.ex ((n : ℂ)⁻¹ • Q b)) (unitOn c) := by
+    intro n a b c hn hc
+    refine hW n ⟨Q a, (hΛ _).2 ⟨a, rfl⟩⟩ ⟨Q b, (hΛ _).2 ⟨b, rfl⟩⟩ c hn ?_
+    have h := hEf ⟨Q a, (hΛ _).2 ⟨a, rfl⟩⟩ ⟨Q b, (hΛ _).2 ⟨b, rfl⟩⟩
+    rw [hE] at h
+    rw [Int.cast_injective h]
+    exact hc
+  obtain ⟨f, ν, ⟨h1, h2, h3⟩, h4⟩ := genus_of_tateIso (D := D) (D' := D')
+    (fun n x y c c' _ hx hy ha hb =>
+      unitOn_injective (((hL.weil _ P n (Over.mk (𝟙 (Sp ℂ)))).1 x y hx hy).unique ha hb))
+    (periodTateIso D' u act Q hQ hΛ hact hW') I
+  refine ⟨f, ν, ⟨hp, hq, h1, h2, h3⟩, fun n hn => ⟨?_, fun x => ?_⟩⟩
+  · rw [(h4 n hn).1]
+    exact expRoot_zpow n _
+  · rw [(h4 n hn).2]
+    rfl
+
+end GlobalTheory.TorsionGenus
+
+
+[HUF_SRC_RELATIVE_EXP] Original local jointly holomorphic relative exponential interface
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsRelativeExpOfParts.lean#L53-L160
+theorem exists_relative_exp_of_parts
+    (hchart : ∀ (m g : ℕ) (Z X : Scheme.{0}) (p : Z ⟶ X) (B : Set (Fin m → ℂ)) (y : (Fin m → ℂ) → (Sp ℂ ⟶ X)) (b₀ : Fin m → ℂ) (z₀ : Sp ℂ ⟶ Z), SmoothOfRelativeDimension g p → IsOpen B → b₀ ∈ B → IsHolTo B y → z₀ ≫ p = y b₀ → ∃ (U : Z.Opens) (t : Fin g → Γ(Z, U)) (n : ℕ) (f : Fin n → Γ(Z, U)) (N : Set ((Fin m → ℂ) × (Fin g → ℂ))) (O : Set ((Fin m → ℂ) × (Fin n → ℂ))) (σ : (Fin m → ℂ) × (Fin g → ℂ) → (Sp ℂ ⟶ Z)), IsOpen N ∧ IsOpen O ∧ ⊤ ≤ z₀ ⁻¹ᵁ U ∧ (b₀, fun j => valAt' z₀ U (f j)) ∈ O ∧ IsHolTo N σ ∧ (∀ q ∈ N, σ q ≫ p = y q.1 ∧ ⊤ ≤ σ q ⁻¹ᵁ U ∧ ∀ i, valAt' (σ q) U (t i) = q.2 i) ∧ (∀ (b : Fin m → ℂ) (x : Sp ℂ ⟶ Z), x ≫ p = y b → ⊤ ≤ x ⁻¹ᵁ U → (b, fun j => valAt' x U (f j)) ∈ O → (b, fun i => valAt' x U (t i)) ∈ N ∧ σ (b, fun i => valAt' x U (t i)) = x) ∧ ∀ (v v' : Sp (DualNumber ℂ) ⟶ Z) (h : ⊤ ≤ v ⁻¹ᵁ U) (h' : ⊤ ≤ v' ⁻¹ᵁ U), v ≫ p = v' ≫ p → spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v = spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v' → (∀ i, GlobalTheory.TangentOrigin.evalPt v U h (t i) = GlobalTheory.TangentOrigin.evalPt v' U h' (t i)) → v = v')
+    (htan : ∀ (X : Scheme.{0}) (G : Over X) (x : Sp ℂ ⟶ X) (g : ℕ) (e : (Fin g → ℂ) → (Over.mk x ⟶ G)), IsHolTo Set.univ (fun z => (e z).left) → (∀ w, ∃! v : epsPt x ⟶ G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧ ∀ (U : G.left.Opens) (t : Fin g → Γ(G.left, U)), ⊤ ≤ (show Sp ℂ ⟶ G.left from (e 0).left) ⁻¹ᵁ U → (∀ (v v' : Sp (DualNumber ℂ) ⟶ G.left) (h : ⊤ ≤ v ⁻¹ᵁ U) (h' : ⊤ ≤ v' ⁻¹ᵁ U), v ≫ G.hom = v' ≫ G.hom → spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v = spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v' → (∀ i, GlobalTheory.TangentOrigin.evalPt v U h (t i) = GlobalTheory.TangentOrigin.evalPt v' U h' (t i)) → v = v') → ((∀ v : epsPt x ⟶ G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e 0).left → ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left) ↔ Function.Injective (fderiv ℂ (fun z i => valAt' (e z).left U (t i)) 0)))
+    (hexp : ∀ (m g : ℕ) (b₀ : Fin m → ℂ) (M : (Fin m → ℂ) × (Fin g → ℂ) × (Fin g → ℂ) → (Fin g → ℂ)), AnalyticAt ℂ M (b₀, 0, 0) → (∀ᶠ q : (Fin m → ℂ) × (Fin g → ℂ) in nhds (b₀, 0), M (q.1, q.2, 0) = q.2) → (∀ᶠ q : (Fin m → ℂ) × (Fin g → ℂ) × (Fin g → ℂ) in nhds (b₀, 0, 0), M (q.1, q.2.1, q.2.2) = M (q.1, q.2.2, q.2.1)) → (∀ᶠ q : (Fin m → ℂ) × (Fin g → ℂ) × (Fin g → ℂ) × (Fin g → ℂ) in nhds (b₀, 0, 0, 0), M (q.1, M (q.1, q.2.1, q.2.2.1), q.2.2.2) = M (q.1, q.2.1, M (q.1, q.2.2.1, q.2.2.2))) → ∃ E L : (Fin m → ℂ) × (Fin g → ℂ) → (Fin g → ℂ), AnalyticAt ℂ E (b₀, 0) ∧ AnalyticAt ℂ L (b₀, 0) ∧ (∀ᶠ b in nhds b₀, E (b, 0) = 0 ∧ HasFDerivAt (fun v => E (b, v)) (ContinuousLinearMap.id ℂ (Fin g → ℂ)) 0) ∧ (∀ᶠ q : (Fin m → ℂ) × (Fin g → ℂ) in nhds (b₀, 0), L (q.1, E q) = q.2 ∧ E (q.1, L q) = q.2) ∧ ∀ᶠ q : (Fin m → ℂ) × (Fin g → ℂ) × (Fin g → ℂ) in nhds (b₀, 0, 0), E (q.1, q.2.1 + q.2.2) = M (q.1, E (q.1, q.2.1), E (q.1, q.2.2)))
+    (hsub : ∀ (X : Scheme.{0}) (G : Over X) [GrpObj G] (x : Sp ℂ ⟶ X) (H : Subgroup (Over.mk x ⟶ G)) (U : G.left.Opens) (κ : Type) [Fintype κ] (f : κ → Γ(G.left, U)) (O : Set (κ → ℂ)), Smooth G.hom → GeometricallyConnected G.hom → IsOpen O → ⊤ ≤ (show Sp ℂ ⟶ G.left from (1 : Over.mk x ⟶ G).left) ⁻¹ᵁ U → (fun j => valAt' (1 : Over.mk x ⟶ G).left U (f j)) ∈ O → (∀ a : Over.mk x ⟶ G, ⊤ ≤ (show Sp ℂ ⟶ G.left from a.left) ⁻¹ᵁ U → (fun j => valAt' a.left U (f j)) ∈ O → a ∈ H) → H = ⊤) :
+    ∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (G : Over X) [GrpObj G] (g m : ℕ) (B : Set (Fin m → ℂ)) (y : (Fin m → ℂ) → (Sp ℂ ⟶ X)) (b₀ : Fin m → ℂ) (e₀ : (Fin g → ℂ) → (Over.mk (y b₀) ⟶ G)), LocallyOfFiniteType s → IsAbelianScheme G → SmoothOfRelativeDimension g G.hom → IsOpen B → b₀ ∈ B → (∀ b ∈ B, y b ≫ s = spMap σ) → IsHolTo B y → ((∀ z w, e₀ (z + w) = e₀ z * e₀ w) ∧ Function.Surjective e₀ ∧ IsHolTo Set.univ (fun z => (e₀ z).left) ∧ (∀ w, ∃! v : epsPt (y b₀) ⟶ G, IsDerivAt0 (fun z => (e₀ z).left) w v.left) ∧ (∀ v : epsPt (y b₀) ⟶ G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e₀ 0).left → ∃! w, IsDerivAt0 (fun z => (e₀ z).left) w v.left)) → ∃ (B' : Set (Fin m → ℂ)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ G)) (r : ℝ), IsOpen B' ∧ b₀ ∈ B' ∧ B' ⊆ B ∧ e b₀ = e₀ ∧ 0 < r ∧ IsHolTo (B' ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left) ∧ (∀ b ∈ B', ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y b) ⟶ G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y b) ⟶ G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b) 0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ ∀ z, ‖z‖ < r → e b z = 1 → z = 0) ∧ ∀ (n : ℕ) (W : Set (Fin n → ℂ)) (β : (Fin n → ℂ) → (Fin m → ℂ)) (x : ∀ w, Over.mk (y (β w)) ⟶ G) (w₀ : Fin n → ℂ) (z₀ : Fin g → ℂ), IsOpen W → w₀ ∈ W → DifferentiableOn ℂ β W → Set.MapsTo β W B' → IsHolTo W (fun w => (x w).left) → e (β w₀) z₀ = x w₀ → ∃ ζ : (Fin n → ℂ) → (Fin g → ℂ), ζ w₀ = z₀ ∧ AnalyticAt ℂ ζ w₀ ∧ ∀ᶠ w in nhds w₀, e (β w) (ζ w) = x w := by
+  intro k _ σ₀ X s₀ G _ g m B y b₀ e₀ _ hab hsm hB hb₀ _ hy ⟨he₀add, _, he₀hol, _, he₀tan⟩
+  have := hab.comm
+  have hy₀ : HolAt y b₀ := ⟨B, hB, hb₀, hy⟩
+  obtain ⟨U, t, n, f, N, O, σ, hN, hO, hU, hO₀, hσ, hσN, hσinv, hunr⟩ :=
+    hchart m g G.left X G.hom B y b₀ (pt (1 : Over.mk (y b₀) ⟶ G)) hsm hB hb₀ hy (Over.w _)
+  obtain ⟨s, hs1, hs2, hs3⟩ := exists_centred_chart hy₀ hN hU hO₀ hσ hσN hσinv
+  obtain ⟨B', e, r, Q, L, hB', hb', hB'B, hr, hQ, hadd, hfib, hinv⟩ :=
+    exists_global_exp hexp (hB.mem_nhds hb₀) hy₀ hO hU hO₀ hs1 hs2 hs3
+  have hzero : ∀ {x : Sp ℂ ⟶ X} {u : (Fin g → ℂ) → (Over.mk x ⟶ G)}, (∀ z w, u (z + w) = u z * u w) → u 0 = 1 :=
+    fun {x u} h => by
+      have := h 0 0
+      rw [add_zero] at this
+      exact mul_eq_left.1 this.symm
+  have he₀0 : e₀ 0 = 1 := hzero he₀add
+  have he₀U : ⊤ ≤ pt (e₀ 0) ⁻¹ᵁ U := by rw [he₀0]; exact hU
+  have hinj := ((htan X G (y b₀) g e₀ he₀hol).2 U t he₀U hunr).1 he₀tan
+  set T₀ : (Fin g → ℂ) →L[ℂ] (Fin g → ℂ) := fderiv ℂ (fun z => crd U t (pt (e₀ z))) 0 with hT₀
+  have hsurj : Function.Surjective T₀ :=
+    (LinearMap.injective_iff_surjective (f := (T₀ : (Fin g → ℂ) →ₗ[ℂ] (Fin g → ℂ)))).1 hinj
+  let T : (Fin g → ℂ) ≃L[ℂ] (Fin g → ℂ) := ContinuousLinearEquiv.ofBijective T₀ (LinearMap.ker_eq_bot.mpr hinj)
+    (LinearMap.range_eq_top.mpr hsurj)
+  have hT : ∀ z, T z = T₀ z := fun _ => rfl
+  have hhol : ∀ b ∈ B', ∀ z, HolAt (fun q : (Fin m → ℂ) × (Fin g → ℂ) => pt (e q.1 (T₀ q.2))) (b, z) :=
+    fun b hb z => by
+      have := HolAt.comp (φ := fun q : (Fin m → ℂ) × (Fin g → ℂ) => (q.1, T₀ q.2)) (v₀ := (b, z))
+        ((hfib b hb).1 (T₀ z)) (analyticAt_fst.prod ((T₀.analyticAt _).comp analyticAt_snd))
+      exact this
+  refine ⟨B', fun b z => e b (T₀ z), r / (‖T₀‖ + 1), hB', hb', hB'B, ?_, by positivity,
+    isHolTo_of_holAt (hB'.prod isOpen_univ) fun q hq => hhol q.1 hq.1 q.2, fun b hb => ?_, ?_⟩
+  ·
+    obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ := hfib b₀ hb'
+    obtain ⟨ζ, hζ0, hζ, hζe⟩ := exists_lift hO hQ hadd hinv (β := fun _ : Fin g → ℂ => b₀) (x := e₀) (w₀ := 0)
+      (z₀ := 0) analyticAt_const ⟨Set.univ, isOpen_univ, trivial, he₀hol⟩ ((hzero (hadd b₀)).trans he₀0.symm)
+      (h1 0) h2 h3 h4 h6 h7
+    have hd : HasFDerivAt ζ T₀ 0 := by
+      have k1 := HasFDerivAt.comp (f := ζ) (0 : Fin g → ℂ) (hζ0.symm ▸ h5) hζ.differentiableAt.hasFDerivAt
+      have k2 : HasFDerivAt (fun z => crd U t (pt (e₀ z))) _ 0 := k1.congr_of_eventuallyEq
+        (hζe.mono fun z hz => by simp only [Function.comp, hz])
+      rw [hT₀, k2.fderiv, ContinuousLinearMap.id_comp]
+      exact hζ.differentiableAt.hasFDerivAt
+    have tζ : Tendsto ζ (𝓝 0) (𝓝 0) := by simpa only [ContinuousAt, hζ0] using hζ.continuousAt
+    have t1 : Tendsto (fun p : (Fin g → ℂ) × (Fin g → ℂ) => p.1) (𝓝 0) (𝓝 0) := continuous_fst.tendsto 0
+    have t2 : Tendsto (fun p : (Fin g → ℂ) × (Fin g → ℂ) => p.2) (𝓝 0) (𝓝 0) := continuous_snd.tendsto 0
+    have t3 : Tendsto (fun p : (Fin g → ℂ) × (Fin g → ℂ) => p.1 + p.2) (𝓝 0) (𝓝 0) := by simpa using t1.add t2
+    have t4 : Tendsto (fun p : (Fin g → ℂ) × (Fin g → ℂ) => ζ (p.1 + p.2) - (ζ p.1 + ζ p.2)) (𝓝 0) (𝓝 0) := by
+      simpa using (tζ.comp t3).sub ((tζ.comp t1).add (tζ.comp t2))
+    have hζT := eventuallyEq_of_additive_of_hasFDerivAt hd (by
+      filter_upwards [t1.eventually hζe, t2.eventually hζe, t3.eventually hζe,
+        t4.eventually (Metric.ball_mem_nhds 0 hr)] with p k1 k2 k3 k4
+      refine sub_eq_zero.1 (h8 _ (mem_ball_zero_iff.1 k4) ?_)
+      have k5 := hadd b₀ (ζ (p.1 + p.2) - (ζ p.1 + ζ p.2)) (ζ p.1 + ζ p.2)
+      rw [sub_add_cancel, hadd b₀ (ζ p.1), k1, k2, k3, he₀add] at k5
+      exact mul_eq_right.1 k5.symm)
+    have key := addMonoidHom_eq_of_eventuallyEq
+      (e := AddMonoidHom.mk' (fun z => Additive.ofMul (e b₀ (T₀ z))) fun z w => by rw [map_add, hadd]; rfl)
+      (e' := AddMonoidHom.mk' (fun z => Additive.ofMul (e₀ z)) fun z w => by rw [he₀add]; rfl) (by
+        filter_upwards [hζT, hζe] with z k1 k2
+        exact congrArg Additive.ofMul (by rw [← k1]; exact k2))
+    exact funext fun z => congrArg Additive.toMul (DFunLike.congr_fun key z)
+  · obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ := hfib b hb
+    have hH : IsHolTo Set.univ (fun z => pt (e b (T₀ z))) := isHolTo_of_holAt isOpen_univ fun z _ => by
+      have := HolAt.comp (φ := fun z : Fin g → ℂ => (b, z)) (v₀ := z) (hhol b hb z)
+        (analyticAt_const.prod analyticAt_id)
+      exact this
+    have hadd' : ∀ z w, e b (T₀ (z + w)) = e b (T₀ z) * e b (T₀ w) := fun z w => by rw [map_add, hadd]
+    obtain ⟨k1, k2⟩ := htan X G (y b) g (fun z => e b (T₀ z)) hH
+    refine ⟨⟨hadd', ?_, hH, k1, (k2 U t ?_ hunr).2 ?_⟩, fun z hz h => ?_⟩
+    · refine Function.Surjective.comp (g := e b) ?_ hsurj
+      let ε : (Fin g → ℂ) →+ Additive (Over.mk (y b) ⟶ G) :=
+        AddMonoidHom.mk' (fun z => Additive.ofMul (e b z)) fun z w => by rw [hadd]; rfl
+      have hc : Continuous fun u : Fin n ⊕ Fin g → ℂ => (b, fun j => u (Sum.inl j)) := by fun_prop
+      have hc' : Continuous fun u : Fin n ⊕ Fin g → ℂ =>
+        (b, (fun j => u (Sum.inr j)) - crd U t (pt (1 : Over.mk (y b) ⟶ G))) := by fun_prop
+      have := hsub X G (y b) (AddSubgroup.toSubgroup' ε.range) U (Fin n ⊕ Fin g) (Sum.elim f t) _ hab.smooth
+        hab.geomConnected ((hO.preimage hc).inter (hQ.preimage hc')) h2
+        ⟨h3, by simpa only [Set.mem_preimage, Sum.elim_inr, sub_self] using h4⟩
+        fun a ha hb => ⟨_, congrArg Additive.ofMul (hinv b a ha hb.1 hb.2)⟩
+      intro a
+      obtain ⟨z, hz⟩ : a ∈ AddSubgroup.toSubgroup' ε.range := this ▸ Subgroup.mem_top a
+      exact ⟨z, congrArg Additive.toMul hz⟩
+    · rw [hzero (u := fun z => e b (T₀ z)) hadd']; exact h2
+    · have := HasFDerivAt.comp (f := T₀) (0 : Fin g → ℂ) (by rw [map_zero]; exact h5) T₀.hasFDerivAt
+      have k3 : fderiv ℂ (fun z => crd U t (pt (e b (T₀ z)))) 0 = _ := this.fderiv
+      rw [ContinuousLinearMap.id_comp] at k3
+      exact k3.symm ▸ hinj
+    · refine hinj ((h8 _ ((T₀.le_opNorm z).trans_lt ?_) h).trans (map_zero T₀).symm)
+      rw [lt_div_iff₀ (by positivity)] at hz
+      nlinarith [norm_nonneg z]
+  · intro j W β x w₀ z₀ hW hw₀ hβ hβW hx h0
+    obtain ⟨h1, h2, h3, h4, h5, h6, h7, h8⟩ := hfib _ (hβW hw₀)
+    obtain ⟨ζ, hζ0, hζ, hζe⟩ := exists_lift hO hQ hadd hinv (x := x)
+      (SCV.analyticAt_of_differentiableOn hβ (hW.mem_nhds hw₀)) ⟨W, hW, hw₀, hx⟩ h0 (h1 _) h2 h3 h4 h6 h7
+    refine ⟨fun w => T.symm (ζ w), by simp only [hζ0, ← hT, T.symm_apply_apply], (T.symm.analyticAt _).comp hζ, ?_⟩
+    filter_upwards [hζe] with w hw
+    rw [← hT, T.apply_symm_apply, hw]
+
+theorem exists_relative_exp :
+    ∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (G : Over X) [GrpObj G] (g m : ℕ) (B : Set (Fin m → ℂ)) (y : (Fin m → ℂ) → (Sp ℂ ⟶ X)) (b₀ : Fin m → ℂ) (e₀ : (Fin g → ℂ) → (Over.mk (y b₀) ⟶ G)), LocallyOfFiniteType s → IsAbelianScheme G → SmoothOfRelativeDimension g G.hom → IsOpen B → b₀ ∈ B → (∀ b ∈ B, y b ≫ s = spMap σ) → IsHolTo B y → ((∀ z w, e₀ (z + w) = e₀ z * e₀ w) ∧ Function.Surjective e₀ ∧ IsHolTo Set.univ (fun z => (e₀ z).left) ∧ (∀ w, ∃! v : epsPt (y b₀) ⟶ G, IsDerivAt0 (fun z => (e₀ z).left) w v.left) ∧ (∀ v : epsPt (y b₀) ⟶ G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e₀ 0).left → ∃! w, IsDerivAt0 (fun z => (e₀ z).left) w v.left)) → ∃ (B' : Set (Fin m → ℂ)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ G)) (r : ℝ), IsOpen B' ∧ b₀ ∈ B' ∧ B' ⊆ B ∧ e b₀ = e₀ ∧ 0 < r ∧ IsHolTo (B' ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left) ∧ (∀ b ∈ B', ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y b) ⟶ G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y b) ⟶ G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b) 0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ ∀ z, ‖z‖ < r → e b z = 1 → z = 0) ∧ ∀ (n : ℕ) (W : Set (Fin n → ℂ)) (β : (Fin n → ℂ) → (Fin m → ℂ)) (x : ∀ w, Over.mk (y (β w)) ⟶ G) (w₀ : Fin n → ℂ) (z₀ : Fin g → ℂ), IsOpen W → w₀ ∈ W → DifferentiableOn ℂ β W → Set.MapsTo β W B' → IsHolTo W (fun w => (x w).left) → e (β w₀) z₀ = x w₀ → ∃ ζ : (Fin n → ℂ) → (Fin g → ℂ), ζ w₀ = z₀ ∧ AnalyticAt ℂ ζ w₀ ∧ ∀ᶠ w in nhds w₀, e (β w) (ζ w) = x w :=
+  exists_relative_exp_of_parts (RelChart.exists_chart_with_parameters EtaleFamily.exists_holomorphic_sections)
+    vertical_derivative_in_coordinates exists_param_exp_log_pi OpenSubgroupPts.subgroup_eq_top_of_nhds_one
+
+end GlobalTheory.RelExp
+
+
+[HUF_SRC_LATTICE_CONTINUATION] Original full-kernel lattice continuation conclusion
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/LatContMapContinuous.lean#L60-L169
+theorem latContinuation : ∀ (La : Type) [AddCommGroup La] [Module.Free ℤ La] [Module.Finite ℤ La] (g m : ℕ) (B : Set (Fin m → ℂ)) (b₀ : Fin m → ℂ) (K : (Fin m → ℂ) → AddSubgroup (Fin g → ℂ)) (P : (Fin m → ℂ) → (La →+ (Fin g → ℂ))) (r : ℝ), IsOpen B → b₀ ∈ B → 0 < r → (∀ b ∈ B, ∀ z ∈ K b, ‖z‖ < r → z = 0) → (∀ (b : ℕ → (Fin m → ℂ)) (z : ℕ → (Fin g → ℂ)) (z₀ : Fin g → ℂ), Filter.Tendsto b Filter.atTop (nhds b₀) → Filter.Tendsto z Filter.atTop (nhds z₀) → (∀ i, z i ∈ K (b i)) → z₀ ∈ K b₀) → (∀ x, ContinuousAt (fun b => P b x) b₀) → (∀ b ∈ B, (P b).range ≤ K b) → (P b₀).range = K b₀ → Function.Injective (P b₀) → Submodule.span ℝ (Set.range (P b₀)) = ⊤ → ∀ᶠ b in nhds b₀, (P b).range = K b ∧ Function.Injective (P b) ∧ Submodule.span ℝ (Set.range (P b)) = ⊤ ∧ DiscreteTopology (P b).range := by
+  intro La _ _ _ g m B b₀ K P r hB hb₀ hr hdisc hclosed hcont hle heq hinj hspan
+  obtain ⟨J, _, ⟨e⟩⟩ : ∃ (J : Type) (_ : Fintype J), Nonempty (Module.Basis J ℤ La) :=
+    ⟨_, inferInstance, ⟨Module.Free.chooseBasis ℤ La⟩⟩
+  have hrepr : ∀ b (k : J → ℤ), P b (e.equivFun.symm k) = ∑ j, ((k j : ℤ) : ℝ) • P b (e j) := by
+    intro b k
+    rw [← latContMap_repr e (P b) k, latContMap_apply]
+  have hcoord : ∀ b x, P b x = ∑ j, ((e.equivFun x j : ℤ) : ℝ) • P b (e j) := by
+    intro b x
+    rw [← hrepr]
+    simp
+  have hdiscR : ∀ b ∈ B, DiscreteTopology (P b).range := fun b hb =>
+    latCont_discrete _ r hr (fun z hz hzr => hdisc b hb z (hle b hb hz) hzr)
+  have hcard : Fintype.card J = Module.finrank ℝ (Fin g → ℂ) := by
+    rw [← Module.finrank_fintype_fun_eq_card ℝ]
+    exact latCont_card e (P b₀) (hdiscR b₀ hb₀) hinj hspan
+  have hspan0 : ⊤ ≤ Submodule.span ℝ (Set.range (fun j => P b₀ (e j))) := by
+    rw [← hspan]
+    apply Submodule.span_le.mpr
+    rintro _ ⟨x, rfl⟩
+    rw [hcoord]
+    exact Submodule.sum_mem _ (fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩))
+  have hli0 : LinearIndependent ℝ (fun j => P b₀ (e j)) :=
+    linearIndependent_of_top_le_span_of_card_eq_finrank hspan0 hcard
+  have hvc : ContinuousAt (fun b => fun j => P b (e j)) b₀ :=
+    continuousAt_pi.mpr (fun j => hcont (e j))
+  have hev_li : ∀ᶠ b in nhds b₀, LinearIndependent ℝ (fun j => P b (e j)) :=
+    hvc.tendsto.eventually hli0.eventually
+  have hev_B : ∀ᶠ b in nhds b₀, b ∈ B := hB.mem_nhds hb₀
+  have hspanv : ∀ b, LinearIndependent ℝ (fun j => P b (e j)) →
+      Submodule.span ℝ (Set.range (fun j => P b (e j))) = ⊤ :=
+    fun b hb => hb.span_eq_top_of_card_eq_finrank' hcard
+  have hsurj : ∀ b, LinearIndependent ℝ (fun j => P b (e j)) →
+      ∀ z, ∃ c : J → ℝ, ∑ j, c j • P b (e j) = z := by
+    intro b hb z
+    have hz : z ∈ Submodule.span ℝ (Set.range (fun j => P b (e j))) := by
+      rw [hspanv b hb]
+      trivial
+    exact (Submodule.mem_span_range_iff_exists_fun ℝ).mp hz
+  have hev_eq : ∀ᶠ b in nhds b₀, ∀ z ∈ K b, z ∈ (P b).range := by
+    by_contra hne
+    rw [Filter.not_eventually] at hne
+    have hfr : ∃ᶠ b in nhds b₀, b ∈ B ∧ LinearIndependent ℝ (fun j => P b (e j)) ∧
+        ∃ z ∈ K b, z ∉ (P b).range := by
+      refine (hne.and_eventually (hev_B.and hev_li)).mono ?_
+      rintro b ⟨h1, h2, h3⟩
+      push Not at h1
+      exact ⟨h2, h3, h1⟩
+    obtain ⟨bs, hbs, hprop⟩ := Filter.exists_seq_forall_of_frequently hfr
+    choose hbsB hbsli z hzK hzR using hprop
+    choose c hc using fun i => hsurj (bs i) (hbsli i) (z i)
+    have hshift : ∀ i (k : J → ℤ),
+        (∑ j, (Int.fract (c i j) - (k j : ℝ)) • P (bs i) (e j)) ∈ K (bs i) ∧
+        (∑ j, (Int.fract (c i j) - (k j : ℝ)) • P (bs i) (e j)) ∉ (P (bs i)).range := by
+      intro i k
+      have e1 : ∑ j, (Int.fract (c i j) - (k j : ℝ)) • P (bs i) (e j)
+          = z i - P (bs i) (e.equivFun.symm (fun j => ⌊c i j⌋ + k j)) := by
+        rw [hrepr, ← hc i, ← Finset.sum_sub_distrib]
+        refine Finset.sum_congr rfl (fun j _ => ?_)
+        rw [← sub_smul]
+        congr 1
+        push_cast
+        rw [← Int.self_sub_floor]
+        ring
+      rw [e1]
+      have hmem : P (bs i) (e.equivFun.symm (fun j => ⌊c i j⌋ + k j)) ∈ (P (bs i)).range :=
+        ⟨_, rfl⟩
+      refine ⟨sub_mem (hzK i) (hle _ (hbsB i) hmem), fun h => hzR i ?_⟩
+      have := add_mem h hmem
+      rwa [sub_add_cancel] at this
+    have hIcc : ∀ i, (fun j => Int.fract (c i j)) ∈ Set.Icc (0 : J → ℝ) 1 := fun i =>
+      ⟨fun j => Int.fract_nonneg _, fun j => (Int.fract_lt_one _).le⟩
+    obtain ⟨a, -, φ, hφ, ha⟩ := (isCompact_Icc (a := (0 : J → ℝ)) (b := 1)).tendsto_subseq hIcc
+    have hbφ : Filter.Tendsto (bs ∘ φ) Filter.atTop (nhds b₀) := hbs.comp hφ.tendsto_atTop
+    have hvφ : ∀ j, Filter.Tendsto (fun i => P (bs (φ i)) (e j)) Filter.atTop
+        (nhds (P b₀ (e j))) := fun j => (hcont (e j)).tendsto.comp hbφ
+    have haj : ∀ j, Filter.Tendsto (fun i => Int.fract (c (φ i) j)) Filter.atTop (nhds (a j)) :=
+      fun j => ((continuous_apply j).tendsto a).comp ha
+    have hlim : ∀ k : J → ℤ, Filter.Tendsto
+        (fun i => ∑ j, (Int.fract (c (φ i) j) - (k j : ℝ)) • P (bs (φ i)) (e j)) Filter.atTop
+        (nhds (∑ j, (a j - (k j : ℝ)) • P b₀ (e j))) := fun k =>
+      tendsto_finsetSum _ (fun j _ => ((haj j).sub_const _).smul (hvφ j))
+    have hz0 : (∑ j, (a j - ((0 : J → ℤ) j : ℝ)) • P b₀ (e j)) ∈ K b₀ :=
+      hclosed (bs ∘ φ) _ _ hbφ (hlim 0) (fun i => (hshift (φ i) 0).1)
+    simp only [Pi.zero_apply, Int.cast_zero, sub_zero] at hz0
+    rw [← heq] at hz0
+    obtain ⟨x, hx⟩ := AddMonoidHom.mem_range.mp hz0
+    have hzero : ∑ j, (a j - ((e.equivFun x j : ℤ) : ℝ)) • P b₀ (e j) = 0 := by
+      simp only [sub_smul, Finset.sum_sub_distrib]
+      rw [← hcoord b₀ x, ← hx, sub_self]
+    have hlim0 := hlim (e.equivFun x)
+    rw [hzero] at hlim0
+    obtain ⟨i, hi⟩ := (hlim0.eventually (Metric.ball_mem_nhds (0 : Fin g → ℂ) hr)).exists
+    rw [dist_zero_right] at hi
+    obtain ⟨hK', hR'⟩ := hshift (φ i) (e.equivFun x)
+    exact hR' (by rw [hdisc _ (hbsB (φ i)) _ hK' hi]; exact zero_mem _)
+  filter_upwards [hev_B, hev_li, hev_eq] with b hb hli hrange
+  refine ⟨le_antisymm (hle b hb) (fun z hz => hrange z hz), ?_, ?_, hdiscR b hb⟩
+  · rw [injective_iff_map_eq_zero]
+    intro x hx
+    rw [hcoord] at hx
+    have h0 := (Fintype.linearIndependent_iff.mp hli) _ hx
+    have h1 : e.equivFun x = 0 := funext fun j => by simpa using h0 j
+    simpa using congrArg e.equivFun.symm h1
+  · rw [eq_top_iff, ← hspanv b hli]
+    apply Submodule.span_mono
+    rintro _ ⟨j, rfl⟩
+    exact ⟨e j, rfl⟩
+
+end GlobalTheory
+
+
+[HUF_SRC_LOCAL_LIFT] Full prescribed-initial-period local lift with one open neighborhood
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsLocalPeriodLift.lean#L21-L27
+theorem exists_local_period_lift :
+    ThetaUnifAV → Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B : Set (Fin m → ℂ)) (y : (Fin m → ℂ) → (Sp ℂ ⟶ Xo.X)) (b₀ : Fin m → ℂ) (P₀ : D'.La →+ (Fin g → ℂ)) (e₀ : (Fin g → ℂ) → (Over.mk (y b₀) ⟶ Xo.univ.t.G)), IsOpen B → b₀ ∈ B → (∀ b ∈ B, y b ≫ Xo.s = spMap σ) → IsHolTo B y → ((y b₀) ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P₀ ∧ ((∀ z w, e₀ (z + w) = e₀ z * e₀ w) ∧ Function.Surjective e₀ ∧ IsHolTo Set.univ (fun z => (e₀ z).left) ∧ (∀ w, ∃! v : epsPt (y b₀) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e₀ z).left) w v.left) ∧ (∀ v : epsPt (y b₀) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e₀ 0).left → ∃! w, IsDerivAt0 (fun z => (e₀ z).left) w v.left)) ∧ (∀ z, e₀ z = 1 ↔ z ∈ (P₀).range) ∧ (∀ (a : 𝓞 E) z, e₀ (fun k => ty k (a : E) * z k) = e₀ z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e₀ ((k : ℂ)⁻¹ • P₀ a)) (e₀ ((k : ℂ)⁻¹ • P₀ a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = e₀ ((l.M : ℂ)⁻¹ • P₀ (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = e₀ ((l.A : ℂ)⁻¹ • P₀ (t a))) → ∃ (B' : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ Xo.univ.t.G)), IsOpen B' ∧ b₀ ∈ B' ∧ B' ⊆ B ∧ P b₀ = P₀ ∧ IsHolPeriods D' ty B' P ∧ IsHolTo (B' ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left) ∧ ∀ b ∈ B', ((y b) ≫ Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b) 0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ • (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a))) :=
+  fun hT hL => GlobalTheory.T.holomorphic_map_moduli_lifts_locally_to_periods hT hL isReduced_isNormalScheme_isLocallyNoetherian_of_smooth_over_field
+    obj_isAbelianScheme_dim_rigidified_sym obj_pull RelExp.exists_relative_exp latContinuation
+    holomorphic_diagonalisation (torsion_eq_and_weilIs_of_isHolTo hL)
+
+end GlobalTheory
+
+
+[HUF_SRC_PERIOD_COORDINATES] Exact PeriodCoord.exists_period_coordinates with finite period set, radius and dimension
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsFinsetOfMemNhds.lean#L325-L398
+theorem exists_period_coordinates : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (g : ℕ) (ty : Fin g → (E →+* ℂ)) (P₀ : D.La →+ (Fin g → ℂ)), IsTypeFn H D.p D.q ty → IsPeriod D ty P₀ → ∃ (Z : (D.La →+ (Fin g → ℂ)) → (Fin D.dim → ℂ)) (s : Finset D.La) (ε : ℝ), 0 < ε ∧ (∀ (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D.La →+ (Fin g → ℂ))), IsOpen B → IsHolPeriods D ty B P → (∀ b ∈ B, ∀ x ∈ s, ‖P b x - P₀ x‖ < ε) → DifferentiableOn ℂ (fun b => Z (P b)) B) ∧ ∀ P P' : D.La →+ (Fin g → ℂ), IsPeriod D ty P → IsPeriod D ty P' → (∀ x ∈ s, ‖P x - P₀ x‖ < ε) → (∀ x ∈ s, ‖P' x - P₀ x‖ < ε) → Z P = Z P' → ∃ h : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ), (∀ a, P' a = h (P a)) ∧ ∀ (a : 𝓞 E) z, h (fun k => ty k (a : E) * z k) = fun k => ty k (a : E) * h z k := by
+  intro E _ _ _ H D g ty P₀ hty hP₀
+  obtain ⟨α, β, hαβ⟩ := exists_colMat hP₀
+  obtain ⟨e, he⟩ := exists_index hty
+  obtain ⟨M₀, -, hpos₀, hM₀⟩ := hP₀.2.2.2.2
+  have hA₀ : colMat α P₀ = 1 := by
+    refine (realMap_inj (B := colMat β P₀) (B' := 0) (ext_period hP₀ fun x => ?_)).1
+    rw [← hαβ P₀ hP₀]
+    simp [realMap_apply]
+  have hcont : Continuous fun f : D.La → Fin g → ℂ => (colMat α f).det := by
+    refine Continuous.matrix_det (continuous_matrix fun i j => ?_)
+    simp only [colMat, of_apply]
+    fun_prop
+  obtain ⟨s, ε, hε, hs⟩ := exists_finset_of_mem_nhds
+    ((hcont.continuousAt (x := ⇑P₀)).eventually_ne (show (colMat α P₀).det ≠ 0 by simp [hA₀]))
+  refine ⟨fun P k => (((colMat α P)⁻¹ * colMat β P)ᵀ * M₀) (e k).1 (e k).2, s, ε, hε, ?_, ?_⟩
+  · intro m B P _ hP hnear
+    have hc : ∀ (γ : Fin g → (D.La →₀ ℂ)) i j, DifferentiableOn ℂ (fun b => colMat γ (P b) i j) B :=
+      fun γ i j => by
+        simp only [colMat, of_apply]
+        exact DifferentiableOn.fun_sum fun x _ => (differentiableOn_pi.1 (hP.2 x) i).const_mul _
+    have hinv := RiemannRel.differentiableOn_left_inverse (fun b => colMat α (P b)) (fun b => (colMat α (P b))⁻¹)
+      (hc α) (fun b hb => nonsing_inv_mul _ (isUnit_iff_ne_zero.2 (hs _ (hnear b hb))))
+    refine differentiableOn_pi.2 fun k => ?_
+    simp only [mul_apply, transpose_apply]
+    exact DifferentiableOn.fun_sum fun l _ =>
+      (DifferentiableOn.fun_sum fun n _ => (hinv _ _).mul (hc β _ _)).mul_const _
+  · intro P P' hP hP' hn hn' hZ
+    have hA : (colMat α P).det ≠ 0 := hs _ hn
+    have hA' : (colMat α P').det ≠ 0 := hs _ hn'
+    have h1 := hαβ P hP
+    have h1' := hαβ P' hP'
+    have h2 := symm_and_support hP₀ hP hM₀ h1 hA
+    have h2' := symm_and_support hP₀ hP' hM₀ h1' hA'
+    beta_reduce at hZ
+    clear hs hαβ
+    generalize colMat α P = A, colMat β P = B, colMat α P' = A', colMat β P' = B' at *
+    have hu := isUnit_iff_ne_zero.2 hA
+    have hu' := isUnit_iff_ne_zero.2 hA'
+    have h3 : ∀ i j, ty i (H.rt : E) = H.rt0 → ((A⁻¹ * B)ᵀ * M₀) i j = ((A'⁻¹ * B')ᵀ * M₀) i j := by
+      intro i j hi
+      by_cases hj : ty j = ComplexEmbedding.conjugate (ty i)
+      · obtain ⟨k, hk⟩ := he i j hi hj
+        simpa only [hk] using congrFun hZ k
+      · rw [(h2 i j).2 hj, (h2' i j).2 hj]
+    have h4 : (A⁻¹ * B)ᵀ * M₀ = (A'⁻¹ * B')ᵀ * M₀ := by
+      ext i j
+      by_cases hi : ty i (H.rt : E) = H.rt0
+      · exact h3 i j hi
+      by_cases hj : ty j = ComplexEmbedding.conjugate (ty i)
+      · rw [(h2 i j).1, (h2' i j).1]
+        exact h3 j i (by rw [hj, conjugate_mem_iff]; exact hi)
+      · rw [(h2 i j).2 hj, (h2' i j).2 hj]
+    have h5 : A⁻¹ * B = A'⁻¹ * B' := by
+      have hM := isUnit_iff_ne_zero.2 (det_ne_zero_of_pos hpos₀)
+      have := congrArg (· * M₀⁻¹) h4
+      simp only [mul_nonsing_inv_cancel_right _ _ hM] at this
+      exact transpose_injective this
+    have hN : IsUnit (A' * A⁻¹).det := by
+      rw [det_mul]; exact hu'.mul (isUnit_nonsing_inv_det _ hu)
+    have h6 : ∀ x, P' x = (A' * A⁻¹) *ᵥ P x := fun x => by
+      rw [h1, h1', realMap_apply, realMap_apply, mulVec_add, mulVec_mulVec, mulVec_mulVec,
+        nonsing_inv_mul_cancel_right _ _ hu, Matrix.mul_assoc, h5, mul_nonsing_inv_cancel_left _ _ hu']
+    refine ⟨Matrix.toLinearEquiv' _ (invertibleOfIsUnitDet _ hN), h6, fun a z => ?_⟩
+    have h7 := (comm_of_realMap hP hP' (A := A' * A⁻¹) (B := 0) (fun x => by simp [realMap_apply, h6]) a).1
+    have h8 : ∀ z : Fin g → ℂ, (fun k => ty k (a : E) * z k) = actMat ty a *ᵥ z := fun z => by
+      funext k; rw [actMat, mulVec_diagonal]
+    rw [h8, h8]
+    change (A' * A⁻¹) *ᵥ _ = _ *ᵥ ((A' * A⁻¹) *ᵥ z)
+    rw [mulVec_mulVec, mulVec_mulVec, h7]
+
+end
+
+end GlobalTheory.PeriodCoord
+
+
+[HUF_SRC_EXPONENTIAL_UNIQUE] Actual half-level isometry rigidity and exp_eq_of_periods_of_marking
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExpEqOfPeriodsOfMarking.lean#L185-L321
+theorem eq_self_of_isometry (D : Datum H) (l : Level H) {g : ℕ} {ty : Fin g → (E →+* ℂ)}
+    {P : D.La →+ (Fin g → ℂ)} (hP : IsPeriod D ty P) (h : (Fin g → ℂ) →L[ℝ] (Fin g → ℂ))
+    (hI : ∀ z, h (Complex.I • z) = Complex.I • h z) (φ : D.La → D.La) (hφ : ∀ a, P (φ a) = h (P a))
+    (hEF : ∀ a b, D.EF (φ a) (φ b) = D.EF a b) (hO : ∀ (c : 𝓞 E) a, φ (c • a) = c • φ a)
+    (hM : ∀ b ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), ∃ z, φ b = b + l.M • z)
+    (z : Fin g → ℂ) : h z = z := by
+  obtain ⟨-, hinj, hd, hspan, Hm, -, hpos, hIm⟩ := hP
+  let σ : Module.End ℤ D.La := (AddMonoidHom.mk' φ fun a b => hinj (by simp only [hφ, map_add])).toIntLinearMap
+  have hσ : ∀ a, σ a = φ a := fun _ => rfl
+  have := D.fin
+  have : Module.Finite ℤ D.La := Module.Finite.trans (𝓞 E) D.La
+  have : Module.IsTorsionFree ℤ D.La :=
+    Function.Injective.moduleIsTorsionFree P hinj fun r m => map_zsmul P r m
+  have : Module.Free ℤ D.La := Module.free_of_finite_type_torsion_free'
+  let B : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ) →ₗ[ℝ] ℝ := LinearMap.mk₂ ℝ (fun u v => (hermForm Hm u v).im)
+    (fun a b c => by simp [hermForm]) (fun r a b => by simp [hermForm])
+    (fun a b c => by simp [hermForm, Matrix.mulVec_add]) (fun r a b => by simp [hermForm, Matrix.mulVec_smul])
+  have hB : B.compl₁₂ h.toLinearMap h.toLinearMap = B := by
+    refine LinearMap.ext_on_range hspan fun a => LinearMap.ext_on_range hspan fun b => ?_
+    show (hermForm Hm (h (P a)) (h (P b))).im = (hermForm Hm (P a) (P b)).im
+    rw [← hφ, ← hφ, hIm, hIm, hEF]
+  have hq : ∀ u, (hermForm Hm u u).re = B (Complex.I • u) u := fun u => by
+    show _ = (hermForm Hm (Complex.I • u) u).im
+    simp [hermForm]
+  have hbd := isBounded_sublevel (q := fun u => (hermForm Hm u u).re)
+    (by unfold hermForm; fun_prop) (fun r u => by
+      simp only [hq]
+      rw [smul_comm, map_smul, map_smul, LinearMap.smul_apply, smul_smul, sq, smul_eq_mul]) hpos
+  have key : σ = 1 := by
+    refine end_eq_one_of_invariant D.La σ ((injective_iff_map_eq_zero σ).2 fun a ha => D.unimod.1 ?_)
+      (fun a => (hermForm Hm (P a) (P a)).re) (fun c => ?_) (fun a => ?_) l.M l.three_le fun a => ?_
+    · ext b
+      rw [← hEF, ← hσ, ha, map_zero]
+      rfl
+    · refine Set.Finite.of_finite_image (f := P) ((Metric.finite_isBounded_inter_isClosed
+        (s := P.range) DiscreteTopology.isDiscrete (hbd c) AddSubgroup.isClosed_of_discrete).subset ?_) hinj.injOn
+      rintro _ ⟨a, ha, rfl⟩
+      exact ⟨ha, a, rfl⟩
+    · simp only [hq, hσ, hφ, ← hI]
+      exact LinearMap.congr_fun₂ hB _ _
+    · obtain ⟨i, hi, j, hj, hij⟩ := Submodule.mem_sup.mp ((Ideal.eq_top_iff_one _).mp l.coprime)
+      obtain ⟨z₁, hz₁⟩ := hM (j • a) (Submodule.smul_mem_smul hj trivial)
+      obtain ⟨z₂, hz₂⟩ := ObjRigid.exists_eq_nsmul D l.M (i • (φ a - a)) fun b => by
+        obtain ⟨w, hw⟩ := hM (H.bar i • b) (Submodule.smul_mem_smul (Ideal.mem_map_of_mem _ hi) trivial)
+        have h1 := hEF a (H.bar i • b)
+        rw [hw, map_add, map_nsmul, nsmul_eq_mul] at h1
+        rw [D.adj, map_sub, LinearMap.sub_apply]
+        exact ⟨-D.EF (φ a) w, by linarith⟩
+      refine ⟨z₂ + z₁, ?_⟩
+      rw [hO] at hz₁
+      rw [hσ, smul_add, ← hz₂, ← sub_eq_iff_eq_add'.2 hz₁, ← smul_sub, ← add_smul, hij, one_smul, add_sub_cancel]
+  have : h.toLinearMap = LinearMap.id := LinearMap.ext_on_range hspan fun a => by
+    show h (P a) = P a
+    rw [← hφ, ← hσ, key]
+    rfl
+  exact LinearMap.congr_fun this z
+
+end GlobalTheory.ExpUnique
+
+namespace GlobalTheory
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open scoped CategoryTheory.Obj TensorProduct
+open ExpUnique
+
+theorem exp_eq_of_periods_of_marking : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (P : D'.La →+ (Fin g → ℂ)) (y : Sp ℂ ⟶ Xo.X) (e e' : (Fin g → ℂ) → (Over.mk y ⟶ Xo.univ.t.G)), (D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧ σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi * Complex.I) * (ν l.A : ℂ) / l.A) ∧ t = f l.M') → (y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧ ((∀ z w, e (z + w) = e z * e w) ∧ Function.Surjective e ∧ IsHolTo Set.univ (fun z => (e z).left) ∧ (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e z).left) w v.left) ∧ (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e 0).left → ∃! w, IsDerivAt0 (fun z => (e z).left) w v.left)) ∧ (∀ z, e z = 1 ↔ z ∈ (P).range) ∧ (∀ (a : 𝓞 E) z, e (fun k => ty k (a : E) * z k) = e z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e ((k : ℂ)⁻¹ • P a)) (e ((k : ℂ)⁻¹ • P a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = e ((l.M : ℂ)⁻¹ • P (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = e ((l.A : ℂ)⁻¹ • P (t a))) → (y ≫ Xo.s = spMap σ ∧ IsPeriod D' ty P ∧ ((∀ z w, e' (z + w) = e' z * e' w) ∧ Function.Surjective e' ∧ IsHolTo Set.univ (fun z => (e' z).left) ∧ (∀ w, ∃! v : epsPt y ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => (e' z).left) w v.left) ∧ (∀ v : epsPt y ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = (e' 0).left → ∃! w, IsDerivAt0 (fun z => (e' z).left) w v.left)) ∧ (∀ z, e' z = 1 ↔ z ∈ (P).range) ∧ (∀ (a : 𝓞 E) z, e' (fun k => ty k (a : E) * z k) = e' z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k (e' ((k : ℂ)⁻¹ • P a)) (e' ((k : ℂ)⁻¹ • P a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = e' ((l.M : ℂ)⁻¹ • P (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = e' ((l.A : ℂ)⁻¹ • P (t a))) → e = e' := by
+  rintro E _ _ _ H D l Xo σ g ty - - - D' t P y e e' ⟨-, -, f, ν, -, hf, -, -, rfl⟩
+    ⟨-, hP, ⟨add, onto, hol, dv, du⟩, ker, lin, weil, eta, -⟩ ⟨-, -, ⟨add', -, hol', -, -⟩, ker', lin', weil', eta', -⟩
+  have hM : 0 < l.M := lt_of_lt_of_le (by norm_num) l.three_le
+  have hd : DiscreteTopology P.range := hP.2.2.1
+  have : DiscreteTopology P.range.toIntSubmodule := hd
+  have : IsZLattice ℝ P.range.toIntSubmodule := ⟨hP.2.2.2.1⟩
+  obtain ⟨h, hh⟩ := exists_realLinear_lift P.range.toIntSubmodule add add' onto ker <| by
+    filter_upwards [eventually_eq_of_mem_closure hol hol' (by rw [hom_zero add, hom_zero add'])] with p hp hc
+    refine Over.OverMorphism.ext (hp (closure_mono (fun r hr => ?_) hc))
+    exact congrArg (·.left) (show e' r.1 = e r.2 from hr)
+  obtain ⟨v, hv, -⟩ := dv 0
+  have hI := map_I_smul hol hol' hv (fun w hw => (du v hv.1).unique hw hv) h fun z => congrArg (·.left) (hh z)
+  have hn : ∀ (k : ℕ) z, h ((k : ℂ)⁻¹ • z) = (k : ℂ)⁻¹ • h z := fun k z => by
+    have : ∀ u : Fin g → ℂ, (k : ℂ)⁻¹ • u = (k : ℝ)⁻¹ • u := fun u => by
+      rw [← Complex.coe_smul, Complex.ofReal_inv, Complex.ofReal_natCast]
+    rw [this, this, map_smul]
+  choose φ hφ using fun a => (ker (h (P a))).1 ((hh _).trans ((ker' _).2 ⟨a, rfl⟩))
+  have he' : ∀ (k : ℕ) a, e' ((k : ℂ)⁻¹ • P a) = e ((k : ℂ)⁻¹ • P (φ a)) := fun k a => by rw [← hh, hn, hφ]
+  have key := eq_self_of_isometry D' l hP h hI φ hφ (fun a b => ?_) (fun c a => hP.2.1 ?_) fun b hb => ?_
+  · exact funext fun z => by rw [← hh, key]
+  ·
+    rw [← sub_eq_zero]
+    refine Int.eq_zero_of_dvd_of_natAbs_lt_natAbs (d := ((D'.EF (φ a) (φ b) - D'.EF a b).natAbs + 1 : ℕ)) ?_
+      (by rw [Int.natAbs_natCast]; exact Nat.lt_succ_self _)
+    generalize hk : (D'.EF (φ a) (φ b) - D'.EF a b).natAbs + 1 = k
+    have hk0 : 0 < k := hk ▸ Nat.succ_pos _
+    have w1 := weil k (φ a) (φ b) (Units.mk0 _ (Complex.exp_ne_zero _)) hk0 rfl
+    have w2 := weil' k a b (Units.mk0 _ (Complex.exp_ne_zero _)) hk0 rfl
+    rw [he', he'] at w2
+    have w3 := congrArg Units.val (weilIs_unique_fieldPoint _ _ _ Xo.univ.t.PP.isLB ℂ y _ _ _ _ _ w1 w2)
+    obtain ⟨n, hn⟩ := Complex.exp_eq_exp_iff_exists_int.1 w3
+    refine ⟨-n, Int.cast_injective (α := ℂ) ?_⟩
+    have hk1 : (k : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hk0.ne'
+    have h2 := Complex.two_pi_I_ne_zero
+    generalize 2 * (Real.pi : ℂ) * Complex.I = c at hn h2
+    field_simp at hn
+    push_cast
+    linear_combination -hn
+  ·
+    let m : (Fin g → ℂ) →ₗ[ℝ] (Fin g → ℂ) :=
+      LinearMap.pi fun k => (LinearMap.mulLeft ℝ (ty k (c : E))).comp (LinearMap.proj k)
+    have hm : ∀ z, m z = fun k => ty k (c : E) * z k := fun _ => rfl
+    have hc : h.toLinearMap ∘ₗ m = m ∘ₗ h.toLinearMap :=
+      realLinear_eq_of_sub_mem_discrete (Γ := P.range) DiscreteTopology.isDiscrete fun z =>
+        (hom_eq_iff add (Λ := P.range) ker _ _).1 (by
+          show e (h (m z)) = e (m (h z))
+          rw [hh, hm, hm, lin, lin', hh])
+    have hPm : ∀ x, P (c • x) = m (P x) := fun x => funext (hP.1 c x)
+    rw [hφ, hPm, hPm, hφ]
+    exact LinearMap.congr_fun hc _
+  ·
+    have hM1 : (l.M : ℂ) ≠ 0 := Nat.cast_ne_zero.2 hM.ne'
+    have hadd : ∀ a b, φ (a + b) = φ a + φ b := fun a b => hP.2.1 (by simp only [hφ, map_add])
+    have hns : ∀ (n : ℕ) a, φ (n • a) = n • φ a := fun n a => hP.2.1 (by simp only [hφ, map_nsmul])
+    refine Submodule.smul_induction_on hb (fun j hj x _ => ?_) ?_
+    · obtain ⟨a, w, rfl⟩ := (hf l.M' (Nat.lcm_pos hM l.A_pos)).2 x
+      obtain ⟨r, hr⟩ : l.M ∣ l.M' := Nat.dvd_lcm_left _ _
+      have ha := Submodule.smul_mem_smul hj (Submodule.mem_top (x := a))
+      obtain ⟨z, hz⟩ := (hom_eq_iff add (Λ := P.range) ker _ _).1
+        ((he' _ _).symm.trans ((eta' _ ha).symm.trans (eta _ ha)))
+      have h1 : φ (f l.M' (j • a)) = f l.M' (j • a) + l.M • z := hP.2.1 (by
+        rw [map_add, map_nsmul, hz, ← Nat.cast_smul_eq_nsmul ℂ, ← smul_sub, smul_inv_smul₀ hM1, add_sub_cancel])
+      have h2 : j • l.M' • w = l.M • r • j • w := by rw [hr, mul_smul, smul_comm j, smul_comm j]
+      refine ⟨z + φ (r • j • w) - r • j • w, ?_⟩
+      rw [smul_add, ← map_smul, h2, hadd, h1, hns, smul_sub, smul_add]
+      abel
+    · rintro x x' ⟨z, hz⟩ ⟨z', hz'⟩
+      exact ⟨z + z', by rw [hadd, hz, hz', smul_add, add_add_add_comm]⟩
+
+end GlobalTheory
+
+
+[HUF_SRC_INJECTIVE_HOLOMORPHIC] Original injective holomorphic map/invertible derivative interface
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/NotInjOnOfFderivEqZero.lean#L1-L378
+import Mathlib
+import ReciprocityTheory.AnalyticForms.AnalyticCharts.Osgood
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.AnalyticAtEntry
+
+open Set Filter Metric Topology
+open scoped ContDiff
+
+namespace GlobalTheory.InjHol
+
+theorem exists_zero_of_norm_lt {φ : ℂ → ℂ} {c : ℂ} {r : ℝ} (hr : 0 < r)
+    (hφ : DifferentiableOn ℂ φ (closedBall c r)) (h : ∀ t ∈ sphere c r, ‖φ c‖ < ‖φ t‖) :
+    ∃ t ∈ closedBall c r, φ t = 0 := by
+  by_contra hne
+  push Not at hne
+  have hd : DiffContOnCl ℂ (fun t => (φ t)⁻¹) (ball c r) := by
+    apply DifferentiableOn.diffContOnCl
+    rw [closure_ball c hr.ne']
+    exact hφ.inv hne
+  obtain ⟨t, ht, hmax⟩ := Complex.exists_mem_frontier_isMaxOn_norm isBounded_ball
+    (nonempty_ball.mpr hr) hd
+  rw [frontier_ball c hr.ne'] at ht
+  have h1 : ‖(φ c)⁻¹‖ ≤ ‖(φ t)⁻¹‖ := hmax (subset_closure (mem_ball_self hr))
+  rw [norm_inv, norm_inv] at h1
+  have h2 : 0 < ‖φ c‖ := norm_pos_iff.mpr (hne c (mem_closedBall_self hr.le))
+  exact absurd (inv_strictAnti₀ h2 (h t ht)) (not_lt.mpr h1)
+
+theorem not_injOn_of_fderiv_eq_zero {E F : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    [NormedAddCommGroup F] [NormedSpace ℂ F] [CompleteSpace F] [Nontrivial E] {f : E → F} {a : E}
+    (hf : AnalyticAt ℂ f a) (h0 : ∀ᶠ x in 𝓝 a, fderiv ℂ f x = 0) {s : Set E} (hs : s ∈ 𝓝 a) :
+    ¬ InjOn f s := by
+  intro hinj
+  obtain ⟨r, hr, hb⟩ := Metric.eventually_nhds_iff_ball.mp
+    (hf.eventually_analyticAt.and (h0.and hs))
+  have hd : DifferentiableOn ℂ f (ball a r) := fun x hx =>
+    (hb x hx).1.differentiableAt.differentiableWithinAt
+  have hnb : (𝓝[≠] a).NeBot := Module.punctured_nhds_neBot ℂ E a
+  obtain ⟨x, hx, hxa⟩ := ((show ∀ᶠ x in 𝓝[≠] a, x ∈ ball a r from
+    mem_nhdsWithin_of_mem_nhds (ball_mem_nhds a hr)).and self_mem_nhdsWithin).exists
+  exact hxa (hinj (hb x hx).2.2 (mem_of_mem_nhds hs)
+    (isOpen_ball.is_const_of_fderiv_eq_zero (𝕜 := ℂ) (convex_ball a r).isPreconnected hd
+      (fun y hy => (hb y hy).2.1) hx (mem_ball_self hr)))
+
+theorem deriv_ne_zero_of_injOn {f : ℂ → ℂ} {a : ℂ} (hf : AnalyticAt ℂ f a) {s : Set ℂ}
+    (hs : s ∈ 𝓝 a) (hinj : InjOn f s) : deriv f a ≠ 0 := by
+  intro h0
+  obtain ⟨r, hr, hb⟩ := nhds_basis_closedBall.eventually_iff.mp (hf.eventually_analyticAt.and hs)
+  have hd : DifferentiableOn ℂ f (closedBall a r) := fun x hx =>
+    (hb hx).1.differentiableAt.differentiableWithinAt
+  have hsym : ∀ w, dslope f w a = dslope f a w := by
+    intro w
+    by_cases hw : w = a
+    · rw [hw]
+    · rw [dslope_of_ne _ hw, dslope_of_ne _ (Ne.symm hw), slope_comm]
+  have h1 : ∀ᶠ w in 𝓝 a, ∀ z ∈ sphere a r, ‖dslope f w a‖ < ‖dslope f w z‖ := by
+    refine (isCompact_sphere a r).eventually_forall_of_forall_eventually fun z hz => ?_
+    have hza : z ≠ a := ne_of_mem_sphere hz hr.ne'
+    have hzc := (hb (sphere_subset_closedBall hz))
+    have c1 : ContinuousAt (fun p : ℂ × ℂ => ‖dslope f a p.1‖) (a, z) :=
+      (ContinuousAt.comp (f := Prod.fst) (x := (a, z))
+        (continuousAt_dslope_same.mpr hf.differentiableAt) continuousAt_fst).norm
+    have c2 : ContinuousAt (fun p : ℂ × ℂ => ‖(p.2 - p.1)⁻¹ * (f p.2 - f p.1)‖) (a, z) := by
+      refine ContinuousAt.norm (ContinuousAt.mul (ContinuousAt.inv₀ (by fun_prop)
+        (sub_ne_zero.mpr hza)) (ContinuousAt.sub ?_ ?_))
+      · exact ContinuousAt.comp (f := Prod.snd) (x := (a, z)) hzc.1.continuousAt continuousAt_snd
+      · exact ContinuousAt.comp (f := Prod.fst) (x := (a, z)) hf.continuousAt continuousAt_fst
+    have hlt : ‖dslope f a a‖ < ‖(z - a)⁻¹ * (f z - f a)‖ := by
+      rw [dslope_same, h0, norm_zero, norm_pos_iff]
+      exact mul_ne_zero (inv_ne_zero (sub_ne_zero.mpr hza))
+        (sub_ne_zero.mpr fun h => hza (hinj hzc.2 (mem_of_mem_nhds hs) h))
+    have hne : ∀ᶠ p : ℂ × ℂ in 𝓝 (a, z), p.2 ≠ p.1 :=
+      (isOpen_ne_fun continuous_snd continuous_fst).mem_nhds hza
+    filter_upwards [c1.eventually_lt c2 hlt, hne] with p hp hp'
+    rw [hsym, dslope_of_ne _ hp', slope_def_module, smul_eq_mul]
+    exact hp
+  have h2 : ∀ᶠ w in 𝓝 a, fderiv ℂ f w = 0 := by
+    filter_upwards [h1, ball_mem_nhds a hr] with w hw hwb
+    obtain ⟨z, hz, hz0⟩ := exists_zero_of_norm_lt hr
+      ((Complex.differentiableOn_dslope (mem_of_superset (isOpen_ball.mem_nhds hwb)
+        ball_subset_closedBall)).mpr hd) hw
+    by_cases hzw : z = w
+    · rw [hzw, dslope_same] at hz0
+      ext
+      simpa using hz0
+    · rw [dslope_of_ne _ hzw, slope_def_module, smul_eq_zero] at hz0
+      rcases hz0 with h | h
+      · exact absurd (sub_eq_zero.mp (inv_eq_zero.mp h)) hzw
+      · exact absurd (hinj (hb hz).2 (hb (ball_subset_closedBall hwb)).2 (sub_eq_zero.mp h)) hzw
+  exact not_injOn_of_fderiv_eq_zero hf h2 hs hinj
+
+theorem exists_apply_eq_one {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {L : E →L[ℂ] ℂ} (h : L ≠ 0) : ∃ v, L v = 1 := by
+  obtain ⟨w, hw⟩ : ∃ w, L w ≠ 0 := by
+    by_contra hc
+    push Not at hc
+    exact h (ContinuousLinearMap.ext hc)
+  exact ⟨(L w)⁻¹ • w, by simp [hw]⟩
+
+theorem exists_slice {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E] [CompleteSpace E]
+    {g : E → ℂ} {b : E} (hg : AnalyticAt ℂ g b) {L : E →L[ℂ] ℂ} (hL : HasFDerivAt g L b)
+    (h0 : L ≠ 0) :
+    ∃ ψ : L.ker → E, AnalyticAt ℂ ψ 0 ∧ ψ 0 = b ∧ HasFDerivAt ψ L.ker.subtypeL 0 ∧
+      (∀ᶠ x in 𝓝 0, g (ψ x) = g b) ∧ ∃ s ∈ 𝓝 (0 : L.ker), InjOn ψ s := by
+  obtain ⟨v, hv⟩ := exists_apply_eq_one h0
+  let R : ℂ →L[ℂ] E := ContinuousLinearMap.toSpanSingleton ℂ v
+  have hR : Function.RightInverse R L := fun t => by simp [R, hv]
+  let p := L.projKerOfRightInverse R hR
+  let e : E ≃L[ℂ] ℂ × L.ker := ContinuousLinearEquiv.equivOfRightInverse L R hR
+  let G : E → ℂ × L.ker := fun x => (g x, p (x - b))
+  have hG : ContDiffAt ℂ ω G b :=
+    (hg.prod ((p.analyticAt _).comp (analyticAt_id.sub analyticAt_const))).contDiffAt
+  have hG' : HasFDerivAt G (e : E →L[ℂ] ℂ × L.ker) b := by
+    have := hL.prodMk (p.hasFDerivAt.comp b ((hasFDerivAt_id b).sub_const b))
+    exact this
+  have hω : (ω : WithTop ℕ∞) ≠ 0 := by simp
+  have hGb : G b = (g b, 0) := by simp [G]
+  let I := hG.localInverse hG' hω
+  have hI : AnalyticAt ℂ I (g b, 0) := hGb ▸ (hG.to_localInverse hG' hω).analyticAt
+  have hI0 : I (g b, 0) = b := hGb ▸ hG.localInverse_apply_image hG' hω
+  have hI' : HasFDerivAt I (e.symm : ℂ × L.ker →L[ℂ] E) (g b, 0) :=
+    hGb ▸ (hG.hasStrictFDerivAt' hG' hω).to_localInverse.hasFDerivAt
+  have hri : ∀ᶠ y in 𝓝 (g b, (0 : L.ker)), G (I y) = y :=
+    hGb ▸ (hG.hasStrictFDerivAt' hG' hω).eventually_right_inverse
+  have hc : ContinuousAt (fun x : L.ker => (g b, x)) 0 := by fun_prop
+  have hri' := hc.eventually hri
+  refine ⟨fun x => I (g b, x), ?_, hI0, ?_, ?_, _, hri', ?_⟩
+  · exact hI.comp_of_eq (analyticAt_const.prod analyticAt_id) rfl
+  · have := HasFDerivAt.comp (0 : L.ker) (f := fun x : L.ker => (g b, x)) hI'
+      (hasFDerivAt_prodMk_right (𝕜 := ℂ) (g b) (0 : L.ker))
+    convert! this
+    ext x
+    simp [e]
+  · filter_upwards [hri'] with x hx
+    exact congrArg Prod.fst hx
+  · intro x hx y hy hxy
+    have h1 : G (I (g b, x)) = (g b, x) := hx
+    have h2 : G (I (g b, y)) = (g b, y) := hy
+    have h3 : I (g b, x) = I (g b, y) := hxy
+    rw [h3, h2] at h1
+    exact (congrArg Prod.snd h1).symm
+
+theorem eventually_zero_of_subset {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    [CompleteSpace E] {g h : E → ℂ} {b : E} (hg : AnalyticAt ℂ g b) (hh : AnalyticAt ℂ h b)
+    (h0 : fderiv ℂ g b ≠ 0) (hb : h b = 0) (hsub : ∀ᶠ z in 𝓝 b, h z = 0 → g z = 0) :
+    ∀ᶠ z in 𝓝 b, g z = 0 → h z = 0 := by
+  obtain ⟨v, hv⟩ := exists_apply_eq_one h0
+  have hgb : g b = 0 := hsub.self_of_nhds hb
+  have hT : Tendsto (fun q : E × ℂ => q.1 + q.2 • v) (𝓝 (b, 0)) (𝓝 b) := by
+    have : ContinuousAt (fun q : E × ℂ => q.1 + q.2 • v) (b, 0) := by fun_prop
+    simpa using this.tendsto
+  have hT1 : Tendsto (fun q : E × ℂ => q.1) (𝓝 (b, 0)) (𝓝 b) := continuous_fst.tendsto _
+  have hc : 0 < (2 * (‖v‖ + 1))⁻¹ := by positivity
+  have hst := (hg.hasStrictFDerivAt.isLittleO.def hc)
+  rw [nhds_prod_eq] at hst
+  have hQ : ∀ᶠ q : E × ℂ in 𝓝 (b, 0), AnalyticAt ℂ h (q.1 + q.2 • v) ∧
+      (g q.1 = 0 → h (q.1 + q.2 • v) = 0 → q.2 = 0) := by
+    filter_upwards [hT.eventually hh.eventually_analyticAt, hT.eventually hsub,
+      (hT.prodMk hT1).eventually hst] with q h1 h2 h3
+    refine ⟨h1, fun h4 h5 => ?_⟩
+    simp only [h2 h5, h4, add_sub_cancel_left, map_smul, hv, smul_eq_mul, mul_one, sub_self,
+      zero_sub, norm_neg, norm_smul] at h3
+    have h6 : (2 * (‖v‖ + 1))⁻¹ * ‖v‖ ≤ 1 / 2 := by
+      rw [inv_mul_le_iff₀ (by positivity)]
+      linarith
+    have h7 : ‖q.2‖ ≤ 0 := by nlinarith [norm_nonneg q.2]
+    exact norm_le_zero_iff.mp h7
+  have hc0 : ContinuousAt (fun t : ℂ => (b, t)) 0 := by fun_prop
+  obtain ⟨r, hr, hball⟩ :=
+    nhds_basis_closedBall.eventually_iff.mp (hc0.eventually hQ.eventually_nhds)
+  have h1 := (isCompact_closedBall (0 : ℂ) r).eventually_forall_of_forall_eventually
+    (x₀ := b) (P := fun z t => AnalyticAt ℂ h (z + t • v) ∧ (g z = 0 → h (z + t • v) = 0 → t = 0))
+    fun t ht => hball ht
+  have h2 : ∀ᶠ z in 𝓝 b, ∀ t ∈ sphere (0 : ℂ) r, ‖h z‖ < ‖h (z + t • v)‖ := by
+    refine (isCompact_sphere (0 : ℂ) r).eventually_forall_of_forall_eventually fun t ht => ?_
+    have ht' := (hball (sphere_subset_closedBall ht)).self_of_nhds
+    have c1 : ContinuousAt (fun q : E × ℂ => ‖h q.1‖) (b, t) :=
+      (ContinuousAt.comp (f := Prod.fst) (x := (b, t)) hh.continuousAt continuousAt_fst).norm
+    have c2 : ContinuousAt (fun q : E × ℂ => ‖h (q.1 + q.2 • v)‖) (b, t) :=
+      (ContinuousAt.comp (f := fun q : E × ℂ => q.1 + q.2 • v) (x := (b, t))
+        ht'.1.continuousAt (by fun_prop)).norm
+    refine c1.eventually_lt c2 ?_
+    simp only [hb, norm_zero, norm_pos_iff]
+    exact fun h5 => ne_of_mem_sphere ht hr.ne' (ht'.2 hgb h5)
+  filter_upwards [h1, h2] with z hz1 hz2 hgz
+  obtain ⟨t, ht, ht0⟩ := exists_zero_of_norm_lt (φ := fun t => h (z + t • v)) hr
+    (fun t ht => (DifferentiableAt.comp t (f := fun t : ℂ => z + t • v)
+      (hz1 t ht).1.differentiableAt (by fun_prop)).differentiableWithinAt)
+    (by simpa using hz2)
+  have := (hz1 t ht).2 hgz ht0
+  simpa [this] using ht0
+
+theorem exists_regular_of_zero {E : Type*} [NormedAddCommGroup E] [NormedSpace ℂ E]
+    {h : E → ℂ} {a : E} (hh : AnalyticAt ℂ h a) (ha : h a = 0) (hne : ¬ ∀ᶠ z in 𝓝 a, h z = 0)
+    {W : Set E} (hW : W ∈ 𝓝 a) :
+    ∃ b ∈ W, h b = 0 ∧ AnalyticAt ℂ h b ∧ ∃ g : E → ℂ, AnalyticAt ℂ g b ∧ fderiv ℂ g b ≠ 0 ∧
+      ∀ᶠ z in 𝓝 b, h z = 0 → g z = 0 := by
+  classical
+  obtain ⟨U, hU, hUo, haU⟩ := _root_.eventually_nhds_iff.mp (hh.eventually_analyticAt.and hW)
+  have hUa : AnalyticOnNhd ℂ h U := fun z hz => (hU z hz).1
+  have hex : ∃ k, ∃ z ∈ U, h z = 0 ∧ iteratedFDeriv ℂ k h z ≠ 0 := by
+    by_contra hc
+    push Not at hc
+    obtain ⟨p, r, hp⟩ := hh
+    apply hne
+    filter_upwards [eball_mem_nhds a hp.r_pos] with z hz
+    have hz' : z - a ∈ Metric.eball (0 : E) r := by
+      simpa [Metric.mem_eball, edist_eq_enorm_sub] using hz
+    have := hp.hasSum_iteratedFDeriv hz'
+    simp only [hc _ a haU ha, ContinuousMultilinearMap.zero_apply, smul_zero,
+      add_sub_cancel] at this
+    exact this.unique hasSum_zero
+  obtain ⟨b, hbU, hb, hk⟩ := Nat.find_spec hex
+  have hmin := fun j => Nat.find_min hex (m := j)
+  generalize Nat.find hex = k at hk hmin
+  cases k with
+  | zero => exact absurd (by ext; simp [hb]) hk
+  | succ j =>
+    obtain ⟨m, hm⟩ : ∃ m, iteratedFDeriv ℂ (j + 1) h b m ≠ 0 := by
+      by_contra hc
+      push Not at hc
+      exact hk (ContinuousMultilinearMap.ext hc)
+    let A := ContinuousMultilinearMap.apply ℂ (fun _ : Fin j => E) ℂ (Fin.tail m)
+    have hj := hUa.iteratedFDeriv j b hbU
+    refine ⟨b, (hU b hbU).2, hb, hUa b hbU, fun z => A (iteratedFDeriv ℂ j h z),
+      (A.analyticAt _).comp hj, fun h0 => hm ?_, ?_⟩
+    · have := (A.hasFDerivAt.comp b hj.differentiableAt.hasFDerivAt).fderiv
+      have h2 : A.comp (fderiv ℂ (iteratedFDeriv ℂ j h) b) = 0 := this.symm.trans h0
+      rw [iteratedFDeriv_succ_apply_left]
+      exact congrArg (fun T => T (m 0)) h2
+    · filter_upwards [hUo.mem_nhds hbU] with z hz hz0
+      have := hmin j (Nat.lt_succ_self j)
+      push Not at this
+      simp [this z hz hz0]
+
+theorem analyticAt_det {X E : Type*} [NormedAddCommGroup X] [NormedSpace ℂ X]
+    [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E] {A : X → E →L[ℂ] E} {a : X}
+    (hA : AnalyticAt ℂ A a) :
+    AnalyticAt ℂ (fun z => LinearMap.det (A z : E →ₗ[ℂ] E)) a := by
+  first
+  | exact @_root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det
+  | exact _root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det
+  | (apply _root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det <;> assumption)
+  | (intros; apply _root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det <;> assumption)
+  | (intros; apply @_root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det <;> first | assumption | infer_instance)
+  | (intros; exact _root_.GlobalTheory.AnalyticMatrixEntries.analyticAt_det ..)
+
+def LocalStatement (n : ℕ) : Prop :=
+  ∀ (E F : Type) [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E]
+    [NormedAddCommGroup F] [NormedSpace ℂ F] [FiniteDimensional ℂ F],
+    Module.finrank ℂ E = n → Module.finrank ℂ F = n → ∀ (f : E → F) (a : E), AnalyticAt ℂ f a →
+      (∃ s ∈ 𝓝 a, InjOn f s) → Function.Injective (fderiv ℂ f a)
+
+theorem injective_of_fderiv_ne_zero {n : ℕ} (ih : LocalStatement n) {E F : Type}
+    [NormedAddCommGroup E] [NormedSpace ℂ E] [FiniteDimensional ℂ E]
+    [NormedAddCommGroup F] [NormedSpace ℂ F] [FiniteDimensional ℂ F]
+    (hE : Module.finrank ℂ E = n + 1) (hF : Module.finrank ℂ F = n + 1) {f : E → F} {a : E}
+    (hf : AnalyticAt ℂ f a) {s : Set E} (hs : s ∈ 𝓝 a) (hinj : InjOn f s)
+    (h0 : fderiv ℂ f a ≠ 0) : Function.Injective (fderiv ℂ f a) := by
+  haveI : CompleteSpace E := FiniteDimensional.complete ℂ E
+  obtain ⟨w, hw⟩ : ∃ w, fderiv ℂ f a w ≠ 0 := by
+    by_contra hc
+    push Not at hc
+    exact h0 (ContinuousLinearMap.ext hc)
+  obtain ⟨l₀, hl₀⟩ := Module.Projective.exists_dual_ne_zero ℂ hw
+  let l : F →L[ℂ] ℂ := LinearMap.toContinuousLinearMap l₀
+  have hL0 : l.comp (fderiv ℂ f a) ≠ 0 := fun h => hl₀ (congrArg (fun T => T w) h)
+  have hl0 : l ≠ 0 := fun h => hL0 (by simp [h])
+  obtain ⟨ψ, hψ, hψ0, hψ', hψg, t, ht, hψi⟩ := exists_slice (g := fun x => l (f x))
+    ((l.analyticAt _).comp hf) (l.hasFDerivAt.comp a hf.differentiableAt.hasFDerivAt) hL0
+  obtain ⟨u, hu⟩ := exists_apply_eq_one hl0
+  let R : ℂ →L[ℂ] F := ContinuousLinearMap.toSpanSingleton ℂ u
+  have hR : Function.RightInverse R l := fun t => by simp [R, hu]
+  let p := l.projKerOfRightInverse R hR
+  have hK : Module.finrank ℂ (l.comp (fderiv ℂ f a)).ker = n := by
+    have := Module.Dual.finrank_ker_add_one_of_ne_zero
+      (f := (l.comp (fderiv ℂ f a) : E →ₗ[ℂ] ℂ)) (fun h => hL0 (ContinuousLinearMap.coe_injective h))
+    omega
+  have hK' : Module.finrank ℂ l.ker = n := by
+    have := Module.Dual.finrank_ker_add_one_of_ne_zero
+      (f := (l : F →ₗ[ℂ] ℂ)) (fun h => hl0 (ContinuousLinearMap.coe_injective h))
+    omega
+  have hs' : ∀ᶠ x in 𝓝 0, ψ x ∈ s := hψ.continuousAt.eventually (by rw [hψ0]; exact hs)
+  have hfa : HasFDerivAt f (fderiv ℂ f a) (ψ 0) := by
+    rw [hψ0]
+    exact hf.differentiableAt.hasFDerivAt
+  have key := ih _ _ hK hK' (fun x => p (f (ψ x))) 0
+    ((p.analyticAt _).comp (hf.comp_of_eq hψ hψ0))
+    ⟨_, inter_mem ht (hs'.and hψg), fun x hx y hy hxy => by
+      refine hψi hx.1 hy.1 (hinj hx.2.1 hy.2.1 ?_)
+      have h1 : f (ψ x) - R (l (f (ψ x))) = f (ψ y) - R (l (f (ψ y))) := congrArg Subtype.val hxy
+      rw [hx.2.2, hy.2.2] at h1
+      exact sub_left_injective h1⟩
+  have hd := (p.hasFDerivAt.comp 0 (hfa.comp 0 hψ')).fderiv
+  rw [show fderiv ℂ (fun x => p (f (ψ x))) 0 = _ from hd] at key
+  rw [injective_iff_map_eq_zero] at key ⊢
+  intro x hx
+  exact congrArg Subtype.val (key ⟨x, by simp [hx]⟩ (by
+    change p (fderiv ℂ f a x) = 0
+    rw [hx, map_zero]))
+
+theorem localStatement (n : ℕ) : LocalStatement n := by
+  induction n with
+  | zero =>
+    intro E F _ _ _ _ _ _ hE _ f a _ _
+    haveI : Subsingleton E := Module.finrank_zero_iff.mp hE
+    exact Function.injective_of_subsingleton _
+  | succ n ih =>
+    rintro E F _ _ _ _ _ _ hE hF f a hf ⟨s, hs, hinj⟩
+    haveI : CompleteSpace E := FiniteDimensional.complete ℂ E
+    haveI : CompleteSpace F := FiniteDimensional.complete ℂ F
+    haveI : Nontrivial E := Module.nontrivial_of_finrank_eq_succ hE
+    refine injective_of_fderiv_ne_zero ih hE hF hf hs hinj fun h0 => ?_
+    rcases Nat.eq_zero_or_pos n with rfl | hn
+    · obtain ⟨eE⟩ : Nonempty (ℂ ≃L[ℂ] E) :=
+        FiniteDimensional.nonempty_continuousLinearEquiv_of_finrank_eq (by simp [hE])
+      obtain ⟨eF⟩ : Nonempty (F ≃L[ℂ] ℂ) :=
+        FiniteDimensional.nonempty_continuousLinearEquiv_of_finrank_eq (by simp [hF])
+      obtain ⟨c, rfl⟩ := eE.surjective a
+      refine deriv_ne_zero_of_injOn (f := fun t => eF (f (eE t))) (a := c)
+        ((eF.analyticAt _).comp (hf.comp (eE.analyticAt _)))
+        (eE.continuous.continuousAt.preimage_mem_nhds hs)
+        (fun x hx y hy hxy => eE.injective (hinj hx hy (eF.injective hxy))) ?_
+      have := (eF.hasFDerivAt.comp c
+        (hf.differentiableAt.hasFDerivAt.comp c eE.hasFDerivAt)).hasDerivAt.deriv
+      refine this.trans ?_
+      simp [h0]
+    · obtain ⟨e⟩ : Nonempty (F ≃L[ℂ] E) :=
+        FiniteDimensional.nonempty_continuousLinearEquiv_of_finrank_eq (hF.trans hE.symm)
+      let A : E → E →L[ℂ] E := fun z => (e : F →L[ℂ] E).comp (fderiv ℂ f z)
+      let h : E → ℂ := fun z => LinearMap.det (A z : E →ₗ[ℂ] E)
+      have hh : AnalyticAt ℂ h a :=
+        analyticAt_det (((ContinuousLinearMap.compL ℂ E F E (e : F →L[ℂ] E)).analyticAt _).comp
+          hf.fderiv)
+      have hW : ∀ᶠ z in 𝓝 a, AnalyticAt ℂ f z ∧ s ∈ 𝓝 z :=
+        hf.eventually_analyticAt.and (eventually_mem_nhds_iff.mpr hs)
+      have hZ : ∀ z, AnalyticAt ℂ f z ∧ s ∈ 𝓝 z → h z = 0 → fderiv ℂ f z = 0 := by
+        intro z hz hz0
+        by_contra hne
+        have hi := injective_of_fderiv_ne_zero ih hE hF hz.1 hz.2 hinj hne
+        exact LinearMap.det_eq_zero_iff_ker_ne_bot.mp hz0
+          (LinearMap.ker_eq_bot.mpr (e.injective.comp hi))
+      have ha : h a = 0 := by
+        refine LinearMap.det_eq_zero_iff_ker_ne_bot.mpr ?_
+        simp [A, h0]
+      have hne : ¬ ∀ᶠ z in 𝓝 a, h z = 0 := fun hc =>
+        not_injOn_of_fderiv_eq_zero hf (by filter_upwards [hW, hc] using hZ) hs hinj
+      obtain ⟨b, hb, hb0, hhb, g, hg, hg0, hsub⟩ := exists_regular_of_zero hh ha hne hW
+      have hgb : g b = 0 := hsub.self_of_nhds hb0
+      have hfill := eventually_zero_of_subset hg hhb hg0 hb0 hsub
+      obtain ⟨ψ, hψ, hψ0, -, hψg, t, ht, hψi⟩ :=
+        exists_slice hg hg.differentiableAt.hasFDerivAt hg0
+      haveI : Nontrivial (fderiv ℂ g b).ker := by
+        have := Module.Dual.finrank_ker_add_one_of_ne_zero
+          (f := (fderiv ℂ g b : E →ₗ[ℂ] ℂ)) (fun h => hg0 (ContinuousLinearMap.coe_injective h))
+        exact Module.nontrivial_of_finrank_pos (R := ℂ) (by omega)
+      have hT : Tendsto ψ (𝓝 0) (𝓝 b) := by
+        have := hψ.continuousAt.tendsto
+        rwa [hψ0] at this
+      have hWb : ∀ᶠ z in 𝓝 b, AnalyticAt ℂ f z ∧ s ∈ 𝓝 z :=
+        hb.1.eventually_analyticAt.and (eventually_mem_nhds_iff.mpr hb.2)
+      refine not_injOn_of_fderiv_eq_zero (f := fun x => f (ψ x)) (hb.1.comp_of_eq hψ hψ0) ?_
+        (inter_mem ht (hT hb.2)) fun x hx y hy hxy => hψi hx.1 hy.1 (hinj hx.2 hy.2 hxy)
+      filter_upwards [hT.eventually hWb, hT.eventually hfill, hψg, hψ.eventually_analyticAt]
+        with x h1 h2 h3 h4
+      have := (h1.1.differentiableAt.hasFDerivAt.comp x h4.differentiableAt.hasFDerivAt).fderiv
+      refine this.trans ?_
+      simp [hZ _ h1 (h2 (h3.trans hgb))]
+
+theorem bijective_fderiv_of_injOn :
+    ∀ (n : ℕ) (U : Set (Fin n → ℂ)) (f : (Fin n → ℂ) → (Fin n → ℂ)), IsOpen U →
+      DifferentiableOn ℂ f U → Set.InjOn f U → ∀ a ∈ U, Function.Bijective (fderiv ℂ f a) := by
+  intro n U f hU hf hinj a ha
+  have han : AnalyticAt ℂ f a := analyticAt_pi_iff.mpr fun i =>
+    ReciprocityTheory.AnForm.Osgood.osgood n U (fun x => f x i) hU (differentiableOn_pi.mp hf i) a ha
+  have hi := localStatement n _ _ (by simp) (by simp) f a han ⟨U, hU.mem_nhds ha, hinj⟩
+  exact ⟨hi, LinearMap.injective_iff_surjective.mp
+    (show Function.Injective (fderiv ℂ f a : (Fin n → ℂ) →ₗ[ℂ] (Fin n → ℂ)) from hi)⟩
+
+end GlobalTheory.InjHol
+
+
+[HUF_SRC_HOLOMORPHIC_FAMILY] Whole original holomorphic dependence for arbitrary pointwise choices and InGenus data
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/IsHolToModulipointExpOfHolomorphicPeriodsStatement.lean#L11-L12
+theorem _root_.GlobalTheory.T.isHolTo_modulipoint_exp_of_holomorphic_periods : ThetaUnifAV → Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (y : (Fin m → ℂ) → (Sp ℂ ⟶ Xo.X)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ Xo.univ.t.G)), (D'.p = D.p ∧ D'.q = D.q ∧ ∃ (f : ℕ → D.La →ₗ[𝓞 E] D'.La) (ν : ℕ → ℤ), (∀ n m : ℕ, 0 < n → 0 < m → ∀ a, ∃ e, f (n * m) a = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → (∀ a, (∃ e, f n a = n • e) ↔ ∃ e, a = n • e) ∧ ∀ a', ∃ a e, a' = f n a + n • e) ∧ (∀ n : ℕ, 0 < n → ∀ a a', (n : ℤ) ∣ D'.EF (f n a) (f n a') - ν n * D.EF a a') ∧ σ (baseKA l).ζ = Complex.exp (-(2 * Real.pi * Complex.I) * (ν l.A : ℂ) / l.A) ∧ t = f l.M') → IsOpen B → IsHolPeriods D' ty B P → (∀ b ∈ B, ((y b) ≫ Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b) 0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ • (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → IsHolTo B y ∧ IsHolTo (B ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left) := by
+  first | exact @GlobalTheory.isHolTo_point_and_exp_of_isHolPeriods | exact GlobalTheory.isHolTo_point_and_exp_of_isHolPeriods | (intros; apply GlobalTheory.isHolTo_point_and_exp_of_isHolPeriods <;> assumption)
+
+
+[HUF_SRC_HOLOMORPHIC_CORE] Original coordinate/injectivity/local-lift proof of point/exponential holomorphy
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/IsHolToPointAndExp.lean#L226-L294
+    intro n C R P₀ s ε hC hR
+    refine isOpen_iff_mem_nhds.2 fun c hc => ?_
+    refine Filter.Eventually.and (hC.mem_nhds hc.1) ((Filter.eventually_all_finset s).2 fun x hx => ?_)
+    have : ContinuousAt (fun c => ‖R c x - P₀ x‖) c :=
+      (((hR.2 x).continuousOn.continuousAt (hC.mem_nhds hc.1)).sub continuousAt_const).norm
+    exact this.eventually_lt continuousAt_const (hc.2 x hx)
+  have loc : ∀ b₀ ∈ B, ∃ B' : Set (Fin m → ℂ), b₀ ∈ B' ∧ B' ⊆ B ∧ IsHolTo B' y ∧
+      IsHolTo (B' ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left) := by
+    intro b₀ hb₀
+    obtain ⟨C₀, y₁, -, -, -, -, hC₀, h0, hy0, hover, hhol, hinj, -⟩ :=
+      hChart (KA l) σ Xo.X Xo.s D'.dim (y b₀) hsm (hU' b₀ hb₀).1
+    obtain ⟨e₀, he₀⟩ : ∃ e₀, Uniformises Xo σ ty D' t (P b₀) (y₁ 0) e₀ := by
+      rw [hy0]; exact ⟨_, hU' b₀ hb₀⟩
+    obtain ⟨C₁, P₁, e₁, hC₁, h01, hsub, hP0, hP₁, he₁, hU₁⟩ :=
+      hLift E H D l Xo σ g ty hpq hσ hty D' t D'.dim C₀ y₁ 0 (P b₀) e₀ hC₀ h0 hover hhol he₀
+    have hU₁' : ∀ c ∈ C₁, Uniformises Xo σ ty D' t (P₁ c) (y₁ c) (e₁ c) := hU₁
+    obtain ⟨Z, s, ε, hε, hZ, hZinj⟩ := hCoord E H D' g ty (P b₀) hty' (hP.1 b₀ hb₀)
+    set C₂ := {c | c ∈ C₁ ∧ ∀ x ∈ s, ‖P₁ c x - P b₀ x‖ < ε} with hC₂def
+    have hC₂ : IsOpen C₂ := near (P b₀) s ε hC₁ hP₁
+    have h02 : (0 : Fin D'.dim → ℂ) ∈ C₂ := ⟨h01, fun x _ => by simpa [hP0] using hε⟩
+    have hF : DifferentiableOn ℂ (fun c => Z (P₁ c)) C₂ :=
+      hZ _ C₂ P₁ hC₂ ⟨fun c hc => hP₁.1 c hc.1, fun x => (hP₁.2 x).mono fun c hc => hc.1⟩ fun c hc => hc.2
+    have hFinj : Set.InjOn (fun c => Z (P₁ c)) C₂ := by
+      intro c hc c' hc' hcc
+      obtain ⟨k, hk, -⟩ := hZinj _ _ (hP₁.1 c hc.1) (hP₁.1 c' hc'.1) hc.2 hc'.2 hcc
+      exact hinj (hsub hc.1) (hsub hc'.1) (uniq (hU₁' c hc.1) (hU₁' c' hc'.1) k hk)
+    obtain ⟨W, G, hW, hW0, hG, hGW⟩ :=
+      exists_local_section hC₂ hF h02 (hOpen _ C₂ _ hC₂ hF hFinj 0 h02)
+    set B₁ := {b | b ∈ B ∧ ∀ x ∈ s, ‖P b x - P b₀ x‖ < ε} with hB₁def
+    have hB₁ : IsOpen B₁ := near (P b₀) s ε hB hP
+    have hZP : DifferentiableOn ℂ (fun b => Z (P b)) B₁ :=
+      hZ _ B₁ P hB₁ ⟨fun c hc => hP.1 c hc.1, fun x => (hP.2 x).mono fun c hc => hc.1⟩ fun c hc => hc.2
+    set B₂ := B₁ ∩ (fun b => Z (P b)) ⁻¹' W with hB₂def
+    have hB₂ : IsOpen B₂ := hZP.continuousOn.isOpen_inter_preimage hB₁ hW
+    have hb₂ : b₀ ∈ B₂ := ⟨⟨hb₀, fun x _ => by simpa using hε⟩, by simpa [hP0] using hW0⟩
+    have hβ : DifferentiableOn ℂ (fun b => G (Z (P b))) B₂ :=
+      hG.comp (hZP.mono Set.inter_subset_left) fun b hb => hb.2
+    have hβC : ∀ b ∈ B₂, G (Z (P b)) ∈ C₂ := fun b hb => (hGW _ hb.2).1
+    have hk : ∀ b, ∃ k : (Fin g → ℂ) ≃ₗ[ℂ] (Fin g → ℂ), b ∈ B₂ → (∀ a, P₁ (G (Z (P b))) a = k (P b a)) ∧
+        ∀ (a : 𝓞 E) z, k (fun i => ty i (a : E) * z i) = fun i => ty i (a : E) * k z i := by
+      intro b
+      by_cases hb : b ∈ B₂
+      · obtain ⟨k, hk⟩ := hZinj _ _ (hP.1 b hb.1.1) (hP₁.1 _ (hβC b hb).1) hb.1.2 (hβC b hb).2
+          (hGW _ hb.2).2.symm
+        exact ⟨k, fun _ => hk⟩
+      · exact ⟨LinearEquiv.refl _ _, fun h => absurd h hb⟩
+    choose k hk using hk
+    obtain ⟨B₃, hB₃, hb₃, hsub₃, hkd⟩ := exists_differentiableOn_transfer (Q := P)
+      (Q' := fun b => P₁ (G (Z (P b)))) hB₂ (fun x => (hP.2 x).mono fun b hb => hb.1.1)
+      (fun x => (hP₁.2 x).comp hβ fun b hb => (hβC b hb).1) hb₂ (hP.1 b₀ hb₀).2.2.2.1
+      (fun b => (k b).toLinearMap) fun b hb x => (hk b hb).1 x
+    refine ⟨B₃, hb₃, fun b hb => (hsub₃ hb).1.1, ?_, ?_⟩
+    · refine isHolTo_congr (isHolTo_comp hhol hB₃ (hβ.mono hsub₃)
+        fun b hb => hsub (hβC b (hsub₃ hb)).1) fun b hb => ?_
+      exact uniq (hU' b (hsub₃ hb).1.1) (hU₁' _ (hβC b (hsub₃ hb)).1) (k b) (hk b (hsub₃ hb)).1
+    · have hφ : DifferentiableOn ℂ (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (G (Z (P bz.1)), k bz.1 bz.2))
+          (B₃ ×ˢ Set.univ) :=
+        (hβ.comp differentiableOn_fst fun bz hbz => hsub₃ hbz.1).prodMk hkd
+      refine isHolTo_congr (isHolTo_comp he₁ (hB₃.prod isOpen_univ) hφ
+        fun bz hbz => ⟨(hβC _ (hsub₃ hbz.1)).1, trivial⟩) fun bz hbz => ?_
+      exact expo (hU' _ (hsub₃ hbz.1).1.1) (hU₁' _ (hβC _ (hsub₃ hbz.1)).1) (k bz.1)
+        (hk _ (hsub₃ hbz.1)).1 (hk _ (hsub₃ hbz.1)).2 bz.2
+  refine ⟨isHolTo_of_local fun b hb => ?_, isHolTo_of_local fun bz hbz => ?_⟩
+  · obtain ⟨B', h1, h2, h3, -⟩ := loc b hb
+    exact ⟨B', h1, h2, h3⟩
+  · obtain ⟨B', h1, h2, -, h4⟩ := loc bz.1 hbz.1
+    exact ⟨B' ×ˢ Set.univ, ⟨h1, trivial⟩, Set.prod_mono h2 le_rfl, h4⟩
+
+end GlobalTheory.HolPeriods
+
+
+[HUF_SRC_FINITE_CLASSES] Original finite-image consequence for locally constant holomorphic families
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/FiniteImageOfLocallyConstantOnHolomorphicFamilie.lean#L71-L149
+theorem finite_range {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ) [LocallyOfFiniteType p] [QuasiCompact p] {I : Type*}
+    (c : Pts p → I) (hc : IsLocallyConstant c) : (Set.range c).Finite := by
+  have : CompactSpace Y := QuasiCompact.compactSpace_of_compactSpace p
+  let 𝒰 := Y.affineOpenCover
+  obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (X := Y)
+    (fun i => ((𝒰.f i).opensRange : Set Y)) (fun i => (𝒰.f i).opensRange.isOpen)
+    (fun y _ => Set.mem_iUnion.2 ⟨𝒰.idx y, 𝒰.covers y⟩)
+  have key : ∀ {R : CommRingCat.{0}} (j : Spec R ⟶ Y) [IsOpenImmersion j],
+      (Set.range (c ∘ PtsOver.map j rfl (𝟙 _))).Finite := by
+    intro R j _
+    have hl : IsLocallyConstant (c ∘ PtsOver.map j rfl (𝟙 _)) :=
+      hc.comp_continuous (PtsOver.continuous_map _ _ _)
+    have hft : LocallyOfFiniteType (j ≫ p) := inferInstance
+    generalize c ∘ PtsOver.map j rfl (𝟙 _) = c' at hl
+    generalize j ≫ p = q at c' hl hft
+    obtain ⟨φ, rfl⟩ := Spec.map_surjective q
+    let _ := φ.hom.toAlgebra
+    have : Algebra.FiniteType ℂ R := (HasRingHomProperty.Spec_iff (P := @LocallyOfFiniteType)).1 hft
+    exact finite_range_affine R c' hl
+  refine (t.finite_toSet.biUnion fun i _ => key (𝒰.f i)).subset ?_
+  rintro _ ⟨x, rfl⟩
+  obtain ⟨i, hi, hx⟩ := Set.mem_iUnion₂.1 (ht (Set.mem_univ (x.1 (IsLocalRing.closedPoint ℂ))))
+  have hx' : x ∈ Set.range (PtsOver.map (𝒰.f i) rfl (𝟙 _)) := by
+    rw [PtsOver.range_map, range_comp_of_isOpenImmersion]
+    exact (le_preimage_iff x.1 _).2 hx
+  obtain ⟨z, rfl⟩ := hx'
+  exact Set.mem_biUnion hi ⟨z, rfl⟩
+
+theorem isLocallyConstant_of_hol {Y : Scheme.{0}} (p : Y ⟶ Sp ℂ) (d : ℕ)
+    (hp : SmoothOfRelativeDimension d p) {I : Type*} (c : Pts p → I)
+    (H : ∀ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → Pts p), IsOpen B → IsHolTo B (fun b => (y b).1) →
+      ∀ b₀ ∈ B, ∀ᶠ b in 𝓝 b₀, c (y b) = c (y b₀)) : IsLocallyConstant c := by
+  rw [IsLocallyConstant.iff_eventually_eq]
+  intro x
+  let h := overHomeomorph (C := ℂ) (Over.mk p)
+  obtain ⟨W, σ, U, t, hW, h0, hσ, -, hhol, hco, hop, -⟩ := HolChart.exists_holomorphic_chart valAt'_rules
+    existsUnique_point_of_ringHom exists_holomorphic_section_of_etale (Over.mk p) d hp (h.symm x)
+  have hop' : IsOpen (σ '' W) := by
+    refine TopologicalSpace.le_def.1 (le_generateFrom ?_) _ hop
+    rintro _ ⟨V, f, O, hO, rfl⟩
+    exact (isOpen_basicSet (C := ℂ) V f hO).preimage (isEmbedding_left (Over.mk p)).continuous
+  have hx : h (σ 0) = x := by rw [hσ, Homeomorph.apply_symm_apply]
+  have hev := H W (fun b => h (σ b)) hW hhol 0 h0
+  have hxU : ⊤ ≤ x.1 ⁻¹ᵁ U := by rw [← hx]; exact (hco 0 h0).1
+  have hT : Tendsto (fun (z : Pts p) (i : Fin d) => valR z.1 U (t i)) (𝓝 x) (𝓝 0) := by
+    refine tendsto_pi_nhds.2 fun i => ?_
+    have h1 := ((continuousAt_valR (t i) hxU).comp continuous_subtype_val.continuousAt).tendsto
+    have h2 : valR x.1 U (t i) = (0 : Fin d → ℂ) i := by rw [← hx]; exact (hco 0 h0).2 i
+    rw [← h2]
+    exact h1
+  have hN : h '' (σ '' W) ∈ 𝓝 x := (h.isOpenMap _ hop').mem_nhds ⟨_, ⟨0, h0, rfl⟩, hx⟩
+  filter_upwards [hN, hT.eventually hev] with z hz hz'
+  obtain ⟨_, ⟨w, hw, rfl⟩, rfl⟩ := hz
+  have : (fun i => valR (h (σ w)).1 U (t i)) = w := funext (hco w hw).2
+  rw [this, hx] at hz'
+  exact hz'
+
+theorem finite_image_of_locally_constant_on_holomorphic_families :
+    (∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (y₀ : Sp ℂ ⟶ X), SmoothOfRelativeDimension d s → y₀ ≫ s = spMap σ → ∃ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)) (U : X.Opens) (f : Fin d → Γ(X, U)) (n : ℕ) (r : Fin n → Γ(X, U)), IsOpen B ∧ (0 : Fin d → ℂ) ∈ B ∧ y 0 = y₀ ∧ (∀ b ∈ B, y b ≫ s = spMap σ) ∧ IsHolTo B y ∧ Set.InjOn y B ∧ ⊤ ≤ y₀ ⁻¹ᵁ U ∧ ∃ ε : ℝ, 0 < ε ∧ ∀ x : Sp ℂ ⟶ X, x ≫ s = spMap σ → ⊤ ≤ x ⁻¹ᵁ U → (∀ i, ‖valAt' x U (r i) - valAt' y₀ U (r i)‖ < ε) → x ∈ y '' B) → ∀ (k : Type) [Field k] (σ : k →+* ℂ) (X : Scheme.{0}) (s : X ⟶ Sp k) (d : ℕ) (I : Type 1) (cls : (Sp ℂ ⟶ X) → I), SmoothOfRelativeDimension d s → QuasiCompact s → (∀ (B : Set (Fin d → ℂ)) (y : (Fin d → ℂ) → (Sp ℂ ⟶ X)), IsOpen B → (∀ b ∈ B, y b ≫ s = spMap σ) → IsHolTo B y → ∀ b₀ ∈ B, ∀ᶠ b in nhds b₀, cls (y b) = cls (y b₀)) → (cls '' {x | x ≫ s = spMap σ}).Finite := by
+  intro _ k _ σ X s d I cls hs hq H
+  let p := pullback.snd s (spMap σ)
+  let q := pullback.fst s (spMap σ)
+  have hp : SmoothOfRelativeDimension d p :=
+    (smoothOfRelativeDimension_isStableUnderBaseChange d).of_isPullback
+      (IsPullback.of_hasPullback s (spMap σ)) hs
+  have : Smooth p := SmoothOfRelativeDimension.smooth d p
+  have hover : ∀ z : Pts p, (z.1 ≫ q) ≫ s = spMap σ := fun z => by
+    rw [Category.assoc, pullback.condition, ← Category.assoc, z.2, Category.id_comp]
+  have hl : IsLocallyConstant fun z : Pts p => cls (z.1 ≫ q) := by
+    refine isLocallyConstant_of_hol p d hp _ fun B y hB hy => ?_
+    refine H B (fun b => (y b).1 ≫ q) hB (fun b _ => hover _) fun U f => ?_
+    simp only [valAt'_eq_valR, valR_comp]
+    exact hy (q ⁻¹ᵁ U) ((q.app U).hom f)
+  refine (finite_range p _ hl).subset ?_
+  rintro _ ⟨x, hx, rfl⟩
+  refine ⟨⟨pullback.lift x (𝟙 _) (by rw [Category.id_comp]; exact hx), pullback.lift_snd _ _ _⟩, ?_⟩
+  exact congrArg cls (pullback.lift_fst _ _ _)
+
+end GlobalTheory.FiniteClasses
+
+
+[HUF_SRC_THETA_SERIES] Actual analytic frame convention, IsAH and exact thetaChar series
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/IsLieBasis.lean#L69-L113
+structure HolUnif (A : Over (Sp ℂ)) [GrpObj A] (L : LB A.left) (g : ℕ) where
+  ex : (Fin g → ℂ) → (𝟙_ (Over (Sp ℂ)) ⟶ A)
+  ex_add : ∀ z w, ex (z + w) = ex z * ex w
+  ex_onto : Function.Surjective ex
+  Λ : Submodule ℤ (Fin g → ℂ)
+  ker : ∀ z, ex z = 1 ↔ z ∈ Λ
+  discrete : DiscreteTopology Λ
+  full : Submodule.span ℝ (Λ : Set (Fin g → ℂ)) = ⊤
+  hol : ∀ (U : A.left.Opens) (f : Γ(A.left, U)), IsOpen {z | ⊤ ≤ (ex z).left ⁻¹ᵁ U} ∧
+    DifferentiableOn ℂ (fun z => valAt' (ex z).left U f) {z | ⊤ ≤ (ex z).left ⁻¹ᵁ U}
+  fr : L.ι → (Fin g → ℂ) → ℂ
+  fr_hol : ∀ i, DifferentiableOn ℂ (fr i) {z | ⊤ ≤ (ex z).left ⁻¹ᵁ L.U i}
+  fr_ne : ∀ i z, ⊤ ≤ (ex z).left ⁻¹ᵁ L.U i → fr i z ≠ 0
+  fr_compat : ∀ i j z, ⊤ ≤ (ex z).left ⁻¹ᵁ (L.U i ⊓ L.U j) →
+    fr i z = valAt' (ex z).left (L.U i ⊓ L.U j) (L.g i j).val * fr j z
+
+namespace HolUnif
+
+variable {A : Over (Sp ℂ)} [GrpObj A] {L : LB A.left} {g : ℕ} (u : HolUnif A L g)
+
+def IsFn (s : L.Sec) (θ : (Fin g → ℂ) → ℂ) : Prop :=
+  ∀ i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i → valAt' (u.ex z).left (L.U i) (s.f i) = θ z * u.fr i z
+
+def IsRig (rig : LB.Gen (L.pull (eSec A))) : Prop :=
+  ∀ j : (L.pull (eSec A)).ι, ⊤ ≤ (L.pull (eSec A)).U j →
+    u.fr (j PUnit.unit) 0 = valAt' (𝟙 (Sp ℂ)) ((L.pull (eSec A)).U j) (rig.s j).val
+
+def IsDiff (w : Fin g → ℂ) (v : epsR ℂ ⟶ A) : Prop :=
+  ∀ (U : A.left.Opens) (h : ⊤ ≤ v.left ⁻¹ᵁ U) (f : Γ(A.left, U)),
+    TrivSqZeroExt.snd (show DualNumber ℂ from
+      (Scheme.ΓSpecIso (CommRingCat.of (DualNumber ℂ))).hom.hom ((v.left.appLE U ⊤ h).hom f)) =
+      fderiv ℂ (fun z => valAt' (u.ex z).left U f) 0 w
+
+def IsAH (Hm : Matrix (Fin g) (Fin g) ℂ) (χ : u.Λ → ℂ) : Prop :=
+  Hm.IsHermitian ∧ (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (z ⬝ᵥ Hm.mulVec (star z)).re) ∧ (∀ l, ‖χ l‖ = 1) ∧
+    ∀ (l : u.Λ) i z, ⊤ ≤ (u.ex z).left ⁻¹ᵁ L.U i →
+      u.fr i z = χ l * Complex.exp (Real.pi * (z ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ))) +
+        Real.pi / 2 * ((l : Fin g → ℂ) ⬝ᵥ Hm.mulVec (star (l : Fin g → ℂ)))) * u.fr i (z + l)
+
+end HolUnif
+
+def thetaChar {g : ℕ} (τ : Matrix (Fin g) (Fin g) ℂ) (a b : Fin g → ℂ) (z : Fin g → ℂ) : ℂ :=
+  ∑' n : Fin g → ℤ, Complex.exp (Real.pi * Complex.I * (((fun i => (n i : ℂ)) + a) ⬝ᵥ τ.mulVec ((fun i => (n i : ℂ)) + a)) +
+    2 * Real.pi * Complex.I * (((fun i => (n i : ℂ)) + a) ⬝ᵥ (z + b)))
+
+
+
+[HUF_SRC_OMEGA] Exact source symplectic form omegaStd, including its sign
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/Clauses.lean#L14-L14
+def omegaStd {h : ℕ} (a b : Fin h ⊕ Fin h → ℤ) : ℤ := ∑ i, (a (.inl i) * b (.inr i) - a (.inr i) * b (.inl i))
+
+
+[HUF_SRC_THETA_SINGLE] Original individual normalized theta-characteristic interface
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsUniqueThetaCharOfUnif.lean#L11-L12
+theorem GlobalTheory.existsUnique_thetaChar_of_unif : ThetaUnifAV → Out.Laws → (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (B B' : Type) [CommRing B] [CommRing B'] (b : Base l B) (b' : Base l B') (j : B →+* B') (S S' : Scheme.{0}) (s : S ⟶ Sp B) (s' : S' ⟶ Sp B') (f : S' ⟶ S), j b.ρ = b'.ρ → j b.ζ = b'.ζ → f ≫ s = s' ≫ spMap j → ∀ o : Obj D l b s, ∃ o' : Obj D l b' s', Nonempty (ObjMap o' o f)) → (∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (B : Type) [CommRing B] (b : Base l B) (S : Scheme.{0}) (s : S ⟶ Sp B) (o : Obj D l b s), IsAbelianScheme o.t.G ∧ SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (D.p + D.q)) o.t.G.hom ∧ Out.Rigidified o.t.G o.t.PP.L ∧ Out.Sym o.t.G o.t.PP.L) → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (y : (Fin m → ℂ) → (Sp ℂ ⟶ Xo.X)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ Xo.univ.t.G)) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] D'.La) (sgn : ℤˣ) (h τ : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ), (∀ b ∈ B, ((y b) ≫ Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b) 0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ • (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → (∀ a b, D'.EF (bas a) (bas b) = sgn * omegaStd a b) → (∀ b ∈ B, ((τ b).map Complex.im).PosDef ∧ ∀ k, (h b).mulVec (P b (bas (Pi.single (.inl k) 1))) = Pi.single k 1 ∧ (h b).mulVec (P b (bas (Pi.single (.inr k) 1))) = (τ b).mulVec (Pi.single k 1)) → ∀ b₀ ∈ B, ∃! cc : (Fin g → ℂ) × (Fin g → ℂ), ∃ c₁ c₂, cc = (c₁, c₂) ∧ (∀ k, c₁ k = 0 ∨ c₁ k = 1 / 2) ∧ (∀ k, c₂ k = 0 ∨ c₂ k = 1 / 2) ∧ IsThetaFrame Xo.univ.t.PP {b₀} y (fun b z => (e b z).left) (fun b z => thetaChar (τ b) c₁ c₂ ((h b).mulVec z)) :=
+  fun hT hLaws _ _ => GlobalTheory.existsUnique_thetaChar_at_point' hT hLaws
+
+
+[HUF_SRC_THETA_GLUING] Original theta family, preconnected characteristic constancy and frame gluing
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsThetaFrameOfPreconnected.lean#L14-L168
+theorem thetaChar_family {g m : ℕ} {B : Set (Fin m → ℂ)} {p q : Fin g → (Fin m → ℂ) → (Fin g → ℂ)}
+    {h τ : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ} (hp : ∀ k, DifferentiableOn ℂ (p k) B)
+    (hq : ∀ k, DifferentiableOn ℂ (q k) B)
+    (hh : ∀ b ∈ B, ((τ b).map Complex.im).PosDef ∧ ∀ k, (h b).mulVec (p k b) = Pi.single k 1 ∧
+      (h b).mulVec (q k b) = (τ b).mulVec (Pi.single k 1))
+    {c₁ c₂ : Fin g → ℂ} (h₁ : ∀ k, c₁ k = 0 ∨ c₁ k = 1 / 2) (h₂ : ∀ k, c₂ k = 0 ∨ c₂ k = 1 / 2) :
+    DifferentiableOn ℂ (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => thetaChar (τ bz.1) c₁ c₂ ((h bz.1).mulVec bz.2))
+      (B ×ˢ Set.univ) ∧ ∀ b ∈ B, ∀ z, ∃ᶠ w in nhds z, thetaChar (τ b) c₁ c₂ ((h b).mulVec w) ≠ 0 := by
+  have re : ∀ {c : Fin g → ℂ}, (∀ k, c k = 0 ∨ c k = 1 / 2) → ∃ a : Fin g → ℝ, c = fun i => (a i : ℂ) := fun {c} hc =>
+    ⟨fun i => (c i).re, funext fun i => by rcases hc i with e | e <;> simp [e]⟩
+  obtain ⟨a₁, rfl⟩ := re h₁
+  obtain ⟨a₂, rfl⟩ := re h₂
+  have hinv : ∀ b ∈ B, h b * Matrix.of (fun i k => p k b i) = 1 := fun b hb => by
+    ext i k
+    have := congrFun ((hh b hb).2 k).1 i
+    rw [Matrix.one_apply, ← Pi.single_apply k (1 : ℂ) i, ← this]
+    rfl
+  have dh : ∀ i j, DifferentiableOn ℂ (fun b => h b i j) B :=
+    differentiableOn_left_inverse (fun i k => differentiableOn_pi.1 (hp k) i) hinv
+  have dτ : ∀ i k, DifferentiableOn ℂ (fun b => τ b i k) B := fun i k => by
+    refine (DifferentiableOn.fun_sum (u := Finset.univ) fun j _ =>
+      (dh i j).mul (differentiableOn_pi.1 (hq k) j)).congr fun b hb => ?_
+    have := congrFun ((hh b hb).2 k).2 i
+    rw [Matrix.mulVec_single_one] at this
+    exact this.symm
+  have fst : ∀ {f : (Fin m → ℂ) → ℂ}, DifferentiableOn ℂ f B →
+      DifferentiableOn ℂ (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => f bz.1) (B ×ˢ Set.univ) := fun hf =>
+    hf.comp differentiableOn_fst fun _ h => h.1
+  refine ⟨CanTh.differentiableOn_thetaChar (T := fun bz : (Fin m → ℂ) × (Fin g → ℂ) => τ bz.1)
+    (Z := fun bz => (h bz.1).mulVec bz.2) (fun i k => fst (dτ i k)) (differentiableOn_pi.2 fun i => ?_)
+    (fun w hw => CanTh.mem_thetaDomain (hh _ hw.1).1) a₁ a₂, fun b hb => ?_⟩
+  · simp only [Matrix.mulVec, dotProduct]
+    exact DifferentiableOn.fun_sum fun j _ => (fst (dh i j)).mul (by fun_prop)
+  · have dl : Differentiable ℂ (fun w : Fin g → ℂ => (h b).mulVec w) :=
+      (LinearMap.toContinuousLinearMap (Matrix.mulVecLin (h b))).differentiable
+    refine frequently_ne_zero_of_entire
+      (θ := fun w => thetaChar (τ b) (fun i => (a₁ i : ℂ)) (fun i => (a₂ i : ℂ)) ((h b).mulVec w))
+      ((CanTh.differentiable_thetaChar (CanTh.mem_thetaDomain (hh b hb).1) a₁ a₂).comp dl) fun h0 => ?_
+    refine thetaChar_ne_zero (hh b hb).1 a₁ a₂ (funext fun w => ?_)
+    have := congrFun h0 ((Matrix.of (fun i k => p k b i)).mulVec w)
+    rwa [Matrix.mulVec_mulVec, hinv b hb, Matrix.one_mulVec] at this
+
+theorem exists_thetaFrame_of_preconnected : Out.Laws → (∀ (k : Type) [Field k] (X : Scheme.{0}) (s
+    : X ⟶ Sp k), Smooth s → IsReduced X ∧ IsNormalScheme X ∧ IsLocallyNoetherian X) → (∀ (E
+    : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (B
+    : Type) [CommRing B] (b : Base l B) (S : Scheme.{0}) (s : S ⟶ Sp B) (o
+    : Obj D l b s), IsAbelianScheme o.t.G ∧ SmoothOfRelativeDimension (Module.finrank ℚ E / 2 * (D.p
+    + D.q)) o.t.G.hom ∧ Out.Rigidified o.t.G o.t.PP.L ∧ Out.Sym o.t.G o.t.PP.L) → (∀ (E
+    : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo
+    : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA
+    l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B
+    : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (y : (Fin m → ℂ) → (Sp ℂ ⟶
+    Xo.X)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ Xo.univ.t.G)) (bas : (Fin g ⊕ Fin g →
+    ℤ) ≃ₗ[ℤ] D'.La) (sgn : ℤˣ) (h τ : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ), (∀ b ∈ B, ((y b) ≫
+    Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧
+    Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y
+    b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y
+    b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b)
+    0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P
+    b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e
+    b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c
+    : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) /
+    k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ •
+    (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → (∀ a b, D'.EF (bas
+    a) (bas b) = sgn * omegaStd a b) → (∀ b ∈ B, ((τ b).map Complex.im).PosDef ∧ ∀ k, (h
+    b).mulVec (P b (bas (Pi.single (.inl k) 1))) = Pi.single k 1 ∧ (h b).mulVec (P b (bas (Pi.single
+    (.inr k) 1))) = (τ b).mulVec (Pi.single k 1)) → ∀ b₀ ∈ B, ∃! cc : (Fin g → ℂ) × (Fin g →
+    ℂ), ∃ c₁ c₂, cc = (c₁,
+    c₂) ∧ (∀ k, c₁ k = 0 ∨ c₁ k = 1 / 2) ∧ (∀ k, c₂ k = 0 ∨ c₂ k = 1 / 2) ∧ IsThetaFrame Xo.univ.t.PP {b₀} y (fun b z => (e
+    b z).left) (fun b z => thetaChar (τ b) c₁ c₂ ((h b).mulVec z))) → (∀ (X
+    : Scheme.{0}) [IsLocallyNoetherian X] (P : Out.PolAV X) (x : X), ∃ (V : X.Opens) (θ
+    : ∀ i, Γ(P.A.left, P.A.hom ⁻¹ᵁ V ⊓ P.L.U i)), x ∈ V ∧ θ ∈ secOn P.L (P.A.hom ⁻¹ᵁ
+    V) ∧ (∀ y ∈ V, ∃ (a : P.A.left) (i : P.L.ι), P.A.hom a = y ∧ a ∈ P.A.left.basicOpen (θ
+    i))) → (∀ (V V' : Type) [NormedAddCommGroup V] [NormedSpace ℂ V] [FiniteDimensional ℂ
+    V] [NormedAddCommGroup V'] [NormedSpace ℂ V'] [FiniteDimensional ℂ V'] (W : Set (V × V')) (f θ F
+    : V × V' → ℂ), IsOpen W → DifferentiableOn ℂ f W → DifferentiableOn ℂ θ W → (∀ w ∈ W, F w * θ w = f w) → (∀ b, DifferentiableOn ℂ (fun z => F (b,
+    z)) {z | (b, z) ∈ W}) → (∀ w ∈ W, ∃ᶠ z in nhds w.2, θ (w.1,
+    z) ≠ 0) → DifferentiableOn ℂ F W) → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H
+    : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty
+    : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D'
+    : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+
+    (Fin g → ℂ))) (y : (Fin m → ℂ) → (Sp ℂ ⟶ Xo.X)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶
+    Xo.univ.t.G)) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] D'.La) (sgn : ℤˣ) (h τ : (Fin m →
+    ℂ) → Matrix (Fin g) (Fin g) ℂ), (∀ b ∈ B, ((y b) ≫ Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧
+    ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧ IsHolTo Set.univ
+    (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b)
+    z).left) w v.left) ∧ (∀ v : epsPt (y b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ
+    ℂ).toRingHom ≫ v.left = ((e b) 0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧
+    (∀ z, (e b) z = 1 ↔ z ∈ ((P b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a
+    : E) * z k) = (e b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c
+    : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) /
+    k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ •
+    (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞
+    E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧
+    ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → (∀ a b, D'.EF (bas
+    a) (bas b) = sgn * omegaStd a b) → (∀ b ∈ B, ((τ b).map Complex.im).PosDef ∧ ∀ k, (h
+    b).mulVec (P b (bas (Pi.single (.inl k) 1))) = Pi.single k 1 ∧ (h b).mulVec (P b (bas (Pi.single
+    (.inr k) 1))) = (τ b).mulVec (Pi.single k
+    1)) → IsOpen B → IsPreconnected B → IsHolPeriods D' ty B P → IsHolTo B y → IsHolTo (B ×ˢ
+    Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1
+    bz.2).left) → ∃ c₁ c₂ : Fin g → ℂ, (∀ k, c₁ k = 0 ∨ c₁ k = 1 / 2) ∧ (∀ k, c₂ k = 0 ∨ c₂ k = 1 / 2) ∧ IsThetaFrame Xo.univ.t.PP B y (fun b z => (e
+    b z).left) (fun b z => thetaChar (τ b) c₁ c₂ ((h b).mulVec z)) := by
+  intro laws hsm hobj hpt hsec _ E _ _ _ H D l Xo σ g ty h1 h2 h3 D' t m B P y e bas sgn h τ hU hbas hh _ hc hP hy hol
+  have pt := hpt E H D l Xo σ g ty h1 h2 h3 D' t m B P y e bas sgn h τ hU hbas hh
+  have th := fun (c₁ c₂ : Fin g → ℂ) h₁ h₂ => thetaChar_family (c₁ := c₁) (c₂ := c₂)
+    (p := fun k b => P b (bas (Pi.single (.inl k) 1))) (q := fun k b => P b (bas (Pi.single (.inr k) 1)))
+    (fun k => hP.2 _) (fun k => hP.2 _) hh h₁ h₂
+  have he : ∀ b ∈ B, ∀ z, (e b z).left ≫ Xo.univ.t.G.hom = y b := fun b _ z => Over.w (e b z)
+  have he0 : ∀ b ∈ B, (e b 0).left = y b ≫ eSec Xo.univ.t.G := fun b hb => by
+    rw [((hU b hb).2.2.2.1 0).2 (zero_mem _)]
+    rfl
+  have := Xo.smooth
+  have := (hsm _ _ Xo.s (SmoothOfRelativeDimension.smooth D.dim Xo.s)).2.2
+  obtain ⟨o₁, o₂, o₃, o₄⟩ := hobj E H D l _ _ _ _ Xo.univ
+  have sec : ∀ b₀ ∈ B, ∃ (V : Xo.X.Opens) (θ₀ : ∀ j, Γ(Xo.univ.t.G.left, Xo.univ.t.G.hom ⁻¹ᵁ V ⊓ Xo.univ.t.PP.L.U j)),
+      ⊤ ≤ y b₀ ⁻¹ᵁ V ∧ ∀ b ∈ B, ⊤ ≤ y b ⁻¹ᵁ V → SpansFibre Xo.univ.t.PP (y b) V θ₀ := fun b₀ _ => by
+    obtain ⟨V, θ₀, m₀, s₀, n₀⟩ := hsec Xo.X
+      { A := Xo.univ.t.G, isAb := o₁, g := _, smoothDim := o₂, L := Xo.univ.t.PP.L, isLB := Xo.univ.t.PP.isLB
+        rigid := o₃, sym := o₄, ample := Xo.univ.ample, ktriv := Xo.univ.ktriv } (y b₀ (default : PrimeSpectrum ℂ))
+    exact ⟨V, θ₀, (top_le_preimage_iff_mem _ _).2 m₀, fun b _ hb =>
+      exists_ratio_fibre laws.globalSectionsRank Xo.univ (y b) V θ₀ s₀ n₀ hb⟩
+  choose! c hc₁ hc₂ using pt
+  let C₀ : Set (Fin g → ℂ) := Set.pi Set.univ fun _ => {0, 1 / 2}
+  have fin : (C₀ ×ˢ C₀).Finite := (Set.Finite.pi fun _ => Set.toFinite _).prod (Set.Finite.pi fun _ => Set.toFinite _)
+  have hc₃ : ∀ b ∈ B, (∀ k, (c b).1 k = 0 ∨ (c b).1 k = 1 / 2) ∧ (∀ k, (c b).2 k = 0 ∨ (c b).2 k = 1 / 2) ∧
+      ∃ fr, IsFibreFrame Xo.univ.t.PP (y b) (fun z => (e b z).left)
+        (fun z => thetaChar (τ b) (c b).1 (c b).2 ((h b).mulVec z)) fr := fun b hb => by
+    obtain ⟨c₁, c₂, e₀, r₁, r₂, r₃⟩ := hc₁ b hb
+    have r := isThetaFrame_singleton_iff.1 r₃
+    rw [e₀]
+    exact ⟨r₁, r₂, r⟩
+  have const := eq_of_finite_of_closed_fibres hc fin c
+    (fun b hb => ⟨fun k _ => (hc₃ b hb).1 k, fun k _ => (hc₃ b hb).2.1 k⟩) (fun k hk b hb hcl => by
+      have k₁ := fun i => hk.1 i trivial
+      have k₂ := fun i => hk.2 i trivial
+      obtain ⟨V, θ₀, hV₀, hV⟩ := sec b hb
+      obtain ⟨fr', h'⟩ := (hc₃ b hb).2.2
+      have r := exists_fibreFrame_of_mem_closure (e := fun b z => (e b z).left)
+        (θ := fun b z => thetaChar (τ b) k.1 k.2 ((h b).mulVec z)) he hol (th _ _ k₁ k₂).1 (th _ _ k₁ k₂).2 hb hV₀ hV
+        (T := {b' ∈ B | c b' = k}) (fun b' hb' => by have r := (hc₃ b' hb'.1).2.2; rw [hb'.2] at r; exact r) hcl
+        ((th _ _ (hc₃ b hb).1 (hc₃ b hb).2.1).2 b hb) h'
+      exact (hc₂ b hb k ⟨k.1, k.2, rfl, k₁, k₂, (isThetaFrame_singleton_iff (y := y) (e := fun b z => (e b z).left)
+        (θ := fun b z => thetaChar (τ b) k.1 k.2 ((h b).mulVec z))).2 r⟩).symm)
+  obtain ⟨k, k₁, k₂, hk⟩ : ∃ k : (Fin g → ℂ) × (Fin g → ℂ), (∀ i, k.1 i = 0 ∨ k.1 i = 1 / 2) ∧
+      (∀ i, k.2 i = 0 ∨ k.2 i = 1 / 2) ∧ ∀ b ∈ B, c b = k := by
+    rcases B.eq_empty_or_nonempty with h0 | ⟨b₀, hb₀⟩
+    · exact ⟨0, fun _ => Or.inl rfl, fun _ => Or.inl rfl, fun b hb => absurd (h0 ▸ hb) (Set.notMem_empty b)⟩
+    · exact ⟨c b₀, (hc₃ b₀ hb₀).1, (hc₃ b₀ hb₀).2.1, fun b hb => const b hb b₀ hb₀⟩
+  exact ⟨k.1, k.2, k₁, k₂, isThetaFrame_of_fibreFrames (e := fun b z => (e b z).left)
+    (θ := fun b z => thetaChar (τ b) k.1 k.2 ((h b).mulVec z)) he he0 hy hol (th _ _ k₁ k₂).1 (th _ _ k₁ k₂).2 sec
+    fun b hb => by have r := (hc₃ b hb).2.2; rw [hk b hb] at r; exact r⟩
+
+end GlobalTheory.ThetaFamily
+
+
+[HUF_SRC_THETA_FAMILY] Whole original exists_thetaFrame_family with arbitrary y/e and their holomorphy hypotheses
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/ExistsThetaFrameFamily.lean#L1-L28
+import Mathlib
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.UnifUniqSt
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjIsAbelianSchemeDimRigidifiedSym
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsReducedIsNormalSchemeIsLocallyNoetherianOfSmoo
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSecOnNonvanishing
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.DifferentiableOnQuotientOfDifferentiableOnSlice
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsThetaFrameOfPreconnected
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniqueThetaCharOfUnif
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ObjPull
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open scoped CategoryTheory.Obj TensorProduct
+
+namespace GlobalTheory
+
+theorem exists_thetaFrame_family : ThetaUnifAV → Out.Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (D : Datum H) (l : Level H) (Xo : Moduli D l) (σ : KA l →+* ℂ) (g : ℕ) (ty : Fin g → (E →+* ℂ)), 1 ≤ D.p + D.q → σ (baseKA l).ρ = H.rt0 → IsTypeFn H D.p D.q ty → ∀ (D' : Datum H) (t : D.La →ₗ[𝓞 E] D'.La) (m : ℕ) (B : Set (Fin m → ℂ)) (P : (Fin m → ℂ) → (D'.La →+ (Fin g → ℂ))) (y : (Fin m → ℂ) → (Sp ℂ ⟶ Xo.X)) (e : ∀ b, (Fin g → ℂ) → (Over.mk (y b) ⟶ Xo.univ.t.G)) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] D'.La) (sgn : ℤˣ) (h τ : (Fin m → ℂ) → Matrix (Fin g) (Fin g) ℂ), (∀ b ∈ B, ((y b) ≫ Xo.s = spMap σ ∧ IsPeriod D' ty (P b) ∧ ((∀ z w, (e b) (z + w) = (e b) z * (e b) w) ∧ Function.Surjective (e b) ∧ IsHolTo Set.univ (fun z => ((e b) z).left) ∧ (∀ w, ∃! v : epsPt (y b) ⟶ Xo.univ.t.G, IsDerivAt0 (fun z => ((e b) z).left) w v.left) ∧ (∀ v : epsPt (y b) ⟶ Xo.univ.t.G, spMap (TrivSqZeroExt.fstHom ℂ ℂ ℂ).toRingHom ≫ v.left = ((e b) 0).left → ∃! w, IsDerivAt0 (fun z => ((e b) z).left) w v.left)) ∧ (∀ z, (e b) z = 1 ↔ z ∈ ((P b)).range) ∧ (∀ (a : 𝓞 E) z, (e b) (fun k => ty k (a : E) * z k) = (e b) z ≫ Xo.univ.t.act.act a) ∧ (∀ (k : ℕ) (a a₂ : D'.La) (c : ℂˣ), 0 < k → (c : ℂ) = Complex.exp (-(2 * Real.pi * Complex.I) * (D'.EF a a₂ : ℂ) / k) → Out.WeilIs Xo.univ.t.G Xo.univ.t.PP.L k ((e b) ((k : ℂ)⁻¹ • (P b) a)) ((e b) ((k : ℂ)⁻¹ • (P b) a₂)) (unitOn c)) ∧ (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) D.La), toUnit _ ≫ Xo.univ.eta a = (e b) ((l.M : ℂ)⁻¹ • (P b) (t a))) ∧ ∀ a, toUnit _ ≫ Xo.univ.etaA a = (e b) ((l.A : ℂ)⁻¹ • (P b) (t a)))) → (∀ a b, D'.EF (bas a) (bas b) = sgn * omegaStd a b) → (∀ b ∈ B, ((τ b).map Complex.im).PosDef ∧ ∀ k, (h b).mulVec (P b (bas (Pi.single (.inl k) 1))) = Pi.single k 1 ∧ (h b).mulVec (P b (bas (Pi.single (.inr k) 1))) = (τ b).mulVec (Pi.single k 1)) → IsOpen B → IsPreconnected B → IsHolPeriods D' ty B P → IsHolTo B y → IsHolTo (B ×ˢ Set.univ) (fun bz : (Fin m → ℂ) × (Fin g → ℂ) => (e bz.1 bz.2).left) → ∃ c₁ c₂ : Fin g → ℂ, (∀ k, c₁ k = 0 ∨ c₁ k = 1 / 2) ∧ (∀ k, c₂ k = 0 ∨ c₂ k = 1 / 2) ∧ IsThetaFrame Xo.univ.t.PP B y (fun b z => (e b z).left) (fun b z => thetaChar (τ b) c₁ c₂ ((h b).mulVec z)) :=
+  fun hT hL => ThetaFamily.exists_thetaFrame_of_preconnected hL
+    isReduced_isNormalScheme_isLocallyNoetherian_of_smooth_over_field
+    obj_isAbelianScheme_dim_rigidified_sym
+    (existsUnique_thetaChar_of_unif hT hL obj_pull obj_isAbelianScheme_dim_rigidified_sym)
+    (SecFamily.exists_secOn_nonvanishing hL)
+    differentiableOn_quotient_of_differentiableOn_slice
+
+end GlobalTheory
+
+
+[HUF_SRC_N1C_ASSEMBLY] Original familyUnif_of_thetaUnif assembly from the point, lift, holomorphy and theta suppliers
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/FamilyUniformisationOfAbelianVarietyUniformisati.lean#L1-L33
+import Mathlib
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.IsHolToModulipointExpOfHolomorphicPeriodsStatement
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsLocalPeriodLift
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsPointOfIsPeriod
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsUniformisationAtPointClosed
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsThetaFrameFamily
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.PointEqIffIsometryClosed
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsHolomorphicChart
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.FiniteImageOfLocallyConstantOnHolomorphicFamilie
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.FamilyUnifOfParts
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.DatumExistsPeriod
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsFormEqOne
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ModNOfDvdModulus
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsSimTrivialOfMult
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.UnifUniqSt
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open scoped CategoryTheory.Obj TensorProduct
+
+namespace GlobalTheory
+
+theorem familyUnif_of_thetaUnif : ThetaUnifAV → Out.Laws → N1c := fun hU hL =>
+  GlobalTheory.familyUnif_of_parts GlobalTheory.datum_exists_period
+    (GlobalTheory.PointUnif.exists_uniformisation_at_point_closed hU hL) (GlobalTheory.Moduli.exists_point_of_isPeriod hU hL) (GlobalTheory.UnifPoint.point_eq_iff_isometry_closed hU hL)
+    (GlobalTheory.exists_local_period_lift hU hL) (GlobalTheory.T.isHolTo_modulipoint_exp_of_holomorphic_periods hU hL)
+    (GlobalTheory.FiniteClasses.finite_image_of_locally_constant_on_holomorphic_families GlobalTheory.SubfieldChart.exists_holomorphic_chart)
+    (GlobalTheory.exists_thetaFrame_family hU hL)
+    (GlobalTheory.SimMult.exists_sim_trivial_of_mult GlobalTheory.SimAlg.sim_group GlobalTheory.exists_sim_lift)
+
+end GlobalTheory
+
+
+[HUF_SRC_N1C_LAWS] Original N1c consumer/assembly; HUF proves the conclusion using named foundations explicitly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/ModuliProofs/CmModuliConsequenceOfAbelianSchemeLaws.lean#L1-L20
+import Mathlib
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.HeckeKer
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.IsHolPeriods
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.UnifUniqSt
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.FamilyUniformisationOfAbelianSchemeLaws
+import Development.AbelianVarietyTheory.Proofs.AbelianSchemeLawProofs.AbelianSchemeLawsUnconditional
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Geo.Tor
+open scoped CategoryTheory.Obj TensorProduct
+
+namespace GlobalTheory
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField in
+open scoped CategoryTheory.Obj TensorProduct in
+
+theorem _root_.GlobalTheory.closing_of_abelianSchemeLaws : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.N1c :=
+  _root_.GlobalTheory.familyUnif_of_laws _root_.GlobalTheory.abelianSchemeLaws_all.1
+
+end GlobalTheory
+
+
+[HUF_SRC_REMAINING_FRAMES] Retained FrameOK/FramesOK/CoverTri/FibTri on the same family
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/ExistenceOfLattices/NormConst.lean#L35-L126
+
+def FrameOK {g : ℕ} (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+    (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1))
+    (M : ModelsOf F r) (k : Fin F.n) (x : (M.X k).dom) (y : FrPt Xo c (CAt σ)) : Prop :=
+  ∃ Pm : (F.Di k).La →+ (Fin g → ℂ),
+        (∀ a j, Pm a j = perFr (M.X k) x.1 (M.φ k a : Fin r → E) (relab c σ (e j).1) (e j).2) ∧
+        IsPeriod (F.Di k) (fun j => relab c σ (e j).1) Pm ∧ y.x = F.u k Pm ∧
+        (∀ τ (i : Fin (Dw.mult τ)), IsDerivAt0 (fun z => (F.ex k Pm z).left) (Pi.single (e.symm ⟨τ, i⟩) 1)
+          (y.u τ i)) ∧
+        ((∀ τ' i', ‖dmin (M.X k).Gm x.1 τ' i'‖ = 1) →
+          ∃ (Hm : Matrix (Fin g) (Fin g) ℂ) (χl : (Fin g → ℂ) → ℂ) (fr : Xo.univ.t.PP.L.ι → (Fin g → ℂ) → ℂ)
+            (θ : (Fin g → ℂ) → ℂ) (Fd : Set (Fin g → ℂ)),
+            Hm.IsHermitian ∧ (∀ z : Fin g → ℂ, z ≠ 0 → 0 < (hermForm Hm z z).re) ∧
+            (∀ a b, (hermForm Hm (Pm a) (Pm b)).im = (F.Di k).EF a b) ∧
+            (∀ j, DifferentiableOn ℂ (fr j) {z | ⊤ ≤ (F.ex k Pm z).left ⁻¹ᵁ Xo.univ.t.PP.L.U j}) ∧
+            (∀ j z, ⊤ ≤ (F.ex k Pm z).left ⁻¹ᵁ Xo.univ.t.PP.L.U j → fr j z ≠ 0) ∧
+            (∀ j j' z, ⊤ ≤ (F.ex k Pm z).left ⁻¹ᵁ (Xo.univ.t.PP.L.U j ⊓ Xo.univ.t.PP.L.U j') →
+              fr j z = valAt' (F.ex k Pm z).left (Xo.univ.t.PP.L.U j ⊓ Xo.univ.t.PP.L.U j')
+                (Xo.univ.t.PP.L.g j j').val * fr j' z) ∧
+            (∀ j, ⊤ ≤ (F.ex k Pm 0).left ⁻¹ᵁ Xo.univ.t.PP.L.U j →
+              fr j 0 = valAt' y.x ((Xo.univ.t.PP.L.pull (eSec Xo.univ.t.G)).U (fun _ => j))
+                (Xo.univ.t.PP.rig.s (fun _ => j)).val) ∧
+            (∀ a j z, ‖χl (Pm a)‖ = 1 ∧ (⊤ ≤ (F.ex k Pm z).left ⁻¹ᵁ Xo.univ.t.PP.L.U j →
+              fr j z = χl (Pm a) * Complex.exp (Real.pi * hermForm Hm z (Pm a) +
+                Real.pi / 2 * hermForm Hm (Pm a) (Pm a)) * fr j (z + Pm a))) ∧
+            (∀ j z (pt : Sp ℂ ⟶ Gx y.x),
+              pt ≫ gxFst y.x = (F.ex k Pm z).left →
+              pt ≫ gxSnd y.x = 𝟙 (Sp ℂ) →
+              ⊤ ≤ (F.ex k Pm z).left ⁻¹ᵁ Xo.univ.t.PP.L.U j →
+              valAt' pt ((PPx y.x).U (fun _ => j)) (y.s.f (fun _ => j)) = θ z * fr j z) ∧
+            MeasureTheory.IsAddFundamentalDomain Pm.range Fd MeasureTheory.volume ∧
+            (∫ z in Fd, ‖θ z‖ ^ 2 * Real.exp (-Real.pi * (hermForm Hm z z).re)) /
+              (MeasureTheory.volume Fd).toReal = 1)
+
+def unfOf {g : ℕ} (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+    (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1))
+    (M : ModelsOf F r) (un : ∀ k, (M.X k).dom → FrPt Xo c (CAt σ)) : Unf Xo c σ r where
+  Comp := Fin F.n
+  X := M.X
+  un := un
+
+def FramesOK {g : ℕ} (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+    (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1))
+    (M : ModelsOf F r) (un : ∀ k, (M.X k).dom → FrPt Xo c (CAt σ)) : Prop :=
+  (∀ k x, FrameOK e F M k x (un k x)) ∧
+  (∀ k (x : (M.X k).dom) b (_hb : b ∈ Bor (M.X k).Ψ r) (h : rmul x.1 b ∈ (M.X k).dom),
+    ∃ t : Ix Dw → (CAt σ)ˣ, FrBor t (un k x) (un k ⟨_, h⟩) ∧
+      ∀ a n, Dom a n → toC (wchar (ex Dw a n) t) = bchar (laU (unfOf e F M un) a n k) b) ∧
+  (∀ k, ∀ γ ∈ (M.X k).Γ, ∀ (x : (M.X k).dom) (h : lact γ x.1 ∈ (M.X k).dom),
+    ∃ t : Ix Dw → (CAt σ)ˣ, FrBor t (un k x) (un k ⟨_, h⟩) ∧ ∀ a n, Dom a n → toC (wchar (ex Dw a n) t) = 1) ∧
+  ∀ a n, Dom a n → ∀ f ∈ sec Xo c a n, ∀ k, DifferentiableOn ℂ (rdU (unfOf e F M un) f k) (M.X k).dom
+
+def CoverTri {g : ℕ} (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+    (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1))
+    (M : ModelsOf F r) : Prop :=
+  ∀ y : FrPt Xo c (CAt σ), ∃ k, ∃ x : (M.X k).dom, ∃ Pm : (F.Di k).La →+ (Fin g → ℂ),
+    (∀ a j, Pm a j = perFr (M.X k) x.1 (M.φ k a : Fin r → E) (relab c σ (e j).1) (e j).2) ∧
+    F.u k Pm = y.x ∧
+    ∀ v : ∀ τ, Fin (Dw.mult τ) → (Sp (DualNumber (CAt σ)) ⟶ Xo.univ.t.G.left),
+      (∀ τ (i : Fin (Dw.mult τ)), IsDerivAt0 (fun z => (F.ex k Pm z).left) (Pi.single (e.symm ⟨τ, i⟩) 1) (v τ i)) →
+      ∀ τ (i : Fin (Dw.mult τ)), ∃ cf : Fin (Dw.mult τ) → CAt σ, IsUnit (cf i) ∧ (∀ j, i < j → cf j = 0) ∧
+        IsCombAt y.x (v τ) cf (y.u τ i)
+
+def FibTri {g : ℕ} (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+    (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1))
+    (M : ModelsOf F r) : Prop :=
+  ∀ k k' (x : (M.X k).dom) (x' : (M.X k').dom) (Pm : (F.Di k).La →+ (Fin g → ℂ))
+    (Pm' : (F.Di k').La →+ (Fin g → ℂ))
+    (v v' : ∀ τ, Fin (Dw.mult τ) → (Sp (DualNumber (CAt σ)) ⟶ Xo.univ.t.G.left)),
+    (∀ a j, Pm a j = perFr (M.X k) x.1 (M.φ k a : Fin r → E) (relab c σ (e j).1) (e j).2) →
+    (∀ a j, Pm' a j = perFr (M.X k') x'.1 (M.φ k' a : Fin r → E) (relab c σ (e j).1) (e j).2) →
+    F.u k Pm = F.u k' Pm' →
+    (∀ τ (i : Fin (Dw.mult τ)), IsDerivAt0 (fun z => (F.ex k Pm z).left) (Pi.single (e.symm ⟨τ, i⟩) 1) (v τ i)) →
+    (∀ τ (i : Fin (Dw.mult τ)), IsDerivAt0 (fun z => (F.ex k' Pm' z).left) (Pi.single (e.symm ⟨τ, i⟩) 1)
+      (v' τ i)) →
+    (∀ τ (i : Fin (Dw.mult τ)), ∃ cf : Fin (Dw.mult τ) → CAt σ, IsUnit (cf i) ∧ (∀ j, i < j → cf j = 0) ∧
+      IsCombAt (F.u k Pm) (v τ) cf (v' τ i)) →
+    ∃ γ ∈ (M.X k).Γ, ∃ b ∈ Bor (M.X k).Ψ r, (⟨k', x'.1⟩ : Σ k, Frame (M.X k).Ψ r) = ⟨k, rmul (lact γ x.1) b⟩
+
+def princ (l : Level H) (Gm : Matrix (Fin r) (Fin r) E) (Di : Datum H) (φ0 : Di.La →ₗ[𝓞 E] (Fin r → E)) :
+    Subgroup (GL (Fin r) E) where
+  carrier := {γ | IsUStab Gm (LinearMap.range φ0) γ ∧
+    (∀ a ∈ l.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) • (⊤ : Submodule (𝓞 E) Di.La), ∃ b : Di.La,
+      (γ : Matrix (Fin r) (Fin r) E) *ᵥ (φ0 a) = φ0 a + (l.M : ℕ) • φ0 b) ∧
+    ∀ a : Di.La, ∃ b : Di.La, (γ : Matrix (Fin r) (Fin r) E) *ᵥ (φ0 a) = φ0 a + (l.A : ℕ) • φ0 b}
+  one_mem' := ⟨⟨fun x y => by simp, fun x => by simp⟩, fun a _ => ⟨0, by simp⟩, fun a => ⟨0, by simp⟩⟩
+  mul_mem' := by
+    intro γ γ' hγ hγ'
+    have hΛ : ∀ b : Di.La, ∃ b', φ0 b' = (γ : Matrix (Fin r) (Fin r) E) *ᵥ φ0 b := fun b =>
+      (hγ.1.2 (φ0 b)).1 (LinearMap.mem_range_self φ0 b)
+    refine ⟨⟨fun x y => ?_, fun x => ?_⟩, fun a ha => ?_, fun a => ?_⟩
+    · rw [Units.val_mul, ← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hγ.1.1, hγ'.1.1]
+
+
+[HUF_SRC_REMAINING_PRINCIPAL] Exact adjoining exists_unf_hasPrinc; not claimed closed by HUF
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/UnitaryExistence/CongrOfDvdModulus.lean#L26-L57
+theorem congr_of_dvd_modulus {E : Type} [Field E] [NumberField E] {r : ℕ} {L : Type} [AddCommGroup L] [Module (𝓞 E) L]
+    (Λ : Submodule (𝓞 E) (Fin r → E)) (φ : L ≃ₗ[𝓞 E] Λ) (γ : Matrix (Fin r) (Fin r) E) {m N : ℕ} (hd : m ∣ N)
+    (h : ∀ x ∈ Λ, ∃ y ∈ Λ, Matrix.mulVec γ x - x = (N : E) • y) (a : L) :
+    ∃ b : L, γ.mulVec (φ a : Fin r → E) = (φ a : Fin r → E) + m • (φ b : Fin r → E) := by
+  obtain ⟨d, rfl⟩ := hd
+  obtain ⟨y, hy, e⟩ := h _ (φ a).2
+  refine ⟨φ.symm (d • ⟨y, hy⟩), ?_⟩
+  rw [LinearEquiv.apply_symm_apply, ← sub_eq_iff_eq_add', e, Nat.cast_smul_eq_nsmul, mul_smul]
+  rfl
+
+theorem exists_unf_hasPrinc : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∀ (σ : c.F →+* ℂ) (r : ℕ) (ξ₀ : E) (Gm : Matrix (Fin r) (Fin r) E) (φ : Dw.La →ₗ[𝓞 E] (Fin r → E)), 1 ≤ Dw.p + Dw.q → GoodEmb c σ → cc ξ₀ = -ξ₀ → (∀ τ : E →+* ℂ, τ (H.rt : E) = H.rt0 → (τ ξ₀).im < 0) → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧ (∀ a b, cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧ ∀ x y, ((Dw.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (-ξ₀ * herm Gm (φ x) (φ y))) → ∃ U : Unf Xo c σ r, IsUnf U ∧ HasPrinc U l.M' ∧ Nonempty U.Comp ∧ (∀ k la γ, (U.X k).χ la γ = 1) ∧ (∀ k, (U.X k).Gm = Gm ∧ (U.X k).ξ0 = ξ₀) ∧ (∀ k x, FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) (U.un k x)) ∧ ∀ ρ, FJ.LatZ U.X ρ ∧ (l.A = 1 → FJ.ExpoMatch U.X 1 ρ l.M) := by
+  intro E _ _ _ H Dw l Xo c σ r ξ₀ Gm φ hpq hσ hξ hneg hφ
+  have hN : N1c := GlobalTheory.T.cmModuli_consequence_of_abelianSchemeLaws
+  have hH := GlobalTheory.T.hasse_norm_theorem_quadratic_extension
+  have hB : Out.SecBaseChangeSt := GlobalTheory.lawsFieldsSeparately.2.1
+  have hT : Out.SecTwistSt := GlobalTheory.lawsFieldsSeparately.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
+  classical
+  let e : Fin (Fintype.card (Σ τ : E →+* ℂ, Fin (Dw.mult τ))) ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ) :=
+    (Fintype.equivFin _).symm
+  obtain ⟨F⟩ := hN E H Dw l Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) _
+    (fun j => relab c σ (e j).1) hpq hσ ((GlobalTheory.T.relabelEmbeddings_good_bijective_conj_compat E H l c σ hσ).2.2.2 Dw _ e)
+  obtain ⟨M, hM, hX, hG⟩ := GlobalTheory.T.exists_flagDomainModels_of_familyUniformisation hH E H Dw l Xo _ _ _ F r ξ₀ Gm φ hξ hneg hφ
+  obtain ⟨un, hun⟩ := GlobalTheory.T.exists_framedPoints_all_normalisations_familyUnif hB hT E H Dw l Xo c σ _ e F r M hσ hM hX
+  have hred : IsReduced (CAt σ) := inferInstanceAs (IsReduced ℂ)
+  refine ⟨unfOf e F M un, GlobalTheory.T.familyUniformisation_isComplexUniformisation hB E H Dw l Xo c σ _ e F r M un hσ hM hX hun, fun k γ hγ h => ?_,
+    ⟨⟨0, F.n_pos⟩⟩, hM.chi, hG,
+    fun k x => GlobalTheory.T.framedPoint_reduced_from_testRing hB E H Dw l Xo c (CAt σ) _, fun ρ => ⟨GlobalTheory.T.arithmeticGroup_cuspCentre_lattice E r ρ _ _, fun hA => ?_⟩⟩
+  · exact (hM.gam k γ).2 ⟨hγ, fun a _ => congr_of_dvd_modulus _ (M.φ k) _ (Nat.dvd_lcm_left _ _) h a,
+      fun a => congr_of_dvd_modulus _ (M.φ k) _ (Nat.dvd_lcm_right _ _) h a⟩
+  · exact GlobalTheory.T.flagDomainModels_exponents_levelM E H Dw l Xo _ _ _ F r M ρ hM hA
+
+end GlobalTheory.FrameUnif

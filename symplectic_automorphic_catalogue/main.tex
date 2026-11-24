@@ -1,0 +1,995 @@
+\section{Closing the uniform symplectic Frobenius catalogue}
+\label{sec:CX}
+
+\status{CX1--CX9 supply the literal \texttt{NumberSp4Alt}.  The
+proof uses the precisely stated classical results below and the
+already reconstructed polynomial coefficient modules and SP9.  It
+has no retained bespoke catalogue, automorphy-counting, or
+level-comparison premise.  An individual representation must still
+satisfy the original \texttt{AdmRAlt} hypotheses; constructing its
+\texttt{IsAutQA} witness is a different obligation.}
+
+The useful target is a catalogue of four-dimensional
+representations with weights
+\[
+ m=(e+1,e,1,0),\qquad w=e+1,\qquad e\ge2.                 \tag{CX.1}
+\]
+We prove exactly the catalogue used by SP9, with its labels chosen
+before the varying coefficient prime, algebraic closure, complex
+embedding, and representation family.  The main simplification is
+to allow the auxiliary automorphic representation to have level
+$M^7$.  Its original Galois representation continues to have level
+$M$.  Since a fixed power of $M$ only changes a polynomial counting
+exponent, the final source predicate permits this simplification.
+We do not assert the source's stronger, unchanged-level
+\texttt{LevelPNAlt} or its all-rank \texttt{CountQAlt}.
+
+\subsection{Conventions and the classical theorems being used}
+
+For a number field $F$, $G_F$ denotes its absolute Galois group in
+the specified algebraic closure.  At a finite place $v$, write
+$q_v$ for the residue-field cardinality.  Reciprocity sends a
+uniformizer to \emph{geometric} Frobenius.  Thus the cyclotomic
+character has value $q_v^{-1}$ there.  The source's
+\texttt{FrobEig} uses this geometric convention, whereas
+\texttt{NumberSp4Alt} evaluates an \emph{arithmetic} Frobenius.
+If $B_v(\pi)$ is the usual unramified Satake multiset for
+$\mathrm{GL}_4$, put
+\[
+ A_v(\pi)=q_v^{3/2}B_v(\pi),\qquad
+ \beta_v(\pi)=\{a^{-1}:a\in A_v(\pi)\}.                \tag{CX.2}
+\]
+The first multiset is the geometric Galois multiset; the second is
+the arithmetic multiset.  The factor $q_v^{3/2}$ is exactly the
+source's \texttt{algSat}, equivalently local Langlands for
+$\pi_v\otimes|\det|^{-3/2}$.
+
+Here are the classical inputs, in the forms actually used.  Their
+primary references and exact source-interface matching are also
+recorded in the component's classical-input registry.
+
+\begin{enumerate}
+\item A regular algebraic cuspidal representation of
+$\mathrm{GL}_n$ has nonzero relative Lie algebra cohomology with
+the irreducible algebraic coefficient of the corresponding
+infinitesimal character.  Its finite part has a number-field
+model, and every automorphism of $\mathbb C$ produces a cuspidal
+conjugate with the permuted infinity type.  These are Clozel's
+cohomological and rationality theorems, specifically Lemma~3.14
+and Theorem~3.13 of \emph{Motifs et formes automorphes}.
+\item Cuspidal cohomology injects into ordinary cohomology with
+the same coefficient system.  We use the arithmetic case of
+Borel--Labesse--Schwermer, Theorem~5.2.  The Borel--Serre
+compactification gives a finite CW model for each fixed
+torsion-free arithmetic quotient.  These assertions alone do not
+provide a uniform counting theorem; CX1 proves the required
+uniform bound from the degree of a congruence covering.
+\item For a regular algebraic cuspidal polarized pair
+$(\pi,\chi)$ over a CM field, and every prime $a$ and isomorphism
+$\overline{\mathbb Q}_a\simeq\mathbb C$, the associated
+semisimple $a$-adic representation exists.  At places away from
+$a$, it satisfies full Frobenius-semisimplified local-global
+compatibility and purity.  Its Hodge--Tate numbers are
+$\lambda_{\tau,i}+n-i$ when the coefficient has highest weight
+$\lambda_\tau$; a spherical place over $a$ gives a crystalline
+representation.  This is Barnet-Lamb--Gee--Geraghty--Taylor,
+\emph{Potential automorphy and change of weight},
+Theorem~2.1.1.  At an arbitrary place over $a$ we use only the
+\emph{semisimplified} compatibility of their
+\emph{Local-global compatibility for $l=p$, II}, Theorem~A.
+No Shin-regularity or monodromy equality at $a$ is assumed.
+\item Every de Rham representation is potentially semistable
+(Berger, \emph{Repr\'esentations $p$-adiques et \'equations
+diff\'erentielles}, Theorem~0.6, equivalently Theorem~5.19).
+The potentially semistable comparison functor is exact
+on potentially semistable representations; a crystalline
+representation gives a weakly admissible filtered Frobenius
+module, with the same Hodge--Tate numbers.  We use the classical
+Fontaine comparison theorem in the form recalled by
+Colmez--Fontaine, Proposition~4.2 and the corollary to
+Theorem~4.3.  CX3 spells out the slope inequality needed here.
+\item Local Langlands for general linear groups preserves
+conductors, is compatible with characters and unramified
+parameters, and every local component of a cuspidal
+$\mathrm{GL}_n$ representation is generic.  The generic newvector
+theorem of Jacquet--Piatetski-Shapiro--Shalika, Theorem~5.1,
+then gives a vector fixed by the usual $K_1(\mathfrak p^a)$ at
+conductor exponent $a$.  We use only the resulting invariance
+under the smaller principal congruence subgroup.  Conductor
+compatibility is the $\varepsilon$-factor part of local
+Langlands; Scholze's Theorem~14.1 is a primary reference.
+\item We use global and local class field theory, Chebotarev,
+and strong multiplicity one for cuspidal $\mathrm{GL}_n$.
+CX4 writes the cyclotomic character, polarization twist and
+comparison of the original representations explicitly.  None of
+these inputs asserts automorphy of an arbitrary Galois
+representation.
+\end{enumerate}
+
+These theorems have their usual characteristic-zero hypotheses.
+In particular, purity below applies only after a polarized
+regular algebraic cuspidal representation has actually been
+constructed.  The sole weak automorphy witness used for that
+construction is already a field of \texttt{AdmRAlt}.
+
+\subsection{A uniform CM catalogue, including its arithmetic properties}
+
+\begin{proposition}[CX1: uniform counting by fixed cells and polynomial coefficients]
+\label{claim:CX1}
+For each fixed imaginary quadratic field $K$ there is an integer
+$c_K\ge1$ such that, for every $e\ge2$ and $L\ge1$, the number
+of isomorphism classes of cuspidal representations $\pi$ of
+$\mathrm{GL}_4(\mathbb A_K)$ with
+\[
+ \operatorname{Inf}_\tau(\pi)=\{3/2+m_i:0\le i<4\}
+ \quad(\tau:K\hookrightarrow\mathbb C),\qquad
+ \pi_f^{K_K(L)}\ne0                                         \tag{CX.3}
+\]
+is at most $c_K L^{32}(e+2)^{32}$.  Here $K_K(L)$ is the
+literal principal congruence subgroup modulo the integer $L$.
+The same bound holds after restricting to polarized pairs.
+\end{proposition}
+
+\begin{proof}
+The required coefficient has, at both embeddings, highest weight
+\[
+ \lambda=(-3,-3,-e-1,-e-1).
+                                                               \tag{CX.4}
+\]
+Indeed its contragredient has infinitesimal character
+$\{3/2+m_i\}$.  More explicitly, if indices are $1,\ldots,4$,
+then $\lambda_i+4-i=-m_{5-i}$; reversing these entries gives
+the prescribed character of the dual coefficient.
+
+We can use the polynomial realization already proved in
+HP1--HP4.  Set $H=e+1$.  The source's polynomial highest weight
+is
+\[
+ \nu_i=i+H-m_{5-i}=(e+2,e+2,4,4)_i,
+ \qquad \lambda=\nu-(e+5)(1,1,1,1).
+                                                               \tag{CX.5}
+\]
+The polynomial module is contained in the polynomials of total
+degree $2e+12$ in sixteen matrix entries.  Counting all possible
+exponent tuples, even those of smaller degree, bounds its
+dimension by $(2e+13)^{16}$.  Tensoring the two embedding factors
+and applying the indicated determinant twists therefore gives a
+coefficient system $E_e$ of rank
+\[
+             d_e\le(2e+13)^{32}\le5^{32}(e+2)^{32}.
+                                                               \tag{CX.6}
+\]
+This argument uses the actual highest weight; it does not count
+all representations of a merely comparable dimension.
+
+Consider the adelic locally symmetric space with level $K_K(3)$,
+with the positive real central factor removed in the usual
+cohomological convention.  It has finitely many arithmetic
+components.  For $\mathrm{GL}_4$ their finiteness also follows
+directly by classifying the underlying rank-four
+$\mathcal O_K$-lattices: each is isomorphic to
+$\mathcal O_K^3\oplus\mathfrak a$, and the ideal class group is
+finite.  Passing from level one to level three only introduces a
+finite index.  The level-three groups are torsion free.  To see
+the last assertion, use an integral basis of each lattice to
+embed its stabilizer in $\mathrm{GL}_8(\mathbb Z)$; an element
+congruent to $1$ modulo $3$ cannot have finite order unless it is
+$1$.  If a nonidentity element of prime order were
+$1+3^sA$, with $s\ge1$ maximal, the binomial expansion of its
+prime power, divided by the first nonzero power of $3$, gives a
+nonzero reduction modulo $3$, a contradiction.  The same
+argument for a prime-order power excludes every finite order.
+
+Choose finite CW models from Borel--Serre for all these fixed
+components, and let $b_K$ be their total number of cells.  The
+level $K_K(3L)$ space is a finite cover.  Its degree is bounded by
+\[
+ [K_K(1):K_K(3L)]
+ \le\bigl|M_4(\mathcal O_K/3L\mathcal O_K)\bigr|
+ =(3L)^{32}.                                                  \tag{CX.7}
+\]
+Indeed reduction modulo $3L$ identifies this quotient with a
+subgroup of the invertible matrices in the displayed finite
+matrix ring.  Each base cell has at most this many lifts.  A
+rank-$d_e$ local system contributes $d_e$ dimensions per cell to
+the cellular cochain complex, independently of its attaching
+maps or monodromy.  Hence the sum of all cohomology dimensions
+is at most $b_K(3L)^{32}d_e$.
+
+Every $\pi$ in (CX.3) also has $K_K(3L)$-fixed vectors.
+Clozel's cohomological theorem and cuspidal-cohomology injection
+put a nonzero summand for $\pi_f^{K_K(3L)}$ in the cohomology
+just bounded.  Distinct cuspidal isomorphism classes give
+distinct summands; equivalently their full unramified Hecke
+eigensystems are distinct by strong multiplicity one.
+Consequently any finite set of distinct classes has at most
+$b_K3^{32}5^{32}L^{32}(e+2)^{32}$ members.  The whole set is
+therefore finite with that bound: otherwise one could select a
+finite subset of larger cardinality.  Enlarging the fixed
+integer constant proves the proposition.  In particular the
+constant is chosen before $L$, $e$, or any Frobenius prime.
+\end{proof}
+
+\begin{proposition}[CX2: the full labels and their conjugation action]
+\label{claim:CX2}
+Let $\mathcal S_K(e,L)$ be the finite set of isomorphism classes
+in (CX.3) that admit a polarized pair.  Every
+$\gamma\in\operatorname{Aut}(\mathbb C)$ permutes this set, and
+at every $v\nmid L$,
+\[
+ A_v({}^{\gamma}\pi)=\gamma A_v(\pi),\qquad
+ \beta_v({}^{\gamma}\pi)=\gamma\beta_v(\pi).
+                                                               \tag{CX.8}
+\]
+All these multisets consist of algebraic numbers.  The labels
+remain the full global isomorphism classes; classes with equal
+eigenvalues at one prime are not identified.
+\end{proposition}
+
+\begin{proof}
+Clozel's conjugation theorem gives ${}^{\gamma}\pi$, whose
+finite part is the scalar conjugate of $\pi_f$.  Fixed vectors
+for the actual compact subgroup are carried to fixed vectors by
+scalar conjugation.  The infinity type is unchanged because
+(CX.3) is the same at both embeddings.  To check polarization,
+write
+\[
+                 \pi^c\simeq\pi^\vee\otimes(\chi\circ N_{K/\mathbb Q}),
+ \qquad \chi_\infty(-1)=1.                                   \tag{CX.9}
+\]
+Here $c$ is complex conjugation of $K$, and $\chi$ is an
+algebraic Hecke character of $\mathbb Q$.  Such a character is a
+finite Dirichlet character times an integral norm power.
+Conjugate the finite character and keep the integral power.
+This produces $\chi_\gamma$ with the same sign.  Scalar
+conjugation commutes with the contragredient, the permutation of
+places induced by $c$, and this character twist.  Thus (CX.9)
+holds at almost every place for ${}^{\gamma}\pi$ and
+$\chi_\gamma$.  Strong multiplicity one makes it a global
+identity.  This proves that the polarized subset is stable.
+Applying $\gamma^{-1}$ shows that the action is a permutation.
+
+There is a useful normalization check at an unramified place.
+Normalize Haar measure so that $\mathrm{GL}_4(\mathcal O_{K_v})$
+has volume one, and let $T_{v,j}$ be the spherical Hecke
+operator for the diagonal element with $j$ uniformizers.  Its
+eigenvalue satisfies
+\[
+ e_j(A_v(\pi))=q_v^{j(j-1)/2}T_{v,j}(\pi),\qquad 0\le j\le4.
+                                                               \tag{CX.10}
+\]
+The exponent on the right is an integer.  The Hecke operator is
+defined over $\mathbb Q$, so its eigenvalue is conjugated by
+$\gamma$.  Equality of the elementary symmetric polynomials
+gives the first equality in (CX.8), including the potentially
+misleading square-root factor in (CX.2).  Inversion gives the
+second equality.  Clozel's number-field model for $\pi_f$
+makes the eigenvalues of $T_{v,j}$ algebraic, so (CX.10) makes
+the entries of $A_v$ and $\beta_v$ algebraic as well.
+\end{proof}
+
+\begin{proposition}[CX3: integral arithmetic eigenvalues and their size]
+\label{claim:CX3}
+Let $\pi\in\mathcal S_K(e,L)$, let $p\nmid L\operatorname{disc}K$
+be prime, and let $v\mid p$, with $q=q_v$.  Every
+$b\in\beta_v(\pi)$ is an algebraic integer, as is $q^{e+1}b^{-1}$.
+Moreover
+\[
+                 |b|=q^{(e+1)/2}.                            \tag{CX.11}
+\]
+The assertions hold for every complex conjugate with the same
+$K,e,L,p,v$.  In particular this supplies the source's full
+\texttt{int} and \texttt{intInv} conditions for the weights
+(CX.1), and supplies its weaker \texttt{Win} condition whenever
+$q>1$.
+\end{proposition}
+
+\begin{proof}
+Apply the polarized automorphic Galois theorem with any
+auxiliary prime $a$.  From (CX.4), at every embedding its
+Hodge--Tate numbers are
+\[
+                     0,-1,-e,-e-1.                          \tag{CX.12}
+\]
+The weight of its pure Weil--Deligne representation at
+$v\nmid a$ is therefore $-e-1$: the theorem pairs the Hodge
+numbers at the two conjugate embeddings by $h\mapsto w_0-h$,
+and (CX.12) forces $w_0=-e-1$.  Its geometric Frobenius
+multiset is $A_v(\pi)$ by local-global compatibility.  Purity
+gives $|a_v|=q^{-(e+1)/2}$ for those eigenvalues, which proves
+(CX.11) after inversion.  CX2 gives the same argument for every
+complex conjugate.
+
+We check integrality at \emph{every} finite place of the number
+field generated by $b$.  First choose a prime $a\ne p$ and an
+embedding of that number field into
+$\overline{\mathbb Q}_a$.  Extend its inverse to the complex
+coefficient isomorphism used in the automorphic Galois theorem.
+Its representation can be written over a finite extension of
+$\mathbb Q_a$.  For completeness, the finite-coefficient
+capture needed here follows from the same Baire argument as
+RV4: enumerate the finite extensions of $\mathbb Q_a$ inside
+its algebraic closure; the closed subgroups on which all matrix
+entries lie in one such field cover the compact profinite
+domain.  One has interior and is therefore open.  Adjoining
+the finitely many matrices for its cosets gives one finite
+coefficient field for the whole representation.
+
+The compact image preserves a lattice.  Indeed the sum of all
+translates of one lattice is bounded above by a fixed
+fractional lattice, contains the original lattice, and is a
+finitely generated module over the coefficient DVR.  It is
+therefore a full stable lattice.  Frobenius and its inverse
+act invertibly on it.  Their eigenvalues, including the chosen
+image of $b$, are $a$-adic units.
+
+For the prime $p$ itself, use the associated $p$-adic
+representation.  The local factor $\pi_v$ is spherical, so
+the representation is crystalline at $v$.  Let $f$ be the
+residue degree, so $q=p^f$.  The eigenvalues of $\varphi^f$ in
+its crystalline module are the images of $A_v(\pi)$.  Weak
+admissibility and (CX.12) put every normalized Newton slope in
+$[-e-1,0]$.  Here is the needed elementary implication.  A
+lowest-slope Frobenius subobject, with its induced filtration,
+has $t_N\ge t_H$, and every filtration jump is at least
+$-e-1$; its slope cannot be below $-e-1$.  A highest-slope
+quotient has $t_N\le t_H$, by subtracting the subobject
+inequality from the equality for the whole module.  Every
+filtration jump of the quotient is at most zero, so its slope
+cannot exceed zero.  The slope subobject or quotient can be
+formed after a finite coefficient extension by grouping the
+generalized eigenvectors of $\varphi^f$ with the indicated
+valuation, together with their cyclic Frobenius translates.
+This proves the bounds without assuming a splitting of the
+original crystalline representation.  The fact that $p$ is
+unramified in $K$ makes $\varphi^f$ precisely the Frobenius
+with residue cardinality $q$; the same argument is applied to
+each coefficient embedding.
+
+Consequently, for a geometric eigenvalue $a_v=b^{-1}$,
+\[
+             -f(e+1)\le v_p(a_v)\le0.
+                                                               \tag{CX.13}
+\]
+Thus $b$ and $q^{e+1}b^{-1}$ have nonnegative valuation at
+every place over $p$, and they have nonnegative valuation at
+all other finite places by the preceding unit argument.
+Since they are algebraic, they are algebraic integers.
+For the source's \texttt{int} condition, $-a\le m_i$ for all
+$i$ forces $a\ge0$, because $\min m_i=0$.  For
+\texttt{intInv}, $m_i\le a$ forces $a\ge e+1$.
+Multiplication by a further nonnegative integral power of $q$
+therefore gives exactly both universally quantified conditions.
+Finally (CX.11) gives the correct product modulus and places
+every entry strictly between $q^{(e+1)/2}/\sqrt q$ and
+$\sqrt q\,q^{(e+1)/2}$.  This is \texttt{Win}.
+\end{proof}
+\subsection{Attaching the actual representation at a polynomial level}
+
+\begin{proposition}[CX4: polarization and comparison in the original closure]
+\label{claim:CX4}
+Fix an odd prime $\ell$, an original algebraic closure
+$\Omega/\mathbb Q$, an isomorphism
+$\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C$, and a
+representation $r$ satisfying the literal
+\texttt{AdmRAlt} at $(M,m,w)$ from (CX.1).  Suppose that an
+imaginary quadratic subfield $K\subset\Omega$ has irreducible
+restriction $r_K$.  The \texttt{IsAutQA} field supplies a
+regular algebraic cuspidal representation $\pi/K$ weakly
+attached to $r_K$.  This same $\pi$ admits a polarized pair,
+and its associated $\ell$-adic representation is isomorphic to
+the actual $r_K$ in the same coefficient field and closure.
+Its infinity type is (CX.3), and at every place away from
+$\ell$ its full Weil--Deligne parameter is the one of $r_K$.
+\end{proposition}
+
+\begin{proof}
+Continuity is a field of the original \texttt{Level}.  Thus
+the literal \texttt{IsAutQA} hypothesis applies to this very
+quadratic restriction, with the given $\Omega$ and $\iota$.
+It provides $\pi$ and equality of geometric Frobenius
+polynomials at all but finitely many places.  It also provides
+the additional \texttt{WitA} assertion, which we need not
+strengthen or use for this argument.
+
+Write the original multiplier as
+\[
+ \theta=\varepsilon_\ell^{e+1}\eta,
+ \qquad \eta\text{ factors through }
+       \operatorname{Gal}(\mathbb Q(\mu_N)/\mathbb Q)
+ \quad\text{for some }N\ge1.                                 \tag{CX.14}
+\]
+This is exactly \texttt{IsCycWt}; factoring follows because its
+\texttt{KillsMu} condition kills the fixing subgroup of all
+$N$-th roots of unity.  The finite character is continuous.
+Class field theory makes
+$\theta\varepsilon_\ell^3$ the $\ell$-adic character of an
+algebraic Hecke character $\chi$ of $\mathbb Q$.  In particular
+at a good rational place, with geometric Frobenius $F_v$,
+\[
+             \chi(v)=\iota\theta(F_v)\,q_v^{-3}.
+                                                               \tag{CX.15}
+\]
+One can construct it directly from the finite Dirichlet
+character in (CX.14) and the integral norm power $e+4$.
+This is the source's shift by $n-1=3$; using only $\theta$
+would give the wrong automorphic twist.
+
+Choose a lift in $G_{\mathbb Q}$ of complex conjugation on
+$K$.  Conjugating $r_K$ by its matrix under $r$ identifies
+$r_K^c$ with $r_K$.  The original nondegenerate bilinear
+form in \texttt{DualTw} identifies $r_K$ with
+$r_K^\vee\otimes\theta|_{G_K}$.  At a common unramified
+place, put $a=q_v^{3/2}b$, where $a$ is a geometric Galois
+eigenvalue and $b$ a Satake eigenvalue.  The duality relation
+sends $a$ to $\theta(F_v)/a$.  After dividing by $q_v^{3/2}$
+it sends $b$ to $\theta(F_v)q_v^{-3}/b$.  By (CX.15) these
+are precisely the Satake parameters of
+$\pi^\vee\otimes(\chi\circ N_{K/\mathbb Q})$.
+Conjugation of places gives those of $\pi^c$.
+Strong multiplicity one proves (CX.9).
+
+If $\chi_\infty(-1)$ is not $+1$, multiply $\chi$ by the
+quadratic character $\eta_K$ of $K/\mathbb Q$.
+This changes the real sign and leaves
+$\chi\circ N_{K/\mathbb Q}$ unchanged: local reciprocity
+sends a norm into the subgroup fixing $K$, or equivalently the
+quadratic character is trivial on these norms.  It also leaves
+the restriction of the associated $\ell$-adic character to
+$G_K$ unchanged.  Thus
+$\varepsilon_\ell^{-3}\chi_\ell|_{G_K}=\theta|_{G_K}$
+after this correction; no equality of the corrected characters
+on all of $G_{\mathbb Q}$ is asserted.  We now have the literal polarized-pair sign
+for rank four.  No polarization theorem about an arbitrary
+nonautomorphic representation has been invoked.
+
+Apply the polarized automorphic Galois theorem to this pair.
+Its representation $R_{\ell,\iota}(\pi)$ is semisimple and
+continuous.  The original $r_K$ is irreducible and continuous.
+Their geometric Frobenius polynomials agree at almost every
+place, by weak attachment and the theorem's normalization
+(CX.2).  Both images lie in a finite coefficient extension by
+the Baire argument recorded in CX3.  Chebotarev and continuity
+make their traces agree on every element of $G_K$.
+Equal characters of semisimple representations in
+characteristic zero give an isomorphism.  For an elementary
+form of this last step, take the finite-dimensional algebra
+spanned by the image on their direct sum.  Its radical acts
+trivially on this semisimple faithful module, so the algebra
+is a product of matrix algebras.  Equality of traces on that
+algebra, and then on its central idempotents, gives equal
+multiplicities of every simple factor.  This proves
+\[
+                      r_K\simeq R_{\ell,\iota}(\pi).
+                                                               \tag{CX.16}
+\]
+
+The infinity type is also forced, not chosen.  The original
+flag at $\ell$ has one-dimensional quotients $\kappa_i$ with
+inertial characters $\varepsilon_\ell^{m_i}\eta_i$, where
+$\eta_i$ is finite.  Each quotient differs from that character
+by an unramified character and has Hodge--Tate number $-m_i$.
+Restriction to $K$ preserves these numbers at every embedding.
+Conjugating the original place transports the same flag to
+any other place needed for this statement.  By (CX.16) the
+whole representation is de Rham; exactness of its de Rham
+filtration now makes its Hodge--Tate multiset precisely
+$(0,-1,-e,-e-1)$.  We have not inferred that an arbitrary
+extension of de Rham characters is de Rham.
+The automorphic Galois theorem identifies these numbers with
+$\lambda_i+4-i$.  Sorting them gives exactly (CX.4), at both
+embeddings, and hence (CX.3).  Finally its away-$\ell$
+local-global compatibility transports through the actual
+isomorphism (CX.16).  The decomposition groups, inertia
+groups, and coefficient embedding remain those with which
+we started.
+\end{proof}
+
+\begin{proposition}[CX5: the actual conductor bound and the level $M^7$]
+\label{claim:CX5}
+In CX4, the same cuspidal representation $\pi$ has a nonzero
+$K_K(M^7)$-fixed vector.  If $p\nmid M$ and $\ell\ne p$, then
+at every place $v\mid p$ the original $r_K$ is unramified and
+its geometric Frobenius polynomial is $A_v(\pi)$.  This holds
+at every original place in $\Omega$ above $v$ and every
+corresponding Frobenius.
+\end{proposition}
+
+\begin{proof}
+The second disjunct of \texttt{SafeRA} says that no two
+specified weights differ by one.  It is false because
+$m_1=m_2+1$ in one-based indexing.  Thus its first disjunct
+holds and
+\[
+                              \ell\mid M.                    \tag{CX.17}
+\]
+This elementary observation is what permits a polynomial
+level enlargement at $\ell$.  There is no exceptional
+uncontrolled $\ell$-factor in the catalogue.
+
+For a place $v$ of $K$, write $a_v=v(M)$, using the valuation
+with $v(\mathfrak p_v)=1$.  Every finite character obtained by
+restricting one of the original \texttt{KillsMu}$\,M$
+characters to $G_{K_v}$ has conductor exponent at most $a_v$.
+Here is the ramification check, including ramified $K_v$.
+Local reciprocity and its norm compatibility identify the
+cyclotomic action of a unit with the inverse of its norm in
+the relevant cyclotomic quotient.  If $a_v>0$, a unit in
+$1+M\mathcal O_{K_v}$ acts trivially, since
+\[
+ N_{K_v/\mathbb Q_b}(1+M x)\equiv1\pmod{M\mathbb Z_b},
+                                                               \tag{CX.18}
+\]
+where $b$ is the residue characteristic.  To prove the
+congruence, express multiplication by $1+Mx$ in an integral
+$\mathbb Z_b$-basis of $\mathcal O_{K_v}$; its matrix is
+$1+M A$, and its determinant is $1$ modulo $M$.  The ideal
+$M\mathcal O_{K_v}$ is $\mathfrak p_v^{a_v}$.
+If $a_v=0$, all $M$-th roots of unity lie in the maximal
+unramified extension at $b$, by the separability of
+$X^M-1$ in the residue field and Hensel lifting.  The character
+is then unramified.  These arguments prove the stated
+conductor bound in every case.
+
+At $v\nmid\ell$, \texttt{LevelAway} diagonalizes the
+restriction of $r_K$ to inertia into four such finite
+characters.  Its inertia image is finite, so its monodromy
+operator is zero, and its Artin conductor is at most $4a_v$.
+Full local-global compatibility in CX4 and conductor
+compatibility of local Langlands give
+$a(\pi_v)\le4a_v$.  In particular, when $a_v=0$, the
+Weil--Deligne parameter is unramified with zero monodromy;
+$\pi_v$ is spherical.
+
+At $v\mid\ell$, (CX.16) is de Rham and potentially
+semistable.  The original local flag and exactness of the
+potentially semistable functor identify the semisimplified
+Weil representation with four characters.  Their inertial
+parts are exactly the finite characters just bounded;
+cyclotomic and unramified twists contribute no inertia to
+their Weil--Deligne characters.  Semisimplified local-global
+compatibility identifies this semisimple Weil representation
+with that of $\pi_v\otimes|\det|^{-3/2}$.  It does not
+identify the monodromy operators, and we do not need it to.
+For any four-dimensional Weil--Deligne parameter $(V,\rho,N)$,
+\[
+ \begin{aligned}
+ a(\rho,N)
+  &=a(\rho)+\dim V^I-\dim(\ker N)^I,\\
+  &\le a(\rho)+\operatorname{rank}N
+   \le a(\rho)+3.
+ \end{aligned}                                                \tag{CX.19}
+\]
+The first equality is the definition of its conductor; the
+last inequality uses nilpotence of $N$ in dimension four.
+Conductor is unchanged by an unramified twist.  Since
+$a_v\ge1$ at $v\mid\ell$ by (CX.17), we obtain
+\[
+                    a(\pi_v)\le4a_v+3\le7a_v.                \tag{CX.20}
+\]
+Thus (CX.20) holds at every finite place, with zero conductor
+outside $M$.
+
+Every $\pi_v$ is generic.  The local newvector theorem gives
+a nonzero vector fixed by $K_1(\mathfrak p_v^{a(\pi_v)})$.
+The principal subgroup congruent to $1$ modulo
+$\mathfrak p_v^{7a_v}$ is contained in that group.  At
+$a_v=0$ use the spherical vector.  Their restricted tensor
+product is a nonzero vector fixed by the actual adelic
+principal subgroup $K_K(M^7)$.  No character conductor or
+coefficient prime has been inserted into this level after
+the fact.
+
+For $p\nmid M$ and $\ell\ne p$, the preceding away-$\ell$
+argument gives unramifiedness and the exact polynomial
+$A_v(\pi)$.  Different lifts of geometric Frobenius differ
+by inertia and hence have identical matrices under $r_K$.
+Different places of $\Omega$ above $v$ are conjugate by
+$G_K$, and conjugating the place conjugates the Frobenius
+matrix.  This proves all of the place and Frobenius
+quantifiers in the proposition.
+\end{proof}
+
+\subsection{Fixed quadratic fields and the finite ambiguity of restriction}
+
+\begin{proposition}[CX6: eighteen fixed fields and the two-extension bound]
+\label{claim:CX6}
+There are eighteen imaginary quadratic fields $K_i$, fixed
+once and for all, with pairwise coprime discriminants.
+For every prime $p$, at least seventeen are unramified at $p$.
+For every irreducible four-dimensional representation $r$
+over an algebraically closed characteristic-zero field, at
+least one of those seventeen quadratic restrictions is
+irreducible.  Once an irreducible restriction to a fixed
+$K_i$ is specified, it has at most two extensions to
+$G_{\mathbb Q}$ up to isomorphism.
+\end{proposition}
+
+\begin{proof}
+Choose eighteen distinct primes $d_i\equiv3\pmod4$ and put
+$K_i=\mathbb Q(\sqrt{-d_i})$.  There are enough such primes
+by the elementary Euclidean argument: if all had occurred
+in a finite list, $4\prod_i d_i-1$ would have a new prime
+factor congruent to $3$ modulo $4$.  Indeed it is $3$ modulo
+$4$, some prime factor with odd multiplicity has that
+congruence, and no old $d_i$ divides it.  The quadratic
+integer-basis calculation gives
+$\operatorname{disc}K_i=-d_i$.  Thus a prime divides at
+most one discriminant.  Each remaining residue degree
+$f_i$ over $p$ is either one or two.
+
+For a representation $V$ of dimension $n$ and every distinct
+self-twist character $\delta$, choose an invertible
+intertwiner $T_\delta:V\simeq V\otimes\delta$.
+Under conjugation on $\operatorname{End}(V)$ these are
+nonzero eigenvectors for distinct one-dimensional
+characters.  They are linearly independent.  One direct
+proof takes a nontrivial relation of minimal length and
+applies a group element distinguishing two characters;
+subtracting the appropriate scalar multiple of the
+original relation gives a shorter relation, a contradiction.
+Consequently there are at most $n^2$ self twists, hence at
+most sixteen in dimension four.  The seventeen quadratic
+characters belonging to the selected fields are distinct.
+One, say $\delta_i$, is not a self twist.
+
+Write $H=G_{K_i}\triangleleft G_{\mathbb Q}$ and choose
+$t\notin H$.  If a nonzero proper $H$-stable subspace $W$
+existed, then $W\cap tW$ and $W+tW$ would be stable under
+the whole group, since $t^2\in H$.  Irreducibility forces
+$W\cap tW=0$ and $W+tW=V$.  The operator which is $+1$
+on $W$ and $-1$ on $tW$ commutes with $H$ and anticommutes
+with the other coset.  It is therefore an invertible
+intertwiner between $r$ and $r\otimes\delta_i$, contrary
+to the choice of $i$.  Thus $r|_H$ is irreducible.  This
+argument requires no unproved semisimplicity assertion
+about an arbitrary restriction.
+
+Finally suppose $r|_H\simeq r'|_H$ is irreducible.  Conjugate
+$r'$ so that the two restrictions agree.  The operator
+$r(t)^{-1}r'(t)$ commutes with $r(H)$ and is scalar by
+Schur's lemma.  An elementary proof of Schur's lemma takes
+an eigenvalue of this operator: its nonzero eigenspace is
+$H$-stable and must be all of $V$.  Let the scalar be $a$.
+Since $t^2\in H$, it satisfies $a^2=1$.  Hence $a=1$ or
+$a=-1$, and the two possible extensions are $r$ and
+$r\otimes\delta_i$.  The argument works in the original
+algebraic closure after any embedding of the fixed $K_i$.
+\end{proof}
+
+\subsection{The common catalogue and the literal integer endpoint}
+
+\begin{proposition}[CX7: complete fixed-field catalogues before the coefficient prime]
+\label{claim:CX7}
+Fix one imaginary quadratic field $K$.  For $e\ge2$, $M\ge1$,
+a prime $p\nmid M\operatorname{disc}K$ and a place $v\mid p$,
+there is a finite labelled catalogue $\mathcal D_K(e,M,v)$
+whose four-element multisets satisfy the literal
+\texttt{EigData} conditions at $(q_v,m,e+1)$.  Its cardinality
+is at most
+\[
+                    c_K M^{224}(e+2)^{32}.                   \tag{CX.21}
+\]
+For every odd $\ell\ne p$, every original $\Omega$ and
+$\iota$, and every irreducible restriction to $K$ of an
+original \texttt{AdmRAlt} representation, there is a label
+with its exact arithmetic Frobenius multiset at $v$.
+Equal labels give isomorphic restrictions.  The catalogue
+is independent of all those later choices.
+\end{proposition}
+
+\begin{proof}
+Take the label set to be $\mathcal S_K(e,M^7)$ from CX2 and
+attach $\beta_v(\pi)$ to the label $[\pi]$.  CX1 gives
+(CX.21); CX2 gives the permutation under every automorphism
+of $\mathbb C$; CX3 gives the four-entry cardinality,
+\texttt{Win}, and both universally quantified integral
+conditions.  Thus this is the literal finite data structure,
+even though its proof used a stronger pure absolute-value
+bound.  The level appearing in its label set is explicitly
+$M^7$.
+
+Given one of the later actual restrictions, CX4 and CX5
+produce a label in that already chosen set.  CX5 identifies
+its geometric Frobenius multiset with $A_v(\pi)$, so (CX.2)
+identifies its arithmetic multiset with the assigned
+$\beta_v(\pi)$.  Equal labels give the same automorphic
+Galois representation and hence isomorphic restrictions by
+(CX.16).  Equivalently, equality of full global Satake
+systems would suffice, by Chebotarev and semisimplicity.
+We keep the full labels and therefore never replace this
+argument by an inference from one Frobenius polynomial.
+The label set was formed using only $K,e,M,v$; no choice
+made to classify an individual restriction changes it or
+the fixed constant $c_K$.
+\end{proof}
+
+\begin{proposition}[CX8: the entire SP9 catalogue with uniform quantifiers]
+\label{claim:CX8}
+There is an integer $c_*\ge1$ such that, for every $e\ge2$,
+$M\ge1$ and prime $p\ge5$ with $p\nmid M$, the full
+catalogue required before SP9 exists with
+\[
+                   A_*=224,
+ \qquad |\mathcal D|\le c_*[M(e+2)]^{224}.                    \tag{CX.22}
+\]
+It is chosen before $\ell$, $\Omega$, $\iota$, the places
+and Frobenius elements in $\Omega$, and the representation
+family.  It classifies every original \texttt{AdmRAlt}
+representation with weights (CX.1), has algebraic-integer
+entries, and is permuted with multiplicity by every
+automorphism of $\mathbb C$.  In fact every entry has
+absolute value $p^{(e+1)/2}$, so its trace satisfies SP9's
+bound.
+\end{proposition}
+
+\begin{proof}
+Use the eighteen fields fixed in CX6.  For this $p$, let
+$I_p$ consist of the indices with $p\nmid\operatorname{disc}K_i$.
+Choose one place $v_i$ of $K_i$ over $p$, and let
+$f_i\in\{1,2\}$ be its residue degree.  Apply CX7 to get
+a catalogue $\mathcal D_i$ at $q_i=p^{f_i}$.
+All these choices precede $\ell$, $\Omega$ and $\iota$.
+
+Define $\mathcal D$ to have the following labels:
+\[
+ (i,s,B,\epsilon),\quad
+ i\in I_p,\ s\in\mathcal D_i,\quad
+ B\text{ a four-element multiset with }B^{f_i}=\beta_{i,s},
+ \quad \epsilon\in\{0,1\}.                                  \tag{CX.23}
+\]
+The multiset attached to this label is $B$ itself.
+Here $B^{f_i}$ means raising every entry to that power,
+with multiplicity.  Enumerate the four entries of
+$\beta_{i,s}$ for the purpose of counting.  There are at
+most $f_i^4\le16$ choices of their roots and therefore at
+most sixteen possible root multisets.  Hence
+\[
+ \begin{aligned}
+ |\mathcal D|
+   &\le32\sum_{i\in I_p}|\mathcal D_i|\\
+   &\le32\left(\sum_{i=1}^{18}c_{K_i}\right)
+                   M^{224}(e+2)^{32}
+    \le c_*[M(e+2)]^{224},
+ \end{aligned}                                                \tag{CX.24}
+\]
+where $c_*=32\sum_i c_{K_i}$ is fixed once and for all.
+
+For an entry $b\in B$, $b^{f_i}$ is an algebraic integer,
+so $b$ is integral over the algebraic integers and hence
+over $\mathbb Z$.  Moreover
+$(p^{e+1}b^{-1})^{f_i}=q_i^{e+1}(b^{f_i})^{-1}$ is
+integral by CX3, proving the inverse integral condition
+as well.  CX3 also gives
+$|b|^{f_i}=q_i^{(e+1)/2}$, so
+$|b|=p^{(e+1)/2}$.  An automorphism $\gamma$ permutes
+the labels by
+\[
+        (i,s,B,\epsilon)\longmapsto
+          (i,\gamma s,\gamma B,\epsilon).                    \tag{CX.25}
+\]
+The power equation in (CX.23) is preserved by (CX.8), and
+the inverse permutation uses $\gamma^{-1}$.  This proves
+the permutation with all multiplicities retained, even
+when distinct labels give the same multiset.  Finally
+\[
+       \left|\sum B\right|
+          \le4p^{(e+1)/2}
+          \le(3\sqrt p+1)p^{(e+1)/2}.                         \tag{CX.26}
+\]
+
+It remains to prove the uniform classification, which is
+stronger than the finiteness of (CX.23).  Fix the later
+$\ell,\Omega,\iota$.  Choose a place $B_0$ of $\Omega$
+above $p$.  Embed each fixed $K_i$ in $\Omega$ so that
+$B_0$ restricts to the selected $v_i$.  Such a choice is
+possible: at an inert prime there is only one place, and
+at a split prime the two embeddings interchange the two
+places.  Changing this embedding only conjugates the
+restriction of a representation of $G_{\mathbb Q}$ and
+does not change any of the counting bounds.
+
+For an actual admissible $r$, CX6 supplies an index
+$i\in I_p$ with irreducible restriction.  Choose the
+least such index.  CX7 attaches its restriction to a
+label $s\in\mathcal D_i$.  At $p$ the original $r$ is
+unramified by \texttt{LevelAway}, since $p\nmid M$ and
+$p\ne\ell$.  Let $B(r)$ be the complex eigenmultiset
+of an arithmetic Frobenius $\sigma$ at $B_0$.  In the
+unramified quadratic extension, $\sigma^{f_i}$ fixes
+$K_i$ and is an arithmetic Frobenius over $v_i$.
+Therefore
+\[
+                     B(r)^{f_i}=\beta_{i,s}.                  \tag{CX.27}
+\]
+This is an identity of characteristic-polynomial roots
+with multiplicity, so no diagonalizability of the
+Frobenius matrix is required.
+
+For each fixed pair $(i,s)$, the admitted restrictions
+are isomorphic by CX7.  By CX6 they arise from at most
+two isomorphism classes of the original representation
+of $G_{\mathbb Q}$.  Choose distinct bits for those
+classes.  Sending $r$ to
+$(i,s,B(r),\epsilon(r))$ now gives a classification map
+into the fixed set (CX.23).  Equal labels imply the same
+original isomorphism class.  The choice of bits is made
+only for the classification map; it adds no labels and
+does not change the already fixed catalogue.
+
+Different arithmetic Frobenius lifts at $B_0$ differ by
+inertia, which acts trivially.  Every other original
+place above $p$ is a $G_{\mathbb Q}$-conjugate of $B_0$,
+so its arithmetic Frobenius has a conjugate matrix.
+Consequently the assigned label satisfies
+\[
+       \iota\bigl(\operatorname{tr}r(\sigma')\bigr)
+                   =\sum B(r)                               \tag{CX.28}
+\]
+for every place and every Frobenius in the source
+quantifiers, not just the auxiliary $B_0$ used in the
+construction.  We have thus proved exactly all three
+SP9 catalogue conditions, in their original order of
+quantification.
+\end{proof}
+
+\begin{proposition}[CX9: literal \texttt{NumberSp4Alt}]
+\label{claim:CX9}
+The source predicate \texttt{NumberSp4Alt} holds
+relative only to the classical theorems specified above.
+One may take
+\[
+                  A=225,\qquad C=c_*2^{225}.                  \tag{CX.29}
+\]
+In particular, after $e\ge2$, $M\ge1$, $p\ge5$ prime
+with $p\nmid M$, $k\ge1$, and three $k$-th roots of
+unity $z_1,z_2,z_3$ are fixed, there is a nonzero
+integer $N_*$ with
+\[
+ \log|N_*|\le C\varphi(k)[M(e+1)]^{225}\log p.                 \tag{CX.30}
+\]
+It is chosen before every odd $\ell\ne p$, every original
+$\Omega,\iota$, every place and arithmetic Frobenius
+$\sigma$ above $p$, and every finite pairwise
+nonisomorphic family $\mathcal X$ of the original
+\texttt{AdmRAlt} representations.  For all of them,
+every difference below is nonzero and
+\[
+ |N_*|_\ell\le
+ \prod_{r\in\mathcal X}
+ \left|\operatorname{tr}r(\sigma)-
+ \iota^{-1}\bigl(p^{e+1}z_1+p^e z_2+pz_3+1\bigr)\right|_\ell.
+                                                               \tag{CX.31}
+\]
+\end{proposition}
+
+\begin{proof}
+CX8 supplies the exact antecedent of SP9, with $A_*=224$
+and the same $c_*$ for all parameters.  Apply its proved
+integral-product construction.  Explicitly its factors
+are indexed by the labels in (CX.23) and by
+$u\in(\mathbb Z/k)^\times$:
+\[
+ N_* =\prod_{s,u}
+ \left(\sum\beta_s-
+     p^{e+1}z_1^u-p^e z_2^u-pz_3^u-1\right).                 \tag{CX.32}
+\]
+CX8 gives integrality of every factor and a permutation
+of the label multiset under every complex automorphism;
+the same automorphism acts on the three roots of unity
+by one common $u$.  The product is consequently a
+rational algebraic integer.  The trace separation and
+the bound on its nonzero factors are exactly the
+elementary inequalities proved in SP9, with (CX.26)
+as their hypothesis.  Its constants give (CX.29) and
+(CX.30).  For a particular family, equal labels imply
+isomorphism, so each member selects a different factor
+of (CX.32).  All unselected factors have $\ell$-adic
+norm at most one.  Equation (CX.28) identifies the
+selected factors with exactly those in (CX.31), with
+the original arithmetic Frobenius and coefficient
+isomorphism.  This proves the normalized valuation
+inequality and all the stated universal quantifiers.
+The integer itself was formed before any of those
+later choices.  This is the literal source endpoint.
+\end{proof}
+
+\subsection{What has closed, and what the closure does not assert}
+
+CX1--CX8 remove the actual uniform catalogue premise of
+SP9.  The bound is uniform because the eighteen number
+fields, their cell counts and their coefficient bounds
+are fixed before $e,M,p$; the finite catalogue is then
+fixed before $\ell,\Omega,\iota$ or a representation
+family.  CX4--CX5 use the same actual restriction of
+the original Galois representation.  The passage from
+$M$ to $M^7$ takes place only in the auxiliary
+automorphic label set.  CX6--CX8 return to the original
+representation, with its original level, through a
+proved two-element ambiguity and the exact Frobenius
+power identity.
+
+The full source predicate \texttt{Hypotheses'} has not been promoted.
+The general record \texttt{Literature\allowbreak RankN\allowbreak Hypothesis} also remains
+separate.  Neither have unchanged-level
+\texttt{LevelPNAlt} and all-rank \texttt{CountQAlt}.
+In particular, this chapter
+does not construct \texttt{IsAutQA} for a new Galois
+representation and does not prove
+\texttt{SymplecticFourImageDense}.  It proves the
+literal universal counting theorem whose inputs are
+already \texttt{AdmRAlt}, and closes precisely the
+catalogue edge needed by the paired-count chain.
+
+\paragraph{Primary references.}
+The cohomological and rationality results are in
+L.~Clozel, \emph{Motifs et formes automorphes}, in
+\emph{Automorphic Forms, Shimura Varieties, and
+$L$-functions}, vol.~I (1990), pp.~77--159,
+Theorem~3.13 and Lemma~3.14;
+\href{https://www.jmilne.org/math/Books/AA1988a.pdf}
+{the editor's copy} is the primary locator.
+For an explicit modern statement with the same
+$C$-algebraic convention, see S.~Patrikis,
+\href{https://people.math.osu.edu/patrikis.1/variationsrevision.pdf}
+{\emph{Variations on a theorem of Tate}},
+Theorem~2.4.5; the cohomological specialization is also
+spelled out by S.~W.~Shin and N.~Templier,
+\href{https://math.berkeley.edu/~swshin/FieldRat.pdf}
+{\emph{On fields of rationality for automorphic
+representations}}, Lemma~2.12 and Proposition~2.15.
+The exact injection used here is A.~Borel,
+J.-P.~Labesse and J.~Schwermer,
+\href{https://www.numdam.org/item/CM_1996__102_1_1_0.pdf}
+{\emph{On the cuspidal cohomology of $S$-arithmetic
+subgroups}}, Theorem~5.2.
+The finite compactification is A.~Borel and J.-P.~Serre,
+\emph{Corners and arithmetic groups},
+\emph{Comment.~Math.~Helv.} 48 (1973), 436--491,
+Theorem~9.3 and the manifold-with-corners construction,
+\href{https://doi.org/10.1007/BF02566134}{original article}.
+
+For the Galois, Hodge and purity assertions see
+T.~Barnet-Lamb, T.~Gee, D.~Geraghty and R.~Taylor,
+\href{https://www.ma.imperial.ac.uk/~tsg/Index_files/potentialautomorphy.pdf}
+{\emph{Potential automorphy and change of weight}},
+Theorem~2.1.1, and
+\href{https://arxiv.org/pdf/1105.2242}
+{\emph{Local-global compatibility for $l=p$, II}},
+Theorem~A.  The finite-coefficient and local
+normalizations are checked in CX3--CX5; only
+semisimplification at $\ell$ is used in (CX.19).
+The filtered-module fact is P.~Colmez and J.-M.~Fontaine,
+\href{https://webusers.imj-prg.fr/~pierre.colmez/CF.pdf}
+{\emph{Construction des repr\'esentations $p$-adiques
+semi-stables}}, Proposition~4.2 and the corollary to
+Theorem~4.3.
+For the implication from de Rham to potentially semistable see
+L.~Berger,
+\href{https://arxiv.org/pdf/math/0102179}
+{\emph{Repr\'esentations $p$-adiques et \'equations
+diff\'erentielles}}, Theorems~0.6 and~5.19.
+For conductors see P.~Scholze,
+\href{https://people.mpim-bonn.mpg.de/scholze/LocalLanglands.pdf}
+{\emph{The local Langlands correspondence for
+$\mathrm{GL}_n$ over $p$-adic fields}}, Theorem~14.1,
+and H.~Jacquet, I.~I.~Piatetski-Shapiro and J.~Shalika,
+\href{https://lesesvre.perso.math.cnrs.fr/newforms-references/jpss.pdf}
+{\emph{Conducteur des repr\'esentations du groupe
+lin\'eaire}}, Theorem~5.1.
+Local norm compatibility and cyclotomic reciprocity are
+used in their classical finite form; convenient primary
+author references are J.~S.~Milne,
+\href{https://www.jmilne.org/math/CourseNotes/CFT.pdf}
+{\emph{Class Field Theory}}, local reciprocity and
+global reciprocity chapters, and
+\href{https://www.jmilne.org/math/CourseNotes/ANT.pdf}
+{\emph{Algebraic Number Theory}}, Theorem~8.31
+(Chebotarev).  Strong multiplicity one and genericity
+are the standard general-linear cuspidal theorems;
+J.~W.~Cogdell's
+\href{https://people.math.osu.edu/cogdell.1/fields-www.pdf}
+{\emph{Lectures on $L$-functions, converse theorems,
+and functoriality for $\mathrm{GL}_n$}}, Theorem~4.3
+and Corollary~4.1.2, gives the precise general-linear formulations.
+

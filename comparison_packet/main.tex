@@ -1,0 +1,1132 @@
+\section{The original comparison packet and its transport to one fitting realization}
+\label{sec:comparison-packet}
+
+This chapter constructs the packet used immediately before the actual readers of
+RDR1--RDR22.  The formal source is fixed at commit
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}; its correctness is a standing
+assumption.  What follows is an independent mathematical reconstruction of the
+constructors, with their original inputs retained.  In particular, a supplied
+geometric realization is never replaced by an unrelated isomorphic model.
+The Hilbert spaces that are introduced below are coordinates for explicitly
+specified original subspaces, with maps back to those subspaces included in
+every assertion.
+
+The principal conclusions are \texttt{exists\_pkT}, the full
+\texttt{rowPk\_nonempty}, and \texttt{exists\_moved}.  They are conditional on
+the same original \texttt{Inputs}, \texttt{Pins}, \texttt{Holds}, and, for the
+last conclusion, \texttt{ExAt}, \texttt{InGeo}, and \texttt{Fits}.
+They do not prove existence of those data.  Nor do they identify an arbitrary
+later congruence parameter with the parameter extracted from the realization.
+The latter equality remains exactly the guard in RDR22.  No additional
+row-integrability hypothesis is introduced: the original row integrals already
+have the supplier RPI14, and RPI15 supplies the first division comparison.
+
+\subsection{Fixed objects and their complex coordinates}
+
+% BEGIN PKT1
+\paragraph{PKT1 (the original interfaces and selection order).}\label{claim:PKT1}
+Fix the original $D$, finite group $G$, three-stage family $A_3$, coefficient
+field $K=D.\mathrm{what}_2.\mathrm{LL}$ with its star-preserving embedding $\sigma$, intermediate
+number field $K_s$, and original records
+\[
+ R:\mathrm{RealDat3}(D,A_3,K_s),\qquad F:\mathrm{Face3}(D,A_3).
+\]
+Assume the original $\mathrm{Inputs}(D)$, $\mathrm{Pins}(R,F,c_G)$ and
+$\mathrm{Holds}(R,F)$, and that the image of the original coefficient ring
+$O$ in $K$ lies in $K_s$.  Its elements are integral by the original $D.O_{\rm int}$ field.  Fix $y:\mathrm{Hd}(R)$ and, before constructing
+any comparison maps, fix matrices $m_A(b,\mu)$ and $m_L(\mu,j)$ satisfying
+all original \texttt{Mat1.Laws}.  Assume the literal equalities
+\[
+\begin{split}
+ m_A(b,y.\mathrm{tup}(t))&=\mathrm{rMat}(A_3.A,P_b,\psi_b,t),\\
+ m_L(y.\mathrm{tup}(t),i+1)&=\mathrm{lMat}(A_3.A,P_0,\psi_0,i,t).
+\end{split}\tag{PKT.1}
+\]
+Here $b=\mathrm{true}$ means $(P_1,\psi_1)$ and $b=\mathrm{false}$ means
+$(P_0,\psi_0)$.  Write $n_b=\mathrm{nP}(F,b)=|P_b|>0$.
+
+The packet to be constructed has one finite type catalogue, all complexified
+spaces $s_A,s_L$, both row chains, one lift family, the full multiplicity
+integer $D_{\rm all}$, the real number $\delta_p$, and the sharp original
+row coordinates.  Its accompanying \texttt{PkT} contains the catalogue
+certificate, every complexification tie, both chain comparisons, the full
+lift comparison, and the equality defining $D_{\rm all}$.  The equality
+$p.m_L=m_L$ is literal.  Thus none of these choices may be made again after
+forming a reader.  These are precisely the fields in the source definitions;
+this paragraph fixes the scope of all subsequent constructions.
+% END PKT1
+
+% BEGIN PKT2
+\paragraph{PKT2 (the exact complexification and lattice).}\label{claim:PKT2}
+Let $m=(n,H,E,N,\mathrm{op})$ satisfy the matrix laws at $\sigma$.
+Choose an invertible complex matrix $S$ with $S^*S=\sigma(H)$ and put
+\[
+ j(x)=S\sigma(x),\qquad \rho(B)=S\sigma(B)S^{-1}.
+ \tag{PKT.2}
+\]
+The spectral theorem, or Gram--Schmidt for the positive Hermitian form, gives
+$S$; when $n=0$ these are the unique empty matrices.  The images of the
+coordinate vectors are a complex basis, and
+$\langle jx,jz\rangle=\sigma(x^*Hz)$.  The matrix law $E=\mathrm{op}(e)$,
+central multiplicativity and $e^2=e$ imply $E^2=E$.  The stated selfadjoint
+law gives symmetry of $\rho(E)$.  Thus $e_m=\rho(E)$ is an orthogonal
+idempotent and $j(Ex)=e_mj(x)$.
+
+The full $O_K$-lattice $N$ is finitely generated over $\mathbb Z$: choose
+$O_K$-generators and multiply them by an integral basis of $O_K$.  Let
+$u_1,\ldots,u_a$ be the resulting generators.  Define the required
+$O$-lattice by the finite generating set $\{j(u_r)\}$ and carrier
+\[
+ \Lambda=j(N).\tag{PKT.3}
+\]
+This is exactly the $O$-span of those generators.  Indeed every coefficient
+coming from $O$ is integral in $K$, hence lies in $O_K$, so the $O$-span is
+contained in $j(N)$; conversely integer coefficients already generate $N$.
+Since $KN=K^n$, these vectors span the whole complex space after applying
+$j$ and scalar extension.  This proves every generator, carrier and spanning
+clause of \texttt{OLatTie}, and also stability under every $\sigma(a)$,
+$a\in O_K$.  It uses no surjectivity of $O\to O_K$.
+% END PKT2
+
+% BEGIN PKT3
+\paragraph{PKT3 (the actual central group-algebra action).}\label{claim:PKT3}
+Only central multiplicativity is assumed for $\mathrm{op}$; we therefore
+construct only the central action requested by \texttt{Sp1}.
+Extend $\rho\circ\mathrm{op}$ complex linearly from the group basis:
+\[
+ T(z)=\sum_{g\in G}z_g\,\rho(\mathrm{op}([g])).
+\]
+For $g\in G$ let $C_g=\sum_{h\in G}[hgh^{-1}]$.  If $z$ is central,
+its coefficients are constant on conjugacy classes, and counting the terms
+of each class gives
+\[
+ |G|z=\sum_g z_g C_g.\tag{PKT.4}
+\]
+Each $C_g$ is central and has integer coefficients.  The original matrix
+law gives $T(C_gC_h)=T(C_g)T(C_h)$.  Expanding (PKT.4) twice and cancelling
+$|G|^2$ proves $T(zz')=T(z)T(z')$ for arbitrary complex central $z,z'$.
+The unit, addition and scalar laws follow directly from their original
+matrix laws.  Thus $T$ is a complex algebra homomorphism on the center.
+If $a\in K[G]$ has coefficientwise image $z$, expansion gives
+\[
+ T(z)j(x)=j(\mathrm{op}(a)x).
+\]
+Together with PKT2 this is the full original \texttt{Sp1}/\texttt{Tie1}
+pair, including its universal \texttt{cen} clause.  Applying the construction
+independently to every already fixed $m_A(b,\mu)$ and $m_L(\mu,j)$ makes
+all those ties at once and leaves the matrices themselves unchanged.
+% END PKT3
+
+\subsection{The actual finite-type catalogue}
+
+% BEGIN PKT4
+\paragraph{PKT4 (finite congruence orbits and the original smooth space).}\label{claim:PKT4}
+Let $\mathcal M_\infty$ be the union of the original multiplicity spaces
+fixed by positive principal congruence levels, with trivial level character.
+It is a vector space: a product of two levels refines both.  Right translation
+preserves it, since conjugating a fixed finite adelic matrix and clearing its
+finitely many denominators sends a sufficiently deep principal congruence
+subgroup into the original one.
+
+Every integral maximal compact subgroup has finite orbits on a vector fixed
+at one principal level.  Here is the finite calculation behind this fact.
+The integral finite adeles of the totally real field modulo a nonzero
+integer have only finitely many classes, since only primes dividing that
+integer contribute.  An integral basis of $O_E$ shows that the integral
+adelic coefficient algebra for $E$ is a finite module over this ring, so its
+quotient is finite as well.  There are only finitely many residue matrices.
+Two integral unitary matrices with the same entries modulo a sufficiently
+deep level differ, after multiplying by the integral inverse of one, by a
+matrix in that principal congruence subgroup.  Their action on the fixed
+vector is therefore identical.
+
+The original \texttt{schur}, \texttt{pet}, \texttt{sm}, \texttt{lev} and
+\texttt{hc} inputs give a positive Hermitian form on $\mathcal M_\infty$
+and finite-dimensional fixed spaces at each principal level.  These are
+applications of those explicitly supplied inputs, not new producers for
+them.  Their metric is the original $\mathrm{ipM}$.  Right translation is
+unitary for this metric: substituting in the same original fundamental-domain
+integral preserves its value by right invariance of Haar measure.  In the
+source definition by a Schur scalar, the sets of admissible scalars for the
+translated and original pair coincide, so the assertion also respects its
+fallback convention.  Standard frames and the finite level character imply
+that every vector in either of the two original good row spaces lies in
+$\mathcal M_\infty$: take a principal subgroup inside the prescribed level
+and in the kernel of its finite character.  These arguments preserve the
+actual group action and both original levels.
+% END PKT4
+
+% BEGIN PKT5
+\paragraph{PKT5 (orthogonal projection without a Hilbert completion).}\label{claim:PKT5}
+Let a group act unitarily on a positive Hermitian vector space $V$.  Let
+$K$ be a subgroup whose orbits on vectors are finite, and suppose
+$F=V^K$ is finite dimensional.  For every invariant subspace $U\subset V$
+and $x\in F$, there is a unique $u\in U$ such that
+\[
+ x=u+z,\qquad z\perp U;
+ \quad\text{moreover }u,z\in F.\tag{PKT.5}
+\]
+Project $x$ in the finite-dimensional space $F$ onto $U\cap F$.  Its
+residual $z$ is orthogonal to $U\cap F$.  For any $a\in U$, the span
+$Y=\langle Ka\rangle$ is finite dimensional and $K$-stable.  The ordinary
+orthogonal projection of $z$ onto $Y$ is $K$-fixed by uniqueness and
+unitarity.  It lies in $U\cap F$ and hence has zero squared norm.  Thus
+$z\perp a$, proving existence.  If two decompositions existed, their
+$U$-components would differ by a vector both in $U$ and perpendicular to
+$U$, hence would coincide.  This argument requires neither closedness of
+$U$ in a completion nor an infinite-dimensional projection theorem.
+% END PKT5
+
+% BEGIN PKT6
+\paragraph{PKT6 (algebraic irreducible decomposition of every smooth vector).}\label{claim:PKT6}
+Under PKT5, every vector of $F$ is a finite sum of vectors in irreducible
+invariant subspaces of $V$.  More precisely, prove the assertion inside any
+invariant $U$ by induction on $\dim(U\cap F)$.  If this dimension is
+positive, choose an invariant $W\subset U$ for which
+$0<\dim(W\cap F)$ is least, and put $E=W\cap F$ and
+$V_1=\langle GE\rangle$.  A nonzero invariant $W'\subset V_1$ cannot
+have $W'\cap F=0$: PKT5 would make $E\perp W'$, and unitarity would then
+make $V_1\perp W'$, forcing $W'=0$.  Otherwise minimality gives
+$W'\cap F=E$, since it is a subspace of $E$; hence $W'$ contains
+$\langle GE\rangle=V_1$.  Thus $V_1$ is irreducible.
+
+For $x\in U\cap F$, PKT5 splits $x$ into its component in $V_1\cap F$
+and a component in $U\cap V_1^\perp\cap F$.  The latter fixed space has
+strictly smaller dimension because $E\ne0$.  Induction terminates.  Each
+vector of the actual $\mathcal M_\infty$ is fixed by one principal level,
+so PKT4 makes this argument applicable to it.  The conclusion is algebraic
+membership in a sum of irreducibles, not merely density of that sum.
+% END PKT6
+
+% BEGIN PKT7
+\paragraph{PKT7 (actual function models and orthogonality of distinct types).}\label{claim:PKT7}
+An irreducible subspace $W\subset\mathcal M_\infty$ has a model of exactly
+the source's type \texttt{FinTyp}.  Choose $w_0\ne0$ and a linear
+functional $\ell$ with $\ell(w_0)\ne0$, and send
+\[
+ w\longmapsto f_w,\qquad f_w(g)=\ell(gw).
+\]
+The map intertwines the original action with right translation on functions.
+Its kernel is invariant and it is nonzero, so irreducibility makes it
+injective.  Its image is nonzero, irreducible and smooth, since each $w$ is
+fixed by a congruence subgroup.  These are precisely the conditions of the
+original finite-type function model.  The inverse on its image embeds that
+same model in $\mathcal M_\infty$.
+
+Two such irreducible subspaces of nonisomorphic types are orthogonal.
+For each smooth vector of one subspace, PKT5 gives its projection onto the
+other.  Uniqueness makes these projections compatible when the fixed level
+is refined, linear in the vector, and equivariant under every group element.
+A nonzero projection would have zero kernel and full image by irreducibility,
+and would therefore be an isomorphism of the two function models.  Hence
+the projection is zero.  This proves orthogonality also for the spans of all
+copies of two distinct types.  No finiteness of the full adelic group and no
+finite-group semisimplicity assertion is used here.
+% END PKT7
+
+% BEGIN PKT8
+\paragraph{PKT8 (the good cuts preserve the decomposition).}\label{claim:PKT8}
+The original good part at one row level is the common kernel of
+\[
+ T\longmapsto e_0T-T,
+ \qquad T\longmapsto r_kT-\chi(k)T\quad(k\text{ in the level}).
+ \tag{PKT.6}
+\]
+Each operator preserves every finite-type isotypic subspace: right
+translations do so, and the original $e_0$ is a finite group-algebra sum of
+such translations.  If $T$ is good, write it by PKT6 as a finite sum and
+combine terms of isomorphic type.  For any one operator in (PKT.6), its
+images of the resulting summands still lie in mutually orthogonal type
+spaces.  Their sum is zero.  Pairing with each image shows that its squared
+norm is zero.  Thus every summand is itself in all the kernels.  This proves
+that the actual good part is the sum of its actual isotypic intersections;
+it does not require the operators in (PKT.6) to commute.
+
+Each good part is finite dimensional by the original Harish--Chandra input.
+Choose a nonzero vector from each occurring distinct type in either row
+level.  Their orthogonality bounds their number by the sum of the two finite
+dimensions.  The quotient of the union of occurring types by isomorphism
+is therefore finite.  Choose one actual occurring representative per class.
+The resulting $\Phi$ and $\mathrm{rep}:\Phi\to\mathrm{FinTyp}$ satisfy
+all four \texttt{Reps} fields: finiteness, occurrence, uniqueness up to
+isomorphism, and exhaustion.  The catalogue is shared by both levels.
+% END PKT8
+
+% BEGIN PKT9
+\paragraph{PKT9 (the source's conjugate convention and adapted row bases).}\label{claim:PKT9}
+The row predicate $\mathrm{isotE}(\pi)$ uses the conjugate finite type;
+the lift predicate $\mathrm{isotL}(\pi)$ uses the direct type.  Conjugating
+twice gives an isomorphism with the original function model, and conjugating
+an intertwiner gives an intertwiner of the conjugate models.  Consequently
+PKT8, with representatives chosen for the source's \texttt{OccRows}
+convention, gives
+\[
+ \mathrm{EEc}_b=\sum_{\pi\in\Phi}\mathrm{prtE}_b(\mathrm{rep}\,\pi),
+ \qquad
+ \mathrm{prtE}_b(\pi)\perp\mathrm{prtE}_b(\pi')\quad(\pi\not\cong\pi').
+ \tag{PKT.7}
+\]
+The tensor-lift identification of multiplicity maps is a linear equivalence,
+so these equalities and the orthogonality hold in the actual ambient spaces
+used by \texttt{ChT}.  Similarly the actual lift parts
+$\mathrm{prtW}_i(\pi)$ have zero intersection for distinct catalogue indices.
+If $j_E:E\to\mathrm{EEc}_b$ is an isometric isomorphism onto that subspace,
+pull back (PKT.7), choose an orthonormal basis in each part and concatenate
+the finitely many bases.  Label a basis vector by its part.  The span of the
+vectors with label $\pi$ is exactly $j_E^{-1}\mathrm{prtE}_b(\mathrm{rep}\,\pi)$.
+Empty parts contribute no vectors.  This proves the full \texttt{ft} and
+\texttt{disj} clauses, including zero-dimensional row spaces.
+% END PKT9
+
+\subsection{Definite coefficients, class sums and both chains}
+
+% BEGIN PKT10
+\paragraph{PKT10 (the actual definite compact models and their dual pairing).}\label{claim:PKT10}
+At the terminal definite row stage the original sign tuple is all positive;
+at a definite lift coefficient stage it is uniformly of the prescribed sign.
+The original lowest compact type is nonzero and finite dimensional.  Since
+in these definite cases the maximal compact real group is the entire real
+group, that lowest type is invariant under the entire group.  It is closed,
+and irreducibility of the original unitary model makes it the whole model.
+In particular the smooth vectors equal the whole finite-dimensional space.
+This also covers rank zero, where the original character model has dimension
+one.  These conclusions use the irreducibility and lowest-type assertions
+already included in the original representation data.
+
+The tensor product over the real places is irreducible for their product
+group.  One elementary justification is useful here.  The algebra spanned
+by a finite-dimensional irreducible unitary representation is a unital
+$*$-algebra.  Spectral projections of its selfadjoint elements belong to the
+algebra, being polynomials in those elements.  Choose a nonzero projection
+of least rank.  Its corner algebra consists of scalars, since otherwise a
+selfadjoint corner element gives a smaller spectral projection.  If its rank
+were at least two, two orthogonal vectors $u,v$ in its range would satisfy
+$\langle Au,Bv\rangle=0$ for all algebra elements $A,B$.  Both cyclic spans
+are the entire irreducible space, a contradiction.  Thus it contains a
+rank-one projection; multiplying it on both sides spans all rank-one
+operators, so the algebra is the full matrix algebra.  The product group
+therefore spans the tensor product of the full matrix algebras, which is the
+full endomorphism algebra of the tensor product.
+
+The original pairing $\mathrm{prX}$ between the coefficient space and this
+tensor model is equivariant and nonzero.  Its kernels are invariant, hence
+zero by the two irreducibilities.  Since both spaces are finite dimensional,
+the two injections into their duals give equality of their dimensions and
+a perfect pairing.  Its actual map is consequently an isomorphism onto the
+dual tensor space; it is not replaced by an unspecified pairing.  In
+particular, with $d_X=\prod_\tau\dim M_{X,\tau}$,
+\[
+ \dim W_X=d_X>0.\tag{PKT.8}
+\]
+The original \texttt{PrIso} normalization says that the Riesz vectors $a_v$
+of pure tensors obey
+$\langle a_{v'},a_v\rangle=\prod_\tau\langle v_\tau,v'_\tau\rangle$.
+This follows directly by expanding in orthonormal bases; the reversed order
+on the right records the conjugate linearity of the Riesz identification.
+% END PKT10
+
+% BEGIN PKT11
+\paragraph{PKT11 (the original compact forms give all multiplicity maps).}\label{claim:PKT11}
+For a finite adelic coefficient form $F$ in the original definite form space,
+the original extension and pairing give
+\[
+ T_F(v)(g)=\mathrm{prX}\bigl(v,\rho(g^{-1})F(g_f)\bigr).
+ \tag{PKT.9}
+\]
+The prescribed rational equivariance of $F$ proves left rational invariance;
+its finite level law proves the same finite character law for $T_F$.
+The compact real action and equivariance of $\mathrm{prX}$ prove the exact
+real intertwining law.
+
+For completeness these functions have all the required automorphic
+regularity, not just the transformation law.  A continuous finite-dimensional
+representation of a real Lie group is smooth: choose a smooth approximate
+identity supported near $1$.  Its averaged operator tends to the identity
+and is therefore invertible for a sufficiently small support; its range
+consists of smooth vectors by differentiating the smooth convolution kernel.
+Thus every vector is smooth.  The derivatives of (PKT.9) are matrix
+coefficients with the corresponding fixed products of Lie matrices.
+The finite class set and unitarity give a bound for each such derivative,
+uniform in $g$.  Hence the uniform moderate-growth condition holds with
+exponent zero.  The center acts on the finite-dimensional coefficient
+function space, so its orbit spans a finite-dimensional space.  A definite
+rational Hermitian space has no nonzero isotropic rational flag, so the
+cuspidal conditions along proper rational isotropic parabolics are vacuous.
+Finally the multilinear maps in the finite-dimensional tensor variables are
+continuous; a fixed coordinate expression bounds them by a constant times
+the product of the norms.  This supplies the source's Sobolev-continuity
+condition using the order-zero seminorm.  Thus (PKT.9) is the actual
+\texttt{IsMultMap}, including its regularity clauses.
+
+Conversely let $T$ be in the original definite multiplicity space.  At each
+$g$, the functional $v\mapsto T(v)(g)$ has a unique coefficient vector
+$\Psi(g)$ by PKT10.  Real equivariance gives
+$\Psi(ga)=\rho(a^{-1})\Psi(g)$, first for one real factor and then for their
+product.  Therefore $\rho(g)\Psi(g)$ depends only on $g_f$.  Call it $F(g_f)$.
+Left rational invariance and the finite character law of $T$ are exactly the
+rational and level laws of this $F$.  The same formula gives $T=T_F$.
+The two constructions are inverse.  This proves the original
+\texttt{TopMultH} on each prescribed tuple, with the original coefficient
+extension, pairing and level subgroup.
+% END PKT11
+
+% BEGIN PKT12
+\paragraph{PKT12 (Schur unfolding with the literal normalization).}\label{claim:PKT12}
+Let $\Omega$ be the preimage of the prescribed finite level in the definite
+adelic group.  The original measure normalization gives $\nu_X(\Omega)=1$.
+The representation is trivial on finite-only elements, while $\Omega$
+contains the whole compact real group.  Thus its action on $W_X$ is unitary
+and irreducible.  Averaging a rank-one operator over $\Omega$ gives an
+operator commuting with this action.  Irreducibility makes it a scalar;
+its trace determines that scalar.  Equivalently,
+\[
+ d_X\!\int_\Omega
+ \overline{\langle a,\rho(k^{-1})u\rangle}
+ \langle a',\rho(k^{-1})u'\rangle\,d\nu_X(k)
+ =\langle a',a\rangle\langle u,u'\rangle .
+ \tag{PKT.10}
+\]
+All integrands here are continuous on the compact quotient acting on the
+finite-dimensional coefficient space, and bounded; their integrability
+requires no cuspidal estimate.
+
+Take the actual finite class representatives $y_c$ from the original class
+presentation and their finite rational stabilizers $\Gamma_c$.  The value
+at $y_ck$ is $\chi(k)\rho(k^{-1})F(y_c)$.  In a product of one conjugate
+and one unconjugated coefficient, the unit-modulus character cancels.
+Unfolding the original fundamental domain yields the sum of the integrals
+on these finitely many pieces with weights $1/|\Gamma_c|$.  To see the
+weight directly, the map from a level coset to the rational quotient has
+exactly $|\Gamma_c|$ preimages on that piece; partition a fundamental
+domain for this finite action and apply translation invariance to its
+translates.  No measure is renormalized during this step.  Applying
+(PKT.10) to each piece gives the original weighted class-sum pairing.
+Using the Riesz identity in PKT10, and a nonzero pure tensor to determine
+the Schur scalar uniquely, gives
+\[
+ d_X\,\mathrm{ipMT}\bigl(T_h,T_{h'}\bigr)
+       =\langle h,h'\rangle_{H_X}.
+ \tag{PKT.11}
+\]
+In particular the scalar exists, so the fallback branch of the definition
+of $\mathrm{ipMT}$ is not used in this computation.
+% END PKT12
+
+% BEGIN PKT13
+\paragraph{PKT13 (exact level spans and both coordinate Gram identities).}\label{claim:PKT13}
+Use the original rational class-value realization MR1 and its character
+averaging in MR2.  For a finite subgroup $P$ and character $\psi$, the
+operator
+\[
+ \Pi_\psi=|P|^{-1}\sum_{p\in P}\psi(p)^{-1}r_p
+ \tag{PKT.12}
+\]
+is the identity on the desired character space and maps the whole form
+space onto it.  This is checked by changing the summation variable under
+$r_q$; applying it twice then gives the same operator.  The coefficient
+field contains the actual character values.  The original action tie says
+that the rational coordinate action and adelic translation in (PKT.12)
+agree.  Applying (PKT.12) to a rational spanning family therefore proves
+that the actual principal-level adelic forms are spanned by the original
+\texttt{rowForm} or \texttt{liftForm} images.  This is equality of ranges,
+not just equality of dimensions.
+
+The original normalized coordinate Gram matrix is
+$|P|^{-1}E^*HE$, where $E$ is the actual cut-basis matrix and $H$ is the
+weighted class-sum Gram matrix.  Thus MR1 and TL7 give, for original row
+coordinates $x,z$,
+\[
+ \langle j_X\mathrm{rowForm}(x),j_X\mathrm{rowForm}(z)\rangle
+ =n_b\,\sigma\bigl(\mathrm{hform}(m_A.H)(x,z)\bigr).
+ \tag{PKT.13}
+\]
+Combining this with (PKT.11) and the literal definition
+$\mathrm{ipXP}_b=(d_X/n_b)\mathrm{ipMT}$ proves that the coordinate-to-top
+map preserves exactly $\sigma(m_A.H)$.  The factor is $n_b$, with $b$
+unchanged throughout.
+
+For lift-source coordinates the original coefficient extension
+$\mathrm{extV}$ is injective and the source inner product is its transported
+coefficient inner product divided by $n_0$.  The same argument at
+$(P_0,\psi_0)$ proves
+\[
+ \mathrm{ipA}_{\mu,i}
+  (\mathrm{extV}\,j_V\mathrm{liftForm}(x),
+   \mathrm{extV}\,j_V\mathrm{liftForm}(z))
+ =\sigma\bigl(\mathrm{hform}(m_L.H)(x,z)\bigr).
+ \tag{PKT.14}
+\]
+The range is exactly the original intersection called $\mathrm{Amt}$:
+intersect the coefficient-extension range with the finite level law, then
+apply (PKT.12) before the injective extension.  These statements retain the
+original class weights, the original $\psi_0^{-1}$ target convention, and
+both distinct normalization factors.
+% END PKT13
+
+% BEGIN PKT14
+\paragraph{PKT14 (Hilbert models and the three Riesz transitions).}\label{claim:PKT14}
+The original inputs make $\mathrm{ipE}_b$, $\mathrm{ipP}_{b,\mu,j}$ and
+$\mathrm{ipXP}_{b,\mu}$ positive on their stated original multiplicity
+spaces.  Indeed the original finite-level Schur--Petersson assertion applies
+to the same Haar measure and fundamental domain; division by $n_b>0$
+preserves positivity.  At the top, the additional factor $d_X$ is positive
+by PKT10.  The original base and intermediate subspaces satisfy
+\[
+ \mathrm{EEc}_b\subset\mathrm{CC}_{b,\mu,0},\qquad
+ \mathrm{CCP}_{b,\mu,j}\subset\mathrm{CC}_{b,\mu,j},\qquad
+ \mathrm{CCXP}_{b,\mu}\subset\mathrm{CCX}_{b,\mu}.
+ \tag{PKT.15}
+\]
+The first follows because the base row rank is $r$ and its lower block has
+rank zero; the others express the stronger character-level condition inside
+the corresponding full level.  They are the actual subgroup inclusions.
+
+Make $E_b$ the finite-dimensional Hilbert model of $\mathrm{EEc}_b$, with
+isometric inclusion $j_E$.  For each used tuple and $1\le j\le m-1$ make
+$M_{\mu,j}$ the analogous model of $\mathrm{CCP}_{b,\mu,j}$, with $j_M$.
+At $j=0$ use $E_b$, and at $j=m$ use the already fixed top $s_A(b,\mu)$.
+PKT13 and the complex basis of PKT2 define its unique isometric map $j_X$
+by the original row-coordinate formula.  Its range is $\mathrm{CCXP}$.
+The inverse $y.\mathrm{tupT}$ is used only on tuples in the image of
+$y.\mathrm{tup}$; every used tuple is in that image, including $\mu_0$
+by $y.\mathrm{tup0}$.
+
+For a finite-dimensional Hilbert model $H$ embedded by $j$ in an ambient
+pairing space, the functional $x\mapsto \mathrm{ip}(jx,w)$ has a unique
+Riesz vector $r(w)$ with $\langle x,r(w)\rangle=\mathrm{ip}(jx,w)$.
+Expansion in an orthonormal basis shows that $r$ is linear in $w$.
+Define the successive maps by applying this construction to the actual
+$\mathrm{ioC}$, and at the last step to the actual $\mathrm{ioX}$.
+At $j=0$ use the $E_b$ pairing, at $1\le j\le m-2$ the corresponding
+intermediate pairing, and at $j=m-1$ the penultimate pairing with $j_X$
+on the input.  This gives exactly the three displayed adjoint-pairing
+identities of \texttt{ChT}.  The equality $m-1+1=m$ accounts for its
+terminal heterogeneous-equality cast.  Unused tuples receive zero transition
+maps.  Outside the intermediate range the arbitrary auxiliary models can
+be $E_b$; they do not change any specified endpoint or transition identity.
+% END PKT14
+
+% BEGIN PKT15
+\paragraph{PKT15 (both complete original chain comparisons).}\label{claim:PKT15}
+Perform PKT14 for $b=\mathrm{false}$ and $b=\mathrm{true}$ with the shared
+catalogue PKT8.  In each base Hilbert space choose the adapted orthonormal
+basis from PKT9.  Define \texttt{multZero} and \texttt{multTop} by the
+identity identifications in the piecewise definition of $M_{\mu,j}$.
+The resulting \texttt{ChD} and \texttt{ChT} have all their fields:
+$j_E$ has the original range and metric; the $j_M$ and $j_X$ have the
+original ranges, injectivity and metrics on every used tuple; all three
+$\mathrm{io}$ identities are PKT14; unused transitions vanish; and the
+labelled basis and distinct-part intersections are PKT9.  Finally the
+coordinate definition of $j_X$ gives, for every original $t$ and $x$,
+\[
+ j_X(y.\mathrm{tup}(t))(j_A(t)x)
+ =R.c_X.\mathrm{toMap}(R.\mathrm{prX})
+       \bigl((R.H_X(t)).e(R.j_X(t)(\mathrm{rowForm}(x)))\bigr).
+ \tag{PKT.16}
+\]
+Equality on the fixed complexified coordinate basis extends this formula
+to all $x$.  This is the complete original \texttt{top} field, on the
+already chosen $s_A$, not a later independently chosen top model.
+% END PKT15
+
+\subsection{The lift lattice and its conditional theta map}
+
+% BEGIN PKT16
+\paragraph{PKT16 (the exact good integral carrier in the target model).}\label{claim:PKT16}
+Fix a target index $i$.  The original \texttt{Holds.aux.integral} supplies
+the $K_s$-rational form, the full finite $O_{K_s}$-lattice
+$M_K=(R.FW_i).MK$, and its stability under the original finite group.  The retained coefficient-field
+and character conditions imply that the actual good cut
+\[
+ W_{\rm good}=W_{\rm good}(P_0,\psi_0^{-1},e)
+\]
+is defined over $K_s$.  The integral-descent argument DI17, with these
+literal inputs, gives
+\[
+ O_K\text{-span}(M_K\cap W_{\rm good})
+   =(O_K\text{-span}M_K)\cap W_{\rm good},
+ \tag{PKT.17}
+\]
+with the field extensions understood exactly as in the original
+\texttt{FW} model.  The relevant intersection is a finite $O_{K_s}$-module because
+it is a submodule of the finite $O_{K_s}$-lattice over a Noetherian ring.  It is full
+in the good subspace: choose a rational basis of that subspace and clear
+the finitely many denominators in the ambient full lattice.
+
+Suppose $E:M\to H_W$ is injective and has range
+$W^{\rm at}_i.\mathrm{comap}(H_W.e)$.  The original level equality in
+\texttt{Holds.aux.levelW} identifies this subspace with the complex span
+of $(R.FW_i).j(\mathrm{sg0})(M_K\cap W_{\rm good})$.  Choose integer
+generators of the latter integral intersection and lift their images
+uniquely through $E$.  The $O$-lattice they generate in $M$ then satisfies
+\[
+ x\in\Lambda_i\ \Longleftrightarrow\
+ \exists v\in M_K\cap W_{\rm good},\quad
+ E x=(R.FW_i).j(\mathrm{sg0})v.\tag{PKT.18}
+\]
+Both implications follow from the chosen integer generators and the
+integrality of the original $O$-action, as in PKT2.  Specifically, its
+image lies in $K_s$ by PKT1; integrality in $K$ descends along the
+field embedding to integrality in $K_s$, so it acts through $O_{K_s}$.
+Full complex spanning
+follows from (PKT.17) and the exact range of $E$.  Thus no arbitrary
+commensurable lattice is used.
+% END PKT16
+
+% BEGIN PKT17
+\paragraph{PKT17 (the target Hilbert space with its factor $n_0$).}\label{claim:PKT17}
+For $1\le j\le m$ put $i=j-1$ and
+\[
+ S_i=(R.W^{\rm at}_i(\mathrm{sg0},\mathrm{levL}_0))
+                   .\mathrm{comap}(R.HW_i(\mathrm{sg0}).e).
+\]
+It is finite dimensional: $HW_i$ is the original finite good coefficient
+model and its embedding into multiplicity maps is injective.  Choose an
+orthonormal basis of $S_i$, set $M_j=\mathbb C^{\dim S_i}$, and let
+$E_i:M_j\to HW_i$ be $\sqrt{n_0}$ times the basis inclusion.  Then
+\[
+ \operatorname{range}E_i=S_i,\qquad
+ \|E_i x\|^2=n_0\|x\|^2.\tag{PKT.19}
+\]
+Define $j_{M_j}$ to be the actual tensor lift of $HW_i.e\circ E_i$.
+The original $HW$ metric identity and the definition of $\mathrm{ipWc}$
+give
+\[
+ \mathrm{ipWc}_i(\operatorname{lift}(HW_i.eu),
+                   \operatorname{lift}(HW_i.ev))
+       =n_0^{-1}\langle u,v\rangle.\tag{PKT.20}
+\]
+To check the constants, its defining $\mathrm{ipAt}$ contributes the
+product of the local lowest-type dimensions, while the original $HW$
+normalization divides by that same product; scaling the original measure
+by $n_0^{-1}$ contributes the remaining factor.  No other scalar survives.
+Thus $j_{M_j}$ is an isometry onto exactly $\mathrm{Wc}_i$.  Equip $M_j$
+with the lattice from PKT16.  At $j=0$ and $j>m$ use the zero Hilbert
+space and its zero lattice.  These choices give all target norm, range,
+lattice, injectivity and out-of-range clauses in the original \texttt{LfT}.
+% END PKT17
+
+% BEGIN PKT18
+\paragraph{PKT18 (the prescribed source embeddings and the conditional lift).}\label{claim:PKT18}
+For a used tuple $\mu=y.\mathrm{tup}(t)$, send the complexified coordinate
+basis of $s_L(\mu,i+1)$ to
+\[
+ \mathrm{extV}_{i,t}\,j_{V,i,t}\,\mathrm{liftForm}(e_k).
+\]
+PKT13 says that this extends to an injective isometry $j_{M_t}$ with
+range exactly $\mathrm{Amt}_{\mu,i}$.  The inverse tuple $t$ is unique
+because $y.\mathrm{tup}$ has the given left inverse.  The map is set to
+zero outside the image when it has no required source comparison.
+
+Now let $U_i$ be the subspace of original $\mathrm{MultW}_i$ consisting
+of maps $w$ with $e_W\circ w\in\mathrm{Wc}_i$.  Restriction
+\[
+ r:U_i\longrightarrow\operatorname{Hom}_{\mathbb C}
+       (\text{lowest compact type},\text{functions}),
+ \qquad r(w)=w\circ\mathrm{embK}_i
+ \tag{PKT.21}
+\]
+is injective.  Indeed each original local lowest type is nonzero; choose a
+nonzero vector in each and apply the one-lowest-tuple determination argument
+DI4 to the difference of two multiplicity maps.  All its original
+intertwining and smoothness conditions are already part of membership in
+$\mathrm{MultW}_i$.
+
+Define a linear left inverse to $r$ on its image and extend it to the full
+ambient vector space by a basis extension.  Compose this map with the
+original $\mathrm{thC}_{\mu,i}\circ j_{M_t}$, then with
+$w\mapsto e_W\circ w$, and finally with the inverse of $j_{M_j}$ on
+$\mathrm{Wc}_i$.  Call the resulting linear map $\theta_{\mu,i+1}$.
+If an original $w\in\mathrm{MultW}_i$ satisfies
+\[
+ w\circ\mathrm{embK}_i=\mathrm{thC}_{\mu,i}(j_{M_t}x),
+ \qquad e_W\circ w\in\mathrm{Wc}_i,
+\]
+then the left inverse recovers that very $w$, and
+\[
+ j_{M_j}(\theta_{\mu,i+1}x)=e_W\circ w.\tag{PKT.22}
+\]
+This proves precisely the conditional theta clause.  It does not assert
+that such a $w$ exists for every $x$, and it does not consume or replace
+the independent theta-extension producer.  Set all $\theta$ maps on unused
+tuples and outside the valid index range to zero.
+% END PKT18
+
+% BEGIN PKT19
+\paragraph{PKT19 (the complete original lift comparison).}\label{claim:PKT19}
+Set the target type subspace at $j=i+1$ to
+$j_{M_j}^{-1}\mathrm{prtW}_i(\mathrm{rep}\,\pi)$.  PKT9 gives the
+required distinct-part intersections.  Use the zero subspace outside the
+valid range.  PKT16--PKT18 now give every \texttt{LfD}/\texttt{LfT}
+field on the fixed $s_L$: the original $e_W$ with its range, factor $n_0$
+and exact integral carrier; the tensor-lift reading and its isometry onto
+$\mathrm{Wc}$; the source $j_{M_t}$ with its exact range and metric; the
+conditional theta equation; unused-tuple vanishing; out-of-range zero
+spaces; and all type predicates.  The coordinate construction also gives
+for every original $t$ and $x$
+\[
+ j_{M_t}(y.\mathrm{tup}(t),i)(j_L(i,t)x)
+       =R.\mathrm{extV}(i,t)
+          (R.j_V(i,t)(\mathrm{liftForm}(A_3.A,P_0,\psi_0,i,t,x))).
+ \tag{PKT.23}
+\]
+This is the literal final \texttt{read} clause, using the same $j_L$
+from PKT3 and (PKT.1).
+% END PKT19
+
+% BEGIN PKT20
+\paragraph{PKT20 (sharp row coordinates and the exact loss parameter).}\label{claim:PKT20}
+Apply the independently proved sharp coordinate theorem RDR7 to the actual
+$j_E$ of the true-level chain in PKT15.  It gives $n_R$, a complex basis
+$c_R$ of that same $E_{\rm true}$, and every original all-place frame
+$X_o(v)$, with
+\[
+\begin{split}
+ j_E\!\left(\sum_a\sigma(x_a)c_R(a)\right)
+ &=\operatorname{lift}\bigl(R.HE.e\,
+      \mathrm{Tw.out}(i_C(\mathrm{cpt}(x)))\bigr),\\
+ X_o(v)&=X_E(v)\text{ reindexed by the same dimension equality},
+ \qquad \det X_o(v)\ne0.
+\end{split}\tag{PKT.24}
+\]
+Here $i_C$, the involutively semilinear $\mathrm{cpt}$, the distinguished
+embedding, and $X_E$ are exactly those of $(R.\mathrm{toCx3}(F))$.
+This is the full original \texttt{RrT}, including all embeddings, and not
+only a dimension comparison.
+
+Let $D_{\rm all}$ be the dimension of the full original row multiplicity
+space at $(P_1,\psi_1)$, before the good idempotent cut, and let
+$n=\dim E_{\rm true}$.  If $D_{\rm all}=0$, the full multiplicity space
+is zero; its good subspace and hence $E_{\rm true}$ are zero.  Define
+\[
+ \delta_p=\begin{cases}0,&D_{\rm all}=0,\\
+                  1-n/D_{\rm all},&D_{\rm all}>0.
+          \end{cases}\tag{PKT.25}
+\]
+Then $\delta_p\le1$ and $n=(1-\delta_p)D_{\rm all}$ in both cases.
+Only this upper bound on $\delta_p$ is required and proved here; no
+additional nonnegativity assertion is included in the packet.
+% END PKT20
+
+% BEGIN PKT21
+\paragraph{PKT21 (full original \texttt{exists\_pkT}).}\label{claim:PKT21}
+Under exactly PKT1's original premises there is $p:\mathrm{PkD}(D,G)$
+with $p.m_L=m_L$ and a member of $\mathrm{PkT}(F,y,m_A,p)$.
+Take the finite catalogue PKT8, every complexified space and tie PKT3,
+both chains PKT15, the lift PKT19, and the numerical and row-coordinate
+data PKT20.  The laws and equalities (PKT.1) are the given ones, copied
+without alteration.  The $\mathrm{PkT}$ fields \texttt{rep/reps},
+\texttt{tA}, \texttt{lawsA/lawsL}, \texttt{hA/hL}, \texttt{ch},
+\texttt{lf}, \texttt{dall}, and \texttt{rr} are respectively the exact
+certificates just proved.  All universal choices are made for the same
+fixed family before constructing $p$; the dependent lift and chain
+coordinates use the resulting same choices.  This proves the original
+endpoint without any new representation-catalogue, lattice, pairing or
+intertwiner premise.
+% END PKT21
+
+\subsection{Construction of the entire original row package}
+
+% BEGIN PKT22
+\paragraph{PKT22 (all original $\mathrm{Hd}$ fields).}\label{claim:PKT22}
+Now fix the original $B,f,T,w,Z_0,h_X,W_t$ and a given realization
+$z_0:\mathrm{Dat}(w.\mathrm{st}(Z_0),w.I,h_X,T,W_t)$.
+Assume the original host equality $F=E^+$, the standard self-dual lattice
+conditions for $Y_0$ and every $W_i$, and the original inputs and holds
+conditions.  We construct the additional \texttt{Hd} data rather than
+assuming compatible frames.
+
+At each finite place the original unramified CM condition and the given
+self-dual lattice give an integral orthonormal frame by DR1, including at
+residue characteristic two.  Relative to the prescribed rational lattice
+frame, both the change matrix and its inverse have integral entries.
+These local matrices glue to a finite adelic matrix: a fixed integral basis
+of $O_E$ expresses each local integral entry as a tuple of integral
+coefficients over the totally real completion; those coefficient tuples
+are integral finite adeles.  Glue the inverse entries in the same way.
+The local identities $AB=BA=1$ and $A^*HA=1$ imply the adelic identities
+because evaluation at all finite places is injective.  This constructs a
+finite adelic orthonormal frame, not a claimed free global $O_E$-basis of
+the lattice.
+
+Conjugation by that frame identifies the standard finite unitary group
+with the original finite-only group, and identifies their maximal compact
+subgroups.  Let these homomorphisms be $P_Y$ and $P_{W_i}$, and set
+$\iota_{W_i}=P_{W_i}P_Y^{-1}$.  The inverse frame matrices show directly
+that this is the original \texttt{IsIsomFin} with its conjugation and
+lattice clauses, and that \texttt{FrameMatch} holds with parameter one.
+Thus the frame maps and their standardness are simultaneous original maps.
+
+The used-tuple inclusion $\mathrm{ixOf}$ is injective.  Define its left
+inverse by its unique preimage on the image, and by the base tuple elsewhere.
+It sends the original base tuple correctly.  The rank assumption gives
+$m\ge2$, hence $m>0$.  PKT11 gives \texttt{TopMultH}; injectivity of
+$\mathrm{extV}$ follows from injectivity of the original coefficient
+extension and of the given coefficient model $HV.e$.  These facts, with
+the constructed frames, are every field of \texttt{Hd}, with
+$y.\mathrm{tup}=\mathrm{ixOf}$.
+% END PKT22
+
+% BEGIN PKT23
+\paragraph{PKT23 (all original coordinate laws and restriction identities).}\label{claim:PKT23}
+Use the original all-tuples matrices $m_{AU}(b,a)$ and $m_{LU}(a,j)$.
+The latter is the actual lift matrix at $i=j-1$ for $1\le j\le m$,
+and is \texttt{Mat1.zero} otherwise.  We verify their laws from their
+original finite coordinates.
+
+Let $E_P$ be the chosen coordinate inclusion of the character cut, and
+$L_P$ its left inverse.  The cut's Gram matrix is
+$|P|^{-1}E_P^*HE_P$ and its integral lattice is the inverse image of the
+original coefficient lattice under $E_P$.  Positivity follows from TL7
+and injectivity of $E_P$.  Fullness follows by clearing denominators of
+a basis in the full ambient lattice; finite generation follows by
+Noetherianity.  This proves the literal lattice law, not just discreteness
+at the distinguished embedding.
+
+For a group-algebra element $a$, the matrix action is
+$L_P\rho(a)E_P$.  It is additive, scalar-linear, and sends $1$ to $1$.
+If $a$ is central then $\rho(a)$ commutes with the character projector
+(PKT.12), so it preserves the cut.  Consequently
+$E_PL_P\rho(a)E_P=\rho(a)E_P$, which proves multiplicativity for two
+central elements.  The original good-character catalogue in $z_0.\mathrm{good}$
+consists of absolute irreducible finite-group characters.  Averaging the
+usual character matrix coefficients gives orthogonal central idempotents;
+the sum over the specified catalogue is therefore the original central
+idempotent.  The finite action is unitary for the actual weighted class-sum
+form TL5--TL7, so this idempotent is selfadjoint.  Its compressed matrix is
+exactly the stored $E$.  These are all ten \texttt{Mat1.Laws} fields.
+For the zero matrix record the space has dimension zero; every identity
+and the full-lattice assertion are vacuous.
+
+The restricted family at a used tuple $t$ and the all-tuples family at
+$\mathrm{ixOf}(t)$ have identical character, weight, level and class-value
+data.  Their coordinate definitions therefore use the same cut basis,
+Gram matrix, lattice and action.  Substituting these data gives the exact
+identities (PKT.1), rather than merely isomorphic coordinate records.
+Finally $z_0.K_s\mathrm{\_le}$ supplies the coefficient-ring hypothesis
+of PKT1.  Thus PKT21 applies to these actual all-tuples matrices.
+% END PKT23
+
+% BEGIN PKT24
+\paragraph{PKT24 (actual period coordinates and the full $\mathrm{PerT}$).}\label{claim:PKT24}
+For every tuple $a$, the original complex row-form space
+$\mathrm{MtCx}(w.I,a)$ has the complexified rational basis of MR1--MR2.
+Map that basis to the same-coordinate basis of $s_A(\mathrm{true},a)$
+from PKT3.  This gives a linear equivalence $e_a$ with the exact
+\texttt{IsCrd} identity for the original \texttt{rowForm}.
+
+For every word $u$ and tuple $a$, there is an explicit equivalence
+$g_{u,a}$ from this row-form space to the original period-form space.
+Here is its descent argument.  Pull a row function back along the original
+surjection from framed points to unframed row points.  Rational and finite
+level equivariance become exactly the period frame law.  Conversely two
+framed points with the same unframed point differ by an element in the
+kernel of frame reduction.  At the disjoint sets $vG_s$ and $Q(a)$ the
+local changes can be chosen independently.  Their assembled reduction is
+the identity, their rational part is the identity, and the product of their
+level characters is one.  The frame law therefore makes the two function
+values equal.  The function descends uniquely.  Equivariance of the
+surjection proves the descended row law.  The disjointness used here is
+exactly the original selection condition in $w.\mathrm{ok}$; the
+reduction maps and inverse characters are the ones in
+\texttt{RightTranslationActionApply}.  The two pullback/descent operations
+are inverse and complex linear.
+
+Set $d.e_0(u)=e_{\mu_0}g_{u,\mu_0}^{-1}$ and
+$d.e_T(u,a)=e_ag_{u,a}^{-1}$.  These maps give the original period record
+$\mathrm{PerD}(p)$.  Their inverses undo the same $g_{u,a}$, so the
+\texttt{SameForm} equalities hold pointwise at every original frame, for
+both the reference and twisted periods.  Together with the initial
+coordinate identity they give all \texttt{PerT} fields \texttt{e},
+\texttt{ref}, \texttt{tw}, and \texttt{crd}.  No statement about the value
+or nonvanishing of a period integral was needed.
+% END PKT24
+
+% BEGIN PKT25
+\paragraph{PKT25 (the prescribed auxiliary rows, weights and Sha dictionary).}\label{claim:PKT25}
+The auxiliary $W_0:\mathrm{RowsRest}(B,w.C)$ can be chosen independently
+of the comparison packet while retaining the original column-period spaces.
+Indeed MR1, the original integral form lattice and its positive metric give
+for each tuple an isometric Euclidean model and an $O$-lattice with exactly
+the original integral carrier; the construction is PKT2 applied to an
+integral basis and its Gram matrix.  Transport the equivalences $g_{u,a}$
+of PKT24 to these models.  Put $\mathrm{Mu}_u$ equal to the original
+ramified column space, with its original positive inner product and the
+identity identification $e_\mu$.
+
+For clarity the permitted auxiliary fields are explicit.  Take $EE=EE_0=0$,
+$D_{\rm rows}=D_0=D_{\rm all}=\delta_p=0$, the empty type set and empty
+orthonormal row bases.  Let $\mathrm{Amb}_a$ be the Euclidean model just
+chosen; let $\mathrm{Mult}_{a,j}=0$ except at $j=m$, where it is
+$\mathrm{Amb}_a$.  All intermediate maps are zero, the ambient lattice
+is the chosen one, and its idempotent is the identity.  Define the column
+period by the actual $P\widetilde{\mathrm{Col}}$, using the inverse
+reference equivalence at $\mu_0$ and the inverse twisted equivalence and
+original $e_{0,\rm Tw}$ elsewhere.  Initially take $B_u=0$ and $z_e=1$.
+Take $M_j=M_{t,\mu,j}=0$, their zero lattices, identity idempotents,
+zero theta maps, and zero $\lambda$, $I_j$, $j_w$ and $\eta_j$; use the
+full subspace as each target type subspace.  Every zero-space basis and
+idempotence clause then holds directly.  The reference and twisted period
+ties follow by the two branches in the definition, and $e_\mu$ preserves
+the original ramified form.  These are initial stand-in fields only: the
+later operation $p.\mathrm{what}_2$ inserts the actual chains and lifts
+of PKT21.
+
+The weight fields are not arbitrary.  Define $s_i$ to be the original
+$v_i$ for $i<k-1$, then the original $-b_{i-(k-1)}$ when in range, and
+zero otherwise; define $e_j=e_{j-1}^{\rm orig}$ for $1\le j\le m$ and
+zero otherwise.  Put
+\[
+\begin{split}
+ a^+_{j,i}&=s_i+e_j-(n_V-1-2i)/2-(k+j-1-m+j)/2,\\
+ a^-_{j,c}&=(b_{j+c}\text{ if in range, else }0)-e_j-(t+1+2c)/2.
+\end{split}\tag{PKT.26}
+\]
+All original $v,b,e$ are integers.  Writing $t=2s+1$ and using the
+original rank identity reduces the two expressions to
+$a+b-(k+j-2-i)-(s+1)$ and $a-b-(s+1+c)$ respectively, with integer
+$a,b$.  Thus set $\mathrm{kaBig}=a^+$ and
+$\mathrm{kaSmall}=-a^-$.  These equalities prove the exact
+\texttt{KapDef} for every later $V,S,N,G$, since these stages do not
+alter the weight formulas.
+
+Choose $\mu_{\rm Tw}(v)$ as a function of the character
+$T.\xi_{\rm Tw}(f,v)$ in the original image of $w.I.\xi$; equal
+characters receive equal preimages.  Conjugate places have equal characters,
+so the tuple is conjugation-invariant.  Set
+$\mu_{\rm At}(v)=\mu_{\rm Tw}(v)$ on $W_t$ and $\mu_0$ off $W_t$;
+the assumed conjugation-invariance of $W_t$ gives all \texttt{MuW} clauses.
+Finally take the actual $\mathrm{shaTrue}$ from LS18: its value is the
+natural conversion of the original extended module length.  When that
+length is a finite integer $n$, its conversion is $n$, exactly
+\texttt{ShaOK}; no finiteness of all those lengths is asserted.  This
+completes all prescribed auxiliary fields.
+% END PKT25
+
+% BEGIN PKT26
+\paragraph{PKT26 (one numerical record valid for every later stage).}\label{claim:PKT26}
+Fix the actual $p,d,W_0$ just constructed.  Temporarily assemble them with
+zero numerical fields and zero $\eta$, and call the resulting underlying
+row data $D^0$.  Its spaces, periods, sections, projections, theta maps and
+integral generators are independent of these numerical placeholders.  Set
+\[
+\begin{split}
+ B_u(\phi,x)&=\mathrm{perCol}_{u,\mu_0}(\phi,
+                                      \mathrm{sec}_{\mu_0}x),\\
+ \lambda_{\mu,j,\pi}
+ &=\frac{\Re\operatorname{tr}
+   (\theta_P\theta_T\operatorname{pr}_{\mathrm{isot}(j,\pi)})}
+          {\dim\mathrm{isot}(j,\pi)}.
+\end{split}\tag{PKT.27}
+\]
+Use the source's division-by-zero convention for a zero type space.  The
+first expression is bilinear since the actual period and section are
+linear.  These definitions are precisely the \texttt{bu} and
+\texttt{lam} clauses of \texttt{NumOK}.
+
+A scalar satisfying the source's period factorization, together with a
+nonzero period witnessing that factorization, is unique: evaluating two
+factorizations at that witness and cancelling the nonzero remaining factor
+gives equality.  At $\mu_0$ the identity
+$\mathrm{sec}\,\mathrm{iota}=1$ on the projected subspace makes it one.
+Define $z_e(u,\mu_0)=1$; at another tuple choose a unit of the original
+field giving such a factorization if one exists, and choose $1$ otherwise.
+If the \texttt{NumOK.ze} antecedent supplies a factorization and a field
+value, its nonzero witness proves that field value is a unit, and uniqueness
+identifies it with this choice.  Thus the required conditional clause holds
+without asserting existence of any new factorization or nonzero period.
+
+For the two index fields let $T_{j,\mu}$ be the $O_K$-span of the original
+rational vectors whose images belong to the original $T_j$ set.  Its dual
+consists of vectors in its $K$-span pairing integrally with all of
+$T_{j,\mu}$.  Define $j_w$ as the original local index of these two
+modules.  In the complex target let $L_j^{\rm can}$ be the $O_K$-span of
+the actual target-lattice generators, and let $T_j^{\rm can}$ consist of
+the theta images of $T_{j,\mu}$ which belong to the $K$-span of those
+same generators.  Define $I_j$ as their local index.
+
+These indices agree with those computed in every subsequently supplied
+rational target model $Y$.  Its injective semilinear $j_M$ maps the target
+lattice onto $L_j^{\rm can}$ by its exact generator law; fullness and
+scalar extension give its rational range as precisely that $K$-span.
+The theta equality then maps the rational theta submodule onto
+$T_j^{\rm can}$ in both directions.  Localization commutes with this
+injective map: if $s\notin\mathfrak p$ and $sy$ is in its range, divide
+by the nonzero field element $s$ to lift $y$; then injectivity lifts
+membership in the localized submodule.  The induced maps on each quotient
+are isomorphisms, preserving its module length.  Applying this twice to
+the two terms of the original signed local index proves the asserted
+$I_j$ equality, with no finite-length hypothesis added.
+
+All these definitions depend only on $p,d,W_0$.  Replacing the zero
+placeholders by them changes none of the spaces, maps or sets used to
+define them.  Thus one numerical record $n$ satisfies
+\[
+ \forall\eta\ge0\ \forall V,S,N,G,
+ \quad \mathrm{NumOK}\bigl(\mathrm{assemble}
+             (p.\mathrm{what}_2(d,W_0,n,\eta),V,S,N,G)\bigr).
+ \tag{PKT.28}
+\]
+The quantifier over $\eta$ occurs after the choice of $n$.
+% END PKT26
+
+% BEGIN PKT27
+\paragraph{PKT27 (full original $\mathrm{rowPk\_nonempty}$).}\label{claim:PKT27}
+On the original premises stated in PKT22, including conjugation-invariance
+of $W_t$, there is an actual $q:\mathrm{RowPk}(w,z_0)$.  Take its $y$
+from PKT22, its $p,t$ from PKT21 applied by PKT23, its period data from
+PKT24, its $W_0$, tuple and Sha clauses from PKT25, and its numerical
+record from PKT26.  The tuple identity is
+$y.\mathrm{tup}=\mathrm{ixOf}$ and the full matrix identity is
+$p.m_L=m_{LU}$ at every tuple and every natural index, including the
+zero cases.  The final two fields are universally quantified:
+\[
+ \forall\eta\ge0\ \forall V,S,N,G,
+   \qquad \mathrm{KapDef}\ \text{and}\ \mathrm{NumOK}.
+ \tag{PKT.29}
+\]
+PKT25 proves the first because the inserted packet preserves both weight
+functions; PKT26 proves the second.  This supplies every field of the
+original \texttt{RowPk}, rather than just its comparison subrecord.
+The given realization $z_0$ and its original column choices are unchanged.
+% END PKT27
+
+\subsection{Copying that same package to a fitting later stage}
+
+% BEGIN PKT28
+\paragraph{PKT28 (the original realization copied with the same finite group).}\label{claim:PKT28}
+Fix the $q$ of PKT27, and then fix an arbitrary $o:q.\mathrm{Over}$.
+Assume exactly the original extra premises of \texttt{exists\_moved}:
+$\mathrm{Holds}(z_0.R,z_0.F)$, $\mathrm{ExAt}(z_0.R)$,
+$\mathrm{InGeo}(z_0.\mathrm{geo})$, $\mathrm{GrpTrue}(Z_0.N,f)$ and
+$o.\mathrm{Fits}$.  The last premise supplies
+$\mathrm{GrpTrue}(o.Z.N,f)$ for the same $f$.
+
+Identify the two finite groups by the original place-label bijections.
+They preserve the underlying primes, residue-field identifications and
+both distinguished-prime families.  The type-idempotent coefficients agree
+because both group records describe the same original $f$.  Thus the
+product group isomorphism $s$ preserves the coefficient function of the
+good idempotent.  Copy $z_0$ as follows: keep its actual $X_g$, trace data,
+coefficient field and field embedding; copy its geometric core and its
+real adelic record along the identity of the underlying fields and ranks;
+compose $c_G$ with $s$; and copy its geometric half to the same original
+spaces.  This is the specified $\mathrm{cpDat}$, not a new geometric
+existence choice.
+
+Here are the nontrivial field checks.  The group record uses the transported
+place bijection and the same residue-field maps, so its reduction and
+character laws hold pointwise.  In the good-character record, both the
+character test
+$\sum_g e_g\sigma(\chi(g))=\sigma(\chi(1))$ and the coefficient equality
+for $\mathrm{idemOf}(X_g)$ are unchanged by $s$.  The level record keeps
+its six clauses: actual level law, chain frame, idele character, group
+primes, $Q$-set and base frame.  The eleven \texttt{Keep} clauses keep
+the same group and two level characters, standard lattices, signs, frames,
+base matrices, top pairing, nondegeneracy guard and three coefficient-field
+conditions.  The weak characterization keeps the original base models,
+inert piece, three full-level clauses, scalars, tuple data, phases and
+all-place condition.  Thus all \texttt{Pins} hold on the copy.  The
+primitive rows, auxiliary rows, finite coordinate laws and separation in
+\texttt{Holds} are the same assertions about the same functions and
+coefficient matrices.  The given \texttt{ExAt}, \texttt{InGeo} and
+canonical-core properties similarly keep their original witnesses.
+For the core laws, the multiplication, cusp multiplication, integral
+$Z$-lattice, nonzero cusp and exponent clauses all use those unchanged
+objects.  Therefore the copy preserves exactly the original conditional
+\texttt{CoreP} implication as well.
+% END PKT28
+
+% BEGIN PKT29
+\paragraph{PKT29 (all comparison maps and metrics survive the copy).}\label{claim:PKT29}
+Copy $y$ with the identical tuple map and inverse and the identical frame
+homomorphisms $P_Y,P_W$.  Its remaining fields are the same rank, range,
+injectivity and frame equalities of PKT22.  The original groups, scalar
+fields, Hermitian spaces, local representations, real actions and finite
+adelic actions have not changed.  Consequently their multiplicity spaces
+are equal as subspaces of the same map spaces: every transformation,
+smoothness, cuspidality, growth and continuity condition has the same
+underlying formula.  Their good parts are equal because the idempotent
+coefficients and character laws were checked in PKT28.  Hence the original
+occurrence sets, row parts and lift parts are equal, with the same direct
+and conjugate type conventions.  The exact same catalogue and
+representatives still satisfy \texttt{Reps}.
+
+The row subspaces $\mathrm{EEc}$, $\mathrm{CC}$, $\mathrm{CCP}$,
+$\mathrm{CCX}$ and $\mathrm{CCXP}$ are therefore equal on the two stages.
+Their measures, fundamental domains, local tensors and constants $n_b,d_X$
+are literally the old ones, so their pairings are equal, including any
+choice-based Schur definition.  The original $\mathrm{ioC}$ and
+$\mathrm{ioX}$ have the same values: their domain casts change only the
+proof of membership in these equal subspaces.  Copying $j_E,j_M,j_X$
+therefore preserves each injection, range, metric, adjoint transition,
+vanishing, labelled-basis and coordinate field of both \texttt{ChT}s.
+
+For the lift, $\mathrm{Wat}$, $\mathrm{MultW}$ and $\mathrm{Wc}$ have the
+same defining level and good-cut conditions.  Copy $e_W,j_{M_j},j_{M_t}$
+and every lattice generator.  The norm constant is still $n_0$, and
+(PKT.18) is the same integral membership equivalence.  The theta clause
+continues to quantify over the same $w$ with the same restriction and
+image conditions; no new $w$ is selected.  The type intersections and
+coordinate reading are unchanged.  Thus the full \texttt{LfT} is
+preserved with the identical maps.
+
+Finally the three-stage complex data $\mathrm{toCx3}$ are identical:
+their block matrices, rational kernels, generalized eigenspaces, norms and
+frames are formed from the same finite data and the same maps just copied.
+The sharp dimension equality, semilinear row basis and every $X_o(v)$
+in PKT20 are therefore unchanged.  This proves the full transported
+\texttt{RrT}.  It also proves directly from its definition that
+\[
+ \eta_{\rm Of}(R',F';j,v)=\eta_{\rm Of}(R,F;j,v)
+ \quad\text{for every }j,v.\tag{PKT.30}
+\]
+In the valid range this is the same $\eta_J$ of the same original rational
+cut at the same twisted place and tuple; outside it both sides are zero.
+The forced-content place set $W_1$ is likewise identical, since its tests
+use those same index functions, dual indices and the same supplied error
+function.  The original $D_{\rm all}$ remains the dimension of the same
+full multiplicity space.  These checks give the complete transported
+\texttt{PkT}, with identical \texttt{tA}, representatives, both chains'
+three reading maps, and the lift's $e_W,j_{M_t}$.
+% END PKT29
+
+% BEGIN PKT30
+\paragraph{PKT30 (full $\mathrm{exists\_moved}$ and the exact reader boundary).}\label{claim:PKT30}
+Under PKT28's original premises there is
+\[
+ m:\mathrm{Moved}(o),\qquad m.\mathrm{Copy}\ \wedge\ m.\mathrm{Coh}.
+ \tag{PKT.31}
+\]
+Take $m.z$ to be PKT28's copied realization.  Its intersection/holds,
+$\mathrm{ExAt}$ and $\mathrm{InGeo}$ fields are the given properties
+transported there.  Its $X_g$ and trace fields are unchanged.  Its core
+field is exactly the conditional core implication proved in PKT28.
+Its $\eta$ and $W_1$ fields are PKT29.  Its $y$, tuple identity and
+comparison packet are the copied ones in PKT29, and its \texttt{tA}
+field records equality of the original complexification maps.  This is
+every field of \texttt{Moved}.
+
+The two \texttt{Copy} clauses say that its geometric core and real record
+are the prescribed copies of $z_0$; they hold by the construction.  The
+nine \texttt{Coh} clauses assert identity of the tuple inverse, row frame,
+all lift frames, representatives, both chains' $j_E,j_M,j_X$, and the
+lift's $e_W,j_{M_t}$.  They hold simultaneously because PKT29 copied
+those functions, rather than choosing new coordinates or orthonormal
+bases.  This proves the full original endpoint for every later $o$
+satisfying its original $\mathrm{Fits}$ guard.
+
+RDR12 and RDR20--RDR21 may now be applied to this same $m$ and $o$ to
+construct the actual level-zero rational side and \texttt{ReadPk};
+RPI15 and DI supply the already reconstructed first division comparison
+on the same underlying objects.  These joins add no row-integrability
+premise.  Full \texttt{ReadL} still requires precisely
+$o.\eta(j,v)=q.\eta(j,v)$ for $1\le j\le m$: (PKT.30) identifies the
+copied realized parameter with $q.\eta$, not an arbitrarily supplied
+$o.\eta$ with that realized parameter.  The outer common-family production
+of $z_0$, its original analytic/geometric \texttt{Inputs/Pins/Holds},
+$\mathrm{ExAt}/\mathrm{InGeo}$, the fitting division/rational tests,
+and the stronger second division-row theta comparison remain independent
+obligations wherever they have not already been supplied.  None is
+inferred from (PKT.31).
+% END PKT30

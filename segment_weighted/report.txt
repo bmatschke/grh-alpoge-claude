@@ -1,0 +1,478 @@
+TYPE-I WEIGHTED SEGMENTS: SW1--SW11
+Version 0.9, 21 November 2026
+Source commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+Scope
+=====
+This is a mathematical reconstruction from the pinned source. It does not
+record a Lean build or kernel replay. It proves the actual level-lattice,
+harmonic comparison, terminal-window and finite-sum mechanisms. It is not
+a proof of RH, GRH or the whole Type-I theorem. In particular, the upper
+and lower coarse rank-on-digits estimates and the simultaneous choice of
+all numerical parameters are separate. Every use of a numerical bound
+below is explicit. The other new components GG, TP and RL have their own
+claims and ledgers.
+
+Notation
+========
+R=Z_p, K=Q_p, p odd. B is the bilinear Fock pairing:
+  B(x^alpha,x^beta) = 0 if alpha!=beta, and alpha! otherwise.
+There are N=2s+1 signed chain rows, r coordinates per row, t disjoint
+adjacent vector--covector ties, and a terminal vector row paired with an
+extra row xi. Each tie also has scalar variables Z_i,S_i. Put
+  Etilde_i=Z_i S_i + sum_c x_(a_i,c)x_(a_i+1,c)
+and analogously Etilde_+ using the terminal row and xi.
+
+Y(d) is the actual rational multidegree space with all prefix first-weight
+cutoffs imposed; Y_R(d)=Y(d) intersect R[x]. A cutoff is the largest
+subrepresentation all of whose monomials have first coordinate weight at
+most the specified integer. It is not just a restriction on a chosen
+set of highest vectors. The proof uses this precise definition.
+
+SW1. Direct levels, saturation, and base change
+=============================================
+For a legal level j=(j_1,...,j_t,j_+), let
+  L_j=Y_R(d(j)) tensor_R R[xi]_(B-j_+)
+inside the polynomial ring in the chain rows and xi. Multiplication in
+disjoint variables identifies this tensor product with its indicated
+image. In particular its rank is
+  dim_K Y(d(j)) * binom(B-j_+ + r-1,r-1).
+
+The raw level map is multiplication by
+  prod_i Etilde_i^j_i * Etilde_+^j_+ * prod_i Z_i^z_i * Z_+^z_+.
+Order the S-multidegrees lexicographically. The leading S-degree of a
+nonzero image is j, with coefficient Z^(z+j) f(x,xi). This is a nonzero
+polynomial because multiplication by a monomial is injective. A finite
+relation has a largest level j, so its leading coefficient cannot be
+cancelled by any other level. This proves independence of levels.
+
+If a rational sum of raw levels has integral coefficients, extracting
+the largest S coefficient shows that the corresponding f is integral.
+Expand f in xi monomials. Each chain coefficient lies rationally in Y
+and is integral, hence belongs to Y_R. Thus f belongs to L_j. Subtract
+the integral raw level and descend. This proves SS_R is exactly the
+intersection of its rational span with the coefficient lattice. It also
+proves that all finite-degree lattices used here are finite and free.
+
+For completeness, Y commutes with scalar extension. Fix a finite-degree
+polynomial space V. For EACH prefix constraint ell separately, let
+A_(ell,i) be that prefix's action generators and P_ell its forbidden-weight
+coefficient projection. Its largest stable subspace in the allowed weights is
+  intersection ker(P_ell A_(ell,i_1)...A_(ell,i_m)),  m>=0.
+Use words only in that same prefix's generators, not mixed-prefix words.
+Each decreasing kernel sequence stabilizes in finite-dimensional V; then
+intersect the finitely many resulting prefix subspaces. Thus a finite
+collection of linear equations with rational coefficients defines Y.
+Kernels of finite matrices commute with field extension.
+This proves the base-change assertion, instead of merely asserting that
+linear independence survives a field embedding. The block rank over
+the ramified field is the same as the sum of the ranks above.
+
+Original source route: SSDirect.ss_direct, ss_sat; LvlDimCondition;
+RestDecompProved; RestDimBCProved. The maximal-S-degree argument is the
+short form of the source's leading-monomial extraction.
+
+SW2. Harmonic level comparison with a logarithmic integral cost
+==============================================================
+For a single disjoint pair w,e of r coordinate rows, write
+  E=sum w_c e_c, F=sum partial_w_c partial_e_c,
+  Et=ZS+E, Ft=partial_Z partial_S+F.
+For f independent of Z,S of bidegree (o,n), define
+  P_(o,n,z) f =
+    sum_l (-1)^l Et^l Z^z F^l f /
+                  [l!^2 binom(o+n+r+z-1,l)].
+The range is 0<=l<=min(o,n). It is the harmonic projection of Z^z f
+in r+1 paired coordinates. This follows directly from
+  [Ft,Et]=r+1+Euler
+and cancellation of successive coefficients in Ft(P f).
+
+The inverse expansion is
+  Z^z f = sum_l Et^l P_(o-l,n-l,z)
+              ( F^l f/[l!^2 binom(o+n+r+z-l,l)] ).
+
+Here is an explicit verification of its coefficient cancellation.
+Set H=o+n+r+z. After substituting P and collecting Et^j Z^z F^j f,
+the coefficient is
+  sum_(l=0)^j (-1)^(j-l) /
+   [(j-l)!^2 binom(H-2l-1,j-l) l!^2 binom(H-l,l)].
+For j=0 it is 1. For 1<=j<=min(o,n), H>=2j+1, and its l-th summand is
+  a_l=(-1)^(j-l)(H-2l)(H-j-l-1)! /
+                   [(j-l)! l! (H-l)!].
+For 0<=l<j put
+  b_l=(-1)^(j-l)(H-j-l-1)! /
+                   [(j-l-1)! l! (H-l-1)!],
+with b_-1=b_j=0. Direct cancellation of factorials gives
+  a_l=(b_l-b_(l-1))/j,
+including the two endpoints. The sum telescopes to zero.
+
+The divided contraction has logarithmically bounded denominators:
+  F^l/l!^2 =
+    sum_(|nu|=l) binom(l;nu)^(-1)
+        prod_c partial_w_c^[nu_c] partial_e_c^[nu_c].
+The divided coordinate derivatives are integral. Legendre's formula
+bounds v_p binom(l;nu) by (r-1)floor(log_p l), so the source's slightly
+weaker r floor(log_p(2A)) is sufficient when l<=2A. Every residual
+vector is still in the correct rational Y space, as checked below;
+coefficient integrality then puts it in its actual Y_R lattice.
+
+For prefix preservation, collect all coordinate derivatives in a vector
+row. Their span is stable under the prefix GL action, by the derivative
+commutator; their first coordinate weight either decreases by one or
+stays unchanged. Hence they preserve each first-weight upper cutoff.
+A complete vector--covector contraction commutes with that action and
+preserves its weight. If a prefix ends between the two rows, the
+covector derivative acts outside the prefix, and the vector derivative
+inside it can only decrease weight. If both rows are outside, the
+operator commutes and has zero prefix weight. These cases prove HypJoin
+for every specified prefix. The terminal derivative proves HypU.
+This argument also applies to every iterate needed above.
+
+In either expansion the remaining inverse binomial has valuation at
+most floor(log_p(6A+r)), when o,n,z<=2A. Thus multiplying by p^u, where
+  u=r floor(log_p(2A))+floor(log_p(6A+r)),
+moves the integral generators in either direction. The change of
+levels does not multiply this loss by the degree: the entire finite
+expansion is paid for once. Replacing u by ceil((r+1)(log_p(8A+r)+1))
+and treating each of the t+1 disjoint pairs in turn gives
+  p^U PS_R subset SS_R, p^U SS_R subset PS_R,
+  U=(t+1)ceil((r+1)(log_p(8A+r)+1)).
+
+The Fock identities used for the harmonic family are equally explicit.
+If h is harmonic of total degree d, then
+  Ft Et^j h=j(d+r+j)Et^(j-1)h.
+Move the adjoint Ft across j times. This gives
+  B(Et^j h,Et^j h')=j!^2 binom(d+r+j,j)B(h,h').
+Different levels at fixed full row degree are orthogonal: move the
+smaller number of powers across and the remaining positive contraction
+annihilates the harmonic member. The harmonic projection is self-adjoint
+and fixes its image. Thus B(P f,P g)=B(Z^z f,P g).
+Since the left input has S-degree zero, only the S-degree-zero term of
+P g pairs with it, and the Z pairing contributes z!. This proves
+  B(P f,P g)=z! B(f,Phi_(o,n,z)g).
+The product of these disjoint-pair identities is exactly SW2.4.
+
+SW3. Actual block integral bound
+===============================
+For each legal level j choose good dual families in L_j for the
+normalized form B(Phi_all .,. )/d_j!, with pairing p^D. Harmonic
+transport multiplies this by c_j d_j!. Put M=max_j v_p(c_j d_j!).
+Multiplying both families by p^U and one family at level j by
+p^M/(c_j d_j!) gives integral raw-block families paired by
+  p^(D+2U+M) delta_ab.
+Orthogonality across distinct levels is essential here.
+
+Factorial estimate. The full extended row degrees do not depend on j.
+Every scalar Z is assigned to the vector row it extends, every scalar S
+to the covector row; these assignments are disjoint. For one pair, its
+two full degrees are (o+z+j,n+j). The integer
+  (o+z+j)!(n+j)!/[j!^2 z! o! n!]
+is a product of multinomials. Therefore the factorial portion of
+c_j d_j! divides the full row-factorial product. The extra binomial
+binom(o+n+r+z+j,j) costs at most floor(log_p(8A+r)).
+For any monomial mu of those full degrees, the row-factorial product
+divided by mu! is a product of multinomials. There are
+  d=(N+1)r+2(t+1)
+variables, each assigned to exactly one row. Its valuation is at most
+d floor(log_p(8A+r)). Adding the t+1 extra binomials proves SW3.1.
+This verifies the bound for every monomial in every SS_R polynomial,
+not just for one chosen highest-weight vector.
+
+With A=(3s+2)a, N=2s+1, 2s+2<=r, p>=(r+1)^2, r>=4 and
+Lambda=log_p(8a+r)+1, one has
+  floor(log_p(8A+r))<=Lambda.
+This follows from 8A+r <= (3s+2)(8a+r) and 3s+2<=p.
+Also
+  U <= (t+1)[(r+1)(Lambda+1)+1].
+For t<=s and Lambda>=1,
+  [(N+1)r+3(t+1)]Lambda+2U
+   <=(s+1)[(4r+5)Lambda+2r+4]
+   <=10(s+1)(r+1)Lambda.
+Adding any nonnegative kappa0 gives the literal levelPassageLoss.
+
+Now pass to the actual ramified lattice, w^2=p, v_p(w)=1/2. Write sb
+for specConst and e=D+2U+M. If
+  e<=v_p(mu!)+D+loss  for all supported mu,
+put F0=floor(D+loss), q=F0-e-v_p(sb), and scale both families by w^q.
+Their coefficients satisfy exactly
+  v_p(coefficient)+[v_p(mu!)+v_p(sb)]/2>=0.
+Their block pairing sb B(.,.) has diagonal valuation F0.
+The first-family span is free. In its saturation, a primitive vector
+has at least one coefficient alpha with v_w(alpha)<=0 in that family:
+otherwise it would be divisible by w inside the saturated lattice.
+Pairing with the corresponding partner has valuation <=F0. Hence the
+saturation is a GoodSub at depth D+loss. Its rank loss is at most the
+sum of level bad counts. This proves BlockBoundUniformiser.
+
+SW4. Normalized tensor pairs and orthogonal bases
+================================================
+Let terminal degree be nxi and dxi=binom(nxi+r-1,r-1).
+For a good pair x_i,y_i in the chain Y lattice, use
+  x_i xi^alpha, [nxi!/alpha!] y_i xi^alpha, |alpha|=nxi.
+The bracket is an integer. The terminal normalized Fock pairing equals
+1 on the corresponding monomials and 0 on distinct ones. The internal
+ties only differentiate chain variables, so act trivially on xi.
+This constructs goodCount(Y)*dxi actual dual pairs in L_j. Subtracting
+from its rank, as computed in SW1, proves SW4.1.
+
+The intermediate form is symmetric since each E^l F^l is Fock
+self-adjoint and the different ties have disjoint supports and commute.
+For a finite free R lattice and any symmetric K-valued form, choose a
+nonzero matrix entry of smallest valuation. If some diagonal entry has
+that valuation, use its basis vector. If none does, for the minimal
+off-diagonal entry B(e_i,e_j), the norm of e_i+e_j is
+B(e_i,e_i)+2B(e_i,e_j)+B(e_j,e_j), whose valuation is the minimum,
+since p is odd. The vector is primitive. For every lattice vector v,
+B(e,v)/B(e,e) is integral, so subtracting this multiple of e splits
+off an orthogonal free rank-one summand. Repeat until the remaining
+form is zero. This proves orthogonal diagonalization also when the
+form is initially nonintegral or degenerate. Smith normal form then
+identifies the good rank as the number of diagonals with valuation<=D.
+
+SW5. Terminal-window polynomial, leading determinant and averaging
+=================================================================
+For an orthogonal good family f_i of the intermediate form, write d_i
+for the nonzero diagonal values and assume v_p(d_i)<=D. Let J=min(o,nxi)
+and q=o+nxi+r-1. Define
+  m_l(u,v)=B(E^l F^l Phi_ties u,v)/(l!^2 binom(J,l) d_j!).
+The identity binom(q+z,J)/binom(q+z,l)
+=binom(q+z-l,J-l)/binom(J,l) gives the exact polynomial matrix
+  p^x0 binom(q+z,J) B_z(f_i,f_k)
+   =sum_(l=0)^J (-1)^l binom(q+z-l,J-l) p^x0 m_l(f_i,f_k).
+
+Internal tie operators have coefficient denominator at most (r+1)L
+each. The divided terminal operator E^l F^l/[l!^2 binom(J,l)] costs
+at most (r+1)L as well, by the divided-contraction expansion from SW2
+and the inverse-binomial bound. For a supported monomial of L_j,
+the quotient d_j!/mu! has valuation <=[(N+1)r+2(t+1)]L by the
+disjoint row assignment. Pair coefficient by coefficient to conclude
+that
+  x0=[(t+1)(r+1)+(N+1)r+2(t+1)]L
+makes every m_l integral. Vandermonde expresses the displayed translates
+as integral combinations of binom(z,h). The leading coefficient is
+  p^x0 diag(d_i)/J!;
+all l>0 terms have smaller degree. Thus determinant degree is Jn,
+including J=0, and it is nonzero. Its leading valuation lambda satisfies
+  lambda+Jn/(p-1)
+   <=n[x0+D+J/(p-1)-v_p(J!)]
+   <=n(x0+D+L).
+
+For z>=0 the multiplier p^x0 binom(q+z,J) is a nonzero integer. It
+cannot decrease any Smith valuation. The number of bad factors of B_z
+at integer threshold k is therefore at most the number of factors of
+the integral matrix with valuation>=k+1. TI5 gives SW5.3 on every
+consecutive window of length W, provided k>=0 and W,J+1<=p^h.
+
+The specialization uses only the explicit inequalities listed in the
+main text, plus the degree bounds for A=(3s+2)a. In particular oPlus<=a
+ensures z=aPlus-oPlus>=0. Since r+1>=5,
+  J/W <=(5/2)b'(r+1)Y/a <5(r+1)Y/(2p)<=1/(2Y).
+Taking h=ceil(log_p(a+1)) gives h<=Lambda<=kappa. The coefficient
+inequality
+  2[(t+1)(r+1)+(2s+2)r+2(t+1)+1]
+     <=3(s+2)r^2
+for r>=4,t<=s, together with L<=2Lambda, gives x0+L<=kappa.
+For D=floor(D1), k=floor(YD1), D1>=kappa>0,
+  J/W+(x0+D+L+(J/W)h)/(k+1)
+    <=1/(2Y)+(2D1+D1/(2Y))/(YD1)
+    <=3/Y.
+The source uses 5/Y, leaving slack. Extending from the good orthogonal
+span back to L_j loses at most rank(L_j)-n directions. Combining with
+SW4 yields the exact RestPlus estimate in the main text.
+
+SW6. Fixed digit classes and bounded endpoint dimension change
+=============================================================
+The root text includes every inequality used. Fix digits and write
+P_u C_u=a_u-d_u where d_u is the sum of the covector digit entries.
+Compatibility implies the divisibility and d_u<(r+1)P_u<=b'. Since
+a_u>=a>25b' and the other coarse degree A_u is at most b_u/P_u,
+with b_u<=5b'/2, one has C_u>=A_u in the whole window.
+Consequently both the kept late orders and the legal tie levels have
+their C_u bound automatically. Early sg_u orders obey
+P_u sg_u<=a/2 while P_u C_u>a-b'>a/2. All other kept conditions depend
+only on the fixed block labels. This proves constancy of the actual
+block-level index set, not merely of its cardinality.
+
+Taking one coordinate to its largest compatible value preserves both
+the degree window and the fixed residue. Its coarse degree changes
+x to y with xP>=3a/4, y>=x, and
+  r(y-x)P <=r[a/((r+1)Y)+xa]<=9a/8<=3xP.
+Thus x>=1 and the only changing ambient-dimension factor has ratio
+  binom(y+r,r)/binom(x+r,r)
+   =prod_(h=1)^r (y+h)/(x+h)
+   <=(y/x)^r<=exp(r(y-x)/x)<=e^3.
+
+SW7. Multiple-tie arithmetic specialization and its exact premises
+=================================================================
+This claim consumes TP11, the exact reconstructed theoremMV7. It does
+not reprove the representation-theoretic mean by counting bad events.
+The source mean weights the i-th exceptional dimension at the endpoint
+in coordinate i. Its epsilon is exactly SW7.1 with E=Y*kappa.
+For the actual coarse progressions the sufficient inequalities are
+SW7.2 and the additional initial-point and degree bounds in the main
+text. The weighted-rank theorem remains valid with these as supplied
+data; the universal derivation of the whole data package from HI is
+not silently assumed to have been reconstructed.
+
+For the numerical estimate, multiply the S_i bound by 2(r+1)Y^2.
+The b' term is <=(5/2)a and the other term is <=4a, since 2s+1<=r+1
+and p>=(r+1)^2Y^2. Dividing by Y_iP_i>=a/[2(r+1)Y] gives
+S_i/Y_i<=6.5/Y<=7/Y. Then
+  epsilon_i<=14/Y+2/Y+14 Lambda/(Y^2 kappa)
+             <=16/Y+7/(12Y^2)<=17/Y.
+For initial-point legality, the source gives
+  n0_i P_i >=a-(r+1)P_i-(5/2)b',
+  S_i P_i <=(5/2)b'+(4s+2)a/p.
+The first is >=a-(7/2)b'. Since b'<a/p and p>=4s+8,
+the second is <=(4s+4.5)a/p<=a-3.5a/p<=a-3.5b'.
+Equivalently their gap is >=a-6b'-(4s+2)a/p>=0.
+These estimates include the natural-number subtraction and floors in
+the actual initial point; no continuous interval replaces it.
+
+SW8. Weighted finite-sum theorem
+===============================
+This is a general elementary statement specialized to the exact
+source functions. Assume the inequalities SW8.1--SW8.2 and fixed index
+set I, and assume each endpoint map u_i sends A to itself with
+m(u_i(a))<=K m(a). With eps1=(30+CM)/Y, eps2=5/Y, K=e^3,
+  sum_(a,w,z) b(a,w,z)
+   <= |W|[sum_(a,z)q(a,z)d(z)+eps2 sum_(a,z)y(a,z)d(z)]
+   <= |W|[eps1 sum_(i,a,z)y(u_i(a),z)d(z)+eps2 sum_a m(a)]
+   <= |W|[eps1 sum_(i,a)m(u_i(a))+eps2 sum_a m(a)]
+   <= (eps1 t K+eps2)|W|sum_a m(a).
+No property of the fibers of u_i is used, so its noninjectivity is
+irrelevant. This is an exact proof of the weighted transfer, including
+all endpoint multiplicities.
+
+The remaining input SW8.1 is concrete:
+  sum_(kept blocks of fixed digits) rank(blockLat)<=mCl.
+By SW1 it is exactly the level-dimension sum, and the formal source
+obtains it from the upper-rank clause of flipOneThree.adm11. This
+companion does not replace that clause by a reference to admissibility.
+It is a named open obligation in the human reconstruction. The
+lower-rank clause (at least half of mCl), needed later in the full
+Type-I density theorem, is also open here.
+
+SW9. Depth arithmetic
+====================
+Let N1>=1,s<=N1,t<=s,Y>=1,CM>=1,Lambda>=1.
+Because s+2<=3N1 and r^2<=(r+1)^2,
+  kappa=3(s+2)r^2 Lambda<=9N1(r+1)^2 Lambda.
+Thus
+  YD1=tY^2 kappa+CM*tY kappa+CM*Y kappa
+      <=[9+18CM]Y^2 N1^2(r+1)^2 Lambda.
+Also 10(s+1)(r+1)Lambda<=20N1(r+1)^2 Lambda.
+The advertised larger constant C>=18(1+CM)+20 therefore bounds their
+sum. The kappa0 term is carried unchanged on the two sides. Floors can
+only reduce the depth used in SW3.
+For the additional mass conversion the sufficient constant is
+  C>=2[(30+CM)e^3+5]e^3.
+Taking the maximum of these two constants, plus 1, fixes C before any
+particular field, digit class or polynomial degree. TP11 permits CM=1.
+This proves the numerical implication; it is not by itself proof of
+all global parameter-selection inequalities.
+
+SW10. Exact coarse-degree alternative under the literal Std conditions
+=====================================================================
+This claim is used in RL's actual raw column construction. Write
+k=r+1, lambda=La, epsilon=N1*lambda/k, delta=de, beta=be. The Std
+conditions imply k>=5, epsilon>=1/k>0,
+  40epsilon<=delta<1/6,
+  0<=beta<=delta/2-18epsilon,
+  E0>=0, E0+Q<=epsilon*a,
+  b'>=k^3 Q, Q>=1.
+Thus kQ<=b'/k<=epsilon*b'.
+
+For one segment let d_i be its odd, strictly increasing interior
+distances, G its length, Qj=p^G<=Q and P_i=p^(G-d_i).
+The split index sigma is characterized by i<sigma iff p^d_i<a/b'.
+For compatible digits with k entries each <P, the coarse degree
+A=(g-sum digits)/P satisfies
+  g-kP<AP<=g,
+with b'(1-beta)<=g<=b'(1+beta).
+The coarse initial degree is A0=floor((a-E0)/Qj), so
+  a-E0-Qj<A0Qj<=a-E0<=a.
+The excluded-band clause of Std says that no odd p^d lies in
+[(a/b')(1-2delta),(a/b')(1+2delta)]. It therefore strengthens the
+two cases of the sigma test to strict inequalities on either side.
+
+The two scalar inequalities needed are
+  (1-2delta)(1+beta)(1+delta)<=1-epsilon,
+  (1-beta-epsilon)(1-delta)(1+2delta)>=1.
+For the first replace beta by delta/2 and expand:
+  (1-2delta)(1+delta/2)(1+delta)
+   =1-delta/2-(5/2)delta^2-delta^3<=1-epsilon.
+Here delta>=40epsilon. For the second beta+epsilon<=delta/2,
+and
+  (1-delta/2)(1-delta)(1+2delta)
+   =1+delta(1/2-(5/2)delta+delta^2)>=1
+because 0<=delta<1/6.
+
+Early case. Since pd=p^d<(a/b')(1-2delta),
+  A(1+delta)Qj
+   <=b'(1+beta)pd(1+delta)
+   <=a(1-2delta)(1+beta)(1+delta)
+   <=a(1-epsilon)
+   <=a-E0-Qj<A0Qj.
+Thus A(1+delta)<A0.
+
+Late case. Since kP<=epsilon*b', AP>b'(1-beta-epsilon).
+The factor (1-beta-epsilon)(1-delta) is positive. With
+pd*b'>a(1+2delta), we obtain
+  A(1-delta)Qj
+   >b'pd(1-beta-epsilon)(1-delta)
+   >a(1+2delta)(1-beta-epsilon)(1-delta)
+   >=a>=A0Qj.
+Thus A0<A(1-delta).
+
+This proves the precise coarse_degree_alternative of the pinned source
+under literal Std, H>=1. The identity defining sigma and parity of the
+interior distances are properties of the actual alternating segment
+indices. It does not prove that parameters satisfying the excluded-band
+condition exist in the arithmetic application.
+
+SW11. Current endpoint and remaining source routes
+=================================================
+Proved in this component:
+  * the precise integral SS/PS level comparison and pairing;
+  * finite-free actual level ranks and SS saturation, including base change;
+  * the block GoodSub construction and logarithmic level loss;
+  * normalized tensor dual families and symmetric p-adic diagonalization;
+  * the terminal binomial Gram polynomial and its 5/Y average;
+  * the fixed-index and endpoint-ratio arguments under the stated bounds;
+  * the exact weighted summation, and the final depth arithmetic.
+
+Consumed from previous/new components:
+TI1--TI2 for the literal block model and Smith interpretation, TI5 for
+the proved matrix-polynomial window, TP11 for the actual multiple-tie
+mean (itself using GG). TI4's coarser gamma exponent is not substituted
+for TP's sharper one.
+
+Not established by this component:
+  (a) both clauses of RootMultiplicityTwo/rankOnDigits, including the
+      upper clause SW8.1 and lower half-density;
+  (b) the remaining collection of numerical hypotheses of the actual
+      segment family, uniformly with the correct quantifier order;
+  (c) the final t0<=tI comparison; RL and SW12 reconstruct the actual
+      raw-lift numerical interfaces and cleaned lifts under literal Std;
+  (d) the global cohomological/analytic/arithmetic branches toward RH
+      and Dirichlet GRH.
+
+Next precise rank route:
+  GrowthBounds/BinomialRatio/RankDefs.lean: UpAt, LowAt, RestUp, RestLow
+  GrowthBounds/BinomialRatio/RankOnDigitsCast.lean: restUp_of
+  GrowthBounds/BinomialRatio/LeAndHalfLeProdOneSubExpNegOfBounds.lean:
+    one_segment_of_upper_lower
+  GrowthBounds/FlipOneThree.lean: adm11
+The ledger retains exact declarations, inclusive line ranges, SHA256
+hashes of the ranges and full source files, and pinned commit URLs.
+
+Independent review
+==================
+The lean_audit reviewer independently checked SW1--SW5, including the
+harmonic inverse certificate, prefix constraints, exact factorial and
+ramified normalizations, primitive saturation and terminal 3/Y estimate.
+The missing plus in the displayed SW3.1 bound was restored. The SW1
+base-change proof was made precise by treating each prefix's own
+generator words separately. The scoped review record is in
+v0_9/reviews/lean_audit_sw1_sw5.txt. This records mathematical review,
+not formal verification or a complete review of all numerical wrappers.

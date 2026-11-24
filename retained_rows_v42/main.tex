@@ -1,0 +1,913 @@
+\section{Finite local weights for retained rows}
+\label{sec:retained-rows-v42}
+
+\status{This chapter constructs the original finite-group idempotents,
+proves positivity and normalization of their original series weights,
+and proves the squarefree, divisor-degree, long-prime-degree, and
+root-to-twist collision parts of the local probability estimate.
+It also constructs the complete
+row labeling from exact additive dimensions and the prescribed good
+rows.  The squarefree character identity, the comparison of the two
+local characters, the root-injectivity collision bound, and the actual
+automorphic row/count identifications remain supplied inputs.  No
+whole global obligation is closed.}
+
+All source references are to
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+The index $k\in\{0,1\}$ used for the two auxiliary primes is kept
+separate from the integer $k_0$ in the finite unipotent subgroup.
+The group-theoretic arguments below work over any finite field
+$\mathbb F_q$; in the original application $q=g_k$ is prime,
+$N=R.r$, $k_0=R.k$, and $s=R.m/2-1$.  The original rank conditions
+give $N=k_0+2s+1$ and $k_0\ge1$.
+
+\subsection{The actual finite idempotents and their probability laws}
+
+Put $G=\operatorname{GL}_N(\mathbb F_q)$ and let $U$ be its upper
+unitriangular subgroup.  All matrix indices start at zero.  Let
+$W=\{s,\ldots,s+k_0-1\}$, $c=s+k_0$, and
+\[
+ J=\{u\in U:u_{a,c}=0\quad(a\in W)\}.
+ \tag{RRT.1}
+\]
+For a nontrivial additive character $\psi:\mathbb F_q\to\mathbb C^\times$,
+let $\phi_U(u)=\sum_{i=0}^{N-2}u_{i,i+1}$.
+The function $\phi_J$ sums the entries along each of two ordered
+chains: the chain $s,s+1,\ldots,s+k_0-1$, and the chain
+\[
+                  0,1,\ldots,s-1,c,c+1,\ldots,N-1.
+\]
+When $s=0$, the second chain is the singleton $c$ and contributes
+zero.  This is exactly the source's \texttt{phiJ}, including its
+truncated sums when $s=0$ or $k_0=1$.  Define in $\mathbb C[G]$
+\[
+ e_U=|U|^{-1}\sum_{u\in U}\psi(\phi_U(u))^{-1}[u],\qquad
+ e_J=|J|^{-1}\sum_{u\in J}\psi(\phi_J(u))^{-1}[u].
+ \tag{RRT.2}
+\]
+These are the literal \texttt{eU} and \texttt{eJ}, not conjugate
+surrogates.  Write $[1]a$ for the coefficient of the identity in
+$a\in\mathbb C[G]$.
+
+% BEGIN RRT1
+\paragraph{RRT1. Exact idempotents and identity coefficients.}
+\label{claim:RRT1}
+Writing $M=N(N-1)/2$, we have
+\[
+ e_U^2=e_U,\quad e_J^2=e_J,\qquad
+ [1]e_U=q^{-M},\quad [1]e_J=q^{k_0-M}>0.
+ \tag{RRT.3}
+\]
+Both idempotents are self-adjoint for the involution
+$a^*(g)=\overline{a(g^{-1})}$.
+
+Indeed, for upper unitriangular $u,v$ and $a<b$,
+\[
+ (uv)_{a,b}=u_{a,b}+v_{a,b}
+                  +\sum_{a<h<b}u_{a,h}v_{h,b}.
+ \tag{RRT.4}
+\]
+For $a\in W,b=c$, every summand in the last sum is zero since
+$h\in W$ and $v_{h,c}=0$.  Thus $J$ contains the identity and is
+closed under multiplication; as a finite subset of a group, it is a
+subgroup.  All entries in the two character sums are adjacent,
+except possibly $(s-1,c)$.  For that entry the intervening indices
+are precisely $W$, so the same calculation makes its cross terms
+zero.  Consequently $\phi_U$ and $\phi_J$ are additive under
+group multiplication on their respective subgroups.
+
+For any finite subgroup $H$ and character $\lambda:H\to\mathbb C^\times$,
+write $e=|H|^{-1}\sum_h\lambda(h)^{-1}[h]$.
+The coefficient of $[z]$ in $e^2$ is zero outside
+$H$, and for $z\in H$ it is
+$|H|^{-2}\sum_{h\in H}\lambda(z)^{-1}=|H|^{-1}\lambda(z)^{-1}$.
+This proves idempotence.  A finite-order complex character has
+absolute value one, which proves self-adjointness.  Its coefficient
+at $1$ is $|H|^{-1}$.  Finally $U$ has $M$ freely chosen entries,
+and $J$ has exactly $M-k_0$ freely chosen entries: the $k_0$
+forbidden entries in (RRT.1) are distinct and lie above the diagonal.
+This gives (RRT.3).  No Green parametrization is used.
+\hfill$\square$
+% END RRT1
+
+% BEGIN RRT2
+\paragraph{RRT2. The original series weights are probabilities.}
+\label{claim:RRT2}
+Let $E_F$ be the actual central series idempotents
+$D.\mathrm{ntypes}.\mathrm{eSer}(k,F)$ for a fixed auxiliary prime.
+They are mutually orthogonal, vanish unless $F$ is monic of degree
+$N$ with nonzero constant coefficient, and sum to $1$ over those
+labels.  These properties are explicit fields of the original
+\texttt{NTypes}.  For $a=e_U$ or $e_J$, set
+\[
+             w_a(F)=\frac{\operatorname{Re}[1](aE_F)}{[1]a}.
+ \tag{RRT.5}
+\]
+Then $w_a(F)\ge0$ for every polynomial, it vanishes off the stated
+labels, and its sum over all monic degree-$N$ polynomials is $1$.
+These assertions apply to the original \texttt{wtOf}; no
+\texttt{admLq} hypothesis is needed for them.
+
+For the proof, left multiplication by $b\in\mathbb C[G]$ has
+diagonal entry $[1]b$ at every vector of the group basis.  Hence
+\[
+                 \operatorname{tr}L_b=|G|[1]b.
+ \tag{RRT.6}
+\]
+Since $a$ and $E_F$ commute and are idempotent, so is $aE_F$.
+Any idempotent linear map is the identity on its image and zero on
+its kernel.  Its trace is its rank, a nonnegative integer.
+Therefore $[1](aE_F)$ is real and nonnegative.  Its denominator
+is positive by RRT1.  The vanishing assertion follows from
+$E_F=0$; summing $aE_F$ gives $a$, proving normalization.
+In fact
+\[
+ w_a(F)=\frac{\dim\operatorname{im}L_{aE_F}}
+                     {\dim\operatorname{im}L_a}.
+ \tag{RRT.7}
+\]
+The monic coefficient parametrization
+$F_c=X^N+\sum_{i<N}c_iX^i$ is a bijection from
+$\mathbb F_q^N$ to all monic degree-$N$ polynomials.  Thus
+RRT2 proves exactly the finite probability normalization used by
+\texttt{ConcNWeight.sum\_wtOf}.
+\hfill$\square$
+% END RRT2
+
+% BEGIN RRT3
+\paragraph{RRT3. The remaining character calculations have precise multiplicity targets.}
+\label{claim:RRT3}
+For an irreducible complex representation $\tau$ of $G$, let
+$d_\tau=\dim\tau$, let $z_\tau$ be its primitive central
+idempotent, and write $m_a(\tau)=\dim\operatorname{im}\tau(a)$.
+The first identity below holds for any idempotent $a$; the
+weight identity is used for $a=e_U,e_J$, whose denominators
+are positive:
+\[
+ [1](az_\tau)=\frac{d_\tau m_a(\tau)}{|G|},\qquad
+ w_a(F)=\frac{\sum_{\tau\in\mathcal S_F}d_\tau m_a(\tau)}
+                                      {|G|[1]a},
+ \tag{RRT.8}
+\]
+where $\mathcal S_F$ is the set of irreducibles on which $E_F$
+acts as $1$.  To see the first equality directly, the coefficient
+formula
+$z_\tau(g)=d_\tau|G|^{-1}\operatorname{tr}\tau(g^{-1})$
+gives $[1](az_\tau)=d_\tau|G|^{-1}\operatorname{tr}\tau(a)$.
+The trace of the idempotent $\tau(a)$ is $m_a(\tau)$.
+Maschke's decomposition, obtained by averaging a projection onto
+any invariant subspace, and Schur's lemma show that each central
+idempotent is the sum of the $z_\tau$ on which it acts as $1$.
+This proves the second equality.
+
+Consequently the actual lower comparison
+\[
+       (1-q^{-1})w_{e_U}(F)\le w_{e_J}(F)
+ \tag{RRT.9}
+\]
+follows if for each irreducible in that same series
+\[
+       (q^{k_0}-q^{k_0-1})m_{e_U}(\tau)\le m_{e_J}(\tau).
+ \tag{RRT.10}
+\]
+Indeed, multiply (RRT.10) by $d_\tau$, sum it, and use the
+ratio $[1]e_J/[1]e_U=q^{k_0}$ from RRT1.
+Likewise, for a squarefree label $F=\prod P$, the two character
+facts
+\[
+ \mathcal S_F=\{\tau_F\},\qquad
+ m_{e_U}(\tau_F)=1,\qquad
+ d_{\tau_F}=\frac{\prod_{j=1}^N(q^j-1)}{\prod_{P\mid F}(q^{\deg P}-1)}
+ \tag{RRT.11}
+\]
+give the exact squarefree law
+\[
+                w_{e_U}(F)=\prod_{P\mid F}(q^{\deg P}-1)^{-1}.
+ \tag{RRT.12}
+\]
+Here $|G|=q^M\prod_{j=1}^N(q^j-1)$, by counting ordered
+bases, and $[1]e_U=q^{-M}$.  Statements (RRT.10)--(RRT.11)
+are explicit remaining character inputs, not conclusions of
+idempotence.  The source proves them using the mirabolic trace
+calculation, root exchange, and the squarefree Harish--Chandra
+series theorem.  The squarefree \emph{upper} comparison for $e_J$
+is not used in the probability proof below.
+\hfill$\square$
+% END RRT3
+
+% BEGIN RRT4
+\paragraph{RRT4. One-sided domination controls every product event.}
+\label{claim:RRT4}
+Let $P_v,Q_v$ be probability laws on finite sets, indexed by a
+set of size $f$, and suppose $Q_v\ge(1-\delta)P_v$ pointwise,
+where $0\le\delta\le1$.  For every event $B$ in their product,
+\[
+ \left|\bigotimes_v Q_v(B)-\bigotimes_v P_v(B)\right|
+       \le1-(1-\delta)^f\le f\delta.
+ \tag{RRT.13}
+\]
+When $\delta>0$, write
+$Q_v=(1-\delta)P_v+\delta R_v$; the remainder is nonnegative
+and sums to $1$.  Expanding the product gives
+$\bigotimes Q_v=(1-\delta)^f\bigotimes P_v+
+(1-(1-\delta)^f)R$ for a probability law $R$, except when the
+second coefficient is zero, in which case the two laws already
+agree.  Their event probabilities differ by at most that
+coefficient.  The last inequality follows by induction from
+$(1-\delta)^{f+1}\ge1-(f+1)\delta$.  The cases $\delta=0$ and
+$f=0$ are immediate.
+
+For the actual local laws, (RRT.9) and RRT2 apply with
+$\delta=1/q$, $P_v=w_{e_U}$, and $Q_v$ equal to either
+$w_{e_U}$ or $w_{e_J}$.  Thus the cost of transferring any bad
+event to the actual sharp-level product law is at most $f/q$.
+This proves the source's \texttt{ComparisonTransfer}, with a
+slightly sharper first bound, from the lower comparison alone.
+\hfill$\square$
+% END RRT4
+
+\subsection{The finite polynomial estimates}
+
+For a monic squarefree polynomial $F$ with $F(0)\ne0$ put
+\[
+           w(F)=\prod_{P\mid F}(q^{\deg P}-1)^{-1}.
+ \tag{RRT.14}
+\]
+The product runs over its distinct monic irreducible factors.
+Let $\mathcal S_N$ denote these polynomials of degree $N$; put
+$\mathcal S_0=\{1\}$.  These are finite sets, so all sums below
+are ordinary finite sums.  They agree with the source's
+\texttt{sqSet} and \texttt{sqWeight} under coefficient
+parametrization.
+
+% BEGIN RRT5
+\paragraph{RRT5. Factor degrees are dominated by uniform permutation cycle degrees.}
+\label{claim:RRT5}
+For any property $\mathcal A$ of multisets of positive integers,
+\[
+ \sum_{\substack{F\in\mathcal S_N\\
+               \mathcal A(\{\deg P:P\mid F\})}}w(F)
+ \le\mathbb P_{\sigma\in S_N}
+              \bigl(\mathcal A(\text{cycle lengths of }\sigma)\bigr).
+ \tag{RRT.15}
+\]
+To prove this, let $I_d$ count the monic irreducibles of degree
+$d$ with nonzero constant coefficient.  Their roots lie in
+$\mathbb F_{q^d}^\times$, and each contributes $d$ distinct roots
+disjoint from the roots of the other irreducibles.  Hence
+$dI_d\le q^d-1$.  This root assertion follows either in the
+quotient field $\mathbb F_q[X]/(P)$, which has $q^d$ elements,
+or by its embedding in an algebraic closure; finite fields are
+perfect and every nonzero element satisfies $x^{q^d-1}=1$.
+
+For prescribed counts $a_d\ge0$ with $\sum_d da_d=N$, unique
+factorization gives exactly $\prod_d\binom{I_d}{a_d}$ such
+polynomials.  Their total weight is
+\[
+ \prod_d\frac{\binom{I_d}{a_d}}{(q^d-1)^{a_d}}
+       \le\prod_d\frac1{d^{a_d}a_d!}.
+ \tag{RRT.16}
+\]
+The right side is the probability of that cycle type for a
+uniform permutation: arranging the $N$ symbols gives $N!$
+orders, and one divides by the $d$ rotations of each $d$-cycle
+and by the $a_d!$ permutations of equally long cycles.
+Summing (RRT.16) over the allowed types proves (RRT.15).
+In particular $\sum_{F\in\mathcal S_N}w(F)\le1$.
+
+There is also the useful exact divisor consequence.  If $H$ is
+monic squarefree, $H(0)\ne0$, and $\deg H\le N$, then
+\[
+                 \sum_{\substack{F\in\mathcal S_N\\H\mid F}}w(F)
+                         \le w(H).
+ \tag{RRT.17}
+\]
+Indeed $F=HR$ with $R\in\mathcal S_{N-\deg H}$ and
+$\gcd(H,R)=1$, and $w(F)=w(H)w(R)$.  Dropping the coprimality
+condition and using the preceding mass bound proves (RRT.17).
+Thus \texttt{TypeWeightExact}, \texttt{TypeSetWeight},
+\texttt{SqMassLeOne}, and \texttt{DivisorBound} all have direct
+human proofs here.
+\hfill$\square$
+% END RRT5
+
+% BEGIN RRT6
+\paragraph{RRT6. The squarefree exceptional mass.}
+\label{claim:RRT6}
+For $N\ge1$,
+\[
+                  \sum_{F\in\mathcal S_N}w(F)\ge1-2/q.
+ \tag{RRT.18}
+\]
+There are $q^N$ monic degree-$N$ polynomials, and at most
+$q^{N-1}$ have zero constant coefficient.  For $N\ge2$ the
+number of monic squarefree degree-$N$ polynomials is
+$q^N-q^{N-1}$.  Here is an elementary count: every monic
+polynomial uniquely has the form $AB^2$ with $A$ squarefree,
+by splitting each irreducible-factor exponent into its parity
+and twice an integer.  If $S(t)$ is the formal generating series
+for monic squarefree polynomials, coefficientwise finite
+counting gives
+\[
+ \frac1{1-qt}=S(t)\frac1{1-qt^2},\qquad
+                  S(t)=\frac{1-qt^2}{1-qt}.
+\]
+Its coefficients are $1,q,q^2-q,q^3-q^2,\ldots$.
+Thus $|\mathcal S_N|\ge q^N-2q^{N-1}$; for $N=1$,
+$|\mathcal S_1|=q-1$ gives the same lower bound.
+Each $F\in\mathcal S_N$ has $w(F)\ge q^{-N}$, because the
+sum of its factor degrees is $N$.  This proves (RRT.18).
+
+In particular, any probability law $P$ on monic degree-$N$
+polynomials that equals $w$ on $\mathcal S_N$ has
+$P(\mathcal S_N^c)\le2/q$.  In $f$ independent coordinates,
+the probability that some coordinate is outside $\mathcal S_N$
+is at most $2f/q$.  Combining this with RRT4 accounts exactly
+for the term $3f/q$ in the original $W_g$.
+\hfill$\square$
+% END RRT6
+
+% BEGIN RRT7
+\paragraph{RRT7. A permutation has an invariant proper size with probability at most $7/8$.}
+\label{claim:RRT7}
+Fix $1\le a<N$.  For a permutation $\sigma$, let $Z(\sigma)$
+be its number of invariant $a$-element subsets.  Let
+$Y(\sigma)$ count those invariant subsets containing a fixed
+point and having a fixed point in their complement.  Uniformly
+over $S_N$,
+\[
+                \mathbb EZ=1,\qquad \mathbb EY\ge1/4.
+ \tag{RRT.19}
+\]
+For the first identity, any particular $a$-set is preserved by
+$a!(N-a)!$ permutations.  For the second, conditional on
+preserving that set, the two restrictions are independent uniform
+permutations.  A uniform permutation of any nonempty finite set
+has a fixed point with probability at least $1/2$.  For sets of
+size one this is immediate; otherwise inclusion--exclusion gives
+the derangement probability $\sum_{j=0}^n(-1)^j/j!\le1/2$:
+after the first three terms, consecutive negative--positive
+pairs have nonpositive sum, and a possible remaining term is
+negative.  Summing over all $a$-sets proves (RRT.19).
+
+Pointwise we have
+\[
+                 2\mathbf1_{Z>0}+Y\le2Z.
+ \tag{RRT.20}
+\]
+If $Y=0$, this follows from $Z\ge1$ on the indicated event.
+If $Y>0$, exchange one fixed point in a counted set with a fixed
+point outside it.  This gives a different invariant $a$-set,
+so $Z\ge2$; since $Y\le Z$, (RRT.20) again follows.
+Taking expectations yields
+$2\mathbb P(Z>0)+1/4\le2$, hence
+\[
+                       \mathbb P(Z>0)\le7/8.
+ \tag{RRT.21}
+\]
+This proves the full original \texttt{LemmaP}, without a
+large-$N$ restriction.
+\hfill$\square$
+% END RRT7
+
+% BEGIN RRT8
+\paragraph{RRT8. No common proper divisor degree, with the source constant.}
+\label{claim:RRT8}
+For $1\le a<N$, a squarefree $F$ has a divisor of degree $a$
+if and only if some subset of its irreducible-factor degrees
+sums to $a$.  A permutation has an invariant $a$-set if and
+only if a subset of its cycle lengths sums to $a$.
+RRT5 and RRT7 therefore give
+\[
+           \sum_{\substack{F\in\mathcal S_N\\
+                      \exists H\mid F:\deg H=a}}w(F)\le7/8.
+ \tag{RRT.22}
+\]
+This is the original \texttt{LocalEstimateIV}.  For any
+probability law $P$ agreeing with $w$ on $\mathcal S_N$, the
+probability that all $f$ independent coordinates are squarefree
+and have a divisor of this same degree is at most $(7/8)^f$.
+There are $\lfloor N/2\rfloor$ possible degrees in the
+source's common-degree obstruction.  The union bound gives
+\[
+   \mathbb P(\text{squarefree common-degree obstruction})
+                          \le\frac N2(7/8)^f.
+ \tag{RRT.23}
+\]
+No assertion about the nonsquarefree part of $P$ is needed for
+this event; that part was handled separately in RRT6.
+\hfill$\square$
+% END RRT8
+
+% BEGIN RRT9
+\paragraph{RRT9. An elementary eventual long-prime reciprocal bound.}
+\label{claim:RRT9}
+There is an absolute $N_0\ge100$ such that for every integer
+$N\ge N_0$,
+\[
+       \sum_{\substack{p\text{ prime}\\N/2<p,\ p+3\le N}}
+                           \frac1p\ge\frac1{5\log N}.
+ \tag{RRT.24}
+\]
+Here only an eventual version is needed; the source proves the
+stronger statement starting at $N=100$ by additional finite
+checks.  The proof below avoids those checks and keeps the same
+constant $5$.
+
+First, the primorial bound $\prod_{p\le m}p\le4^m$ follows by
+strong induction.  For $m=2n$, the product over $n<p\le2n$
+divides $\binom{2n}{n}\le4^n$, and one uses the inductive bound
+at $n$.  For $m=2n+1$, the product over
+$n+1<p\le2n+1$ divides $\binom{2n+1}{n}\le4^n$; the last
+inequality follows because its two equal middle terms already
+contribute twice that coefficient to the sum $2^{2n+1}$.
+Use the inductive bound at $n+1$.  The initial cases are direct.
+
+Let $b_n$ count the primes in $(n,2n]$.  Legendre's factorial
+formula gives
+\[
+ \frac{4^n}{2n+1}\le\binom{2n}{n}
+                 \le (2n)^{\sqrt{2n}}4^{2n/3}(2n)^{b_n}
+ \tag{RRT.25}
+\]
+for all sufficiently large $n$.  To check the upper bound,
+the exponent of $p$ in the middle binomial coefficient is a sum
+of terms
+$\lfloor2n/p^j\rfloor-2\lfloor n/p^j\rfloor\in\{0,1\}$.
+Thus the full power contributed by each $p\le\sqrt{2n}$ is at
+most $2n$, and there are at most $\sqrt{2n}$ such primes.
+Above $\sqrt{2n}$, each exponent is at most one.  The primes up
+to $2n/3$ are bounded by the primorial estimate, the primes in
+$(2n/3,n]$ have exponent zero, and the remaining $b_n$ primes
+contribute at most $(2n)^{b_n}$.  The lower bound in (RRT.25)
+comes from the largest of the $2n+1$ binomial coefficients.
+
+Taking logarithms gives
+\[
+ b_n\ge\frac{(n/3)\log4-\log(2n+1)
+                           -\sqrt{2n}\log(2n)}{\log(2n)}.
+ \tag{RRT.26}
+\]
+Set $n=\lfloor N/2\rfloor$.  Every prime in $(n,2n]$ exceeds
+$N/2$, and excluding the last three possible integers leaves
+at least $b_n-3$ primes satisfying $p+3\le N$.
+Each contributes at least $1/N$.  The lower bound for
+$(b_n-3)\log N/N$ furnished by (RRT.26) tends to
+$\log4/6>1/5$.  For instance
+$\log t\ge2(t-1)/(t+1)$ for $t\ge1$ follows by differentiating
+the difference; applying its strict inequality at $t=2$ gives
+$\log4>4/3$.  Since $\log N/\sqrt N\to0$, one absolute
+threshold makes the bound at least $1/5$, proving (RRT.24).
+All estimates are unconditional elementary integer counts.
+\hfill$\square$
+% END RRT9
+
+% BEGIN RRT10
+\paragraph{RRT10. The long-prime-degree witness appears exponentially often.}
+\label{claim:RRT10}
+For $N\ge N_0$ and a probability law $P$ agreeing with $w$ on
+$\mathcal S_N$,
+\[
+ P\{F\in\mathcal S_N:\text{no irreducible factor has prime degree }p,
+                         \ N/2<p,\ p+3\le N\}
+                   \le1-\frac1{5\log N}.
+ \tag{RRT.27}
+\]
+Indeed, the expected number of $p$-cycles in a uniform
+permutation is $1/p$: choose the $p$ symbols, arrange them into
+one of $(p-1)!$ cycles, and permute the remaining symbols.
+Cycles of lengths exceeding $N/2$ cannot coexist.  Hence the
+probability of at least one of the specified prime cycles is
+exactly the reciprocal sum in (RRT.24).  Apply RRT5 to the
+\emph{failure} property, and then RRT9.  This proves the
+eventual version of the original \texttt{LocalEstimateV}.
+Independence across the $f$ places and $1-t\le e^{-t}$ give
+\[
+ P^{\otimes f}\{\text{every coordinate is squarefree and lacks
+                          this witness}\}
+                       \le\exp\{-f/(5\log N)\}.
+ \tag{RRT.28}
+\]
+The event includes squarefreeness; other failures were already
+assigned their separate cost in RRT6.
+\hfill$\square$
+% END RRT10
+
+\subsection{The exact remaining probability inputs and the original consumer}
+
+For a nonzero element $z$ of an algebraic closure of a finite
+field, $z_{\ell'}$ denotes the unique prime-to-$\ell$ part of
+its finite order.  If $\operatorname{ord}(z)=\ell^a m$ with
+$(\ell,m)=1$, it is the power of $z$ whose exponent is $0$
+modulo $\ell^a$ and $1$ modulo $m$.  This characterizes both
+source formulas for \texttt{primeToPart}: their exponents have
+these same two residues.  All roots considered below are
+nonzero, and lie in a finite field, so this comparison applies.
+Put
+\[
+ \mathcal B(q,N)=\{q\}\cup
+ \{\ell\text{ prime}:\exists\,1\le d\le N,
+                           \ q^d<\ell^{4v_\ell(q^d-1)}\}.
+ \tag{RRT.29}
+\]
+For prime $q$ this is exactly either source version of
+\texttt{BB}.  The formally finite range loses nothing: a prime
+in the displayed second set divides some $q^d-1$, hence is at
+most $q^N$.
+
+Here are the two exact collision inequalities on this same
+polynomial space.  The first remains an input.  The second
+is proved completely in RRT14--RRT16 below:
+\begin{align}
+ \sum_{\substack{F\in\mathcal S_N\\
+   \exists\ell\notin\mathcal B(q,N):\\
+   z\mapsto z_{\ell'}\text{ is not injective on roots of }F}}
+ w(F)&\le\frac{23\log q}{\sqrt q},                 \tag{RRT.30}\\
+ \sum_{\substack{F\in\mathcal S_N\\
+   \exists\ell\ne q\text{ prime},\ z\text{ root of }F:\\
+                         z_{\ell'}=c_{\ell'}}}w(F)
+ &\le A_q:=\frac1{4\min(q_1,d_0)}
+                  +\frac{1+\log N}{q-1}\quad(c\in\mathbb F_q^\times).
+                                                        \tag{RRT.31}
+\end{align}
+In (RRT.30) the quantified $\ell$ is prime.  The exact source
+guards for these two inputs include $q\ge2^{12}$,
+$q_1,d_0$ distinct odd primes, $\max(q_1,d_0)\ge16$, and
+$16,q_1,d_0\mid q-1$.  The two statements are respectively
+\texttt{LocalEstimateII} and \texttt{LocalEstimateIII}.
+RRT5's divisor bound is one of their now proved ingredients.
+
+% BEGIN RRT11
+\paragraph{RRT11. Assemble the original $W_g$ on a reduced local contract.}
+\label{claim:RRT11}
+Let $\iota$ have $f$ elements, let the twist set have $m$
+elements, and prescribe $\chi_{v,j}\in\mathbb F_q^\times$.
+Assume $N\ge N_0$, the guards just stated, the original
+series laws (RRT.9), (RRT.12), and the root-injectivity
+estimate (RRT.30).  The second collision estimate (RRT.31)
+is supplied by RRT16.  Choose each actual place law $Q_v$ to be
+$w_{e_J}$ or $w_{e_U}$.  Then the probability of a tuple failing
+the source's \texttt{goodAt} condition is at most
+\[
+ \frac{3f}{q}+\frac{23f\log q}{\sqrt q}
+       +2fmA_q+\frac N2(7/8)^f
+                         +\exp\{-f/(5\log N)\}.
+ \tag{RRT.32}
+\]
+
+To prove this, first use the common base law $P=w_{e_U}$.
+RRT2 proves that it is a probability on the actual labels;
+(RRT.12) identifies its squarefree weights.  A tuple satisfies
+the six clauses of \texttt{GoodAt} precisely when its
+polynomials are valid labels, all are squarefree, their roots
+remain distinct after every allowed prime-to-$\ell$ projection,
+no root collides under that projection with any
+$\chi_{v,j}$ or $\chi_{v,j}^{-1}$, every degree
+$1\le a\le N/2$ is absent as a divisor degree at some place,
+and some place supplies the long prime-degree factor of RRT10.
+The prime-to-part and exceptional-set identifications above
+identify this with the conjunction of the two original
+\texttt{IsGood} predicates defining \texttt{goodAt}.
+
+The failure set is contained in the union of: a nonsquarefree
+coordinate; a root-injectivity collision at a coordinate; one
+of the two twist collisions at one of the $fm$ pairs; a common
+proper divisor degree across all coordinates; and absence of
+the long-prime-degree witness at every coordinate.  RRT6,
+(RRT.30), (RRT.31), RRT8, and RRT10 bound these probabilities
+by the respective terms in (RRT.32), with $2f/q$ in place of
+$3f/q$.  Independence is needed only for the last two events;
+the other three use the union bound.  RRT4 adds at most $f/q$
+when passing to $\bigotimes Q_v$, proving (RRT.32).
+
+For the actual datum take $q=g_k$, $N=R.r$, $f=R.f$,
+$m=R.m$, $(q_1,d_0)=(\mathrm{host}.q,\mathrm{host}.d)$, and
+the original twist table.  The cardinality field
+$|\mathrm{PlG}(k)|=R.f$ makes (RRT.32) the literal $W_g$.
+RRT2 supplies \emph{all} local nonnegativity assertions in
+\texttt{WeightAllRows}.  Any finite set of bad tuples has
+weight at most the full bad event, so (RRT.32) supplies its
+second assertion as well.  Polynomial tuples that are not
+valid labels contribute zero; coefficient parametrization is
+injective on the others.  Repeated global row labels do not
+affect this local argument.
+
+The field \texttt{AllJoinA.level} gives $Q_v=w_{e_J}$ at
+every place, with one nontrivial additive character per
+auxiliary prime.  Its bundle field is not used in this local
+weight argument.  Only the lower comparison and squarefree
+$e_U$ formula are required from \texttt{admLq}; its
+squarefree upper bound on $e_J$ is unnecessary for this
+consumer.  Finally $R.f\le R.k\le R.r$ and
+$x^2\le R.f$ imply $R.r\ge N_0$ after the single absolute
+threshold $x\ge\sqrt{N_0}$.  Thus RRT9's eventual version
+suffices for the original eventual \texttt{LinkIRR}
+application, with exactly the same $W_g$ and all choice orders
+of GQT5.  Here the rank inequalities come from
+\texttt{Params.lean}: $R.f=2R.\mathrm{ord}$,
+$2R.\mathrm{ord}\le R.k$, $R.r=R.k+R.m-1$, and $R.m\ge2$.
+They are explicitly used again in \texttt{sizesRec\_at} of
+\texttt{LinkIRROfJoinEx.lean}.  The abstract numerical
+\texttt{SizesAt} conditions alone do not assert $N\to\infty$;
+the displayed actual-rank comparison is essential here.
+\hfill$\square$
+% END RRT11
+
+\subsection{Two algebraic parts of the actual row construction}
+
+% BEGIN RRT12
+\paragraph{RRT12. Exact finite tensor cylinders.}
+\label{claim:RRT12}
+Let the finite local groups be $G_v$, with central orthogonal
+idempotents $E_{v,t}$ summing to $1$, and nonzero idempotents
+$a_v$ having positive identity coefficients.  In
+$\mathbb C[\prod_vG_v]\simeq\bigotimes_v\mathbb C[G_v]$ put
+\[
+ a=\bigotimes_va_v,\qquad
+ E_S=\sum_{(t_v)\in S}\bigotimes_vE_{v,t_v}.
+ \tag{RRT.33}
+\]
+Then $E_S$ is central and idempotent,
+$E_SE_T=E_{S\cap T}$, and $E_{\rm all}=1$.
+For an event determined by a subcollection $V_0$ of places,
+\[
+ \frac{[1](aE_S)}{[1]a}
+          =\sum_{(t_v)_{v\in V_0}\in S}
+                   \prod_{v\in V_0}w_{a_v}(t_v).
+ \tag{RRT.34}
+\]
+Indeed products of different tuple idempotents vanish and
+their sums expand coordinate by coordinate.  Identity
+coefficients multiply under the displayed tensor product.
+The complementary coordinates sum to $a_v$, so their factors
+cancel in the ratio.  RRT2 makes the remaining factors real
+and nonnegative.  These steps prove every assertion directly.
+
+For the two auxiliary-prime collections, (RRT.33) is exactly
+the finite \texttt{AllRowsOf.ES} coefficient formula.  Its
+universal event and cylinder value are therefore proved on
+the original finite groups.  Passing to the original adelic
+function $e_T$, including its Haar factor, still requires the
+actual reduction/inflation and convolution comparison
+\texttt{EtOne}; (RRT.34) does not choose or rescale that Haar
+measure.  It supplies the finite algebraic identity inside
+that comparison.
+\hfill$\square$
+% END RRT12
+
+% BEGIN RRT13
+\paragraph{RRT13. Construct labels and the retained injection without distinct-label assumptions.}
+\label{claim:RRT13}
+Let $L$ be the finite set of valid tuple labels, with good
+subset $L^+$.  Suppose exact nonnegative integer multiplicities
+$d_t$ satisfy $\sum_{t\in L}d_t=D_{\rm all}$ and that the
+given retained rows $\sigma\in\{1,\ldots,D_{\rm rows}\}$ have
+their original good labels $\lambda_\sigma\in L^+$, with
+\[
+       |\{\sigma:\lambda_\sigma=t\}|=d_t\qquad(t\in L^+).
+ \tag{RRT.35}
+\]
+Then there is a labeling of $D_{\rm all}$ rows and an
+injection of the original retained rows preserving every
+label, whose image is exactly the good rows, and with exactly
+$\sum_{t\in S}d_t$ rows in each set of labels $S$.
+
+Construct the finite set
+\[
+ T=\{1,\ldots,D_{\rm rows}\}\ \sqcup\!
+            \coprod_{t\in L\setminus L^+}\{1,\ldots,d_t\}.
+ \tag{RRT.36}
+\]
+Keep $\lambda_\sigma$ on the first summand and assign label
+$t$ to the $t$-summand on the right.  Summing (RRT.35) over
+$L^+$ shows $|T|=D_{\rm all}$.  Choose any enumeration of
+$T$ by the full row index set and transport this labeling.
+The first inclusion gives the required injection.  Its image
+is exactly the good part because every other summand has a
+bad label.  Fiber sizes are (RRT.35) on good labels and the
+specified $d_t$ on bad labels.  Summing those fibers over $S$
+gives the assertion.  This construction includes zero
+multiplicities and repeated labels, and does not require
+choosing distinct polynomials for distinct rows.
+
+In the original construction take
+$d_t=\mathrm{dimX}(\{t\})$.  The hypotheses
+\texttt{RowsAdd}, \texttt{RowsGood}, \texttt{EtUniv}, and
+the original \texttt{AutTie} give the exact additivity,
+good-fiber equation, and total rank needed above.  Use the
+original retained labels
+$\lambda_\sigma(k)=D.\mathrm{nd}.\mathrm{lab}(k,
+D.\mathrm{what}_2.\mathrm{ft}(\sigma))$.
+RRT13 then constructs \texttt{RowsLab}, with all its fields,
+and hence the original \texttt{LabelCountGoodInjective} once
+the same \texttt{allRowsOf} object is installed.  The
+representation-theoretic producers of \texttt{RowsAdd} and
+\texttt{RowsGood} are separate requirements, not consequences
+of finite enumeration.
+\hfill$\square$
+% END RRT13
+
+\subsection{The complete root-to-twist collision estimate}
+
+% BEGIN RRT14
+\paragraph{RRT14. Two prime-power sums, with the original constants.}
+\label{claim:RRT14}
+For a positive integer $n$ write
+$S(n)=\sum_{\ell\mid n,\ \ell\text{ prime}}\ell^{v_\ell(n)}$.
+If $q\ge2$, $4\mid q-1$, and $\delta\ge1$, then
+\[
+ S(q^\delta-1)\le\delta(q-1)+\frac{q^\delta-1}{q-1}.
+ \tag{RRT.37}
+\]
+If moreover $p_1,p_2$ are distinct odd primes dividing $q-1$,
+$16\mid q-1$, and $\max(p_1,p_2)\ge16$, then
+\[
+               \frac{S(q-1)}{q-1}
+                         \le\frac1{4\min(p_1,p_2)}.
+ \tag{RRT.38}
+\]
+These are exactly \texttt{PrimePowerOrderCount} and
+\texttt{PrimePowerOrderShare}.
+
+For (RRT.37), first observe that for any finite collection of
+integers at least $2$, its sum is at most its product; this
+includes the empty collection, whose sum is $0$ and product
+is $1$.  For a nonempty collection, induction uses
+$u+v\le uv$ for $u,v\ge2$.  Put $A=q-1$ and
+$B=(q^\delta-1)/A$.  For a prime $\ell\mid A$,
+\[
+ v_\ell(q^\delta-1)=v_\ell(A)+v_\ell(\delta).
+ \tag{RRT.39}
+\]
+Here is the needed elementary valuation proof.  If
+$u=1+\ell^h b$ with $\ell\nmid b$, and either $\ell$ is odd
+and $h\ge1$ or $\ell=2$ and $h\ge2$, expansion of
+$u^\ell-1$ has first term $\ell^{h+1}b$ and every other
+term has valuation strictly greater than $h+1$.  Hence
+raising to the power $\ell$ raises the valuation by exactly
+one.  Raising to an integer coprime to $\ell$ keeps valuation
+$h$, again by the first binomial term.  Splitting $\delta$
+into an $\ell$-power times a coprime integer proves (RRT.39).
+For $\ell=2$ the hypothesis $4\mid A$ gives $h\ge2$.
+
+The prime-power factors of $q^\delta-1$ at primes dividing
+$A$ therefore have product dividing $\delta A$.  Their sum
+is at most that product, hence at most $\delta A$.  The other
+prime-power factors have product dividing $B$, since these
+primes do not divide $A$; their sum is at most $B$.
+Adding proves (RRT.37), including empty parts.
+
+For (RRT.38) set $m=\min(p_1,p_2)$ and isolate the
+prime-power factors $X$ at $2$, $Y$ at the smaller selected
+prime, and $Z$ at the larger selected prime.  Then
+$X\ge16$, $Y\ge m$, $Z\ge16$, and $Z\ge m$.
+Let $P$ be the product of all remaining prime-power factors,
+and $T$ their sum.  Thus $P\ge1$, $T\le P$,
+$q-1=XYZP$, and $S(q-1)=X+Y+Z+T$.
+Each of
+\[
+ \frac{X}{XYZP},\qquad \frac{Y}{XYZP},\qquad
+ \frac{Z}{XYZP},\qquad \frac{T}{XYZP}
+\]
+is at most $1/(16m)$: use respectively $YZ\ge16m$,
+$XZ\ge16m$, $XY\ge16m$, and $T\le P$ together with
+$XYZ\ge16m$.  Their sum proves (RRT.38).
+\hfill$\square$
+% END RRT14
+
+% BEGIN RRT15
+\paragraph{RRT15. Count the actual irreducible collision factors.}
+\label{claim:RRT15}
+Fix $c\in\mathbb F_q^\times$ and $\delta\ge1$, with $q\ge3$.
+Let $\mathcal B_\delta(c)$ be the monic irreducible polynomials
+of degree $\delta$ that divide at least one polynomial
+\[
+ X^{\ell^{v_\ell(q^\delta-1)}}
+             -c^{\ell^{v_\ell(q^\delta-1)}}
+       \quad(\ell\text{ prime},\ \ell\mid q^\delta-1).
+ \tag{RRT.40}
+\]
+Write $b_\delta=|\mathcal B_\delta(c)|$.  Then
+\[
+                  \delta b_\delta\le S(q^\delta-1).
+ \tag{RRT.41}
+\]
+Every monic irreducible degree-$\delta$ polynomial with a
+nonzero root $z$ satisfying $z_{\ell'}=c_{\ell'}$ for some
+prime $\ell$ belongs to $\mathcal B_\delta(c)$.
+
+Indeed, $z$ and $c$ lie in $\mathbb F_{q^\delta}^\times$.
+The canonical prime-to-$\ell$ map is a homomorphism on this
+finite cyclic group, so the quotient $z/c$ has $\ell$-power
+order.  Its order also divides $q^\delta-1$.  If that order
+is greater than one, it divides
+$\ell^{v_\ell(q^\delta-1)}$.  If it is one, use any prime
+divisor of $q^\delta-1$, which exists since $q\ge3$.
+Thus $z$ is a root of one polynomial in (RRT.40), and its
+monic minimal polynomial divides that polynomial.
+
+For each fixed $\ell$, the distinct monic irreducible factors
+of degree $\delta$ in (RRT.40) are coprime.  Their product
+divides its nonzero polynomial of degree
+$\ell^{v_\ell(q^\delta-1)}$.  Consequently their number
+times $\delta$ is at most this degree.  Summing these bounds
+over $\ell$ proves (RRT.41).  Counting a factor more than
+once only enlarges the bound.  Every polynomial in
+$\mathcal B_\delta(c)$ has nonzero constant coefficient,
+because the polynomials in (RRT.40) do.
+\hfill$\square$
+% END RRT15
+
+% BEGIN RRT16
+\paragraph{RRT16. The full original LocalEstimateIII.}
+\label{claim:RRT16}
+Assume $N\ge1$, $p_1,p_2$ are distinct odd primes,
+$16,p_1,p_2\mid q-1$, and $\max(p_1,p_2)\ge16$.
+Then for every $c\in\mathbb F_q^\times$,
+\[
+ \sum_{\substack{F\in\mathcal S_N\\
+        \exists\ell\ne q\text{ prime},\ z\text{ root of }F:\\
+                                      z_{\ell'}=c_{\ell'}}}w(F)
+        \le\frac1{4\min(p_1,p_2)}+\frac{1+\log N}{q-1}.
+ \tag{RRT.42}
+\]
+In fact the proof also allows the prime $\ell=q$ whenever
+$q$ is prime.  The displayed weaker form is the exact
+original \texttt{LocalEstimateIII}.
+
+If $F$ occurs in this sum, the monic minimal polynomial of
+its indicated root is a factor of $F$, has a degree
+$1\le\delta\le N$, and belongs to $\mathcal B_\delta(c)$
+by RRT15.  RRT5's divisor bound, followed by a union bound
+over these factors, therefore bounds the left side by
+\[
+                  \sum_{\delta=1}^N
+                                \frac{b_\delta}{q^\delta-1}.
+ \tag{RRT.43}
+\]
+For $\delta=1$, RRT15 and (RRT.38) bound this summand by
+$1/(4\min(p_1,p_2))$.  For $\delta\ge2$, RRT15 and
+(RRT.37) give
+\[
+ \frac{b_\delta}{q^\delta-1}
+       \le\frac{q-1}{q^\delta-1}+\frac1{\delta(q-1)}
+       \le q^{-(\delta-1)}+\frac1{\delta(q-1)}.
+ \tag{RRT.44}
+\]
+The last comparison follows from
+$(q-1)q^{\delta-1}\le q^\delta-1$.
+Finally
+\[
+ \sum_{\delta=2}^Nq^{-(\delta-1)}\le\frac1{q-1},
+ \qquad \sum_{\delta=2}^N\frac1\delta\le\log N.
+\]
+The first is the finite geometric sum; the second follows
+by bounding $1/\delta$ by
+$\int_{\delta-1}^{\delta}dt/t$.  They also hold for $N=1$
+with empty sums.  Substitution in (RRT.43) proves (RRT.42).
+There is no character-theoretic hypothesis in this proof:
+the weight is the explicit squarefree product (RRT.14).
+Installing $p_1=q_1,p_2=d_0$ proves (RRT.31) and supplies
+the entire $2fmA_q$ term in RRT11 once the base probability
+law is identified by (RRT.12).
+\hfill$\square$
+% END RRT16
+
+\subsection{What has advanced, and the remaining frontier}
+
+The nonnegativity and normalization part of the actual local
+weights is now proved without Green.  The source's
+\texttt{ComparisonTransfer}, \texttt{TypeSetWeight},
+\texttt{SqMassLower}, \texttt{SqMassLeOne},
+\texttt{DivisorBound}, \texttt{LemmaP}, and
+\texttt{LocalEstimateIII} and \texttt{LocalEstimateIV} have
+complete finite proofs here.
+The eventual \texttt{LocalEstimateV} has the original constant
+and is enough for the selected family.  This supplies four of
+the five displayed terms of $W_g$, including their actual
+probabilistic meaning, and the exact finite tensor and label
+constructions required upstream of GQT5.
+
+Three local quantitative inputs remain: the original
+squarefree $e_U$ character law, the $e_J$ lower comparison,
+and the root-injectivity collision inequality (RRT.30).
+For the first two, (RRT.10)--(RRT.11) are explicit finite
+character targets.  The source's normalized-label bridge
+permutes irreducible polynomial labels by degree before
+identifying the original series projector with Green's
+parametrization; it must be written on the same labels, not
+assumed from a name.  Its exact entry point is
+\texttt{AdmissibleLabelWeightsOfGreenCuspidalParametrisa}.
+For the remaining collision input the next proofs are the
+same-factor and cross-factor root-fiber counts and their
+weighted divisor sums.  They can now use RRT5 directly.
+
+The global frontier still includes the original adelic
+\texttt{HidaSetting}, reduction/inflation and \texttt{EtOne},
+the actual \texttt{RowsAdd}/\texttt{RowsGood} identifications,
+and the cylinder counts.  RRT13 is the full finite enumeration
+after those identifications; it does not construct an
+automorphic spectrum.  GQT1--GQT5 continue from the resulting
+original row object and the three sufficient counting tests.
+No new proof of RH or GRH, and no completion of
+\texttt{GLOBAL\_RETAINED\_DEFECT}, is claimed by this packet.

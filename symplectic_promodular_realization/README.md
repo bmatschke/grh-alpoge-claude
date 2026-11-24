@@ -1,0 +1,9 @@
+# Actual case-II promodular support realization
+
+The complete readable proof is in `main.tex`, with twelve consolidated claims UX1–UX12. UX12 proves the literal source implication from `SeedIIAlt` and `PMExAlt` to `ProModAlt` for every original case-II star pair. It constructs the support witness on the original valued representation, with the fixed complex embedding and all coefficient and inertia equalities retained.
+
+The main intermediate constructions are the actual tame tower and lattice, three residual polynomial links, uniform cyclotomic cohomology bounds, the deformation space with all its fields, its local presentation deficit, bounds for both exceptional loci, component propagation through actual finite-field curves, and return to the original valuation ring. The proof retains the seed and five-clause support producer as explicit incoming hypotheses. It does not claim the complete case-III realization or unconditional image density.
+
+`provenance.json` binds every claim and source range to commit `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`. `closure.json` records the exact endpoints and dependency graph. `input_registry.json` and `classical_inputs.json` distinguish the two retained automorphic hypotheses from previously reconstructed suppliers and named classical results. `remaining_inputs.json` and `next_targets.json` expose the remaining producer and case-III obligations without retiring compound historical targets.
+
+To regenerate the exact source ledger, run `python build_provenance.py --repo /absolute/path/to/pinned/source`. To check the TeX, run `python validate_tex.py` in the delivered project layout. The latter uses draft mode only and produces no PDF. These checks are source/format checks, not a Lean kernel replay or a certification of the mathematics. Independent mathematical reviews are stored separately in the versioned review directory.

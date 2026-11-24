@@ -1,0 +1,1520 @@
+\section{Completing the seven cohomological fields on one linked frame}
+\label{sec:linked-frame-completion}
+
+\paragraph{The endpoint.}
+This chapter proves all seven fields left open by MFC14:
+\texttt{phi}, \texttt{gen}, \texttt{cl}, \texttt{ec},
+\texttt{b1p}, \texttt{b1}, and \texttt{h1}.
+The proofs apply to the actual linked frame already constructed there.
+They neither replace its quotient nor enlarge its class-rank constant.
+Consequently the original \texttt{frame\_ex} theorem, with its full
+\texttt{Gen} and \(\texttt{GC.Hypotheses}_{2}\) antecedents, is obtained.
+For the original coefficient DVR, CAF7 then installs the character
+\texttt{SeedClause} and gives \texttt{HasFrame}.
+The separate \texttt{gen\_gd} and \texttt{gen\_host} entry theorems and
+the two automorphic seed representations are not asserted here.
+
+\paragraph{Retained mathematical inputs.}
+Write \(P:\texttt{GC.Hypotheses}_{2}\) for the original published
+cohomological package.  We use its local finiteness, local Tate
+duality, local Euler characteristic, global finiteness, global Euler
+characteristic and normalized Poitou--Tate fields at their stated
+finite-module instances.  MFC's two strict classes retain the
+Greenberg--Wiles input used there.  Class-group finiteness, the
+Dirichlet unit theorem and finite class-field reciprocity are the
+named classical number-theoretic inputs below; the last is the
+same class-character dictionary already used in MFC5 and TW1.
+We give the needed Kummer, coefficient, quotient, inertia and cone
+arguments explicitly.  In particular the specialized source
+\texttt{CharacterH1GaloisQuotient} theorem is replaced, for its
+trivial-character application here, by a CM-unit argument.
+
+\subsection{The linked data and literal cohomology spaces}
+
+Until the final assembly let \(F\) be a totally real number field,
+\(\Omega\) its specified algebraic closure, and
+\(G_F=\operatorname{Gal}(\Omega/F)\).  Let \(\ell\) be odd and
+\(k\) a field of characteristic \(\ell\).  The given frame
+\(\Phi\) has a profinite group \(\Gamma\), a sign character
+\(\delta:\Gamma\to\{\pm1\}\), an element \(c\) with
+\(\delta(c)=-1\), and \(\Gamma_0=\ker\delta\).
+It has finite sets \(V,\mathrm{Inf}\), profinite groups \(G_v\),
+maps
+\[
+ \operatorname{loc}_{0,v}:G_v\longrightarrow\Gamma_0,\qquad
+ \operatorname{loc}_v:G_v\longrightarrow\Gamma,
+ \qquad I_v\subset G_v,\qquad d_v\in\mathbb N,
+\]
+the cyclotomic character \(\epsilon:\Gamma\to\mathbb Z_\ell^\times\),
+and a residual character \(\Psi:\Gamma\to k^\times\).
+Put
+\[
+ \operatorname{loc}_{2,(v,0)}=\operatorname{loc}_{0,v},\qquad
+ \operatorname{loc}_{2,(v,1)}(s)
+       =c\,\operatorname{loc}_{0,v}(s)c^{-1},\qquad
+ N_v=I_v\cap\ker(\epsilon\operatorname{loc}_v).
+\]
+The element in the second formula is regarded as an element of
+\(\Gamma_0\).  For any characteristic-\(\ell\) field \(E\), denote
+the reduction of \(\epsilon\) in \(E^\times\) by \(\omega_E\),
+and the sign character in \(E^\times\) by \(\delta_E\).
+
+The full \texttt{FLink} gives a finite set \(S\) consisting
+\emph{exactly} of the places of \(F\) above \(\ell\), a normal open
+subgroup \(K\subset G_F\) of index prime to \(\ell\), and a
+continuous surjection
+\[
+ \pi:G_F\twoheadrightarrow\Gamma,\qquad
+ \ker\pi=
+ \overline{\langle I_A\cap K:
+                  A\mid v,\ v\notin S\rangle^{\mathrm{normal}}}.
+                                                        \tag{LFC.1}
+\]
+There are bijectively indexed places \(v\mapsto\mathfrak p_v\in S\),
+chosen prolongations \(A_v\), and continuous isomorphisms
+\(\iota_v:G_v\simeq D_{A_v}\).  Under these isomorphisms,
+\(\operatorname{loc}_v=\pi\iota_v\), \(I_v\) is the actual inertia
+group, and \(d_v=[F_{\mathfrak p_v}:\mathbb Q_\ell]\).
+The set \(\mathrm{Inf}\) indexes all real places, and \(c_w\)
+is the image of a complex conjugation at that place.
+Furthermore
+\[
+ \epsilon\pi=\epsilon_F,\qquad
+ K\subset\ker(\delta\pi)\cap\ker(\Psi\pi),\qquad
+ \ker\delta\ \hbox{is open}.                              \tag{LFC.2}
+\]
+No assertion of \texttt{Ok} is included in this input.
+When only \texttt{GLink} is needed, the hypotheses are (LFC.1),
+\(\ell\nmid[G_F:K]\), and \(S\) containing the \(\ell\)-places.
+
+All cochains below are continuous, with discrete coefficient
+modules.  For a representation \(\rho\) on \(W\), write
+\[
+ (d x)(g)=\rho(g)x-x,\qquad
+ (d z)(g,h)=z(g)+\rho(g)z(h)-z(gh).
+\]
+For stable local subspaces \(b_v\subset W\), the source's
+\(H^1_C(\operatorname{loc},W,b)\) consists of pairs
+\((z,(x_v))\), where \(z\) is a cocycle and
+\[
+ z(\operatorname{loc}_v s)
+       -\bigl(\rho(\operatorname{loc}_v s)x_v-x_v\bigr)\in b_v,
+                                                        \tag{LFC.3}
+\]
+modulo the pairs \((dX,(X+y_v))\), \(y_v\in b_v\).
+This is the literal \texttt{Z1C}/\texttt{continuousCoboundaries1}
+quotient, including its local primitives.  In particular local
+condition \(0\) retains those primitives, whereas local condition
+\(W\) makes them irrelevant.
+
+\subsection{Finite characters and the uniform class exponent}
+
+% BEGIN LFC1
+\paragraph{LFC1. Kummer classes with bounded ramification are finite.}
+\label{claim:LFC1}
+Let \(E\) be a number field containing \(\mu_\ell\), and let
+\(T\) be a finite set of its finite places.  Put
+\[
+ V_T(E)=\{a\in E^\times:\ell\mid v(a)\text{ for every }v\notin T\}.
+\]
+There is an exact sequence of finite-dimensional
+\(\mathbb F_\ell\)-spaces
+\[
+ 0\longrightarrow
+   \mathcal O_{E,T}^{\times}/(\mathcal O_{E,T}^{\times})^\ell
+ \longrightarrow V_T(E)/E^{\times\ell}
+ \longrightarrow \operatorname{Cl}(\mathcal O_{E,T})[\ell]
+ \longrightarrow0.                                     \tag{LFC.4}
+\]
+Consequently there are only finitely many continuous additive
+characters \(G_E\to\mathbb F_\ell\) unramified outside \(T\).
+
+\begin{proof}
+In the ring with the primes \(T\) inverted, write
+\((a)=\mathfrak a^\ell\).  Unique ideal factorization makes
+\(\mathfrak a\) unique, and sends the class of \(a\) to
+\([\mathfrak a]\).  Multiplying \(a\) by an \(\ell\)-th power
+changes \(\mathfrak a\) by a principal ideal.  Conversely an ideal
+class killed by \(\ell\) has a representative with
+\(\mathfrak a^\ell=(a)\), giving surjectivity.  The class is zero
+precisely when \(a=u b^\ell\), with \(u\) a \(T\)-unit.
+If a \(T\)-unit is an \(\ell\)-th power in \(E^\times\),
+its root is again a \(T\)-unit by valuations.  This proves
+exactness.  The unit theorem and class-group finiteness prove
+the stated finiteness.
+
+Fix a primitive root \(\zeta\in E\).  A nonzero character
+\(\chi:G_E\to\mathbb F_\ell\) cuts out a cyclic extension of
+degree \(\ell\).  If \(\tau\) generates its Galois group with
+\(\chi(\tau)=1\), the operator
+\(\sum_{j=0}^{\ell-1}\zeta^{-j}\tau^j\) is nonzero by linear
+independence of distinct field embeddings.  Choose \(x\) on
+which it is nonzero and call its value \(\beta\).
+Then \(\tau\beta=\zeta\beta\), \(\beta^\ell=a\in E^\times\),
+and \(g\beta=\zeta^{\chi(g)}\beta\).
+The zero character corresponds to \(a=1\).  If two such
+\(a\)'s differ by an \(\ell\)-th power, the corresponding
+\(\beta\)'s differ by an element of \(E^\times\) times a power
+of \(\zeta\), so the two characters are equal.
+
+At a place outside \(T\), the extension cut out by \(\chi\)
+is unramified.  Its normalized valuation therefore takes integral
+values on \(\beta\), whence \(v(a)=\ell v(\beta)\) is divisible
+by \(\ell\).  The characters inject into the finite middle
+space of (LFC.4).  This proves the final assertion without
+assuming the converse local ramification criterion.
+\end{proof}
+% END LFC1
+
+% BEGIN LFC2
+\paragraph{LFC2. The full \texttt{PhiCond} on every open subgroup.}
+\label{claim:LFC2}
+For any \texttt{GLink} over any number field \(F\), without
+a total-reality assumption, every open subgroup \(H\subset\Gamma\)
+has only finitely many homomorphisms \(H\to(\mathbb F_\ell,+)\)
+with open kernel.  Thus \(\operatorname{PhiCond}(\Gamma,\ell)\)
+holds, including its quantifier over all open \(H\).
+
+\begin{proof}
+Let
+\[
+ J=\pi^{-1}(H)\cap K\cap\ker(\bar\epsilon_F),\qquad
+ E=\Omega^J.
+\]
+This is an open subgroup, so \(E/F\) is finite, and \(E\)
+contains \(\mu_\ell\).  The map \(G_E=J\to H\) induced by
+\(\pi\) has image of finite index: representatives of the
+finitely many cosets of \(J\) in \(G_F\) also cover its image
+cosets in \(\Gamma\), and hence in \(H\).
+Choose a nonzero rational integer \(n\) divisible by the residue
+characteristic of every place of \(S\).
+At a place of \(E\) not dividing \(n\), the underlying place of
+\(F\) is outside \(S\).  Its inertia in \(G_E\) is contained
+in \(I_A\cap K\), and is killed by (LFC.1).
+
+Consequently restriction sends each character of \(H\) to one
+of the finitely many characters supplied by LFC1, with \(T\)
+the places of \(E\) dividing \(n\).  Fix finitely many coset
+representatives for the image of \(G_E\) in \(H\).  A character
+is determined by its restriction and its value on these
+representatives, so there are only finitely many possibilities.
+Normality of this image is not needed for this argument.
+For a homomorphism to a finite discrete group, an open kernel
+is equivalent to continuity, since every fiber is a coset of
+the kernel.  This is exactly the source's definition of
+\texttt{PhiCond}, not a statement only about \(\Gamma\) itself.
+\end{proof}
+% END LFC2
+
+% BEGIN LFC3
+\paragraph{LFC3. One nonzero exponent for all unramified characters.}
+\label{claim:LFC3}
+For a full \texttt{FLink}, there is \(h>0\), chosen before
+the finite abelian \(\ell\)-group \(B\) and the character
+\(\chi:\Gamma_0\to B\), such that every open-kernel \(\chi\)
+satisfying
+\[
+ \chi(\operatorname{loc}_{2,(v,b)}s)=1
+ \quad(v\in V,\ b\in\{0,1\},\ s\in I_v)
+                                                        \tag{LFC.5}
+\]
+satisfies \(\chi(g)^h=1\) for every \(g\in\Gamma_0\).
+This is the full \texttt{cl} field.
+
+\begin{proof}
+Put \(U=\pi^{-1}(\Gamma_0)\), \(E=\Omega^U\), and choose
+\[
+                  h=2\,|\operatorname{Cl}(\mathcal O_E)|.
+                                                        \tag{LFC.6}
+\]
+This positive integer depends only on the linked data.
+The pullback of \(\chi\) to \(G_E=U\) is unramified at every
+finite place.  Indeed, above \(v\in S\), conjugate the
+prolongation to the chosen \(A_v\).
+If the image \(a\) of the conjugating element has
+\(\delta(a)=1\), the character sees a conjugate inside
+\(\Gamma_0\) of \(\operatorname{loc}_{0,v}(I_v)\).
+If \(\delta(a)=-1\), write \(a=(ac^{-1})c\);
+it sees a conjugate inside \(\Gamma_0\) of the second branch
+\(c\operatorname{loc}_{0,v}(I_v)c^{-1}\).
+Both are killed by (LFC.5), since \(B\) is abelian.
+This uses the actual inertia groups, including their
+intersections with \(G_E\).
+
+At a finite place outside \(S\), let \(t\) be such an inertia
+element and put \(r=[G_F:K]\).  Normality of \(K\) gives
+\(t^r\in K\), so (LFC.1) gives \(\pi(t)^r=1\).
+The order of \(\chi(\pi(t))\) is an \(\ell\)-power and divides
+the prime-to-\(\ell\) integer \(r\); hence it is one.
+Finally the square of the pullback character kills every
+real complex conjugation, since these have order at most two.
+Finite class-field reciprocity therefore factors that square
+through the ordinary finite ideal class group of \(E\).
+It is annihilated by the class number, giving (LFC.6).
+The map \(G_E\to\Gamma_0\) is onto, by surjectivity of \(\pi\),
+so this proves the assertion for every \(g\).
+No bound on \(B\), or choice depending on \(\chi\), entered
+the choice of \(h\).
+\end{proof}
+% END LFC3
+
+\subsection{Local generators with the required cyclotomic exception}
+
+% BEGIN LFC4
+\paragraph{LFC4. The elementary procyclic cohomology calculation.}
+\label{claim:LFC4}
+In this claim \(\ell\) may be any prime and the base number
+field need not be totally real.
+Let \(D\) be a local decomposition group, \(I\) its inertia,
+and \(\varphi\in D\) a lift of arithmetic Frobenius, so that
+\(D/I\simeq\widehat{\mathbb Z}\), with \(\varphi\) mapping to
+one.  If \(J\triangleleft D\) is closed, contained in \(I\),
+and \([I:J]\) is finite and prime to \(\ell\), then for every
+finite-dimensional finite-field characteristic-\(\ell\)
+continuous representation \(W\) on which \(J\) acts trivially,
+\[
+ H^2(D/J,W)=0,\qquad
+ \dim H^1(D/J,W)=\dim H^0(D/J,W).                         \tag{LFC.7}
+\]
+
+\begin{proof}
+For a procyclic group with generator \(t\), a continuous
+one-cocycle is determined by \(x=z(t)\).
+Every \(x\in W\) occurs: if the action has period \(a\),
+the cocycle on the integers defined by its partial sums
+factors through the cyclic group of order \(a\ell\), because
+the sum over \(a\ell\) terms is zero.
+Coboundaries correspond to \((t-1)W\).  Thus
+\(H^1=W/(t-1)W\), whose dimension is \(\dim\ker(t-1)\).
+A continuous two-cocycle factors through some finite cyclic
+quotient.  For a cyclic quotient of order \(a\) acting through
+\(t\), the periodic resolution gives
+\(H^2=W^t/(1+t+\cdots+t^{a-1})W\): this follows by lifting
+the cyclic generator in the extension defined by the cocycle,
+whose \(a\)-th power is the displayed invariant.
+Inflation to the quotient of order \(a\ell\) multiplies that
+invariant by \(\ell\), and hence kills the class.
+The same conclusion holds in continuous cohomology, since
+the new primitive is a cochain on a finite quotient.
+
+Now \(A=I/J\) is finite of order invertible in the coefficient
+field.  Averaging over \(A\) projects \(W\) onto \(W^A\).
+It also contracts the positive-degree homogeneous cochains
+of \(A\): insert an initial variable \(a\), sum over \(a\in A\),
+and divide by \(|A|\).  The cochain identity is \(ds+sd=1\)
+in positive degrees.  Apply this contraction to the
+normal-subgroup double complex for
+\(1\to A\to D/J\to\widehat{\mathbb Z}\to1\);
+all positive \(A\)-rows disappear and the remaining row is
+the continuous cochain complex of
+\(\widehat{\mathbb Z}\) with coefficients \(W^A\).
+This proves (LFC.7) by the preceding calculation.
+All maps are continuous: the \(A\)-sums are finite and every
+cochain used here factors through a finite quotient.
+\end{proof}
+% END LFC4
+
+% BEGIN LFC5
+\paragraph{LFC5. Exactly \(d\) universal inertia detectors.}
+\label{claim:LFC5}
+Let \(v\mid\ell\), \(D=D_A\), \(I=I_A\), and
+\(d=[F_v:\mathbb Q_\ell]>0\).  Assume the local fields of
+\(P\), and assume \(\bar\epsilon_F|_D\ne1\).
+For any normal open \(K\subset G_F\) of prime-to-\(\ell\)
+index there are \(u_1,\ldots,u_d\in I\cap K\), with a
+distinguished index \(a_0\), such that
+\[
+ \epsilon_F(u_a)=1\quad(a\ne a_0),                       \tag{LFC.8}
+\]
+and, for every finite abelian \(\ell\)-group \(B\), every
+open-kernel homomorphism \(\chi:D\to B\) which kills all
+\(u_a\) kills all of \(I\).
+
+\begin{proof}
+The residue-field Galois group is \(\widehat{\mathbb Z}\):
+on its finite subfields Frobenius has precisely their degrees
+as orders, and taking the inverse limit gives this statement.
+Choose a Frobenius lift \(\varphi\in D\).  Then \(I\) and
+\(\varphi\) topologically generate \(D\), and for every
+integer \(n>0\) there is a continuous degree map
+\(\deg_n:D\to\mathbb Z/n\) killing \(I\) and taking
+\(\varphi\) to one.
+
+Let \(X=\operatorname{Hom}_{\rm cont}(D,\mathbb F_\ell)\).
+Local finiteness makes \(X\) finite-dimensional.
+Local Tate duality gives \(H^2(D,\mathbb F_\ell)=0\):
+its dual is the invariant subspace of the nontrivial
+cyclotomic character.  The local Euler characteristic therefore
+gives \(\dim X=d+1\).
+Evaluation at \(\varphi\) is onto, witnessed by \(\deg_\ell\).
+Thus \(Y=\{f\in X:f(\varphi)=0\}\) has dimension \(d\).
+Put \(J=I\cap K\), \(J_0=J\cap\ker\epsilon_F\), and
+\[
+                   W_0=\{f\in Y:f|_{J_0}=0\}.
+ \]
+Evaluation on \(J\) separates \(Y\).  Indeed, if \(f|_J=0\)
+and \(r=[G_F:K]\), then \(t^r\in J\) for \(t\in I\);
+as \(r\) is invertible modulo \(\ell\), \(f|_I=0\).
+Together with \(f(\varphi)=0\) and continuity this gives
+\(f=0\).
+
+If \(W_0=0\), successively choose points of \(J_0\) which
+reduce the common evaluation kernel.  After at most \(d\)
+choices that kernel is zero.  Pad the list by identities.
+If \(W_0\ne0\), the same procedure chooses at most \(d-1\)
+points of \(J_0\) with common kernel \(W_0\).
+Let \(N\) be the common kernel in \(J\) of the finitely many
+characters in \(W_0\).  It is open in the compact group \(J\)
+and contains \(\ker(\epsilon_F|_J)\).
+Hence \(J/N\) is a finite continuous quotient of the closed
+subgroup \(\epsilon_F(J)\subset\mathbb Z_\ell^\times\).
+Such a quotient is cyclic when \(\ell\) is odd.
+For completeness, compactness and openness show that its
+kernel contains the intersection with \(1+\ell^a\mathbb Z_\ell\)
+for some \(a\): otherwise a nested sequence outside the
+kernel would have a limit in the kernel with cyclotomic value
+one.  The quotient is therefore a quotient of a subgroup of
+\((\mathbb Z/\ell^a)^\times\), a cyclic group for odd \(\ell\).
+Choose \(u_{a_0}\in J\) mapping to a generator of \(J/N\).
+Vanishing at this one point forces a member of \(W_0\) to
+vanish on \(J\), and hence to be zero.  Pad with identities
+to obtain \(d\) points.  In both cases (LFC.8) holds, and
+a character in \(X\) killed by the \(u_a\)'s and \(\varphi\)
+is zero.
+
+To obtain the assertion for every \(B\), put \(n=|B|\) and
+consider the finite abelian \(\ell\)-group
+\[
+             C=\operatorname{im}(\chi,\deg_n)
+                       \subset B\times\mathbb Z/n.
+ \]
+It is generated by the image of \(\varphi\).
+Otherwise its quotient by that cyclic subgroup is a nonzero
+finite abelian \(\ell\)-group and has a nonzero homomorphism
+to \(\mathbb F_\ell\) (reduce one cyclic factor modulo \(\ell\)).
+Composing with \(D\to C\) contradicts the preceding detection
+statement: it kills all \(u_a\) and \(\varphi\).
+For \(t\in I\), write its image in \(C\) as the \(b\)-th
+power of the image of \(\varphi\).  Its degree is zero, so
+\(n\mid b\); since \(n\) annihilates \(B\), \(\chi(t)=1\).
+This also handles \(B=1\).  The same \(u_a\)'s work for all
+groups \(B\) and all characters \(\chi\).
+\end{proof}
+% END LFC5
+
+% BEGIN LFC6
+\paragraph{LFC6. The exact local \texttt{gen} field.}
+\label{claim:LFC6}
+Assume \(P\), a full \texttt{FLink}, and
+\(\omega_k\operatorname{loc}_v\ne1\) for every \(v\).
+Then \(\Phi\) satisfies the full \texttt{gen} field:
+for every \(v\) there are \(u:\operatorname{Fin}(d_v)\to G_v\)
+and \(a_0\in\operatorname{Fin}(d_v)\), with
+\[
+ u_a\in I_v,\quad \Psi(\operatorname{loc}_v u_a)=1,\quad
+ a\ne a_0\Longrightarrow u_a\in N_v,
+                                                        \tag{LFC.9}
+\]
+which detect the restriction to inertia of every continuous
+character to every finite abelian \(\ell\)-group.
+
+\begin{proof}
+The inclusion \(\mathbb F_\ell\hookrightarrow k\) is injective.
+The compatibility \(\epsilon\pi=\epsilon_F\) thus identifies
+the stated nontriviality with
+\(\bar\epsilon_F|_{D_{A_v}}\ne1\), including the source's
+modulo-\(\ell^1\) convention.
+Apply LFC5 at \(A_v\) and pull its points back through the
+continuous isomorphism \(\iota_v:G_v\simeq D_{A_v}\).
+Every point lies in \(I_{A_v}\cap K\), so its image has
+\(\Psi=1\) by (LFC.2).  All but the distinguished point
+have cyclotomic value one, giving membership in \(N_v\).
+The local degree is exactly \(d_v\), not an upper bound.
+A character of \(G_v\) transfers through \(\iota_v^{-1}\)
+to a character of \(D_{A_v}\) with open kernel, so LFC5
+proves its universal inertia assertion verbatim.
+\end{proof}
+% END LFC6
+
+\subsection{The actual strict-cohomology dictionary and rank bounds}
+
+% BEGIN LFC7
+\paragraph{LFC7. Literal class characters and extension of coefficients.}
+\label{claim:LFC7}
+Here \(F\) may be any number field and \(\ell\) any prime.
+For an open subgroup \(J\subset G_F\), let
+\[
+ X_E(J)=\{f:J\to E:\ f\text{ locally constant and additive},
+                   \ f(I_A\cap J)=0\text{ for every }A\}.
+ \]
+This is exactly \(\texttt{Kum.XDual}(1,J,E,E)\).
+For every characteristic-\(\ell\) field \(E\),
+\[
+ \dim_E X_E(J)=\dim_{\mathbb F_\ell}X_{\mathbb F_\ell}(J)
+                  =\operatorname{clRk}_\ell(J).           \tag{LFC.10}
+\]
+In particular the literal \texttt{clRk}, not a substitute
+class number, bounds these coefficient spaces.
+
+\begin{proof}
+The extra decomposition condition in \texttt{XDual} is
+imposed only when \(A(1)<1\), which never happens.
+The other three conditions in its definition are exactly
+those displayed above.  Identify \(J=G_{E_0}\) for the finite
+fixed field \(E_0\).  Inertia under this identification is
+the intersection with \(J\), by its definition as the
+kernel of the action on the residue field.
+Finite class-field reciprocity identifies the prime-field
+space with the characters of the narrow ideal class group.
+For odd \(\ell\) these are also the characters of the
+ordinary class group, since the extra sign quotient is
+a group of order a power of two.
+Thus this prime-field space is finite-dimensional.
+
+Any \(f\in X_E(J)\) has finite image, because \(J\) is
+compact and \(f\) is locally constant.  Its image spans a
+finite-dimensional \(\mathbb F_\ell\)-subspace of \(E\).
+Take coordinates in a basis of that span.  Each coordinate
+is an additive, locally constant function killing every
+inertia intersection, and hence belongs to
+\(X_{\mathbb F_\ell}(J)\).
+It follows that a prime-field basis of that space spans
+\(X_E(J)\) over \(E\).  It remains independent: finitely
+many evaluations give a nonsingular minor over
+\(\mathbb F_\ell\), which remains nonsingular over \(E\).
+This proves (LFC.10), without assuming that \(E\) is finite.
+\end{proof}
+% END LFC7
+
+% BEGIN LFC8
+\paragraph{LFC8. The full strict-generator estimate.}
+\label{claim:LFC8}
+Here again \(F\) is any number field and \(\ell\) any prime.
+Let \(U\subset G_F\), let \(J\triangleleft G_F\) be open with
+\(J\subset U\) and \(\ell\nmid[U:J]\), and let
+\(\pi_U:U\twoheadrightarrow\Delta\) be continuous.
+Here \(\Delta\) is an abstract group equipped with any topology:
+compactness, Hausdorffness, and continuity of its group operations
+are not required.  The cochains in the conclusion are locally
+constant in that topology.
+Let \(\kappa:\Delta\to E^\times\) be trivial on \(\pi_U(J)\).
+Suppose that the finite local family \(a_v:G_v\to\Delta\)
+has the following inertia coverage: for every
+\(t\in J\cap I_A\), either \(\pi_U(t)=1\), or
+\[
+                    \pi_U(t)=g\,a_v(s)g^{-1}
+                                                        \tag{LFC.11}
+\]
+for some \(v,s,g\).  Then the literal strict cone satisfies
+\[
+ \operatorname{rank}_E H^1_C(a,E(\kappa),0)
+ \le \operatorname{clRk}_\ell(J)
+           +\#\{v:\kappa a_v=1\}.                       \tag{LFC.12}
+\]
+This is the original \texttt{strGen}, including its local
+primitive correction and arbitrary coefficient field.
+
+\begin{proof}
+Restrict a representative \((z,(x_v))\) along \(\pi_U\) to \(J\).
+Because \(\kappa\pi_U=1\) there, the restriction is additive.
+It is locally constant and is unchanged by adding a
+global coboundary.  It kills inertia.  Indeed if (LFC.11)
+holds, then \(\kappa(a_v(s))=1\), while strictness says
+\(z(a_v(s))=(\kappa(a_v(s))-1)x_v=0\).
+The cocycle identity gives the exact formula
+\[
+ z(gag^{-1})=\kappa(g)z(a)+(1-\kappa(a))z(g),             \tag{LFC.13}
+\]
+so \(z(\pi_U(t))=0\).  The case \(\pi_U(t)=1\) is immediate.
+We have constructed a linear map from the strict cone
+space to the \emph{actual} \(X_E(J)\) of LFC7.
+
+To bound its kernel, put \(N=\pi_U(J)\).  This is normal
+of finite index \(n\) dividing \([U:J]\), hence
+\(\ell\nmid n\).  If the restricted character is zero,
+then \(z\) vanishes on \(N\) and descends to
+the finite group \(\Delta/N\), as does \(\kappa\).
+Set
+\[
+           X=-n^{-1}\sum_{q\in\Delta/N}z(q).
+\]
+The cocycle identity and permutation of the summation
+indices give \(z(g)=\kappa(g)X-X\).
+Subtract the coboundary pair \((dX,(X)_v)\).
+The remaining representative has zero global cocycle,
+and its local primitive \(x_v-X\) satisfies
+\((\kappa(a_v(s))-1)(x_v-X)=0\) for every \(s\).
+It is zero whenever \(\kappa a_v\ne1\).
+The kernel is therefore an image of
+\(E^{\{v:\kappa a_v=1\}}\); it is not silently identified
+with zero when a local invariant exists.
+Rank--nullity, or the same dimension inequality for image
+and kernel, now gives (LFC.12) using LFC7.
+\end{proof}
+% END LFC8
+
+% BEGIN LFC9
+\paragraph{LFC9. The original \texttt{b1p} bound.}
+\label{claim:LFC9}
+For a full \texttt{FLink}, assume
+\[
+ \forall v\ \exists s:\ \Psi(\operatorname{loc}_v s)^2\ne1,
+ \qquad
+ \operatorname{clRk}_\ell
+       (K\cap\ker\bar\epsilon_F)\le C_0.                 \tag{LFC.14}
+\]
+Then
+\[
+ \operatorname{rank}_k
+ H^1_C\bigl(\operatorname{loc},
+               k(\Psi^{-2}\delta_k),0\bigr)\le C_0.
+                                                        \tag{LFC.15}
+\]
+
+\begin{proof}
+Apply LFC8 with \(U=G_F\),
+\(J=K\cap\ker\bar\epsilon_F\), \(\Delta=\Gamma\), and
+\(\kappa=\Psi^{-2}\delta_k\).
+The subgroup \(J\) is normal open and its index divides
+\([G_F:K](\ell-1)\), so its index is prime to \(\ell\).
+Equation (LFC.2) makes \(\kappa\pi\) trivial on \(J\).
+For an inertia element at a place outside \(S\), (LFC.1)
+kills its image.  At a place in \(S\), conjugacy of
+prolongations sends it to the chosen inertia subgroup,
+which lies in \(D_{A_v}=\iota_v(G_v)\).  Applying \(\pi\)
+gives precisely (LFC.11).
+The trivial valuation has trivial inertia and causes
+no extra case.
+
+Because \(\delta\operatorname{loc}_v=1\), local triviality
+of \(\kappa\) would imply
+\(\Psi(\operatorname{loc}_v s)^2=1\) for all \(s\),
+contradicting (LFC.14).
+The local correction term in (LFC.12) is therefore zero.
+Its remaining term is bounded by the same \(C_0\).
+\end{proof}
+% END LFC9
+
+% BEGIN LFC10
+\paragraph{LFC10. The original doubled-local \texttt{b1} bound.}
+\label{claim:LFC10}
+Under the same hypotheses (LFC.14),
+\[
+ \operatorname{rank}_k H^1_C
+   \bigl(\operatorname{loc}_2,
+         k(\Psi^{-1}|_{\Gamma_0}),0\bigr)\le C_0.
+                                                        \tag{LFC.16}
+\]
+
+\begin{proof}
+Use LFC8 with \(U=\pi^{-1}\Gamma_0\),
+\(J=K\cap\ker\bar\epsilon_F\), \(\Delta=\Gamma_0\), and
+the surjection induced by \(\pi\).  The same index argument
+works for \([U:J]\), and \(K\subset U\) by (LFC.2).
+The character is trivial on \(J\).
+Outside \(S\) the required inertia images vanish.
+At \(v\in S\), a conjugating image \(a\in\Gamma\) either
+belongs to \(\Gamma_0\), giving the first local branch,
+or is \((ac^{-1})c\), giving the second branch with
+conjugator \(ac^{-1}\in\Gamma_0\).
+Thus the full inertia coverage holds for the actual
+family indexed by \(V\times\{0,1\}\).
+
+Characters are conjugation invariant, so
+\[
+ \Psi(\operatorname{loc}_{2,(v,b)}s)
+                  =\Psi(\operatorname{loc}_v s)
+                     \quad(b=0,1).
+\]
+A trivial local \(\Psi^{-1}\) would again contradict the
+nonquadratic witness in (LFC.14).
+Both branches have zero local correction in (LFC.12),
+which proves (LFC.16).  No identification of this doubled
+cone with an undoubled cone has been made.
+\end{proof}
+% END LFC10
+
+\subsection{A shorter proof of the untwisted bound}
+
+% BEGIN LFC11
+\paragraph{LFC11. The cyclotomic eigenspace bound over a CM field.}
+\label{claim:LFC11}
+Let \(F\) be totally real and let \(\ell\) be odd.
+Suppose \(\bar\epsilon_F\) is nontrivial on every
+decomposition group above \(\ell\).
+Put \(E=F(\mu_\ell)\) and let \(r_\ell(E)\) be the
+\(\ell\)-rank of its ideal class group.  Then
+\[
+ \dim_{\mathbb F_\ell}
+   \operatorname{Hom}_{\rm cont}
+      (G_{F,S},\mathbb F_\ell)\le 1+r_\ell(E),
+                                                        \tag{LFC.17}
+\]
+where \(S\) is the set of \(\ell\)-places.
+
+\begin{proof}
+Let \(\Delta=\operatorname{Gal}(E/F)\) and
+\(\omega:\Delta\hookrightarrow\mathbb F_\ell^\times\)
+be its cyclotomic character.  Its order is prime to \(\ell\).
+Restriction of additive characters from \(G_F\) to \(G_E\)
+is injective: a character vanishing on \(G_E\) factors
+through \(\Delta\), whose order is prime to \(\ell\).
+The Kummer construction in LFC1 sends such a restriction
+to a class \([a]\in E^\times/E^{\times\ell}\).
+For \(d\in\Delta\), its class satisfies
+\[
+                         d[a]=\omega(d)[a]               \tag{LFC.18}
+\]
+in additive notation for this \(\mathbb F_\ell\)-space.
+Indeed, if \(g\beta/\beta=\zeta^{\chi(g)}\), a lift of \(d\)
+sends \(\zeta\) to \(\zeta^{\omega(d)}\), while
+\(\chi(d^{-1}gd)=\chi(g)\).  Thus \(d\beta\) is a
+Kummer root for the character \(\omega(d)\chi\),
+proving (LFC.18) by the injectivity argument of LFC1.
+Unramifiedness outside \(\ell\) places the class in
+\(V_T(E)/E^{\times\ell}\), with \(T\) the places above \(\ell\).
+
+Taking \(\omega\)-eigenspaces in (LFC.4) is exact:
+the projector is
+\[
+ e_\omega=|\Delta|^{-1}
+           \sum_{d\in\Delta}\omega(d)^{-1}d.
+ \]
+The class-group term has dimension at most \(r_\ell(E)\).
+To see this also for the localized class group, it is a
+quotient of \(\operatorname{Cl}(\mathcal O_E)\);
+the minimal number of generators of a finite abelian
+\(\ell\)-group, equivalently the dimension of its
+\(\ell\)-torsion, cannot increase on taking a quotient.
+
+We claim that the \(\omega\)-part of the \(T\)-unit term
+has dimension at most one.  The valuation map gives
+\(\mathcal O_{E,T}^\times/\mathcal O_E^\times\) as a
+subgroup \(\Lambda\) of the permutation lattice
+\(\mathbb Z[T]\).  The quotient by the units is torsion-free,
+so reducing
+\(0\to\mathcal O_E^\times\to
+ \mathcal O_{E,T}^\times\to\Lambda\to0\)
+modulo \(\ell\) is right exact with the left injection.
+For a prime \(w\in T\), its stabilizer in \(\Delta\) is
+the image of the local decomposition group in
+\(\operatorname{Gal}(E/F)\).  By hypothesis \(\omega\)
+is nontrivial on this stabilizer.  A vector of the
+permutation representation transforming by \(\omega\)
+must therefore have zero coefficient at \(w\), and hence
+at every prime in its orbit.
+
+Here it is essential to handle the lattice, rather than
+assume that reduction preserves an arbitrary inclusion.
+Since \(|\Delta|\) is prime to \(\ell\), the idempotent
+\(e_\omega\) lifts to \(\mathbb Z_\ell[\Delta]\) using
+the Teichmuller lift of \(\omega\).
+Its action on \(\mathbb Q_\ell[T]\) is zero by the same
+stabilizer argument.  Therefore its action on
+\(\Lambda\otimes\mathbb Z_\ell\) is zero, and reduction
+shows that \((\Lambda/\ell\Lambda)_\omega=0\).
+Thus the \(\omega\)-part of the \(T\)-units modulo
+\(\ell\)-th powers comes entirely from ordinary units.
+
+The field \(E=F(\mu_\ell)\) is CM.  Complex conjugation
+\(j\in\Delta\) acts by \(\omega(j)=-1\).
+For an ordinary unit \(u\), every complex absolute value
+of \(u/j(u)\) is one.  This is an algebraic integer unit
+all of whose conjugates have absolute value one, hence
+a root of unity.  One elementary proof of this last fact
+observes that the monic polynomials having the conjugates
+of its positive powers as roots have integral coefficients
+bounded uniformly by binomial coefficients.  There are
+only finitely many such polynomials and thus finitely many
+possible powers; two powers agree.
+Consequently \((1-j)\mathcal O_E^\times\subset\mu(E)\).
+Modulo \(\ell\), every \(j\)-anti-invariant unit class is
+half of its image under \(1-j\), and so lies in the image
+of \(\mu(E)/\mu(E)^\ell\).
+The roots of unity in a number field form a finite cyclic
+group, whose quotient by \(\ell\)-th powers has dimension
+at most one.  This proves the claim about units.
+Combining it with the class-group bound proves (LFC.17).
+\end{proof}
+% END LFC11
+
+% BEGIN LFC12
+\paragraph{LFC12. The full original \texttt{h1} field.}
+\label{claim:LFC12}
+For a full \texttt{FLink}, suppose \(k\) is finite,
+\(\omega_k\operatorname{loc}_v\ne1\) for every \(v\), and
+\(\operatorname{clRk}_\ell(K\cap\ker\bar\epsilon_F)\le C_0\).
+Then
+\[
+ \operatorname{rank}_k
+       H^1_C(\operatorname{loc},k(1),k)\le1+C_0.          \tag{LFC.19}
+\]
+In particular the source's theorem \texttt{GC.h1}, with
+its additional retained premise \(P\), follows.
+
+\begin{proof}
+With the full local subspaces \(k\), the local primitives
+in (LFC.3) are quotiented out.  Since the action is trivial,
+global coboundaries are zero.  Thus the space in (LFC.19)
+is literally \(\operatorname{Hom}_{\rm cont}(\Gamma,k)\).
+For an additive \(\mathbb F_\ell\)-character of \(\Gamma\),
+its pullback to \(G_F\) kills every inertia outside \(S\):
+for \(t\in I_A\), the prime-to-\(\ell\) power
+\(t^{[G_F:K]}\) belongs to \(I_A\cap K\), and (LFC.1)
+kills its image.  Hence LFC11 bounds the prime-field
+character dimension by \(1+r_\ell(F(\mu_\ell))\).
+
+Put \(J=K\cap\ker\bar\epsilon_F\) and \(E_1=\Omega^J\).
+Then \(E_1\supset E=F(\mu_\ell)\) and \([E_1:E]\)
+is prime to \(\ell\).
+Restriction of unramified additive characters
+\(G_E\to\mathbb F_\ell\) to \(G_{E_1}\) is injective.
+Indeed, for a character vanishing on the latter subgroup,
+the \([E_1:E]\)-th power of every element lies in it
+(these are normal subgroups here), and that degree is
+invertible modulo \(\ell\).
+Restriction remains unramified because inertia is
+intersected with \(G_{E_1}\).
+Finite class-field reciprocity and LFC7 therefore give
+\[
+ r_\ell(E)\le\dim_{\mathbb F_\ell}X_{\mathbb F_\ell}(J)
+             =\operatorname{clRk}_\ell(J)\le C_0.
+ \]
+Finally a basis of the finite extension \(k/\mathbb F_\ell\)
+shows, by taking coordinates of additive functions, that
+\(\operatorname{Hom}_{\rm cont}(\Gamma,k)\) is obtained
+from its prime-field character space by scalar extension.
+Its dimension over \(k\) is the prime-field dimension.
+This gives (LFC.19) with the original \(C_0\).
+\end{proof}
+% END LFC12
+
+\subsection{Euler estimates through the actual inertia quotient}
+
+% BEGIN LFC13
+\paragraph{LFC13. A finite ramification level with its exact kernel.}
+\label{claim:LFC13}
+For a \texttt{GLink} over any number field there is a
+finite set \(S'\supset S\)
+and a continuous surjection
+\[
+ p:G_{F,S'}\twoheadrightarrow\Gamma,\qquad p\,q=\pi,
+                                                        \tag{LFC.20}
+\]
+where \(q:G_F\to G_{F,S'}\), such that
+\[
+ \ker p=\overline{\langle J_v:v\in S'\setminus S
+                                      \rangle^{\rm normal}},
+ \qquad J_v=q(I_{A_v}\cap K).                            \tag{LFC.21}
+\]
+One chosen prolongation at each place suffices in this formula.
+
+\begin{proof}
+The finite extension fixed by \(K\) ramifies at finitely
+many finite places, say \(T\); this follows by inverting
+the nonzero discriminant of an integral basis.
+At \(v\notin T\) all inertia is contained in \(K\).
+Take \(S'=S\cup T\).
+For \(v\notin S'\), (LFC.1) therefore kills all of \(I_A\),
+so \(\pi\) factors through the maximal quotient
+unramified outside \(S'\), giving (LFC.20).
+The quotient topology gives continuity, and surjectivity
+comes from that of \(\pi\).
+
+Under \(q\), all generators of (LFC.1) at places outside
+\(S'\) become one.  At a place of \(S'\setminus S\),
+any prolongation is conjugate to the chosen one, and
+normality of \(K\) carries its inertia intersection to
+the chosen intersection.  Thus their images are precisely
+the normal generators in (LFC.21).
+To justify closure, the image of a closed subgroup of a
+compact group in a Hausdorff quotient is closed.
+The closed normal subgroup generated by the displayed
+images has inverse image containing every generator
+of \(\ker\pi\); conversely its generators all lie in
+\(\ker p\).  These two inclusions prove (LFC.21).
+\end{proof}
+% END LFC13
+
+% BEGIN LFC14
+\paragraph{LFC14. The exact local correction at a discarded prime.}
+\label{claim:LFC14}
+Here \(\ell\) may be any prime, including two, and the
+base number field is arbitrary.
+Let \(v\nmid\ell\), let \(D=D_A\), \(I=I_A\), and
+\(J=I\cap K\).  Let \(W\) be a finite-dimensional
+representation over a finite field \(E\) of characteristic
+\(\ell\), with continuous action and trivial \(J\)-action.
+Define
+\[
+ \mathcal E(D,J;W)=
+ \{f:J\to W:\ f\text{ continuous and additive},\
+                     f(g t g^{-1})=\rho(g)f(t)\}.
+ \]
+Under the local fields of \(P\), this is finite-dimensional and
+\[
+              \dim_E\mathcal E(D,J;W)=\dim_E H^2(D,W).
+                                                        \tag{LFC.22}
+\]
+Moreover every class inflated to \(D\) from a continuous
+quotient killing \(J\) is zero in \(H^2(D,W)\).
+
+\begin{proof}
+Here \([I:J]\) divides \([G_F:K]\), so LFC4 applies.
+Restriction of a one-cocycle to \(J\) is an additive
+equivariant map and kills coboundaries.
+Its kernel in \(H^1(D,W)\) is \(H^1(D/J,W)\):
+if the restriction is zero, the cocycle descends
+continuously through the compact-to-Hausdorff quotient;
+the converse is immediate.
+
+We verify surjectivity of this restriction without
+assuming an extension property for arbitrary functions.
+For \(f\in\mathcal E(D,J;W)\), choose a normal open
+subgroup \(U_0\subset D\) killing the action and satisfying
+\(U_0\cap J\subset\ker f\).  Such a subgroup exists
+by continuity and compactness.  On the finite quotient
+by \(U_0\), choose representatives modulo the image of \(J\)
+and define a function \(a:D\to W\) by
+\[
+                 a(r t)=\rho(r)f(t),\qquad t\in J.
+ \]
+The condition on \(U_0\cap J\) makes this definition
+well defined on the quotient; choose value zero on
+the representatives.  It is continuous and satisfies
+\(a(g t)=a(g)+\rho(g)f(t)\).
+Equivariance of \(f\) shows by substitution that
+\(d a(g,h)\) is unchanged on replacing either \(g\) or \(h\)
+by a right translate by \(J\).  It is therefore a
+two-cocycle on \(D/J\).
+By LFC4 it is \(d b\) for a continuous cochain \(b\)
+on \(D/J\).  The cocycle \(a-b\) restricts to \(f\).
+This proves the exact sequence
+\[
+ 0\longrightarrow H^1(D/J,W)\longrightarrow H^1(D,W)
+       \longrightarrow\mathcal E(D,J;W)\longrightarrow0.
+ \]
+LFC4 gives dimension \(\dim H^0(D,W)\) for its first term.
+The local Euler characteristic away from \(\ell\) is
+\(\dim H^1(D,W)=\dim H^0(D,W)+\dim H^2(D,W)\).
+This proves (LFC.22), with finiteness supplied by \(P\).
+For the final assertion, the quotient map from \(D\)
+factors through \(D/J\), whose \(H^2\) is zero by LFC4.
+The pullback of every two-cocycle class is therefore zero.
+\end{proof}
+% END LFC14
+
+% BEGIN LFC15
+\paragraph{LFC15. The inflation defect is bounded by the same corrections.}
+\label{claim:LFC15}
+Let \(p:\Gamma'\twoheadrightarrow\Gamma\) be a continuous
+surjection of profinite groups whose kernel is the closed
+normal subgroup generated by a finite family \(J_v\).
+Let \(D_v\) be arbitrary subgroups of \(\Gamma'\), and let
+\(W\) be a finite representation of \(\Gamma\) over a finite
+field of any prime characteristic.
+No containment \(J_v\subset D_v\) or normalization of \(J_v\)
+by \(D_v\) is assumed.  Here \(\mathcal E(D_v,J_v;W)\)
+means the continuous additive functions on \(J_v\)
+satisfying
+\(f(g t g^{-1})=\rho(p g)f(t)\) whenever \(g\in D_v\),
+\(t\in J_v\), and \(g t g^{-1}\in J_v\).
+This is the source's conditional equivariance convention.
+Put
+\[
+ T=\ker\bigl(H^2(\Gamma,W)\to H^2(\Gamma',W)\bigr).
+ \]
+If \(H^1(\Gamma',W)\) and the spaces
+\(\mathcal E(D_v,J_v;W)\) are finite-dimensional, then
+\(H^1(\Gamma,W)\) and \(T\) are finite-dimensional and
+\[
+ \dim T+\dim H^1(\Gamma',W)
+   \le\dim H^1(\Gamma,W)+
+                          \sum_v\dim\mathcal E(D_v,J_v;W).
+                                                        \tag{LFC.23}
+\]
+
+\begin{proof}
+Inflation on \(H^1\) is injective: a pulled-back
+cocycle which is \(g\mapsto\rho(p g)X-X\) has the
+same formula downstairs, by surjectivity of \(p\).
+Restriction to the \(J_v\)'s defines
+\[
+ R:H^1(\Gamma',W)\longrightarrow
+                  \bigoplus_v\mathcal E(D_v,J_v;W).
+ \]
+Its kernel is the image of inflation.
+Indeed a cocycle vanishing on every \(J_v\) vanishes
+on their conjugates by the cocycle formula, and its zero
+set inside \(\ker p\) is a closed normal subgroup.
+It thus vanishes on \(\ker p\) and descends continuously.
+
+For the second-degree defect, consider the vector space
+\(\mathcal T\) of pairs \((z,\beta)\), where \(z\) is a
+normalized continuous two-cocycle on \(\Gamma\),
+\(\beta(1)=0\), and \(d\beta=p^*z\).
+It maps onto \(T\) by \((z,\beta)\mapsto[z]\).
+Every element of \(T\) has such a representative:
+subtract the coboundary of the constant value \(\beta(1)\)
+to normalize a primitive and the corresponding cocycle.
+For \(n\in\ker p\), the identity \(d\beta=p^*z\) gives
+\[
+ \beta(ng)=\beta(n)+\beta(g),\quad
+ \beta(gn)=\beta(g)+\rho(p g)\beta(n),\quad
+ \beta(gng^{-1})=\rho(p g)\beta(n).                       \tag{LFC.24}
+\]
+Hence restrictions of \(\beta\) define a linear map
+\(r:\mathcal T\to\bigoplus_v\mathcal E(D_v,J_v;W)\).
+If \(r(z,\beta)=0\), (LFC.24) and closed normal generation
+force \(\beta|_{\ker p}=0\).
+The first two identities then make \(\beta\) constant
+on fibers, so it descends to a continuous \(b:\Gamma\to W\).
+Surjectivity gives \(z=db\), and \([z]=0\).
+Thus \(\ker r\) is contained in the kernel of
+\(\mathcal T\to T\).
+The restriction image \(R(H^1(\Gamma',W))\) is contained
+in \(r(\ker(\mathcal T\to T))\), using the pairs \((0,\beta)\).
+It follows that \(T\) is a quotient of a subspace of
+\[
+ \left(\bigoplus_v\mathcal E(D_v,J_v;W)\right)
+                    \big/R(H^1(\Gamma',W)).
+ \]
+In particular it is finite-dimensional.
+Since
+\(\dim R(H^1(\Gamma',W))=
+ \dim H^1(\Gamma',W)-\dim H^1(\Gamma,W)\),
+the displayed quotient bound is exactly (LFC.23).
+This argument uses actual continuous primitives and
+requires no global continuous section of \(p\).
+\end{proof}
+% END LFC15
+
+% BEGIN LFC16
+\paragraph{LFC16. The finite-level Euler and Poitou--Tate identities.}
+\label{claim:LFC16}
+Let \(F\) be totally real, \(\ell\) odd,
+\(S'\) finite containing every \(\ell\)-place, and \(W\)
+a finite-dimensional continuous representation of
+\(G_{F,S'}\) over a finite field \(E\) of characteristic
+\(\ell\).  The retained fields of \(P\) give finite
+\(H^1,H^2\) and the identities
+\[
+ \begin{split}
+ \dim H^1+\sum_{w\mid\infty}\dim W^{c_w=1}
+   &=\dim H^0+\dim H^2+[F:\mathbb Q]\dim W,\\
+ \dim\operatorname{Sha}^2+\sum_{v\in S'}\dim H^2(D_v,W)
+   &=\dim H^2+\dim H^0(G_F,W^\vee(1)).
+ \end{split}                                           \tag{LFC.25}
+\]
+Here \(\operatorname{Sha}^2\) is precisely the kernel of localization
+to the displayed \(H^2(D_v,W)\)'s.
+
+\begin{proof}
+Apply \(P\)'s local and global finiteness and its global
+Euler characteristic at exponent \(\ell^1\), after
+restricting scalars to \(\mathbb F_\ell\).
+The cocycle and coboundary sets do not change under this
+restriction: their defining equations and continuity
+conditions are identical.  If \(q=|E|\), each finite
+cohomology space therefore has cardinality \(q^{\dim_E}\).
+The Euler characteristic's cardinal identity becomes
+the first equality after taking exponents of \(q>1\).
+
+The last two maps in the normalized Poitou--Tate sequence
+provided by \(P\) are exact, and the last is onto:
+\[
+ H^2(G_{F,S'},W)\longrightarrow
+ \bigoplus_{v\in S'}H^2(D_v,W)
+       \longrightarrow H^0(G_F,W^\vee(1))^\vee
+       \longrightarrow0.
+ \]
+Its first kernel is the stated \(\operatorname{Sha}^2\), by the
+literal restriction maps on two-cocycles.
+Taking cardinalities gives the second identity.
+The coefficient-field dual is correctly identified as
+follows.  Composition with
+\(\operatorname{Tr}_{E/\mathbb F_\ell}\) identifies the
+underlying additive space of \(\operatorname{Hom}_E(W,E)\)
+with \(\operatorname{Hom}_{\mathbb F_\ell}(W,\mathbb F_\ell)\).
+Injectivity follows from nondegeneracy of the finite-field
+trace pairing, and equal cardinalities give surjectivity.
+The map commutes with the representation and the
+cyclotomic twist, so it identifies the invariant spaces.
+This supplies the exact dual term in (LFC.25), without
+assuming an unintended \(E\)-linearity of the original
+prime-field duality normalization.
+\end{proof}
+% END LFC16
+
+% BEGIN LFC17
+\paragraph{LFC17. The global estimate for the actual quotient.}
+\label{claim:LFC17}
+For a \texttt{GLink}, a totally real \(F\), and a
+finite-dimensional finite-field representation \(W\)
+of \(\Gamma\) with continuous action, \(H^1(\Gamma,W)\)
+and \(H^2(\Gamma,W)\) are finite-dimensional, and
+\[
+ \begin{split}
+ &\dim\operatorname{Sha}^2_S(\Gamma,W)+
+       \sum_{v\in S}\dim H^2(D_v,W)+\dim H^0(\Gamma,W)
+                          +[F:\mathbb Q]\dim W\\
+ &\hspace{12mm}\le
+       \dim H^1(\Gamma,W)+
+       \sum_{w\mid\infty}\dim W^{\pi(c_w)=1}
+       +\dim H^0(G_F,W^\vee(1)).
+ \end{split}                                           \tag{LFC.26}
+\]
+The local actions on the left are through \(\pi\), and
+\(\operatorname{Sha}^2_S\) is their exact localization kernel.
+
+\begin{proof}
+Choose \(S',p\) by LFC13.
+Let \(a_i=\dim H^i(\Gamma,W)\),
+\(a_i'=\dim H^i(G_{F,S'},W)\),
+\(t=\dim\ker(H^2(\Gamma,W)\to H^2(G_{F,S'},W))\),
+and \(b_v=\dim H^2(D_v,W)\).
+At a discarded place \(v\in S'\setminus S\), pullback
+injects the equivariant homomorphisms on
+\((qD_v,q(I_v\cap K))\) into those on \((D_v,I_v\cap K)\).
+LFC14 bounds their dimension by \(b_v\).
+LFC15 consequently gives
+\[
+                     t+a_1'\le a_1+\sum_{S'\setminus S}b_v.
+                                                        \tag{LFC.27}
+\]
+It also gives finiteness of \(a_1\) and \(t\).
+The target \(H^2(G_{F,S'},W)\) is finite by LFC16;
+its finite kernel \(T\) then proves finiteness of \(a_2\).
+
+Inflation sends \(\operatorname{Sha}^2_S(\Gamma,W)\) into
+\(\operatorname{Sha}^2_{S'}(G_{F,S'},W)\).
+At places in \(S\) this is the definition; at the other
+places LFC14 says that all inflated classes vanish
+locally, because \(\pi\) kills \(I_v\cap K\).
+Thus
+\[
+             \dim\operatorname{Sha}^2_S\le t+\dim\operatorname{Sha}^2_{S'}.
+ \]
+Use the second equality in (LFC.25) to replace
+\(\dim\operatorname{Sha}^2_{S'}\), and then the first to replace
+\(a_2'\).  The invariants and the real fixed spaces
+are unchanged by the surjection \(p\).
+The resulting discarded-place sum is cancelled by
+(LFC.27).  Explicitly the left side of (LFC.26) is at most
+\[
+ t+a_2'+\dim H^0(G_F,W^\vee(1))
+     -\sum_{S'\setminus S}b_v+a_0+[F:\mathbb Q]\dim W,
+ \]
+which is at most its right side by these two identities.
+This proves the estimate without erasing any discarded
+prime or assuming inflation on \(H^2\) is injective.
+\end{proof}
+% END LFC17
+
+% BEGIN LFC18
+\paragraph{LFC18. Local coefficient quotients preserve the required bound.}
+\label{claim:LFC18}
+In LFC17 suppose \(H^0(G_F,W^\vee(1))=0\).
+For every family of equivariant surjections
+\(q_v:W\twoheadrightarrow Q_v\) for the local groups,
+let
+\[
+ X_Q=\ker\left(H^2(\Gamma,W)\longrightarrow
+                              \bigoplus_{v\in S}H^2(D_v,Q_v)\right).
+ \]
+Then
+\[
+ \begin{split}
+ \dim X_Q+\sum_{v\in S}\dim H^2(D_v,Q_v)
+       +\dim H^0(\Gamma,W)+[F:\mathbb Q]\dim W\\
+ \le \dim H^1(\Gamma,W)
+       +\sum_{w\mid\infty}\dim W^{\pi(c_w)=1}.
+ \end{split}                                           \tag{LFC.28}
+\]
+No flatness, choice of a local complement preserved by
+the action, or global stability of \(\ker q_v\) is required.
+
+\begin{proof}
+Local Tate duality identifies \(H^2(D_v,W)\) with the
+dual of \(\operatorname{Hom}_{D_v}(W,E(1))\), and similarly
+for \(Q_v\).  These perfect finite pairings are natural
+in the coefficients: on cochains this is the equality
+\(f(q_v x)=(f\circ q_v)(x)\) in the evaluation pairing.
+Thus the map on \(H^2\) induced by \(q_v\) is dual to the
+injection
+\(\operatorname{Hom}_{D_v}(Q_v,E(1))
+ \hookrightarrow\operatorname{Hom}_{D_v}(W,E(1))\).
+It is therefore onto.  The same conclusion follows after
+the trace identification in LFC16, so it holds with the
+precise prime-field duality contained in \(P\).
+
+Here is the needed linear algebra.  For maps
+\(r_v:A\to B_v\) and surjections \(f_v:B_v\to C_v\),
+put \(X=\bigcap\ker(f_vr_v)\) and \(Y=\bigcap\ker r_v\).
+Restriction of \((r_v)_v\) gives an injection
+\(X/Y\hookrightarrow\bigoplus_v\ker f_v\).
+Hence
+\[
+          \dim X+\sum_v\dim C_v
+                   \le\dim Y+\sum_v\dim B_v.
+ \]
+Apply this to \(A=H^2(\Gamma,W)\), the local
+\(H^2(D_v,W)\), and their quotient-coefficient images.
+LFC17 with its zero dual term gives (LFC.28).
+\end{proof}
+% END LFC18
+
+\subsection{From ordinary cohomology to the literal cone}
+
+% BEGIN LFC19
+\paragraph{LFC19. The full cone dimension identity.}
+\label{claim:LFC19}
+This claim is independent of the arithmetic linked data.
+Let \(\Gamma\) and \(G_v\) be arbitrary profinite groups,
+with finitely many \(v\), continuous maps
+\(\operatorname{loc}_v:G_v\to\Gamma\), a finite field \(E\),
+and a finite-dimensional continuous representation \(W\) of
+\(\Gamma\) over \(E\).
+Let \(q_v:W\twoheadrightarrow Q_v=W/b_v\) be equivariant
+for each local group, and suppose the global \(H^1,H^2\)
+and local \(H^1(G_v,Q_v)\) are finite-dimensional.
+Equivalently one may start with arbitrary equivariant
+surjections \(q_v\), taking \(b_v=\ker q_v\) and identifying
+the targets with \(W/b_v\); all the maps below respect
+that canonical identification.
+Write
+\[
+ \begin{split}
+ H^0_C&=\{x\in W^\Gamma:x\in b_v\text{ for every }v\},\\
+ X_Q&=\bigcap_v\ker\bigl(H^2(\Gamma,W)\to H^2(G_v,Q_v)\bigr).
+ \end{split}
+ \]
+Then the literal \(H^1_C,H^2_C\) are finite-dimensional and
+\[
+ \begin{split}
+ &\dim H^2_C+\dim H^0_C+\dim H^1(\Gamma,W)
+                       +\sum_v\dim H^0(G_v,Q_v)\\
+ &\qquad=\dim H^1_C+\dim H^0(\Gamma,W)
+                       +\sum_v\dim H^1(G_v,Q_v)+\dim X_Q.
+ \end{split}                                           \tag{LFC.29}
+\]
+
+\begin{proof}
+We use the cochain model, so that the local primitives
+are accounted for rather than discarded.
+A degree-two cone representative is a global continuous
+two-cocycle \(z\), together with local continuous
+one-cochains \(a_v:G_v\to W\), satisfying
+\[
+ q_v z(\operatorname{loc}_v s,\operatorname{loc}_v t)
+                         =d(q_v a_v)(s,t).
+ \]
+Its coboundaries have the form
+\[
+ z=d\beta,\qquad
+ a_v(s)\equiv
+   \beta(\operatorname{loc}_v s)
+        -\bigl(\rho(\operatorname{loc}_v s)Y_v-Y_v\bigr)
+                                    \pmod {b_v}.        \tag{LFC.30}
+\]
+These are exactly the source's
+\texttt{continuousCocycles2} and
+\texttt{continuousCoboundaries2}.
+Choose arbitrary linear sections of the \(q_v\)'s;
+they are continuous for the discrete topologies and
+are not required to intertwine the action.
+
+The definitions give the following exact sequence, ending
+with the indicated image:
+\[
+ \begin{gathered}
+ 0\longrightarrow H^0_C\longrightarrow H^0(\Gamma,W)
+ \longrightarrow \bigoplus_v H^0(G_v,Q_v)
+ \longrightarrow H^1_C\longrightarrow H^1(\Gamma,W)\\
+ \longrightarrow\bigoplus_v H^1(G_v,Q_v)
+ \longrightarrow H^2_C\longrightarrow X_Q
+ \longrightarrow0.                                    \tag{LFC.31}
+ \end{gathered}
+\]
+Here an invariant local tuple maps to the class of
+\((0,(x_v))\) after lifting it; a local one-cocycle
+tuple maps to the cone class \((0,(a_v))\) after lifting.
+The maps from the cone groups forget the local data.
+Changing a lift changes its value by \(b_v\), hence
+does not change these classes.
+
+For clarity, exactness can be checked directly at every
+nontrivial step.  A local invariant tuple is a cone
+coboundary precisely when it is the image of one global
+invariant \(X\), by (LFC.3).
+If the global cocycle of a cone-one class is \(dX\),
+subtract its coboundary; the remaining local primitives
+are invariant in \(Q_v\), giving the preceding image.
+A global one-class has zero local classes precisely
+when its local coboundary primitives can be lifted to
+form a cone-one representative.
+A local one-cocycle tuple gives zero in \(H^2_C\)
+precisely when (LFC.30) supplies a global one-cocycle
+\(\beta\) whose local cohomology classes equal that tuple.
+If a cone-two class has zero global class, subtract
+the coboundary of a global primitive \(\beta\);
+the remaining \(q_v(a_v-\beta\operatorname{loc}_v)\)
+are local one-cocycles.
+Finally a global two-class lies in \(X_Q\) precisely
+when local continuous primitives exist in each \(Q_v\);
+lift them to obtain a cone-two representative.
+This proves (LFC.31).
+
+Every term except possibly the cone terms is
+finite-dimensional; exactness proves their finiteness
+as well.  The alternating dimension sum of (LFC.31)
+is zero, and rearranging it is exactly (LFC.29).
+\end{proof}
+% END LFC19
+
+% BEGIN LFC20
+\paragraph{LFC20. The complete \texttt{EC} field for every finite module.}
+\label{claim:LFC20}
+Assume \(P\) and a full \texttt{FLink}.
+For every finite field \(E\) of characteristic \(\ell\),
+finite-dimensional \(E\)-space \(W\), representation
+\(\rho:\Gamma\to\operatorname{End}_E(W)\) with open kernel,
+and locally stable subspaces \(b_v\subset W\), suppose
+\[
+ \bigl[f(\rho(g)x)=\omega_E(g)f(x)
+           \text{ for all }g,x\bigr]\Longrightarrow f=0
+                   \quad(f:W\to E\text{ linear}).        \tag{LFC.32}
+\]
+Then \(H^2_C\) is finite-dimensional and
+\[
+ \dim_E H^2_C+\dim_E H^0_C+\sum_v d_v\dim_E b_v
+ \le \dim_E H^1_C+
+                 \sum_{w\in\mathrm{Inf}}\dim_E W^{c_w=1}.
+                                                        \tag{LFC.33}
+\]
+This is the full source \(\Phi.\texttt{EC}\), with its
+quantifiers over coefficient fields, representations,
+and all stable local conditions.
+
+\begin{proof}
+An open kernel makes the action continuous: for fixed
+\(x\), its value is constant on cosets of that kernel;
+the finite discrete space \(W\) then gives joint
+continuity.  Condition (LFC.32), surjectivity of \(\pi\),
+and \(\epsilon\pi=\epsilon_F\) say exactly that
+\(H^0(G_F,W^\vee(1))=0\).
+Put \(Q_v=W/b_v\).
+The maps \(\iota_v:G_v\simeq D_{A_v}\) are homeomorphisms,
+since they are continuous bijections from compact
+groups to Hausdorff groups.  Pullback and its inverse
+identify their continuous cocycles, coboundaries,
+invariants and cohomology.  Thus LFC18 applies to
+the actual local family of the frame.
+
+Local Euler characteristic at \(v\mid\ell\) gives
+\[
+ \dim H^1(G_v,Q_v)+d_v\dim b_v
+ =\dim H^0(G_v,Q_v)+\dim H^2(G_v,Q_v)+d_v\dim W.
+                                                        \tag{LFC.34}
+\]
+All local groups in this equation are finite-dimensional.
+The local degree formula, with every place above \(\ell\)
+present exactly once, gives
+\(\sum_v d_v=[F:\mathbb Q]\).
+Use (LFC.34) in (LFC.29).
+The combination on its right involving \(X_Q\), local
+\(H^2\), global \(H^0\), and \([F:\mathbb Q]\dim W\)
+is bounded by (LFC.28).
+Cancel the remaining global \(H^1\) and local \(H^0\)
+terms.  This is precisely (LFC.33), with the real
+fixed spaces identified by the given bijection
+\(\mathrm{Inf}\simeq\{\text{real places of }F\}\).
+Finiteness of \(H^2_C\) follows from LFC17 and LFC19.
+In particular no chosen local condition was replaced
+by \(0\) or by \(W\) in proving this field.
+\end{proof}
+% END LFC20
+
+\subsection{Assembly without changing the field, marking, or bound}
+
+% BEGIN LFC21
+\paragraph{LFC21. All twenty-eight \texttt{Ok} fields on the MFC frame.}
+\label{claim:LFC21}
+Fix the full original \(\texttt{Gen}\), \(P\), and the
+single \(L,g_1,\Phi,C_0,w\) constructed in MFC14.
+Then this very frame satisfies
+\[
+                         \Phi.\texttt{Ok}(C_0)
+                    \quad\hbox{and}\quad
+                         \Phi.\texttt{Big}(C_0).          \tag{LFC.35}
+\]
+
+\begin{proof}
+Let \(F=L^+\), \(U=G_F\subset G_{\mathbb Q}\), and
+\(\alpha=\overline\Psi_{\mathbb Q}\).
+The \texttt{FLink} supplied by the \texttt{Linked} witness
+has
+\[
+ K=(\ker\eta\cap\ker\alpha)|_{G_F},\qquad
+ J=K\cap\ker\bar\epsilon_F.
+ \]
+Under the actual field-embedding map, \(J\) is precisely
+\[
+     U\cap\ker\eta\cap\ker\alpha\cap\ker\bar\epsilon_{\mathbb Q}.
+                                                        \tag{LFC.36}
+\]
+This is an equality of subgroups after the natural
+topological isomorphism, not just an index comparison.
+Inertia groups are carried to intersections with the
+same valuation inertia, and the cyclotomic characters
+agree on every root of unity.  Precomposition therefore
+identifies the literal \(\texttt{XDual}(1,-,\mathbb F_\ell,
+\mathbb F_\ell)\) spaces, including continuity and
+every inertia condition.
+Their ranks are equal.  Thus MFC5's uniform bound,
+at MFC's already chosen layer \(m\), is exactly
+\(\operatorname{clRk}_\ell(J)\le C_0\) required above.
+
+MFC4 and MFC8 give a nontrivial local
+\(\bar\epsilon_F\), at every local group, and MFC9
+gives the nonquadratic residual local witness
+\(\Psi(\operatorname{loc}_v s)^2\ne1\).
+The conversion of cyclotomic reduction to
+\(\omega_k\) uses the injective prime-field map,
+as in LFC6, and does not strengthen a residue condition.
+Apply LFC2 for \texttt{phi}, LFC6 for \texttt{gen},
+LFC3 for \texttt{cl}, LFC20 for \texttt{ec},
+LFC9 for \texttt{b1p}, LFC10 for \texttt{b1},
+and LFC12 for \texttt{h1}, using this one \(C_0\).
+
+The twenty-one already proved fields are
+\[
+ \begin{gathered}
+ \texttt{l\_odd},\ \texttt{fin},\ \texttt{del\_open},\
+ \texttt{c\_sq},\ \texttt{del\_c},\ \texttt{loc\_cont},\
+ \texttt{eps\_cont},\ \texttt{Psi\_open},\ \texttt{Psi\_c},\\
+ \texttt{baseSubgroup\_spec},\ \texttt{card\_inf},\
+ \texttt{cw\_sq},\ \texttt{del\_cw},\
+ \texttt{f2a},\ \texttt{f2b},\ \texttt{f2c},\
+ \texttt{f3},\ \texttt{f4},\ \texttt{f4'},\
+ \texttt{f5},\ \texttt{Psi\_N}.
+ \end{gathered}
+ \]
+Here the displayed \texttt{Psi} is the source's
+\(\Psi\)-named field.  MFC13 supplies both nonzero
+strict cone classes for \texttt{f4}, \texttt{f4'} on
+this same quotient.  Together with the seven just
+proved, these are exactly all twenty-eight fields.
+MFC9 and MFC14 already proved
+\(3C_0+7<\sum_v d_v\) and \(d_v>5\) for every \(v\),
+which are the two \texttt{Big} requirements.
+They are unchanged.  This proves (LFC.35).
+\end{proof}
+% END LFC21
+
+% BEGIN LFC22
+\paragraph{LFC22. The full original \texttt{HasFrameW} constructor.}
+\label{claim:LFC22}
+For every commutative local ring \(O\) whose residue
+field has characteristic \(\ell\), the full original
+\(\texttt{Gen}(\ell,\eta,\Psi,\sigma,B,M,H_b)\) and \(P\)
+imply, for every \(Q>0\),
+\[
+                \texttt{HasFrameW}
+                     (\ell,\eta,\Psi,\sigma,B,M,Q).
+                                                        \tag{LFC.37}
+\]
+The output is one CM field \(L\subset\Omega\), one
+marked \(g_1\in G_L\cap D_B\), one frame \(\Phi\),
+and \(C_0,w\), with all the literal output clauses.
+
+\begin{proof}
+Fix \(Q\) first.  MFC1 chooses the real quadratic
+subgroup \(H_0\).  CAF5 chooses a witness prime \(w\)
+with \(w\equiv1\pmod Q\); its witness conditions are
+the complete \texttt{FrobeniusWitnessPrime}.
+MFC5 chooses \(C_0\) uniformly for every later layer,
+using TW1 at the exact fixed abelian field.
+Only then set \(m=3C_0+7\), so
+\(3C_0+7<\ell^m\).
+MFC4, MFC6 and CAF8 construct the actual CM fixed
+field with
+\[
+  U=H_0\cap H_\theta(w)\cap H_b\cap H_m,\qquad
+  G_L=U\cap\ker\eta,\qquad G_{L^+}=U.
+ \]
+The nonquadratic local element provided there is the
+marked \(g_1\in D_B\cap G_L\).
+MFC8 constructs \(\Phi\) and the full \texttt{Linked}
+witness for this \(L,g_1\); MFC12--MFC13 supply both
+strict classes, and LFC21 gives its full \texttt{Ok}
+and \texttt{Big} at the already chosen \(C_0\).
+Finally \(G_{L^+}=U\subset H_\theta(w)\) follows directly
+from the displayed intersection.
+
+Thus the same tuple has, in the order of the definition:
+\(\texttt{Linked}\), \(\Phi.\texttt{Ok}(C_0)\),
+\(\Phi.\texttt{Big}(C_0)\), the full witness-prime record,
+\(w\equiv1\pmod Q\), and
+\(\operatorname{upl}(\Omega,L)\subset H_\theta(w)\).
+These are exactly all the fields of \texttt{HasFrameW}.
+The finite residue-field requirement was supplied by
+\texttt{Gen.fin}; no DVR or characteristic-zero condition
+on \(O\) was used for (LFC.37).
+\end{proof}
+% END LFC22
+
+% BEGIN LFC23
+\paragraph{LFC23. The original coefficient-DVR \texttt{HasFrame} join.}
+\label{claim:LFC23}
+Specialize to the original coefficient DVR \(O=c.O\)
+and retain the full \texttt{Gen} and \(P\).
+The construction gives \(\texttt{HasFrame}\), with
+the character \(\texttt{SeedClause}\) on the same
+\(L,\Phi,g_1\) as its complete \texttt{Ok} and
+\texttt{Big} fields.
+
+\begin{proof}
+CAF7, applied to the full \texttt{Gen}'s seed-relevant
+fields in this coefficient-DVR setting, chooses one
+positive integer \(Q\) and the core finite characters
+before the later compatible \(L\) and \(w\).
+Apply LFC22 to this \(Q\).  The produced \(w\) has
+the stipulated congruence, and the resulting \(L\)
+has the required embedded fixed-field description
+and \(\operatorname{upl}(\Omega,L)\subset H_\theta(w)\).
+CAF7 therefore supplies the complete original
+\texttt{SeedClause} for that very field.
+CAF11's literal installation then returns the
+\texttt{GalLink}, the complete \(\texttt{Ok}\),
+\(\texttt{Big}\), and this \texttt{SeedClause} with
+the same marked element and frame.
+This is the defining conjunction of \texttt{HasFrame}.
+The statement is restricted to \(O=c.O\) because that
+is CAF7's original coefficient-DVR scope.
+Its character seed is not an automorphic rank-two
+or rank-three representation.
+\end{proof}
+% END LFC23
+
+\paragraph{Exact remaining arithmetic boundary.}
+The seven missing \texttt{Ok} fields, the full
+\texttt{frame\_ex}/\texttt{HasFrameW} theorem, and
+the coefficient-DVR \texttt{HasFrame} join have now
+been proved at their original premises.
+To obtain \texttt{GdFrameEx} and \texttt{HostFrameEx}
+from their named data, one must still supply the full
+entry records \texttt{gen\_gd} and \texttt{gen\_host}.
+The latter requires the actual
+\(H_b=\ker(\operatorname{dirG}(\kappa_B))\), its
+\(\ell\)-power index, its inertia containment and exact
+Teichmuller lifting, as well as the host's local
+nonquadratic witness.  The host case continues to
+allow \(\ell=3\); no stronger lower bound on \(\ell\)
+has been introduced in this chapter.
+Both automorphic seed producers, the shared coefficient
+extension, the original/alternative endpoint matching,
+and the full common \texttt{GdEnd} remain separate work.
+No whole selected compound obligation or complete
+human proof of RH or Dirichlet GRH is closed by this
+chapter alone.

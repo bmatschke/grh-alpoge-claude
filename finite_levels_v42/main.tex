@@ -1,0 +1,595 @@
+\section{Finite representatives for the original ordinary-form levels}
+\label{sec:finite-levels-v42}
+
+The ordinary projector is constructed on functions on a definite unitary
+adelic quotient.  Before applying any argument about finite coefficient
+rings, one needs a finite set of adelic representatives for the exact level
+of those functions.  This chapter supplies that input.  It proves the full
+original \texttt{FuCmpMem.finU} for arbitrary integral coefficient
+representation and every permitted compact-open auxiliary level.
+
+The standing source pin is
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+All definitions below are read at that pin.  The only non-elementary input
+is the already reconstructed finite-class theorem FV9, applied through an
+explicit dictionary.  No integral type, ordinary structure, automorphic
+Galois representation, or new published theorem is assumed.
+
+\subsection{The objects and endpoint}
+
+Let \(L\) be the original CM field, \(F=L^+\), and \(\sigma\) its complex
+conjugation.  Let \(\ell,s,n,V,Q,c,m,\tau _0,K\) be arbitrary original
+\texttt{finU} data: \(s\) is a Hida setting, \(n\ge1\),
+\(V:s.\texttt{Lev}\), \(Q:\texttt{QData}\,V\),
+\(\tau _0:\prod_{u\in s.S_t}\mathrm{GL}_n(\mathcal O_{L_{w(u)}})
+\to\mathrm{GL}_m(c.\mathcal O)\), and \(K_q\) is a compact open
+subgroup of \(\mathrm{GL}_n(L_{w_q})\) for each \(q\in Q\).
+Write \(v(w)=w\cap\mathcal O_F\), \(v_q=v(w_q)\), and
+\[
+ S=\{v:v\mid\ell\}\cup s.S_t\cup\{s.v_0\},\qquad
+ V.S'=S\cup\{v_q:q\in Q\}.
+\]
+The \(v_q\)'s are distinct and outside \(S\).  Put
+\[
+ U_{\mathbb A}=\{g\in\mathrm{GL}_n(\mathbb A_L):
+                  \sigma(g)^{\mathsf t}g=1\},\quad
+ U_f=\{g\in U_{\mathbb A}:g_\infty=1\},\quad
+ U_\infty=\{g\in U_{\mathbb A}:g_f=1\}.
+\]
+Here conjugation on the full adele ring is the original
+\texttt{conjAd}; the infinite coordinates are read through the original
+\texttt{infEq}.  The subgroup \(\Gamma\) is the rational matrix image
+\(U(F)\), literally \texttt{ratU}.  These groups are respectively
+\texttt{UA}, \texttt{finU}, and \texttt{infU} in
+\texttt{BaseChangeDefiniteUnitary.lean}; the name \texttt{finU} there
+is a subgroup and is distinct from the endpoint theorem.
+
+Let \(a:U_{\mathbb A}\to G^a\) be the range-restricted projection onto
+all finite places of \(L\) away from \(\ell\).  For each place \(w\),
+\(\operatorname{cmp}_w\) is evaluation at \(w\) when \(w\nmid\ell\)
+and the trivial homomorphism otherwise.  Let \(U_b\subset G^a\) impose
+integrality at the stored \(s.S_t\) places and the stored principal
+congruence condition at \(w(s.v_0)\).  On this subgroup the original
+\(\operatorname{sec}_w\) is the inverse of its own-place projection
+on the subgroup supported above \(v(w)\), when that projection is
+bijective, and is the trivial homomorphism otherwise.  Set
+\[
+ U_Q=\{u\in U_b:\operatorname{cmp}_w(u)\in\mathrm{GL}_n(\mathcal O_{L_w})
+      \ (v(w)\notin V.S'),\quad
+      \operatorname{cmp}_{w_q}(u)=1\ (q\in Q)\},
+\]
+\[
+ U(K)=U_Q\vee\bigvee_{q\in Q}\operatorname{sec}_{w_q}(K_q),\qquad
+ G^\ell=\prod_{v\mid\ell}\mathrm{GL}_n(L_{w(v)}).
+\]
+All joins here are subgroup joins in the source's original \(U_b\).
+With \(X=(\texttt{hset}\,Q\,\tau_0).X\), the assertion to prove is
+\begin{equation}\label{eq:fnl-target}
+ \exists\mathcal S\subset G^a\times G^\ell\text{ finite},\quad
+ \forall g\ \exists\gamma\in\Gamma,\ x\in\mathcal S,\ u\in U(K),\
+ b\in X.I.\operatorname{Iw}(0):\quad
+             g=\operatorname{glob}(\gamma)\,x\,(u,b).
+\end{equation}
+The finite set may depend on the displayed initial datum and \(K\), but
+is chosen before \(g\).  It does not require a bound on its size.
+
+% BEGIN FNL1
+\paragraph{FNL1. Finite coordinate patching in an arbitrary group.}
+\label{claim:FNL1}
+Suppose \(I\) is finite, \(p_i:G\to H_i\) are homomorphisms and
+\(P\subseteq G\) is a subgroup.  If for each \(i\) and prescribed
+\(b_i\in H_i\) one has \(y_i\in P\) with
+\(p_i(y_i)=b_i\) and \(p_j(y_i)=1\) for every \(j\ne i\), then there
+is \(y\in P\) with \(p_i(y)=b_i\) for all \(i\).
+Choose any ordering of \(I\) and multiply the \(y_i\)'s in that order.
+Every coordinate of the product has exactly one possibly nonidentity
+factor, so gives the required value.  Commutation of the \(y_i\)'s is
+unnecessary.  For \(I=\varnothing\), use \(y=1\).
+This is the original \texttt{fu\_patch} argument.
+% END FNL1
+
+% BEGIN FNL2
+\paragraph{FNL2. The identity-form adelic dictionary, including topology.}
+\label{claim:FNL2}
+The finite unitary group for the algebraic \(F\)-group
+\[
+ \mathcal U(A)=\{g\in\mathrm{GL}_n(A\otimes_F L):
+                     (1\otimes\sigma)(g)^{\mathsf t}g=1\}
+\]
+is topologically isomorphic to the literal \(U_f\).  The isomorphism
+commutes with every finite-place evaluation and sends the finite image of
+each rational matrix to its finite adelic extension with infinite
+component \(1\).
+
+Indeed the algebra map
+\[
+ \alpha:\mathbb A_{F,f}\otimes_F L\longrightarrow\mathbb A_{L,f},
+ \qquad a\otimes x\longmapsto \bigl(a_{v(w)}x\bigr)_w
+\]
+is the original \texttt{finAdEquiv}.  Locally it is
+\(F_v\otimes_F L\simeq\prod_{w\mid v}L_w\).
+To check topology, choose an \(F\)-basis of \(L\).  After inverting
+one nonzero integer it is a basis of an order containing and contained
+in fixed multiples of \(\mathcal O_L\).  Outside finitely many places
+its integral lattice agrees with the product of the local integer
+rings.  Each local map and its inverse are continuous linear maps
+between finite dimensional local vector spaces.  They therefore induce
+inverse continuous maps of the restricted products.  Equivalently this
+is the tensor topology of FV4 in these coordinates.
+
+For a simple tensor,
+\(\alpha((1\otimes\sigma)(a\otimes x))=\alpha(a\otimes\sigma x)\)
+is \(\operatorname{conjFin}(\alpha(a\otimes x))\); here conjugation
+fixes the embedded \(F\)-adeles and carries the \(w\) coordinate to
+the conjugate place.  Linearity gives the equality on every tensor.
+Applying it entrywise identifies the two unitary equations, including
+the identity Gram matrix.  Extending a finite matrix by the identity
+at infinity then gives \(U_f\); projection to the finite components
+is its inverse.  Both maps are continuous in the displayed coordinates.
+For \(x\in L\), \(\alpha(1\otimes x)\) is its diagonal finite
+adelic image.  Thus rational matrices and all local projections agree
+literally.  Finally, every \(g\in U_{\mathbb A}\) has a unique
+factorization \(g=g_f g_\infty=g_\infty g_f\) with the indicated
+finite and infinite components: extend each component by the identity
+in the other factor.  This also proves that \(U_f\) and \(U_\infty\)
+commute.
+
+This dictionary checks the specialization \(J=1\), \(E=L\),
+\(F=L^+\), and \(\sigma=c_L\) of FV1--FV4 and FV9.  The CM condition,
+Hermitian symmetry, and nonzero determinant are automatic from these
+data.  In particular no change of rational form or rational subgroup
+has entered the finite-class application.
+% END FNL2
+
+% BEGIN FNL3
+\paragraph{FNL3. Finite classes with the source's infinite factor in its exact position.}
+\label{claim:FNL3}
+For every open subgroup \(K'\subset U_f\), there is a finite
+\(\mathcal T\subset U_f\subset U_{\mathbb A}\) such that
+\begin{equation}\label{eq:fnl-class}
+ \forall g\in U_{\mathbb A}\ \exists\gamma\in\Gamma,\ t\in\mathcal T,
+ z\in U_\infty,\ k\in K':\qquad g=\gamma t z k.
+\end{equation}
+
+Apply FV9 through FNL2 to get
+\(g_f=\gamma_f t k\).  For the actual rational adelic matrix
+\(\gamma\), define \(z=(\gamma t)^{-1}gk^{-1}\).
+Its finite component is
+\(t^{-1}\gamma_f^{-1}g_f k^{-1}=1\), so \(z\in U_\infty\).
+Its definition gives \(g=\gamma t z k\) with exactly that order.
+The selected \(t\)'s depend only on \(K'\), not on \(g\).
+This proves the full \texttt{DefU.ClassFin.classSet\_finite} conclusion
+used here.  It uses the inherited checked Borel application in FV9;
+it does not infer finiteness merely from finite volume.  Compactness
+of \(K'\) is not required.
+% END FNL3
+
+% BEGIN FNL4
+\paragraph{FNL4. All the places at which sections are needed are actually split.}
+\label{claim:FNL4}
+For every \(v\in V.S'\), the extension \(L/F\) is split at \(v\).
+Furthermore \(v(w(v))=v\), and
+\(\ell\in w\) if and only if \(\ell\in v(w)\).
+
+The latter assertions follow by pulling back the maximal ideal of the
+same stored valuation subring along
+\(\mathcal O_F\to\mathcal O_L\to\Omega\); this is also NTL15.
+For the split assertion, the hypothesis \(V.\texttt{split}\) says
+that the absolute decomposition group at the stored place of \(\Omega\)
+is contained in \(\operatorname{Gal}(\Omega/L)\).
+Its image in \(\operatorname{Gal}(L/F)\) is the finite decomposition
+group at \(w(v)\), hence that group is trivial.  A place in a quadratic
+Galois extension has trivial decomposition group precisely when there
+are two distinct places above it, each with completion \(F_v\).
+
+Here the asserted surjectivity onto the finite decomposition group has
+no unmentioned splitting assumption.  If an automorphism stabilizes
+\(w(v)\), lift it to \(\Omega\); its image of the stored valuation
+and the stored valuation both lie over \(w(v)\).  An element of
+\(\operatorname{Gal}(\Omega/L)\) carries the former to the latter,
+and correcting the lift gives an element of the absolute decomposition
+group.  The conjugacy of extensions of a place follows first for finite
+normal extensions from transitivity of primes, and then for \(\Omega\)
+by compactness of the compatible finite Galois groups.  For completeness,
+finite transitivity follows by prime avoidance and the norm: if a prime
+\(\mathfrak q\) were outside the orbit of \(\mathfrak p\), choose an
+integer in \(\mathfrak q\) outside every conjugate of \(\mathfrak p\).
+Its norm belongs to the common base prime and is outside
+\(\mathfrak p\), a contradiction.
+
+In particular every \(w(v)\) for \(v\mid\ell\), and every added
+\(w_q\), is a split place.  The proof retains the given \(V\); no
+replacement set of places is chosen.
+% END FNL4
+
+% BEGIN FNL5
+\paragraph{FNL5. The actual split sections and their trivial-map fallback.}
+\label{claim:FNL5}
+At a split place \(w\), put \(\bar w=\sigma w\).  Conjugation gives
+an isomorphism \(c_w:L_w\to L_{\bar w}\).  For
+\(h\in\mathrm{GL}_n(L_w)\), form the adelic unitary matrix \(j_w(h)\)
+whose \(w\) coordinate is \(h\), whose \(\bar w\) coordinate is
+\(c_w(h)^{-\mathsf t}\), and whose other finite and all infinite
+coordinates are \(1\).  This is a continuous homomorphism.  The two
+unitary equations at the split pair force exactly this relation, so
+\(j_w\) is inverse to the \(w\) projection on the source subgroup
+\(\operatorname{locU}_w\).  In particular it is trivial at each
+place whose underlying \(F\)-place differs from \(v(w)\).
+
+If \(v(w)\notin S\), its away projection belongs to \(U_b\): at all
+the stored \(S_t\) and auxiliary-congruence coordinates it is the
+identity.  Also \(w,\bar w\nmid\ell\).  Projection at \(w\) on the
+source \(\operatorname{locA}_w\subset U_b\) is bijective.  Surjectivity
+is provided by \(a(j_w(h))\).  For injectivity, an element in its
+kernel has all coordinates away from \(v(w)\) equal to \(1\), its
+\(w\) coordinate equal to \(1\), and therefore its \(\bar w\)
+coordinate equal to \(1\) by the unitary relation; the away-range
+coordinates separate its elements.  Thus
+\[
+       \operatorname{sec}_w(h)=a(j_w(h))
+          \qquad(v(w)\notin S).
+\]
+This is an equality with the definition of the original section:
+the bijective alternative of its definition has been verified and
+its trivial-map fallback cannot occur at any \(w_q\).  At \(w\mid\ell\)
+we use \(j_w\) in the full adelic group, not the away-section fallback.
+The opposite-place inverse transpose and the distinction between these
+two types of sections are essential to these identities.
+% END FNL5
+
+% BEGIN FNL6
+\paragraph{FNL6. Surjectivity onto the actual frame and annihilation of the infinite group.}
+\label{claim:FNL6}
+The homomorphism
+\[
+ \Phi:U_{\mathbb A}\longrightarrow G^a\times G^\ell,
+ \qquad g\longmapsto\bigl(a(g),(g_{w(v)})_{v\mid\ell}\bigr)
+\]
+is surjective, restricts to the original \(\operatorname{glob}\) on
+\(\Gamma\), and kills \(U_\infty\).
+
+For a prescribed \((a_0,b)\), choose \(g\) with \(a(g)=a_0\), using
+that \(G^a\) is the image, not an independently specified restricted
+product.  For each \(v\mid\ell\) apply FNL5 with
+\(h_v=g_{w(v)}^{-1}b_v\).  Its matrix \(j_{w(v)}(h_v)\) belongs to
+\(\ker a\), because both places above \(v\) divide \(\ell\).
+It changes no selected \(w(v')\) coordinate with \(v'\ne v\).
+The index set is finite, and FNL1 gives \(y\in\ker a\) with
+\(y_{w(v)}=h_v\) for all \(v\).  Consequently \(\Phi(gy)=(a_0,b)\).
+On \(\Gamma\) the displayed expression is the definition of
+\texttt{hset.glob}.  An infinite-only matrix has every finite
+coordinate equal to \(1\), hence \(\Phi(U_\infty)=1\).
+% END FNL6
+
+% BEGIN FNL7
+\paragraph{FNL7. The exact first Iwahori subgroup is open.}
+\label{claim:FNL7}
+For a nonarchimedean completion \(E=L_w\), the source subgroup
+\(\mathrm{I}_1(0)\) is the inverse image of the upper unipotent
+subgroup of \(\mathrm{GL}_n(k_E)\) under reduction on
+\(\mathrm{GL}_n(\mathcal O_E)\).  In particular it is open.  If
+\(b_v\in\mathrm{I}_{1,v}(0)\) for each \(v\mid\ell\), then
+\((b_v)_v\in X.I.\operatorname{Iw}(0)\).
+
+Indeed the three defining factors of \(\mathrm{I}_1(0)\) are the
+integral upper unipotents \(N\), the diagonal matrices
+\(T_c(0)\) congruent to \(1\) modulo the maximal ideal, and the
+lower unipotents \(N_m(0)\) congruent to \(1\).  They all reduce
+to upper unipotents.  Conversely, suppose \(g\) has such reduction.
+The following upper-diagonal-lower elimination proves that
+\(g=x t y\) with these three types of factors.  Write
+\[
+ g=\begin{pmatrix}A&b\\c&d\end{pmatrix}
+ =\begin{pmatrix}1&bd^{-1}\\0&1\end{pmatrix}
+  \begin{pmatrix}A-bd^{-1}c&0\\0&d\end{pmatrix}
+  \begin{pmatrix}1&0\\d^{-1}c&1\end{pmatrix}.
+\]
+Here \(d\equiv1\) is a unit, \(c\equiv0\), and the Schur
+complement reduces to an upper unipotent matrix of size \(n-1\).
+Induction gives the required factors; the zero-size case is trivial.
+The factorization lies in the subgroup join defining \(\mathrm I_1(0)\).
+Thus the claimed equality holds, and reduction is continuous to a
+finite discrete matrix group.  Since the integral general linear
+group is open, so is this inverse image.
+
+Finally choose such factorizations \(b_v=x_vt_vy_v\) in each factor.
+Their finite coordinatewise products satisfy
+\(x\in X.I.N\), \(t\in X.I.T_c(0)\subset X.I.T\), and
+\(y\in X.I.N_m(0)\).  Hence \(b=xty\in X.I.\operatorname{Iw}(0)\)
+by its original subgroup-join definition.  This reconstructs the
+\texttt{fu\_Iw} use of Iwahori factorization without importing the
+representation-theoretic parts of \texttt{GlBridge}.
+% END FNL7
+
+% BEGIN FNL8
+\paragraph{FNL8. The source's auxiliary subgroup is open on the same adelic group.}
+\label{claim:FNL8}
+In \(U_{\mathbb A}\) define the original subgroup
+\[
+ \begin{split}
+ K_0=\{k:\;& k_w\in\mathrm{GL}_n(\mathcal O_{L_w})
+                          \quad\hbox{for every finite }w;\\
+ &k_{w(s.v_0)}\equiv1\pmod{\mathfrak m_{w(s.v_0)}};\quad
+ k_{w_q}\in K_q\ (q\in Q);\quad
+ k_{w(v)}\in\mathrm I_{1,v}(0)\ (v\mid\ell)\}.
+ \end{split}
+\]
+It is open, and \(K_0\cap U_f\) is open in \(U_f\).
+The all-integral condition is open: the product
+\(\widehat{\mathcal O}_L=\prod_w\mathcal O_{L_w}\) is an open
+subring in the finite adele ring, and membership of a matrix and its
+inverse in \(M_n(\widehat{\mathcal O}_L)\) is an open condition in
+\(\mathrm{GL}_n(\mathbb A_{L,f})\).  It is exactly coordinatewise
+membership in the integral general linear groups.  Finite projection
+and inclusion of \(U_{\mathbb A}\) are continuous by FNL2.
+The principal congruence condition is the inverse image of the
+identity under continuous reduction.  Each \(K_q\) is open by the
+original datum and each \(\mathrm I_{1,v}(0)\) is open by FNL7.
+There are only finitely many of these additional conditions, so their
+intersection with the all-integral subgroup is open.  Taking its
+preimage along \(U_f\hookrightarrow U_{\mathbb A}\) proves the last
+assertion.  Notice that compactness of \(K_0\) was not asserted or
+needed.  The auxiliary prime and every supplied \(K_q\) are unchanged.
+% END FNL8
+
+% BEGIN FNL9
+\paragraph{FNL9. Transport of the actual finite subgroup into the actual level.}
+\label{claim:FNL9}
+For every \(k\in K_0\), write \(\Phi(k)=(u,b)\).  Then
+\(u\in U(K)\) and \(b\in X.I.\operatorname{Iw}(0)\).
+
+The \(U_b\) conditions on \(u=a(k)\) follow from the integral and
+auxiliary-congruence conditions on \(k\).  If a tested coordinate
+lies over \(\ell\), the source \(\operatorname{cmp}\) is the
+trivial map, whose value belongs to each tested subgroup; away from
+\(\ell\) it is exactly \(k_w\).  For each \(q\), put
+\(h_q=k_{w_q}\in K_q\).  FNL5 gives
+\(y_q=\operatorname{sec}_{w_q}(h_q)\), with its own \(q\) coordinate
+\(h_q\), all other added-place coordinates equal to \(1\), and
+all coordinates over places outside \(V.S'\) equal to \(1\).
+Applying FNL1 inside the intersection of the indicated kernel
+subgroups and \(\bigvee_q\operatorname{sec}_{w_q}(K_q)\) gives
+\(y\) with all these properties simultaneously.
+
+Set \(u_0=uy^{-1}\).  At \(w_q\) its coordinate is
+\(h_qh_q^{-1}=1\); here \(w_q\nmid\ell\) follows from
+\(v_q\notin S\).  At a place over \(F\setminus V.S'\), the
+coordinate of \(y\) is \(1\), so \(u_0\) remains integral.
+Therefore \(u_0\in U_Q\), and
+\(u=u_0y\in U_Q\vee\bigvee_q\operatorname{sec}_{w_q}(K_q)=U(K)\).
+This order of factors uses no unproved commutation or normality.
+The assertion about \(b\) follows from its coordinatewise
+\(\mathrm I_1(0)\) membership and FNL7.
+% END FNL9
+
+% BEGIN FNL10
+\paragraph{FNL10. Full original finite-level theorem.}
+\label{claim:FNL10}
+The assertion \eqref{eq:fnl-target} holds for every original datum
+specified above.  In particular the full original
+\texttt{UpperTheory.V.Hi.finU} is reconstructed.
+
+Apply FNL3 to the open subgroup \(K_0\cap U_f\), using FNL8,
+and obtain a finite set \(\mathcal T\subset U_{\mathbb A}\).
+Set \(\mathcal S=\Phi(\mathcal T)\).  Given any element of the
+actual frame \(G^a\times G^\ell\), lift it to \(g\in U_{\mathbb A}\)
+by FNL6 and write \(g=\gamma t z k\) by FNL3.  Applying \(\Phi\)
+and using FNL6 and FNL9 gives
+\[
+ \Phi(g)=\operatorname{glob}(\gamma)\,\Phi(t)\,\Phi(z)\,\Phi(k)
+         =\operatorname{glob}(\gamma)\,\Phi(t)\,(u,b),
+ \quad u\in U(K),\ b\in X.I.\operatorname{Iw}(0).
+\]
+This is exactly the defining statement of \(X.\texttt{FinLevel}\).
+The coefficient representation \(\tau _0\), its dimension \(m\),
+and the coefficient ring have not been restricted at any step.
+The given rank, auxiliary prime, actual section maps, Iwahori factors,
+and order of multiplication have all been retained.  No condition
+\(\ell>n\) is introduced; in particular rank four at \(\ell=3\)
+remains in the original scope.
+% END FNL10
+
+\subsection{The remaining original Hecke-setting axioms}
+
+The finite-level theorem also permits completion of the original
+\texttt{HSet.Ax} package.  Its group-theoretic fields must refer to
+the same sections as FNL5.  The arithmetic ingredients are inherited
+CIP4 (the exact chosen local Artin map) and CAP6 (degree-one
+Chebotarev with a prescribed Frobenius coset).  This removes an
+input-producing task; it is distinct from the full ordinary/control
+or Hida construction.
+
+% BEGIN FNL11
+\paragraph{FNL11. Coordinate equality, opposite places, and commuting supports.}
+\label{claim:FNL11}
+The family \(\operatorname{cmp}_w\) separates points of \(G^a\).
+If \(v(w')=v(w)\), then
+\[
+ \operatorname{cmp}_w(u)=1\ \Longrightarrow\
+ \operatorname{cmp}_{w'}(u)=1,\qquad
+ \operatorname{cmp}_w(u)\in\mathrm{GL}_n(\mathcal O_{L_w})
+ \ \Longrightarrow\
+ \operatorname{cmp}_{w'}(u)\in\mathrm{GL}_n(\mathcal O_{L_{w'}}).
+\]
+The first assertion is the definition of the range inside a product.
+For the latter assertions lift \(u\) to \(U_{\mathbb A}\).
+Above a nonsplit place there is only one coordinate.  Above a split
+place the other coordinate is the field conjugate inverse transpose,
+which preserves the identity and integral invertible matrices.
+At places above \(\ell\), both \(\operatorname{cmp}\)'s are the
+trivial map, so the assertions still hold.
+
+If \(u,x\in U_b\), \(\operatorname{cmp}_w(u)=1\), and \(x\) is
+supported over \(v(w)\), then \(ux=xu\).  On the two possible
+coordinates above \(v(w)\), the preceding assertion makes \(u=1\);
+on every other coordinate \(x=1\).  Thus the products agree on
+every coordinate.  This proves the equality in the literal subgroup,
+not only in an abstract local quotient.  Two sections supported over
+distinct \(F\)-places therefore commute, even before their inputs
+are restricted to compact subgroups.
+% END FNL11
+
+% BEGIN FNL12
+\paragraph{FNL12. Coefficient triviality and the three section commutation fields.}
+\label{claim:FNL12}
+Put
+\(W'=\{w:v(w)\notin V.S',\ w\text{ split}\}\), the original
+\texttt{HSet.Wp}.  For every added place \(w_q\) and every
+\(w\in W'\), the original coefficient representation
+\(\tau=\tau_0\circ\operatorname{toKT}\) is trivial on the image of
+the corresponding section.  Each such section has trivial coordinates
+at every place in \(s.S_t\), since its supporting \(F\)-place is
+outside \(S\).  Hence its image under \(\operatorname{toKT}\) is
+\(1\), and its image under \(\tau_0\) is \(1\).
+This supplies both \texttt{tau\_Q} and
+\texttt{coefficientRep\_trivial\_on\_unramified}.
+
+An element of \(U_Q\) has trivial \(w_q\) coordinate, so FNL11
+makes it commute with \(\operatorname{sec}_{w_q}(h)\) for every
+\(h\).  Distinct added places have different underlying places by
+\(Q.\texttt{inj}\), so their sections commute by FNL11.  A place
+in \(W'\) lies outside \(V.S'\), while each \(v_q\) lies inside
+it, so those sections commute too.  These prove exactly
+\texttt{Q\_UQ}, \texttt{Q\_Q}, and
+\texttt{sectionsCommuteAtSplit}.
+% END FNL12
+
+% BEGIN FNL13
+\paragraph{FNL13. Integral unramified sections and the required commuting remainder.}
+\label{claim:FNL13}
+For every \(w\in W'\),
+\[
+ \operatorname{sec}_w(\mathrm{GL}_n(\mathcal O_{L_w}))\subset U_Q.
+\]
+At \(w\) this follows from the original inverse-section identity
+FNL5.  At the conjugate place it follows from FNL11; away from the
+pair the section is \(1\).  Each added-place coordinate is \(1\)
+because its underlying place is in \(V.S'\).  These are all defining
+conditions of \(U_Q\), proving the inclusion.
+
+For \(u\in U_Q\) let \(h=\operatorname{cmp}_w(u)\), which is
+integral, and put \(u'=\operatorname{sec}_w(h)^{-1}u\).
+The inclusion just proved implies \(u'\in U_Q\), and FNL5 gives
+\(\operatorname{cmp}_w(u')=h^{-1}h=1\).
+Thus
+\[
+ u=\operatorname{sec}_w(h)u',\qquad
+ [u',\operatorname{sec}_w(g)]=1\quad\hbox{for every }g,
+\]
+where the second equality is FNL11.  This is the original
+\texttt{W\_dec} order, and the preceding inclusion is
+\texttt{W\_le}.
+% END FNL13
+
+% BEGIN FNL14
+\paragraph{FNL14. The same-place alternative preserves the actual sections and maximal compact groups.}
+\label{claim:FNL14}
+Let \(w,w'\in W'\).  If their underlying \(F\)-places differ,
+all their section images commute.  If their underlying places agree,
+there is a group isomorphism
+\[
+ e:\mathrm{GL}_n(L_{w'})\longrightarrow\mathrm{GL}_n(L_w)
+\]
+carrying the integral general linear group onto the integral general
+linear group and satisfying
+\(\operatorname{sec}_{w'}(g)=\operatorname{sec}_w(e(g))\) for every
+\(g\).  For equal places take the identity.  For the two conjugate
+places take the field-conjugate inverse-transpose isomorphism.
+FNL5 identifies both sides coordinatewise, and FNL11 verifies the
+integral equivalence in both directions.  This proves the exact
+\texttt{Wm\_mul\_Wm\_comm} alternative; it never assumes that two
+opposite-place sections commute.
+% END FNL14
+
+% BEGIN FNL15
+\paragraph{FNL15. Density of inverse Frobenius on the original quotient.}
+\label{claim:FNL15}
+Let \(G_0=\ker\eta\subset G_{F,S'}\) be the original quotient group
+in \(V.\texttt{frame}\), and
+\(p=V.\operatorname{pr}:G_L\to G_0\) the original map.  It is a
+continuous surjection.  Moreover
+\begin{equation}\label{eq:fnl-dense}
+ \{p(\sigma^{-1}):w\in W',\ A\text{ lies over }w,\
+       \sigma\text{ is arithmetic Frobenius at }A\}
+                    \quad\text{is dense in }G_0.
+\end{equation}
+
+The original quotient map \(q:G_F\to G_{F,S'}\) is continuous and
+onto.  Its sign character has
+\(\eta(q(g))=1\) exactly when \(g\) fixes \(L\), by the stored
+\(V.\texttt{h}\eta\) identity.  A lift under \(q\) of any element
+of \(G_0\) therefore belongs to \(G_L\), proving surjectivity of
+\(p\).  Continuity follows from continuity of restriction to the
+same algebraic closure, the quotient topology, and the subgroup
+topology.  Consequently \(g\mapsto p(g^{-1})\) is continuous and
+surjective as well.
+
+Only finitely many places of \(L\) lie over \(V.S'\): there are
+finitely many base places, each with finitely many factors in the
+number field extension.  Add the finitely many places ramified in
+\(L/F\) to this excluded set.  CAP6, applied with \(E=L\), says
+that arithmetic Frobenius elements at the remaining degree-one
+places meet every open coset of \(G_L\).  Such cosets form a basis
+of its profinite topology, so those Frobenius elements are dense.
+For one of these places \(w\), absolute degree one means
+\(k_w=\mathbb F_p\).  Hence also \(k_{v(w)}=\mathbb F_p\) and the
+relative residue degree is one.  The relative ramification index is
+one by our exclusion.  The quadratic Galois degree formula
+\(2=e f g\) then gives two primes above \(v(w)\), so \(w\) is split.
+It is therefore in \(W'\).
+
+The image of a dense subset under a continuous surjection is dense:
+every nonempty open set has a nonempty open preimage.  Apply this
+to \(g\mapsto p(g^{-1})\) and the Frobenius set just obtained.
+This proves \eqref{eq:fnl-dense} with the source's exact inverse
+and its arbitrary valuation-over-place witnesses.  CAP6 supplies
+both those witnesses and the actual arithmetic Frobenius action;
+no density assertion about an unrelated quotient is substituted.
+% END FNL15
+
+% BEGIN FNL16
+\paragraph{FNL16. The complete original \texttt{HSet.Ax} on the constructed setting.}
+\label{claim:FNL16}
+For every original datum in FNL10, the setting
+\(H=\texttt{hset}\,Q\,\tau_0\) satisfies all eighteen fields of
+\(H.\texttt{Ax}\).
+
+Here is the complete assembly, retaining the original field names.
+\begin{center}\small
+\begin{tabular}{p{0.43\linewidth}p{0.49\linewidth}}
+\texttt{odd}, \texttt{pos} & The stored \(s.\texttt{odd}\) and \(n\ge1\).\\
+\texttt{Sl\_over}, \texttt{Sl\_inj} & FNL4, by contraction of places.\\
+\texttt{art\_spec} & CIP4 on the same stored valuation and \(\operatorname{artOf}\).\\
+\texttt{Q\_away}, \texttt{Wp\_away} & The defining place exclusions and FNL4.\\
+\texttt{fin} & FNL10 for every permitted \(K\).\\
+\texttt{tau\_Q}, \texttt{coefficientRep\_trivial\_on\_unramified} & FNL12.\\
+\texttt{Q\_UQ}, \texttt{Q\_Q}, \texttt{sectionsCommuteAtSplit} & FNL12.\\
+\texttt{W\_le}, \texttt{W\_dec} & FNL13.\\
+\texttt{Wm\_mul\_Wm\_comm} & FNL14.\\
+\texttt{prj\_cont}, \texttt{dense} & FNL15.
+\end{tabular}
+\end{center}
+In particular \(w(v)=w(v')\) implies \(v=v'\) by contraction,
+which verifies \texttt{Sl\_inj} without a choice of new embeddings.
+The local Artin field uses CIP4's validity of the original Hilbert-choice
+map, so no further \texttt{LiteratureRankNHypothesis} premise is needed
+in this human proof beyond its already proved class-field-theory input.
+This is the full original \texttt{axU} conclusion and, in particular,
+the conclusion of \texttt{CLocConj.axU\_s}.  The latter source variant
+carries a larger literature package because of its Artin-map route;
+CIP4 is a proved replacement for that use.
+% END FNL16
+
+\subsection{What this supplies, and what still has to be constructed}
+
+Together with NTL17 and OTW12, FNL10 supplies finite level and the actual
+\texttt{Frame.Free} stabilizer condition needed at the entrance to
+ordinary theory.  FNL16 supplies the entire original
+\texttt{HSet.Ax}, including inverse-Frobenius density, so this package
+is no longer an unconstructed antecedent.  The argument does not by
+itself supply ordinary Hecke commutation, classical control,
+arithmetic-point separation, the integral type, or same-ideal all-level
+automorphy.  The outer \texttt{COUNT\_II\_SUPPORT} obligation remains
+open until those producers have been proved.  The finite-class,
+local-reciprocity and Chebotarev results are used as completed
+mathematical inputs with their actual objects and maps checked.

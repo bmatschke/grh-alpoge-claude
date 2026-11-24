@@ -1,0 +1,840 @@
+\section{Constructing the character field and its arithmetic host}
+\label{sec:arithmetic-hosts}
+
+\status{AH1--AH18 reconstruct the finite character construction, its actual
+cyclotomic fixed field, every field of \texttt{HostDer}, the half-different
+ideal and its trace-self-dual inverse, and the literal \texttt{fieldChi}
+conclusion. The hypotheses on the primes $q,d$, their splitting congruences,
+and their eventual analytic windows remain hypotheses. These arguments
+construct arithmetic data once those hypotheses hold; they do not select
+the analytic windows.}
+
+Throughout this section $U_a=(\mathbb Z/a\mathbb Z)^\times$ for $a>0$,
+$T_e=2^{e+2}$, and $H_e=U_{T_e}/\langle-1\rangle$.
+The symbol $\varphi(a)$ denotes Euler's totient, whereas $\phi$ denotes a
+frame. Write $n=\phi.\mathrm{ord}=|A|$, $n_0=|A_0|$ and
+$o=n/n_0$. We use multiplicative notation for the finite group $A$;
+transporting it to an additive group on $\{0,\ldots,n-1\}$ gives the
+literal frame. Put
+\[
+ G=\{\pm1\}\times\{\pm1\}\times A,\qquad
+ c=(-1,-1,1),\quad \iota_d=(1,-1,1),\quad
+ \Psi=\{(s,t,a):t=1\}.                         \tag{AH.1}
+\]
+The exact prime hypothesis is
+\[
+ q,d\text{ prime},\qquad q\equiv3\pmod8,
+ \quad d\equiv7\pmod{16},\qquad
+ \left(\frac{-d}{q}\right)=1.                 \tag{AH.2}
+\]
+It implies that $q,d$ are distinct odd primes. In particular no choice of
+such primes is included in the arguments below.
+
+\paragraph{AH1: finite character duality and the two-adic quotient.}
+The quotient $H_e$ is cyclic of order $2^e$. Indeed,
+$v_2(5^{2^j}-1)=j+2$: the case $j=0$ is immediate, and the induction step
+uses $5^{2^j}+1\equiv2\pmod8$ for $j\ge1$, with the first step checked
+directly. Thus $5$ has order $2^e$ modulo $T_e$. Its powers are $1$ modulo
+$4$, so $-1$ is outside this subgroup, and counting the $2^{e+1}$ odd
+residue classes proves $U_{T_e}=\langle-1\rangle\times\langle5\rangle$.
+
+Let $M>0$ and let $\Xi$ be a subgroup of the complex characters of $U_M$.
+Set
+\[
+ B=U_M/\operatorname{ann}(\Xi),\qquad
+ \operatorname{ann}(\Xi)=\{u:\chi(u)=1\text{ for every }\chi\in\Xi\}.
+                                                               \tag{AH.3}
+\]
+Then $|B|=|\Xi|$, and the characters of $B$ are exactly the characters in
+$\Xi$. To see both assertions, sum $\chi(u)$ over $u\in U_M$ and
+$\chi\in\Xi$. The sum of a nontrivial character is zero, since translating
+the sum by a point where the character is not $1$ multiplies it by that
+value. Summing first over $\Xi$ gives
+$|\operatorname{ann}(\Xi)||\Xi|=|U_M|$. Every character in $\Xi$ factors
+through $B$, and a finite abelian group has exactly its order many complex
+characters: on each cyclic factor of order $a$ one chooses any $a$th root
+of unity. The resulting cardinality equality proves the assertion.
+This argument includes groups with odd-order factors.
+
+We also use the following elementary reduction fact. If $a\mid b$,
+the map $U_b\to U_a$ is onto. Lift a unit modulo $a$ to an integer and
+use CRT to make it $1$ at every prime dividing $b$ but not $a$.
+The resulting integer is coprime to $b$ and has the required image.
+
+\paragraph{AH2: the minimal modulus and the actual mixed frame.}
+Fix $e\ge0$, put $W_e=\operatorname{lcm}(T_e,M)$, and let
+$\xi_W:U_{W_e}\to B$ be reduction modulo $M$ followed by the quotient.
+Choose the least positive integer $Q=Q_e$ satisfying
+\[
+ Q\mid W_e,\quad T_e\mid Q,\quad
+ u\equiv1\pmod Q\Longrightarrow\xi_W(u)=1.       \tag{AH.4}
+\]
+The set is nonempty because $W_e$ belongs to it. Reduction $U_{W_e}\to U_Q$
+is surjective; its kernel lies in $\ker\xi_W$, so there is a unique
+surjective homomorphism $\xi:U_Q\to B$ with
+$\xi(u\bmod Q)=\xi_W(u)$. Define
+\[
+ \operatorname{cl}:U_Q\longrightarrow H_e,
+ \qquad \eta(u)=(\operatorname{cl}(u),\xi(u)),
+ \qquad A=\eta(U_Q)\subset H_e\times B.          \tag{AH.5}
+\]
+The first projection $p_1:A\to H_e$ is onto. On $\ker p_2$ it is
+injective, since an element with both coordinates $1$ is the identity.
+Hence $\ker p_2$ is cyclic. Choose a generator $a_0$ and set
+$A_0=\langle a_0\rangle=\ker p_2$. If $p_1(a_0^j)=1$, then $a_0^j=1$;
+this is precisely the generator condition of \texttt{Frame}.
+Relabeling the finite group by $\operatorname{Fin}(|A|)$ gives the literal
+\texttt{ModData.frame}, with its supplied group isomorphism, not merely a
+group of the same order. Let $a:U_Q\to A$ denote $\eta$ with this relabeling,
+and let $\xi_A:A\to B$ denote $p_2$. Then
+\[
+ p_1a=\operatorname{cl},\quad \xi_Aa=\xi,
+ \quad A_0=\ker\xi_A,
+ \quad o=[A:A_0]=|B|=|\Xi|,
+ \quad 2^e\mid n.                              \tag{AH.6}
+\]
+If every element of $B$ has order dividing $2^j$, then $A$ is a $2$-group,
+because it is a subgroup of $H_e\times B$. No such assumption is made
+for the construction itself.
+
+\paragraph{AH3: CRT constructs the Artin map, including its sign twist.}
+More generally take any $Q>0$, $T_e\mid Q$, and any homomorphism
+$\xi:U_Q\to B$, and form $A$ as in AH2. Assume (AH.2),
+$\gcd(Q,qd)=1$, $e\ge2$, and
+$(-d/\ell)=1$ for every odd prime $\ell\mid Q$.
+Set $N=Qqd$ and
+\[
+ \alpha(u)=\left(\frac{u}{q}\right),\qquad
+ \beta(u)=\left(\frac{u}{d}\right),\qquad
+ w(s)=a(s\bmod Q),\quad s\in\{\pm1\}.
+\]
+The literal homomorphism is
+\[
+ \operatorname{art}(u)=
+ \bigl(\alpha(u),\beta(u),a(u\bmod Q)w(\alpha(u))\bigr).
+                                                               \tag{AH.7}
+\]
+For a prescribed $(s,t,b)\in G$, choose $v\in U_Q$ with
+$a(v)=b\,w(s)$. Choose a residue of Legendre sign $s$ modulo $q$ and
+one of sign $t$ modulo $d$; one may use $1$ or $-1$ because both primes
+are $3$ modulo $4$. CRT gives a unit $u\in U_N$ with these three
+residues. Since $w(s)^2=1$, (AH.7) maps it to $(s,t,b)$.
+Thus the Artin map is surjective.
+
+The remaining identities follow from the same formula:
+\[
+ \begin{aligned}
+ \operatorname{art}(-1)&=c,\\
+ p_1(\operatorname{art}(u)_A)&=[u\bmod T_e],\\
+ u\equiv1\pmod{Qq}&\Longrightarrow
+              \operatorname{art}(u)\in\{1,\iota_d\},\\
+ u\equiv1\pmod{Qd}&\Longrightarrow
+              \operatorname{art}(u)^2=1.
+ \end{aligned}                                                   \tag{AH.8}
+\]
+For the first identity the $A$ coordinate is $a(-1)w(-1)=1$;
+for the second, $p_1w(s)=1$ because $s=\pm1$ dies in $H_e$.
+These calculations prove every Artin field of
+\texttt{ModData.charData}. The factor $w(\alpha(u))$ is indispensable
+when the original characters are not even.
+
+\paragraph{AH4: the cyclotomic fixed field and the actual quadratic roots.}
+Take any \texttt{CharData}, with its surjection
+$\operatorname{art}:U_N\to G$ and the identities (AH.8), and put
+\[
+ L=\mathbb Q(\zeta_N),\qquad
+ U=\ker(\operatorname{art}),\qquad E=L^U.        \tag{AH.9}
+\]
+Under the usual cyclotomic identification
+$\tau_u(\zeta_N)=\zeta_N^u$, the fundamental theorem of Galois theory gives
+\[
+ \operatorname{Gal}(E/\mathbb Q)\simeq U_N/U\simeq G,
+ \qquad [E:\mathbb Q]=4n.                       \tag{AH.10}
+\]
+The isomorphism is characterized by
+$\operatorname{gal}(\tau_u|_E)=\operatorname{art}(u)$, so the inclusion
+$E\hookrightarrow L$ satisfies the literal \texttt{art\_spec}.
+
+For completeness, the quadratic elements can be constructed inside this
+same cyclotomic field. For a prime $p\equiv3\pmod4$ dividing $N$, choose
+$\zeta_p=\zeta_N^{N/p}$ and set
+$g_p=\sum_{a\bmod p}(a/p)\zeta_p^a$. Changing $a$ to $u^{-1}a$ gives
+$\tau_u g_p=(u/p)g_p$. Also $\overline{g_p}=-g_p$ and
+\[
+ g_p\overline{g_p}
+ =\sum_{t\ne0}(t/p)\sum_{b\ne0}\zeta_p^{(t-1)b}=p.
+\]
+Here the inner sum is $p-1$ when $t=1$ and $-1$ otherwise, and
+$\sum_{t\ne0}(t/p)=0$. Hence $g_p^2=-p$.
+If $(u/p)$ is a character of $\operatorname{art}(u)$, its value is $1$
+on $U$, so $g_p\in E$ with the prescribed Galois action. In particular
+$s_d=g_d$ realizes the required second sign. For the Artin map of AH3,
+$s_q=g_q$ realizes the first sign as well. This proves
+\texttt{CharData.toHostRaw}, \texttt{ModData.host} and
+\texttt{AnyGrp.host}, including their specified roots, embeddings and
+Galois maps.
+
+\paragraph{AH5: exactness of the modulus and the primitive conductor.}
+Return to the minimal $Q_e$ of AH2 and assume $e\ge1$.
+For every prime $\ell\mid Q$ there is a unit $v\in U_Q$ with
+\[
+ v\equiv1\pmod{Q/\ell},\qquad \eta(v)\ne1.      \tag{AH.11}
+\]
+If $T_e\mid Q/\ell$ and no such $v$ existed, every unit modulo $W_e$
+congruent to $1$ modulo $Q/\ell$ would have trivial $\xi_W$-value.
+Thus $Q/\ell$ would satisfy (AH.4), contradicting minimality.
+Otherwise $\ell=2$ and $v_2(Q)=e+2$. The unit $v=1+Q/2$ is $1$ modulo
+$Q/2$ but is neither $1$ nor $-1$ modulo $T_e$; the latter assertion uses
+$e\ge1$ and $Q/2\equiv2^{e+1}\pmod{T_e}$. Its $H_e$ coordinate is
+therefore nontrivial. Lift $v$ by CRT to a unit $u$ which is $1$ modulo
+$q$ and $d$. Then $u\equiv1\pmod{N/\ell}$ and
+$\operatorname{art}(u)\ne1$. This is every clause of
+\texttt{HostRaw.Exact}, for the actual modulus $Q$.
+
+When $\Xi=\langle\psi\rangle$ for a primitive character of conductor $M$,
+\[
+                    M\mid Q,\qquad Q=W_e.       \tag{AH.12}
+\]
+Indeed, let $g=\gcd(M,Q)$ and let $v\in U_M$ be $1$ modulo $g$.
+Generalized CRT gives $z\equiv v\pmod M$ and $z\equiv1\pmod Q$.
+It is a unit modulo $W_e$, because $T_e\mid Q$; (AH.4) implies
+$\psi(v)=1$. Thus $\psi$ factors through $U_g$. Primitivity forces
+$g=M$, proving $M\mid Q$; together with $T_e\mid Q\mid W_e$ this gives
+the displayed equality. The literal source only needs its divisibility
+consequence.
+
+\paragraph{AH6: one eventually constant multiplier in the frame order.}
+For the fixed $M,\Xi$, define
+\[
+ J_e=\xi(\ker\operatorname{cl})\subset B.
+\]
+Projection of $A\subset H_e\times B$ onto $H_e$ has kernel
+$\{1\}\times J_e$. Consequently
+\[
+              n_e=2^e|J_e|,\qquad 1\le|J_e|\le|\Xi|.             \tag{AH.13}
+\]
+These subgroups form a descending sequence. To check this without assuming
+$Q_e\mid Q_{e+1}$, lift a representative at level $Q_{e+1}$ to a unit
+modulo $W_{e+1}$, reduce it modulo $W_e$, then modulo $Q_e$.
+Its two-adic residue, originally $\pm1$ modulo $T_{e+1}$, is $\pm1$
+modulo $T_e$, and its $B$ coordinate is unchanged. Hence
+$J_{e+1}\subset J_e$. The nonincreasing positive integers $|J_e|$ attain
+a minimum. Choose an index $e_1$ attaining it and write that minimum as
+$c_0$. For all $e\ge e_1$,
+\[
+ 1\le c_0\le|\Xi|,\qquad n_e=c_0\,2^e.          \tag{AH.14}
+\]
+The constants precede $q,d$ and every analytic scale. This is the exact
+quantifier order of \texttt{ordAny}.
+
+\paragraph{AH7: the prescribed characters are actually kept.}
+For $\chi\in\Xi$, let $\chi_B:B\to\mathbb C^\times$ be its descent and
+write $\theta_A=\chi_B\xi_A$. Define the character of the actual group $G$
+by
+\[
+ \theta_\chi(s,t,b)=\theta_A\bigl(b\,w(s)\bigr). \tag{AH.15}
+\]
+It is trivial on $(1,1,A_0)$ and on $\iota_d$, so belongs to the literal
+$X^+$ character set. Substitution in (AH.7) cancels $w(\alpha)^2$ and gives
+\[
+       \theta_\chi(\operatorname{art}(u))=\chi(u)                 \tag{AH.16}
+\]
+whenever both sides are read on units of a common multiple of $N$ and $M$.
+Thus the primitive Dirichlet character induced by $\theta_\chi$ is the
+primitive character induced by $\chi$. This uses uniqueness of the
+primitive inducing character, which follows by factoring both characters
+through the common modulus and then through the gcd of their conductors.
+Accordingly every primitive character in \texttt{Level.ofSub} is kept in
+$X^+$.
+
+The first-sign character is not among them. Use CRT to choose
+$u\equiv1\pmod Q$, $u\equiv1\pmod d$ and $(u/q)=-1$.
+For every character (AH.15), its value on $\operatorname{art}(u)$ is $1$,
+whereas the first sign is $-1$. Equal primitive inducing characters would
+have equal values on all units modulo $N$, a contradiction. Since
+\texttt{Level.ofSub.psK=none}, this is the entire
+\texttt{ExceptionalCharacterKept} predicate. It does not assert that all
+characters in $X^+$ are kept.
+
+\paragraph{AH8: the exact kernel and every allowed quadratic twist.}
+Let $\psi$ be primitive of conductor $M$, and $\Xi=\langle\psi\rangle$.
+For every integer $a$ coprime to $N$, (AH.7) and (AH.12) give
+\[
+ \begin{split}
+ \operatorname{art}(a)=1\quad\Longleftrightarrow\quad&
+ a\equiv\pm1\pmod{T_e},\quad\psi(a)=1,\\
+ & (a/q)=(a/d)=1. 
+ \end{split}                                                     \tag{AH.17}
+\]
+Indeed, the first two coordinates must be $1$; then $w(\alpha)=1$ and
+the remaining coordinate is trivial exactly when both components of
+$\eta(a)$ are trivial. The annihilator of $\langle\psi\rangle$ is
+$\ker\psi$. This proves \texttt{KerChi}, including $M\mid Q$.
+
+Now let $\theta:G\to\mathbb C^\times$ be trivial on $(1,1,A_0)$.
+Its restriction to $A$ factors through $A/A_0\simeq B$, hence by AH1 is
+some $\chi\in\Xi$. The restrictions to
+$s\mapsto(s,1,w(s))$ and $t\mapsto(1,t,1)$ have values $s^i,t^j$
+for some $i,j\in\{0,1\}$. This follows because the image of the generator
+of a group of order $2$ has square $1$, hence is $1$ or $-1$.
+The factorization
+\[
+ \operatorname{art}(a)
+  =(\alpha,1,w(\alpha))(1,\beta,1)(1,1,a(a\bmod Q))
+\]
+therefore gives
+\[
+ \theta(\operatorname{art}(a))
+   =\chi(a)(a/q)^i(a/d)^j,\qquad
+ \theta(\iota_d)=(-1)^j.                        \tag{AH.18}
+\]
+This is \texttt{TwistForm} with its prescribed $\iota_d$ sign. It includes
+all characters trivial on the designated cyclic subgroup, with no
+restriction to even characters or to $2$-groups.
+
+\paragraph{AH9: cyclotomic reduction gives the complete local Galois laws.}
+Let $L=\mathbb Q(\zeta_N)$ and let $P_L$ lie above a rational prime $p$.
+Write $N=p^v m$, with $p\nmid m$. In the residue field, the reduction of
+$\zeta_N$ has exact order $m$. Its order divides $m$ because a root of
+$p$-power order reduces to $1$. A root of order prime to $p$ keeps its
+order: if $\eta\ne1$, $\eta^a=1$, $p\nmid a$, and $\eta\equiv1\pmod{P_L}$,
+then $1+\eta+\cdots+\eta^{a-1}=0$ would reduce to $a=0$, a contradiction.
+Applying this to powers of $\zeta_N^{p^v}$ gives exactness. Thus
+\[
+ \zeta_N^r\equiv\zeta_N^s\pmod{P_L}
+       \quad\Longleftrightarrow\quad r\equiv s\pmod m.          \tag{AH.19}
+\]
+
+Here one may test integral residue maps on $\zeta_N$, since
+$\mathcal O_L=\mathbb Z[\zeta_N]$. The relevant integral statement has
+a direct local proof. For each $p$, the prime-to-$p$ polynomial
+$X^m-1$ has nonzero derivative at all its roots modulo $p$.
+Hensel factorization therefore makes $\mathbb Z_p[\zeta_m]$ a product
+of unramified discrete valuation rings. On each factor,
+$\Phi_{p^v}(1+X)$ is Eisenstein if $v>0$: its constant coefficient is
+$p$, its leading coefficient is $1$, and the others are divisible by $p$.
+Adjoining $\zeta_{p^v}-1$ consequently gives a discrete valuation ring,
+with the power basis of this Eisenstein polynomial. Since
+$\mathbb Z_p[\zeta_N]=\mathbb Z_p[\zeta_m,\zeta_{p^v}]$, this is the
+full integral closure locally. The finite index between
+$\mathbb Z[\zeta_N]$ and $\mathcal O_L$ is therefore divisible by no prime,
+so is $1$. For $v=0$ the unramified argument already suffices.
+
+It follows from (AH.19), on the integral generator, that
+\[
+ \begin{aligned}
+ \tau_u\in I(P_L)&\Longleftrightarrow u\equiv1\pmod m,\\
+ \tau_u\text{ induces arithmetic Frobenius at }P_L
+      &\Longleftrightarrow u\equiv p\pmod m.
+ \end{aligned}                                                   \tag{AH.20}
+\]
+For the second assertion the two ring maps on the residue field agree on
+the generator precisely when $\overline{\zeta_N}^u=
+\overline{\zeta_N}^{p}$. A unit $u$ in this congruence class exists by
+CRT, choosing its $p$-part to be $1$. The decomposition group is the
+preimage of the cyclic residue Galois group generated by this Frobenius,
+so
+\[
+ \tau_u\in D(P_L)
+       \quad\Longleftrightarrow\quad
+       u\equiv p^j\pmod m\text{ for some }j\ge0.                \tag{AH.21}
+\]
+
+These formulas descend to every Galois subfield $E$ of $L$ under its
+actual restriction map. More explicitly, restriction maps decomposition
+and inertia groups onto the respective groups at $P=P_L\cap\mathcal O_E$.
+For decomposition, lift an automorphism of $E$ to $L$ and adjust the
+lift by an element of $\operatorname{Gal}(L/E)$ so that it fixes $P_L$;
+this is possible because that group is transitive on the primes above
+$P$. For inertia, the resulting residue action fixes $\kappa(P)$.
+The decomposition group over $E$ maps onto
+$\operatorname{Gal}(\kappa(P_L)/\kappa(P))$; cancel this residue action
+by an element over $E$. This proves the claimed surjectivity, including
+the inertia direction that restriction alone would not prove.
+The residue surjectivity used here is the usual finite Galois prime
+theorem: the stabilizer acts on the residue field with kernel inertia
+and quotient the finite-field Galois group. It follows by localizing
+the normal extension at the prime and lifting the embeddings of its
+maximal unramified subextension.
+
+Consequently, for the cyclotomic realization of any raw host, writing
+$N_p=N/p^{v_p(N)}$, one has the literal identities
+\[
+ \begin{aligned}
+ \sigma\in I(P)&\Longleftrightarrow
+     \exists u\in U_N: u\equiv1\pmod{N_p},\quad
+                       \operatorname{gal}(\sigma)=\operatorname{art}(u),\\
+ \sigma\text{ is arithmetic Frobenius at }P&\Longleftrightarrow
+     \exists u\in U_N: u\equiv p\pmod{N_p},\quad
+                       \operatorname{gal}(\sigma)=\operatorname{art}(u),\\
+ \sigma\in D(P)&\Longleftrightarrow
+     \exists u\in U_N,\ j\ge0: u\equiv p^j\pmod{N_p},\quad
+                       \operatorname{gal}(\sigma)=\operatorname{art}(u).
+ \end{aligned}                                                   \tag{AH.22}
+\]
+For the Frobenius converse, two lifts induce the same residue Frobenius
+exactly when their quotient is in inertia. This supplies the necessary
+lift without imposing that a general lift itself be Frobenius. If $p\nmid N$,
+the inertia group is trivial and the unique arithmetic Frobenius has
+image $\operatorname{art}(p\bmod N)$.
+
+\paragraph{AH10: the CM field, the exact CM-type and the sign characters.}
+Now let $H$ be an arbitrary \texttt{HostRaw}, not necessarily one just
+constructed in AH4. Its specified embedding in $\mathbb Q(\zeta_N)$
+and \texttt{art\_spec} imply that $\operatorname{art}$ is onto: extend
+an automorphism of $E$ to the cyclotomic field and read its exponent on
+$\zeta_N$. They also identify the image of $E$ with the fixed field of
+$\ker\operatorname{art}$. Thus AH9 applies to this actual raw host.
+
+Complex conjugation on $\zeta_N$ is $\tau_{-1}$, so its restriction to $E$
+is $\operatorname{gal}^{-1}(c)$; denote it by $\overline{\phantom{x}}$.
+Every embedding of $E$ into $\mathbb C$ extends to the cyclotomic field,
+and hence
+$\psi(\overline{x})=\overline{\psi(x)}$ for every embedding $\psi$.
+Because $s_d^2=-d$ and $d>0$, no embedding of $E$ is real. The fixed field
+$F=E^{\langle\overline{\phantom{x}}\rangle}$ is totally real, is the
+maximal real subfield, and $E/F$ is quadratic. Therefore
+\[
+ [E:\mathbb Q]=4n,\qquad [F:\mathbb Q]=2n,\qquad
+ x\in F\Longleftrightarrow\overline{x}=x.        \tag{AH.23}
+\]
+An automorphism induces conjugation at even one complex embedding exactly
+when it is this automorphism, by injectivity of that embedding. This
+proves the full \texttt{conj\_iff} predicate.
+
+The actual CM-type consists of the embeddings with
+$\psi(s_d)=i\sqrt d$. Each embedding sends $s_d$ to one of
+$\pm i\sqrt d$, and conjugation exchanges the two possibilities.
+Thus the type has $2n$ elements, selects exactly one from each conjugate
+pair, and, for $\psi$ in the type,
+\[
+ \psi\sigma\text{ is in the type}
+       \quad\Longleftrightarrow\quad
+       \operatorname{gal}(\sigma)\in\Psi.        \tag{AH.24}
+\]
+Also $K=\mathbb Q(s_d)$ is exactly the fixed field of $\Psi$.
+
+There is a nonzero first-sign eigenvector even when a raw host does not
+assert \texttt{PsQ}. Take the quadratic fixed field of the kernel of the
+first-sign character, choose $x$ moved by conjugation there, and use
+$a=x-\overline{x}\ne0$. Automorphisms of first sign $1$ fix it and those
+of first sign $-1$ negate it. This proves \texttt{ps\_root}; it does not
+replace the stronger square-root-of-$-q$ supplied in AH4 for our constructed
+host.
+
+Finally compare the image of the raw element $s_d$ with the Gauss sum
+$g_d$ of AH4. Their squares are both $-d$, so they differ by sign. The
+Gauss action therefore forces
+\[
+ \operatorname{art}(u)_d=(u/d).                  \tag{AH.25}
+\]
+For $p\nmid N$, AH9, (AH.25), quadratic reciprocity and $d\equiv3\pmod4$
+give every coordinate required by \texttt{frob}: the first sign is the
+defined $\mathrm{psAt}(p)$, the second is $(p/d)=(-d/p)$, and the $H_e$
+coordinate is the class of $p$ modulo $T_e$.
+
+\paragraph{AH11: ramified decomposition and the unramified CM extension.}
+The quadratic integral calculation in AC8 gives
+\[
+ \mathcal O_K=\mathbb Z[\omega],\quad
+ \omega=(1+s_d)/2,\quad
+ f_\omega(X)=X^2-X+(d+1)/4,quad \operatorname{disc}(K)=-d.
+                                                               \tag{AH.26}
+\]
+At $2$ this polynomial is $X(X-1)$ modulo $2$, since $d\equiv7\pmod{16}$.
+At an odd prime different from $d$ its roots are distinct, and it splits
+exactly when $(-d/p)=1$; at $d$ the prime ramifies. Thus every prime
+dividing $Qq$ splits in $K$. Restriction of a decomposition automorphism
+at such a prime fixes its prime in $K$. In a split quadratic extension
+that stabilizer is trivial, so
+\[
+              p\mid Qq\quad\Longrightarrow\quad D(P)\subset\Psi.
+                                                               \tag{AH.27}
+\]
+This proves \texttt{decomp\_typeI}, including the prime $2$.
+
+At $d$, (AH.22) and $N_d=Qq$ give
+\[
+                     I(P)=\{1,\iota_d\}.        \tag{AH.28}
+\]
+The containment follows from \texttt{art\_d}. For the reverse inclusion,
+CRT gives $u\equiv1\pmod{Qq}$ and $u\equiv-1\pmod d$.
+Its second sign is $-1$ by (AH.25), so its image is $\iota_d$.
+
+We need a further first-sign fact at $d$. The integer $-d$ is a square
+modulo $Qq$. At every odd prime factor, start with the prescribed
+nonzero square root and lift by solving the linear congruence for its
+next digit; $2s$ is invertible. At $2$, start with $s=1$ modulo $8$.
+If $s^2\equiv-d\pmod{2^a}$, $a\ge3$, replacing $s$ by
+$s+2^{a-1}$ changes its square by $2^a$ modulo $2^{a+1}$, and therefore
+corrects the next bit when necessary. CRT combines the prime powers.
+The first sign of $\operatorname{art}$ factors through $U_{Qq}$ by
+\texttt{art\_d}. If $s^2\equiv-d\pmod{Qq}$, then $d\equiv-s^2$, whence
+\[
+ u\equiv d\pmod{Qq}\quad\Longrightarrow\quad
+              \operatorname{art}(u)_q=-1.       \tag{AH.29}
+\]
+This proof uses the first sign of $\operatorname{art}(-1)$ and the square
+of a sign; it does not assume \texttt{PsQ} for a general raw host.
+
+Conjugation fixes no prime above a divisor of $N$. For a divisor of $Qq$
+this follows from (AH.27), since $c\notin\Psi$. At $d$, choose a
+Frobenius lift $F$ with exponent $u\equiv d\pmod{Qq}$. If conjugation
+were in the decomposition group, then
+$c=\rho\,\operatorname{gal}(F)^j$ with
+$\rho\in\{1,\iota_d\}$ and $j\ge0$. The $A$ coordinate and
+\texttt{art\_h} would give $d^j\equiv\pm1\pmod{T_e}$.
+Reducing modulo $16$, the congruence $d\equiv7$ forces $j$ even, because
+$7^j$ is $7$ for odd $j$ and $1$ for even $j$.
+But the first sign, using (AH.29), gives $-1=(-1)^j$, a contradiction.
+Thus \texttt{decompConj} holds. At primes outside $N$ inertia is trivial;
+at primes dividing $N$ conjugation is not even in the decomposition group.
+It follows that conjugation is in no finite inertia group, proving the
+literal \texttt{unramEF}: $E/F$ is unramified at every finite prime.
+
+\paragraph{AH12: splitting, ordinary places and the exact $\eta$ clauses.}
+The factorization in (AH.26) gives
+\[
+ \#\{\mathfrak p\subset\mathcal O_K:\mathfrak p\mid p\}=2
+ \quad\Longleftrightarrow\quad
+ p=2\ \text{or}\ \bigl(p\ne2\text{ and }(-d/p)=1\bigr).        \tag{AH.30}
+\]
+For a prime $P$ of $E$, the source's ordinary condition says
+$\sigma\tau\in\Psi\Longleftrightarrow\sigma\in\Psi$ for every
+$\tau\in D(P)$ and every $\sigma$. Taking $\sigma=1$ shows this is
+equivalent to $D(P)\subset\Psi$; the converse follows because $\Psi$ is
+a subgroup. Since restriction maps $D(P)$ onto the decomposition group
+in $K$, this is equivalent to splitting in $K$. This proves the full
+\texttt{ordinary} equivalence for all rational primes, including $d$.
+
+Since $E/F$ is quadratic and unramified at finite primes, every nonzero
+prime of $F$ either has two primes above it or has one prime of residue
+degree $2$. The latter case occurs exactly when conjugation fixes a prime
+$P$ above it. For $p\nmid N$, the decomposition group is generated by
+the arithmetic Frobenius $\sigma$, so this is equivalent to
+$c\in\langle\operatorname{gal}(\sigma)\rangle$.
+For $p\mid N$, AH11 shows it never occurs. With $\eta_F=1$ in the split
+case and $-1$ in the inert case, these are precisely all three clauses of
+\texttt{HostDer.eta}.
+
+\paragraph{AH13: constructing the actual half-different ideal.}
+Let $\mathfrak D=\mathfrak D_{E/K}$.
+The relative inertia group for $E/K$ is $I(P)\cap\Psi$. At a prime above
+$d$ it is trivial by (AH.28); outside $N$ it is trivial by AH9.
+In a finite extension of number fields, a prime divides the different
+exactly when it is ramified. This follows locally from the trace dual
+over discrete valuation rings, or from the derivative of a local integral
+generator; in the unramified case that derivative is a unit.
+Therefore
+\[
+ P\mid\mathfrak D\quad\Longrightarrow\quad P\mid Qq.           \tag{AH.31}
+\]
+Every such rational prime splits in $K$. Hence, for
+$\mathfrak p=P\cap\mathcal O_K$,
+$\overline{\mathfrak p}\ne\mathfrak p$.
+
+The different is invariant under every $\sigma\in\operatorname{Gal}(E/\mathbb Q)$.
+Indeed, $K$ is stable because the Galois group is abelian, and
+\[
+ \operatorname{Tr}_{E/K}(\sigma z)
+       =\sigma|_K\bigl(\operatorname{Tr}_{E/K}(z)\bigr).
+\]
+This preserves integrality in $\mathcal O_K$, hence preserves the
+codifferent and its inverse $\mathfrak D$. In particular the exponents
+of $P$ and $\overline P$ in $\mathfrak D$ agree.
+Order the finite set of primes of $K$ below the support of $\mathfrak D$,
+and define
+\[
+ \mathfrak b=
+ \prod_{\substack{P\mid\mathfrak D\\
+              P\cap\mathcal O_K<\overline P\cap\mathcal O_K}}
+                       P^{v_P(\mathfrak D)}.                  \tag{AH.32}
+\]
+Exactly one prime of each conjugate pair contributes. Unique factorization
+of nonzero ideals gives
+\[
+ \mathfrak D=\mathfrak b\overline{\mathfrak b},\qquad
+ \mathfrak b+\overline{\mathfrak b}=\mathcal O_E.                 \tag{AH.33}
+\]
+An element of $\operatorname{Gal}(E/K)=\Psi$ preserves contractions to
+$K$, commutes with conjugation, and preserves the exponents of the
+different. It therefore preserves the selected product:
+$\sigma\mathfrak b=\mathfrak b$ for every $\sigma\in\Psi$.
+This proves every clause of the source theorem named
+\texttt{KcDiff.principal}. Its conclusion is a selected integral ideal
+$\mathfrak b$. It does not assert that this ideal is generated by one
+element and uses no class-number hypothesis.
+
+\paragraph{AH14: the inverse ideal is self-dual for the conjugated trace.}
+The codifferent is
+\[
+ \mathfrak D^{-1}
+   =\{z\in E:\operatorname{Tr}_{E/K}(z\mathcal O_E)
+                                      \subset\mathcal O_K\}.
+\]
+For any nonzero fractional $\mathcal O_E$-ideal $J$, its trace dual satisfies
+\[
+ J^*=\{x:\operatorname{Tr}_{E/K}(xJ)\subset\mathcal O_K\}
+       =\mathfrak D^{-1}J^{-1}.                  \tag{AH.34}
+\]
+To prove the equality, the trace condition is equivalent to
+$xJ\subset\mathfrak D^{-1}$: for $y\in J$ and $a\in\mathcal O_E$,
+the element $ay$ is still in $J$. Since a nonzero ideal in a Dedekind domain
+is invertible, the latter inclusion is equivalent to
+$x\in\mathfrak D^{-1}J^{-1}$.
+
+Take any integral ideal $\mathfrak b$ satisfying (AH.33), not necessarily
+the particular choice (AH.32). It is nonzero because the different is
+nonzero. Conjugation maps $\mathfrak b^{-1}$ bijectively onto
+$(\overline{\mathfrak b})^{-1}$: multiply the defining inclusion
+$y\mathfrak b\subset\mathcal O_E$ by conjugation in both directions.
+Apply (AH.34) with $J=(\overline{\mathfrak b})^{-1}$ to obtain
+\[
+ J^*=(\mathfrak b\overline{\mathfrak b})^{-1}
+             \overline{\mathfrak b}=\mathfrak b^{-1}.
+\]
+Consequently, for every $x\in E$,
+\[
+ x\in\mathfrak b^{-1}
+ \quad\Longleftrightarrow\quad
+ \operatorname{Tr}_{E/K}(x\overline y)\in\mathcal O_K
+                 \text{ for every }y\in\mathfrak b^{-1}.        \tag{AH.35}
+\]
+This proves \texttt{KcDiffSmulMem.unimodular} in both directions, with
+the literal $\mathcal O_K$-valued trace pairing and the literal inverse
+fractional ideal. No principal generator or metric comparison has been
+substituted for this pairing.
+
+\paragraph{AH15: a finite-kernel formula for the root discriminant.}
+Let $E\subset L=\mathbb Q(\zeta_N)$ be any subfield, and let
+$U\subset U_N$ be its fixing subgroup. For $f\mid N$ define
+\[
+ K_f=\ker(U_N\longrightarrow U_f),\qquad
+ \rho_U(f)=\frac{|K_f\setminus U|}{|K_f|},\qquad
+ S(U)=\sum_{a\mid N}\Lambda(a)\rho_U(N/a),        \tag{AH.36}
+\]
+where $\Lambda(p^j)=\log p$ for $j\ge1$ and is zero on other positive
+integers. Then
+\[
+           \log\operatorname{rd}(E)=S(U),\qquad
+ \operatorname{rd}(E)=|\operatorname{disc}E|^{1/[E:\mathbb Q]}.
+                                                               \tag{AH.37}
+\]
+Here is a derivation, so this formula introduces no analytic input.
+By AH9, $\mathcal O_L=\mathbb Z[\zeta_N]=\mathcal O_E[\zeta_N]$.
+If $f_E$ is the minimal polynomial of $\zeta_N$ over $E$, the relative
+different is $(f_E'(\zeta_N))$. The monogenic different formula follows
+directly from Lagrange interpolation: for a monic separable polynomial
+of degree $a$, the sums
+$\sum_{f_E(z)=0}z^j/f_E'(z)$ are $0$ for $j<a-1$ and $1$ for $j=a-1$.
+Reducing higher powers by $f_E$, these identities give a trace-dual basis
+of $\mathcal O_E[\zeta_N]$ in
+$f_E'(\zeta_N)^{-1}\mathcal O_E[\zeta_N]$, with a triangular change of
+basis of determinant $\pm1$. This proves the ideal formula in both
+directions. Also
+\[
+ f_E'(\zeta_N)=
+       \prod_{\substack{u\in U\\u\ne1}}(\zeta_N-\zeta_N^u).
+\]
+The discriminant tower identity, obtained from the determinant of the
+trace pairing in a tower, is
+\[
+ |\operatorname{disc}L|
+   =|\operatorname{disc}E|^{[L:E]}
+      N_{L/\mathbb Q}(\mathfrak D_{L/E}).
+\]
+Subtract its logarithm from the corresponding product for $E=\mathbb Q$.
+This gives
+\[
+ [L:E]\log|\operatorname{disc}E|
+       =\sum_{u\notin U}\log|N_{L/\mathbb Q}(\zeta_N-\zeta_N^u)|.
+                                                               \tag{AH.38}
+\]
+If $h$ is the additive order of $u-1$ modulo $N$, then $h>1$ and
+$\zeta_N-\zeta_N^u$ is a root of unity times $1-\eta$ for a primitive
+$h$th root $\eta$. Its norm has logarithm
+$\varphi(N)\Lambda(h)/\varphi(h)$. Indeed,
+$\Phi_h(1)=p$ for $h=p^j$ and $1$ otherwise. The last evaluation follows
+by induction from
+$\prod_{a\mid h,\,a>1}\Phi_a(1)=h$, obtained by evaluating
+$(X^h-1)/(X-1)$ at $1$. Taking the norm first in $\mathbb Q(\eta)$ and
+then in $L$ proves the stated logarithm.
+
+For each divisor $h>1$ of $N$, the elementary identity
+\[
+ \frac{\Lambda(h)}{\varphi(h)}
+   =\sum_{\substack{a\mid N\\h\mid a}}
+             \Lambda(a)\frac{\varphi(N/a)}{\varphi(N)}           \tag{AH.39}
+\]
+holds. If $h$ is not a prime power both sides vanish. If $h=p^j$ and
+$N=p^v m$, $p\nmid m$, the right side is the geometric totient sum
+$\log p\,\sum_{i=j}^v\varphi(p^{v-i})/\varphi(p^v)
+=\log p/\varphi(p^j)$.
+The condition $h\mid a$ says $u\equiv1\pmod{N/a}$, and
+$|K_f|=\varphi(N)/\varphi(f)$ by surjective reduction.
+Interchange the two finite sums in (AH.38), use (AH.39), and divide by
+$[L:E][E:\mathbb Q]=\varphi(N)$. This proves (AH.37).
+
+\paragraph{AH16: all three numerical discriminant bounds and its support.}
+First, for any subgroup $U\subset U_N$,
+\[
+                  [U_N:U]\le\exp(2S(U)).        \tag{AH.40}
+\]
+Choose the least divisor $c_1$ of $N$ for which $K_{c_1}\subset U$.
+If $K_a,K_b\subset U$, then $K_{\gcd(a,b)}\subset U$:
+for $u\equiv1\pmod{\gcd(a,b)}$, CRT gives a unit $v$ with
+$v\equiv1\pmod a$, $v\equiv u\pmod b$, and then
+$u=v(v^{-1}u)\in K_aK_b$. Lift from the lcm modulus to $N$ using AH1.
+It follows by minimality that $c_1\mid f$ whenever $K_f\subset U$.
+If $c_1\nmid f$, the proper subgroup $K_f\cap U$ has index at least $2$
+in $K_f$, so $\rho_U(f)\ge1/2$. Counting prime powers shows
+\[
+ \sum_{\substack{a\mid N\\c_1\nmid N/a}}\Lambda(a)=\log c_1:
+\]
+for $p^v\Vert N$ and $p^b\Vert c_1$ the sum contains precisely the last
+$b$ powers of $p$. Hence $2S(U)\ge\log c_1$, while
+$[U_N:U]\le\varphi(c_1)\le c_1$. This proves (AH.40).
+
+Apply this to $U=\ker\operatorname{art}$ of a raw host.
+Surjectivity and $|G|=4n$ give
+\[
+                         4n\le\operatorname{rd}(E)^2.           \tag{AH.41}
+\]
+For the upper bound, $\rho_U(f)\le1-\varphi(f)/\varphi(N)$ because
+$1\in K_f\cap U$. At $f=N/d=Qq$, the image of $K_f$ has order $2$ by
+(AH.28), so $\rho_U(f)=1/2$. At $f=N/q=Qd$, the group $K_f$ is cyclic,
+being isomorphic to $U_q$ by CRT, and \texttt{art\_q} makes its image
+have exponent dividing $2$. Thus its image has order at most $2$, and
+$\rho_U(N/q)\le1/2$. In the remaining terms of (AH.36), retain just the
+improvement at powers of $2$ over the bound $\rho\le1$.
+Writing $N=2^v m$ with $m$ odd, their total improvement is
+\[
+ \log2\sum_{j=1}^v\frac{\varphi(N/2^j)}{\varphi(N)}
+       =\log2.
+\]
+Since $q,d$ are distinct odd primes, these corrections are disjoint.
+Using $\sum_{a\mid N}\Lambda(a)=\log N$ gives
+\[
+ \begin{split}
+ \log\operatorname{rd}(E)
+ &\le\log N-\log2-\tfrac12\log q-\tfrac12\log d,\\
+ \operatorname{rd}(E)&\le\frac Q2\sqrt{qd}.       \tag{AH.42}
+ \end{split}
+\]
+
+For the lower bound, \texttt{art\_h} implies that every $u\in U$ reduces
+to $1$ or $-1$ modulo $T_e$. Write again $N=2^v m$, $m$ odd; here
+$v\ge e+2$. For $0\le i\le e+1$, the reduction of $K_{2^i m}$ in
+$U_{T_e}$ has order $2^{e+1}/\varphi(2^i)$ and equal-size fibers.
+Among its elements, at most two of $\{1,-1\}$ are possible if $i=0,1$,
+and at most one if $i\ge2$. Therefore
+\[
+ \rho_U(2^i m)\ge
+     1-\frac{\varphi(2^i)+\mathbf1_{i<2}}{2^{e+1}}.
+\]
+Use in (AH.36) the distinct prime-power terms $a=2^{v-i}$ for these
+indices and the term $a=d$. All other terms are nonnegative.
+Since $\sum_{i=0}^{e+1}\varphi(2^i)=2^{e+1}$ and
+$\rho_U(N/d)=1/2$, this proves
+\[
+ \begin{split}
+ \log\operatorname{rd}(E)
+   &\ge(e+1-2^{-e})\log2+\tfrac12\log d,\\
+ 2^{e+1-2^{-e}}\sqrt d&\le\operatorname{rd}(E).  \tag{AH.43}
+ \end{split}
+\]
+The counts also justify the stated reductions when $i=0$, since
+$U_1$ is the trivial group.
+
+No rational prime outside $N$ divides $\operatorname{disc}E$, by AH9 and
+the ramification criterion for the different. The prime $d$ does divide
+it because its inertia group is nontrivial. The same is true of $2$:
+CRT makes $K_m$ surject onto $U_{T_e}$, and \texttt{art\_h} makes its
+image surject onto the nontrivial group $H_e$; thus $I_2\ne1$.
+Finally $E/F$ is unramified at every finite prime, so the discriminant
+tower identity gives $|\operatorname{disc}E|=|\operatorname{disc}F|^2$.
+There are $2n$ conjugate pairs of complex embeddings of $E$, an even
+number, so its discriminant has positive sign. Thus
+\[
+ \operatorname{disc}E=(\operatorname{disc}F)^2,\qquad
+ 2d\mid\operatorname{disc}E,\qquad
+ p\mid\operatorname{disc}E\Longrightarrow p\mid N
+ \quad(p\text{ prime}).                         \tag{AH.44}
+\]
+These are the literal \texttt{discr\_sq}, \texttt{discr\_primes},
+\texttt{rd\_ge}, \texttt{rd\_le} and \texttt{rd\_sq\_ge} fields.
+
+\paragraph{AH17: the full raw-to-derived host theorem.}
+The preceding arguments prove \texttt{HostRaw.der} for every raw host,
+with no new arithmetic premise. The exact coverage of its thirty fields
+is as follows:
+\[
+\begin{array}{p{0.72\linewidth}l}
+\texttt{art\_surj, cm, conj\_iff, finrank\_E, finrank\_F, mem\_F,
+cmType, ps\_root, art\_ch}&\mathrm{AH10}\\[2pt]
+\texttt{frob, frob\_any, inertia, decomp}&\mathrm{AH9,AH10}\\[2pt]
+\texttt{ps\_d, inertia\_d, decomp\_typeI, decompConj, unramEF}
+ &\mathrm{AH11}\\[2pt]
+\texttt{splitK, ordinary, eta}&\mathrm{AH12}\\[2pt]
+\texttt{diffSupport, principal}&\mathrm{AH13}\\[2pt]
+\texttt{unimodular}&\mathrm{AH14}\\[2pt]
+\texttt{discr\_sq, discr\_primes, rd\_ge, rd\_le, rd\_sq\_ge}
+ &\mathrm{AH15,AH16}\\[2pt]
+\texttt{norm\_mu}&\mathrm{AC2,AC3}.
+\end{array}                                                     \tag{AH.45}
+\]
+For the last line, the raw hypotheses already give
+$[E:\mathbb Q]=4n$, $d>3$ prime, and $K=\mathbb Q(\sqrt{-d})$;
+AC2--AC3 prove $N_{E/K}(\zeta)=1$ for every root of unity, including its
+$2$-primary part. Thus that result introduces no dependency on
+\texttt{HostDer.norm\_mu} itself. Appending these proved fields to $H$
+gives the literal \texttt{HostAx.ofRaw H}, whose raw projection is $H$.
+In particular the arithmetic input to HC4's host witness is now supplied.
+
+\paragraph{AH18: the complete prescribed-character field theorem.}
+Let $\psi$ be any primitive complex Dirichlet character of conductor $M>0$,
+and set $\Xi=\langle\psi\rangle$, $o=|\Xi|$. Choose $c_0,e_1$ by AH6
+and set
+\[
+                   e_0=\max(e_1,2,4M,64o).       \tag{AH.46}
+\]
+For every $e\ge e_0$, every $q,d$ satisfying (AH.2), and every integer
+$b\ge4M$, assume additionally
+\[
+ q\ne3,\qquad \gcd(M,qd)=1,\qquad
+ (-d/p)=1\text{ for every odd prime }p\le b.     \tag{AH.47}
+\]
+Use the frame from AH2, the Artin map from AH3, the fixed field from AH4,
+and AH17 to obtain an actual $H:\texttt{HostAx}\,\phi$.
+Then $\phi.e=e$, $n=c_0\,2^e$, $H.q=q$, $H.d=d$, and
+$\phi.o=o=(\texttt{Level.cyc}\,\psi).o$.
+
+Here are all the remaining quantitative rows. Since
+$Q\mid W_e\mid4M2^e$ and $n\ge2^e$,
+\[
+ Q\mid\operatorname{lcm}(T_e,M),\qquad Q\le4Mn.
+\]
+Also $4M\le e<2^e$ implies
+$Q\le4M2^e\le2^{2e}\le n^2$. The bound $o\le2^o$ gives
+$o^{64}\le2^{64o}\le2^e$. If an odd prime $\ell$ divides $Q$, it divides
+$M$; hence $4\ell\le4M\le b$, and the splitting hypothesis in (AH.47)
+applies. Thus the eight fields of \texttt{FieldRows} are all proved:
+the first-sign Legendre formula and the actual square root of $-q$ come
+from AH3--AH4, exactness from AH5, $Q\le n^2$ and $o^{64}\le2^e$ from
+these inequalities, $q\ne3$ and splitting below $b$ from (AH.47), and
+$4\ell\le b$ for odd $\ell\mid Q$ from the divisor argument.
+AH7 supplies \texttt{KeptInXp} and
+\texttt{ExceptionalCharacterKept}; AH8 supplies \texttt{KerChi} and
+\texttt{TwistForm}. This is every conjunct of the literal
+\texttt{UpperTheory.Top.fieldChi} theorem, with $c_0\ge1$ and with
+$c_0,e_0$ chosen before $e,q,d,b$.
+
+The result does not select primes satisfying the simultaneous analytic
+pair window, does not supply \texttt{VVle}, and does not prove a top-window
+estimate. The original $q,d$ congruence and splitting hypotheses are
+preserved exactly. HC10 can now use this constructed field, and SZ13 can
+construct ranks over its actual frame when the required order window is
+supplied. Those joins retain their analytic inputs and the separate
+\texttt{HostGood}, \texttt{WinOK}, \texttt{LevelPrime},
+$d_u$--$D_s$, \texttt{Over} and \texttt{RecOK} interfaces.
+

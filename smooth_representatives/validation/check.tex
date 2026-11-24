@@ -1,0 +1,1424 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools,microtype,mathrsfs}
+\usepackage[margin=25mm,top=23mm,bottom=25mm]{geometry}
+\usepackage{booktabs,array,longtable,enumitem,xcolor,fancyhdr}
+\usepackage[colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black,citecolor=blue!45!black]{hyperref}
+\hypersetup{pdftitle={Reading the Alpoge--Claude RH and Dirichlet-GRH proof: working version 0.36},pdfauthor={ChatGPT},pdfsubject={Partial human-readable reconstruction with explicit arithmetic inputs},pdfkeywords={Riemann hypothesis, Lean, theta lifts, prime sums, Arakelov slopes}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlist{topsep=3pt,itemsep=3pt,leftmargin=*}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small RH and Dirichlet GRH: a reconstruction}
+\fancyhead[R]{\small Working version 0.36}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\Rea}{\operatorname{Re}}
+\newcommand{\HS}{\mathrm{HS}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\codim}{\operatorname{codim}}
+\newcommand{\covol}{\operatorname{covol}}
+\newcommand{\OK}{\mathcal O_K}
+\newcommand{\src}[2]{\href{https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/#1}{\texttt{#2}}}
+\newcommand{\status}[1]{\textbf{Status:} #1}
+\begin{document}
+\section{From Hilbert vectors to the original smooth automorphic map}
+\label{sec:smooth-representatives}
+
+This chapter proves the original smooth-representative theorem and the
+full \texttt{BackForm.\allowbreak exists\_\allowbreak multMap} on its stated inputs.  The
+actual adelic chart and fixed-order growth estimate are supplied in
+ASB; the representative construction uses only its local chart
+comparison, not the global rational-point count.
+The final installation retains the original initial boundedness and
+target finite-volume inputs.  The common datum \(R\) is never replaced.
+
+We first work with a locally compact, second-countable Hausdorff group
+\(G\), a left Haar measure \(\mu\), a complex Hilbert space
+\(\mathcal H\), and a representative assignment
+\(\iota:\mathcal H\to\mathbf C^G\).
+The two assumptions on this assignment are
+\[
+\begin{split}
+ &\iota(av+w)=a\,\iota(v)+\iota(w)\quad\mu\text{-almost everywhere},\\
+ &\forall K\subset G\text{ compact}\ \exists M_K\ge0\
+   \forall v\in\mathcal H:\quad
+   \iota(v)\in L^1(K),\qquad
+   \int_K|\iota(v)|\,d\mu\le M_K\|v\|.
+\end{split}
+\tag{SPR.1}
+\]
+An equality between representatives below means a globally Haar
+almost-everywhere equality, not an equality restricted to one
+fundamental domain.  Write
+\(\operatorname{Rep}(v,\phi)\) for
+\(\iota(v)=\phi\) almost everywhere.
+When a representation is used, it is a homomorphism
+\(\rho:G\to\operatorname{Isom}_{\mathbf C}(\mathcal H)\) with
+strongly continuous orbits and
+\[
+ \operatorname{Rep}\bigl(\rho(g)v,\iota(v)(\,\cdot\,g)\bigr).
+ \tag{SPR.2}
+\]
+The group is assumed unimodular precisely where right translation of
+almost-everywhere identities is used.  These assumptions hold on the
+original quotient by RQC1--RQC6 and RQC11.
+
+% BEGIN SPR1
+\paragraph{SPR1: local \(L^1\) calculus and uniqueness of continuous representatives.}
+\label{claim:SPR1}
+Under (SPR.1), the map
+\[
+ I_K:\mathcal H\longrightarrow L^1(K,\mu),\qquad
+               v\longmapsto[\iota(v)|_K]
+ \tag{SPR.3}
+\]
+is complex linear and bounded, with norm at most \(M_K\).
+It commutes with every Bochner integral for which the integrand is
+integrable in \(\mathcal H\).  Continuous representatives are unique.
+
+\emph{Proof.}
+The first line of (SPR.1) implies the zero, addition and scalar
+identities in the quotient \(L^1(K)\); the second gives its norm
+bound.  Approximate a Bochner-integrable function by integrable simple
+functions.  Linearity gives commutation for the simple functions,
+and boundedness of \(I_K\) passes the identity to their \(L^1\) limits.
+
+For completeness, the global representative test used below is
+\[
+ \left[\ \int_K\iota(v)\,d\mu=\int_K\phi\,d\mu
+           \quad\hbox{for every compact }K\ \right]
+ \quad\Longrightarrow\quad \operatorname{Rep}(v,\phi),
+ \tag{SPR.4}
+\]
+provided \(\phi\) is locally integrable.
+Indeed the locally integrable difference defines a complex measure
+on each relatively compact open set.  Haar regularity and
+integrability of its density approximate every measurable set there
+from compact sets in the total-variation measure.  All its compact
+integrals being zero, this complex measure is zero.  Apply this
+separately to the positive and negative parts of the real and
+imaginary densities, and cover \(G\) by countably many relatively
+compact sets.  The difference is zero almost everywhere on \(G\).
+
+If two continuous representatives agree almost everywhere, their
+difference vanishes everywhere.  A nonzero value would, by
+continuity, give a nonempty open set on which its absolute value is
+bounded below by a positive constant.  Every nonempty open set has
+positive Haar measure.  This proves uniqueness, including when
+\(\iota\) is not injective as a map of vectors.
+These arguments give the entire local representative calculus used
+by \texttt{LocRep.\allowbreak exists\_\allowbreak pairing} and \texttt{rep\_\allowbreak of\_\allowbreak pairing}.
+% END SPR1
+
+% BEGIN SPR2
+\paragraph{SPR2: a continuous parameter integral represents the Hilbert integral.}
+\label{claim:SPR2}
+Let \(Q\) be a compact subset of a second-countable Hausdorff parameter
+space with locally finite Borel measure \(\nu\).  Suppose \(w(t)\) is
+continuous with values in \(\mathcal H\), the function
+\((t,x)\mapsto\phi(t,x)\) is continuous, and
+\(\operatorname{Rep}(w(t),\phi(t,\cdot))\) holds for each \(t\).
+Then
+\[
+ \Phi(x)=\int_Q\phi(t,x)\,d\nu(t)
+ \quad\hbox{is continuous},\qquad
+ \operatorname{Rep}\left(\int_Qw(t)\,d\nu(t),\Phi\right).
+ \tag{SPR.5}
+\]
+
+\emph{Proof.}
+Near a fixed \(x_0\), choose a compact neighborhood \(B\).
+The continuous integrand is bounded on \(Q\times B\), so dominated
+convergence proves continuity in \(x\).
+For any compact \(K\), both \(w\) and the scalar integrand on
+\(Q\times K\) are integrable.  The bounded functional
+\[
+ v\longmapsto\int_K\iota(v)\,d\mu
+\]
+from SPR1 commutes with the Hilbert integral.  Fubini and the
+individual representative identities yield
+\[
+ \int_K\iota\!\left(\int_Q w(t)\,d\nu(t)\right)d\mu
+ =\int_Q\int_K\phi(t,x)\,d\mu(x)\,d\nu(t)
+ =\int_K\Phi(x)\,d\mu(x).
+\]
+SPR1's compact-set test proves (SPR.5).
+No common exceptional set for all parameters was assumed:
+integration is performed through the continuous functionals.
+This proves the full original
+\texttt{representative\_\allowbreak parametric\_\allowbreak integral\_\allowbreak continuous\_\allowbreak family}.
+% END SPR2
+
+% BEGIN SPR3
+\paragraph{SPR3: compact averaging produces a continuous representative.}
+\label{claim:SPR3}
+Assume (SPR.1)--(SPR.2).  For \(\eta\in C_c(G)\) and \(v\in\mathcal H\),
+the vector
+\[
+ A_\eta v=\int_G\eta(y)\rho(y)v\,d\mu(y)
+\]
+has the continuous representative
+\[
+ \phi_{\eta,v}(x)
+   =\int_G\eta(y)\iota(v)(xy)\,d\mu(y)
+   =\int_G\eta(x^{-1}z)\iota(v)(z)\,d\mu(z).
+ \tag{SPR.6}
+\]
+This conclusion needs left Haar invariance only.
+
+\emph{Proof.}
+The Hilbert integral converges since its integrand is continuous,
+compactly supported, and has norm \(|\eta(y)|\|v\|\).
+The second expression follows by the left translation \(z=xy\).
+For \(x\) in a compact neighborhood \(B\) of \(x_0\), its scalar
+integrand is supported in \(B\operatorname{supp}\eta\) and dominated
+by
+\(\|\eta\|_\infty|\iota(v)(z)|\) there.
+This is integrable by (SPR.1).  Dominated convergence gives
+continuity of \(\phi_{\eta,v}\).
+
+Fix a compact \(K\).  From (SPR.2), the local bound and isometry,
+\[
+ \int_K|\iota(v)(xy)|\,d\mu(x)
+ =\int_K|\iota(\rho(y)v)(x)|\,d\mu(x)
+ \le M_K\|v\|.
+\]
+Consequently the absolute double integral of
+\(\eta(y)\iota(v)(xy)\) over \(G\times K\) is at most
+\(M_K\|v\|\|\eta\|_1\).
+The product function is measurable up to completion: choose a
+measurable representative of \(\iota(v)\), and use the Haar
+null-set property for the multiplication map, justified slice by
+slice by left translation and Fubini.
+Thus Fubini is applicable.  The same compact integration
+functional as in SPR2 gives
+\[
+ \int_K\iota(A_\eta v)\,d\mu=\int_K\phi_{\eta,v}\,d\mu.
+\]
+SPR1 proves the representative identity.
+This is the original
+\texttt{exists\_\allowbreak continuous\_\allowbreak representative\_\allowbreak average}, with no
+smoothness assumption on \(v\).
+% END SPR3
+
+% BEGIN SPR4
+\paragraph{SPR4: continuous representatives are dense at the same fixed finite level.}
+\label{claim:SPR4}
+Let \(H,U\le G\), with \(U\) open, and suppose
+\[
+          y^{-1}Hy\subseteq H\qquad(y\in U).
+ \tag{SPR.7}
+\]
+Every \(H\)-fixed vector is a norm limit of \(H\)-fixed vectors
+having continuous representatives.
+
+\emph{Proof.}
+For an \(H\)-fixed \(v\) and \(\epsilon>0\), strong continuity gives
+an identity neighborhood
+\[
+ W=U\cap\{y:\|\rho(y)v-v\|<\epsilon/2\}.
+\]
+Choose a nonnegative continuous compactly supported function
+\(f\) supported in \(W\), with \(f(1)=1\).
+Such a function follows from local compactness and the separation
+of a compact neighborhood of \(1\) from the complement of \(W\);
+the standard separation construction gives a function between
+zero and one.  Its integral \(c\) is positive by Haar positivity
+and finite by compact support.
+Set \(\eta=f/c\).  Then \(\int\eta=1\), and SPR3 gives a
+continuous representative for \(A_\eta v\).
+
+For \(h\in H\) and \(y\) in the support,
+\[
+ \rho(h)\rho(y)v
+ =\rho(y)\rho(y^{-1}hy)v=\rho(y)v
+\]
+by (SPR.7).  Hence \(A_\eta v\) is fixed by the same \(H\).
+Moreover
+\[
+ \|v-A_\eta v\|
+ \le\int_G\eta(y)\|v-\rho(y)v\|\,d\mu(y)
+ \le\epsilon/2<\epsilon.
+\]
+Choosing \(\epsilon\to0\) proves density.
+This checks the original
+\texttt{exists\_\allowbreak fixed\_\allowbreak average\_\allowbreak approx\_\allowbreak of\_\allowbreak subgroup\_\allowbreak fixed}
+with its actual normalization condition; no smaller varying
+finite level has been introduced.
+% END SPR4
+
+% BEGIN SPR5
+\paragraph{SPR5: bounded local evaluations extend to the Hilbert closure.}
+\label{claim:SPR5}
+Let \(A:\mathcal H\to\mathcal H\) be bounded complex linear and
+\(E\subseteq\mathcal H\) a complex subspace.
+Suppose every \(Av\), \(v\in E\), has a continuous representative
+\(\psi_v\), and for every compact \(B\subset G\) there is \(c_B\ge0\)
+such that
+\[
+           |\psi_v(x)|\le c_B\|v\|
+             \qquad(v\in E,\ x\in B).
+ \tag{SPR.8}
+\]
+Then there are bounded linear functionals
+\(\Lambda_x:\mathcal H\to\mathbf C\) such that, for \(v\in\overline E\),
+\[
+ x\longmapsto\Lambda_xv\text{ is continuous},\qquad
+             \operatorname{Rep}(Av,\Lambda_\bullet v).
+ \tag{SPR.9}
+\]
+
+\emph{Proof.}
+SPR1 and (SPR.1) make \(v\mapsto\psi_v(x)\) linear:
+both sides of an addition or scalar identity are continuous
+representatives of the same Hilbert vector.
+The singleton case of (SPR.8) makes this functional bounded on
+\(E\); extend it by continuity to \(\overline E\).
+Compose with the orthogonal projection
+\(P:\mathcal H\to\overline E\) to obtain \(\Lambda_x\) on all of
+\(\mathcal H\), with the same bound.
+The needed projection is obtained directly by minimizing distance
+to the closed subspace: a minimizing sequence is Cauchy by the
+parallelogram identity; its limit exists by completeness, and
+differentiation of its squared distance along the subspace gives
+orthogonality and the norm bound \(\|P\|\le1\).
+
+For \(v_n\in E\) with \(v_n\to v\in\overline E\),
+\[
+ \sup_{x\in B}|\Lambda_xv_n-\Lambda_xv|
+                       \le c_B\|v_n-v\|.
+ \tag{SPR.10}
+\]
+Thus \(\Lambda_\bullet v\) is a locally uniform limit of continuous
+functions and is continuous.  Also \(Av_n\to Av\), and the bounded
+map \(I_K\) of SPR1 gives
+\(\iota(Av_n)\to\iota(Av)\) in \(L^1(K)\).
+Equation (SPR.10) gives convergence of their continuous
+representatives in the same \(L^1(K)\).
+Their two limits agree almost everywhere on \(K\), and a countable
+compact cover gives (SPR.9) globally.
+This proves the full original \texttt{exists\_\allowbreak eval\_\allowbreak closure}.
+Only the evaluations on \(\overline E\) matter; operator-norm
+continuity of \(x\mapsto\Lambda_x\) is not required.
+% END SPR5
+
+% BEGIN SPR6
+\paragraph{SPR6: evaluation of a compact parameter average at the original level.}
+\label{claim:SPR6}
+Assume also that \(\mu\) is right invariant.
+Let \(H,U\) satisfy (SPR.7), with \(U\) open.
+Let \(Q\subset\mathbf R^N\) and \(\Omega\subset G\) be compact,
+\(\Theta:\mathbf R^N\to G\) continuous, and \(C\ge0\).
+Suppose, for every continuous nonnegative right-\(H\)-invariant
+function \(f\),
+\[
+             \int_Q f(\Theta(t))\,dt
+                  \le C\int_\Omega f(y)\,d\mu(y).
+ \tag{SPR.11}
+\]
+For every continuous scalar \(\kappa\) there is a family of bounded
+linear evaluations \(\Lambda_x\) such that every \(H\)-fixed \(v\)
+satisfies
+\[
+ \operatorname{Rep}\left(
+       \int_Q\kappa(t)\rho(\Theta(t))v\,dt,\,
+       x\longmapsto\Lambda_xv\right),
+ \qquad \Lambda_\bullet v\text{ is continuous}.
+ \tag{SPR.12}
+\]
+
+\emph{Proof.}
+The Hilbert averaging operator \(A\) is bounded by
+\(\int_Q|\kappa(t)|\,dt\).
+Let \(E\) be the subspace of \(H\)-fixed vectors having continuous
+representatives.  Its linearity follows from SPR1.
+For \(v\in E\), write \(\operatorname{Rep}(v,\phi)\).
+Right invariance of Haar measure, (SPR.2), and continuous
+uniqueness give
+\[
+                         \phi(xh)=\phi(x)\qquad(h\in H).
+ \tag{SPR.13}
+\]
+SPR2 identifies the continuous representative of \(Av\) as
+\(\psi_v(x)=\int_Q\kappa(t)\phi(x\Theta(t))\,dt\).
+
+For \(x\) in a compact \(B\), apply (SPR.11) to
+\(f(y)=|\phi(xy)|\).  Put
+\(b=\sup_{t\in Q}|\kappa(t)|\).  Left Haar invariance and (SPR.1)
+give
+\[
+\begin{split}
+ |\psi_v(x)|
+ &\le bC\int_\Omega|\phi(xy)|\,d\mu(y)\\
+ &\le bC\int_{B\Omega}|\phi(z)|\,d\mu(z)
+ \le bC M_{B\Omega}\|v\|.
+\end{split}
+\tag{SPR.14}
+\]
+The second inequality follows since \(x\Omega\subseteq B\Omega\);
+no invariance of \(\Omega\) is assumed.
+Apply SPR5, then SPR4, since every \(H\)-fixed vector belongs to
+\(\overline E\).  This is exactly the original
+\texttt{SmoothRep.\allowbreak exists\_\allowbreak eval}.  In the adelic application ASB4
+supplies (SPR.11) with the same prescribed finite level.
+% END SPR6
+
+% BEGIN SPR7
+\paragraph{SPR7: the vector-valued one-dimensional averaging identity.}
+\label{claim:SPR7}
+Let \(c:\mathbf R\to G\) be a continuous one-parameter subgroup.
+If
+\(\frac{d}{dt}|_{t=0}\rho(c(t))w=w'\), then, for \(s>0\),
+\[
+ w=\int_0^s\frac1s\,\rho(c(r))w\,dr
+       -\int_0^s\frac{s-r}{s}\,\rho(c(r))w'\,dr.
+ \tag{SPR.15}
+\]
+
+\emph{Proof.}
+The group law and boundedness of \(\rho(c(r))\) transport the
+derivative at zero to
+\[
+ \frac{d}{dt}\bigg|_{t=r}\rho(c(t))w=\rho(c(r))w'.
+\]
+The latter is continuous in \(r\) by strong continuity.
+Differentiate
+\((s-r)\rho(c(r))w/s\), integrate from \(0\) to \(s\), and use
+its endpoint values \(w\) and \(0\).
+The Banach-valued fundamental theorem follows by integrating
+the continuous derivative; it may also be checked after every
+continuous real linear functional, which separates points.
+All integrals are of continuous functions on a compact interval.
+This proves the original weighted-average identity, with its
+minus sign and exact scale.
+% END SPR7
+
+% BEGIN SPR8
+\paragraph{SPR8: a finite cube identity preserving the noncommutative word order.}
+\label{claim:SPR8}
+Let \(c_1,\ldots,c_N\) be continuous one-parameter subgroups,
+and let \(S\subseteq\mathcal H\) be stable under maps \(d_j\)
+such that
+\(\frac{d}{dt}|_0\rho(c_j(t))v=d_jv\) for every \(v\in S\).
+Set
+\[
+ Q=[0,s]^N,\qquad
+       \Theta(t)=c_1(t_1)\cdots c_N(t_N).
+\]
+For \(I=\{i_1<\cdots<i_r\}\subseteq\{1,\ldots,N\}\), put
+\[
+ \kappa_I(t)=
+   \prod_{j\notin I}\frac1s
+   \prod_{j\in I}\left(-\frac{s-t_j}{s}\right),
+ \qquad D_Iv=d_{i_r}\cdots d_{i_1}v,\qquad D_\varnothing v=v.
+\]
+Then
+\[
+             v=\sum_{I\subseteq\{1,\ldots,N\}}
+                  \int_Q\kappa_I(t)\rho(\Theta(t))D_Iv\,dt
+                     \qquad(v\in S).
+ \tag{SPR.16}
+\]
+In particular the coefficient functions and finite derivative
+words are chosen before the maps \(d_j\), the stable set \(S\),
+and the vector \(v\).
+
+\emph{Proof.}
+For \(N=0\), the cube is a point of zero-dimensional volume one,
+and there is one empty word with coefficient one.
+Assume the formula for \(N\).  In each term apply (SPR.15)
+for \(c_{N+1}\) to the vector \(D_Iv\in S\).
+The nondifferentiated term appends the factor \(1/s\).
+The differentiated term appends the scalar
+\(-(s-t_{N+1})/s\) and replaces \(D_Iv\) by
+\(d_{N+1}D_Iv\).
+The group action becomes
+\(\rho(c_1(t_1)\cdots c_N(t_N)c_{N+1}(t_{N+1}))\).
+Fubini for continuous Hilbert-valued functions on the compact cube
+gives (SPR.16) at \(N+1\).
+
+The new derivative is placed on the left of the old derivative
+word; no derivative operators have been commuted.  In the source's
+right-fold convention the corresponding list is
+\([i_r,\ldots,i_1]\).
+This explicit choice supplies every field of the original
+\texttt{eq\_\allowbreak sum\_\allowbreak integral\_\allowbreak cube\_\allowbreak derivatives}.
+% END SPR8
+
+
+% BEGIN SPR9
+\paragraph{SPR9: smooth curve products remain smooth after ordered differentiation.}
+\label{claim:SPR9}
+In this paragraph the global isometry and strong-continuity
+assumptions on \(\rho\) are unnecessary: only the group law and
+bounded linearity of each \(\rho(g)\) are used, together with
+the following smoothness hypothesis.  No topology on \(G\)
+is needed for this assertion.
+Let \(A\subseteq P\) index maps \(e_p:\mathbf R\to G\), and put
+\[
+ \operatorname{Sm}(v)\ \Longleftrightarrow\
+  \left[t\longmapsto
+   \rho(e_{p_1}(t_1)\cdots e_{p_k}(t_k))v
+     \text{ is }C^\infty
+       \text{ for every finite admissible list }p_1,\ldots,p_k\right].
+ \tag{SPR.17}
+\]
+Write \(d_pv=\frac{d}{dr}|_0\rho(e_p(r))v\) when
+\(\operatorname{Sm}(v)\).
+Then smooth vectors are stable under these derivatives and under
+finite products of the actions \(e_p(r)\).  More precisely, for
+every admissible word \(l\),
+\[
+ t\longmapsto d_l\!
+       \left(\rho(e_{p_1}(t_1)\cdots e_{p_k}(t_k))v\right)
+           \quad\hbox{is }C^\infty,
+ \tag{SPR.18}
+\]
+where \(d_l\) has the original right-fold order.
+
+\emph{Proof.}
+Use the following strengthened smoothness property for a
+parameter-dependent vector \(\Phi(z)\).
+After every smooth change of its parameters and after multiplication
+on the left by any finite product
+\(\rho(e_{q_1}(a_1(s))\cdots e_{q_m}(a_m(s)))\), with admissible
+\(q_j\) and smooth real functions \(a_j\), the resulting
+Hilbert-valued function is smooth.
+A constant vector \(v\) has this property by (SPR.17), composed
+with the smooth coordinate map
+\(s\mapsto(a_1(s),\ldots,a_m(s))\).
+Adding a parameter-dependent finite group word preserves the
+property by concatenation of the two words.
+
+It is also preserved by \(\Phi\mapsto d_p\Phi\).
+For a given outer word, introduce a new real variable \(r\) and
+insert \(e_p(r)\) between that word and \(\Phi\).
+The strengthened hypothesis makes the resulting function of
+\((s,r)\) smooth.  Its derivative in \(r\) at zero is smooth in
+\(s\).  At each fixed \(s\), bounded linearity of the outer
+\(\rho\)-operator identifies this derivative with the outer
+operator applied to \(d_p\Phi(s)\).
+Induction on \(l\) proves the strengthened property for every
+ordered derivative word.  Applying it to a translated constant
+vector gives (SPR.18), and specializing the parameters gives the
+two stability assertions.
+
+No interchange of two Lie derivatives is used.  This argument
+also proves the literal
+\texttt{smooth\_\allowbreak along\_\allowbreak curve\_\allowbreak products\_\allowbreak stable} for arbitrary maps
+\(e_p\) satisfying its product-smoothness premise: the group and
+one-parameter laws are not used in this particular stability proof.
+% END SPR9
+
+% BEGIN SPR10
+\paragraph{SPR10: Hilbert derivatives transfer to supplied continuous representatives.}
+\label{claim:SPR10}
+Here isometry of \(\rho\) is not required.  Retain strong
+orbit continuity, bounded linearity and the other representative
+hypotheses of the chapter.
+Assume \(\mu\) is right invariant, let \(c:\mathbf R\to G\)
+be a continuous one-parameter subgroup, and suppose
+\[
+ \frac{d}{dt}\bigg|_{0}\rho(c(t))v=v',\qquad
+ \operatorname{Rep}(v,\phi),\quad
+ \operatorname{Rep}(v',\phi'),
+\]
+with \(\phi,\phi'\) continuous.
+Then, for every \(x\in G\),
+\[
+          \frac{d}{dt}\bigg|_0\phi(xc(t))=\phi'(x).
+ \tag{SPR.19}
+\]
+
+\emph{Proof.}
+The one-parameter law transports the Hilbert derivative to
+\(\rho(c(t))v'\) at every \(t\).  Hence
+\[
+ \rho(c(b))v-\rho(c(a))v
+                  =\int_a^b\rho(c(t))v'\,dt.
+\]
+Right invariance, (SPR.2), and the given representative identities
+give continuous representatives \(\phi(\,\cdot\,c(t))\) and
+\(\phi'(\,\cdot\,c(t))\) for the translated vectors.
+SPR2 identifies the continuous representative of the integral.
+By SPR1's uniqueness, for every \(x\) and \(a\le b\),
+\[
+ \phi(xc(b))-\phi(xc(a))
+                    =\int_a^b\phi'(xc(t))\,dt.
+ \tag{SPR.20}
+\]
+Using reversed endpoints covers \(b<a\).
+Thus
+\(\phi(xc(t))=\phi(x)+\int_0^t\phi'(xc(r))\,dr\).
+The ordinary fundamental theorem, whose integrand is continuous,
+gives (SPR.19).  This proves the full
+\texttt{SmoothRep.\allowbreak hasDerivAt\_\allowbreak rep}; it does not differentiate a
+chosen almost-everywhere representative without first constructing
+the continuous representative of its derivative.
+% END SPR10
+
+% BEGIN SPR11
+\paragraph{SPR11: one continuous representative assignment from finitely many averages.}
+\label{claim:SPR11}
+Assume the hypotheses of SPR6.  Suppose all admissible \(e_p\)
+are continuous one-parameter subgroups commuting with every
+\(h\in H\).  Let
+\[
+ \mathcal S=\{v:\operatorname{Sm}(v),\ \rho(h)v=v\ (h\in H)\}.
+\]
+Choose an admissible list \(q_1,\ldots,q_N\), \(s>0\), and put
+\(\Theta(t)=e_{q_1}(t_1)\cdots e_{q_N}(t_N)\).
+Assume its cube \(Q=[0,s]^N\) satisfies (SPR.11).
+Then there is one assignment
+\[
+                     R:\mathcal H\longrightarrow\mathbf C^G
+\]
+such that \(Rv\) is continuous and
+\(\operatorname{Rep}(v,Rv)\) for every \(v\in\mathcal S\).
+
+\emph{Proof.}
+SPR9 proves smoothness of \(d_pv\).  Its \(H\)-fixedness follows by
+differentiating
+\[
+       \rho(h)\rho(e_p(r))v=\rho(e_p(r))\rho(h)v
+                           =\rho(e_p(r))v.
+\]
+The operator \(\rho(h)\) is bounded, so it passes through this
+Hilbert derivative.  Thus \(\mathcal S\) is stable under every
+admissible \(d_p\) and every ordered word.
+
+Use SPR8 for the fixed cube.  For each of its finitely many
+weights \(\kappa_I\), SPR6 supplies evaluations
+\(\Lambda_{I,x}\).  Define, for \(v\in\mathcal S\),
+\[
+                       Rv(x)=\sum_I\Lambda_{I,x}(D_Iv).
+ \tag{SPR.21}
+\]
+Extend this assignment arbitrarily, for example by zero, outside
+\(\mathcal S\).  Each \(D_Iv\) is fixed by \(H\), so every term
+of (SPR.21) is continuous.
+SPR6 identifies its representative as the corresponding averaged
+Hilbert vector.  Summing and applying (SPR.16) gives
+\(\operatorname{Rep}(v,Rv)\).
+
+The same finite weights, derivative words, and evaluation
+functionals are used for every \(v\in\mathcal S\).
+Consequently derivatives of different vectors do not require
+unrelated pointwise choices.
+% END SPR11
+
+% BEGIN SPR12
+\paragraph{SPR12: the same representative has every original pointwise derivative.}
+\label{claim:SPR12}
+For the single assignment \(R\) in SPR11, every
+\(v\in\mathcal S\) satisfies
+\[
+\begin{split}
+ &t\longmapsto Rv\bigl(g\,e_{p_1}(t_1)\cdots e_{p_k}(t_k)\bigr)
+                                  \text{ is }C^\infty,\\
+ &R_{p_1}\cdots R_{p_m}(Rv)=R(d_{p_1}\cdots d_{p_m}v),
+\end{split}
+\tag{SPR.22}
+\]
+for every admissible list and every \(g\in G\), where
+\(R_p\phi(x)=\frac{d}{dt}|_0\phi(xe_p(t))\).
+In the second line both sides are continuous and represent the
+same Hilbert derivative word.
+
+\emph{Proof.}
+Put \(a(t)=e_{p_1}(t_1)\cdots e_{p_k}(t_k)\).
+SPR9 and commutation with \(H\) show that \(\rho(a(t))v\)
+belongs to \(\mathcal S\).
+The representative translation identity and uniqueness imply
+\[
+                     Rv(ga(t))=R(\rho(a(t))v)(g).
+ \tag{SPR.23}
+\]
+Using (SPR.21), the right-hand side is
+\[
+             \sum_I\Lambda_{I,g}\bigl(D_I(\rho(a(t))v)\bigr).
+\]
+Every vector-valued summand is smooth by SPR9, and
+\(\Lambda_{I,g}\) is bounded linear.  This proves the first line
+of (SPR.22).  It avoids a continuity assertion for an unbounded
+derived operator on the ambient Hilbert space.
+
+For a single derivative, SPR10 applies to the continuous
+representatives \(Rv\) and \(R(d_pv)\), supplied simultaneously
+by SPR11.  It gives \(R_p(Rv)=R(d_pv)\).
+The set \(\mathcal S\) is derivative-stable, so induction on a
+right-fold list gives the second line in its original order.
+At each induction step the new representative is the value of
+this same \(R\).  This also proves the source's
+\texttt{foldr\_\allowbreak rel} installation and the complete generic
+\texttt{exists\_\allowbreak smooth\_\allowbreak rep}.
+% END SPR12
+
+% BEGIN SPR13
+\paragraph{SPR13: the full original smooth automorphic representative theorem.}
+\label{claim:SPR13}
+Fix the original \(D,\theta,V\), with \(\operatorname{IsInfFam}(\theta)\),
+the same \(\operatorname{FinPair}(V,\mu,\mathcal F)\), and any
+\(\operatorname{IsReg}(V,\mu,\mathcal F,\rho)\).
+Fix one open subgroup \(U\le G=G_A(D,V)\).
+If \(F\in L^2(\operatorname{AutQ}(V),\nu_Q)\) satisfies the original
+\(\operatorname{IsSmoothVector}'\) and is fixed by
+\(U\cap G_f(V)\), there is one \(\psi:G\to\mathbf C\) such that
+\[
+ \operatorname{Repr}(F,\psi),\qquad
+                  \operatorname{IsAutFun}(V,\psi),
+ \tag{SPR.24}
+\]
+all original finite products of \(\operatorname{oneP}\)-curves give
+smooth functions after every left base point, and, for every
+admissible ordered list \(l\),
+\[
+       R_l\psi\text{ is continuous},\qquad
+                    \operatorname{Repr}(d_lF,R_l\psi).
+ \tag{SPR.25}
+\]
+The \(R_l\) and \(d_l\) here are exactly the source's right folds.
+This is the complete original
+\texttt{SmoothRep.\allowbreak exists\_\allowbreak smooth\_\allowbreak repr}.
+
+\emph{Proof.}
+RQC1 supplies the group topology; RQC3 and RQC6 supply the literal
+quotient measure, global representative convention, and any original
+regular action.  Choose measurable representatives of the quotient
+\(L^2\) classes and pull them back by \(\operatorname{autMk}\):
+\[
+                   \iota(F)(g)=F(\operatorname{autMk}(g)).
+\]
+They are exactly left rational invariant.  A different quotient
+representative changes the pullback only on a globally Haar-null
+set by RQC3, so this assignment gives precisely the source's
+\(\operatorname{Repr}\), including for its chosen \(L^2\) functions.
+Linearity almost everywhere and (SPR.2) follow from HCU16 and
+\(\operatorname{IsReg.val}\).
+
+RQC11 gives (SPR.1) for every compact \(K\), with
+\[
+       M_K=\#(G_Q(V)\cap KK^{-1})\,\mu(\mathcal F)^{1/2}.
+ \tag{SPR.26}
+\]
+This step needs no quantitative rational-point growth estimate.
+It applies to the measurable rational-invariant pullbacks just
+chosen, as in the full scope of RQC11.
+
+Set \(H=U\cap G_f(V)\).
+The finite subgroup is the kernel of the archimedean homomorphism,
+hence is normal.  Therefore \(y^{-1}Hy\subseteq H\) for \(y\in U\).
+The original real one-place elements commute with \(G_f(V)\),
+by the coordinate separation in HCU14.
+Take \(P\) to be the pairs \((\tau,X)\) with
+\(X\in\operatorname{lieAt}(V,\tau)\), and
+\(e_p(t)=\operatorname{oneP}(\theta,V,\tau,X,t)\).
+ASB3 gives their one-parameter laws and the actual finite ordered
+chart; ASB4 gives its exact scalar comparison (SPR.11).
+All hypotheses of SPR11--SPR12 are now checked on the original
+objects.
+
+Let \(\psi=RF\).  Equations (SPR.24)--(SPR.25), except for the
+finite and rational invariances in \(\operatorname{IsAutFun}\),
+follow immediately from SPR11--SPR12.
+For a rational \(\gamma\), the continuous functions
+\(\psi(\gamma\,\cdot)\) and \(\psi\) represent \(F\), by left
+Haar invariance and
+\(\operatorname{autMk}(\gamma g)=\operatorname{autMk}(g)\).
+They are equal everywhere by SPR1.
+For \(k\in U\cap G_f(V)\), the continuous functions
+\(\psi(\,\cdot\,k)\) and \(\psi\) likewise represent the same
+\(F=\rho(k)F\), so they are equal everywhere.
+Thus the original open \(U\) witnesses the finite level; it has
+not been replaced by a level depending on \(l\).
+The smooth curve statement is exactly (SPR.22), and its derivative
+identity gives the whole source list quantifier in (SPR.25).
+
+This proof uses the source's fixed finite pair and global
+almost-everywhere convention.  It proves existence of the
+representatives and every derivative identity, not existence
+of the finite pair itself.
+% END SPR13
+
+\subsection{Installation in the original multiplicity space}
+
+For SPR14--SPR21 fix the original \(D,\theta,V,S,M,w,v\)
+with \(\operatorname{IsInfFam}(\theta)\),
+\(\operatorname{HolShape}(M)\), \(\operatorname{WtIs}(M,w)\), and
+\(\operatorname{IsExtVec}(M,v)\).
+Fix one \(\operatorname{FinPair}(V,\mu,\mathcal F)\), put
+\(\mathcal H=L^2(\operatorname{AutQ}(V),\nu_Q)\), and take the
+original regular action supplied by RQC6.
+Let \(J\subseteq G_f(V)\), and retain
+\[
+ \operatorname{HolForm}(\theta,M,w,J,\chi,\phi),
+                 \qquad \operatorname{ZCusp}(V,\phi).
+ \tag{SPR.27}
+\]
+Thus \(\phi\) is continuous, rational-left invariant, bounded,
+of the prescribed finite character and original holomorphic type.
+The separate \(\operatorname{ZCusp}\) hypothesis is retained.
+HCU16--HCU18 give the original \(F_0\) and bounded multilinear map
+\[
+       \Phi:\prod_\tau M.\mathcal H_\tau\longrightarrow\mathcal H,
+       \qquad \Phi(v)=F_0,\quad
+                     \operatorname{Repr}(F_0,\phi),
+ \tag{SPR.28}
+\]
+with all its original equivariance, closed-orbit and finite-character
+properties.
+Let \(U\) be one open subgroup witnessing the finite invariance
+of \(\phi\).  Every \(\Phi(y)\) is fixed by \(U\cap G_f(V)\)
+by HCU18.  RQC9--RQC10 give its Hilbert smoothness and all derivative
+words.  The same \(U\) will be used throughout this installation.
+
+% BEGIN SPR14
+\paragraph{SPR14: the pointwise realization is one multilinear map.}
+\label{claim:SPR14}
+For \(y=(y_\tau)_\tau\in M.\mathrm{Vec}=\prod_\tau M.\mathrm{sm}_\tau\),
+let \(T(y)\) be the continuous representative of
+\(\Phi((y_\tau)_\tau)\) supplied by SPR13.
+These choices form one complex multilinear map
+\[
+                    T:M.\mathrm{Vec}\longrightarrow\mathbf C^G,
+ \tag{SPR.29}
+\]
+and every \(T(y)\) satisfies the original
+\(\operatorname{IsAutFun}\), at the same \(U\), and all smooth
+curve-product conditions.
+
+\emph{Proof.}
+Existence follows from RQC9, the common finite fixedness in
+HCU18, and SPR13.  The construction may use the single \(R\)
+of SPR11 installed in SPR13; alternatively, uniqueness makes
+any choices agree.
+Fix a place \(\tau\), the other entries of \(y\), and two smooth
+vectors \(a,b\) in that place.
+The continuous functions
+\(T(y[\tau\leftarrow a+b])\) and
+\(T(y[\tau\leftarrow a])+T(y[\tau\leftarrow b])\)
+represent the same Hilbert vector by multilinearity of \(\Phi\)
+and HCU16.  They are equal everywhere.
+The scalar identity follows in the same way.
+These are every defining field of the source's
+\(\operatorname{MMap}(M)\).  SPR13 supplies the asserted
+automorphic and smooth properties for each value.
+% END SPR14
+
+% BEGIN SPR15
+\paragraph{SPR15: exact finite character and original one-place equivariance.}
+\label{claim:SPR15}
+The map \(T\) satisfies
+\[
+ T(y)(xk)=\chi(k)T(y)(x)\quad(k\in J)
+ \tag{SPR.30}
+\]
+and, whenever \(g\in U(\operatorname{gramAt}(V,\tau))\) and
+\(z\in M.\mathrm{sm}_\tau\) satisfies
+\(z=M.\mathrm{rep}_\tau(g)y_\tau\),
+\[
+             T(y[\tau\leftarrow z])
+              =r\operatorname{Tr}\bigl(\operatorname{atTau}
+                    (\theta,V,\tau,g)\bigr)T(y).
+ \tag{SPR.31}
+\]
+These are precisely the \texttt{lev} and \texttt{equiv} fields
+of the original \(\operatorname{IsMultMap}\).
+
+\emph{Proof.}
+The finite-character clause of HCU18 gives
+\(\rho(k)\Phi(y)=\chi(k)\Phi(y)\), since the same identity holds
+for \(\phi\) and \(k\in J\subseteq G_f(V)\).
+HCU16 identifies the continuous representatives of these two
+Hilbert vectors as the two sides of (SPR.30), so continuous
+uniqueness gives the identity at every \(x\).
+No continuity or multiplicativity of the function \(\chi\)
+outside the given source hypotheses is inserted.
+
+For (SPR.31), HCU18 gives the exact one-place identity for
+\(\Phi\) with the original \(\operatorname{atTau}\) and frame.
+Both sides of (SPR.31) are continuous by SPR14 and continuity
+of right translation.  HCU16 identifies both with that same
+Hilbert vector.  Uniqueness proves (SPR.31).
+This uses the actual updated tuple of smooth vectors, as
+quantified in the source; it asserts no extension of \(T\) to
+all ambient Hilbert vectors.
+% END SPR15
+
+% BEGIN SPR16
+\paragraph{SPR16: pointwise differentiation of the same map in every ordered word.}
+\label{claim:SPR16}
+For \(X\in\operatorname{lieAt}(V,\tau)\),
+\[
+ R_{\tau,X}T(y)
+   =T\bigl(y[\tau\leftarrow d\operatorname{Rep}_\tau(X)y_\tau]\bigr).
+ \tag{SPR.32}
+\]
+For every admissible list \(l\), let \(l_\tau\) be its subsequence
+at \(\tau\), retaining its order, and put
+\[
+        y^l_\tau=d\operatorname{Rep}_{l_\tau}y_\tau.
+\]
+Then \(y^l\in M.\mathrm{Vec}\) and
+\[
+                 R_lT(y)=T(y^l),\qquad
+                   d_l\Phi(y)=\Phi(y^l).
+ \tag{SPR.33}
+\]
+
+\emph{Proof.}
+RQC7 gives stability of the original \(M.\mathrm{sm}_\tau\)
+under every allowed derived action.
+RQC9 identifies the Hilbert derivative
+\(d_{\tau,X}\Phi(y)\) with the corresponding updated \(\Phi\)-value.
+SPR13 says that \(R_{\tau,X}T(y)\) is continuous and represents
+that Hilbert derivative.
+The updated \(T\)-value has the same properties by SPR14.
+HCU16's uniqueness gives (SPR.32).
+
+Induct on the original right-fold list.
+At its first letter update the corresponding factor of the tuple
+already produced by the rest of the list.
+The filtered subsequence within each place retains precisely this
+order.  This is the existing RQC10 word formula for the Hilbert
+map, now with its pointwise counterpart justified by (SPR.32).
+No same-place derivatives have been permuted.
+The same finite-level fixedness continues to hold for every
+\(\Phi(y^l)\), by HCU18, independently of \(l\).
+% END SPR16
+
+% BEGIN SPR17
+\paragraph{SPR17: one growth exponent for every value and every derivative word.}
+\label{claim:SPR17}
+For the fixed original finite level \(U\), there is one natural
+number \(N\) such that for every \(y\in M.\mathrm{Vec}\), every
+admissible word \(l\), and every \(x\in G\), there is a constant
+\(C_{y,l,x}\) with
+\[
+              |R_lT(y)(xu)|
+                 \le C_{y,l,x}\operatorname{normInf}(u)^N
+                       \qquad(u\in G_\infty(V)).
+ \tag{SPR.34}
+\]
+The height is the literal original sum of the archimedean matrix
+and inverse-matrix entry norms.
+
+\emph{Proof.}
+ASB14, applied once to this quotient and this open \(U\), supplies
+one \(N\), one finite list \(L\) of admissible derivative words,
+and, for every \(x\), a constant \(C_x\) before the Hilbert vector
+and its continuous representative are varied:
+\[
+ |\psi(xu)|
+ \le C_x\operatorname{normInf}(u)^N
+                           \sum_{a\in L}\|d_aF\|_2.
+ \tag{SPR.35}
+\]
+For a fixed outer word \(l\), take
+\(F=\Phi(y^l)\) and \(\psi=T(y^l)=R_lT(y)\).
+Their smoothness, same-level fixedness and representative identity
+are supplied by RQC9, HCU18 and SPR14--SPR16.
+Thus (SPR.35) proves (SPR.34), for example with
+\[
+                  C_{y,l,x}
+                  =|C_x|\sum_{a\in L}\|d_a\Phi(y^l)\|_2.
+\]
+The finitely many displayed norms are finite Hilbert norms;
+no uniform bound in \(l\) for them is required by the source.
+
+This supplies the full \texttt{growth} field of
+\(\operatorname{IsAutFunSm}\), with \(N\) chosen before both
+\(y\) and \(l\).
+Its uniformity is for this fixed finite level.  If the initial
+seed or external parameter changes the level, this argument
+makes no additional assertion of a common \(N\) across those
+levels.  The earlier TAE kernel exponent retains its separate
+stronger parameter order.
+% END SPR17
+
+% BEGIN SPR18
+\paragraph{SPR18: the central-finiteness field on the actual pointwise realization.}
+\label{claim:SPR18}
+For every \(y\), the finite-dimensional space
+\[
+                         W_y=\mathbf C\,T(y)
+ \tag{SPR.36}
+\]
+contains \(T(y)\) and is stable under every original
+\(\operatorname{gelf}(\theta,V,\tau,k)\).
+Thus the source's full \texttt{zfin} field holds.
+
+\emph{Proof.}
+The original \(\operatorname{HolShape}\),
+\(\operatorname{WtIs}\) and \(\operatorname{IsExtVec}\)
+give the exact extremal Borel equations by HCU12.
+RQC20 therefore supplies, for each \(\tau,k\), one scalar
+\(c_{\tau,k}\) for the corresponding \(k+1\)-cycle operator on
+every smooth model vector.
+The now established identity (SPR.32) checks the previously
+retained real pointwise-derivative premise of RQC21.
+Its complexification and ordered-word transfer give
+\[
+             \operatorname{gelf}(\theta,V,\tau,k)T(y)
+                          =c_{\tau,k}T(y).
+\]
+The same formula holds on scalar multiples of \(T(y)\), by
+the smooth derivative identities, so \(W_y\) is stable.
+Its dimension is at most one, including when \(T(y)=0\).
+The operator normalization and right-fold order are exactly
+those already verified in RQC17--RQC21.
+This use of central finiteness occurs after the bounded seed
+and Hilbert map have been supplied.
+% END SPR18
+
+% BEGIN SPR19
+\paragraph{SPR19: full cuspidality of every value of the same map.}
+\label{claim:SPR19}
+For every \(y\in M.\mathrm{Vec}\),
+\[
+             \operatorname{ZCusp}(V,T(y)),
+                       \qquad \operatorname{IsCuspFun}(V,T(y)).
+ \tag{SPR.37}
+\]
+
+\emph{Proof.}
+HCU18 places \(\Phi(y)\) in the closed span of the full regular
+orbit of \(F_0\).
+The seed \(\phi\) is an original automorphic function with the
+separate \(\operatorname{ZCusp}\) condition in (SPR.27).
+SPR14 supplies the continuous rational-invariant representative
+\(T(y)\) of \(\Phi(y)\), with its original finite-level law.
+All hypotheses of the complete RQC15 cusp-closure statement
+therefore hold on the same quotient and measure.
+It proves every transvection, every Haar-measure and every
+fundamental-domain quantifier in
+\(\operatorname{ZCusp}(V,T(y))\).
+CTC12, as installed in RQC16, gives genuine cuspidality.
+This completes the \texttt{cusp} field; no restriction of a
+bare \(L^2\) class to a unipotent subgroup occurs.
+% END SPR19
+
+% BEGIN SPR20
+\paragraph{SPR20: the exact separate Sobolev continuity of point evaluation.}
+\label{claim:SPR20}
+For every place \(\tau\), tuple \(y\in M.\mathrm{Vec}\), and
+\(x\in G\), there is an algebraic complex linear functional
+\[
+                   \ell:M.\mathcal H_\tau\longrightarrow\mathbf C
+\]
+satisfying the literal \(\operatorname{Sobolev}_2\) predicate and
+\[
+                    \ell(w)=T(y[\tau\leftarrow w])(x)
+                        \qquad(w\in M.\mathrm{sm}_\tau).
+ \tag{SPR.38}
+\]
+This is the full \texttt{cont} field of
+\(\operatorname{IsMultMap}\).
+
+\emph{Proof.}
+Evaluate the ASB14 estimate at the identity real element.
+For the same finite list \(L\) as in (SPR.35), there is \(B_x\ge0\)
+such that
+\[
+             |T(z)(x)|\le B_x
+                         \sum_{a\in L}\|d_a\Phi(z)\|_2
+                           \qquad(z\in M.\mathrm{Vec}).
+ \tag{SPR.39}
+\]
+One may take \(B_x=|C_x|\operatorname{normInf}(1)^N\).
+No division by this height is used.
+
+Fix the entries of \(y\) outside \(\tau\).
+By RQC10 and bounded multilinearity of \(\Phi\), for each \(a\in L\),
+\[
+\begin{split}
+ \|d_a\Phi(y[\tau\leftarrow w])\|_2
+ &\le b_a\,\|d\operatorname{Rep}_{a_\tau}w\|,\\
+ b_a&=\|\Phi\|\prod_{\sigma\ne\tau}
+                    \|d\operatorname{Rep}_{a_\sigma}y_\sigma\|.
+\end{split}
+\tag{SPR.40}
+\]
+This uses the actual filtered word \(a_\sigma\), with its order
+unchanged.
+Let \(b\) be the maximum of zero and these finitely many \(b_a\)'s;
+if \(L\) is empty let \(b=0\).
+Equations (SPR.39)--(SPR.40) give
+\[
+ |T(y[\tau\leftarrow w])(x)|
+ \le B_xb\sum_{a\in L}
+                         \|d\operatorname{Rep}_{a_\tau}w\|.
+ \tag{SPR.41}
+\]
+The list \([a_\tau:a\in L]\) is finite, has only admissible Lie
+letters, and may retain repetitions, as permitted by the source.
+
+By SPR14, evaluation in this slot is a linear functional on
+\(M.\mathrm{sm}_\tau\).
+Extend a vector-space basis of this subspace to a basis of
+\(M.\mathcal H_\tau\), and extend the functional by zero on the
+new basis vectors.
+Equation (SPR.41) holds on every original smooth vector, since
+such a vector belongs to \(M.\mathrm{sm}_\tau\).
+It is precisely the \(\operatorname{Sobolev}_2\) bound for this
+algebraic extension \(\ell\).
+No boundedness for the Hilbert norm alone is asserted or needed.
+This proves \texttt{BackForm.\allowbreak cont\_\allowbreak value}, including its full
+ambient algebraic-functional conclusion.
+% END SPR20
+
+% BEGIN SPR21
+\paragraph{SPR21: the complete original bounded-holomorphic multiplicity producer.}
+\label{claim:SPR21}
+For the original data, assume
+\[
+\begin{gathered}
+ \operatorname{IsInfFam}(\theta),\
+ \operatorname{HolShape}(M),\
+ \operatorname{WtIs}(M,w),\
+ \operatorname{IsExtVec}(M,v),\\
+ \exists\mu,\mathcal F\ \operatorname{FinPair}(V,\mu,\mathcal F),\\
+ J\subseteq G_f(V),\
+ \operatorname{HolForm}(\theta,M,w,J,\chi,\phi),\
+ \operatorname{ZCusp}(V,\phi).
+\end{gathered}
+\tag{SPR.42}
+\]
+Then there is an original \(T:\operatorname{MMap}(M)\) with
+\[
+                   \operatorname{IsMultMap}(\theta,M,J,\chi,T),
+                                  \qquad T(v)=\phi.
+ \tag{SPR.43}
+\]
+This is the full source theorem
+\texttt{BackForm.\allowbreak exists\_\allowbreak multMap}, without a remaining unnamed
+smooth-representative, evaluation or Sobolev premise.
+
+\emph{Proof.}
+Choose one finite pair from (SPR.42), once for the whole map.
+RQC6 gives its original regular action.
+HCU16 turns the bounded seed into \(F_0\);
+HCU17 checks its exact extremal coefficient identity;
+HCU18 constructs the same-quotient \(\Phi\) in (SPR.28).
+Choose one finite level from the seed's
+\(\operatorname{IsAutFun}\) and use SPR14 to construct \(T\).
+
+Its \texttt{aut} field consists of the automorphic and smooth
+properties in SPR14, central finiteness in SPR18, and the
+full all-word growth statement in SPR17.
+SPR19 gives \texttt{cusp}.
+SPR15 gives \texttt{lev} and \texttt{equiv}.
+SPR20 gives \texttt{cont}.
+These are all five fields of the literal source
+\(\operatorname{IsMultMap}\).
+
+Finally \(\Phi(v)=F_0\), and both \(T(v)\) and \(\phi\) are
+continuous representatives of \(F_0\).
+HCU16 gives \(T(v)=\phi\) at every point.
+The zero seed causes no exception: the same construction gives
+the zero map.
+The boundedness in \(\operatorname{HolForm}\), the initial
+finite pair, and the seed \(\operatorname{ZCusp}\) were genuine
+inputs.  None has been deduced from the downstream
+central-finiteness conclusion.
+% END SPR21
+
+% BEGIN SPR22
+\paragraph{SPR22: equality at one nonzero lowest-type tuple gives full restriction.}
+\label{claim:SPR22}
+Let the original model satisfy \(\operatorname{LowSm}(M)\) and
+\(\operatorname{LowIrr}(M)\).  Let \(T\) satisfy
+\(\operatorname{IsMultMap}(\theta,M,J,\chi,T)\), and let
+\(U:\operatorname{KMap}(M)\) satisfy the original compact
+equivariance \(\operatorname{KEquiv}(\theta,M,U)\).
+If every component of a lowest-type tuple \(e\) is nonzero and
+\[
+       T((e_\tau)_\tau)=U(e),
+ \tag{SPR.44}
+\]
+then \(\operatorname{RestrictsTo}(M,T,U)\): equality holds for
+every lowest-type tuple, with the original embeddings into
+\(M.\mathrm{sm}\).
+
+\emph{Proof.}
+For each \(\tau\), the linear span of the compact-group orbit of
+\(e_\tau\) is nonzero and invariant.  Irreducibility makes it
+the entire original lowest-type space.  This is an algebraic
+span; every vector is a finite linear combination of such orbit
+vectors.  Put \(B=T|_{\mathrm{low}}-U\), a multilinear map to
+the space of functions on the original adelic group.
+
+We first check that its zero relation propagates under the
+actual compact action.  Given a compact matrix \(k\) at \(\tau\),
+put \(g=(M.\mathrm{fr}_\tau)^{-1}kM.\mathrm{fr}_\tau\).
+The source identity
+\[
+ \mathrm{gramAt}_\tau
+   =(M.\mathrm{fr}_\tau)^*J_{M.\varepsilon_\tau}
+                         M.\mathrm{fr}_\tau
+ \tag{SPR.45}
+\]
+and \(k^*J_{M.\varepsilon_\tau}k=J_{M.\varepsilon_\tau}\)
+give \(g^*\mathrm{gramAt}_\tau g=\mathrm{gramAt}_\tau\).
+The definition of the model representation gives
+\(M.\operatorname{rep}_\tau(g)=M.\sigma_\tau(k)\).
+Thus the \texttt{equiv} field of \(T\) and compact equivariance
+of \(U\) give the same right translate after updating this
+slot.  In particular, if \(B(v)=0\), then
+\(B(v[\tau\leftarrow M.\sigma_\tau(k)v_\tau])=0\).
+The embeddings of an updated tuple agree slot by slot, so this
+is an identity of the actual multilinear maps.
+
+Starting from (SPR.44), propagate through compact translates
+in each of the finitely many slots.  Expand an arbitrary tuple
+as finite linear combinations of those translates in each slot.
+Multilinearity makes every term zero.  Hence \(B=0\).
+This proves the full source \texttt{ThetaMap.\allowbreak restrictsTo\_\allowbreak of\_\allowbreak eq};
+there is no additional density, completion, or continuity step.
+% END SPR22
+
+% BEGIN SPR23
+\paragraph{SPR23: the lowest-type extension after its two initial analytic inputs.}
+\label{claim:SPR23}
+Retain \(\operatorname{IsInfFam}(\theta)\),
+\(\operatorname{HolShape}(M)\), \(\operatorname{WtIs}(M,w)\),
+\(\operatorname{LowSm}(M)\), \(\operatorname{LowIrr}(M)\),
+and one actual extremal tuple \(v\) with
+\(\operatorname{IsExtVec}(M,v)\).
+Let \(e\) be its tuple in the original lowest types.
+Let \(J\subseteq G_f\), and let \(U:\operatorname{KMap}(M)\)
+satisfy, for every lowest-type tuple \(z\),
+\[
+\begin{gathered}
+ \operatorname{IsAutFun}(V,U(z)),\qquad
+ U(z)(gk)=\chi(k)U(z)(g)\quad(k\in J),\\
+ \operatorname{IsSmoothFn}(V,\theta,U(z)),\qquad
+ \operatorname{KEquiv}(\theta,M,U),\\
+ R^\mathbb C_{\tau,Z}U(z)=0
+                  \quad(Z\in\mathfrak p^-_{M,\tau}).
+\end{gathered}
+\tag{SPR.46}
+\]
+Assume the seed \(U(e)\) is \(\operatorname{ZCusp}\), and supply
+the following two initial analytic outputs explicitly:
+\[
+ \exists\mu,\mathcal F\ \operatorname{FinPair}(V,\mu,\mathcal F),
+ \qquad \exists C\ \forall g\ |U(e)(g)|\le C.
+ \tag{SPR.47}
+\]
+Then there is \(T:\operatorname{MMap}(M)\) satisfying
+\(\operatorname{IsMultMap}(\theta,M,J,\chi,T)\) and
+\(\operatorname{RestrictsTo}(M,T,U)\).
+
+\emph{Proof.}
+HCU19 checks the original \(\operatorname{HolAd}\) equations
+for \(U(e)\), from the matching weight, compact action,
+smoothness and lowering equations in (SPR.46).
+Together with \(\operatorname{IsAutFun}\), the level law and
+the bound in (SPR.47), these are all fields of
+\(\operatorname{HolForm}\).  Apply SPR21 with the same finite
+pair and the separately supplied \(\operatorname{ZCusp}\).
+It gives \(T(v)=U(e)\).  The unit-norm clause in
+\(\operatorname{IsExtVec}\) implies \(e_\tau\ne0\) for every
+\(\tau\).  SPR22 gives the full restriction identity.
+
+This reconstructs the complete extension consumer after
+(SPR.47).  The original \texttt{ThetaMap.\allowbreak exists\_\allowbreak extension}
+obtains those two outputs from target quotient volume and
+boundedness of smooth cuspidal uniformly moderate forms.
+Neither supplier is asserted here.  In particular, an
+\(\operatorname{IsHolCuspKMap}\) packet does not silently supply
+the open finite level in \(\operatorname{IsAutFun}\); that field
+is explicit in (SPR.46).
+% END SPR23
+
+% BEGIN SPR24
+\paragraph{SPR24: full linear choice from pointwise theta firing.}
+\label{claim:SPR24}
+Let \(X,M,N\) be complex vector spaces, \(W\le M\) a subspace,
+and \(r:M\to N\), \(u:X\to N\) linear maps.  Then
+\[
+ (\forall x\ \exists m\in W\quad r(m)=u(x))
+ \quad\Longrightarrow\quad
+ \exists y:X\to M\text{ linear},\quad
+ y(X)\subseteq W,\quad r\circ y=u.
+ \tag{SPR.48}
+\]
+Consequently the full original
+\texttt{ThetaFiresLinear.\allowbreak exists\_\allowbreak linear\_\allowbreak lift} holds, with its
+bilinear theta integral on \(\operatorname{range}(\mathrm{ext})\),
+for an arbitrary source vector space \(X\).  No finite-dimensional
+or injectivity premise is needed.
+
+\emph{Proof.}
+Choose a Hamel basis \((b_j)\) of \(X\).  For each basis vector
+choose \(m_j\in W\) with \(r(m_j)=u(b_j)\).
+For the unique finite basis expansion \(x=\sum_jc_jb_j\), set
+\(y(x)=\sum_jc_jm_j\).  This is linear, lies in \(W\), and
+has the required image under \(r\).  This proves (SPR.48).
+
+We verify every input when using this choice for the actual
+theta integral.  Let \(\nu,\mathcal F\) be its unchanged
+measure and fundamental-domain set.  Write its kernel as
+\(\mathrm{th}(g,h,s)=\mathrm{thL}(g,h)(s)\), with
+\(\mathrm{thL}(g,h)\) complex linear, and its polynomial map as
+the actual linear \(\mathrm{ptL}\).
+Let \(\mathrm{io}:TK\to\operatorname{Hom}_{\mathbb C}
+(\mathrm{Tau},S_\infty)\) and
+\(\mathrm{ext}:X\to(H'\to\mathrm{Tau})\) be the original
+linear maps.  Assume the integrands are integrable on
+\(\mathcal F\) for every \(x,e,g\).
+For \(f\in\operatorname{range}(\mathrm{ext})\), put
+\[
+ P(f)(e)(g)=\int_{\mathcal F}
+   \mathrm{thL}(g,h)
+     \bigl(\mathrm{ptL}(\mathrm{io}(e)(f(h)))\bigr)\,d\nu(h).
+ \tag{SPR.49}
+\]
+Such an \(f\) has a preimage, so its integrability follows from
+the hypothesis.  Formula (SPR.49) uses \(f\) itself; it does not
+choose a preimage in its definition.  Additivity of integrals
+of integrable functions and their scalar law prove that \(P\)
+is linear in \(f\) and in \(e\).  It is exactly the original
+\(\operatorname{Lift.IsThetaP}\) map, including the integrability
+field and the pointwise integral equality.
+
+Let \(M\) now be the space of multilinear maps from the model
+smooth spaces to functions on the target group, and let
+\(W\) be the original prescribed subspace of such maps.
+Take \(N\) to be all functions of a lowest-type tuple with
+values in target functions.  Restriction defines a linear
+\(r:M\to N\).  The rule
+\[
+ u(x)(z)=P(\mathrm{ext}(x))
+                       \bigl(\mathop{\otimes}_\tau z_\tau\bigr)
+ \tag{SPR.50}
+\]
+is linear in \(x\).  Pointwise firing supplies, for each \(x\),
+an \(m\in W\) whose restriction is (SPR.50).  Apply (SPR.48).
+The resulting \(y\), together with this same \(P\), has every
+field of \texttt{exists\_\allowbreak linear\_\allowbreak lift}.
+For the original theta kernel, \(\mathrm{thL}\) is evaluation
+at zero after the original Weil operator, and
+\(\mathrm{ptL}\) is the original polynomial-to-Schwartz map;
+their linearity is literal.  Thus this also proves the complete
+\texttt{ThetaFiresOfMult.\allowbreak exists\_\allowbreak isThetaMult\_\allowbreak of\_\allowbreak firesAt}
+consumer, for every fixed original \(i,t\).
+% END SPR24
+
+% BEGIN SPR25
+\paragraph{SPR25: the same-realization theta map with the exact two remaining analytic gates.}
+\label{claim:SPR25}
+Fix the original common \(R\), with its level, family and model
+laws, and its actual \(\mathrm{thP\_\omega P}\),
+\(\mathrm{thP\_vP}\), \(\mathrm{thP\_pt\_theta}\) and
+\(\mathrm{thP\_ioP}\) laws.  The last two may be supplied by
+JIO19 when its original weak stored-choice laws are available.
+Choose the original unit extremal tuples \(e_i\) from HCU20,
+before \(t\).  Denote by \(U_{i,t,x}\) the literal lowest-type
+theta integral of TAE13, for \(x\in(R.\mathrm{HV}_{i,t}).H\).
+Assume precisely the following additional outputs:
+\[
+ \forall i\ \exists\mu_i,\mathcal F_i\quad
+       \operatorname{FinPair}(W_i,\mu_i,\mathcal F_i).
+ \tag{SPR.51}
+\]
+\[
+ \forall i,t,x\ \exists C_{i,t,x}\ \forall g\quad
+       |U_{i,t,x}(e_i)(g)|\le C_{i,t,x}.
+ \tag{SPR.52}
+\]
+Then there is one family of linear theta maps \(\mathrm{th}_{i,t}\)
+into the original \(\operatorname{MMap}(R.\mathrm{MW}_i)\)
+such that updating \(R.\mathrm{thF}\) with this family satisfies
+both original \(\mathrm{thP\_thF\_mem}\) and
+\(\mathrm{thP\_thF}\), for all \(i,t\).
+
+\emph{Proof.}
+HCU20 supplies the matching holomorphic shape, integral weight,
+lowest-type smoothness and irreducibility, and the same unit
+extremal tuple.  TAE13 supplies the actual \(U_{i,t,x}\), all
+its smoothness and lowering equations, its compact equivariance,
+and its uniform moderate-growth packet.  Its left invariance
+and continuity are those of the original theta integral.
+The principal-level law from BTH5 and BTH15 uses exactly
+\(\chi=1\), as in the original source.
+
+For clarity the open-level input is checked separately.
+Write \(L\) for the original lattice-level datum, \(\beta\) for
+its actual conjugating matrix, and \(T=L.P_g\cup L.Q\).
+The integral finite tensor subring is open in the original module
+topology: finite place coordinates identify it with local integer
+rings, and any fixed integral basis gives the same open lattice
+outside finitely many places; at those remaining places two full
+lattices are commensurable and open.
+Near \(k=1\), require the entries of both
+\(m(k)=\beta^{-1}\mathrm{finE}(k)\beta\) and \(m(k)^{-1}\)
+to be integral, and require
+\[
+  m(k)_{ab}-\delta_{ab}
+       \in(\operatorname{Norm}P)\,\mathrm{intAf}
+            \quad(P\in T,\ a,b).
+\]
+These finitely many conditions hold on an open identity
+neighborhood, by continuity, inversion and multiplication by
+the nonzero field scalar \((\operatorname{Norm}P)^{-1}\).
+Integrality of both matrices puts \(\mathrm{finE}(k)\) in the
+original lattice stabilizer.  Since \(\operatorname{Norm}P\)
+annihilates its residue field, its reduction at every \(P\in T\)
+is the identity.  It therefore satisfies both original block-flag
+conditions and the original residual subgroup condition, because
+each contains the identity.  This is the exact inclusion
+\(K_g(\beta,T)\subseteq\mathrm{lev}(\beta,L)\).
+The inverse image of the latter subgroup under the continuous
+finite-component homomorphism contains this neighborhood, hence
+is an open subgroup \(O\) of the full adelic group.
+By the definition of the original \(J_i=\mathrm{levS}(\beta,L)\),
+\(O\cap G_f\subseteq J_i\).  This proves the source
+\texttt{ThetaMap.\allowbreak level\_\allowbreak open}, with its original conjugating
+matrix and lattice datum.  Consequently every \(U_{i,t,x}(z)\)
+has the required \(\operatorname{IsAutFun}\) field.  No new
+level or character replaces \(J_i\).
+
+The Heisenberg-averaging and constant-term argument of TAE13
+and CTC13 supplies the seed \(\operatorname{ZCusp}\).
+With (SPR.51)--(SPR.52), SPR23 therefore gives a genuine
+\(\operatorname{IsMultMap}\) extending each \(U_{i,t,x}\).
+It belongs to \(R.\mathrm{Wall}_i\), since that subspace is the
+span of the original maps satisfying \(\operatorname{IsMultMap}\).
+Integrability for every tensor input and target point is the
+original definite-source integral theorem in TAE6 and TAE13.
+These facts give the complete \(\operatorname{FiresAt}(R,i,t,x)\)
+packet, for every \(x\), with the original kernel, measure,
+fundamental domain, polynomial map and \(\mathrm{io}_i\).
+
+Apply SPR24 for each \(i,t\).  It yields a single linear map in
+\(x\), its range in the same \(R.\mathrm{Wall}_i\), and the
+exact bilinear theta-integral law on
+\(\operatorname{range}(R.\mathrm{extV}_{i,t})\).
+Choose these maps as a family \(\mathrm{th}_{i,t}\).
+The two conclusions are precisely the two fields of the updated
+\(R\) in the source \texttt{ThetaMap.\allowbreak exists\_\allowbreak thetaMap}.
+Only \(\mathrm{thF}\) has been replaced; all other data are the
+same.  When an original stored \(\mathrm{OrZero}\) law is used,
+this existence activates its predicate by the weak-choice law;
+it does not identify the stored witness with the chosen one.
+
+This is a conditional reconstruction of that final consumer.
+The initial seed bound (SPR.52) and target finite pair (SPR.51)
+remain unresolved original producers.  The smooth representatives,
+their full derivative words, pointwise growth, the five
+multiplicity-map fields, lowest-type restriction and linear
+assembly have now been reconstructed after those two inputs.
+% END SPR25
+
+\end{document}

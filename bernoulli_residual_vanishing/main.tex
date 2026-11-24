@@ -1,0 +1,797 @@
+% Version 0.26. The literal Bernoulli-unit and residual CorX supplier.
+% Pinned source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+\section{Bernoulli units and residual unramified cocycles}
+\label{sec:bernoulli-residual}
+
+\status{This section proves the prescribed Bernoulli-unit theorem
+\texttt{LemmaX}, the full residual unramified cocycle theorem,
+and the literal \texttt{CorX} interface.  The power-of-two conductor,
+both inverse characters, the original coefficient and residue fields,
+and the prime-to-$\ell$ relative-index local condition are retained.
+The Bernoulli-unit argument is finite and elementary.  Its use in
+cohomology rests on the Jacobi ideal relation already proved in OS1
+and the finite Hilbert class field theorem stated below.}
+
+\subsection{The exact statements and the classical boundary}
+
+Put $G=\operatorname{Gal}(\Omega/\mathbb Q)$ for the specified algebraic
+closure.  Write $I_A$ for inertia at a valuation subring $A$ of $\Omega$.
+For a character $\gamma:G\to k^\times$, a cocycle means a locally
+constant function $z:G\to k$ satisfying
+\[
+                  z(gh)=z(g)+\gamma(g)z(h).
+                  \tag{BR.1}
+\]
+This is the source's \texttt{IsCoc}; no topology on the arbitrary field
+$k$ has to be added to its statement.  Its condition
+$\operatorname{UnrEv}(\ell,\gamma,z)$ says that for every $A$ there is
+a subgroup $H_A\le G$ such that
+\[
+ \begin{gathered}
+  K_A=I_A\cap\ker\gamma,\qquad
+  \ell\nmid[K_A:K_A\cap H_A],\\
+  z|_{K_A\cap H_A}=0.
+ \end{gathered}
+ \tag{BR.2}
+\]
+The natural-number relative index in the source is zero when the index
+is infinite.  Thus the nondivisibility assertion in (BR.2) in
+particular makes this index finite.  There is no requirement that
+$H_A$ itself be contained in $K_A$.
+
+Dirichlet characters are extended by zero off the units.  If $\varphi$
+has level $f$ and $\xi$ has level $2^n$, let
+\[
+ \chi=\operatorname{prodX}(\varphi,\xi),\qquad
+ \chi(a)=\varphi(a\bmod f)\xi(a\bmod 2^n).
+ \tag{BR.3}
+\]
+The equality holds also at nonunits: a nonunit of the product level is
+a nonunit at at least one factor.  We use the source normalization
+\[
+ B_{1,\chi}=\frac1M\sum_{a=0}^{M-1}a\chi(a)
+ \quad\text{if }\chi\ne1\text{ has level }M.
+ \tag{BR.4}
+\]
+Indeed the defining first Bernoulli polynomial is $T-\tfrac12$, and
+$\sum_a\chi(a)=0$ for a nontrivial character.  Formula (BR.4) is
+therefore the literal \texttt{genB 1}, including for imprimitive
+characters at their specified level.
+When a Dirichlet character is evaluated on $g\in G$, its argument
+means the cyclotomic residue $\operatorname{cls}_M(g)$ at its stated
+level $M$.  Thus
+$\operatorname{redChar}(\chi)(g)=\operatorname{red}(\chi(g))$.
+
+The data $\operatorname{XData}(\ell,d,\varphi,\xi)$ mean:
+$\ell$ is prime, $d>0$, $4\mid\ell^d-1$, $f$ is odd,
+$\varphi$ and $\xi$ are primitive at their respective levels,
+\[
+ \operatorname{ord}(\varphi)\mid\ell^d-1,\qquad
+ f\,4^{v_2(\ell^d-1)}\le2^n,\qquad
+ \varphi(-1)\xi(-1)=-1.
+ \tag{BR.5}
+\]
+In particular $f>0$.  The precise Bernoulli-unit assertion is
+$|B_{1,\operatorname{prodX}(\varphi,\xi)}|_\ell=1$ in the specified
+$\overline{\mathbb Q}_\ell$.
+
+\paragraph{Accepted classical input.}
+For a number field $F$, the finite Hilbert class field is its maximal
+abelian extension unramified at all finite places and split at its
+real places; its Artin group is the ordinary ideal class group.
+We use this in the form of Milne,
+\href{https://www.jmilne.org/math/CourseNotes/CFT.pdf}{\emph{Class
+Field Theory}}, v4.03, V, Theorems~3.5--3.6 and Example~3.9.
+We also use the elementary cyclotomic identification
+$\operatorname{Gal}(\mathbb Q(\mu_M)/\mathbb Q)
+\simeq(\mathbb Z/M)^\times$, with $\sigma_b(\zeta)=\zeta^b$,
+and extension of a finite Galois automorphism to the specified
+algebraic closure; see Milne,
+\href{https://www.jmilne.org/math/CourseNotes/ANT.pdf}{\emph{Algebraic
+Number Theory}}, v3.08, \S6.
+All transfers from these finite theorems to the actual cocycle and its
+original field are given in BR4.  The needed annihilator is derived
+from OS1; no general Stickelberger annihilation theorem is retained
+as an additional input.
+
+\subsection{Dyadic powers and a finite Frobenius projection}
+
+\begin{proposition}[BR1: dyadic generation and character-sum projection]
+\label{prop:br-dyadic}
+Let $Q=1+2^e a$ with $e\ge2$ and $a$ odd.  For $r\ge e$, the
+powers of $Q$ modulo $2^r$ are exactly the units congruent to $1$
+modulo $2^e$.
+
+Let $k$ have odd characteristic $\ell$, let $Q=\ell^d$ with
+$v_2(Q-1)=e\ge2$, and let $n\ge e$.  For any finite family
+$z_i,g_i\in k$ such that
+$z_i=0$ or $z_i^{2^n}=1$, and $g_i^Q=g_i$, one has
+\[
+ \sum_i z_i g_i=0
+ \quad\Longrightarrow\quad
+ \sum_{\{i:z_i^{2^e}=1\}}z_i g_i=0.
+ \tag{BR.6}
+\]
+Finally, put $n=m+e$ with $m\ge e\ge2$.  Suppose
+$\eta:\mathbb Z/2^n\to k$ is multiplicative, is $1$ at $1$,
+vanishes on nonunits, and
+\[
+                    \eta(1+2^{n-1})=-1.
+                    \tag{BR.7}
+\]
+If $\eta(u)^{2^e}=1$, then
+$u\equiv1$ or $-1\pmod{2^m}$.
+\end{proposition}
+
+\begin{proof}
+Repeated squaring gives
+\[
+ Q^{2^j}=1+2^{e+j}a_j,\qquad a_j\text{ odd},\qquad
+ a_{j+1}=a_j+2^{e+j-1}a_j^2.
+ \tag{BR.8}
+\]
+The last summand is even, which proves the assertion about $a_j$
+inductively.  Thus $Q$ has order exactly $2^{r-e}$ modulo $2^r$
+when $r>e$, and order one when $r=e$.  Its powers lie in the
+subgroup $1+2^e\mathbb Z/2^r$, whose size is $2^{r-e}$.
+They consequently exhaust that subgroup.
+
+Raise the assumed zero sum in (BR.6) to $Q^j$.  Frobenius is a
+ring homomorphism and $g_i^{Q^j}=g_i$, so
+$\sum_i z_i^{Q^j}g_i=0$.  By the first assertion, every exponent
+$1+2^e t$ occurs modulo $2^n$ among the $Q^j$.  Zero entries cause
+no problem, since all these exponents are positive.  Summing for
+$0\le t<2^{n-e}$ gives
+\[
+ \begin{split}
+ 0&=\sum_i g_i z_i
+       \sum_{t=0}^{2^{n-e}-1}(z_i^{2^e})^t\\
+  &=2^{n-e}\sum_{\{i:z_i^{2^e}=1\}}z_i g_i.
+ \end{split}
+ \tag{BR.9}
+\]
+For a nonzero $z_i$ not satisfying $z_i^{2^e}=1$, the geometric
+sum vanishes because its ratio has $2^{n-e}$th power one.
+For $z_i=0$ the prefactor makes the term zero.  The scalar
+$2^{n-e}$ is invertible in $k$, proving (BR.6).
+
+Apply (BR.8) to $5=1+4$.
+It generates all units congruent to $1$ modulo $4$ at level $2^n$.
+Every odd $u$ therefore has a unique expression
+$u=(-1)^\epsilon5^j$, with $j$ modulo $2^{n-2}$.
+Moreover
+$5^{2^{n-3}}=1+2^{n-1}$ modulo $2^n$.
+By (BR.7), $\eta(5)$ has order exactly $2^{n-2}$:
+its $2^{n-2}$th power is one and its $2^{n-3}$rd power is $-1$.
+Since $\eta(-1)^2=1$, the condition
+$\eta(u)^{2^e}=1$ implies
+$2^{n-2}\mid j2^e$, or $2^{m-2}\mid j$.
+The powers of $5$ with this property are $1$ modulo $2^m$,
+again by (BR.8).  This proves the last assertion.
+Nonunits cannot occur because their $\eta$-value is zero.
+\end{proof}
+
+\subsection{An integral partial Bernoulli sum}
+
+\begin{proposition}[BR2: partial sums without dividing by the odd conductor]
+\label{prop:br-partial}
+Let $F$ be a field of characteristic zero, let $(f,N)=1$ with
+$f,N>0$, and let $w:\mathbb N\to F$ be periodic modulo $f$.
+Suppose a subring $B\subset F$ contains all $w(a)$ and $N^{-1}$.
+There are $g:\mathbb Z/N\to B$ and $c\in B$ such that, for
+$ft\le N$,
+\[
+ g(u)-g(u-ft)=tc-
+           \begin{cases}w(\langle u\rangle_N),&
+                          \langle u\rangle_N<ft,\\0,&
+                          \langle u\rangle_N\ge ft,
+           \end{cases}
+ \tag{BR.10}
+\]
+where $0\le\langle u\rangle_N<N$.
+For every $\xi:\mathbb Z/N\to F$ of sum zero,
+\[
+ \sum_{a=0}^{fN-1}a\,w(a)\xi(a)
+             =fN\sum_{u\bmod N}\xi(u)g(u).
+ \tag{BR.11}
+\]
+If $w(a)=\varphi(a\bmod f)$, $\xi$ is a nontrivial character
+of level $N$, and $\varphi(-1)\xi(-1)=-1$, then the last sum is
+$B_{1,\operatorname{prodX}(\varphi,\xi)}$.
+\end{proposition}
+
+\begin{proof}
+Define, initially in $F$,
+\[
+ \begin{gathered}
+ S(u)=\sum_{\substack{0\le a<fN\\a\equiv u\ (N)}}w(a),
+ \qquad
+ A(u)=\sum_{\substack{0\le a<fN\\a\equiv u\ (N)}}a\,w(a),\\
+ c=S(0)/N,\qquad g(u)=\frac{A(u)-A(0)}{fN}.
+ \end{gathered}
+ \tag{BR.12}
+\]
+The $f$ integers in each residue class $u$ modulo $N$ run through
+all residues modulo $f$, so $S(u)$ is independent of $u$.
+This also follows by shifting by $f$, since $f$ generates
+$\mathbb Z/N$ additively.
+
+Here is the shift identity, including the terms crossing the endpoints.
+Put $M=fN$ and
+$\psi_u(a)=\mathbf1_{a\equiv u\ (N)}w(a)$.
+For any function $h$ and any nonnegative $s$,
+\[
+ \sum_{a=0}^{M-1}h(a+s)
+ =\sum_{a=0}^{M-1}h(a)
+   +\sum_{a=0}^{s-1}\bigl(h(M+a)-h(a)\bigr).
+ \tag{BR.13}
+\]
+It follows by writing the sum from $0$ to $M+s-1$ in its two
+possible ways.  With $s=ft$ and $h(a)=a\psi_u(a)$, periodicity gives
+$\psi_u(a+s)=\psi_{u-s}(a)$ and $\psi_u(M+a)=\psi_u(a)$.
+Consequently (BR.13) becomes
+\[
+ A(u-s)+sS(u-s)
+          =A(u)+M\sum_{a=0}^{s-1}\psi_u(a).
+ \tag{BR.14}
+\]
+Subtract and divide by $M$ to obtain, for every $t\ge0$,
+\[
+ g(u)-g(u-ft)=tc-
+            \sum_{\substack{0\le a<ft\\a\equiv u\ (N)}}w(a).
+ \tag{BR.15}
+\]
+Choose $t$ with $ft=u$ modulo $N$.  Since $g(0)=0$, this formula
+shows that $g(u)$ belongs to $B$.  It is only a multiple of $c$
+minus a sum of the $w(a)$; division by $f$ has disappeared.
+Also $c\in B$ by its definition.  When $ft\le N$, the final sum
+in (BR.15) has exactly the possible term described in (BR.10).
+
+Finally, grouping the left side of (BR.11) by residues gives
+$\sum_u\xi(u)A(u)$.
+The constant $A(0)$ contributes zero because $\xi$ has sum zero;
+this proves (BR.11).
+For the character assertion, the product character is odd and
+therefore nontrivial; (BR.3)--(BR.4) identify its Bernoulli number
+with the left side divided by $fN$.  This proves the asserted
+identity at the original product level.
+\end{proof}
+
+\begin{proposition}[BR3: the prescribed Bernoulli unit]
+\label{prop:br-lemma-x}
+For every $\operatorname{XData}(\ell,d,\varphi,\xi)$ with values in
+the specified $\overline{\mathbb Q}_\ell$,
+\[
+             |B_{1,\operatorname{prodX}(\varphi,\xi)}|_\ell=1.
+             \tag{BR.16}
+\]
+The bound in (BR.5) is used with no enlargement or subsequent choice
+of $n$.  In particular this proves the entire source
+\texttt{LemmaX} interface.
+\end{proposition}
+
+\begin{proof}
+Put $Q=\ell^d$ and $e=v_2(Q-1)$.  The hypotheses give $e\ge2$
+and $\ell\ne2$.  Write $n=m+e$.  Since
+$f\,2^{2e}\le2^n$ and $f\ge1$, one has $m\ge e$ and
+\[
+                   s=f2^e,\qquad 1<s\le2^m.
+                   \tag{BR.17}
+\]
+Let $\mathcal A=\{x:|x|_\ell\le1\}$ in
+$\overline{\mathbb Q}_\ell$, and let
+$\mathfrak m=\{x:|x|_\ell<1\}$.  The ultrametric inequality makes
+$\mathcal A$ a ring and $\mathfrak m$ an ideal.  Each element of
+norm one has its inverse in $\mathcal A$, so $\mathfrak m$ is
+maximal.  The field $\kappa=\mathcal A/\mathfrak m$ has
+characteristic $\ell$, since $|\ell|_\ell<1$.
+This auxiliary residue field is used only to test (BR.16).
+It does not replace the given field $k$ in BR4--BR7.
+
+Every value of $\varphi$ is either zero or a root of unity of
+order dividing $Q-1$.  Thus it is integral and its residue is
+fixed by $x\mapsto x^Q$.  Define the subring
+\[
+ B=\{x\in\mathcal A:\overline{x}^{\,Q}=\overline{x}\}.
+ \tag{BR.18}
+\]
+It is a subring because the $Q$th-power map on $\kappa$ is an
+iterated Frobenius.  The element $(2^n)^{-1}$ belongs to $B$:
+it has norm one and its residue is an invertible prime-field element.
+Apply BR2 with $N=2^n$ and $w(a)=\varphi(a\bmod f)$.
+It supplies $g(u),c\in B$ and
+\[
+ B_{1,\operatorname{prodX}(\varphi,\xi)}
+                         =\sum_{u\bmod 2^n}\xi(u)g(u).
+ \tag{BR.19}
+\]
+The character $\xi$ is nontrivial, as follows also from its
+primitivity and $n\ge4$.
+
+For completeness, primitivity gives the exact half-period value
+\[
+                         \xi(1+2^{n-1})=-1.
+                         \tag{BR.20}
+\]
+Indeed $h=1+2^{n-1}$ has order two.  The kernel of
+$(\mathbb Z/2^n)^\times\to(\mathbb Z/2^{n-1})^\times$
+is exactly $\{1,h\}$, as is seen from the two representatives
+congruent to $1$ modulo $2^{n-1}$.
+If $\xi(h)=1$, the character factors through level $2^{n-1}$,
+contradicting primitivity.  In a characteristic-zero field its
+value is therefore $-1$.
+
+All values of $\xi$ are integral, so (BR.19) is integral.
+Write $\eta=\overline{\xi}$, $b(u)=\overline{g(u)}$,
+$w_0(a)=\overline{\varphi(a)}$, and $C=2^e\overline c$.
+Then $b(u)^Q=b(u)$ and (BR.10), with $t=2^e$, says
+\[
+ b(u)-b(u-s)
+        =C-\mathbf1_{\langle u\rangle_{2^n}<s}
+                              w_0(\langle u\rangle_{2^n}).
+ \tag{BR.21}
+\]
+Also $w_0(1)=1$ and
+$w_0(s-1)\eta(-1)=-1$, because $s-1=-1$ modulo $f$.
+By (BR.20), $\eta(h)=-1$ in the odd characteristic field $\kappa$.
+
+Suppose the residue of (BR.19) were zero.  Put
+\[
+ T=\{u\bmod2^n:\eta(u)^{2^e}=1\},\qquad
+ \pi:\mathbb Z/2^n\longrightarrow\mathbb Z/2^m.
+ \tag{BR.22}
+\]
+For every unit $y$, changing variables in the zero sum gives
+$\sum_u\eta(u)b(uy)=0$: multiplication by $\eta(y)\ne0$
+recovers the original sum.  BR1 therefore implies
+\[
+                         \sum_{u\in T}\eta(u)b(uy)=0.
+                         \tag{BR.23}
+\]
+BR1 also gives $\pi(u)=1$ or $-1$ for $u\in T$.
+Define $\epsilon(u)=1$ in the first case and $-1$ in the second.
+Since $2^e\mid s$, these two cases give respectively
+$u(1-s)=u-s$ and $u(1-s)=u+s$ modulo $2^n$.
+The element $1-s$ is a unit.
+
+Use (BR.21) to subtract the two instances $y=1$ and $y=1-s$
+of (BR.23).  For each $u\in T$ the resulting summand is
+\[
+ \eta(u)b(u)-\eta(u)b(u(1-s))
+     =\epsilon(u)\eta(u)C-\mathbf1_{u=1}-\mathbf1_{u=-1}.
+ \tag{BR.24}
+\]
+Here are the endpoint checks.  In the case $\pi(u)=1$,
+a representative less than $s\le2^m$ must equal $1$,
+giving $-\eta(1)w_0(1)=-1$.
+In the case $\pi(u)=-1$, apply (BR.21) at $u+s$ and change
+the sign.  A representative of $u+s$ less than $s$ must
+equal $s-1$, hence $u=-1$; its contribution is
+$\eta(-1)w_0(s-1)=-1$.
+The two points are distinct since $m\ge2$.
+
+Multiplication by $h=1+2^{n-1}$ permutes $T$, fixes $\pi(u)$,
+and multiplies $\eta(u)$ by $-1$.  The first two facts use
+$n-1\ge m$ and the evenness of $2^e$.  Hence
+\[
+                         \sum_{u\in T}\epsilon(u)\eta(u)=0,
+                         \tag{BR.25}
+\]
+since $2$ is invertible in $\kappa$.
+Both $1$ and $-1$ belong to $T$.  Summing (BR.24), its left
+side is zero by (BR.23), whereas its right side is $-2$ by
+(BR.25), a contradiction.
+The integral number (BR.19) consequently has nonzero residue,
+which is exactly norm one.  This proves (BR.16) with all of
+the source's prescribed data.
+\end{proof}
+
+\subsection{Unramified homomorphisms and the finite Jacobi relation}
+
+For $N>2$, an odd positive integer $a$ prime to $N$, and
+$b\in(\mathbb Z/N)^\times$, set
+\[
+ \begin{gathered}
+ y_b=\langle a^{-1}b\rangle_N,\qquad
+ j_{N,a}(b)=\frac{a y_b-\langle b\rangle_N}{N},\\
+ E_{N,a}(b)=\frac{a-1}{2}-j_{N,a}(b).
+ \end{gathered}
+ \tag{BR.26}
+\]
+These are integers and are exactly the source's \texttt{yCl},
+\texttt{jv}, and \texttt{Eone}, evaluated on units.
+
+\begin{proposition}[BR4: the original tame-index condition and Jacobi annihilator]
+\label{prop:br-unramified}
+Let $\ell$ be odd, let $k$ be any field of characteristic $\ell$,
+and let $z$ satisfy (BR.1)--(BR.2).
+Then $z$ vanishes on $I_A\cap\ker\gamma$ for every $A$.
+
+Let $F=\mathbb Q(\mu_N)\subset\Omega$ for $N>2$, put
+$U=\operatorname{Gal}(\Omega/F)$, and suppose $\gamma|_U=1$.
+Choose lifts $\widetilde\sigma_b\in G$ of
+$\sigma_b(\zeta_N)=\zeta_N^b$.
+For every odd positive $a$ prime to $N$ and every $u\in U$,
+\[
+ \sum_{b\in(\mathbb Z/N)^\times}
+ E_{N,a}(b)\,
+ z(\widetilde\sigma_b^{-1}u\widetilde\sigma_b)=0.
+ \tag{BR.27}
+\]
+The statement uses the original $\Omega$ and $k$ and does not require
+$k$ finite, a surjective residue map, or a common choice of $H_A$.
+\end{proposition}
+
+\begin{proof}
+On $K_A=I_A\cap\ker\gamma$, equation (BR.1) makes $z$ an
+additive homomorphism.  Its kernel contains $K_A\cap H_A$.
+Thus the finite index of that kernel divides
+$[K_A:K_A\cap H_A]$, which is prime to $\ell$.
+Its image is a finite additive subgroup of $k$ and therefore an
+elementary abelian $\ell$-group.  Its order is both a power of
+$\ell$ and prime to $\ell$, so it is one.  This proves the first
+assertion, without assuming that $H_A$ is contained in inertia.
+
+The restriction $\lambda=z|_U$ is now an additive, locally constant
+homomorphism, zero on every $I_A\cap U$.  The group $U$ is compact,
+so the locally constant function $\lambda$ has finite image.
+Its kernel is open and normal in $U$, and its fixed field is an
+actual finite abelian extension of $F$ inside the original $\Omega$.
+For every place of $F$, inertia in $G_F$ is exactly
+$I_A\cap U$ under this inclusion: both groups fix the chosen
+valuation and act trivially on its residue field.
+Thus this finite extension is unramified at all finite places.
+The field $F$ is totally complex because $N>2$; there is no real
+place condition to add.  The finite Hilbert class field theorem
+therefore gives an additive map
+\[
+       \Lambda:\operatorname{Cl}(F)\longrightarrow k,\qquad
+       \lambda=\Lambda\circ\operatorname{Art}_F.
+       \tag{BR.28}
+\]
+Only its finite image is used.  The range remains a subgroup of $k$.
+
+We derive the required ideal relation from OS1.
+For $1\le r<N$, let
+\[
+ \theta_{N,r}(t)=
+    \left\lfloor\frac{r\langle t\rangle_N}{N}\right\rfloor
+    -\left\lfloor\frac{r(N-\langle t\rangle_N)}{N}\right\rfloor.
+ \tag{BR.29}
+\]
+For every nonzero ideal $\mathfrak a$, OS1 constructs an element
+whose principal ideal is
+\[
+                       \prod_t
+                 \sigma_t^{-1}\mathfrak a^{\,\theta_{N,r}(t)}.
+\]
+Consequently the group-ring element
+$\sum_t\theta_{N,r}(t)\sigma_t^{-1}$
+annihilates the ideal class group.
+This consequence uses only the ideal assertion in OS1.
+
+There is no restriction $a<N$ in (BR.27).
+Write $a=qN+r$ with $1\le r<N$; this is possible since $(a,N)=1$.
+The same floor expression at the positive integer $a$ satisfies
+\[
+ \theta_{N,a}(t)=\theta_{N,r}(t)+q(2\langle t\rangle_N-N),
+ \qquad
+ \theta_{N,N-1}(t)=2\langle t\rangle_N-N.
+ \tag{BR.30}
+\]
+Both follow by separating the integer part $q\langle t\rangle_N$.
+The relation from OS1 for $r$ and for $N-1$ therefore proves
+that $\Theta_a=\sum_t\theta_{N,a}(t)\sigma_t^{-1}$
+annihilates $\operatorname{Cl}(F)$ for this arbitrary $a$.
+
+Because $a\langle t\rangle_N$ is not divisible by $N$,
+\[
+ \theta_{N,a}(t)=
+       2\left\lfloor\frac{a\langle t\rangle_N}{N}\right\rfloor
+                  -(a-1).
+ \tag{BR.31}
+\]
+Putting $b=at$ modulo $N$ in (BR.26) gives the exact group-ring
+identity
+\[
+ 2\sum_b E_{N,a}(b)\sigma_b^{-1}
+                       =-\sigma_a^{-1}\Theta_a.
+ \tag{BR.32}
+\]
+Thus the left side annihilates every class.
+After applying the additive map $\Lambda$ to it, division by
+$2$ is legitimate in the original odd-characteristic field $k$.
+
+Finally Artin is compatible with conjugation:
+\[
+ \operatorname{Art}_F(\widetilde\sigma_b^{-1}u
+                         \widetilde\sigma_b)
+                   =\sigma_b^{-1}\operatorname{Art}_F(u).
+ \tag{BR.33}
+\]
+One can check the convention on a Frobenius at a finite prime:
+conjugating the automorphism conjugates that prime by
+$\sigma_b^{-1}$, and Artin sends its Frobenius to its ideal class.
+The resulting compatibility on all elements follows from the
+Artin map, or from the density of Frobenius in each finite abelian
+quotient.  This is finite reciprocity on the same field $F$;
+the inverse agrees with the ideal action in OS1.
+Apply $\Lambda$ to (BR.32) at
+$\operatorname{Art}_F(u)$ and use (BR.28)--(BR.33).
+This proves (BR.27).
+\end{proof}
+
+\subsection{The exact Bernoulli scalar on the original coefficient ring}
+
+\begin{proposition}[BR5: the nonzero residual annihilator]
+\label{prop:br-scalar}
+Let $O=c.O\subset\overline{\mathbb Q}_\ell$ be the source's finite
+discrete valuation ring over $\mathbb Z_\ell$, let $k$ be any field
+of characteristic $\ell$, and let $\operatorname{red}:O\to k$
+be the specified unital ring map.
+Let $\chi$ be a nontrivial Dirichlet character of level $N>0$
+and order prime to $\ell$, where $\ell$ is odd.
+Write $\gamma=\operatorname{redChar}(\chi)$.
+Suppose $\gamma$ differs somewhere from the reduction
+$\overline{\chi_\ell}$ of the cyclotomic character, and suppose
+\[
+                         |B_{1,\chi^{-1}}|_\ell=1.
+                         \tag{BR.34}
+\]
+Then $N>2$, $\gamma$ is nontrivial, and there is an odd positive
+integer $a$ prime to $N$ such that
+\[
+ \operatorname{red}\left(
+      \sum_{b\in(\mathbb Z/N)^\times}E_{N,a}(b)\chi^{-1}(b)
+                    \right)\ne0.
+ \tag{BR.35}
+\]
+The Bernoulli number in (BR.34) is evaluated through the original
+inclusion $O\subset\overline{\mathbb Q}_\ell$.
+\end{proposition}
+
+\begin{proof}
+We first record precisely what the given residue map implies.
+The structure map $\mathbb Z_\ell\to O$ is injective, because $O$
+is an actual subalgebra of $\overline{\mathbb Q}_\ell$.
+The prime ideal $\ker(\operatorname{red})$ contains the nonzero
+element $\ell$.  In a discrete valuation ring the only nonzero
+prime ideal is the maximal ideal.  Hence this kernel is exactly
+the maximal ideal, even though the map need not be surjective.
+In particular $\operatorname{red}(x)\ne0$ if and only if $x\in O^\times$.
+
+For use with the norm, all elements of $O$ have norm at most one:
+they are integral over $\mathbb Z_\ell$ by module finiteness,
+and a monic integral equation contradicts a norm greater than one
+by the ultrametric inequality.  A unit and its inverse are integral,
+so every unit has norm one.  Write
+$\ell=u\varpi^h$ with $u$ a unit and $h>0$, which is possible
+because $\ell$ is a nonzero nonunit.
+Then $|\varpi|_\ell=\ell^{-1/h}<1$.
+The discrete valuation factorization of every nonzero $x\in O$
+shows conversely that $|x|_\ell=1$ implies $x$ is a unit.
+This proves the norm-to-residue test on the actual ring $O$.
+
+Reduction is injective on roots of unity of order prime to $\ell$.
+Indeed, if $x^r=1$, $x\ne1$, and $\ell\nmid r$, then
+$1+x+\cdots+x^{r-1}=0$.  Were $\operatorname{red}(x)=1$,
+reduction would give $r=0$ in $k$, a contradiction.
+Apply this with $r=\operatorname{ord}(\chi)$ to a unit residue
+where $\chi$ is not one.  The cyclotomic restriction map
+$G\to(\mathbb Z/N)^\times$ is surjective, so $\gamma\ne1$.
+Also $N>2$, since the unit groups at levels $1$ and $2$ are trivial.
+
+We choose $a$ so that
+\[
+                    \operatorname{red}(\chi(a))\ne \overline a.
+                    \tag{BR.36}
+\]
+If $\ell\nmid N$, take $a=\ell$.
+It is odd and prime to $N$; the left side is a nonzero character
+value whereas the right side is zero.
+If $\ell\mid N$, choose the given $g\in G$ where
+$\gamma(g)\ne\overline{\chi_\ell}(g)$ and put
+$b=\operatorname{cls}_N(g)$.
+Choose a positive odd representative $a$ of $b$ modulo $N$.
+This is possible: for even $N$ every unit representative is odd;
+for odd $N$, adding $N$ changes parity.
+The action of $g$ on $\mu_\ell\subset\mu_N$ is the $a$th-power
+map.  Thus $\chi_\ell(g)-a\in\ell\mathbb Z_\ell$, and reduction
+in the given $k$ gives
+$\overline{\chi_\ell}(g)=\overline a$.
+The chosen inequality is now (BR.36).
+
+For any nontrivial character $\psi$ with values in a
+characteristic-zero field, direct summation in (BR.26) gives
+\[
+ \sum_b E_{N,a}(b)\psi(b)
+                    =(1-a\psi(a))B_{1,\psi}.
+                    \tag{BR.37}
+\]
+Here is the calculation, including the inverse in $y_b$.
+The constant term vanishes because $\sum_b\psi(b)=0$.
+Multiplication by $a$ permutes the units, so
+\[
+ \sum_b y_b\psi(b)
+      =\psi(a)\sum_t\langle t\rangle_N\psi(t).
+ \tag{BR.38}
+\]
+Multiply the left side of (BR.37) by $N$ and use
+$Nj_{N,a}(b)=a y_b-\langle b\rangle_N$.
+Equations (BR.38) and (BR.4) give
+$N(1-a\psi(a))B_{1,\psi}$, proving (BR.37) since $N\ne0$
+in characteristic zero.
+
+Apply (BR.37) to $\psi=\chi^{-1}$ in the specified
+$\overline{\mathbb Q}_\ell$.
+By (BR.36) the element
+$v=1-a\chi^{-1}(a)\in O$ has nonzero reduction and hence is a unit.
+Let $S=\sum_b E_{N,a}(b)\chi^{-1}(b)\in O$.
+The element $v^{-1}S\in O$ maps to $B_{1,\chi^{-1}}$.
+By (BR.34) and the norm criterion above it is a unit.
+Thus $S$ is a unit, and its reduction is nonzero.
+This proves (BR.35) without making an integrality or nonvanishing
+assumption on a different character or coefficient ring.
+\end{proof}
+
+\begin{proposition}[BR6: the full residual unramified cocycle theorem]
+\label{prop:br-residual}
+Under exactly the hypotheses of BR5, every cocycle $z:G\to k$
+for $\gamma=\operatorname{redChar}(\chi)$ satisfying
+$\operatorname{UnrEv}(\ell,\gamma,z)$ has the form
+\[
+                     z(g)=(\gamma(g)-1)m\qquad(g\in G)
+                     \tag{BR.39}
+\]
+for some $m$ in the original field $k$.
+This is the literal source interface
+\texttt{UnramifiedCocycleIs\allowbreak CoboundaryOfBernoulliUnit}.
+\end{proposition}
+
+\begin{proof}
+Put $F=\mathbb Q(\mu_N)\subset\Omega$ and $U=G_F$.
+The character $\gamma$ is trivial on $U$.
+For $u\in U$ and any lift $\widetilde\sigma_b$ as in BR4,
+the cocycle identity gives
+\[
+ z(\widetilde\sigma_b^{-1}u\widetilde\sigma_b)
+                    =\gamma(\widetilde\sigma_b)^{-1}z(u)
+                    =\operatorname{red}(\chi^{-1}(b))z(u).
+ \tag{BR.40}
+\]
+For example, compare $z(u\widetilde\sigma_b)$ with
+$z(\widetilde\sigma_b
+        (\widetilde\sigma_b^{-1}u\widetilde\sigma_b))$;
+the terms $z(\widetilde\sigma_b)$ cancel because $\gamma(u)=1$.
+Use in BR4 the integer $a$ supplied by BR5.
+Equations (BR.27) and (BR.40) then say
+\[
+      \operatorname{red}(S)\,z(u)=0,\qquad u\in U.
+      \tag{BR.41}
+\]
+The scalar $\operatorname{red}(S)$ is nonzero, so $z|_U=0$.
+
+Choose $h\in G$ with $\gamma(h)\ne1$, which exists by BR5.
+The quotient $G/U=\operatorname{Gal}(F/\mathbb Q)$ is abelian.
+Hence $gh$ and $hg$ differ by an element of $U$, on which
+both $\gamma-1$ and $z$ vanish.  Thus $z(gh)=z(hg)$.
+Using (BR.1) on both products gives
+\[
+                (\gamma(h)-1)z(g)
+                    =(\gamma(g)-1)z(h).
+                \tag{BR.42}
+\]
+Set $m=z(h)/(\gamma(h)-1)\in k$.
+Equation (BR.42) proves (BR.39) for all $g$.
+In particular no division by the order of
+$\operatorname{Gal}(F/\mathbb Q)$ is required; that order may
+be divisible by $\ell$.  All local conditions, lifts and the
+final coboundary remain on the original $\Omega$ and $k$.
+\end{proof}
+
+\subsection{Both characters and the literal CorX endpoint}
+
+\begin{proposition}[BR7: the complete original CorX supplier]
+\label{prop:br-cor-x}
+Let $\Omega,\ell,c,O,k,\operatorname{red},d,f,n,\varphi,\xi$
+be exactly as in the source's \texttt{CorX}: $O=c.O$ is the
+specified finite DVR subalgebra, $k$ is any field of characteristic
+$\ell$, $\operatorname{red}:O\to k$ is any unital ring map,
+and $\operatorname{XData}(\ell,d,\varphi,\xi)$ holds.
+Put $\chi=\operatorname{prodX}(\varphi,\xi)$ and let
+\[
+        \gamma=\operatorname{redChar}(\chi)
+          \quad\text{or}\quad
+        \gamma=\operatorname{redChar}(\chi)^{-1}.
+        \tag{BR.43}
+\]
+For every locally constant $\gamma$-cocycle $z$ satisfying the
+exact condition (BR.2), there is $m\in k$ with
+$z(g)=(\gamma(g)-1)m$ for every $g\in G$.
+There are no remaining bespoke assumptions in this supplier.
+\end{proposition}
+
+\begin{proof}
+Write $e=v_2(\ell^d-1)$.  As in BR3,
+$\ell$ is odd and $n\ge2e\ge4$.
+The order of $\xi$ divides a power of $2$, since it is a
+character of the finite group $(\mathbb Z/2^n)^\times$.
+The order of $\varphi$ divides $\ell^d-1$.
+Therefore
+\[
+                \chi^{\,(\ell^d-1)2^n}=1,
+                \qquad \ell\nmid\operatorname{ord}(\chi).
+                \tag{BR.44}
+\]
+The same statements hold for $\chi^{-1}$.
+
+We verify explicitly both nontriviality and the cyclotomic exclusion
+required in BR5.  Put $b=1+2^{n-1}$ modulo $2^n$.
+The primitive character calculation (BR.20) gives $\xi(b)=-1$
+also in $O$, since its inclusion into
+$\overline{\mathbb Q}_\ell$ is injective.
+As $\ell f$ is odd, the Chinese remainder theorem gives a unit
+$a$ modulo $\ell f2^n$ satisfying
+\[
+                   a\equiv1\pmod{\ell f},
+                   \qquad a\equiv b\pmod{2^n}.
+                   \tag{BR.45}
+\]
+Choose in the original $G$ a lift $g$ of this cyclotomic
+automorphism.  It fixes $\mu_\ell$, so
+$\overline{\chi_\ell}(g)=1$ in the original $k$.
+On the other hand (BR.3) gives
+\[
+                 \chi(g)=-1,\qquad \chi^{-1}(g)=-1.
+                 \tag{BR.46}
+\]
+Reduction preserves $-1\ne1$ because $\ell$ is odd.
+Thus both residual characters are nontrivial and each differs
+from $\overline{\chi_\ell}$ at this very same $g$.
+In particular $\chi$ and $\chi^{-1}$ are nontrivial before reduction.
+
+The data (BR.5) are preserved under simultaneous inversion:
+the conductors and the character orders are unchanged,
+$\varphi^{-1}(-1)=\varphi(-1)$ and
+$\xi^{-1}(-1)=\xi(-1)$, and the numerical data are identical.
+They are also preserved under the actual inclusion
+$O\hookrightarrow\overline{\mathbb Q}_\ell$.
+For conductor preservation, a character factors through a lower
+level exactly when its unit-group kernel contains the corresponding
+reduction kernel; an injective coefficient map does not change that
+kernel.  Multiplication, inversion and the level changes in
+(BR.3) commute with this inclusion.  Therefore BR3 applied to
+both pairs gives
+\[
+                         |B_{1,\chi}|_\ell
+                         =|B_{1,\chi^{-1}}|_\ell=1.
+                         \tag{BR.47}
+\]
+
+For the first alternative of (BR.43), apply BR6 to $\chi$,
+using the second equality in (BR.47).  For the second alternative,
+apply BR6 to $\chi^{-1}$, using the first equality.
+The identity
+$\operatorname{redChar}(\chi^{-1})
+ =\operatorname{redChar}(\chi)^{-1}$
+follows by evaluating the unit-valued character and then applying
+the same ring map $\operatorname{red}$.
+Thus the input cocycle and its condition (BR.2) are literally
+the ones required by BR6 in either case.
+Its output lies in the originally quantified $k$.
+This proves the full \texttt{CorX} statement.
+\end{proof}
+
+\paragraph{Closure and the downstream boundary.}
+The complete chain established here is the finite Frobenius projection
+and integral partial sum, followed by the prescribed Bernoulli unit;
+the original tame-index condition, finite Hilbert class-field descent
+and OS1 Jacobi relation; and finally the nonzero scalar, cocycle
+vanishing and both-character \texttt{CorX} endpoint.
+BR4 uses only the odd-characteristic specialization of the source's
+general \texttt{homKill}; it does not assert the unrestricted
+integral \texttt{clKill} or arbitrary-coefficient \texttt{homKill}
+interfaces.  BR7 supplies the exact input to the paired
+\texttt{CountII}/\texttt{CountIII} argument.  Automorphy, rigidity,
+congruence-number bounds and the other hypotheses of that argument
+are separate obligations.

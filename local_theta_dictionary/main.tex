@@ -1,0 +1,690 @@
+\section{The original local, theta, and operator dictionary}
+\label{sec:local-theta-dictionary}
+
+\status{LTD1--LTD8 reconstruct exact transports on the selected objects and
+the finite Hecke argument producing the full local rank coverage.  In
+particular, an actual \texttt{NBuilt} certificate implies the literal
+\texttt{LocsCoverTw}, and eventual such certificates imply
+\texttt{LinkEta}.  No additional published Hecke theorem is needed for
+this implication: its precise hypotheses occur in \texttt{NdSpec.std}.
+The existence of the compatible original geometric, theta, spectral,
+and local certificates remains a producer obligation.}
+
+The same field names occur in several different records in this part of
+the source.  We distinguish the rational row operators, acting on
+\(S.W_L(j)\), from the ambient operators, acting on
+\(D.\mathrm{MtL}(\mu_w,j)\).  The former have Hecke indices through
+\(r\), and the latter through \(n_V\).  Their comparison must use
+the prescribed maps and normalizing scalars.  Merely having the same
+name \texttt{hL} does not identify them.
+
+All assertions below concern the pinned original source and the exact
+data in their premises.  ``B'' classifies the complete human proof of
+the stated implication; it does not classify the unconstructed premise
+as elementary.  No new Lean replay is claimed.
+
+% BEGIN LTD1
+\paragraph{LTD1: all global selections come from one literal bundle.}
+\label{claim:LTD1}
+Let \(\mathcal A\) be a family class and let \(\sigma\) be a
+\texttt{RawSel Bundle} on that class.  Thus, whenever
+\(\mathcal F\in\mathcal A\), \(x>\mathcal F.x_1\), and
+\(i\in\mathcal F.I_x\), there is a specified bundle
+\[
+ b=\sigma(\mathcal F,x,i)
+  =(R,S,P,\mathrm{pin},DH,C,B)
+\]
+on the original \(D=\mathcal F.D(x,i)\), its original object \(O\),
+and the same size constant \(c=\mathcal F.C_{\rm sz}\).
+Here \(R\) is the tied record, \(S\) its spectral realization,
+\(P\) its row family, \(C\) the compatible columns, and
+\[
+ B:\texttt{RealTB}
+   (R,P,C.\mathrm{face},C.\mathrm{Sp},
+                 \mathrm{zsc}(P,DH,c),S).
+ \tag{LTD.1}
+\]
+The source's selections are exactly
+\[
+ \begin{split}
+ \mathrm{sel}(\mathcal F)&=
+   \bigl\langle\mathcal F.x_1,
+           (x,i)\longmapsto b.R\bigr\rangle,\\
+ \mathrm{selS}&=b.S,\quad \mathrm{selP}=(b.P,b.\mathrm{pin}),\quad
+ \mathrm{selDH}=b.DH,\quad \mathrm{selC}=b.C,\quad
+ \mathrm{selB}=b.B.
+ \end{split}                                                    \tag{LTD.2}
+\]
+Indeed, substituting these projections in the definition of
+\texttt{ZscAt} gives the very scale in (LTD.1): its last component
+is set to zero and its previous component is changed by
+\(-c\,z_{6,u}\).  All other terms use the same \(P,DH,D,O.L\).
+Consequently the dependent type of \(b.B\) is precisely the type
+required by \texttt{SelB}; no new compatible realization is chosen.
+
+In particular, the indefinite realization selected by
+\texttt{selIOf} is exactly \(b.B.Q\), and its coefficient field
+selected by \texttt{selKOf} is exactly \(b.B.T.Q.c.F\).
+The source's \texttt{wire\_sel} uses this one \(Q=b.B.Q\) for its
+all-tuples comparison, its point comparison and its base-rank
+comparison.  Likewise \texttt{link\_alt} takes its spectral
+instance and its instance tie from \(b.S\), its real volume tie
+from \(b.R.T.\mathrm{theta.real}\), and its scale tie from the
+original \(\mathcal F\).  These are common-object identities, not
+assertions inferred from equal dimensions.
+
+The condition \(x>\mathcal F.x_1\) already implies the weak
+threshold requirement \(\mathcal F.x_1\le x\) in (LTD.2).
+No further eventual threshold is needed to align these projections.
+This proves the compatibility of the selection once \(\sigma\)
+is supplied; it does not construct the bundles.
+% END LTD1
+
+% BEGIN LTD2
+\paragraph{LTD2: the local installation preserves the original theta and form objects.}
+\label{claim:LTD2}
+Fix \(D\) and \(L:\texttt{LocAll}(\texttt{lay0}(D))\), and put
+\(D_L=\texttt{withLoc}(L)\).  The local installation replaces the
+local index set, local rings, modules, projections, automorphic
+specializations and associated local comparisons by the fields of
+\(L\).  It also sets \(Z,Z_{\rm good}\) to the specified actual
+subsets and replaces the row number \(\eta_J\), for \(1\le j\le m\),
+by
+\[
+       \eta_{J,L}(j,w)=\sum_{a\in\mathrm{locs}_L(j,w)}\eta_{\rm loc}(a).
+       \tag{LTD.3}
+\]
+Outside that range it preserves the previous \(\eta_J\).
+It preserves the host, its coefficient fields and their embeddings,
+all row spaces \(\mathrm{MtL},\mathrm{Mt},\mathrm{Mj}\), their
+original realization maps and lattices, and their theta maps.
+
+Here is a direct check of the claim.  \texttt{LocNd.nd} changes
+exactly the local-indexed fields of \texttt{NData}.  In
+\texttt{LocTw.ntw}, only the maps from these new local indices to
+the old twist indices, their local coefficient maps, and the local
+characters are replaced.  The twist indices, their rings \(O_0,O,O_k\),
+the two side embeddings, the universal Artin maps, the twist
+characters, signatures and toric theta values are copied.  In
+\texttt{LocAll.lay}, \texttt{nexp} and \texttt{nth} are record
+copies.  The subsequent \texttt{fixZ} changes only the two finite
+sets; \texttt{reEta} changes only \(\eta_J\) in the underlying
+row datum.  Therefore every claimed carrier and every claimed map
+has the same defining expression after the necessary dependent
+type identifications.  In particular, the coefficient-valued
+\(\mathrm{th},\mathrm{thPsi},\mathrm{thU},\mathrm{thP}\), the
+form action and Hecke operators, and the actual evaluation maps
+of \texttt{NTh} are the originals.
+
+For an original form family \(M\), normalized choice \(C\),
+character frame \(cf\), and tuple tie \(tp\), the source defines
+\[
+ M_L=\texttt{mtL}(L,M),\qquad C_L=\texttt{chL}(L,C),\qquad
+ cf_L=\texttt{cfL}(L,cf),\qquad tp_L=\texttt{tpL}(L,tp).
+ \tag{LTD.4}
+\]
+These copy the old fields, including \(C.\mathrm{twI},C.\mathrm{sd},
+C.Q,C.k',C.\psi',C.\mathrm{embW},C.e_{Mt}\), and the tuple
+characters.  Thus the exact semilinear basis and lattice equalities
+in \texttt{NChoice} retain their maps, not merely their numerical
+ranks.  This is the source's \texttt{Kept} comparison at this step.
+
+Preservation is an implication on an existing object.  It does not
+turn an initialized zero theta map into a nonzero one.  In particular,
+the separate \texttt{NTh.ThEv} and \texttt{NTh.EmbBRange}
+propositions are not fields proved merely by presenting an
+\texttt{NTh} record.  Whenever such a proposition has been proved
+for the original maps, the equality just checked transports it
+unchanged; its mathematical content has not been manufactured by
+the installation.
+% END LTD2
+
+% BEGIN LTD3
+\paragraph{LTD3: integral simultaneous generalized eigenspaces.}
+\label{claim:LTD3}
+Let \(O\) be a discrete valuation ring, \(K\) its fraction field,
+and \(V\) a finite-dimensional \(K\)-vector space.  Let
+\(\mathcal S\subseteq\operatorname{End}_K(V)\) be a possibly
+infinite pairwise commuting family.  Suppose each member splits
+over \(K\), in the sense that its generalized eigenspaces span
+\(V\), and every eigenvalue having a nonzero generalized
+eigenspace lies in \(O\).  Let \(T=O[\mathcal S]\).  For an
+\(O\)-algebra homomorphism \(\psi:T\to O\), define
+\[
+ W_\psi=\bigcap_{t\in T}\operatorname{GEig}(t,\psi(t)),
+ \qquad
+ \mathfrak m_\psi=\ker(T\xrightarrow{\psi}O\longrightarrow O/\mathfrak m_O).
+ \tag{LTD.5}
+\]
+The scalar inclusion \(O\hookrightarrow K\) is implicit in
+\(\operatorname{GEig}\).  There are only finitely many nonzero
+\(W_\psi\), and
+\[
+                     V=\bigoplus_{W_\psi\ne0}W_\psi.             \tag{LTD.6}
+\]
+
+We prove this without a finiteness assumption on \(\mathcal S\).
+Begin with \(V\).  If a nonzero current block is split into two
+or more generalized eigenspaces by some \(s\in\mathcal S\),
+perform that refinement.  Every new block is invariant under
+all of \(\mathcal S\), since commuting operators preserve the
+kernels of powers of \(s-\lambda\).  The restriction of another
+split operator to an invariant subspace still splits: its
+generalized spectral projections are polynomials in that
+operator, hence preserve the invariant subspace.  Each strict
+refinement increases the number of nonzero summands, which is
+at most \(\dim_KV\).  We therefore reach a finite direct sum
+\(V=\bigoplus_aV_a\) such that every \(s\in\mathcal S\) has on
+each nonzero \(V_a\) exactly one generalized eigenvalue
+\(\lambda_a(s)\in O\).
+
+On \(V_a\), write \(s=\lambda_a(s)I+N_s\).  Each \(N_s\)
+is nilpotent, and all these nilpotents commute.  A polynomial
+with zero constant term in finitely many commuting nilpotents
+is nilpotent: in a sufficiently high power, every monomial has
+an exponent at least the nilpotence exponent of one factor.
+Consequently every polynomial expression \(t\in T\) acts as
+\(\lambda_a(t)I+N_t\), where \(N_t\) is nilpotent and the scalar
+is the same polynomial in the \(\lambda_a(s)\) and its
+\(O\)-coefficients.  This scalar is independent of the expression
+for \(t\).  Indeed, a relation would make \(cI\) nilpotent for
+the difference \(c\) of two putative scalars; on the nonzero
+space \(V_a\), that implies \(c=0\).  Thus \(\lambda_a\) is an
+\(O\)-algebra homomorphism \(T\to O\).
+
+Two distinct blocks were separated at a refinement and hence
+have distinct values on some generator.  Their characters
+\(\lambda_a\) are distinct.  Their generalized character spaces
+are exactly the blocks: on any other block, a generator with
+a different value has invertible scalar-plus-nilpotent difference.
+The same observation proves that any nonzero \(W_\psi\) is one
+of these blocks.  This proves (LTD.6).  For \(V=0\), all spaces
+in (LTD.5) are zero and the conclusion is immediate.
+
+For a maximal ideal \(\mathfrak m\subset T\), put
+\[
+ V_{\mathfrak m}=\sum_{\mathfrak m_\psi=\mathfrak m}W_\psi,
+ \qquad V^{\rm off}_{\mathfrak m}
+            =\sum_{\mathfrak m_\psi\ne\mathfrak m}W_\psi.        \tag{LTD.7}
+\]
+Each \(\mathfrak m_\psi\) is maximal: residue evaluation is
+surjective because it contains the images of all constant
+elements of \(O\).  Therefore, for any finite set \(\mathcal M\)
+containing every maximal ideal of \(T\), grouping (LTD.6) by
+these residue kernels gives
+\[
+ \sum_{\mathfrak m\in\mathcal M}\dim_KV_{\mathfrak m}=\dim_KV,
+ \qquad
+ \bigcap_{\mathfrak m\in\mathcal M}V^{\rm off}_{\mathfrak m}=0.
+ \tag{LTD.8}
+\]
+Ideals with no supported character contribute a zero summand.
+The argument does not assert diagonalizability, and does not
+need to prove that \(T\) is finite as an \(O\)-module.
+% END LTD3
+
+% BEGIN LTD4
+\paragraph{LTD4: the actual local specialization gives complete rank coverage.}
+\label{claim:LTD4}
+Retain \(D,L,M,C\) from LTD2 and a specified
+\[
+ \mathrm{Sp}:\texttt{NdSpec}(\mathrm{Pl},M,C,\mathrm{big},L.X,L.T).
+ \tag{LTD.9}
+\]
+For every \(1\le j\le m\) and every original place \(w\) with
+\(D.\mu_{\rm At}(w)\ne D.\mu_0\), one has
+\[
+ \sum_{a\in D_L.\mathrm{locs}(j,w)}
+          \operatorname{rank}_{O_a}M_a
+       =\dim_{D.L}D.\mathrm{MtL}(D.\mu_{\rm Tw}(w),j).
+ \tag{LTD.10}
+\]
+Moreover the original projections \(\mathrm{pr}_{Mt,a}\), after
+the explicit index casts, are jointly injective on the right-hand
+space.  Equation (LTD.10), for these exact quantifiers, is
+\texttt{LocsCoverTw} on \(D_L\).
+
+Fix \(j,w\).  Take \(O=\mathrm{Sp}.B.O_c(j,w)\), its fraction
+field \(K\), \(V=\mathrm{Sp}.B.V(j,w)\), and the family
+\(H_{v,k}=\mathrm{Sp}.B.h_K(j,w,v,k)\) with the literal
+\texttt{GenAt} restrictions: \(v\) is split, away from the
+coefficient prime, the specified auxiliary set and \(Q_c(j,w)\),
+and \(1\le k\le n_V\).  The field \texttt{Sp.std} gives
+pairwise commutation and integrality of every occurring
+generalized eigenvalue.  The field \texttt{Sp.B.split} gives
+the splitting hypothesis of LTD3.
+
+The original row-basis axiom first makes
+\(D.\mathrm{MtL}(\mu_w,j)\) finite dimensional: its basis maps
+to a linearly independent family in the finite-dimensional
+original complex row space.  The field \texttt{iV\_basis} maps
+that same basis to a \(K\)-basis of \(V\).  Thus
+\[
+ \dim_KV=\dim_{D.L}D.\mathrm{MtL}(\mu_w,j),\qquad
+                 i_V\text{ is injective}.                         \tag{LTD.11}
+\]
+For the second assertion, write a vector in the original basis.
+A zero image gives a zero combination in the image basis, so
+each coefficient has zero image under the field embedding and
+is zero.
+
+The fields \texttt{mx\_max}, \texttt{mx\_inj}, and
+\texttt{mx\_all} identify the finite set
+\(D_L.\mathrm{locs}(j,w)\) bijectively with the maximal ideals
+used in (LTD.8).  For each index \(a\), the specified map
+\[
+ \Psi_a:K_a\otimes_{O_a}M_a\longrightarrow V
+\]
+is semilinear for the field isomorphism \(\mathrm{phK}_a:K_a\simeq K\),
+is injective, and has image exactly \(V_{\mathrm{mx}(a)}\).
+Transporting a basis along this isomorphism gives
+\[
+ \operatorname{rank}_{O_a}M_a
+       =\dim_KV_{\mathrm{mx}(a)}.                                 \tag{LTD.12}
+\]
+Here \(M_a\) is finite free over the given DVR, so extending a
+free basis to its fraction field preserves its length.
+Summing (LTD.12), using injectivity and exhaustiveness of
+\(\mathrm{mx}\), then (LTD.8) and (LTD.11), proves (LTD.10).
+
+Finally suppose every original local projection of \(y\) is
+zero.  Membership \(a\in\mathrm{locs}(j,w)\) supplies the
+identities of the row number, place and twist index; these give
+the source casts \texttt{castMtInv}.  The actual
+\texttt{Psi\_pr} equality says
+\[
+ \Psi_a(\mathrm{pr}_{Mt,a}(y))-i_V(y)
+                    \in V^{\rm off}_{\mathrm{mx}(a)}.
+ \tag{LTD.13}
+\]
+Its first term is zero.  By (LTD.8), \(i_V(y)=0\), and (LTD.11)
+gives \(y=0\).  This proves joint injectivity on the original
+space, not on an arbitrarily chosen space of the same dimension.
+
+No \texttt{AutSpec} hypothesis is needed for this proof.
+If one wants the entire \texttt{NormalizedLocal}\allowbreak\texttt{Compatibility}
+record, \texttt{Sp} supplies all its displayed algebraic fields;
+the two additional equalities \texttt{AutSpec.iotaQ} and
+\texttt{iotaQC} turn \texttt{Sp.iotaC\_coh} into the required
+complex embedding square.  This is exactly the \texttt{cover}
+construction in \texttt{heckeOpen\_withLoc\_alt}.
+% END LTD4
+
+% BEGIN LTD5
+\paragraph{LTD5: the exact original certificate implies the terminal coverage link.}
+\label{claim:LTD5}
+For every original datum \(D'\), every fixed local Langlands
+input \(h_{LL}\), and every supplied
+\(N:\texttt{NBuilt}(h_{LL},D')\), one has
+\[
+                    \texttt{LocsCoverTw}(D').                    \tag{LTD.14}
+\]
+Indeed, \(N\) contains \(D,L,M,C,\mathrm{Sp}\) as in LTD4 and
+the equality \(D'=\texttt{withLoc}(L)\).  Substitute this
+equality and apply LTD4.  The proof never applies the theorem
+denoted by \(h_{LL}\); it uses the already supplied local
+certificate.  The role of local Langlands in producing that
+certificate is separate.
+
+The stronger \texttt{NTrue} record additionally identifies the
+entire dependent tuple
+\[
+ (D',cf',C',tp')
+       =(D_L,cf_L,C_L,tp_L).                                     \tag{LTD.15}
+\]
+Thus (LTD.14) is compatible with the exact characters and choice
+used later.  In \texttt{RowsAtStart.}\allowbreak\texttt{nTrueAtWeight}, both the datum
+equality and (LTD.15) are reflexive: the constructor packages
+these very objects.  No isomorphic replacement is inserted.
+
+Consequently, for a fixed \(\mathcal F:\texttt{FamP}(\epsilon)\),
+the sufficient family condition is precisely
+\[
+ \exists x_0\ \forall x\ge x_0\ \forall i\in\mathcal F.I_x,
+       \exists N:\texttt{NBuilt}(h_{LL},\mathcal F.D(x,i)).
+ \tag{LTD.16}
+\]
+Applying (LTD.14) separately at each \((x,i)\), without changing
+\(x_0\), gives the source's \(\texttt{LinkEta}(\mathcal F)\).
+When the producer requires \(x>\mathcal F.x_1\), replace
+\(x_0\) by \(\max(x_0,\mathcal F.x_1+1)\) before applying it.
+If (LTD.16) is provided for every member of the actual selected
+class, the same assertion is \texttt{Closed} on that class,
+and on its \(D3\) subclass by the defining inclusion.
+
+This is a strict reduction of the coverage consumer to the
+original \texttt{NBuilt}/\texttt{NdSpec} producer.  It does not
+assert that an arbitrary \texttt{TSel} carries an \texttt{NBuilt}
+certificate.  The generic source theorem \texttt{link\_eta}
+uses only the selected tied records' \texttt{MtFam},
+\texttt{NormalizedLocalCompatibility} and \texttt{HeckeTied};
+its \texttt{Duty} argument is unused.  That generic route calls
+\texttt{heckeStd}.  The concrete route (LTD.16) instead retains
+the \texttt{std} proof already present in the actual local
+construction, and therefore introduces no second independent
+Hecke integrality supplier.
+% END LTD5
+
+% BEGIN LTD6
+\paragraph{LTD6: the original row spectrum and its normalized Hecke action.}
+\label{claim:LTD6}
+Fix one source geometric state \(x:\texttt{St}(P)\) and a
+compatible \(l:\texttt{LC}(h_{LL},x)\).  This is the source's
+\texttt{StrictHenselian}\allowbreak\texttt{AcyclicLevel} in the expanded naming.
+Its rational form datum is
+\[
+ S=\texttt{ratDatR}(x.m.z.R,x.m.z.cG,l.\mathrm{rat}.k_{K_s},
+                                                l.\mathrm{rat}.hk).
+\]
+Under the installation \(L\), the source chooses
+\[
+ D_L=\texttt{DL}(x,L)=\texttt{withLoc}(L),\qquad
+ \texttt{datL}=\texttt{Dat.transfer}(x.m.z),
+\]
+using the identity finite-group comparison.  Consequently
+\[
+ S_L=\texttt{ratL}(L,S),\quad H^{\rm row}_{L,j,k,v}
+              =l.\mathrm{rat}.\mathrm{In}.h_L(j,k,v),\quad
+ e_{L,j,\tau,k,v}=l.\mathrm{rat}.\mathrm{In}.\mathrm{eig}(j,\tau,k,v).
+ \tag{LTD.17}
+\]
+These are equalities of the operators on the transported original
+spaces.  Their proof is substitution in \texttt{SL},
+\texttt{ysL}, \texttt{hkH}, \texttt{hkHL}, and \texttt{eigD}:
+\texttt{SL\_heq} and \texttt{hL\_eq} reduce to reflexive
+equalities.  A final row reading \(Y\) is related by the specified
+\texttt{YRel}, which keeps its actual representation and its
+\(e_W,j_{Mt}\) readings.  \texttt{normalizedRowDatum} uses that
+relation to identify its representation with
+\(\tau\mapsto\texttt{rowRepR}(R.\theta,Y.e_{FT}(\tau))\).
+
+To check that this identification is useful for the spectral
+consumer, write \(G_j\) for \texttt{goodL}: the intersection of
+the eigenspace of the original finite-group projector with the
+specified generic-character eigenspaces.  All operators and
+characters defining this intersection are preserved in LTD2 and
+(LTD.17), so its transported subspace is literally the same
+\(G_j\).  The original \texttt{RatIn.span} assertion is
+\[
+ G_j\ \subseteq\sum_{\substack{\tau:\,\mathrm{isot}(j,\tau)\ne0\\
+                                      \mathrm{goodRow}(\tau)}}
+ \left(G_j\cap\bigcap_{\substack{1\le k\le r\\
+                      v\text{ split},\ v\notin S_b}}
+       \ker(H^{\rm row}_{j,k,v}-e_{j,\tau,k,v})\right).
+ \tag{LTD.18}
+\]
+Substitution proves exactly (LTD.18) for the final original row
+model.  Likewise, if \(\Lambda_j\) is the
+\(\mathcal O_{D.L}\)-span of its prescribed integral coefficient
+module, the original \texttt{hL\_int} becomes, with the same
+quantifiers and the same \(S_b\),
+\[
+ \forall j,k,v\ \exists n\quad
+     (\operatorname{N}v)^n H^{\rm row}_{j,k,v}
+                    (\Lambda_j\cap G_j)\subseteq\Lambda_j,
+ \tag{LTD.19}
+\]
+for \(1\le j\le m\), split \(v\notin S_b\), and \(k\le r\).
+No uniform denominator exponent is inferred: \(n\) may depend
+on \(j,k,v\), exactly as in the original field.
+
+The coefficient-valued Hecke action is related to this row
+action by the actual map \(e_F\) and actual unit \(u_{i,b,v}\):
+\[
+ e_F H^{\rm exp}_{i,j,b,k,v}
+       =u_{i,b,v}^{\,k}(1\otimes H^{\rm row}_{j,k,v})e_F,
+       \qquad 0\le k\le r,\quad v\notin S_0(i),\ v\text{ split}.
+ \tag{LTD.20}
+\]
+This follows from \texttt{SideB.hkEq} and the equality
+\(l.b.YS.e_F=l.b.Bs.e_F\); \texttt{hkH} defines the scalar as
+the \(k\)-th power of the embedded \texttt{cHk} unit.  For
+\(k=0\) it is one.  For any scalar \(a\), induction on \(n\)
+in (LTD.20) gives
+\[
+ e_F(H^{\rm exp}-u^ka)^n
+       =u^{kn}(1\otimes H^{\rm row}-a)^n e_F.                    \tag{LTD.21}
+\]
+Thus \(e_F\) carries both ordinary and generalized eigenspaces
+to those with the prescribed rescaled eigenvalue.  This proves
+the exact spectral transport; it does not assert the initial
+spanning or integrality in (LTD.18)--(LTD.19) without
+\texttt{RatIn}.
+
+There is a second family \(\mathrm{Sp}.B.h_L/h_K\), used in
+LTD4, on \(\mathrm{MtL}(\mu_w,j)\) with \(k\le n_V\).
+Its operator square is \texttt{NLocBase.hL\_def/hK\_def}, and
+its local action square is \texttt{NdSpec.act\_hK}.  These
+are not (LTD.17).  In particular,
+\texttt{ChoiceSide.eMt\_level} only gives an extending complex
+embedding, equality of the level subgroup, and equality of its
+character after \texttt{kMapE}.  It contains no pointwise
+equality for \(e_{Mt}\) and no Hecke square.  The missing
+comparison cannot be supplied by silently identifying these
+two operator families.
+% END LTD6
+
+% BEGIN LTD7
+\paragraph{LTD7: localization transports the existing theta evaluation and export series.}
+\label{claim:LTD7}
+Continue with the same \(x,l,L\) as in LTD6.  The source's
+\texttt{ModuliPointsState} contained in \(l\) supplies an actual
+\texttt{GeoTie.ThetaTie} between its original expansion and
+\(D.\mathrm{nth}\).  Copy its points, covering maps, evaluation
+identities, unramified forms, Hecke identities and unramified
+extension condition.  By LTD2 the coefficient fields,
+evaluation maps and Hecke operators appearing on both sides
+are unchanged, and by LTD6 their real model has been transported
+by the identity comparison.  Every copied equality therefore
+has exactly the required target and source.  This constructs
+the final \texttt{ThetaTie}; it is the source's
+\texttt{geoL}.  In particular, it uses the existing evaluation
+identity, rather than deducing one from the existence of a
+theta-named record.
+
+There is also an exact transport for the exported series.  Let
+\(X'\) be any \texttt{NExpTied} on \(D_L\), and suppose
+\[
+      h:\texttt{ExpRel}(L,l.b.Bs.\mathrm{exp},X').                 \tag{LTD.22}
+\]
+This comparison has precisely three fields.  It transports
+\texttt{TauTrue}; it preserves the ordered pair of bad-place
+sets \((QP,DP)\) of every admissible level; and it transports
+every \texttt{Reads} factorization.  The latter says that a
+specified pointwise reading \(r(f,g)\) factors through the
+actual realization by an injective semilinear coefficient map:
+\[
+ r(f,g)=\omega((\mathrm{real}(f))(g)),\qquad\omega\text{ injective}.
+ \tag{LTD.23}
+\]
+No equality of the two realizations themselves is presumed.
+
+Construct the localized export by retaining the original
+characters, finite class sets and representatives, measures,
+Hermitian frames, integral lattices, additive character and
+normalizing scalars.  Only their ambient datum is relabeled.
+The twist maps in the two directions are inverse identity
+readings of \((Q,\chi,\mathrm{res})\); thus all original
+admissibility and finite-class conditions have the same
+meaning.  The \texttt{setupL} construction has the following
+pointwise equalities under this relabeling:
+\[
+ \theta_L=\theta,\qquad \mathrm{gens}_L=\mathrm{gens},\qquad
+ \xi_L=\xi,\qquad \mathrm{classSum}_L=\mathrm{classSum},
+ \tag{LTD.24}
+\]
+and its predicates \texttt{IsDatum} and \texttt{IsHeckeDatum}
+are equivalent to the originals.  To see this, expand a theta
+or class-sum vector into its original frame, place map, finite
+representatives and vector function.  Each of these has just
+been retained.  The datum predicates assert splitting,
+avoidance, finiteness, support and membership for those same
+arguments; the Hecke predicate asserts the same chosen element,
+representatives and determinant.  Each clause is unchanged.
+
+An original \texttt{CellTie} can now be copied field by field.
+Its support, class, polynomial coefficient and \(\mathrm{rdV}\)
+maps are kept.  Its datum-surjectivity and theta equalities use
+the first equality in (LTD.24), its twisted-generator equality
+uses the second, its universal coefficient identities and
+off-support vanishing use the third, and its theta-projection
+identity uses the fourth.  The equality of integral lattices
+and injectivity of \(\mathrm{rdV}\) refer to the unchanged maps.
+The finite-group and level-character equations are unchanged
+as well.  This checks every field of \texttt{CellTie},
+including its conditional antecedents.
+
+Keep exactly the original normalization scalar \(\nu\ne0\).
+The norm assertion \texttt{IsNorm} transports in both directions
+because its actual family, measures and maps have been retained.
+The three rationality conditions on the base theta values,
+twisted generators and universal coefficients are equivalent
+by (LTD.24).  Hence both conditional clauses in
+\texttt{IsScalar}, as well as \(\nu\ne0\), transport.  This
+preserves the original scalar choice even when a conditional
+rationality antecedent is false; it does not add an unconditional
+nonvanishing theorem.  The copied Hecke tie follows from the
+\texttt{IsHeckeDatum} equivalence, and the universal-character
+tie is retained by LTD2.  We have constructed the localized
+\texttt{ExportTie} with its original normalization.
+
+To finish \texttt{SerAt}, retain its bad-place equality, its
+selected-place equality, the bounded-lattice equivalence, the
+off-range zero condition and its original lambda datum and
+lambda ties.  Its only remaining field, \texttt{join}, is the
+factorization (LTD.23) for the pointwise expression
+\[
+                 \mathrm{rdV}(f)(\mathrm{finHom}(\mathrm{PV}(g))).
+\]
+The old \texttt{join} supplies that reading; apply
+\(h.\mathrm{reads}\) to it.  This produces its required
+injective semilinear map for \(X'\), on the same \(f,g\).
+We have therefore proved
+\[
+ \texttt{ExpRel}(L,l.b.Bs.\mathrm{exp},X')
+  \Longrightarrow
+ \operatorname{Nonempty}\bigl(\texttt{SerAt}
+     (\mathrm{ysL},\mathrm{datL}.\mathrm{geo}.v_0,
+                     X',\mathrm{pvL},\mathrm{cfD},\mathrm{pqD})\bigr).
+ \tag{LTD.25}
+\]
+The original \texttt{ThetaTie}, \texttt{SerAt} and the comparison
+(LTD.22) remain explicit premises.  Their analytic rationality,
+convergence and initial realization content is not replaced
+by the transport proof.
+% END LTD7
+
+% BEGIN LTD8
+\paragraph{LTD8: the coefficient field is the actual embedded field.}
+\label{claim:LTD8}
+Fix the source's real choice \(ch\).  Its predicate
+\texttt{FieldOK} means \texttt{NumbersIn} for the particular
+embedding \(\iota=D.\mathrm{embLL}:D.L\hookrightarrow\mathbb C\).
+The required numbers comprise the specified character values,
+eighth roots, the place-dependent roots of unity, phases,
+square roots of place norms, finite expansion jets, critical
+toric ratios and normalized bottom sums.  Thus, for any field
+embedding \(\sigma:K\hookrightarrow\mathbb C\),
+\[
+ \texttt{FieldIn}_\sigma(ch)\quad\hbox{and}\quad
+ \sigma(K)\subseteq\iota(D.L)
+       \quad\Longrightarrow\quad\texttt{FieldOK}(ch).            \tag{LTD.26}
+\]
+For every required number, compose its asserted membership in
+\(\sigma(K)\) with the displayed containment.  In the bottom
+sum clause retain the same triangles and the same nonzero
+period scalars, and apply the containment to each normalized
+sum.  All quantifiers over tuples, supported expansions and
+places are untouched.  This proves every clause of
+\texttt{NumbersIn}, hence (LTD.26).
+
+Conversely, \texttt{FieldOK} implies \texttt{HasNumberField}:
+take the image field \(\iota(D.L)\subseteq\mathbb C\).
+The embedding identifies it with the original number field,
+so it has the same finite dimension over \(\mathbb Q\);
+every required number is in that image.  The converse needs
+the containment in (LTD.26); existence of some number field
+alone gives no such containment for the fixed datum.
+
+The jets clause immediately makes the specified top and row
+jets rational at their actual pairs of points, and the
+character clause gives \texttt{ValLL}.  For the further
+\texttt{FieldCond} consumer the source also requires the same
+real additive character and theta datum, equality of the two
+grid characters at every relevant index, equality of the
+selected place set and its depths, nonvanishing of the
+denominator Hecke values at the specified positive integers,
+existing bottom triangles, and integrability of their two
+kernel expressions.  Under those additional premises,
+substitution gives the required roots and character values;
+the critical-ratio clause supplies
+\(\iota(\rho)=\Lambda(s)/\Lambda_0(s)\), and the nonzero
+denominator gives \(\Lambda(s)=\iota(\rho)\Lambda_0(s)\).
+
+For the last clause, the existing bottom-triangle witness
+activates \texttt{BottomIn}.  This supplies a possibly newly
+chosen triangle \(X\) satisfying the same \texttt{IsBottomTri}
+conditions, and nonzero complex periods \(\Omega,\Omega'\).
+Its \texttt{SumsIn} certificate already asserts that every
+normalized monomial integral \(I/\Omega\), respectively
+\(I'/\Omega'\), lies in the actual field image, conditional on
+integrability of its corresponding kernel.  The additional
+\texttt{hI} hypothesis is quantified over every such triangle,
+so it applies to this selected \(X\) and discharges both
+integrability guards.  For every allowed \(t\), finite-adelic
+point \(g\), and respective monomial indices \(k,k'\), there are
+therefore
+\(z,z'\in D.L\) with
+\[
+ \iota(z)=\frac{I(t,k,g)}{\Omega},\qquad
+ \iota(z')=\frac{I'(t,k',g)}{\Omega'},\qquad
+ I(t,k,g)=\Omega\iota(z),\quad
+ I'(t,k',g)=\Omega'\iota(z').
+ \tag{LTD.27}
+\]
+The last two equalities follow by multiplying through the
+nonzero periods.  Together with the integrability statements
+they are exactly \texttt{SumsIn.rationalSums}; the remaining
+triangle fields transport by the stated character, place and
+rank equalities.  Rationality of these integrals is thus an
+explicit part of the \texttt{SumsIn} input.  Without these
+premises, \texttt{FieldOK} is not the whole period formula.
+% END LTD8
+
+\subsection*{The reduced producer boundary}
+
+The following distinctions are consequences of the proofs above.
+They specify remaining work on the original objects, rather than
+introducing replacement models.
+
+\begin{longtable}{p{0.22\textwidth}p{0.34\textwidth}p{0.36\textwidth}}
+\textbf{Consumer}&\textbf{Completed implication}&\textbf{Retained producer}\\\hline
+Common selected objects&LTD1: every selection is a projection of the
+same bundle&The common bundle/compatible design existence theorem.\\
+Local installation&LTD2: original forms, theta maps, embeddings,
+choices and operators survive the installation&The original
+\texttt{LocAll} and the earlier nonplaceholder theta realization.\\
+Local rank coverage&LTD3--LTD5: actual \texttt{NdSpec}/\texttt{NBuilt}
+gives \texttt{LocsCoverTw}; eventual certificates give
+\texttt{LinkEta}&Actual local specialization on the common model,
+including \(\Psi\), its range and its projection square.\\
+Actual row spectrum&LTD6: the specified rational row operators,
+eigenvalues, lattices and normalized coefficient action are transported
+exactly&Original \texttt{RatIn.span}, \texttt{hL\_int}, row reading,
+and the compatible geometric state.\\
+Theta evaluation and series&LTD7: existing \texttt{ThetaTie} and
+\texttt{SerAt} survive localization with their original scalar&The
+original evaluation/series proofs and \texttt{ExpRel}; the separate
+\texttt{EMtTheta} comparison and actual row theta square.\\
+Coefficient rationality&LTD8: every inclusion and field transport is
+on the specified embedding&Actual toric-ratio/jet/period values,
+their prescribed field containment and analytic hypotheses.\\
+\end{longtable}
+
+The next reconstruction should construct these retained inputs at
+the state used by \texttt{RowsAtStart}.  They must then be retained
+through the bundle constructor.  In particular, the local coverage step no
+longer warrants a separate deep reconstruction after the actual
+\texttt{NdSpec} has been supplied.  The shared local/theta dictionary
+has been narrowed by exact transport theorems, while its substantive
+existence content remains open in the human reconstruction.

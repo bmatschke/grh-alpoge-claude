@@ -1,0 +1,299 @@
+# Saturation and the actual source lattices: v0.3 audit
+
+Source pin: `CocoSgt/riemann-hypothesis-lean`, commit `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`.
+
+## Result
+
+**LC2 applies to the actual retained reference lattice.** The correct saturated inclusion is the ramified reference lattice inside the full integral column lattice. The selected lattice `NuLat` need not be saturated. The source already supplies the exact comparison, rational-subspace, and localized-index identities needed to distinguish these objects.
+
+Replacing one coarse step in `MultisetValuation/StabilizerCount.core` gives, at each served regular place,
+
+\[
+\ell_w((R_u)_w/(N_u)_w)
+\le e_w\left[r_u\tau_w+d_uS_w\left(\prod_v(1+m\kappa_v)-1\right)\right].
+\tag{1}
+\]
+
+Here **the depth includes the entire stabilizer/Weyl sandwich shift**:
+
+\[
+\tau_w=e_p+\sum_{v\in\mathcal V_p}m(t_v+D_p+1).
+\]
+
+The term (e_p) is retained. Its rank multiplier becomes (r_u), just like the rest of the baseline depth. This removes ((d_u/r_u-1)\mathrm{Ta}) from LC5, without changing the selected lattice or its divisibility properties.
+
+There is a further useful improvement. Under the source's existing rank formula and size hypotheses, (r_u/d_u\ge127/128). Since (Sigma_p\le1/2), the factorial tail gives
+
+\[
+\prod_v(1+m\kappa_v)-1
+\le e^{\Sigma_p}-1
+\le\frac{\Sigma_p}{1-\Sigma_p/2}
+\le\frac43\Sigma_p.
+\]
+
+Consequently the tail in (1) is at most (r_u\mathrm{io}_p), where the **unchanged source definition** is (mathrm{io}_p=2S_p\Sigma_p). Thus the actual regular-place index allowance improves to
+
+\[
+\ell_w((R_u)_w/(N_u)_w)\le e_wr_u(\tau_w+\mathrm{io}_p).
+\tag{2}
+\]
+
+The resulting squared-norm slope bound is
+
+\[
+\mu(I_uN_u)\ge\mu(R_u)+\mathrm{Ga}+\mathrm{Fo}-\mathrm{Ee}_u
+-\mathrm{IO}-\mathcal R_u-\mathcal B_u,
+\tag{3}
+\]
+
+with the type-prime cost (mathcal B_u), the fractional-ideal rounding loss (mathcal R_u), and the ramified mean correction all still present. This is a proved deduction from the stated joint-rank bounds and actual comparison identities. It is not an independent proof of the difficult joint-rank bounds or a global validation of the released Lean project.
+
+## SR1 — The reference lattice that is saturated
+
+Fix a word (u). Let (K) be its coefficient field, (L_u) the full integral column lattice in a (K)-space (V_u), and (U_u\subset V_u) the ramified rational subspace. Define
+
+\[
+R_u=L_u\cap U_u.
+\]
+
+The source has this definition at two levels:
+
+| Source object | Exact meaning |
+|---|---|
+| `Columns.ColRamV` | Joint kernel of the (K)-linear averaging operators `NmOp` |
+| `Columns.ramifiedColumnLattice` | `ColL ∩ ColRamV` |
+| `MemberForms.ramSub` | Rational inverse image of the complex ramified subspace under the coefficient-field embedding |
+| `MemberForms.ramL` | `(lat 0).L ∩ ramSub` |
+| `DV.MramL` | Pullback of `(lat 0).L` under `D.nuIn` |
+| `D7.MramL_map` | Exact image of `DV.MramL` under `D.nuIn` is `ramL` |
+
+Since (U_u) is a (K)-subspace, (ax\in U_u) with (a\ne0) implies (x\in U_u). Therefore (R_u) is saturated in (L_u). The source proves the same fact directly in `Columns.AtTLemmas.ramified_sublattice_saturated`; no augmentation Gram determinant, integral tensor decomposition, or slope formula is needed for this elementary conclusion.
+
+At a served (w\mid p), write (mathcal O\subset F) for the comparison DVR and its fraction field. `LatCmp` includes a semilinear map (phi), an embedding (K\hookrightarrow F) detecting integrality at (w), independence of the images of a (K)-basis, and the exact equality
+
+\[
+M=\mathcal O\phi(L_u)=\texttt{G.M}.
+\]
+
+`VramDef` says that `Y.Vram` is the restriction of scalars of (U_F:=F\phi(U_u)). Hence
+
+\[
+M_{\rm ram}=M\cap U_F
+\]
+
+is saturated in (M). This is the explicit proof in `TopChoiceBounds.ramified_saturated_of_subspace` (also repeated in `PlaneCountTheoremWithConstants.saturated_ramified_lattice`). In particular,
+
+\[
+M_{\rm ram}\cap p^\tau M=p^\tau M_{\rm ram}.
+\tag{4}
+\]
+
+The selected lattice (P\subset M_{\rm ram}), or (N_u\subset R_u), usually has nontrivial torsion quotient and is generally **not** saturated. LC2 never requires it to be.
+
+## SR2 — Exact comparison, descent, and length normalization
+
+Put (A=\mathcal O_{K,w}). The integrality equivalence in `LatCmp.embW_int` induces an injective local map (A\to\mathcal O). Because (A) is a DVR and (mathcal O) is torsion-free over (A), this extension is flat. It is faithfully flat because the map is local. Basis independence identifies the scalar extensions with their images in the comparison vector space.
+
+Flatness commutes with intersections, including intersections with rational subspaces. One can also see the latter directly: (L_{u,w}/(L_{u,w}\cap U_u)) is torsion-free, hence free over the DVR, so the exact sequence splits. Tensoring gives
+
+\[
+M\cap U_F=\mathcal O\phi(R_u).
+\tag{5}
+\]
+
+This is exactly `LatCmp.M_inf_Vram`; it identifies the correct retained reference, rather than merely proving commensurability.
+
+The selected comparison lattice is the source's `NP`:
+
+\[
+P=J\cap p^\tau M\cap U_F,
+\qquad
+J=\sum_{B\subseteq\mathcal V}
+p^{\sum_{v\notin B}S_v}\left(\prod_{v\in B}y_v^m\right)M.
+\tag{6}
+\]
+
+There is a short reconstruction of the descent step. Suppose each (y_v) agrees on rational vectors with a (K)-linear operator (a_v), possibly multiplied by a unit of (mathcal O). Define an (A)-lattice
+
+\[
+J_A=\sum_{B\subseteq\mathcal V}
+p^{\sum_{v\notin B}S_v}\left(\prod_{v\in B}a_v^m\right)L_{u,w}.
+\]
+
+These are finite sums of images of a finite free lattice. Even if an (a_v) initially has denominators, this is still a finitely generated fractional lattice, and the empty subset supplies a nonzero scalar multiple of (L_{u,w}). Unit factors do not change the generated (mathcal O)-submodules. Thus (J=\mathcal O\otimes_AJ_A). Flatness now gives
+
+\[
+P=\mathcal O\otimes_A
+(J_A\cap p^\tau L_{u,w}\cap U_u).
+\tag{7}
+\]
+
+Faithful flatness detects membership, so the rational preimage of (P) is exactly the lattice in parentheses. The source proves this as `Joints.Lit.NPDesc_of` from `YvRat`, and has the unit variant `NPDesc_ofU` from `YvRatU`. The actual route is
+
+`CmpTied.valRat → yvRat_of_valRat → npDesc_of_valRat → NPDescF`.
+
+The existence of the actual comparison/rationality data is a source input here. The flatness, intersection, and membership argument above is independently reconstructed; it does not add a new arithmetic conjecture or import a new Smith-attainment claim.
+
+`NuServedDef` identifies the localized selected global lattice with the rational preimage of (P). Combining it with (5)–(7), `LatCmp.NP_eq_span` records
+
+\[
+P=\mathcal O\phi(N_u\cap R_u).
+\]
+
+Intersecting globally with (R_u) causes no change at a regular served place, since `NuDef` gives (N_{u,w}\subseteq R_{u,w}).
+
+For the index normalization, let (pi_w) be a uniformizer of (A), let (a=v_{mathcal O}(\pi_w)), and put (e_w=v_w(p)), (e_{mathcal O}=v_{mathcal O}(p)=ae_w). A Smith factor (A/(\pi_w^c)) becomes (mathcal O/(\pi_w^c)), of length (ac). Therefore
+
+\[
+\frac{\ell_{mathcal O}(M_{\rm ram}/P)}{e_{mathcal O}}
+=\frac{\ell_A(R_{u,w}/N_{u,w})}{e_w}.
+\tag{8}
+\]
+
+The extension need not have ramification index one and need not be finite. The residue-field degree does not enter module length. Equation (8) is the normalization in `FBC.flat_ext` and `LatCmp.length_quotient_of_nonempty`. Ranks are unchanged: `cmpN_li` preserves independence of a retained-space basis, while `MramL` spans the retained space. Thus (operatorname{rank}_{mathcal O}M=d_u) and (operatorname{rank}_{mathcal O}M_{m ram}=r_u).
+
+### Actual constructor versus the NZCol example
+
+`NZColD.nuLat` is a generic intersection construction, with `cond` selecting an `NP` preimage at served places, `Nlam` at the word's type prime, and `locS MramL` elsewhere. `NZColF.nuDataOf` plugs in the same `NP`; `NZColG.sizeDataNu` stores the resulting lattice and length divided by (e_w). These give useful parallel definitions.
+
+However, a repository-wide name search did **not** establish that this named `sizeDataNu` is the final constructor used by the main family. The concrete constructor checked here is instead:
+
+| Source declaration | What it actually establishes |
+|---|---|
+| `ExistsLedPart.exists_served` | The exact rational preimage of `NP` is a module closed under division by (w)-units |
+| `ExistsLedPart.exists_lat` | A global lattice whose localizations are that preimage at served places, `Nlam` at the own type prime, and `MramL` at unserved regular places |
+| `ExistsLedPart.setLat` | Stores that global lattice as `NuLat`, and stores `lenLoc/e_w` as `lenMN` |
+| `ExistsLedPart.exists_ledPart` | Packages the served identity, `NuDef`, `NuUnserved`, and the type-prime identity into the actual record |
+
+The proof uses finite patching (`Glue.exists_glue`). The place set is finite because served rational primes satisfy (p<X'), and the own type prime has only finitely many places above it. This is the same elementary patching principle treated in the period-lattice reconstruction. Closure under division by (w)-units here means being an (A)-module; it is distinct from the all-nonzero-scalar saturation in (4).
+
+## SR3 — `G.Mna` does not create an extra retained-rank penalty
+
+The source has a sandwich
+
+\[
+p^eM_{\rm na}\subseteq M\subseteq M_{\rm na},
+\quad M_{\rm na}=\texttt{G.Mna},\quad M=\texttt{G.M}.
+\]
+
+It follows that their fraction-field spans and ranks agree. These integral lattices need not be equal or saturated in one another. The comparison identity is with (M), as explicitly proved by `TieLatFin.comparison_lattice_span_eq`.
+
+The operators (y_v) preserve both lattices. If (J_{m na}) denotes (6) with (M_{m na}), linearity gives
+
+\[
+p^eJ_{\rm na}\subseteq J\subseteq J_{\rm na}.
+\]
+
+If (g) vectors (z_i\in M_{m na}) supplement (J_{m na}) enough to contain (p^EM_{m na}), then (p^ez_i\in M) supplement (J) enough to contain (p^{E+e}M). Hence the exceptional count is unchanged, and the depth increases by exactly (e). This is `inverse_shift` in the actual `core` proof.
+
+For nonempty (mathcal V), `StabilizerCount.stmt6G` explicitly proves
+
+\[
+\texttt{tauP}=e_p+\sum_{v\in\mathcal V}m(\lceil\texttt{tv}_v\rceil+D_p+1)\in\mathbb N.
+\]
+
+Its further displayed ceiling/toNat is therefore the identity. `SvG_cast` proves the analogous fact for `Sv`, which is defined as the ceiling of a nonnegative sum. The maximum (S) can be the exact maximum of these integers. The outer `ioP` is then exactly (2S\Sigma). Reindexing to the local set of components uses the recorded injectivity of `vOf`; no rank changes occur.
+
+At unserved regular places `NuUnserved` gives local equality with the retained reference. At the own type prime the source uses `Nlam` instead; that contribution is not estimated by (1).
+
+## SR4 — Improved index and global slope
+
+Assume the original all-but bounds after the sandwich shift, for every integer (eta\ge0):
+
+\[
+\#\{i:c_i>e_{mathcal O}(\tau+\beta S)\}
+\le d_u m^{\beta+1}e_{\beta+1}(\kappa).
+\]
+
+LC2 bounds the tail quotient (p^\tau M/(J\cap p^\tau M)) by (e_{mathcal O}d_uS\Theta), with (Theta=\prod(1+m\kappa_v)-1). By (4),
+
+\[
+0\longrightarrow p^\tau M_{m ram}/P
+\longrightarrow M_{m ram}/P
+\longrightarrow M_{m ram}/p^\tau M_{m ram}\longrightarrow0.
+\]
+
+The last quotient has exact length (e_{mathcal O}r_u\tau). The first injects into the full tail quotient. Combining with (8) proves (1).
+
+In the original `core`, the final proof instead injects the entire retained quotient into the entire full quotient. That charges (e_{mathcal O}d_u\tau) for its baseline. The new argument changes only this accounting step and the elementary tail summation; it does not change `NP`, `NuLat`, any operator, or any divisibility statement.
+
+The strongest convenient global form retains the product:
+
+\[
+\mu(I_uN_u)\ge\mu(R_u)+\mathrm{Ga}+\mathrm{Fo}-\mathrm{Ee}_u
+-\sum_{w\ {m served}}\operatorname{sz}_w(\rho_uS_w\Theta_w)
+-\mathcal R_u-\mathcal B_u,
+\tag{9}
+\]
+
+where (operatorname{sz}_w(z)=2\log(Nw)e_wz/[K:\mathbb Q]). Since (Theta\le2\Sigma), (9) first gives the uniform improvement
+
+\[
+-\rho_u\mathrm{IO}-(\rho_u-1)\mathrm{Ta}quad\rightsquigarrow\quad-\rho_u\mathrm{IO}.
+\]
+
+The old and new (	au) include (e_p). Its contribution to `Ga` is not erased; only the excess full-rank multiplier is erased.
+
+## SR5 — Existing actual size conditions absorb ρ as well
+
+The elementary symmetric-function estimate (m^je_j(\kappa)\le\Sigma^j/j!) and (j!\ge2^{j-1}) give
+
+\[
+\Theta\le\frac{\Sigma}{1-\Sigma/2}\le\frac43\Sigma,
+\qquad0\le\Sigma\le\frac12.
+\]
+
+Thus (r_u/d_u\ge2/3) suffices for (d_uS\Theta\le r_u\mathrm{io}). Bernoulli's inequality applied to the source's retained rank formula gives
+
+\[
+\delta_u:=1-\frac{r_u}{d_u}
+\le\frac{f}{T_u-1}\le\frac{2f}{T_u}.
+\]
+
+The actual family assembly uses (16f\le b), (b\ge4), (T_u\ge b^3). Therefore
+
+\[
+\delta_u\le\frac{2f}{T_u}\le\frac{b}{8T_u}
+\le\frac1{8b^2}\le\frac1{128},
+\]
+
+so (r_u/d_u\ge127/128>2/3). For (f=0), the ranks coincide and the same conclusion holds. `PlacesP.sizes_at` supplies the first two numerical inequalities; `placesF_of` proves the third before invoking `size_alt`. This is not a newly imposed type-prime condition.
+
+Equation (2), hence (3), follows. If the LC7 metric transport is also supplied, put
+
+\[
+A_u=\frac{f\log(T_u-1)}{T_u-2},\qquad\mu(R_u)=\mu(L_u)-A_u.
+\]
+
+Then (3) reads
+
+\[
+\boxed{\mu(I_uN_u)\ge\mu(L_u)+\mathrm{Ga}+\mathrm{Fo}-\mathrm{Ee}_u
+-\mathrm{IO}-A_u-\mathcal R_u-\mathcal B_u.}
+\]
+
+The source prime-sum normalization is unchanged:
+
+\[
+\mathrm{IO}=\sum_w\operatorname{sz}_w(\mathrm{io}_{p(w)})
+=2\sum_p\mathrm{io}_p\log p=2\mathrm{IOp}.
+\]
+
+Using the already available (A_u\le1), the new clean allowance is (2\mathrm{IOp}+1+mathcal R_u+mathcal B_u), versus the source's coarser (4\mathrm{IOp}+1+mathcal R_u+mathcal B_u). Keeping (9) is sharper than either constant simplification.
+
+The type-prime allowance is unchanged. At (p=T_u), the actual size assumptions give (T_u\ge b^3\ge X'); hence `VV` is empty and (	au=mathrm{io}=0). Both the old and new regular baselines vanish there. The separate bound on the `Nlam` contribution is still necessary; the argument does not improve that bound.
+
+## SR6 — Limits and a useful obstruction
+
+Saturation alone does not permit replacing the full-rank tail by a retained-rank tail. For example, over a DVR with uniformizer (pi), take
+
+\[
+M=\mathcal O^4,\quad M'=\mathcal O e_1,\quad
+J=\pi^C\mathcal Oe_1\oplus\mathcal Oe_2\oplus\mathcal Oe_3\oplus\mathcal Oe_4.
+\]
+
+Let (p=pi,	au=0,S=C,m=1), and use one parameter (kappa=1/4). The exceptional count at depth zero is (1=d\kappa); all later counts vanish. The entire length (C) is concentrated in the saturated rank-one reference (M'). A retained-rank product-tail estimate would falsely give (C/4), and a retained-rank source `io` estimate would falsely give (C/2). The absorption in SR5 therefore uses the actual high retained-rank ratio and the factorial saving; it is not a general principle about saturated subspaces.
+
+Similarly, the sandwich alone does not identify (M) with (M_{m na}). In rank one, (M_{m na}=mathcal O) and (M=pimathcal O) already satisfy such a sandwich but have different reference indices. The exact `cmp_M` and `M_inf_Vram` identities are the reason the improvement applies to the actual source.
+
+The remaining substantive inputs are the joint exceptional-direction estimates, the constructed comparison maps/rational operator identities, the chosen family's rank formula and size assertions, the period/divisibility statements, and the separate type-prime bound. This note expands the transport and index argument and isolates those inputs; it does not assert their full independent verification or Lean compilation.

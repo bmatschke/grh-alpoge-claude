@@ -1,0 +1,1997 @@
+[JRP_original_endpoint_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TJRing.lean:22-46
+SHA256 05d2911124f7ebbe1128660fdc3fd5f34a03964423d99944747e56d1dcfcacc2
+open UpperTheory.V.W
+private theorem jr_teich_ex (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O]
+    [IsAdicComplete (maximalIdeal O) O] [Finite (ResidueField O)] [CharP (ResidueField O) l] :
+    ∃ τ : ResidueField O →* O, ∀ x, residue O (τ x) = x := by
+  haveI : CharP (O ⧸ maximalIdeal O) l := inferInstanceAs (CharP (ResidueField O) l)
+  haveI : PerfectRing (ResidueField O) l := inferInstance
+  let j : ResidueField O →+* Perfection (O ⧸ maximalIdeal O) l :=
+    Perfection.lift l (ResidueField O) (O ⧸ maximalIdeal O) (RingHom.id (ResidueField O))
+  have hj : ∀ x, Perfection.coeff (O ⧸ maximalIdeal O) l 0 (j x) = x := fun x => by
+    have := (Perfection.lift l (ResidueField O) (O ⧸ maximalIdeal O)).symm_apply_apply (RingHom.id (ResidueField O))
+    exact RingHom.congr_fun this x
+  refine ⟨(Perfection.teichmuller l (maximalIdeal O)).comp j, fun x => ?_⟩
+  exact (Perfection.mk_teichmuller (j x)).trans (hj x)
+private theorem jr_isTeich {l : ℕ} [hl : Fact l.Prime] {F : GFrame l} (c : Coef l) {n : ℕ} (r : Resid F c.O n) :
+    ∃ t, r.IsTeich t ∧ ∀ i g, r.chib i g = 1 → t i g = 1 := by
+  obtain ⟨hc, hfin, hlm, -⟩ := UpperTheory.V.abelian₂.dvr_finite l c.O
+  haveI : Finite (ResidueField c.O) := hfin
+  haveI : CharP (ResidueField c.O) l := by
+    refine (CharP.charP_iff_prime_eq_zero hl.out).2 ?_
+    rw [← map_natCast (residue c.O), residue_eq_zero_iff]
+    exact hlm
+  obtain ⟨τ, hτ⟩ := jr_teich_ex l c.O
+  refine ⟨fun i => (Units.map τ).comp (r.chib i), fun i g => ⟨hτ _, ?_⟩, fun i g h => ?_⟩
+  · rw [MonoidHom.comp_apply, ← map_pow, ← Nat.card_units, pow_card_eq_one', map_one]
+  · rw [MonoidHom.comp_apply, h, map_one]
+
+
+[JRP_original_endpoint_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TJRing.lean:47-136
+SHA256 873bb8b36efbc227d3102fe917c73fc1ec8d19eb7dab031dbf6f083230e28962
+private theorem jr_abs {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ}
+    {r : Resid F O n} (B : UniversalOrdinaryDeterminantRing r) (Λ : LamObj r) (J : Ideal B.B) {ι : Type} (K : Type) [CommRing K] [Algebra O K]
+    (x : ι → B.B →ₐ[O] K) (hJ : ∀ i, ∀ b ∈ J, x i b = 0) (sep : ∀ b, (∀ i, x i b = 0) → b ∈ J)
+    (ρ : ι → F.G₀ →* GL (Fin n) K) (hD : ∀ i, B.u.D.map (x i : B.B →+* K) = GDet.ofRep (mat (ρ i)))
+    (form : ∀ i, ∃ P, F.IsForm O n (ρ i) P)
+    (flag : ∀ i v, HasFlag ((ρ i).comp (F.φ v)) fun j => pushCh (x i : B.B →+* K) (B.u.ψ v j))
+    (type : ∀ i t, r.IsTeich t → ∀ u, ∃ g : GL (Fin n) K, ∀ y ∈ F.Iu u,
+      ((g * ρ i y * g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) = Matrix.diagonal fun j => algebraMap O K (t j y))
+    (unr : r.V0ok → ∀ i, ∀ g ∈ F.I0, ρ i g = 1)
+    (hT : ∃ t, r.IsTeich t ∧ ∀ i g, r.chib i g = 1 → t i g = 1)
+    (fin : ((Ideal.Quotient.mk J).comp (Λ.toPair B.u : Λ.Λ →+* B.B)).Finite)
+    (tf : ∀ a : Λ.Λ, a ≠ 0 → ∀ b : B.B, Λ.toPair B.u a * b ∈ J → b ∈ J) : B.RingProps Λ J := by
+  let f : ι → (B.B ⧸ J) →ₐ[O] K := fun i => Ideal.Quotient.liftₐ J (x i) (hJ i)
+  have hf : ∀ i, (f i : B.B ⧸ J →+* K).comp (Ideal.Quotient.mk J) = x i := fun i => rfl
+  have hinj : ∀ a, (∀ i, f i a = 0) → a = 0 := fun a ha => by
+    obtain ⟨b, rfl⟩ := Ideal.Quotient.mk_surjective a
+    exact Ideal.Quotient.eq_zero_iff_mem.2 (sep b ha)
+  have hD' : ∀ i, (B.DD J).map (f i : B.B ⧸ J →+* K) = GDet.ofRep (mat (ρ i)) := fun i => by
+    rw [UniversalOrdinaryDeterminantRing.DD, (UpperTheory.V.AlgebraTools.Det.mapApi B.u.D _).2.2.2.2.2.2.1, hf, hD]
+  have hflag : ∀ i v, HasFlag ((ρ i).comp (F.φ v)) fun j => pushCh (f i : B.B ⧸ J →+* K) (B.psiT J v j) := flag
+  have hP : F.IsPolar O (B.DD J) := UpperTheory.V.AlgebraTools.Det.polarInj F O _ n _ (fun _ => K) f hinj fun i => by
+    obtain ⟨P, hP⟩ := form i
+    rw [hD' i]
+    exact (UpperTheory.V.AlgebraTools.Det.formRep F O K n (ρ i) P hP).2.2
+  have hker : ∀ g, (∀ i, ρ i g = 1) → (B.DD J).Kills (MonoidAlgebra.single g 1 - 1) ∧
+      (B.DD J).Kills (F.star O _ n (MonoidAlgebra.single g 1) - 1) := fun g hg => by
+    have hk : (B.DD J).Kills (MonoidAlgebra.single g 1 - 1) := by
+      refine UpperTheory.V.AlgebraTools.Det.kerTest (fun _ => K) (fun i => (f i : B.B ⧸ J →+* K)) (fun i => mat (ρ i)) _ hinj hD' _ fun i => ?_
+      rw [map_sub, map_sub, map_one, map_one, MonoidAlgebra.mapRingHom_single, map_one]
+      simp [GDet.repAlg, mat, hg i]
+    refine ⟨hk, ?_⟩
+    have h1 := UpperTheory.V.AlgebraTools.Det.killsStar F O _ n _ hP _ hk
+    have h2 : F.star O (B.B ⧸ J) n (MonoidAlgebra.single g 1 - 1) = F.star O _ n (MonoidAlgebra.single g 1) - 1 := by
+      simp [GFrame.star]
+    rwa [h2] at h1
+  refine ⟨fin, tf, hP, fun v g => ?_, fun v g => ?_, fun u g hg => hker g fun i => ?_, fun t ht u => ?_,
+    fun h g hg => hker g fun i => unr h i g hg⟩
+  · ext k
+    rw [← sub_eq_zero]
+    apply hinj
+    intro i
+    have h1 := (UpperTheory.V.AlgebraTools.Det.mapApi (B.DD J) (f i : B.B ⧸ J →+* K)).1 (MonoidAlgebra.single (F.φ v g) 1)
+    rw [hD' i, MonoidAlgebra.mapRingHom_single, map_one, (UpperTheory.V.AlgebraTools.Det.repApi (mat (ρ i))).2.1] at h1
+    have h2 := (UpperTheory.V.AlgebraTools.Det.flagRel _ _ (hflag i v)).1 g
+    have h3 : mat ((ρ i).comp (F.φ v)) g = mat (ρ i) (F.φ v g) := rfl
+    rw [h3, h1] at h2
+    have h4 : (∏ j, (X - C ((B.psiT J v j g : (B.B ⧸ J)ˣ) : B.B ⧸ J))).map (f i : B.B ⧸ J →+* K) =
+        ∏ j, (X - C ((pushCh (f i : B.B ⧸ J →+* K) (B.psiT J v j) g : Kˣ) : K)) := by
+      rw [Polynomial.map_prod]
+      simp
+    have h5 := congrArg (fun p => p.coeff k) (h2.trans h4.symm)
+    simp only [Polynomial.coeff_map] at h5
+    rw [map_sub, sub_eq_zero]
+    exact h5
+  · have hk : (B.DD J).Kills (F.oEl v (B.psiT J v) g) := by
+      refine UpperTheory.V.AlgebraTools.Det.kerTest (fun _ => K) (fun i => (f i : B.B ⧸ J →+* K)) (fun i => mat (ρ i)) _ hinj hD' _ fun i => ?_
+      have h1 : MonoidAlgebra.mapRingHom F.G₀ (f i : B.B ⧸ J →+* K) (F.oEl v (B.psiT J v) g) =
+          F.oEl v (fun j => pushCh (f i : B.B ⧸ J →+* K) (B.psiT J v j)) g := by
+        unfold GFrame.oEl
+        rw [map_list_prod, List.map_ofFn]
+        congr 2
+        funext j
+        simp only [Function.comp_apply, map_sub, MonoidAlgebra.mapRingHom_single, map_one]
+        rfl
+      rw [h1]
+      exact UpperTheory.V.AlgebraTools.Det.oElRep F O K n (ρ i) v _ (hflag i v) g
+    exact ⟨hk, UpperTheory.V.AlgebraTools.Det.killsStar F O _ n _ hP _ hk⟩
+  · obtain ⟨t, ht, ht1⟩ := hT
+    obtain ⟨Q, hQ⟩ := type i t ht u
+    have h1 := hQ g hg.1
+    have h2 : ∀ j, t j g = 1 := fun j => ht1 j g (Subgroup.mem_iInf.1 hg.2 j)
+    simp only [h2, Units.val_one, map_one, Matrix.diagonal_one] at h1
+    have h3 : Q * ρ i g * Q⁻¹ = 1 := Units.ext h1
+    simpa using h3
+  · refine (UpperTheory.V.AlgebraTools.Det.injTest (fun _ => K) (fun i => (f i : B.B ⧸ J →+* K)) hinj).1 _ _ fun i => ?_
+    obtain ⟨Q, hQ⟩ := type i t ht u
+    have h1 : ((B.DD J).comap (F.Iu u).subtype).map (f i : B.B ⧸ J →+* K) =
+        ((B.DD J).map (f i : B.B ⧸ J →+* K)).comap (F.Iu u).subtype := rfl
+    rw [h1, hD', (UpperTheory.V.AlgebraTools.Det.repApi _).2.2.2.2.2.2.1, (UpperTheory.V.AlgebraTools.Det.repApi _).2.2.2.2.2.1]
+    refine (UpperTheory.V.AlgebraTools.Det.repApi _).2.2.2.2.2.2.2 _ Q fun y => ?_
+    have h2 : (RingHom.mapMatrix (f i : B.B ⧸ J →+* K)).toMonoidHom.comp
+        (diagRep fun j => pushCh (algebraMap O (B.B ⧸ J)) ((t j).comp (F.Iu u).subtype)) y =
+        Matrix.diagonal fun j => algebraMap O K (t j y) := by
+      change (Matrix.diagonal _).map (f i) = _
+      rw [Matrix.diagonal_map (map_zero _)]
+      congr 1
+      funext j
+      exact (f i).commutes _
+    rw [h2, ← hQ y y.2, ← Units.val_mul, inv_mul_cancel_right]
+    rfl
+
+
+[JRP_original_endpoint_03] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TJRing.lean:137-169
+SHA256 06b5830af63813f07236dbfb2668f7ea5eb442a9b3c9cc299e825a26a0d9e7fa
+private theorem jr_surj {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ}
+    {r : Resid F O n} (B : UniversalOrdinaryDeterminantRing r) (Λ : LamObj r) {T : Type} [CommRing T] [Algebra O T] [Algebra Λ.Λ T] (f : B.B →ₐ[O] T)
+    (hsurj : Function.Surjective f) (hlam : ∀ b, f (Λ.toPair B.u b) = algebraMap Λ.Λ T b) (K : Type) [CommRing K] [Algebra O K]
+    (good : (T →ₐ[O] K) → Prop) (sep : ∀ t, (∀ x, good x → x t = 0) → t = 0)
+    (pt : ∀ x, good x → ∃ ρ : F.G₀ →* GL (Fin n) K, (B.u.D.map f.toRingHom).map x.toRingHom = GDet.ofRep (mat ρ) ∧
+      (∃ P, F.IsForm O n ρ P) ∧
+      (∀ v, HasFlag (ρ.comp (F.φ v)) fun j => pushCh x.toRingHom (pushCh f.toRingHom (B.u.ψ v j))) ∧
+      (∀ t, r.IsTeich t → ∀ u, ∃ g : GL (Fin n) K, ∀ y ∈ F.Iu u,
+        ((g * ρ y * g⁻¹ : GL (Fin n) K) : Matrix (Fin n) (Fin n) K) = Matrix.diagonal fun j => algebraMap O K (t j y)) ∧
+      (r.V0ok → B.u.D.map (x.comp f : B.B →+* K) = GDet.ofRep (mat ρ) → ∀ g ∈ F.I0, ρ g = 1))
+    (hT : ∃ t, r.IsTeich t ∧ ∀ i g, r.chib i g = 1 → t i g = 1) (hfin : (algebraMap Λ.Λ T).Finite)
+    (htf : ∀ b : Λ.Λ, b ≠ 0 → ∀ t : T, algebraMap Λ.Λ T b * t = 0 → t = 0) : B.RingProps Λ (RingHom.ker f) := by
+  choose ρ hD hform hfl hty hun using fun x : {x // good x} => pt x.1 x.2
+  have hD' : ∀ x : {x // good x}, B.u.D.map (x.1.comp f : B.B →+* K) = GDet.ofRep (mat (ρ x)) := fun x => by
+    rw [← hD x]
+    exact ((UpperTheory.V.AlgebraTools.Det.mapApi B.u.D f.toRingHom).2.2.2.2.2.2.1 x.1.toRingHom).symm
+  refine jr_abs B Λ _ K (fun x : {x // good x} => x.1.comp f) (fun x b hb => ?_) (fun b hb => ?_) ρ hD' hform hfl hty
+    (fun h x => hun x h (hD' x)) hT ?_ ?_
+  · rw [AlgHom.comp_apply, (RingHom.mem_ker).1 hb, map_zero]
+  · exact sep (f b) fun x hx => hb ⟨x, hx⟩
+  · let e := Ideal.quotientKerAlgEquivOfSurjective hsurj
+    have he : (Ideal.Quotient.mk (RingHom.ker f)).comp (Λ.toPair B.u : Λ.Λ →+* B.B) =
+        (e.symm : T →+* B.B ⧸ RingHom.ker f).comp (algebraMap Λ.Λ T) := by
+      refine RingHom.ext fun b => ?_
+      change _ = e.symm (algebraMap Λ.Λ T b)
+      rw [AlgEquiv.eq_symm_apply, ← hlam]
+      rfl
+    rw [he]
+    exact (RingHom.Finite.of_surjective _ e.symm.surjective).comp hfin
+  · intro a ha b hb
+    refine htf a ha (f b) ?_
+    rw [← hlam, ← map_mul]
+    exact hb
+
+
+[JRP_original_endpoint_04] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TJRing.lean:171-189
+SHA256 323cb4a64e4ebdc46d53a24d19f9521ad8da81d34108b7e81451bcdac4f28137
+attribute [-instance] UpperTheory.V.GradeZeroInterpolatingElement.instIsLocalRingSubtypePadicAlgClMemSubalgebraPadicIntO in
+theorem UpperTheory.V.Hi.ring_props_of_is_j_unitary_hecke_data :
+    _root_.UpperTheory.V.Af.HypothesesH' → ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ), 1 ≤ n →
+    ∀ (V : s.Lev) (Q : QData V) (c : Coef l), ∀ (r : Resid V.frame c.O n) (ι : Qbar l ≃+* ℂ), ∀ (B : UniversalOrdinaryDeterminantRing r) (Λ : LamObj r) (R : _root_.UpperTheory.V.Hi.CaseU.UnitaryHeckeData Q ι Λ) (K : (hset Q R.τ₀).Lev), V.S' = s.S → ∀ J : Ideal B.B, R.IsJ B K J → B.RingProps Λ J := by
+  intro hP l _ L Ω _ _ _ _ _ _ s n hn V Q c r ι B Λ R K _ J hJ
+  rcases hJ with ⟨-, rfl⟩ | ⟨hcomm, hco, f, hne, hmap, hsurj, hlam, rfl⟩
+  · refine jr_abs B Λ ⊤ (ι := Empty) (Qbar l) Empty.elim (fun i => i.elim) (fun _ _ => trivial) Empty.elim (fun i => i.elim)
+      (fun i => i.elim) (fun i => i.elim) (fun i => i.elim) (fun _ i => i.elim) (jr_isTeich c r) ?_ fun _ _ _ _ => trivial
+    exact RingHom.Finite.of_surjective _ fun b => ⟨0, Subsingleton.elim _ _⟩
+  have hAx := _root_.UpperTheory.V.Hi.axU_s hP.litN l L Ω s n hn V Q c _ R.τ₀
+  obtain ⟨hdom, hden⟩ := _root_.UpperTheory.V.Hi.isDomain_and_denseWt_of_isTheta hP.litN l L Ω s n hn V Q c _ R.τ₀ r Λ R.θ R.theta
+  obtain ⟨-, hfin, htf, -⟩ := hiAlg L Ω l n c _ hAx Λ.Λ R.θ R.isWt R.a K hne
+  let lam : Wt L l n := fun _ => ⟨0, fun _ _ _ => le_rfl⟩
+  have hout := _root_.UpperTheory.V.Z.Ord.core_hecke_of_automorphic_hecke_dense_weight hP.litN L Ω l n c _ hAx Λ.Λ R.θ R.isWt ι _ (_root_.UpperTheory.V.Hi.automorphicHeckeSet_unitaryPointProperties_of_typeFor hP l L Ω s n hn V Q c r ι _ R.τ₀ R.type) lam trivial
+    (hden lam) R.a K _ _ hmap
+  refine jr_surj B Λ f hsurj hlam (Qbar l) _ (hout.sep lam trivial (hden lam)) (fun x hx => ?_) (jr_isTeich c r) hfin (htf hdom)
+  obtain ⟨ρ, hc, -, hPU, hD, hfl⟩ := hout.pt lam trivial x hx.2.1
+  exact ⟨ρ, hD, hPU.form, fun v => (hfl hx v).1, hPU.type, fun h h' => point_rep_unramified_at_auxiliary_place hn B h _ _ hc h'⟩
+end
+
+
+[JRP_original_endpoint_05] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/THidaU.lean:37-49
+SHA256 125136f4c1cb6bcf84d9b1ea1729a45e12a48b3a1f97477e1bac3fe0b0e89e74
+  ⟨P.loc.bz, P.loc.geo, GlobalTheory.Published.TameLocal_of_duality P.coh.lt⟩
+theorem UpperTheory.V.Hi.hida_unitary_of_printed_hida :
+    _root_.UpperTheory.V.Af.HypothesesH' → _root_.UpperTheory.V.W.HidaUAlt := by
+  intro P l _ L Ω _ _ _ _ _ _ s V hS _ c _ n hn r B Λ ι
+  obtain ⟨R⟩ := _root_.UpperTheory.V.Hi.nonempty_unitaryHeckeData P l L Ω s n hn V (QData.empty V hS) c r ι Λ
+  let K : (hset (QData.empty V hS) R.τ₀).Lev := ⟨fun q => Empty.elim q, fun q => Empty.elim q⟩
+  obtain ⟨J, hJ⟩ := _root_.UpperTheory.V.Hi.exists_hecke_ideal P l L Ω s n hn V _ c r ι B Λ R K
+  have hE := _root_.UpperTheory.Gal.projectedFormsSystemPart.decomposition_and_automorphicAway_of_isJ P l L Ω s n hn V _ c r ι B Λ R K hS J hJ
+  haveI := coef_isCoef l c
+  exact ⟨J, ⟨_root_.UpperTheory.V.Hi.ring_props_of_is_j_unitary_hecke_data P l L Ω s n hn V _ c r ι B Λ R K hS J hJ, _root_.UpperTheory.V.Hi.dense_of_is_j_unitary_hecke_data P l L Ω s n hn V _ c r ι B Λ R K hS J hJ,
+    _root_.UpperTheory.V.Hi.hecke_ideal_point_properties P l L Ω s n hn V _ c r ι B Λ R K hS J hJ, hE.1, hE.2, _root_.UpperTheory.V.Z.Desc.W.twistOk_of_isJ P l L Ω s n hn V _ c r ι B Λ R K hS J hJ⟩,
+    _root_.UpperTheory.V.Pa.has_automorphy_of_statement (locP_of P.litN) l L Ω s V c.O n r B J hS (_root_.UpperTheory.V.Hi.level_of_is_j_unitary_hecke_data P l L Ω s n hn V _ c r ι B Λ R K hS J hJ)⟩
+end
+
+
+[JRP_literal_definitions_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/WeilGroupCharacters/ArithmeticPointClassicality.lean:12-39
+SHA256 703c95607fe7ea3d11fe1ce9111883f9efbcc2722776b40f8a99bdddc6a1dded
+variable {l : ℕ} [Fact l.Prime] {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ}
+
+def Resid.V0ok (r : Resid F O n) : Prop :=
+  (∀ i, F.I0 ≤ (r.chib i).ker) ∧ (∀ g ∈ F.D0, ∀ i j, r.chib i g = r.chib j g) ∧ ∃ g ∈ F.D0, F.eps O (ResidueField O) g ≠ 1
+
+def Resid.IsTeich (r : Resid F O n) (t : Fin n → F.G₀ →* Oˣ) : Prop :=
+  ∀ i g, residue O (t i g) = r.chib i g ∧ t i g ^ (Nat.card (ResidueField O) - 1) = 1
+
+variable {r : Resid F O n} (B : UniversalOrdinaryDeterminantRing r) (Λ : LamObj r) (J : Ideal B.B)
+
+def UniversalOrdinaryDeterminantRing.DD : GDet n (B.B ⧸ J) F.G₀ := B.u.D.map (Ideal.Quotient.mk J)
+
+def UniversalOrdinaryDeterminantRing.psiT (v : F.Vl) (j : Fin n) : F.Gv v →* (B.B ⧸ J)ˣ := pushCh (Ideal.Quotient.mk J) (B.u.ψ v j)
+
+structure UniversalOrdinaryDeterminantRing.RingProps : Prop where
+  fin : ((Ideal.Quotient.mk J).comp (Λ.toPair B.u : Λ.Λ →+* B.B)).Finite
+  tf : ∀ a : Λ.Λ, a ≠ 0 → ∀ b : B.B, Λ.toPair B.u a * b ∈ J → b ∈ J
+  polar : F.IsPolar O (B.DD J)
+  O1 : ∀ v g, (B.DD J).chi (MonoidAlgebra.single (F.φ v g) 1) = ∏ j, (X - C ((B.psiT J v j g : (B.B ⧸ J)ˣ) : B.B ⧸ J))
+  O2 : ∀ v g, (B.DD J).Kills (F.oEl v (B.psiT J v) g) ∧ (B.DD J).Kills (F.star O _ n (F.oEl v (B.psiT J v) g))
+  O3 : ∀ u, ∀ g ∈ r.Ip u, (B.DD J).Kills (MonoidAlgebra.single g 1 - 1) ∧
+    (B.DD J).Kills (F.star O _ n (MonoidAlgebra.single g 1) - 1)
+  types : ∀ t, r.IsTeich t → ∀ u, (B.DD J).comap (F.Iu u).subtype =
+    GDet.ofRep (diagRep fun i => pushCh (algebraMap O (B.B ⧸ J)) ((t i).comp (F.Iu u).subtype))
+  unr0 : r.V0ok → ∀ g ∈ F.I0, (B.DD J).Kills (MonoidAlgebra.single g 1 - 1) ∧
+    (B.DD J).Kills (F.star O _ n (MonoidAlgebra.single g 1) - 1)
+
+end Abstract
+
+
+[JRP_literal_definitions_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/WeilGroupCharacters/UniversalOrdinaryDeterminantRing.lean:46-103
+SHA256 441395096394aff03e686dba187a485e12c79c44fb150f3f9160733353bdc81d
+    ∀ i, (g * r s * g⁻¹ : GL (Fin n) k) i i = (κ i s : k)
+
+def mat {H k : Type} [Group H] [CommRing k] {n : ℕ} (r : H →* GL (Fin n) k) : H →* Matrix (Fin n) (Fin n) k :=
+  (Units.coeHom _).comp r
+
+def diagRep {H k : Type} [Group H] [CommRing k] {n : ℕ} (χ : Fin n → H →* kˣ) : H →* Matrix (Fin n) (Fin n) k where
+  toFun s := diagonal fun i => (χ i s : k)
+  map_one' := by simp
+  map_mul' s t := by simp [diagonal_mul_diagonal]
+
+abbrev pushCh {H A B : Type} [Group H] [CommRing A] [CommRing B] (f : A →+* B) (χ : H →* Aˣ) : H →* Bˣ :=
+  (Units.map (f : A →* B)).comp χ
+
+abbrev pushRep {H A B : Type} [Group H] [CommRing A] [CommRing B] {n : ℕ} (f : A →+* B) (r : H →* GL (Fin n) A) :
+    H →* GL (Fin n) B := (GeneralLinearGroup.map f).comp r
+
+namespace GFrame
+
+variable {l : ℕ} [Fact l.Prime] (F : GFrame l)
+
+abbrev G₀ : Type := F.η.ker
+
+def conj : F.G₀ →* F.G₀ where
+  toFun g := ⟨F.c * g * F.c⁻¹, (MonoidHom.normal_ker F.η).conj_mem _ g.2 _⟩
+  map_one' := Subtype.ext (by simp)
+  map_mul' g h := Subtype.ext (by simp [mul_assoc])
+
+def G' : Subgroup F.G₀ := (F.ε.comp F.η.ker.subtype).ker
+
+def mu (v : F.Vl) : Subgroup (F.Gv v) :=
+  (CommGroup.primaryComponent (TopologicalAbelianization (F.Gv v)) l).comap (QuotientGroup.mk' _)
+
+variable (O : Type) [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R] [Algebra O R]
+
+def eps : F.G₀ →* Rˣ := pushCh ((algebraMap O R).comp (algebraMap ℤ_[l] O)) (F.ε.comp F.η.ker.subtype)
+
+def starOp (n : ℕ) : MonoidAlgebra R F.G₀ →ₐ[R] (MonoidAlgebra R F.G₀)ᵐᵒᵖ :=
+  MonoidAlgebra.lift R _ F.G₀
+    { toFun := fun g => MulOpposite.op (MonoidAlgebra.single (F.conj g)⁻¹ ((F.eps O R g ^ (1 - (n : ℤ)) : Rˣ) : R))
+      map_one' := by simp [← MonoidAlgebra.one_def]
+      map_mul' := fun g h => by
+        rw [← MulOpposite.op_mul, MonoidAlgebra.single_mul_single, map_mul, map_mul, _root_.mul_inv_rev, mul_zpow,
+          Units.val_mul, mul_comm ((F.eps O R g ^ (1 - (n : ℤ)) : Rˣ) : R)] }
+
+def star (n : ℕ) (y : MonoidAlgebra R F.G₀) : MonoidAlgebra R F.G₀ := (F.starOp O R n y).unop
+
+variable {R}
+
+def oEl {n : ℕ} (v : F.Vl) (ψ : Fin n → F.Gv v →* Rˣ) (g : Fin n → F.Gv v) : MonoidAlgebra R F.G₀ :=
+  (List.ofFn fun i => MonoidAlgebra.single (F.φ v (g i)) (1 : R) - MonoidAlgebra.single 1 ((ψ i (g i) : Rˣ) : R)).prod
+
+def IsPolar {n : ℕ} (D : GDet n R F.G₀) : Prop :=
+  ∀ (B : Type) [CommRing B] [Algebra R B] [Algebra O B] [IsScalarTower O R B] (y : MonoidAlgebra B F.G₀),
+    D.D B (F.star O B n y) = D.D B y
+
+def IsForm (n : ℕ) {a : ℕ} (r : F.G₀ →* GL (Fin a) R) (P : GL (Fin a) R) : Prop :=
+  ∀ g, (mat r g)ᵀ * (P : Matrix (Fin a) (Fin a) R) * mat r (F.conj g) =
+    ((F.eps O R g ^ (1 - (n : ℤ)) : Rˣ) : R) • (P : Matrix (Fin a) (Fin a) R)
+
+
+[JRP_literal_definitions_03] src/Development/AutomorphicArithmetic/AutomorphicVarieties/WeilGroupCharacters/UniversalOrdinaryDeterminantRing.lean:107-189
+SHA256 1d812ca4a5d1c21d1a8cc4229fdcd770f23315a85b0d1ec9ad15bd1a09d4f073
+variable {l : ℕ} [Fact l.Prime]
+
+structure Resid (F : GFrame l) (O : Type) [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] (n : ℕ) where
+  chib : Fin n → F.G₀ →* (ResidueField O)ˣ
+  chib_open : ∀ i, IsOpen ((chib i).ker : Set F.G₀)
+  chib_inj : Function.Injective chib
+  polar : F.IsPolar O (GDet.ofRep (diagRep chib))
+  psib : ∀ v, Fin n → F.Gv v →* (ResidueField O)ˣ
+  psib_open : ∀ v i, IsOpen ((psib v i).ker : Set (F.Gv v))
+  th : ∀ v, Fin n → F.mu v →* Oˣ
+  th_comm : ∀ v i (g : F.mu v), (g : F.Gv v) ∈ (commutator (F.Gv v)).topologicalClosure → th v i g = 1
+
+section Rings
+
+variable {F : GFrame l} {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] {n : ℕ} (r : Resid F O n)
+
+namespace Resid
+
+def Dbar : GDet n (ResidueField O) F.G₀ := GDet.ofRep (diagRep r.chib)
+
+def Ip (u : F.St) : Subgroup F.G₀ := F.Iu u ⊓ ⨅ i, (r.chib i).ker
+
+variable {R : Type} [CommRing R] [Algebra O R] [IsCO O R]
+
+structure IsPsi (v : F.Vl) (i : Fin n) (ψ : F.Gv v →* Rˣ) : Prop where
+  cont : AdicCont (maximalIdeal R) fun g => ((ψ g : Rˣ) : R)
+  red : ∀ g, res O R (ψ g) = r.psib v i g
+  mu : ∀ g : F.mu v, ((ψ g : Rˣ) : R) = algebraMap O R (r.th v i g)
+
+end Resid
+
+structure Pair (R : Type) [CommRing R] [Algebra O R] [IsCO O R] : Type 1 where
+  D : GDet n R F.G₀
+  ψ : ∀ v, Fin n → F.Gv v →* Rˣ
+  cont : D.IsCont (maximalIdeal R)
+  red : D.map (res O R : R →+* ResidueField O) = r.Dbar
+  psi : ∀ v i, r.IsPsi v i (ψ v i)
+  P : ∀ i g, D.lam i (F.star O R n (MonoidAlgebra.single g 1)) = D.lam i (MonoidAlgebra.single g 1)
+  Ord : ∀ v (g : Fin n → F.Gv v) (h : F.G₀), D.tr (MonoidAlgebra.single h 1 * F.oEl v (ψ v) g) = 0
+  I : ∀ u, ∀ g ∈ r.Ip u, ∀ h : F.G₀, D.tr (MonoidAlgebra.single h 1 * (MonoidAlgebra.single g 1 - 1)) = 0
+
+variable {r} in
+
+def Pair.Maps {R A : Type} [CommRing R] [Algebra O R] [IsCO O R] [CommRing A] (p : Pair r R) (f : R →+* A)
+    (D : GDet n A F.G₀) (ψ : ∀ v, Fin n → F.Gv v →* Aˣ) : Prop :=
+  p.D.map f = D ∧ ∀ v i, pushCh f (p.ψ v i) = ψ v i
+
+structure UniversalOrdinaryDeterminantRing : Type 1 where
+  B : Type
+  [ring : CommRing B]
+  [alg : Algebra O B]
+  [co : IsCO O B]
+  u : Pair r B
+  univ : ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (p : Pair r R),
+    ∃! f : B →ₐ[O] R, u.Maps (f : B →+* R) p.D p.ψ
+
+attribute [instance] UniversalOrdinaryDeterminantRing.ring UniversalOrdinaryDeterminantRing.alg UniversalOrdinaryDeterminantRing.co
+
+def IsInert {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (κ : ∀ v, Fin n → F.Iv v →* Rˣ) : Prop :=
+  ∀ v i, ∃ ψ : F.Gv v →* Rˣ, r.IsPsi v i ψ ∧ κ v i = ψ.comp (F.Iv v).subtype
+
+structure LamObj : Type 1 where
+  Λ : Type
+  [ring : CommRing Λ]
+  [alg : Algebra O Λ]
+  [co : IsCO O Λ]
+  κ : ∀ v, Fin n → F.Iv v →* Λˣ
+  inert : IsInert r κ
+  univ : ∀ (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (κ' : ∀ v, Fin n → F.Iv v →* Rˣ), IsInert r κ' →
+    ∃! f : Λ →ₐ[O] R, ∀ v i, pushCh (f : Λ →+* R) (κ v i) = κ' v i
+
+attribute [instance] LamObj.ring LamObj.alg LamObj.co
+
+variable {r} in
+
+def LamObj.toPair (Λ : LamObj r) {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (p : Pair r R) : Λ.Λ →ₐ[O] R :=
+  (Λ.univ R (fun v i => (p.ψ v i).comp (F.Iv v).subtype) fun v i => ⟨_, p.psi v i, rfl⟩).choose
+
+theorem LamObj.toPair_spec (Λ : LamObj r) {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (p : Pair r R) (v : F.Vl)
+    (i : Fin n) : pushCh (Λ.toPair p : Λ.Λ →+* R) (Λ.κ v i) = (p.ψ v i).comp (F.Iv v).subtype :=
+  (Λ.univ R (fun v i => (p.ψ v i).comp (F.Iv v).subtype) fun v i => ⟨_, p.psi v i, rfl⟩).choose_spec.1 v i
+
+structure Point : Type 1 where
+
+
+[JRP_literal_definitions_04] src/Development/AutomorphicArithmetic/AutomorphicVarieties/WeilGroupCharacters/RepAlg.lean:44-113
+SHA256 da055d1d3880393c29a55f181a9f58871f2a29cea3b71ed6d0032402da0ca017
+structure GDet (n : ℕ) (A G : Type) [CommRing A] [Group G] : Type 1 where
+  D : ∀ (B : Type) [CommRing B] [Algebra A B], MonoidAlgebra B G →* B
+  nat : ∀ (B B' : Type) [CommRing B] [Algebra A B] [CommRing B'] [Algebra A B'] (f : B →ₐ[A] B') (x : MonoidAlgebra B G),
+    D B' (MonoidAlgebra.mapRingHom G (f : B →+* B') x) = f (D B x)
+  homog : ∀ (B : Type) [CommRing B] [Algebra A B] (b : B) (x : MonoidAlgebra B G), D B (b • x) = b ^ n * D B x
+
+namespace GDet
+
+variable {n : ℕ} {A G : Type} [CommRing A] [Group G] (D : GDet n A G)
+
+@[ext] theorem ext {D D' : GDet n A G} (h : ∀ (B : Type) [CommRing B] [Algebra A B] (x), D.D B x = D'.D B x) : D = D' := by
+  cases D; cases D'; congr; funext B _ _; exact MonoidHom.ext (h B)
+
+def map {A' : Type} [CommRing A'] (f : A →+* A') : GDet n A' G where
+  D B _ _ := letI : Algebra A B := ((algebraMap A' B).comp f).toAlgebra; D.D B
+  nat B B' _ _ _ _ g x :=
+    letI : Algebra A B := ((algebraMap A' B).comp f).toAlgebra
+    letI : Algebra A B' := ((algebraMap A' B').comp f).toAlgebra
+    D.nat B B' { (g : B →+* B') with commutes' := fun a => g.commutes (f a) } x
+  homog B _ _ b x := letI : Algebra A B := ((algebraMap A' B).comp f).toAlgebra; D.homog B b x
+
+def comap {H : Type} [Group H] (φ : H →* G) : GDet n A H where
+  D B _ _ := (D.D B).comp (MonoidAlgebra.mapDomainRingHom B φ).toMonoidHom
+  nat B B' _ _ _ _ f x := by
+    change D.D B' (MonoidAlgebra.mapDomainRingHom B' φ _) = f (D.D B (MonoidAlgebra.mapDomainRingHom B φ x))
+    rw [← D.nat]
+    congr 1
+    induction x using MonoidAlgebra.induction_linear with
+    | zero => simp
+    | add a b ha hb => simp only [map_add, ha, hb]
+    | single g r => simp
+  homog B _ _ b x := by
+    change D.D B (MonoidAlgebra.mapDomainAlgHom B B φ (b • x)) = b ^ n * D.D B (MonoidAlgebra.mapDomainAlgHom B B φ x)
+    rw [map_smul, D.homog]
+
+def repAlg {ι : Type} [Fintype ι] [DecidableEq ι] (ρ : G →* Matrix ι ι A) (B : Type) [CommRing B] [Algebra A B] :
+    MonoidAlgebra B G →ₐ[B] Matrix ι ι B :=
+  MonoidAlgebra.lift B (Matrix ι ι B) G ((RingHom.mapMatrix (algebraMap A B)).toMonoidHom.comp ρ)
+
+def ofRep (ρ : G →* Matrix (Fin n) (Fin n) A) : GDet n A G where
+  D B _ _ := Matrix.detMonoidHom.comp (repAlg ρ B).toMonoidHom
+  nat B B' _ _ _ _ f x := by
+    change (repAlg ρ B' _).det = f (repAlg ρ B x).det
+    rw [AlgHom.map_det]
+    congr 1
+    induction x using MonoidAlgebra.induction_linear with
+    | zero => simp
+    | add a b ha hb => simp only [map_add, ha, hb]
+    | single g r => ext i j; simp [repAlg]
+  homog B _ _ b x := by
+    change (repAlg ρ B (b • x)).det = b ^ n * (repAlg ρ B x).det
+    rw [map_smul, Matrix.det_smul, Fintype.card_fin]
+
+def chi (y : MonoidAlgebra A G) : A[X] := D.D A[X] (MonoidAlgebra.single 1 X - MonoidAlgebra.mapRingHom G C y)
+
+def lam (i : ℕ) (y : MonoidAlgebra A G) : A := (-1) ^ i * (D.chi y).coeff (n - i)
+
+def tr (y : MonoidAlgebra A G) : A := D.lam 1 y
+
+def Kills (y : MonoidAlgebra A G) : Prop :=
+  ∀ (B : Type) [CommRing B] [Algebra A B] (h : MonoidAlgebra B G),
+    D.D B (1 + h * MonoidAlgebra.mapRingHom G (algebraMap A B) y) = 1
+
+def gen {m : ℕ} (y : Fin m → MonoidAlgebra A G) : MonoidAlgebra (MvPolynomial (Fin m) A) G :=
+  ∑ j, (MvPolynomial.X j : MvPolynomial (Fin m) A) • MonoidAlgebra.mapRingHom G MvPolynomial.C (y j)
+
+def CH : Set (MonoidAlgebra A G) :=
+  {z | ∃ (m : ℕ) (y : Fin m → MonoidAlgebra A G) (β : Fin m →₀ ℕ), ∀ g : G,
+    z.coeff g = MvPolynomial.coeff β
+      ((Polynomial.aeval (gen y) ((D.map (MvPolynomial.C : A →+* MvPolynomial (Fin m) A)).chi (gen y))).coeff g)}
+
+
+[JRP_literal_definitions_05] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/IsTheta.lean:39-53
+SHA256 a3178e5b20e636819e48446dfa241982b33abc0e289c5a08c52e1908fad73c5f
+
+def HSet.IsMap {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] {l : ℕ} [Fact l.Prime] {n : ℕ}
+    {c : Coef l} (H : HSet L Ω l n c) {A : Type} [CommRing A] [Algebra c.O A] [IsLocalRing A] (θ : H.X.I.T →* Aˣ) (a : H.Op → c.O)
+    (K : H.Lev) [Fact (CommOn (H.MK θ a K) (H.op A))] [Alg.IsCO c.O (H.TK θ a K)] {R : Type} [CommRing R] [Algebra c.O R]
+    (D₀ : W.GDet n R H.Gq) (ψ₀ : ∀ v, Fin n → Dec (F := L) (H.pl v) →* Rˣ) (f : R →ₐ[c.O] H.TK θ a K) : Prop :=
+  H.IsUniv θ a K (maximalIdeal _) (D₀.map f.toRingHom) fun v i => W.pushCh f.toRingHom (ψ₀ v i)
+
+def HSet.IsJ {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] {l : ℕ} [Fact l.Prime] {n : ℕ}
+    {c : Coef l} (H : HSet L Ω l n c) {A : Type} [CommRing A] [Algebra c.O A] [IsLocalRing A] (θ : H.X.I.T →* Aˣ) (a : H.Op → c.O)
+    (K : H.Lev) {R : Type} [CommRing R] [Algebra c.O R] (D₀ : W.GDet n R H.Gq) (ψ₀ : ∀ v, Fin n → Dec (F := L) (H.pl v) →* Rˣ)
+    (lam : A →ₐ[c.O] R) (J : Ideal R) : Prop :=
+  (H.MK θ a K = ⊥ ∧ J = ⊤) ∨ ∃ (_ : Fact (CommOn (H.MK θ a K) (H.op A))) (_ : Alg.IsCO c.O (H.TK θ a K))
+    (f : R →ₐ[c.O] H.TK θ a K), H.MK θ a K ≠ ⊥ ∧ H.IsMap θ a K D₀ ψ₀ f ∧ Function.Surjective f ∧
+      (∀ b, f (lam b) = algebraMap A _ b) ∧ J = RingHom.ker f
+
+
+
+[JRP_literal_definitions_06] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/UnitaryHeckeData.lean:43-74
+SHA256 fa9ed96e69ca9b16b8677ee365c4f9faf835499ac23998fb2b9a5ea08ae01b61
+structure UnitaryPointProperties (lam : Wt L l n) (ρ : V.frame.G₀ →* GL (Fin n) (Qbar l)) : Prop where
+  form : ∃ P, V.frame.IsForm c.O n ρ P
+  type : ∀ t, r.IsTeich t → ∀ u : s.St, ∃ g : GL (Fin n) (Qbar l), ∀ x ∈ V.frame.Iu u,
+    ((g * ρ x * g⁻¹ : GL (Fin n) (Qbar l)) : Matrix (Fin n) (Fin n) (Qbar l)) =
+      Matrix.diagonal fun i => algebraMap c.O (Qbar l) (t i x)
+  cusp : Af.IsIrr ρ → ∃ π : CuspSub L n, (CG.mk π).IsRegAlg ∧ GlobalTheory.ContraPair.DualIsConj π ∧ Af.AttC ι (ρ.comp V.pr) π ∧ HasWt ι s π lam
+  aut : ∃ σ : Submodule ℂ (UA L n → ℂ), IsAutRepU σ ∧ (∀ w, IsSplitAt w → ∀ τ : SmIrr (GLw n w),
+      IsCompAlong σ (locU n w) ((cLoc w).comp (locU n w).subtype) τ.ρ → _root_.UpperTheory.V.Z.Win.LocGlobT ι (ρ.comp V.pr) w τ) ∧
+    (∀ y : Emb l (fun v : V.frame.Vl => s.w v.1), HasWeightAt σ (ι.toRingHom.comp y.res) (lam y.res).dual) ∧
+    (∀ w : Plc L, w.under (𝓞 (Lp L)) ∉ V.S' → IsUnramU σ w) ∧
+    (∀ w, IsSplitAt w → ∃ τ : SmIrr (GLw n w), IsCompAlong σ (locU n w) ((cLoc w).comp (locU n w).subtype) τ.ρ) ∧
+    ∃ τ : SmIrr (GLw n (s.w s.v0)), IsCompAlong σ (locU n (s.w s.v0)) ((cLoc (s.w s.v0)).comp (locU n (s.w s.v0)).subtype) τ.ρ ∧
+      fixd τ.ρ (Kc _ n 1) ≠ ⊥
+variable {lam : Wt L l n} {d : ℕ}
+  (e : (Fin d → ℂ) ≃ₗ[ℂ] ⨂[ℂ] e : Emb l (fun v : V.frame.Vl => s.w v.1), nablaSq ℂ n (lam e.res))
+variable {r} (B : UniversalOrdinaryDeterminantRing r) (Λ : LamObj r)
+structure UnitaryHeckeData : Type where
+  m : ℕ
+  τ₀ : KT n (wt s) →* GL (Fin m) c.O
+  type : _root_.UpperTheory.V.Hi.CaseU.TypeForAlt r ι τ₀
+  θ : (hset Q τ₀).X.I.T →* Λ.Λˣ
+  theta : IsTheta Q τ₀ Λ θ
+  isWt : (hset Q τ₀).IsWt θ
+  a : (hset Q τ₀).Op → c.O
+  res : IsRes Q r τ₀ a
+variable {Q ι Λ} (R : _root_.UpperTheory.V.Hi.CaseU.UnitaryHeckeData Q ι Λ) (K : (hset Q R.τ₀).Lev)
+abbrev UnitaryHeckeData.M := (hset Q R.τ₀).MK R.θ R.a K
+def UnitaryHeckeData.IsJ (J : Ideal B.B) : Prop := (hset Q R.τ₀).IsJ R.θ R.a K B.u.D B.u.ψ (Λ.toPair B.u) J
+end CaseU
+end UpperTheory.V.Hi
+end
+end
+
+
+[JRP_coefficient_points_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/DirichletPrimeToLPartMulLPowerPart.lean:10-15
+SHA256 8cd86f2b0747e172b3750a0543e209178d600a06a856d69995fa3aead314553f
+structure Coef (l : ℕ) [Fact l.Prime] where
+  O : Subalgebra ℤ_[l] (PadicAlgCl l)
+  dvr : IsDiscreteValuationRing O
+  fin : Module.Finite ℤ_[l] O
+
+attribute [instance] Coef.dvr Coef.fin
+
+
+[JRP_coefficient_points_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/LocalRingsCompletion/dvrFinite.lean:59-93
+SHA256 16aa89c463ba5ef680bf41e62942eb9a03c821692247516044a5cdefa445c7ab
+theorem UpperTheory.V.abelian₂.dvr_finite :
+    ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [CharZero O]
+      [Algebra ℤ_[l] O] [Module.Finite ℤ_[l] O],
+      IsAdicComplete (maximalIdeal O) O ∧ Finite (ResidueField O) ∧ (l : O) ∈ maximalIdeal O ∧
+        Function.Injective (algebraMap ℤ_[l] O) ∧ Module.Free ℤ_[l] O ∧ IsLocalHom (algebraMap ℤ_[l] O) := by
+  intro l hl O _ _ _ _ _ _
+  have hl0 : (l : O) ≠ 0 := Nat.cast_ne_zero.2 hl.out.ne_zero
+  have hinj : Function.Injective (algebraMap ℤ_[l] O) := by
+    rw [injective_iff_map_eq_zero]
+    intro x hx
+    by_contra h0
+    rw [PadicInt.unitCoeff_spec h0, map_mul, map_pow, map_natCast] at hx
+    exact mul_ne_zero ((PadicInt.unitCoeff h0).isUnit.map _).ne_zero (pow_ne_zero _ hl0) hx
+  have : FaithfulSMul ℤ_[l] O := (faithfulSMul_iff_algebraMap_injective _ _).2 hinj
+  have hfree : Module.Free ℤ_[l] O := Module.free_of_finite_type_torsion_free'
+  have hloc : IsLocalHom (algebraMap ℤ_[l] O) := inferInstance
+  have hlm : (l : O) ∈ maximalIdeal O := by
+    have h : (l : ℤ_[l]) ∈ maximalIdeal ℤ_[l] := by
+      rw [PadicInt.maximalIdeal_eq_span_p]; exact Ideal.mem_span_singleton_self _
+    have := map_nonunit (algebraMap ℤ_[l] O) _ h
+    rwa [map_natCast] at this
+  have hres : Finite (ResidueField O) := by
+    have : Finite (ResidueField ℤ_[l]) := Finite.of_equiv _ (PadicInt.residueField (p := l)).symm.toEquiv
+    exact Module.finite_of_finite (ResidueField ℤ_[l])
+  refine ⟨?_, hres, hlm, hinj, hfree, hloc⟩
+  have hP : IsPrecomplete (maximalIdeal O) O := by
+    have h1 : IsPrecomplete ((maximalIdeal ℤ_[l]).map (algebraMap ℤ_[l] O)) O :=
+      IsPrecomplete.map_algebraMap_iff.2 (prec_free _)
+    rw [PadicInt.maximalIdeal_eq_span_p, Ideal.map_span, Set.image_singleton, map_natCast] at h1
+    obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible O
+    obtain ⟨e, he⟩ := IsDiscreteValuationRing.ideal_eq_span_pow_irreducible
+      (s := Ideal.span {(l : O)}) (by simpa using hl0) hϖ
+    refine prec_cofinal ((Ideal.span_singleton_le_iff_mem _).2 hlm) (e := e) ?_ h1
+    rw [he, hϖ.maximalIdeal_eq, Ideal.span_singleton_pow]
+  exact { toIsHausdorff := inferInstance, toIsPrecomplete := hP }
+
+
+[JRP_coefficient_points_03] src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/ResMapBijective.lean:9-44
+SHA256 4b0c871283f874c4f41cb6df8df993b800cf8fbc13b8d7be3144e9658e6221a9
+class IsCO (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] : Prop
+    extends IsLocalRing R, IsNoetherianRing R where
+  complete : IsAdicComplete (maximalIdeal R) R
+  isLocalHom : IsLocalHom (algebraMap O R)
+  res_surj : ∀ x : R, ∃ a : O, x - algebraMap O R a ∈ maximalIdeal R
+
+attribute [instance] IsCO.complete IsCO.isLocalHom
+
+instance IsCO.self (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+    [IsAdicComplete (maximalIdeal O) O] : IsCO O O where
+  complete := inferInstance
+  isLocalHom := ⟨fun _ h => h⟩
+  res_surj x := ⟨x, by simp⟩
+
+section Res
+
+variable (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
+
+theorem resMap_bijective : Function.Bijective (ResidueField.map (algebraMap O R)) := by
+  refine ⟨(ResidueField.map (algebraMap O R)).injective, fun y => ?_⟩
+  obtain ⟨x, rfl⟩ := residue_surjective y
+  obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) x
+  refine ⟨residue O a, ?_⟩
+  rw [ResidueField.map_residue]
+  exact ((Ideal.Quotient.eq).2 ha).symm
+
+def res : R →ₐ[O] ResidueField O :=
+  { ((RingEquiv.ofBijective _ (resMap_bijective O R)).symm.toRingHom.comp (residue R)) with
+    commutes' := fun a => by
+      show (RingEquiv.ofBijective _ (resMap_bijective O R)).symm (residue R (algebraMap O R a)) = residue O a
+      rw [RingEquiv.symm_apply_eq]
+      exact (ResidueField.map_residue _ _).symm }
+
+theorem res_eq_zero_iff (x : R) : res O R x = 0 ↔ x ∈ maximalIdeal R := by
+  show (RingEquiv.ofBijective _ (resMap_bijective O R)).symm (residue R x) = 0 ↔ _
+  rw [map_eq_zero_iff _ (RingEquiv.injective _), residue_eq_zero_iff]
+
+
+[JRP_coefficient_points_04] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/PointRepUnramifiedAtAuxiliaryPlace.lean:213-283
+SHA256 2da6c9b43dcbffb27665cb0635b4849f702a9ba7e3141294558eae616b488acb
+private theorem exists_finiteDimensional_ge_forall_coef_integer_mem {l : ℕ} [Fact l.Prime] (c : Coef l)
+    (K : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] K] :
+    ∃ E : IntermediateField ℚ_[l] (PadicAlgCl l), FiniteDimensional ℚ_[l] E ∧ K ≤ E ∧
+      ∀ x : c.O, (x : PadicAlgCl l) ∈ E := by
+  obtain ⟨s, hs⟩ := Module.Finite.fg_top (R := ℤ_[l]) (M := c.O)
+  set S : Set (PadicAlgCl l) := (fun t : c.O => (t : PadicAlgCl l)) '' (s : Set c.O)
+  haveI : Finite S := Set.Finite.image _ s.finite_toSet
+  haveI : FiniteDimensional ℚ_[l] (IntermediateField.adjoin ℚ_[l] S) :=
+    IntermediateField.finiteDimensional_adjoin fun x _ => Algebra.IsIntegral.isIntegral x
+  refine ⟨K ⊔ IntermediateField.adjoin ℚ_[l] S, inferInstance, le_sup_left, fun x => ?_⟩
+  have hx : x ∈ Submodule.span ℤ_[l] (s : Set c.O) := by
+    rw [hs]
+    trivial
+  induction hx using Submodule.span_induction with
+  | mem t ht =>
+    exact (le_sup_right : IntermediateField.adjoin ℚ_[l] S ≤ _)
+      (IntermediateField.subset_adjoin _ _ ⟨t, ht, rfl⟩)
+  | zero => exact zero_mem _
+  | add a b _ _ ha hb =>
+    rw [Subalgebra.coe_add]
+    exact add_mem ha hb
+  | smul a z _ hz =>
+    rw [Subalgebra.coe_smul, Algebra.smul_def, IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] (PadicAlgCl l)]
+    exact mul_mem (IntermediateField.algebraMap_mem _ _) hz
+
+private theorem isLocalHom_inclusion_coef_of_le {l : ℕ} [Fact l.Prime] (c c' : Coef l) (hle : c.O ≤ c'.O) :
+    IsLocalHom (Subalgebra.inclusion hle).toRingHom := by
+  refine RingHom.IsIntegral.isLocalHom ?_ (Subalgebra.inclusion_injective hle)
+  intro z
+  obtain ⟨p, hp, hpz⟩ := (Algebra.IsIntegral.isIntegral z : IsIntegral ℤ_[l] z)
+  refine ⟨p.map (algebraMap ℤ_[l] c.O), hp.map _, ?_⟩
+  rw [Polynomial.eval₂_map]
+  convert hpz
+  exact RingHom.ext fun a => rfl
+
+private theorem resid_h4_lemma_6 {l : ℕ} [Fact l.Prime] (c c' : Coef l) (hle : c.O ≤ c'.O)
+    (R : Type) [CommRing R] [Algebra c.O R] [Alg.IsCO c.O R] (y : R →ₐ[c.O] PadicAlgCl l) (a : R) (t : c'.O)
+    (ht : (t : PadicAlgCl l) = y a) :
+    haveI := isLocalHom_inclusion_coef_of_le c c' hle
+    residue c'.O t = ResidueField.map (Subalgebra.inclusion hle).toRingHom (Alg.res c.O R a) := by
+  haveI := isLocalHom_inclusion_coef_of_le c c' hle
+  obtain ⟨b, hb⟩ := IsLocalRing.residue_surjective (Alg.res c.O R a)
+  have hres : ∀ x : R, ResidueField.map (algebraMap c.O R) (Alg.res c.O R x) = residue R x := by
+    intro x
+    simp only [Alg.res]
+    exact (RingEquiv.ofBijective _ (Alg.resMap_bijective c.O R)).apply_symm_apply _
+  have hm : a - algebraMap c.O R b ∈ maximalIdeal R := by
+    rw [← residue_eq_zero_iff, ← hres, map_sub, AlgHom.commutes, ResidueField.algebraMap_eq, hb, sub_self,
+      map_zero]
+  obtain ⟨-, a0, ha0, -, hbd⟩ := (GradeZeroInterpolatingElement.coPt c R).1 y
+  have hn : ‖y (a - algebraMap c.O R b)‖ < 1 :=
+    (hbd 1 _ (by rwa [pow_one])).trans_lt (by rwa [pow_one])
+  have hy : y (a - algebraMap c.O R b) =
+      ((t - (Subalgebra.inclusion hle).toRingHom b : c'.O) : PadicAlgCl l) := by
+    rw [map_sub, AlgHom.commutes, ← ht]
+    rfl
+  have hmax : t - (Subalgebra.inclusion hle).toRingHom b ∈ maximalIdeal c'.O := by
+    rw [mem_maximalIdeal, mem_nonunits_iff]
+    rintro ⟨u, hu⟩
+    have h1 := norm_coe_coef_integer_le_one c' (↑u⁻¹ : c'.O)
+    have h2 : ((↑u : c'.O) : PadicAlgCl l) * ((↑u⁻¹ : c'.O) : PadicAlgCl l) = 1 := by
+      rw [← Subalgebra.coe_mul, Units.mul_inv]
+      rfl
+    rw [hu, ← hy] at h2
+    have h3 := congrArg norm h2
+    rw [norm_mul, norm_one] at h3
+    have := mul_le_of_le_one_right (norm_nonneg (y (a - algebraMap c.O R b))) h1
+    linarith
+  have h0 := (residue_eq_zero_iff _).2 hmax
+  rw [map_sub, sub_eq_zero] at h0
+  rw [h0, ← ResidueField.map_residue, hb]
+
+
+[JRP_local_inertia_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/ExistsNontrivialCharacterPgroup.lean:5-133
+SHA256 d98b6bfb33e4494f674ec79725d7f23f160a1172e57f825db11edad1e041e24a
+private theorem exists_eigenvector_tame_inertia {p : ℕ} [Fact p.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (φ : G →* GQ p) (hφ : IsOpenEmbedding φ) (c : ↥((Iq p).comap φ) →* (Om p)ˣ) (m : ℕ) (hm : ¬ p ∣ m)
+    (hc : ∀ τ, c τ ^ m = 1) (U : Subgroup G) (hU : IsOpen (U : Set G))
+    (hUc : ∀ τ : ↥((Iq p).comap φ), (τ : G) ∈ U → c τ = 1) :
+    ∃ x : Om p, x ≠ 0 ∧ ∀ τ : ↥((Iq p).comap φ), φ τ x = c τ * x := by
+  classical
+  have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero _)
+  haveI : NeZero m := ⟨hm0⟩
+  have hfix : ∀ τ σ : ↥((Iq p).comap φ), φ τ (c σ : Om p) = c σ := fun τ σ =>
+    (IntermediateField.mem_fixingSubgroup_iff _ _).1 τ.2 _
+      (IntermediateField.subset_adjoin _ _ ⟨m, Nat.pos_of_ne_zero hm0, hm, by
+        rw [← Units.val_pow_eq_pow_val, hc, Units.val_one]⟩)
+  have hle : c.range ≤ rootsOfUnity m (Om p) := by
+    rintro _ ⟨τ, rfl⟩
+    exact hc τ
+  haveI : Finite c.range := Finite.of_injective _ (Subgroup.inclusion_injective hle)
+  haveI : Fintype c.range := Fintype.ofFinite _
+  let J : Subgroup (GQ p) := (c.ker.map ((Iq p).comap φ).subtype).map φ
+  have hJ : IsClosed (J : Set (GQ p)) := by
+    have h1 : IsOpen (c.ker : Set ↥((Iq p).comap φ)) :=
+      Subgroup.isOpen_mono (H₁ := U.subgroupOf _) (fun τ hτ => hUc τ hτ) (hU.preimage continuous_subtype_val)
+    have h2 := c.ker.isClosed_of_isOpen h1
+    have h3 : IsClosed (((Iq p).comap φ : Subgroup G) : Set G) := (iqBasic p).2.1.preimage hφ.continuous
+    have h4 := h3.isClosedMap_subtype_val _ h2
+    have h5 : IsClosedEmbedding φ := ⟨hφ.isEmbedding, by
+      rw [← MonoidHom.coe_range]
+      exact φ.range.isClosed_of_isOpen (by rw [MonoidHom.coe_range]; exact hφ.isOpen_range)⟩
+    exact h5.isClosedMap _ h4
+  have hJ' : (IntermediateField.fixedField J).fixingSubgroup = J :=
+    InfiniteGalois.fixingSubgroup_fixedField ⟨J, hJ⟩
+  have key : ∀ τ σ : ↥((Iq p).comap φ), c τ = c σ ↔
+      ∀ z : ↥(IntermediateField.fixedField J), φ τ (z : Om p) = φ σ (z : Om p) := by
+    intro τ σ
+    have h1 : c τ = c σ ↔ φ (σ⁻¹ * τ : ↥((Iq p).comap φ)) ∈ J := by
+      constructor
+      · intro h
+        exact ⟨_, ⟨σ⁻¹ * τ, by simp [h], rfl⟩, rfl⟩
+      · rintro ⟨_, ⟨a, ha, rfl⟩, h⟩
+        have h2 : a = σ⁻¹ * τ := Subtype.ext (hφ.injective h)
+        rw [h2] at ha
+        have h3 : c (σ⁻¹ * τ) = 1 := ha
+        rw [map_mul, map_inv, inv_mul_eq_one] at h3
+        exact h3.symm
+    rw [h1, ← hJ', IntermediateField.mem_fixingSubgroup_iff]
+    have h4 : ∀ z : Om p, φ (σ⁻¹ * τ : ↥((Iq p).comap φ)) z = z ↔ φ τ z = φ σ z := by
+      intro z
+      rw [Subgroup.coe_mul, Subgroup.coe_inv, map_mul, map_inv, AlgEquiv.mul_apply]
+      exact (φ σ).symm_apply_eq
+    rw [hJ']
+    exact ⟨fun h z => (h4 _).1 (h z z.2), fun h z hz => (h4 _).2 (h ⟨z, hz⟩)⟩
+  choose s hs using fun q : c.range => q.2
+  let F : c.range → (↥(IntermediateField.fixedField J) →* Om p) := fun q =>
+    ((φ (s q) : Om p →+* Om p).comp (IntermediateField.fixedField J).subtype).toMonoidHom
+  have hF : Function.Injective F := by
+    intro q q' h
+    refine Subtype.ext ?_
+    rw [← hs, ← hs, key]
+    exact fun z => DFunLike.congr_fun h z
+  have hli := (linearIndependent_monoidHom ↥(IntermediateField.fixedField J) (Om p)).comp F hF
+  rw [Fintype.linearIndependent_iff] at hli
+  have hne : ¬ (∑ q : c.range, (((q : (Om p)ˣ)⁻¹ : (Om p)ˣ) : Om p) • (F q : _ → Om p)) = 0 := fun h =>
+    Units.ne_zero _ (hli _ h 1)
+  obtain ⟨z, hz⟩ := Function.ne_iff.1 hne
+  refine ⟨_, hz, fun τ => ?_⟩
+  simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, map_sum, map_mul, Finset.mul_sum]
+  refine Fintype.sum_equiv (Equiv.mulLeft (c.rangeRestrict τ)) _ _ fun q => ?_
+  have e1 : φ τ (((q : (Om p)ˣ)⁻¹ : (Om p)ˣ) : Om p) = (((q : (Om p)ˣ)⁻¹ : (Om p)ˣ) : Om p) := by
+    rw [← hs, ← map_inv, hfix]
+  have e2 : φ τ (F q z) = F (c.rangeRestrict τ * q) z := by
+    have := (key (τ * s q) (s (c.rangeRestrict τ * q))).1 (by rw [map_mul, hs, hs]; rfl) z
+    rw [Subgroup.coe_mul, map_mul, AlgEquiv.mul_apply] at this
+    exact this
+  rw [e1, e2, Equiv.coe_mulLeft, ← mul_assoc, ← Units.val_mul]
+  congr 2
+  simp [mul_comm]
+
+private theorem tame_character_conjugation {p : ℕ} [Fact p.Prime] {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G]
+    (φ : G →* GQ p) (hφ : IsOpenEmbedding φ) (c : ↥((Iq p).comap φ) →* (Om p)ˣ) (m : ℕ) (hm : ¬ p ∣ m)
+    (hc : ∀ τ, c τ ^ m = 1) (U : Subgroup G) (hU : IsOpen (U : Set G))
+    (hUc : ∀ τ : ↥((Iq p).comap φ), (τ : G) ∈ U → c τ = 1) (g : G) (τ τ' : ↥((Iq p).comap φ))
+    (h : (τ' : G) = g * τ * g⁻¹) : (c τ' : Om p) = φ g (c τ) := by
+  obtain ⟨x, hx0, hx⟩ := exists_eigenvector_tame_inertia φ hφ c m hm hc U hU hUc
+  have hc' : ∀ τ, (c τ : Om p) ^ m = 1 := fun τ => by rw [← Units.val_pow_eq_pow_val, hc, Units.val_one]
+  have e1 : φ τ ((φ g)⁻¹ x) = (φ g)⁻¹ (c τ') * (φ g)⁻¹ x := by
+    rw [← map_mul, ← hx, h, map_mul, map_mul, map_inv, ← AlgEquiv.mul_apply, ← AlgEquiv.mul_apply]
+    congr 1
+    group
+  have hn : ∀ (σ : GQ p) (y : Om p), ‖σ y‖ = ‖y‖ := KStar.IdealValuations.norm_aut_and_roots.1
+  have hm0 : m ≠ 0 := by rintro rfl; exact hm (dvd_zero _)
+  have hy : ‖(φ g)⁻¹ x / x‖ = 1 := by rw [norm_div, hn, div_self (norm_ne_zero_iff.2 hx0)]
+  have h1 := ((iqBasic p).2.2.1 _).1 τ.2 _ hy.le
+  have hτ : ‖(c τ : Om p)‖ = 1 := by
+    have := congrArg norm (hc' τ)
+    rw [norm_pow, norm_one] at this
+    exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hm0).1 this
+  have e2 : φ τ ((φ g)⁻¹ x / x) - (φ g)⁻¹ x / x =
+      ((φ g)⁻¹ (c τ') - c τ) * ((φ g)⁻¹ x / x) / c τ := by
+    rw [map_div₀, e1, hx]
+    have := (c τ).ne_zero
+    field_simp
+  rw [e2, norm_div, norm_mul, hy, hτ, mul_one, div_one] at h1
+  have h2 := KStar.IdealValuations.norm_aut_and_roots.2 m _ _ hm (by rw [← map_pow, hc', map_one]) (hc' τ) h1
+  rw [← h2, ← AlgEquiv.mul_apply, mul_inv_cancel, AlgEquiv.one_apply]
+
+private theorem cyclotomic_congruence_fixed_root {p l : ℕ} [Fact p.Prime] [Fact l.Prime] (σ : GQ p) (x : Om p) (k : ℕ)
+    (hx : x ^ l ^ k = 1) (hx1 : x ≠ 1) (h : σ x = x) : (l : ℤ_[l]) ∣ (cyc p l σ : ℤ_[l]) - 1 := by
+  have hl : l.Prime := Fact.out
+  obtain ⟨y, hy, hy1, h⟩ : ∃ y : Om p, y ^ l ^ 1 = 1 ∧ y ≠ 1 ∧ σ y = y := by
+    induction k with
+    | zero => exact absurd (by simpa using hx) hx1
+    | succ k ih =>
+      by_cases h0 : x ^ l ^ k = 1
+      · exact ih h0
+      · exact ⟨x ^ l ^ k, by rw [← pow_mul, ← pow_add, hx], h0, by rw [map_pow, h]⟩
+  have hs := cyclotomicCharacter.spec l (n := 1) (MulSemiringAction.toRingAut (GQ p) (Om p) σ) y hy
+  have hs' : σ y = y ^ (PadicInt.toZModPow 1 (cyc p l σ : ℤ_[l])).val := hs
+  have ho : orderOf y = l ^ 1 := by
+    rw [pow_one] at hy ⊢
+    exact orderOf_eq_prime hy hy1
+  haveI : NeZero (l ^ 1) := ⟨pow_ne_zero _ hl.ne_zero⟩
+  have h4 : (PadicInt.toZModPow 1 (cyc p l σ : ℤ_[l])).val ≡ 1 [MOD l ^ 1] := by
+    have := (isOfFinOrder_iff_pow_eq_one.2 ⟨_, NeZero.pos _, hy⟩).pow_eq_pow_iff_modEq.mp
+      (hs'.symm.trans (h.trans (pow_one y).symm))
+    rwa [ho] at this
+  have h5 := (ZMod.natCast_eq_natCast_iff _ _ _).mpr h4
+  rw [ZMod.natCast_zmod_val, Nat.cast_one] at h5
+  rw [← pow_one (l : ℤ_[l]), ← Ideal.mem_span_singleton, ← PadicInt.ker_toZModPow, RingHom.mem_ker, map_sub,
+    h5, map_one, sub_self]
+
+
+
+[JRP_local_inertia_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/ExistsNontrivialCharacterPgroup.lean:134-190
+SHA256 51265cda39ab6047a4866d749fc434f7caa6b941e0395889f75c38f2ce61dff0
+private theorem matrix_pow_l_congruence_succ {A : Type} [CommRing A] (I : Ideal A) {l : ℕ} (hl : (l : A) ∈ I) {n : ℕ}
+    (M : Matrix (Fin n) (Fin n) A) (c : A) (k : ℕ)
+    (h : ∀ i j, (M - Matrix.scalar (Fin n) c) i j ∈ I ^ (k + 1)) :
+    ∀ i j, (M ^ l - Matrix.scalar (Fin n) (c ^ l)) i j ∈ I ^ (k + 2) := by
+  intro i j
+  have hcomm : Commute M (Matrix.scalar (Fin n) c) := (Matrix.scalar_commute c (fun _ => Commute.all _ _) M).symm
+  rw [map_pow, ← hcomm.geom_sum₂_mul, Matrix.mul_apply, pow_succ' I (k + 1)]
+  refine Ideal.sum_mem _ fun a _ => Ideal.mul_mem_mul ?_ (h a j)
+  have h1 : (Ideal.Quotient.mk I).mapMatrix M = (Ideal.Quotient.mk I).mapMatrix (Matrix.scalar (Fin n) c) := by
+    rw [← sub_eq_zero, ← map_sub]
+    ext a b
+    exact Ideal.Quotient.eq_zero_iff_mem.2 (Ideal.pow_le_self (Nat.succ_ne_zero k) (h a b))
+  have h2 : (Ideal.Quotient.mk I).mapMatrix
+      (∑ i ∈ Finset.range l, M ^ i * Matrix.scalar (Fin n) c ^ (l - 1 - i)) = 0 := by
+    simp only [map_sum, map_mul, map_pow, h1]
+    rw [geom_sum₂_self, ← nsmul_eq_mul, ← Nat.cast_smul_eq_nsmul (A ⧸ I), ← map_natCast (Ideal.Quotient.mk I),
+      Ideal.Quotient.eq_zero_iff_mem.2 hl, zero_smul]
+  exact Ideal.Quotient.eq_zero_iff_mem.1 (congrFun (congrFun h2 i) a)
+
+private theorem matrix_pow_l_iterate_congruence {A : Type} [CommRing A] (I : Ideal A) {l : ℕ} (hl : (l : A) ∈ I) {n : ℕ}
+    (M : Matrix (Fin n) (Fin n) A) (c : A) (h : ∀ i j, (M - Matrix.scalar (Fin n) c) i j ∈ I) (k : ℕ) :
+    ∀ i j, (M ^ l ^ k - Matrix.scalar (Fin n) (c ^ l ^ k)) i j ∈ I ^ (k + 1) := by
+  induction k with
+  | zero => simpa using h
+  | succ k ih =>
+    rw [pow_succ l, pow_mul, pow_mul]
+    exact matrix_pow_l_congruence_succ I hl _ _ k ih
+
+private theorem unipotent_residue_pow_mod_maximal {A : Type} [CommRing A] [IsLocalRing A] {l : ℕ} [Fact l.Prime]
+    [CharP (IsLocalRing.ResidueField A) l] {n : ℕ} (M : Matrix (Fin n) (Fin n) A) (c : A)
+    (h : (M.map (IsLocalRing.residue A)).charpoly = (Polynomial.X - Polynomial.C (IsLocalRing.residue A c)) ^ n) :
+    ∀ i j, (M ^ l ^ n - Matrix.scalar (Fin n) (c ^ l ^ n)) i j ∈ IsLocalRing.maximalIdeal A := by
+  intro i j
+  have hl : l.Prime := Fact.out
+  haveI : Nonempty (Fin n) := ⟨i⟩
+  have h1 := (M.map (IsLocalRing.residue A)).aeval_self_charpoly
+  rw [h, map_pow, map_sub, Polynomial.aeval_X, Polynomial.aeval_C] at h1
+  have h2 : (M.map (IsLocalRing.residue A) - algebraMap _ _ (IsLocalRing.residue A c)) ^ l ^ n = 0 :=
+    pow_eq_zero_of_le (Nat.lt_pow_self hl.one_lt).le h1
+  rw [sub_pow_char_pow_of_commute l n (Algebra.commute_algebraMap_right _ _)] at h2
+  have h3 : (IsLocalRing.residue A).mapMatrix (M ^ l ^ n - Matrix.scalar (Fin n) (c ^ l ^ n)) = 0 := by
+    rw [← h2, map_sub, map_pow, map_pow, map_pow, RingHom.mapMatrix_apply]
+    congr 2
+    ext a b
+    by_cases hab : a = b <;> simp [Matrix.algebraMap_eq_diagonal, hab]
+  exact (IsLocalRing.residue_eq_zero_iff _).1 (congrFun (congrFun h3 i) j)
+
+private theorem exists_nontrivial_character_pgroup {H : Type} [Group H] [Finite H] [Nontrivial H] {l : ℕ} [Fact l.Prime] (hH : IsPGroup l H)
+    (F : Type) [Field F] [IsAlgClosed F] [CharZero F] : ∃ (ψ : H →* Fˣ) (a : H), ψ a ≠ 1 := by
+  haveI := hH.isNilpotent
+  have h1 := IsSolvable.commutator_lt_top_of_nontrivial H
+  obtain ⟨a, -, ha⟩ := SetLike.exists_of_lt h1
+  have h2 : Abelianization.of a ≠ 1 := fun h => ha ((QuotientGroup.eq_one_iff a).1 h)
+  haveI : NeZero (Monoid.exponent (Abelianization H)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  obtain ⟨ψ, hψ⟩ := CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (Abelianization H) F h2
+  exact ⟨ψ.comp Abelianization.of, a, hψ⟩
+
+
+
+[JRP_local_inertia_03] src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/ExistsNontrivialCharacterPgroup.lean:218-303
+SHA256 4267886ddab3cf69426c56e99ae2d2146ef715b66603a1513fa286ee1347e38a
+theorem UpperTheory.V.Loc.v0b :
+    ∀ {p l : ℕ} [Fact p.Prime] [Fact l.Prime], p ≠ l → ∀ {G : Type} [Group G] [TopologicalSpace G] [IsTopologicalGroup G] (φ : G →* GQ p) (hφ : IsOpenEmbedding φ) (A : Type) [CommRing A] [IsDomain A] [IsDiscreteValuationRing A] [IsAdicComplete (IsLocalRing.maximalIdeal A) A] [Finite (IsLocalRing.ResidueField A)] [CharP (IsLocalRing.ResidueField A) l] [Algebra ℤ_[l] A] (κ : G →* (IsLocalRing.ResidueField A)ˣ), (∀ g, φ g ∈ Iq p → κ g = 1) → (∃ g, IsLocalRing.residue A (cycA p l A (φ g) : A) ≠ 1) → ∀ {n : ℕ} (r : G →* GL (Fin n) A), (∀ (N : ℕ) i j, IsLocallyConstant fun g => Ideal.Quotient.mk (IsLocalRing.maximalIdeal A ^ N) ((r g : Matrix (Fin n) (Fin n) A) i j)) → (∀ g, ((r g : Matrix (Fin n) (Fin n) A).map (IsLocalRing.residue A)).charpoly = (Polynomial.X - Polynomial.C (κ g : IsLocalRing.ResidueField A)) ^ n) → (∀ g, φ g ∈ Iq p → r g = 1) ∧ ∀ (K : Type) [Field K] [Algebra A K] [IsFractionRing A K] (X : Matrix (Fin n) (Fin n) K), (∀ g, algebraMap A K (cycA p l A (φ g) : A) • ((r g : Matrix (Fin n) (Fin n) A).map (algebraMap A K) * X) = X * (r g : Matrix (Fin n) (Fin n) A).map (algebraMap A K)) → X = 0 := by
+  intro p l _ _ hpl G _ _ _ φ hφ A _ _ _ _ _ _ _ κ hκ ⟨g, hg⟩ n r hr hch
+  have hl : l.Prime := Fact.out
+  have hp : p.Prime := Fact.out
+  have hlm : (l : A) ∈ IsLocalRing.maximalIdeal A := by
+    rw [← IsLocalRing.residue_eq_zero_iff, map_natCast, CharP.cast_eq_zero]
+  have hgk : ∀ k : ℕ, IsLocalRing.residue A (cycA p l A (φ (g ^ l ^ k)) : A) ≠ 1 := by
+    intro k h
+    rw [map_pow, map_pow, Units.val_pow_eq_pow_val, map_pow, ← sub_eq_zero, ← one_pow (l ^ k),
+      ← sub_pow_char_pow] at h
+    exact hg (sub_eq_zero.1 (pow_eq_zero_iff (pow_ne_zero _ hl.ne_zero) |>.1 h))
+  have hpow : ∀ (a : G) (c : A), IsLocalRing.residue A c = κ a → ∀ N i j,
+      ((r (a ^ l ^ (n + N)) : Matrix (Fin n) (Fin n) A) - Matrix.scalar (Fin n) (c ^ l ^ (n + N))) i j ∈
+        IsLocalRing.maximalIdeal A ^ (N + 1) := by
+    intro a c hc N
+    rw [map_pow, Units.val_pow_eq_pow_val, pow_add l, pow_mul, pow_mul]
+    exact matrix_pow_l_iterate_congruence _ hlm _ _ (unipotent_residue_pow_mod_maximal _ c (by rw [hch, hc])) N
+  obtain ⟨c, hc⟩ := IsLocalRing.residue_surjective (κ g : IsLocalRing.ResidueField A)
+  refine ⟨fun τ hτ => ?_, fun K _ _ _ X hX => ?_⟩
+  · have main : ∀ N : ℕ, Matrix.GeneralLinearGroup.map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal A ^ N)) (r τ) = 1 := by
+      intro N
+      haveI : Finite (A ⧸ IsLocalRing.maximalIdeal A) := inferInstanceAs (Finite (IsLocalRing.ResidueField A))
+      haveI : Finite (A ⧸ IsLocalRing.maximalIdeal A ^ N) :=
+        Ideal.finite_quotient_pow (IsNoetherian.noetherian _) N
+      let ρ : G →* GL (Fin n) (A ⧸ IsLocalRing.maximalIdeal A ^ N) :=
+        (Matrix.GeneralLinearGroup.map (Ideal.Quotient.mk (IsLocalRing.maximalIdeal A ^ N))).comp r
+      have hρ : ∀ (a : G) (c : A), IsLocalRing.residue A c = κ a →
+          (ρ (a ^ l ^ (n + N))).val =
+            Matrix.scalar (Fin n) (Ideal.Quotient.mk _ (c ^ l ^ (n + N))) := by
+        intro a c hc
+        ext i j
+        have h1 := Ideal.Quotient.eq.2 (Ideal.pow_le_pow_right (Nat.le_succ N) (hpow a c hc N i j))
+        refine h1.trans ?_
+        by_cases hab : i = j <;> simp [hab]
+      have hU : IsOpen (ρ.ker : Set G) := by
+        have : (ρ.ker : Set G) = ⋂ i, ⋂ j, (fun g => Ideal.Quotient.mk (IsLocalRing.maximalIdeal A ^ N)
+            ((r g : Matrix (Fin n) (Fin n) A) i j)) ⁻¹' {(1 : Matrix (Fin n) (Fin n) _) i j} := by
+          ext a
+          simp only [SetLike.mem_coe, MonoidHom.mem_ker, Set.mem_iInter, Set.mem_preimage, Set.mem_singleton_iff]
+          rw [Units.ext_iff, ← Matrix.ext_iff]
+          rfl
+        rw [this]
+        exact isOpen_iInter_of_finite fun i => isOpen_iInter_of_finite fun j => hr N i j _
+      let ρ' := ρ.comp ((Iq p).comap φ).subtype
+      have h1 : ∀ a : ↥((Iq p).comap φ), ρ'.rangeRestrict a ^ l ^ (n + N) = 1 := by
+        intro a
+        refine Subtype.ext (Units.ext ?_)
+        have := hρ a 1 (by rw [hκ a a.2, map_one, Units.val_one])
+        rw [one_pow, map_one, map_one, map_pow] at this
+        exact this
+      have hP : IsPGroup l ρ'.range := by
+        rintro ⟨_, a, rfl⟩
+        exact ⟨_, h1 a⟩
+      by_contra hne
+      haveI : Nontrivial ρ'.range := ⟨⟨ρ'.rangeRestrict ⟨τ, hτ⟩, 1, fun h => hne (congrArg Subtype.val h)⟩⟩
+      obtain ⟨ψ, ⟨_, a, rfl⟩, ha⟩ := exists_nontrivial_character_pgroup hP (Om p)
+      have hcm : ∀ b, (ψ.comp ρ'.rangeRestrict) b ^ l ^ (n + N) = 1 := fun b => by
+        rw [MonoidHom.comp_apply, ← map_pow, h1, map_one]
+      let a' : ↥((Iq p).comap φ) := ⟨g ^ l ^ (n + N) * a * (g ^ l ^ (n + N))⁻¹,
+        ((iqBasic p).1.comap φ).conj_mem _ a.2 _⟩
+      have h2 := tame_character_conjugation φ hφ (ψ.comp ρ'.rangeRestrict) (l ^ (n + N))
+        (fun h => hpl ((Nat.prime_dvd_prime_iff_eq hp hl).1 (hp.dvd_of_dvd_pow h))) hcm ρ.ker hU
+        (fun b hb => by
+          rw [MonoidHom.comp_apply, show ρ'.rangeRestrict b = 1 from Subtype.ext hb, map_one])
+        (g ^ l ^ (n + N)) a a' rfl
+      have h3 : ρ'.rangeRestrict a' = ρ'.rangeRestrict a := by
+        refine Subtype.ext ?_
+        change ρ (g ^ l ^ (n + N) * a * (g ^ l ^ (n + N))⁻¹) = ρ a
+        rw [map_mul, map_mul, map_inv, mul_inv_eq_iff_eq_mul]
+        refine Units.ext ?_
+        rw [Units.val_mul, Units.val_mul, hρ g c hc]
+        exact (Matrix.scalar_commute _ (fun _ => Commute.all _ _) _).eq
+      rw [MonoidHom.comp_apply, h3, ← MonoidHom.comp_apply] at h2
+      obtain ⟨y, hy⟩ := cyclotomic_congruence_fixed_root (l := l) _ _ (n + N) (by rw [← Units.val_pow_eq_pow_val]; exact congrArg Units.val (hcm a))
+        (fun h => ha (Units.ext h)) h2.symm
+      apply hgk (n + N)
+      change IsLocalRing.residue A (algebraMap ℤ_[l] A (cyc p l (φ (g ^ l ^ (n + N))) : ℤ_[l])) = 1
+      rw [sub_eq_iff_eq_add.1 hy]
+      simp
+    ext i j
+    rw [← sub_eq_zero]
+    refine IsHausdorff.haus (I := IsLocalRing.maximalIdeal A) inferInstance _ fun N => ?_
+    rw [SModEq.zero, smul_eq_mul, Ideal.mul_top, ← Ideal.Quotient.eq]
+    have := Matrix.ext_iff.2 (congrArg Units.val (main N)) i j
+    refine this.trans ?_
+
+
+[JRP_local_inertia_04] src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/IqBasic.lean:1-101
+SHA256 b52e10c6f234d809fa14ef06193dd166f17a12fc4a366deafe764dc44548d253
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.LocalPublishedTheorems
+import Development.AutomorphicArithmetic.CyclotomicBounds.ClassNumberBounds.IdealValuations.LocRootsY
+import Development.AbelianVarietyTheory.Proofs.DegenerationProofs.ExistsArithFrobeniusAbsGalois
+import Development.AbelianVarietyTheory.Proofs.FoundationProofs.IsDiscreteValuationRingIntegralClosurePadicInt
+open Formalism.WeaklyAdmissibleFiltrations Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc ReciprocityTheory.Gal TensorProduct Module UpperTheory.V.Loc Topology
+
+namespace UpperTheory.V.Loc
+
+variable {l : ℕ} [Fact l.Prime]
+
+private theorem iqb_unit (x : integralClosure ℤ_[l] (PadicAlgCl l)) (h : ‖(x : PadicAlgCl l)‖ = 1) : IsUnit x := by
+  have h0 : (x : PadicAlgCl l) ≠ 0 := by
+    intro e; rw [e, norm_zero] at h; exact zero_ne_one h
+  refine IsUnit.of_mul_eq_one ⟨(x : PadicAlgCl l)⁻¹, (GlobalTheory.isIntegral_padicInt_iff_norm_le_one _).2 ?_⟩
+    (Subtype.ext (mul_inv_cancel₀ h0))
+  rw [norm_inv, h, inv_one]
+
+private theorem iqb_local : IsLocalRing (integralClosure ℤ_[l] (PadicAlgCl l)) := by
+  refine IsLocalRing.of_isUnit_or_isUnit_one_sub_self fun x => ?_
+  have hx : ‖(x : PadicAlgCl l)‖ ≤ 1 := (GlobalTheory.isIntegral_padicInt_iff_norm_le_one _).1 x.2
+  rcases hx.eq_or_lt with h | h
+  · exact Or.inl (iqb_unit x h)
+  · refine Or.inr (iqb_unit _ ?_)
+    have : ‖(1 : PadicAlgCl l)‖ ≠ ‖-(x : PadicAlgCl l)‖ := by rw [norm_one, norm_neg]; exact h.ne'
+    have h2 := IsUltrametricDist.norm_add_eq_max_of_norm_ne_norm this
+    rw [norm_one, norm_neg, max_eq_left hx] at h2
+    simpa [sub_eq_add_neg] using h2
+
+private theorem iqb_frob : ∃ g : GQ l, IsFrob g := by
+  haveI := iqb_local (l := l)
+  have e : IsLocalRing.ResidueField ℤ_[l] ≃+* ZMod l := PadicInt.residueField
+  obtain ⟨g, hg⟩ := GlobalTheory.exists_arithFrobenius_absGalois ℤ_[l] ℚ_[l] (Finite.of_equiv _ e.symm.toEquiv) (PadicAlgCl l)
+  refine ⟨g, fun x hx => ?_⟩
+  obtain ⟨y, hy, hm⟩ := hg ⟨x, (GlobalTheory.isIntegral_padicInt_iff_norm_le_one _).2 hx⟩
+  rw [Nat.card_congr e.toEquiv, Nat.card_zmod] at hm
+  have hle := (GlobalTheory.isIntegral_padicInt_iff_norm_le_one _).1
+    (y - (⟨x, (GlobalTheory.isIntegral_padicInt_iff_norm_le_one _).2 hx⟩ : integralClosure ℤ_[l] (PadicAlgCl l)) ^ l).2
+  have hne := mt (iqb_unit _) hm
+  have := lt_of_le_of_ne hle hne
+  simpa [hy] using this
+
+private theorem iqb_norm (g : GQ l) (x : Om l) : ‖g x‖ = ‖x‖ := KStar.IdealValuations.norm_aut_and_roots.1 g x
+
+private theorem iqb_sub {x y : Om l} (hx : ‖x‖ < 1) (hy : ‖y‖ < 1) : ‖x - y‖ < 1 := by
+  rw [sub_eq_add_neg]
+  exact (IsUltrametricDist.norm_add_le_max _ _).trans_lt (max_lt hx (by rwa [norm_neg]))
+
+private theorem iqb_mem (g : GQ l) : g ∈ Iq l ↔ ∀ x : Om l, ‖x‖ ≤ 1 → ‖g x - x‖ < 1 := by
+  rw [Iq, IntermediateField.mem_fixingSubgroup_iff]
+  constructor
+  · intro hg x hx
+    rcases lt_or_eq_of_le hx with hlt | heq
+    · exact iqb_sub (by rwa [iqb_norm]) hlt
+    · obtain ⟨m, ζ, hm, hζ, hxζ⟩ := KStar.IdealValuations.exists_root_congr heq
+      have hm0 : 0 < m := Nat.pos_of_ne_zero (by rintro rfl; exact hm (dvd_zero l))
+      have h1 : g ζ = ζ := hg ζ (IntermediateField.subset_adjoin _ _ ⟨m, hm0, hm, hζ⟩)
+      have h2 : g x - x = g (x - ζ) - (x - ζ) := by rw [map_sub, h1]; ring
+      rw [h2]
+      exact iqb_sub (by rwa [iqb_norm]) hxζ
+  · intro hg x hx
+    have hle : MaximalUnramifiedExtension l ≤ IntermediateField.fixedField (Subgroup.zpowers g) := by
+      rw [MaximalUnramifiedExtension, IntermediateField.adjoin_le_iff]
+      rintro ζ ⟨m, hm0, hm, hζ⟩
+      have hn : ‖ζ‖ = 1 := by
+        have h1 : ‖ζ‖ ^ m = 1 := by rw [← norm_pow, hζ, norm_one]
+        exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) hm0.ne').mp h1
+      have h1 : g ζ = ζ := KStar.IdealValuations.norm_aut_and_roots.2 m _ _ hm (by rw [← map_pow, hζ, map_one]) hζ
+        (hg ζ hn.le)
+      have h2 : Subgroup.zpowers g ≤ MulAction.stabilizer (GQ l) ζ :=
+        (Subgroup.zpowers_le (G := GQ l)).2 h1
+      exact (IntermediateField.mem_fixedField_iff _ _).2 fun f hf => h2 hf
+    exact (IntermediateField.mem_fixedField_iff _ _).1 (hle hx) g (Subgroup.mem_zpowers g)
+
+end UpperTheory.V.Loc
+
+theorem UpperTheory.V.Loc.iqBasic :
+    ∀ (v : ℕ) [Fact v.Prime], (Iq v).Normal ∧ IsClosed (Iq v : Set (GQ v)) ∧ (∀ g : GQ v, g ∈ Iq v ↔ ∀ x : Om v, ‖x‖ ≤ 1 → ‖g x - x‖ < 1) ∧ (∃ σ : GQ v, IsFrob σ) ∧ ∀ σ σ' : GQ v, IsFrob σ → (IsFrob σ' ↔ σ⁻¹ * σ' ∈ Iq v) := by
+  intro v _
+  refine ⟨⟨fun n hn g => ?_⟩, ?_, iqb_mem, iqb_frob, fun σ σ' hσ => ?_⟩
+  · rw [iqb_mem] at hn ⊢
+    intro x hx
+    have h := hn (g⁻¹ x) (by rwa [iqb_norm])
+    have e : (g * n * g⁻¹) x - x = g (n (g⁻¹ x) - g⁻¹ x) := by
+      rw [map_sub, AlgEquiv.mul_apply, AlgEquiv.mul_apply, ← AlgEquiv.mul_apply g g⁻¹ x, mul_inv_cancel,
+        AlgEquiv.one_apply]
+    rwa [e, iqb_norm]
+  · have : IsGalois ℚ_[v] (Om v) := {}
+    exact InfiniteGalois.fixingSubgroup_isClosed (MaximalUnramifiedExtension v)
+  · have e : ∀ x : Om v, ‖(σ⁻¹ * σ') x - x‖ = ‖σ' x - σ x‖ := fun x => by
+      rw [← iqb_norm σ, map_sub, ← AlgEquiv.mul_apply, mul_inv_cancel_left]
+    rw [iqb_mem]
+    simp only [e]
+    constructor
+    · intro h x hx
+      have h2 : σ' x - σ x = (σ' x - x ^ v) - (σ x - x ^ v) := by ring
+      rw [h2]
+      exact iqb_sub (h x hx) (hσ x hx)
+    · intro h x hx
+      have h2 : σ' x - x ^ v = (σ' x - σ x) - -(σ x - x ^ v) := by ring
+      rw [h2]
+      exact iqb_sub (h x hx) (by rw [norm_neg]; exact hσ x hx)
+
+
+[JRP_actual_auxiliary_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/PointRepUnramifiedAtAuxiliaryPlace.lean:71-144
+SHA256 ea28855e8c08ae1fa5b30f8d203d920950daa3ea52320f2726736c11b9b8a584
+private theorem jv_model {l : ℕ} [hl : Fact l.Prime] {G : Type} [Group G] [TopologicalSpace G] [CompactSpace G] {n : ℕ}
+    (E : IntermediateField ℚ_[l] (PadicAlgCl l)) (c : Coef l) (hc : ∀ x, x ∈ c.O ↔ x ∈ E ∧ ‖x‖ ≤ 1)
+    (r : G →* GL (Fin n) (PadicAlgCl l)) (hr : ∀ i j, Continuous fun g => (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j)
+    (hE : ∀ g i j, (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ E) :
+    ∃ (Q : GL (Fin n) (PadicAlgCl l)) (r₀ : G →* GL (Fin n) c.O),
+      ∀ g, r g * Q = Q * pushRep (algebraMap c.O (PadicAlgCl l)) r₀ g := by
+  classical
+  letI : Algebra c.O E :=
+    ((algebraMap c.O (PadicAlgCl l)).codRestrict E (fun a => ((hc a).1 a.2).1)).toAlgebra
+  have hφ : ∀ a : c.O, ((algebraMap c.O E a : E) : PadicAlgCl l) = a := fun a => rfl
+  haveI := isFractionRing_coef_of_mem_iff_norm_le_one E c hc hφ
+  let ι : E →+* PadicAlgCl l := algebraMap E (PadicAlgCl l)
+  have hι : ∀ e : E, ι e = (e : PadicAlgCl l) := fun e => rfl
+  have hinjM : Function.Injective (ι.mapMatrix : Matrix (Fin n) (Fin n) E →+* _) := by
+    intro A A' h
+    ext i j
+    have := congrFun (congrFun h i) j
+    exact this
+  let M : G →* Matrix (Fin n) (Fin n) E :=
+    { toFun := fun g => Matrix.of fun i j => ⟨(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j, hE g i j⟩
+      map_one' := by
+        apply hinjM
+        ext i j
+        simp [hι, Matrix.one_apply]
+        split_ifs <;> rfl
+      map_mul' := by
+        intro g h
+        apply hinjM
+        ext i j
+        simp [hι, Matrix.mul_apply] }
+  have hM : ∀ g, ι.mapMatrix (M g) = (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) := by
+    intro g
+    ext i j
+    rfl
+  let rE : G →* GL (Fin n) E := M.toHomUnits
+  have hb : ∀ i j, ∃ C : ℝ, ∀ g, ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j‖ ≤ C := by
+    intro i j
+    obtain ⟨C, hC⟩ := isBounded_iff_forall_norm_le.1 (isCompact_range (hr i j)).isBounded
+    exact ⟨C, fun g => hC _ ⟨g, rfl⟩⟩
+  choose C hC using hb
+  obtain ⟨N, hN⟩ := jv_small (l := l) (∑ i, ∑ j, |C i j|)
+  have hbd : ∀ g i j, ‖(r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j‖ ≤ ∑ i, ∑ j, |C i j| := by
+    intro g i j
+    refine (hC i j g).trans ((le_abs_self _).trans ?_)
+    refine (Finset.single_le_sum (f := fun j => |C i j|) (fun _ _ => abs_nonneg _) (Finset.mem_univ j)).trans ?_
+    exact Finset.single_le_sum (f := fun i => ∑ j, |C i j|) (fun _ _ => Finset.sum_nonneg fun _ _ => abs_nonneg _) (Finset.mem_univ i)
+  have hlO : ((l : PadicAlgCl l)) ∈ c.O := Subalgebra.natCast_mem _ _
+  have hl0 : ((l : PadicAlgCl l)) ≠ 0 := by exact_mod_cast (Fact.out : l.Prime).ne_zero
+  let d : c.O := ⟨(l : PadicAlgCl l) ^ N, c.O.pow_mem hlO N⟩
+  have hd : d ≠ 0 := by
+    intro h
+    apply pow_ne_zero N hl0
+    exact congrArg Subtype.val h
+  have hint : ∀ g i j, ∃ a : c.O, algebraMap c.O E d * (rE g : Matrix (Fin n) (Fin n) E) i j = algebraMap c.O E a := by
+    intro g i j
+    have hmem : (l : PadicAlgCl l) ^ N * (r g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j ∈ c.O := by
+      rw [hc]
+      refine ⟨E.mul_mem (pow_mem (E.natCast_mem l) N) (hE g i j), ?_⟩
+      rw [norm_mul]
+      exact (mul_le_mul_of_nonneg_left (hbd g i j) (norm_nonneg _)).trans hN
+    exact ⟨⟨_, hmem⟩, Subtype.ext rfl⟩
+  obtain ⟨Q, r₀, hQ⟩ := Pa.Det.latInt rE d hd hint
+  refine ⟨Matrix.GeneralLinearGroup.map ι Q, r₀, fun g => ?_⟩
+  have key := congrArg (Matrix.GeneralLinearGroup.map ι) (hQ g)
+  rw [map_mul, map_mul] at key
+  have h1 : Matrix.GeneralLinearGroup.map ι (rE g) = r g := by
+    ext i j
+    rfl
+  have h2 : Matrix.GeneralLinearGroup.map ι (pushRep (algebraMap c.O E) r₀ g) =
+      pushRep (algebraMap c.O (PadicAlgCl l)) r₀ g := by
+    ext i j
+    rfl
+  rw [h1, h2] at key
+  exact key
+
+
+[JRP_actual_auxiliary_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/PointRepUnramifiedAtAuxiliaryPlace.lean:146-176
+SHA256 05d7967736301a991dc970b6cc197724dbf7457205a76b8e085310f069295e0e
+private theorem jv_cont {l : ℕ} [hl : Fact l.Prime] {G : Type} [TopologicalSpace G]
+    (E : IntermediateField ℚ_[l] (PadicAlgCl l)) (c : Coef l) (hc : ∀ x, x ∈ c.O ↔ x ∈ E ∧ ‖x‖ ≤ 1)
+    (f : G → c.O) (hf : Continuous fun g => (f g : PadicAlgCl l)) (N : ℕ) :
+    IsLocallyConstant fun g => Ideal.Quotient.mk (maximalIdeal c.O ^ N) (f g) := by
+  obtain ⟨ϖ, hϖ⟩ := IsDiscreteValuationRing.exists_irreducible c.O
+  have hm : maximalIdeal c.O ^ N = Ideal.span {ϖ ^ N} := by
+    rw [(IsDiscreteValuationRing.irreducible_iff_uniformizer ϖ).1 hϖ, Ideal.span_singleton_pow]
+  have hne : ((ϖ ^ N : c.O) : PadicAlgCl l) ≠ 0 := by
+    have h0 : ϖ ^ N ≠ 0 := pow_ne_zero _ hϖ.ne_zero
+    exact fun h => h0 (Subtype.ext h)
+  have hδ : 0 < ‖((ϖ ^ N : c.O) : PadicAlgCl l)‖ := norm_pos_iff.2 hne
+  have key : ∀ z : c.O, ‖(z : PadicAlgCl l)‖ < ‖((ϖ ^ N : c.O) : PadicAlgCl l)‖ →
+      z ∈ maximalIdeal c.O ^ N := by
+    intro z hz
+    rw [hm, Ideal.mem_span_singleton']
+    have hq : (z : PadicAlgCl l) / ((ϖ ^ N : c.O) : PadicAlgCl l) ∈ c.O := by
+      rw [hc]
+      refine ⟨E.div_mem ((hc _).1 z.2).1 ((hc _).1 (ϖ ^ N).2).1, ?_⟩
+      rw [norm_div, div_le_one hδ]
+      exact hz.le
+    refine ⟨⟨_, hq⟩, Subtype.ext ?_⟩
+    show (z : PadicAlgCl l) / ((ϖ ^ N : c.O) : PadicAlgCl l) * ((ϖ ^ N : c.O) : PadicAlgCl l) = z
+    exact div_mul_cancel₀ _ hne
+  rw [IsLocallyConstant.iff_exists_open]
+  intro g0
+  refine ⟨(fun g => (f g : PadicAlgCl l)) ⁻¹' Metric.ball (f g0 : PadicAlgCl l) ‖((ϖ ^ N : c.O) : PadicAlgCl l)‖,
+    Metric.isOpen_ball.preimage hf, Metric.mem_ball_self hδ, ?_⟩
+  intro g hg
+  rw [Ideal.Quotient.eq]
+  apply key
+  simpa [dist_eq_norm] using hg
+
+
+[JRP_actual_auxiliary_03] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/PointRepUnramifiedAtAuxiliaryPlace.lean:285-365
+SHA256 81ddbbedab6a319268876fb27c6517acbc019aa6d5ee29d74979b8118fa70160
+private theorem jv_local {p l : ℕ} [Fact p.Prime] [hl : Fact l.Prime] (hpl : p ≠ l) {G : Type} [Group G] [TopologicalSpace G]
+    [IsTopologicalGroup G] [CompactSpace G] [T2Space G] (φ : G →* GQ p) (hφ : IsOpenEmbedding φ) (c : Coef l) (R : Type) [CommRing R]
+    [Algebra c.O R] [Alg.IsCO c.O R] (y : R →ₐ[c.O] PadicAlgCl l) {n : ℕ} (ρ : G →* GL (Fin n) (PadicAlgCl l)) (hρ : Continuous ρ)
+    (κ : G →* (ResidueField c.O)ˣ) (hκ : ∀ g, φ g ∈ Loc.Iq p → κ g = 1)
+    (hω : ∃ g, residue c.O (algebraMap ℤ_[l] c.O (Loc.cyc p l (φ g) : ℤ_[l])) ≠ 1) (χ : G → R[X])
+    (h1 : ∀ g, (χ g).map (y : R →+* PadicAlgCl l) = (mat ρ g).charpoly)
+    (h2 : ∀ g, (χ g).map (Alg.res c.O R : R →+* ResidueField c.O) = (X - C (κ g : ResidueField c.O)) ^ n) :
+    ∀ g, φ g ∈ Loc.Iq p → ρ g = 1 := by
+  have hρe : ∀ i j, Continuous fun g => (ρ g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) i j :=
+    fun i j => (Units.continuous_val.comp hρ).matrix_elem i j
+  obtain ⟨K, hKfd, hK⟩ := GlobalTheory.CompactRepField.exists_finiteDimensional_entries_mem l G n ρ hρe
+  obtain ⟨E, hEfd, hKE, hcE⟩ := exists_finiteDimensional_ge_forall_coef_integer_mem c K
+  obtain ⟨c', hc'⟩ := X.So.coefOf l E
+  have hle : c.O ≤ c'.O := fun x hx => (hc' x).2 ⟨hcE ⟨x, hx⟩, norm_coe_coef_integer_le_one c ⟨x, hx⟩⟩
+  obtain ⟨Q, r₀, hQ⟩ := jv_model E c' hc' ρ hρe (fun g i j => hKE (hK g i j))
+  obtain ⟨hcomp, hfin, hlmem, -, -, -⟩ := abelian₂.dvr_finite l c'.O
+  haveI := hcomp
+  haveI := hfin
+  haveI : CharP (ResidueField c'.O) l := (CharP.charP_iff_prime_eq_zero hl.out).2 (by
+    rw [← map_natCast (residue c'.O)]
+    exact (residue_eq_zero_iff _).2 hlmem)
+  haveI := isLocalHom_inclusion_coef_of_le c c' hle
+  have hconj : ∀ g, pushRep (algebraMap c'.O (PadicAlgCl l)) r₀ g = Q⁻¹ * ρ g * Q := by
+    intro g
+    rw [mul_assoc, hQ g, ← mul_assoc, inv_mul_cancel, one_mul]
+  have hcont : ∀ i j, Continuous fun g => ((r₀ g : Matrix (Fin n) (Fin n) c'.O) i j : PadicAlgCl l) := by
+    intro i j
+    have e : (fun g => ((r₀ g : Matrix (Fin n) (Fin n) c'.O) i j : PadicAlgCl l)) = fun g =>
+        (((Q⁻¹ : GL (Fin n) (PadicAlgCl l)) : Matrix (Fin n) (Fin n) (PadicAlgCl l)) *
+          (ρ g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) * (Q : Matrix (Fin n) (Fin n) (PadicAlgCl l))) i j := by
+      funext g
+      rw [← Units.val_mul, ← Units.val_mul, ← hconj g]
+      rfl
+    rw [e]
+    exact ((continuous_const.matrix_mul (Units.continuous_val.comp hρ)).matrix_mul continuous_const).matrix_elem i j
+  have hcp : ∀ g, ((r₀ g : Matrix (Fin n) (Fin n) c'.O).charpoly).map (algebraMap c'.O (PadicAlgCl l)) =
+      (χ g).map (y : R →+* PadicAlgCl l) := by
+    intro g
+    rw [← Matrix.charpoly_map, h1 g]
+    have e : (r₀ g : Matrix (Fin n) (Fin n) c'.O).map (algebraMap c'.O (PadicAlgCl l)) =
+        ((Q : Matrix (Fin n) (Fin n) (PadicAlgCl l)))⁻¹ * (ρ g : Matrix (Fin n) (Fin n) (PadicAlgCl l)) *
+          (Q : Matrix (Fin n) (Fin n) (PadicAlgCl l)) := by
+      rw [← Matrix.coe_units_inv, ← Units.val_mul, ← Units.val_mul, ← hconj g]
+      rfl
+    rw [e, Matrix.charpoly_units_conj']
+    rfl
+  set ιr := ResidueField.map (Subalgebra.inclusion hle).toRingHom with hιr
+  set κ' : G →* (ResidueField c'.O)ˣ := (Units.map ιr.toMonoidHom).comp κ with hκ'
+  have hred : ∀ g, ((r₀ g : Matrix (Fin n) (Fin n) c'.O).map (residue c'.O)).charpoly =
+      (X - C (κ' g : ResidueField c'.O)) ^ n := by
+    intro g
+    rw [Matrix.charpoly_map]
+    have e : ((r₀ g : Matrix (Fin n) (Fin n) c'.O).charpoly).map (residue c'.O) =
+        ((χ g).map (Alg.res c.O R : R →+* ResidueField c.O)).map ιr := by
+      ext k
+      rw [coeff_map, coeff_map, coeff_map]
+      apply resid_h4_lemma_6 c c' hle R y
+      have := congrArg (fun p => p.coeff k) (hcp g)
+      simp only [coeff_map] at this
+      exact this
+    rw [e, h2 g]
+    simp [hκ', Polynomial.map_pow]
+  have hω' : ∃ g, residue c'.O ↑(Loc.cycA p l c'.O (φ g)) ≠ 1 := by
+    obtain ⟨g, hg⟩ := hω
+    refine ⟨g, fun h => hg ?_⟩
+    have e : (↑(Loc.cycA p l c'.O (φ g)) : c'.O) =
+        (Subalgebra.inclusion hle).toRingHom (algebraMap ℤ_[l] c.O (Loc.cyc p l (φ g) : ℤ_[l])) := rfl
+    rw [e, ← ResidueField.map_residue] at h
+    apply ιr.injective
+    rw [h, map_one]
+  have key := (Loc.v0b hpl φ hφ c'.O κ' (fun g hg => by simp [hκ', hκ g hg]) hω' r₀
+    (fun N i j => jv_cont E c' hc' _ (hcont i j) N) hred).1
+  intro g hg
+  have hp1 : pushRep (algebraMap c'.O (PadicAlgCl l)) r₀ g = 1 := by
+    refine Units.ext (Matrix.ext fun i j => ?_)
+    show algebraMap c'.O (PadicAlgCl l) ((r₀ g : Matrix (Fin n) (Fin n) c'.O) i j) = _
+    rw [key g hg, Units.val_one, Units.val_one, Matrix.one_apply, Matrix.one_apply]
+    split_ifs <;> simp
+  have e := hQ g
+  rw [hp1, mul_one] at e
+  exact mul_right_cancel (e.trans (one_mul Q).symm)
+
+
+[JRP_actual_auxiliary_04] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/PointRepUnramifiedAtAuxiliaryPlace.lean:367-475
+SHA256 3bca672e1650d938c1400012642e782ff83493e319884722218b3ce5b93339a6
+theorem UpperTheory.V.Hi.point_rep_unramified_at_auxiliary_place {l : ℕ} [Fact l.Prime] {L Ω : Type} [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω]
+    [IsAlgClosure L Ω] {s : HidaSetting l L Ω} {V : s.Lev} {c : Coef l} {n : ℕ} (hn : 1 ≤ n) {r : Resid V.frame c.O n} (B : UniversalOrdinaryDeterminantRing r)
+    (h : r.V0ok) (x : B.B →ₐ[c.O] PadicAlgCl l) (ρ : V.frame.G₀ →* GL (Fin n) (PadicAlgCl l)) (hρ : Continuous ρ)
+    (hx : B.u.D.map (x : B.B →+* PadicAlgCl l) = GDet.ofRep (mat ρ)) : ∀ g ∈ V.frame.I0, ρ g = 1 := by
+  intro g hg
+  change g ∈ Subgroup.map V.pr (Ine (s.A s.v0)) at hg
+  obtain ⟨d, hd, rfl⟩ := hg
+  haveI : Fact s.p.Prime := ⟨s.p_prime⟩
+  have hpv : ((s.p : ℕ) : 𝓞 (Lp L)) ∈ s.v0.asIdeal := by
+    have hcard : Nat.card (𝓞 (Lp L) ⧸ s.v0.asIdeal) = s.p := s.norm_v0_eq_one
+    haveI : Finite (𝓞 (Lp L) ⧸ s.v0.asIdeal) :=
+      Nat.finite_of_card_ne_zero (by rw [hcard]; exact s.p_prime.ne_zero)
+    letI := Fintype.ofFinite (𝓞 (Lp L) ⧸ s.v0.asIdeal)
+    rw [← Ideal.Quotient.eq_zero_iff_mem, map_natCast, ← hcard, Nat.card_eq_fintype_card]
+    exact Nat.cast_card_eq_zero _
+  haveI : CharZero Ω := charZero_of_injective_algebraMap (algebraMap L Ω).injective
+  obtain ⟨j, hj⟩ := (Loc.decEmb (F := Lp L) (Ω := Ω) (v := s.p)).1 (s.A s.v0) s.v0 (s.hA s.v0) hpv
+  obtain ⟨-, φ, hφo, -, -, hIne, hcyc, -⟩ := (Loc.decEmb (F := Lp L) (Ω := Ω) (v := s.p)).2 j
+  have hDr : Dec (Loc.placeJ j) ≤ (resP L Ω).range := hj ▸ s.19 s.v0 (Or.inr (Or.inr rfl))
+  obtain ⟨ψ0, hψ0⟩ : ∃ ψ0 : ↥(Dec (Loc.placeJ j)) →* V.frame.G₀,
+      ∀ x, (ψ0 x).1 = toGS Ω V.S' (x : G (Lp L) Ω) :=
+    ⟨MonoidHom.codRestrict ((toGS Ω V.S').comp (Dec (Loc.placeJ j)).subtype) V.η.ker
+      (fun x => (V.6 x).2 (hDr x.2)), fun _ => rfl⟩
+  have hpr : ∀ x : ↥(Dec (Loc.placeJ j)), ∃ e : G L Ω, e ∈ Dec (s.A s.v0) ∧
+      resP L Ω e = x ∧ ψ0 x = V.pr e := by
+    intro x
+    obtain ⟨e, he⟩ := hDr x.2
+    refine ⟨e, ?_, he, ?_⟩
+    · have hx := x.2
+      rw [← he, hj] at hx
+      exact hx
+    · apply Subtype.ext
+      rw [hψ0, ← he]
+      rfl
+  have hψc : Continuous ψ0 := by
+    apply continuous_induced_rng.2
+    exact ((continuous_toGS Ω V.S').comp continuous_subtype_val).congr (fun t => (hψ0 t).symm)
+  haveI : CompactSpace ↥(Dec (Loc.placeJ j)) :=
+    isCompact_iff_compactSpace.1 (isClosed_Dec (F := Lp L) (Loc.placeJ j)).isCompact
+  have hD0 : ∀ x : ↥(Dec (Loc.placeJ j)), ψ0 x ∈ V.frame.D0 := by
+    intro x
+    obtain ⟨e, he, -, hx⟩ := hpr x
+    rw [hx]
+    exact Subgroup.mem_map_of_mem _ he
+  have hIq : ∀ t : ↥(Dec (Loc.placeJ j)), φ t ∈ Loc.Iq s.p → ψ0 t ∈ V.frame.I0 := by
+    intro t ht
+    obtain ⟨e, -, he, hte⟩ := hpr t
+    rw [hte]
+    refine Subgroup.mem_map_of_mem _ ?_
+    have h1 := (hIne t).1 ht
+    rw [← he, hj] at h1
+    exact h1
+  delta Resid.V0ok at h
+  obtain ⟨hI0, hDeq, g1, hg1, hg1e⟩ := h
+  have i0 : Fin n := ⟨0, hn⟩
+  have hκ : ∀ t, φ t ∈ Loc.Iq s.p → ((r.chib i0).comp ψ0) t = 1 := fun t ht => hI0 i0 (hIq t ht)
+  change g1 ∈ Subgroup.map V.pr (Dec (s.A s.v0)) at hg1
+  obtain ⟨e1, he1, rfl⟩ := hg1
+  have hω : ∃ t, residue c.O (algebraMap ℤ_[l] c.O (Loc.cyc s.p l (φ t) : ℤ_[l])) ≠ 1 := by
+    refine ⟨⟨resP L Ω e1, by rw [hj]; exact he1⟩, ?_⟩
+    rw [hcyc l]
+    intro hcon
+    apply hg1e
+    apply Units.ext
+    delta GFrame.eps
+    have hε1 : (V.frame.ε (V.pr e1).1 : ℤ_[l]ˣ) = cycZ (Lp L) Ω l (resP L Ω e1) :=
+      DFunLike.congr_fun V.hε (resP L Ω e1)
+    simp only [pushCh, MonoidHom.comp_apply, Units.coe_map, Subgroup.coe_subtype, hε1,
+      MonoidHom.coe_coe, RingHom.comp_apply, Units.val_one, IsLocalRing.ResidueField.algebraMap_eq]
+    change ((residue c.O).comp (algebraMap ℤ_[l] c.O)) ((V.frame.ε (V.pr e1).1 : ℤ_[l]ˣ) : ℤ_[l]) = 1
+    rw [hε1, RingHom.comp_apply]
+    exact hcon
+  have hs : ∀ (A' : Type) [CommRing A'] (f : B.B →+* A') (t : ↥(Dec (Loc.placeJ j))),
+      MonoidAlgebra.mapRingHom V.frame.G₀ f (MonoidAlgebra.single (ψ0 t) 1) = MonoidAlgebra.single (ψ0 t) 1 := by
+    intro A' _ f t
+    simp [MonoidAlgebra.mapRingHom]
+  have key := jv_local (p := s.p) (l := l) s.p_ne φ hφo c B.B x (ρ.comp ψ0) (hρ.comp hψc)
+    ((r.chib i0).comp ψ0) hκ hω (fun t => B.u.D.chi (MonoidAlgebra.single (ψ0 t) 1)) ?_ ?_
+  · have hdD : resP L Ω d ∈ Dec (Loc.placeJ j) := by
+      rw [hj]
+      exact Ine_le_Dec _ hd
+    have hφt : φ ⟨resP L Ω d, hdD⟩ ∈ Loc.Iq s.p := by
+      rw [hIne]
+      show resP L Ω d ∈ Ine (Loc.placeJ j)
+      rw [hj]
+      exact hd
+    have h0 := key _ hφt
+    have hψt : ψ0 ⟨resP L Ω d, hdD⟩ = V.pr d := by
+      apply Subtype.ext
+      rw [hψ0]
+      rfl
+    rw [MonoidHom.comp_apply, hψt] at h0
+    exact h0
+  · intro t
+    have e := (AlgebraTools.Det.mapApi B.u.D (x : B.B →+* PadicAlgCl l)).1 (MonoidAlgebra.single (ψ0 t) 1)
+    rw [hs, hx] at e
+    rw [← e, (AlgebraTools.Det.repApi (mat ρ)).2.1]
+    rfl
+  · intro t
+    have e := (AlgebraTools.Det.mapApi B.u.D (Alg.res c.O B.B : B.B →+* ResidueField c.O)).1
+      (MonoidAlgebra.single (ψ0 t) 1)
+    rw [hs, B.u.red] at e
+    rw [← e]
+    delta Resid.Dbar
+    rw [(AlgebraTools.Det.repApi (diagRep r.chib)).2.1]
+    change (Matrix.diagonal fun i => ((r.chib i (ψ0 t) : (ResidueField c.O)ˣ) : ResidueField c.O)).charpoly = _
+    rw [Matrix.charpoly_diagonal]
+    have hc : ∀ i, r.chib i (ψ0 t) = r.chib i0 (ψ0 t) := fun i => hDeq _ (hD0 t) i i0
+    simp only [hc, Finset.prod_const, Finset.card_univ, Fintype.card_fin, MonoidHom.comp_apply]
+
+
+[JRP_actual_auxiliary_05] src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/DecEmb.lean:12-116
+SHA256 532060dc5ca2df92895747118eaab1122e41d5024c6bc03a0c16b623d3ce0bfb
+private theorem de_ine {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] [IsAlgClosure F Ω]
+    {v : ℕ} [Fact v.Prime] {A : ValuationSubring Ω} {j : Ω →+* Om v} (hj : ∀ x, x ∈ A ↔ ‖j x‖ ≤ 1)
+    (g : ↥(Dec (F := F) A)) (σ : GQ v) (hi : ∀ y, σ (j y) = j ((g : G F Ω) y)) :
+    σ ∈ Iq v ↔ (g : G F Ω) ∈ Ine (F := F) A := by
+  haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
+  have hnorm : ∀ y, ‖j y‖ < 1 ↔ A.valuation y < 1 := GlobalTheory.DecLocal.norm_lt_one_iff A j hj
+  have hle : ∀ y, A.valuation y ≤ 1 ↔ ‖j y‖ ≤ 1 := fun y => by
+    rw [ValuationSubring.valuation_le_one_iff, hj]
+  rw [(iqBasic v).2.2.1 σ]
+  change _ ↔ (g : G F Ω) ∈ ValuationSubring.decompositionSubgroup F A ∧
+    ∀ x, A.valuation x ≤ 1 → A.valuation ((g : G F Ω) x - x) < 1
+  constructor
+  · intro h
+    refine ⟨g.2, fun x hx => ?_⟩
+    rw [← hnorm, map_sub, ← hi]
+    exact h (j x) ((hle x).mp hx)
+  · rintro ⟨-, h⟩ y hy
+    obtain ⟨x, hx⟩ := (GlobalTheory.PlaceBridge.denseRange_embedding j).exists_dist_lt y one_pos
+    rw [dist_eq_norm] at hx
+    have hjx : ‖j x‖ ≤ 1 := by
+      have hm := IsUltrametricDist.norm_add_le_max y (-(y - j x))
+      rw [norm_neg, ← sub_eq_add_neg, sub_sub_cancel] at hm
+      exact hm.trans (max_le hy hx.le)
+    have h3 : ‖σ (j x) - j x‖ < 1 := by
+      rw [hi, ← map_sub, hnorm]
+      exact h x ((hle x).mpr hjx)
+    have hdecomp : σ y - y = (σ (y - j x) - (y - j x)) + (σ (j x) - j x) := by
+      rw [map_sub]
+      ring
+    have h1 : ‖σ (y - j x)‖ < 1 := by
+      rw [GlobalTheory.PlaceBridge.norm_algEquiv]
+      exact hx
+    have h5 : ‖σ (y - j x) - (y - j x)‖ < 1 := by
+      have hm := IsUltrametricDist.norm_add_le_max (σ (y - j x)) (-(y - j x))
+      rw [norm_neg, ← sub_eq_add_neg] at hm
+      exact lt_of_le_of_lt hm (max_lt h1 hx)
+    rw [hdecomp]
+    exact lt_of_le_of_lt (IsUltrametricDist.norm_add_le_max _ _) (max_lt h5 h3)
+
+private theorem de_cyc {F Ω : Type} [Field F] [Field Ω] [CharZero Ω] [Algebra F Ω] [IsAlgClosed Ω]
+    {v : ℕ} [Fact v.Prime] {j : Ω →+* Om v} (l : ℕ) [Fact l.Prime]
+    (g : G F Ω) (σ : GQ v) (hi : ∀ y, σ (j y) = j (g y)) :
+    UpperTheory.V.Loc.cyc v l σ = cycZ F Ω l g := by
+  have hjinj : Function.Injective j := j.injective
+  simp only [UpperTheory.V.Loc.cyc, ReciprocityTheory.Gal.cycZ, MonoidHom.comp_apply]
+  apply Units.ext
+  apply (PadicInt.ext_of_toZModPow).mp
+  intro n
+  haveI : NeZero (l ^ n) := ⟨pow_ne_zero _ (Fact.out : l.Prime).ne_zero⟩
+  obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (l ^ n)
+  have h1 := cyclotomicCharacter.spec l (MulSemiringAction.toRingAut (G F Ω) Ω g) ζ hζ.pow_eq_one
+  have h2 := cyclotomicCharacter.spec l (MulSemiringAction.toRingAut (GQ v) (Om v) σ) (j ζ)
+    (by rw [← map_pow, hζ.pow_eq_one, map_one])
+  rw [show (MulSemiringAction.toRingAut (G F Ω) Ω g) ζ = g ζ from rfl] at h1
+  rw [show (MulSemiringAction.toRingAut (GQ v) (Om v) σ) (j ζ) = σ (j ζ) from rfl] at h2
+  rw [hi, h1, ← map_pow] at h2
+  have h4 := hζ.pow_inj (ZMod.val_lt _) (ZMod.val_lt _) (hjinj h2)
+  exact (ZMod.val_injective _ h4).symm
+
+theorem UpperTheory.V.Loc.decEmb :
+    ∀ {F Ω : Type} [Field F] [NumberField F] [Field Ω] [CharZero Ω] [Algebra F Ω] [IsAlgClosure F Ω] {v : ℕ} [Fact v.Prime], (∀ (A : ValuationSubring Ω) (w : HeightOneSpectrum (𝓞 F)), IsPlaceOver A w → ((v : ℕ) : 𝓞 F) ∈ w.asIdeal → ∃ j : Ω →+* Om v, placeJ j = A) ∧ ∀ j : Ω →+* Om v, (∃ w : HeightOneSpectrum (𝓞 F), IsPlaceOver (placeJ j) w ∧ ((v : ℕ) : 𝓞 F) ∈ w.asIdeal) ∧ ∃ φ : ↥(Dec (F := F) (placeJ j)) →* GQ v, IsOpenEmbedding φ ∧ (∀ g y, φ g (j y) = j ((g : G F Ω) y)) ∧ (∀ σ : GQ v, σ ∈ φ.range ↔ ∀ x : F, σ (j (algebraMap F Ω x)) = j (algebraMap F Ω x)) ∧ (∀ g, φ g ∈ Iq v ↔ (g : G F Ω) ∈ Ine (F := F) (placeJ j)) ∧ (∀ (l : ℕ) [Fact l.Prime] g, UpperTheory.V.Loc.cyc v l (φ g) = cycZ F Ω l (g : G F Ω)) ∧ ∀ w : HeightOneSpectrum (𝓞 F), IsPlaceOver (placeJ j) w → φ.range.index = locDeg w := by
+  intro F Ω _ _ _ _ _ _ v _
+  haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed F
+  refine ⟨?_, ?_⟩
+  · intro A w hA hw
+    obtain ⟨j, hj⟩ := GlobalTheory.PlaceBridge.exists_embedding (l := v) F Ω w A hw hA
+    refine ⟨j, ?_⟩
+    ext x
+    rw [de_mem, hj]
+  · intro j
+    have hj : ∀ x, x ∈ placeJ j ↔ ‖j x‖ ≤ 1 := de_mem j
+    refine ⟨?_, ?_⟩
+    · have hlt : (placeJ j).valuation ((v : ℕ) : Ω) < 1 := by
+        rw [← GlobalTheory.DecLocal.norm_lt_one_iff _ j hj, map_natCast]
+        exact GlobalTheory.PlaceBridge.norm_l_lt_one
+      obtain ⟨w, hw, hpo⟩ := GlobalTheory.DecLocal.exists_place_below (p := v) (F := F) (placeJ j) hlt
+      exact ⟨w, hpo, hw⟩
+    · let K : FinExt v := ⟨IntermediateField.adjoin ℚ_[v] (Set.range fun x => j (algebraMap F Ω x)),
+        GlobalTheory.PlaceBridge.finiteDimensional_adjoin_range (j.comp (algebraMap F Ω))⟩
+      haveI : FiniteDimensional ℚ_[v] (K : IntermediateField ℚ_[v] (Om v)) := K.2
+      have hK : (K : IntermediateField ℚ_[v] (Om v)) =
+          IntermediateField.adjoin ℚ_[v] (Set.range fun x => j (algebraMap F Ω x)) := rfl
+      obtain ⟨e, hec, hesc, he⟩ := GlobalTheory.PlaceBridge.exists_mulEquiv (E := F) hj K hK
+      let φ : ↥(Dec (F := F) (placeJ j)) →* GQ v := (GK K).subtype.comp e.toMonoidHom
+      have hφ : ∀ g, φ g = (e g : GQ v) := fun g => rfl
+      have hrange : ∀ σ : GQ v, σ ∈ φ.range ↔ σ ∈ GK K := by
+        intro σ
+        constructor
+        · rintro ⟨g, rfl⟩
+          exact (e g).2
+        · intro h
+          exact ⟨e.symm ⟨σ, h⟩, by rw [hφ, MulEquiv.apply_symm_apply]⟩
+      have hopen : IsOpen ((GK K : Subgroup (GQ v)) : Set (GQ v)) :=
+        IntermediateField.fixingSubgroup_isOpen (K : IntermediateField ℚ_[v] (Om v))
+      refine ⟨φ, ?_, fun g y => he g y, fun σ => by rw [hrange, GlobalTheory.PlaceBridge.mem_GK_iff (E := F) K hK],
+        fun g => de_ine hj g (φ g) (he g), fun l _ g => de_cyc l (g : G F Ω) (φ g) (he g), fun w hw => ?_⟩
+      · let h : ↥(Dec (F := F) (placeJ j)) ≃ₜ ↥(GK K) :=
+          { e.toEquiv with continuous_toFun := hec, continuous_invFun := hesc }
+        exact hopen.isOpenEmbedding_subtypeVal.comp h.isOpenEmbedding
+      · have hr : φ.range = GK K := by
+          ext σ
+          exact hrange σ
+        rw [hr, ← GlobalTheory.DecLocal.finrank_closure_eq_locDeg v F Ω (placeJ j) j hj w hw,
+          IntermediateField.finrank_eq_fixingSubgroup_index]
+        rfl
+
+
+[JRP_law_descent_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DeterminantRepresentations/InjTest.lean:35-65
+SHA256 8f2c615d4e3ddca5c4d7f6e38461dadbd1a16f1f6a2196b763b413d1ac175073
+theorem UpperTheory.V.AlgebraTools.Det.injTest :
+    ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] {X : Type} (K : X → Type) [∀ x, CommRing (K x)] (f : ∀ x, A →+* K x),
+    (∀ a, (∀ x, f x a = 0) → a = 0) →
+    (∀ D D' : GDet n A G, (∀ x, D.map (f x) = D'.map (f x)) → D = D') ∧
+    (∀ (D : GDet n A G) (y : MonoidAlgebra A G), (∀ x, (D.map (f x)).Kills (MonoidAlgebra.mapRingHom G (f x) y)) → D.Kills y) := by
+  intro n A G _ _ X K _ f hf
+  refine ⟨fun D D' h => ?_, fun D y h => ?_⟩
+  · refine UpperTheory.V.AlgebraTools.Det.extGen D D' fun m g => ?_
+    refine injTest_mvInj K f hf _ _ fun x => ?_
+    rw [← (UpperTheory.V.AlgebraTools.Det.mapApi D (f x)).2.2.2.2.1, ← (UpperTheory.V.AlgebraTools.Det.mapApi D' (f x)).2.2.2.2.1, h x]
+  · intro B _ _ w
+    obtain ⟨m, g, b, rfl⟩ := UpperTheory.V.AlgebraTools.Det.genSpan (A := A) B w
+    set z : MonoidAlgebra (MvPolynomial (Fin m) A) G :=
+      1 + GDet.gen (fun j => MonoidAlgebra.single (g j) (1 : A)) * MonoidAlgebra.mapRingHom G MvPolynomial.C y with hz
+    have h1 : D.D (MvPolynomial (Fin m) A) z = 1 := by
+      refine injTest_mvInj K f hf _ _ fun x => ?_
+      rw [← (UpperTheory.V.AlgebraTools.Det.mapApi D (f x)).2.2.2.1, map_one, hz, map_add, map_one, map_mul, injTest_comp]
+      have e : (MvPolynomial.map (f x) : MvPolynomial (Fin m) A →+* _).comp MvPolynomial.C =
+          (algebraMap (K x) (MvPolynomial (Fin m) (K x))).comp (f x) := by
+        ext a : 1
+        simp
+      rw [e, ← injTest_comp]
+      exact h x _ _
+    have h2 := D.nat _ B (MvPolynomial.aeval b) z
+    have e : ((MvPolynomial.aeval b : MvPolynomial (Fin m) A →ₐ[A] B) : MvPolynomial (Fin m) A →+* B).comp
+        MvPolynomial.C = algebraMap A B := by
+      ext a : 1
+      simp
+    rw [h1, map_one, hz, map_add, map_one, map_mul, injTest_comp, e, GDet.gen, map_sum] at h2
+    simp only [injTest_smul, injTest_comp, e] at h2
+    simpa only [RingHom.coe_coe, MvPolynomial.aeval_X] using h2
+
+
+[JRP_law_descent_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DeterminantRepresentations/KerTest.lean:7-15
+SHA256 fb26249af8847ddd074edb5529a8f15e5b09934d34a641fc4cf5388e21f68e0e
+theorem UpperTheory.V.AlgebraTools.Det.kerTest :
+    ∀ {n : ℕ} {A G : Type} [CommRing A] [Group G] {X : Type} (K : X → Type) [∀ x, CommRing (K x)] (f : ∀ x, A →+* K x)
+    (ρ : ∀ x, G →* Matrix (Fin n) (Fin n) (K x)) (D : GDet n A G),
+    (∀ a, (∀ x, f x a = 0) → a = 0) → (∀ x, D.map (f x) = GDet.ofRep (ρ x)) →
+    ∀ y : MonoidAlgebra A G, (∀ x, GDet.repAlg (ρ x) (K x) (MonoidAlgebra.mapRingHom G (f x) y) = 0) → D.Kills y := by
+  intro n A G _ _ X K _ f ρ D hf hD y hy
+  refine (UpperTheory.V.AlgebraTools.Det.injTest K f hf).2 D y fun x => ?_
+  rw [hD x]
+  exact (UpperTheory.V.AlgebraTools.Det.repApi (ρ x)).2.2.2.2.1 _ (hy x)
+
+
+[JRP_law_descent_03] src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DeterminantRepresentations/PolarInj.lean:1-71
+SHA256 b1696c507854bbdb7bfdc4a15171a019d8363c6ce5ccf2ab394a923c9a3975ca
+import Development.AutomorphicArithmetic.AutomorphicVarieties.WeilGroupCharacters.UniversalOrdinaryDeterminantRing
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.DeterminantRepresentations.StarDet
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AlgebraTools.DeterminantRepresentations.InjTest
+
+open Polynomial Matrix UpperTheory.V UpperTheory.V.W
+
+private theorem star_mapRingHom_eq_mapRingHom_star {l : ℕ} [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [Algebra ℤ_[l] O] (B B' : Type) [CommRing B] [CommRing B'] [Algebra O B] [Algebra O B'] (n : ℕ) (φ : B →+* B') (hφ : φ.comp (algebraMap O B) = algebraMap O B') (y : MonoidAlgebra B F.G₀) :
+    F.star O B' n (MonoidAlgebra.mapRingHom F.G₀ φ y) = MonoidAlgebra.mapRingHom F.G₀ φ (F.star O B n y) := by
+  have h1 : ∀ (u : Bˣ) (k : ℤ), φ ((u ^ k : Bˣ) : B) = ((Units.map (φ : B →* B') u ^ k : B'ˣ) : B') := by
+    intro u k
+    rw [← map_zpow]
+    rfl
+  induction y using MonoidAlgebra.induction_linear with
+  | zero => simp [GFrame.star]
+  | add a b ha hb =>
+    simp only [map_add, GFrame.star, MulOpposite.unop_add] at *
+    rw [ha, hb]
+  | single g b =>
+    simp only [GFrame.star, GFrame.starOp, MonoidAlgebra.lift_single, GFrame.eps, MonoidAlgebra.mapRingHom_single]
+    simp
+    rw [h1]
+    congr 3
+    ext
+    simp [← hφ]
+
+theorem UpperTheory.V.AlgebraTools.Det.polarInj :
+    ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R] [Algebra O R] (n : ℕ) (D : GDet n R F.G₀) {X : Type} (K : X → Type) [∀ x, CommRing (K x)] [∀ x, Algebra O (K x)] (f : ∀ x, R →ₐ[O] K x),
+    (∀ a, (∀ x, f x a = 0) → a = 0) → (∀ x, F.IsPolar O (D.map (f x : R →+* K x))) → F.IsPolar O D := by
+  intro l _ F O _ _ R _ _ n D X K _ _ f hf h
+  intro B _ _ _ _ y
+  classical
+  let u : MonoidAlgebra (MvPolynomial F.G₀ R) F.G₀ := y.coeff.support.sum fun g => MonoidAlgebra.single g (MvPolynomial.X g)
+  let ev : MvPolynomial F.G₀ R →ₐ[R] B := MvPolynomial.aeval fun g => y.coeff g
+  have hev : MonoidAlgebra.mapRingHom F.G₀ (ev : MvPolynomial F.G₀ R →+* B) u = y := by
+    simp only [u, map_sum, MonoidAlgebra.mapRingHom_single]
+    simp only [ev, AlgHom.coe_toRingHom, MvPolynomial.aeval_X]
+    exact y.sum_single
+  have hevO : (ev : MvPolynomial F.G₀ R →+* B).comp (algebraMap O (MvPolynomial F.G₀ R)) = algebraMap O B := by
+    ext o
+    simp [ev, MvPolynomial.algebraMap_eq, IsScalarTower.algebraMap_apply O R B]
+  have key : D.D _ (F.star O _ n u) = D.D _ u := by
+    rw [← sub_eq_zero]
+    ext m
+    rw [MvPolynomial.coeff_zero]
+    apply hf
+    intro x
+    letI : Algebra R (MvPolynomial F.G₀ (K x)) := ((algebraMap (K x) (MvPolynomial F.G₀ (K x))).comp (f x : R →+* K x)).toAlgebra
+    let φ : MvPolynomial F.G₀ R →ₐ[R] MvPolynomial F.G₀ (K x) := MvPolynomial.aeval MvPolynomial.X
+    have hφ : (φ : MvPolynomial F.G₀ R →+* MvPolynomial F.G₀ (K x)) = MvPolynomial.map (f x : R →+* K x) := by
+      apply MvPolynomial.ringHom_ext
+      · intro r
+        simp [φ, RingHom.algebraMap_toAlgebra, MvPolynomial.algebraMap_eq]
+      · intro i
+        simp [φ]
+    have hφO : (φ : MvPolynomial F.G₀ R →+* MvPolynomial F.G₀ (K x)).comp (algebraMap O (MvPolynomial F.G₀ R)) = algebraMap O (MvPolynomial F.G₀ (K x)) := by
+      rw [hφ]
+      refine RingHom.ext fun o => ?_
+      rw [RingHom.comp_apply, MvPolynomial.algebraMap_apply, MvPolynomial.algebraMap_apply, MvPolynomial.map_C]
+      congr 1
+      exact (f x).commutes o
+    have hz : MvPolynomial.map (f x : R →+* K x) (D.D _ (F.star O _ n u) - D.D _ u) = 0 := by
+      rw [← hφ, map_sub, sub_eq_zero]
+      have hx := h x (MvPolynomial F.G₀ (K x)) (MonoidAlgebra.mapRingHom F.G₀ (φ : MvPolynomial F.G₀ R →+* MvPolynomial F.G₀ (K x)) u)
+      rw [star_mapRingHom_eq_mapRingHom_star F O _ _ n _ hφO] at hx
+      change D.D _ (MonoidAlgebra.mapRingHom F.G₀ (φ : MvPolynomial F.G₀ R →+* MvPolynomial F.G₀ (K x)) (F.star O _ n u)) = D.D _ (MonoidAlgebra.mapRingHom F.G₀ (φ : MvPolynomial F.G₀ R →+* MvPolynomial F.G₀ (K x)) u) at hx
+      rw [D.nat _ _ φ, D.nat _ _ φ] at hx
+      exact hx
+    have hc := congrArg (MvPolynomial.coeff m) hz
+    rw [MvPolynomial.coeff_map] at hc
+    simpa using hc
+  rw [← hev, star_mapRingHom_eq_mapRingHom_star F O _ _ n _ hevO, D.nat _ _ ev, D.nat _ _ ev, key]
+
+
+[JRP_law_descent_04] src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DeterminantRepresentations/FormRep.lean:21-83
+SHA256 7d975ba646393af083efdb974c29104703838227c031358262d6b69970df1c42
+theorem UpperTheory.V.AlgebraTools.Det.formRep :
+    ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R] [Algebra O R] (n : ℕ) {a : ℕ} (r : F.G₀ →* GL (Fin a) R) (P : GL (Fin a) R), F.IsForm O n r P →
+    (∀ (B : Type) [CommRing B] [Algebra R B] [Algebra O B] [IsScalarTower O R B] (y : MonoidAlgebra B F.G₀),
+      (GDet.repAlg (mat r) B y)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) =
+        (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) * GDet.repAlg (mat r) B (F.star O B n y)) ∧
+    (∀ y, GDet.repAlg (mat r) R y = 0 → GDet.repAlg (mat r) R (F.star O R n y) = 0) ∧
+    ∀ (B : Type) [CommRing B] [Algebra R B] [Algebra O B] [IsScalarTower O R B] (y : MonoidAlgebra B F.G₀),
+      (GDet.ofRep (mat r)).D B (F.star O B n y) = (GDet.ofRep (mat r)).D B y := by
+  intro l _ F O _ _ R _ _ n a r P hP
+  have h1 : ∀ (B : Type) [CommRing B] [Algebra R B] [Algebra O B] [IsScalarTower O R B] (y : MonoidAlgebra B F.G₀),
+      (GDet.repAlg (mat r) B y)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) =
+        (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) * GDet.repAlg (mat r) B (F.star O B n y) := by
+    intro B _ _ _ _ y
+    let ρ' : F.G₀ →* Matrix (Fin a) (Fin a) B := (algebraMap R B).mapMatrix.toMonoidHom.comp (mat r)
+    have hρ : ∀ g, (mat r g).map (algebraMap R B) = ρ' g := fun g => rfl
+    induction y using MonoidAlgebra.induction_linear with
+    | zero => simp [GFrame.star]
+    | add x z hx hz =>
+      rw [(UpperTheory.V.AlgebraTools.Det.starApi F O B n).2.2.1, map_add, map_add, Matrix.transpose_add, Matrix.add_mul,
+        Matrix.mul_add, hx, hz]
+    | single g b =>
+      have hs : F.star O B n (MonoidAlgebra.single g b) =
+          MonoidAlgebra.single (F.conj g)⁻¹ (b * ((F.eps O B g ^ (1 - (n:ℤ)) : Bˣ) : B)) := by
+        simp [GFrame.star, GFrame.starOp]
+      rw [hs, repAlg_single, repAlg_single, hρ, hρ, UpperTheory.V.AlgebraTools.Det.eps_zpow_algebraMap_eq F O R B]
+      have hF : (ρ' g)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) * ρ' (F.conj g) =
+          algebraMap R B ((F.eps O R g ^ (1 - (n:ℤ)) : Rˣ) : R) • (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) := by
+        have := congrArg (fun M : Matrix (Fin a) (Fin a) R => M.map (algebraMap R B)) (hP g)
+        have h' : (ρ' g)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) * ρ' (F.conj g) =
+            ((((F.eps O R g ^ (1 - (n:ℤ)) : Rˣ) : R)) • (P : Matrix (Fin a) (Fin a) R)).map (algebraMap R B) := by
+          simpa [Matrix.map_mul, Matrix.transpose_map, ρ'] using this
+        rw [h']
+        ext i j
+        simp
+      have hinv : ρ' (F.conj g) * ρ' (F.conj g)⁻¹ = 1 := by
+        rw [← map_mul, mul_inv_cancel, map_one]
+      have key : (ρ' g)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) =
+          algebraMap R B ((F.eps O R g ^ (1 - (n:ℤ)) : Rˣ) : R) •
+            ((P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) * ρ' (F.conj g)⁻¹) := by
+        calc (ρ' g)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B)
+            = (ρ' g)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) * (ρ' (F.conj g) * ρ' (F.conj g)⁻¹) := by
+              rw [hinv, Matrix.mul_one]
+          _ = (ρ' g)ᵀ * (P : Matrix (Fin a) (Fin a) R).map (algebraMap R B) * ρ' (F.conj g) * ρ' (F.conj g)⁻¹ := by
+              simp only [Matrix.mul_assoc]
+          _ = _ := by rw [hF, Matrix.smul_mul]
+      rw [Matrix.transpose_smul, Matrix.smul_mul, key, Matrix.mul_smul, smul_smul]
+  have hu : ∀ (B : Type) [CommRing B] [Algebra R B],
+      IsUnit ((P : Matrix (Fin a) (Fin a) R).map (algebraMap R B)) := by
+    intro B _ _
+    exact (P.isUnit.map (algebraMap R B).mapMatrix)
+  refine ⟨h1, ?_, ?_⟩
+  · intro y hy
+    have := h1 R y
+    rw [hy, Matrix.transpose_zero, Matrix.zero_mul] at this
+    obtain ⟨u, hu'⟩ := hu R
+    have h2 := congrArg (fun M => (↑u⁻¹ : Matrix (Fin a) (Fin a) R) * M) this
+    simp only [← hu', Matrix.mul_zero, ← Matrix.mul_assoc, Units.inv_mul, Matrix.one_mul] at h2
+    exact h2.symm
+  · intro B _ _ _ _ y
+    have := congrArg Matrix.det (h1 B y)
+    rw [Matrix.det_mul, Matrix.det_mul, Matrix.det_transpose, mul_comm] at this
+    have hd := (Matrix.isUnit_iff_isUnit_det _).mp (hu B)
+    exact (hd.mul_left_cancel this).symm
+
+
+[JRP_ordinary_relations_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DeterminantRepresentations/FlagRel.lean:6-67
+SHA256 fdb089e67a1d7a914a46c121a835db8201ecd57f910c79fb782738ea7f3211c7
+theorem UpperTheory.V.AlgebraTools.Det.flagRel :
+    ∀ {k H : Type} [CommRing k] [Group H] {n : ℕ} (r : H →* GL (Fin n) k) (κ : Fin n → H →* kˣ), HasFlag r κ →
+    (∀ s, (mat r s).charpoly = ∏ j, (X - C (κ j s : k))) ∧
+    ∀ g : Fin n → H, (List.ofFn fun j => mat r (g j) - (κ j (g j) : k) • (1 : Matrix (Fin n) (Fin n) k)).prod = 0 := by
+  intro k H _ _ n r κ ⟨P, hP⟩
+  have hm : ∀ s, mat r s = (r s : Matrix (Fin n) (Fin n) k) := fun _ => rfl
+  constructor
+  · intro s
+    have h1 : ((P * r s * P⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).charpoly = (mat r s).charpoly := by
+      rw [hm, Units.val_mul, Units.val_mul, Matrix.charpoly_mul_comm, ← mul_assoc, Units.inv_mul, one_mul]
+    have h2 : ((P * r s * P⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k).BlockTriangular id :=
+      fun i j hij => (hP s).1 i j hij
+    rw [← h1, Matrix.charpoly_of_upperTriangular _ h2]
+    exact Finset.prod_congr rfl fun i _ => by rw [← (hP s).2 i]
+  · intro g
+    let W : ℕ → Submodule k (Fin n → k) := fun j =>
+      { carrier := {v | ∀ i : Fin n, j ≤ i.val → ((P : Matrix (Fin n) (Fin n) k) *ᵥ v) i = 0}
+        add_mem' := fun {a b} ha hb i hi => by
+          rw [Matrix.mulVec_add, Pi.add_apply, ha i hi, hb i hi, add_zero]
+        zero_mem' := fun i _ => by simp
+        smul_mem' := fun c a ha i hi => by
+          rw [Matrix.mulVec_smul, Pi.smul_apply, ha i hi, smul_zero] }
+    have hW : ∀ j v, v ∈ W j ↔ ∀ i : Fin n, j ≤ i.val → ((P : Matrix (Fin n) (Fin n) k) *ᵥ v) i = 0 :=
+      fun _ _ => Iff.rfl
+    have key := UpperTheory.V.AlgebraTools.Det.flagKill n W
+      (fun j => Matrix.toLinAlgEquiv' (mat r (g j) - (κ j (g j) : k) • (1 : Matrix (Fin n) (Fin n) k))) ?_ ?_ ?_
+    · apply (Matrix.toLinAlgEquiv' (R := k) (n := Fin n)).injective
+      rw [map_list_prod, map_zero, List.map_ofFn]
+      exact key
+    · rw [eq_bot_iff]
+      intro v hv
+      have h0 : (P : Matrix (Fin n) (Fin n) k) *ᵥ v = 0 := funext fun i => (hW 0 v).1 hv i (Nat.zero_le _)
+      have : v = ((P⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) *ᵥ ((P : Matrix (Fin n) (Fin n) k) *ᵥ v) := by
+        rw [Matrix.mulVec_mulVec, Units.inv_mul, Matrix.one_mulVec]
+      rw [Submodule.mem_bot, this, h0, Matrix.mulVec_zero]
+    · rw [eq_top_iff]
+      intro v _
+      exact (hW n v).2 fun i hi => absurd i.2 (not_lt.2 hi)
+    · intro j v hv
+      rw [hW] at hv ⊢
+      intro i hi
+      have e : (P : Matrix (Fin n) (Fin n) k) *ᵥ
+          (Matrix.toLinAlgEquiv' (mat r (g j) - (κ j (g j) : k) • (1 : Matrix (Fin n) (Fin n) k)) v) =
+          ((P * r (g j) * P⁻¹ : GL (Fin n) k) : Matrix (Fin n) (Fin n) k) *ᵥ ((P : Matrix (Fin n) (Fin n) k) *ᵥ v)
+            - (κ j (g j) : k) • ((P : Matrix (Fin n) (Fin n) k) *ᵥ v) := by
+        rw [Matrix.toLinAlgEquiv'_apply, Matrix.sub_mulVec, Matrix.mulVec_sub, Matrix.smul_mulVec, Matrix.one_mulVec,
+          Matrix.mulVec_smul, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, hm, Units.val_mul, Units.val_mul,
+          Units.inv_mul_cancel_right]
+      rw [e, Pi.sub_apply, Pi.smul_apply, smul_eq_mul, sub_eq_zero]
+      generalize (P : Matrix (Fin n) (Fin n) k) *ᵥ v = w at hv ⊢
+      rw [Matrix.mulVec, dotProduct, Finset.sum_eq_single i]
+      · rcases eq_or_lt_of_le hi with h | h
+        · have : j = i := Fin.ext h
+          subst this
+          rw [← (hP (g j)).2 j]
+        · rw [hv i h, mul_zero, mul_zero]
+      · intro b _ hb
+        rcases lt_or_gt_of_ne hb with h | h
+        · have := (hP (g j)).1 i b h
+          rw [this, zero_mul]
+        · rw [hv b (by have : i.val < b.val := h; omega), mul_zero]
+      · intro h; exact absurd (Finset.mem_univ i) h
+
+
+[JRP_ordinary_relations_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/AlgebraTools/DeterminantRepresentations/OElRep.lean:6-13
+SHA256 9dc3ed776558dc8ac5465410bc4c733713063d420941501748dfe67470ba0b5b
+theorem UpperTheory.V.AlgebraTools.Det.oElRep :
+    ∀ {l : ℕ} [Fact l.Prime] (F : GFrame l) (O : Type) [CommRing O] [Algebra ℤ_[l] O] (R : Type) [CommRing R] [Algebra O R] (n : ℕ) (r : F.G₀ →* GL (Fin n) R) (v : F.Vl) (ψ : Fin n → F.Gv v →* Rˣ), HasFlag (r.comp (F.φ v)) ψ →
+    ∀ g, GDet.repAlg (mat r) R (F.oEl v ψ g) = 0 := by
+  intro l _ F O _ _ R _ _ n r v ψ h g
+  rw [← (UpperTheory.V.AlgebraTools.Det.flagRel _ _ h).2 g, GFrame.oEl, map_list_prod, List.map_ofFn]
+  congr 2
+  funext i
+  simp [GDet.repAlg, mat, MonoidAlgebra.lift_single]
+
+
+[JRP_installation_01] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/OrdinaryHeckeCharacters/HiAlgUnit.lean:137-170
+SHA256 398de9c9ec0f367d5b1edf7b2c0262b545bc895182cc6d8eb076d91c59ae92b2
+  obtain ⟨hcY, hfY, hfrY, hMK⟩ := hiComm L Ω l n c H hAx A θ hθ K
+  obtain ⟨-, hfM, -⟩ := hMK a
+  haveI := hfY
+  haveI := hfM
+  haveI := hfrY
+  have hP : ∀ (v : H.V) (k : ℕ), alV n H.Sl v k ∈ H.X.I.P := by
+    intro v k
+    unfold UpperTheory.V.Hi.alV UpperTheory.V.Hi.HSet.X
+    dsimp only
+    unfold UpperTheory.V.Hi.iwS UpperTheory.V.Hi.piIwa
+    dsimp only
+    unfold UpperTheory.V.Hi.piData
+    dsimp only
+    intro w _
+    by_cases hw : w = v
+    · subst hw
+      simp only [Pi.mulSingle_eq_same]
+      exact al_mem _ n k
+    · simp only [Pi.mulSingle, Function.update, hw, dif_neg, not_false_eq_true, Pi.one_apply]
+      exact (glIwa _ n).P.one_mem
+  obtain ⟨-, -, hbij⟩ := ordFree _ _ _ H.X A H.m (H.τA A) θ hθ.cont (H.lev K) (hAx.fin K) (hθ.free K)
+  obtain ⟨hCO, hfin, hnz, hres⟩ := hiAlg_abs (O := c.O) (H.X.Ord (H.τA A) θ (H.lev K)) (H.op A) a hcY
+    (H.MK θ a K) rfl hne
+  refine ⟨hCO, hfin, ?_, hres, ?_, hiAlg_top _ _⟩
+  · intro hdom b hb t ht
+    refine hnz b ?_ t ht
+    intro y hy hby
+    have h0 : b • (⟨y, hy⟩ : H.X.Ord (H.τA A) θ (H.lev K)) = 0 := Subtype.ext hby
+    rcases smul_eq_zero.1 h0 with h1 | h1
+    · exact absurd h1 hb
+    · exact congrArg Subtype.val h1
+  · intro v j
+    exact hiAlg_unit (H.X.Ord (H.τA A) θ (H.lev K)) (H.MK θ a K) inf_le_left (H.op A) (.inr (v, j))
+      (hbij _ (hP v (j + 1)))
+
+
+[JRP_installation_02] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TDenseU.lean:374-457
+SHA256 531f229d5c0a87d10c48a9299a850e0f493f12fc8c83c8986a9a902acdb71e5f
+theorem UpperTheory.V.Hi.isDomain_and_denseWt_of_isTheta :
+    _root_.GlobalTheory.Mem.LiteralAutomorphy.LiteratureRankNHypothesis → ∀ (l : ℕ) [Fact l.Prime] (L Ω : Type) [Field L] [NumberField L] [IsCMField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (s : HidaSetting l L Ω) (n : ℕ), 1 ≤ n →
+    ∀ (V : s.Lev) (Q : QData V) (c : Coef l), ∀ (m : ℕ) (τ₀ : KT n (wt s) →* GL (Fin m) c.O), ∀ (r : Resid V.frame c.O n) (Λ : LamObj r) (θ : (hset Q τ₀).X.I.T →* Λ.Λˣ), IsTheta Q τ₀ Λ θ → IsDomain Λ.Λ ∧ ∀ lam, (hset Q τ₀).DenseWt θ lam := by
+  intro hN l _ L Ω _ _ _ _ _ _ s n _ V Q c m τ₀ r Λ θ hθ
+  classical
+  haveI : IsAdicComplete (maximalIdeal c.O) c.O := (UpperTheory.V.Base.dvrFacts l c.O).2.2.2.1
+  haveI : IsLocalHom (algebraMap ℤ_[l] c.O) := (UpperTheory.V.Base.dvrFacts l c.O).2.2.1
+  haveI : Finite (ResidueField ℤ_[l]) := Finite.of_equiv _ (PadicInt.residueField (p := l)).symm.toEquiv
+  haveI : Finite (ResidueField c.O) := Module.finite_of_finite (ResidueField ℤ_[l])
+  haveI : CharP (ResidueField ℤ_[l]) l :=
+    charP_of_injective_ringHom (f := (PadicInt.residueField (p := l)).symm.toRingHom)
+      (PadicInt.residueField (p := l)).symm.injective l
+  haveI : CharP (ResidueField c.O) l :=
+    charP_of_injective_ringHom (algebraMap (ResidueField ℤ_[l]) (ResidueField c.O)).injective l
+  obtain ⟨d₀, -, hA⟩ := W.locCFT hN.aut.art ⟨hN.coh.lf, hN.coh.lt, hN.coh.le, hN.coh.gf, hN.coh.ge, hN.coh.gw, hN.coh.pt,
+    GlobalTheory.Published.TameLocal_of_duality hN.coh.lt⟩ l L Ω s
+  let d : V.frame.Vl → ℕ := d₀
+  let A : ∀ v : V.frame.Vl, W.LocAb l (V.frame.Gv v) (V.frame.Iv v) (d v) := fun v => (hA v).some
+  have hd : ∀ v : V.frame.Vl, 0 < d v := fun v => du_pos (s.hA v.1) v.2 (hA v).some
+  obtain ⟨e, ψ₀, hψ₀, he⟩ := (W.lam_ex_free l V.frame c.O n r d A).2 Λ
+  haveI : IsDomain (MvPowerSeries (Σ v : V.frame.Vl, Fin n × Fin (d v)) c.O) := NoZeroDivisors.to_isDomain _
+  refine ⟨MulEquiv.isDomain _ e.symm.toMulEquiv, fun lam f hf => ?_⟩
+  have ha : ∀ v : V.frame.Vl, IsLocalArtin (s.hw v.1) (artOf (s.hw v.1)) :=
+    fun v => Classical.epsilon_spec (_root_.UpperTheory.V.Z.Win.T2.laArtinLit' hN _)
+  choose δ hδ hδ' using fun (v : V.frame.Vl) (i : Fin n) => du_alg (l := l) hN.aut.art (ha v) (lowW lam i)
+  choose ψ hψ hκ using Λ.inert
+  let ω : ∀ v : V.frame.Vl, Fin n → V.frame.Gv v →* (Qbar l)ˣ := fun v i =>
+    ((cycBar L Ω l).comp (Dec (F := L) (s.A v.1)).subtype) ^ (i : ℕ) * δ v i
+  have hω : ∀ v i, Continuous (ω v i) := fun v i => ((du_cyc.comp continuous_subtype_val).pow (i : ℕ)).mul (hδ v i)
+  let Φ : (Λ.Λ →ₐ[c.O] Qbar l) → ∀ v : V.frame.Vl, Fin n → V.frame.Gv v →* (Qbar l)ˣ := fun x v i =>
+    W.pushCh (x : Λ.Λ →+* Qbar l) (ψ v i) * ω v i
+  have hΦ : ∀ x v i, Continuous (Φ x v i) := fun x v i => (du_cont c Λ.Λ x _ (hψ v i).cont).mul (hω v i)
+  have key : ∀ (x : Λ.Λ →ₐ[c.O] Qbar l) (v : V.frame.Vl) i (t : Weil (s.hw v.1)) (y : Uo ((s.w v.1).adicCompletion L)),
+      artOf (s.hw v.1) t = y → (hset Q τ₀).finPart θ (x : Λ.Λ →+* Qbar l) lam v i y =
+        ((Φ x v i (Subgroup.inclusion (Weil_le_Dec _) t) : (Qbar l)ˣ) : Qbar l)⁻¹ := by
+    intro x v i t y hy
+    have ht := (du_unit (ha v) t).1 (hy ▸ y.2)
+    have h1 := congrArg (fun z : Λ.Λˣ => x z) (hθ v i t (Subgroup.inclusion (Weil_le_Dec _) t) ht y rfl hy)
+    simp only [hκ, Units.val_mul, map_mul, Units.val_pow_eq_pow_val, map_pow, Units.val_one, map_one] at h1
+    have h2 : x ((hset Q τ₀).epsV Λ.Λ v (Subgroup.inclusion (Weil_le_Dec _) t) : Λ.Λˣ) = cycBar L Ω l t := x.commutes _
+    have h3 := hδ' v i t ht
+    rw [hy] at h3
+    show x _ / algPow (s.w v.1) _ _ = (x (ψ v i _) * ((cycBar L Ω l t ^ (i : ℕ) : (Qbar l)ˣ) * δ v i _))⁻¹
+    rw [h3, ← mul_assoc, mul_inv, div_eq_mul_inv, Units.val_pow_eq_pow_val]
+    exact congrArg (· * _) (eq_inv_of_mul_eq_one_right (by rw [← h2]; exact h1))
+  choose γ hγI hγ using fun (v : V.frame.Vl) (j : Fin (d v)) => ((A v).inertia (Pi.single j 1, 0)).2 rfl
+  let χ : ∀ v : V.frame.Vl, Fin n → V.frame.Gv v →* (Qbar l)ˣ := fun v i =>
+    (W.pushCh (Algebra.ofId c.O (Qbar l) : c.O →+* Qbar l) (ψ₀ v i) * ω v i)⁻¹
+  have hχ : ∀ v i, Continuous (χ v i) := fun v i => ((du_cont c c.O _ _ (hψ₀ v i).cont).mul (hω v i)).inv
+  refine e.symm.injective ?_
+  rw [map_zero]
+  refine du_box c (σ := Σ v, Fin n × Fin (d v)) (fun p => p.2.1) (fun p => χ p.1 p.2.1 (γ p.1 p.2.2))
+    (fun p => (du_pow _ (hχ p.1 p.2.1)).imp fun M hM => ⟨hM.1, hM.2 _⟩) _ fun y η h1 h2 h3 => ?_
+  let x : Λ.Λ →ₐ[c.O] Qbar l := y.comp e.symm.toAlgHom
+  have hx : ∀ v i j, (Φ x v i (γ v j) : Qbar l) = η ⟨v, i, j⟩ := fun v i j => by
+    have h4 := congrArg x (he v i j ⟨γ v j, hγI v j⟩ (hγ v j))
+    have h5 : x (e (MvPowerSeries.X ⟨v, i, j⟩)) = y (MvPowerSeries.X ⟨v, i, j⟩) := congrArg y (e.symm_apply_apply _)
+    rw [hκ, map_mul, map_add, map_one, x.commutes, h5, h3] at h4
+    show x (ψ v i (γ v j)) * (ω v i (γ v j) : Qbar l) = _
+    refine (congrArg (· * _) h4).trans ?_
+    have h6 : (χ v i (γ v j) : Qbar l) = (algebraMap c.O (Qbar l) (ψ₀ v i (γ v j)) * ω v i (γ v j))⁻¹ :=
+      Units.val_inv_eq_inv_val _
+    have h7 : algebraMap c.O (Qbar l) (ψ₀ v i (γ v j)) * ω v i (γ v j) ≠ 0 := fun h => by
+      rw [h, inv_zero] at h6
+      exact Units.ne_zero _ h6
+    simp only [h6]
+    rw [mul_right_comm, mul_inv_cancel_left₀ h7]
+  refine hf x ⟨trivial, ?_, fun v i j hij => ?_⟩
+  · choose N hN hN' using fun v i => du_fin (A v) (Φ x v i) (hΦ x v i) (γ v) (hγ v) fun j => by
+      rw [← Units.isOfFinOrder_val, hx]
+      exact h1 _
+    choose k hk using fun v i => du_arith (ha v) (Φ x v i) (hΦ x v i) (hN v i) (hN' v i)
+    refine ⟨∑ v, ∑ i, k v i, fun v i z hz => ?_⟩
+    obtain ⟨t, ht⟩ := (ha v).surj z.1
+    refine (key x v i t z ht).trans ?_
+    have h9 := hk v i _ ((Finset.single_le_sum (f := k v) (fun _ _ => Nat.zero_le _) (Finset.mem_univ i)).trans
+      (Finset.single_le_sum (f := fun v => ∑ i, k v i) (fun _ _ => Nat.zero_le _) (Finset.mem_univ v))) t (ht ▸ hz)
+    exact inv_eq_one.2 (congrArg Units.val h9)
+  · let t : Weil (s.hw v.1) := ⟨(γ v ⟨0, hd v⟩).1, Ine_le_Weil _ (hγI v _)⟩
+    let z : Uo ((s.w v.1).adicCompletion L) := ⟨_, (du_unit (ha v) t).2 (hγI v _)⟩
+    refine ⟨z, fun h' => ?_⟩
+    have h := inv_injective (((key x v i t z rfl).symm.trans h').trans (key x v j t z rfl))
+    exact h2 ⟨v, i, ⟨0, hd v⟩⟩ ⟨v, j, ⟨0, hd v⟩⟩ hij (((hx v i _).symm.trans h).trans (hx v j _))
+end
+
+
+[JRP_installation_03] src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeckeAlgebras/CoefficientRepTrivialOnUnramified.lean:276-285
+SHA256 880fd46e0aabe7701d7c59224cf254676f2fe17c88219d8d1d7ee0fe957ed5ed
+structure Out (P : Wt L l n → (H.Gq →* GL (Fin n) (Qbar l)) → Prop) (I : Ideal (H.TK θ a K)) (D : W.GDet n (H.TK θ a K) H.Gq)
+    (ψ : ∀ v, Fin n → Dec (F := L) (H.pl v) →* (H.TK θ a K)ˣ) : Prop where
+  univ : H.IsUniv θ a K I D ψ
+  sep : ∀ lam ∈ H.admitted, H.DenseWt θ lam → ∀ t : H.TK θ a K,
+    (∀ x : H.TK θ a K →ₐ[c.O] Qbar l, H.Good θ (x.toRingHom.comp (algebraMap A _)) lam → x t = 0) → t = 0
+  pt : ∀ lam ∈ H.admitted, ∀ x : H.TK θ a K →ₐ[c.O] Qbar l, H.Arith θ (x.toRingHom.comp (algebraMap A _)) lam →
+    ∃ r : H.Gq →* GL (Fin n) (Qbar l), Continuous r ∧ IsSSRep r ∧ P lam r ∧ D.map x.toRingHom = W.GDet.ofRep (W.mat r) ∧
+      (H.Good θ (x.toRingHom.comp (algebraMap A _)) lam →
+        ∀ v, W.HasFlag (r.comp (H.dec v)) (fun i => W.pushCh x.toRingHom (ψ v i)) ∧ PotCrys (H.pl v) (r.comp (H.dec v)))
+
+
+
+[JRP_installation_04] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/OrdCoreH.lean:20-62
+SHA256 549c560ec0e54f04eefd372fdfe6e08546753c756ebdec2ae433624df188a93e
+theorem UpperTheory.V.Z.Ord.core_hecke_of_automorphic_hecke_dense_weight :
+    _root_.GlobalTheory.Mem.LiteralAutomorphy.LiteratureRankNHypothesis → ∀ (L Ω : Type) [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] (l : ℕ) [Fact l.Prime] (n : ℕ) (c : Coef l) (H : HSet L Ω l n c), H.Ax →
+    ∀ (A : Type) [CommRing A] [Algebra c.O A] [Alg.IsCO c.O A] (θ : H.X.I.T →* Aˣ), H.IsWt θ →
+    ∀ (ι : Qbar l ≃+* ℂ) (P : Wt L l n → (H.Gq →* GL (Fin n) (Qbar l)) → Prop), H.AutomorphicHeckeSet ι P →
+    ∀ lam0 ∈ H.admitted, H.DenseWt θ lam0 → ∀ (a : H.Op → c.O) (K : H.Lev) [Fact (CommOn (H.MK θ a K) (H.op A))] [Alg.IsCO c.O (H.TK θ a K)], ∀ (D : W.GDet n (H.TK θ a K) H.Gq) (ψ : ∀ v, Fin n → Dec (F := L) (H.pl v) →* (H.TK θ a K)ˣ), H.IsUniv θ a K (maximalIdeal _) D ψ →
+    H.Out θ a K P (maximalIdeal _) D ψ := by
+  intro hL L Ω _ _ _ _ _ l _ n c H hA A _ _ _ θ hθ ι P hP _ _ _ a K _ _ D ψ hU
+  refine ⟨hU, _root_.UpperTheory.V.Hi.eq_zero_of_vanish_at_good_points_dense_weight hL L Ω l n c H hA A θ hθ ι P hP a K, fun lam hlam y hy => ?_⟩
+  let x : A →ₐ[c.O] Qbar l := y.comp (IsScalarTower.toAlgHom c.O A (H.TK θ a K))
+  have hx : y.toRingHom.comp (algebraMap A _) = x.toRingHom := rfl
+  rw [hx] at hy ⊢
+  obtain ⟨d, ξ, c0, sp, hsp⟩ := UpperTheory.V.Hi.spec L Ω l n c H hA A θ hθ ι x lam hy
+  obtain ⟨-, -, -, -, -, hpt, -⟩ :=
+    _root_.UpperTheory.V.Hi.partAct0_alt hL L Ω l n c H hA A θ hθ ι P hP x lam d ξ c0 sp hsp hlam a K _ rfl
+  obtain ⟨Y, F, e, hY, he, hF0, hF, hop⟩ := hpt y hx
+  obtain ⟨hD, hch⟩ := _root_.UpperTheory.V.Hi.core_eigen_of_weight_char_hecke_level hL L Ω l n c H hA A θ hθ ι a K D ψ hU y lam d ξ Y F hF.1 hF0
+    fun w j => hop _
+  refine ⟨Y.r, Y.cont, Y.ss, hY, hD, fun hg v => ?_⟩
+  obtain ⟨ω, hsm, hPS, hinv, hU'⟩ := _root_.UpperTheory.V.Hi.goodScalB_alt hL L Ω l n c H hA A θ hθ ι x lam d ξ c0 sp hsp hg Y K e he
+    fun h0 => hF0 ((Submodule.mem_bot ℂ).1 (h0 ▸ hF))
+  have hO := hch v (ω v) (hsm v) (hinv v) fun j =>
+    smul_left_injective ℂ hF0 ((hop (.inr (v, j))).symm.trans ((hU' v j).2 F hF))
+  obtain ⟨rc, hrc⟩ := _root_.UpperTheory.V.Z.Win.exRec'_alt hL (H.ovr v)
+  obtain ⟨φ⟩ := hPS v
+  have hpol := (_root_.UpperTheory.V.Z.Win.T2.psRec_alt hL L Ω n (H.Sl v) (H.pl v) (H.ovr v) (H.art v) (hA.art_spec v) rc hrc (Y.σl v) (ω v)
+    (hsm v)).1 (.of_injective φ.toIntertwiningMap φ.toLinearEquiv.injective)
+  have hdist : ∀ i j, i ≠ j → ∃ u : Uo ((H.Sl v).adicCompletion L), ω v i u ≠ ω v j u := fun i j hij => by
+    obtain ⟨u, hu⟩ := hg.2.2 v i j hij
+    refine ⟨u, fun h0 => hu (ι.injective (mul_left_cancel₀ (ω v j u).ne_zero ?_))⟩
+    rw [hinv v j u, ← h0, hinv v i u]
+  have hdr := _root_.UpperTheory.V.Z.Ord.useAtL' (Y.atL v) (ω v) (hsm v) hdist ⟨φ⟩ rc hrc ((UpperTheory.V.Lev.ssCalc L Ω _ _ (H.ovr v)).1 n _ (fun j => (ω v j).comp (H.art v)) hpol)
+  rw [funext hpol] at hdr
+  refine _root_.UpperTheory.V.Loc.ordFlag_alt hL L Ω l hA.odd ι n (H.Sl v) (hA.Sl_over v) (H.pl v) (H.ovr v) (H.art v) (hA.art_spec v)
+    _ (Y.cont.comp (hA.prj_cont.comp continuous_subtype_val)) (htW lam) (fun τ i j hij => ?_) (ω v) _ hO
+    (fun i j hij => ?_) hdr
+  · have h1 := (lam τ).anti (Fin.rev_le_rev.2 hij.le)
+    have h2 : (i : ℕ) < j := hij
+    simp only [htW, lowW]
+    omega
+  · obtain ⟨u, hu⟩ := hg.2.2 v i j hij
+    refine ⟨u, fun h0 => hu (ι.injective (mul_left_cancel₀ (ω v j u).ne_zero ?_))⟩
+    rw [hinv v j u, ← h0, hinv v i u]
+end
+
+
+[JRP_installation_05] src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/UnitaryPointProperties.lean:1-56
+SHA256 6bb2f5f6df4fb8f869ca21611e7c79a17e1d751c6c9aec4941b0e57230002370
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.ThresholdArguments.DenseThresholdCases.DiscreteSeriesCoefficientsCuspidal
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeckeAlgebras.CoefficientRepTrivialOnUnramified
+import Development.AutomorphicArithmetic.Foundations.LocalLanglands.IsRecTOfIsRec
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.AutomorphyLifting.LocDataT
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.OrdinaryJacquetModules.AtLOf
+
+set_option maxHeartbeats 800000
+set_option synthInstance.maxHeartbeats 200000
+
+section
+noncomputable section
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.BasicNotions Formalism.BasicNotions.Loc Formalism.MainNotions.N Polynomial ValuativeRel IsLocalRing
+open GlobalTheory.CuspRep GlobalTheory.WeilDeligne GlobalTheory.Pst GlobalTheory.LocLanglands GlobalTheory.LocGL GlobalTheory.GalOfCusp GlobalTheory.SmGL GlobalTheory.SplitWeil
+open scoped TensorProduct Matrix
+attribute [local instance] GlobalTheory.LocalData.complRel GlobalTheory.LocalData.isLocalField
+namespace UpperTheory.V.Hi
+open UpperTheory.V.W (Plc)
+open UpperTheory.V.HV (Coef)
+section Alg
+variable {L : Type} [Field L] [NumberField L] {l : ℕ} [Fact l.Prime] (n : ℕ) {V : Type} [Fintype V] (S : V → Plc L)
+variable {n S}
+end Alg
+namespace HSet
+variable {L Ω : Type} [Field L] [NumberField L] [Field Ω] [Algebra L Ω] [IsAlgClosure L Ω] {l : ℕ} [Fact l.Prime] {n : ℕ}
+  {c : Coef l} (H : HSet L Ω l n c)
+variable (A : Type) [CommRing A] [Algebra c.O A]
+variable {A} (θ : H.X.I.T →* Aˣ)
+variable (ι : Qbar l ≃+* ℂ)
+structure PartAltAlt (lam : Wt L l n) {d : ℕ} (ξ : GV n H.Sl →* GL (Fin d) ℂ) : Type 1 where
+  Y : Submodule ℂ (Fin H.m → H.X.Fn ℂ d)
+  le : Y ≤ H.Big ι ξ
+  ne : Y ≠ ⊥
+  σl : ∀ v : H.V, SmIrr (GLw n (H.Sl v))
+  isoL : ∀ v, IsoSum (H.atV d v) Y (σl v)
+  σq : ∀ q : H.Q, SmIrr (GLw n (H.wq q))
+  isoQ : ∀ q : H.Q, IsoSum (H.atW ι d (H.wq q)) Y (σq q)
+  a : H.Wp → ℕ → ℂ
+  a_zero : ∀ w, a w 0 = 1
+  sph : ∀ (w : H.Wp) j, ∀ F ∈ Y, sphOp (H.atW ι d w.1) j F = a w j • F
+  r : H.Gq →* GL (Fin n) (Qbar l)
+  cont : Continuous r
+  ss : IsSSRep r
+  frob : ∀ (w : H.Wp) (B : ValuationSubring Ω) (σ : G L Ω), IsPlaceOver B w.1 → IsFrob B (normV w.1) σ →
+    (r (H.prj σ⁻¹) : Matrix (Fin n) (Fin n) (Qbar l)).charpoly.map ι.toRingHom = heckePol n (normV w.1) (a w)
+  atL : ∀ v, _root_.UpperTheory.V.Z.Ord.AtLT ι (H.ovr v) (r.comp (H.dec v)) lam (σl v)
+  atQ : ∀ (q : H.Q) (B : ValuationSubring Ω) (h : IsPlaceOver B (H.wq q)) (rc : IrrGL ((H.wq q).adicCompletion L) → WD h), _root_.UpperTheory.Zero.LLC.IsRecT h rc →
+    _root_.UpperTheory.V.Z.Win.WOT ι (r.comp H.prj) (rc (algNorm (σq q)))
+def AutomorphicHeckeSet (P : Wt L l n → (H.Gq →* GL (Fin n) (Qbar l)) → Prop) : Prop :=
+  ∀ lam ∈ H.admitted, ∀ (d : ℕ) (ξ : GV n H.Sl →* GL (Fin d) ℂ), IsAlgWt ι lam ξ → ∀ F ∈ H.Big ι ξ,
+    (∃ K, F ∈ fixd (H.X.raF d (H.τC ι)) (H.lev K)) → (∃ e, F ∈ fixd (H.X.rpF ℂ d H.m) (H.X.I.I1 e)) →
+    F ∈ ⨆ Y : {Y : H.PartAltAlt ι lam ξ // P lam Y.r}, Y.1.Y
+variable [IsLocalRing A] (a : H.Op → c.O) (K : H.Lev) [Fact (CommOn (H.MK θ a K) (H.op A))]
+end HSet
+end UpperTheory.V.Hi
+end
+end
+

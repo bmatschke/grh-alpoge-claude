@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+"""Record the selected complete-proof audit and its precise scope changes."""
+from pathlib import Path
+import json
+
+ROOT = Path(__file__).resolve().parent
+components = ['host_window_installation', 'metric_transport',
+              'count_i_aggregation', 'tied_window_completion', 'analytic_envelope']
+scope = (
+ 'Partial human reconstruction of RH and Dirichlet GRH, accepting the checked Lean proof as correct. '
+ 'Version 0.30 gives a connected selected-route dependency audit, complete disposition of all 245 inherited continuation records, and 26 new proof claims. '
+ 'HX closes the actual host construction conditional on the original fixed-target VWinAt(401); MT closes the exact fractional-ideal metric/floor transport on the original family; '
+ 'KA closes PropGK to CorGK to CountI and removes Case III only for fixed targets of power-of-two order, including RH; '
+ 'ZW closes the complete literal ChainTied-to-prime-sum-window numerical deduction at exponent 1/2+(eD+eL+7)epsilon; '
+ 'AQ proves a weaker positive-part integral analytic endpoint and integer interpolation, without an arithmetic supplier of that endpoint. '
+ 'The actual common-family geometric, theta/local, denominator and spectral producers and the specialized I/II/V counts remain; unrestricted Dirichlet targets also retain Case III. '
+ 'Historical claims, source arrays and mathematical dependency edges are preserved. This is not a finished human RH/Dirichlet-GRH proof, a new Lean build, or a kernel replay.'
+)
+new = [
+ 'HX1–HX4: the least-prime theorem supplies SmallOne; exact ranks, admission and all host-completion clauses are matched; VWinAt(psi,401) supplies HostExW(3/2) on the same character field and prime pair, with cutoff floor(x^400).',
+ 'MT1–MT7: finite fractional-ideal index/covolume calculation, literal preservation of all archimedean metrics, complete negative-floor error and exceptional-prime support, and a uniform LinkMu installation from the existing same-family premises.',
+ 'KA1–KA6: exact character-kernel mass aggregation, all twelve GD clauses, two-prime exception removal and the full uniform PropGK→CorGK→CountI deduction. Case III is empty for fixed targets of power-of-two order; the specialization is followed through every original height/window consumer.',
+ 'ZW1–ZW4: the original-host ChainTied/CoreAtH identification; the eleven-field weighted-slope calculation; explicit uniform error absorption by 200R^3; and the terminal prime-sum bound with exponent 1/2+(eD+eL+7)epsilon, equal to 1/2+9epsilon on the selected route.',
+ 'AQ1–AQ5: exact positive-part envelope interface, arbitrary fixed window stretch, gamma localization, both real and nonreal nearest-pole alternatives, and integer interpolation with error at most 1/(8n). The arithmetic envelope remains a separate unsupplied input.',
+ 'The dependency audit distinguishes exact sufficient interfaces from open producer proofs and work-sharing links, gives separate RH and unrestricted Dirichlet-GRH routes, checks eight published applications this round, retains 101 inherited entries in 22 registries in their documented scopes, and dispositions all 245 inherited continuation records.'
+]
+remaining = [
+ 'One actual DesignExists witness and the exact same-family local/theta/operator dictionary: original state, reads, coefficient maps, lattices, rows and actual spectra. D denotes missing human identification or route interpretation; its arithmetic construction may be C.',
+ 'The nine original Closed predicates consumed by topDesWin: LinkN, LinkEta, LinkIRR, SmallLevelRankEq, TuSize→DGamSize→LinkDIVt, ChosenE→NuFullF∧MuRank, LinkG, TuSize→LinkS, and TuSize→DGamSize→LinkGLOBAL. Their exact class inclusions and HypV are retained. Shared producer work is counted once without asserting that partial dependency lists are sufficient.',
+ 'Original RealPlaceSecondLayerConditions and the matching MassRatioUnderVolume and GenusMassAt(D2) supply shared full-rank/global-slope work; the exact LinkGl installation remains distinguished from those arithmetic inputs.',
+ 'CountI at the target field Kstar(pK chi): CorGK suffices; PropGK is a stronger source route through OneChar, the exact RigII/Kato/adjoint and marked automorphic inputs, and the original uniform rank-three congruence integer. Its aggregation is complete.',
+ 'CountII: one rank-four ordinary Hecke ideal on each of QX’s two actual Links, with all six HidaPropsAlt fields and P1core on that same ideal after one common coefficient threshold. QX/YX provide the downstream PMExAlt and CountII joins.',
+ 'CountV: the exact ThmS6_s, HostRigid_s and HostNumber_s producers and their separately classified original-host frame/vanishing/XPP installations. The principal-target bad primes 3 and 7 do not bound the dyadic conductor. CountV’s Gaussian-field endpoint is not CountI’s field.',
+ 'For unrestricted Dirichlet targets only, the selected Case-III route still needs SeedIVAlt and original Ctx3 promodularity, including the rank-four chain/component construction. The KA5–KA6 specialization eliminates this producer for power-of-two-order targets, not globally.',
+ 'The positive-part AQ envelope is a proved alternative analytic endpoint, but no arithmetic construction of that weaker envelope is claimed. Stronger all-rank packages and unused alternatives are not added to the selected sufficient cut.'
+]
+priority = (
+ 'First resolve the shared original local/theta/operator dictionary and the exact second-layer/mass bindings on the selected family. '
+ 'Use the resulting identity to close the bounded SmallLevelRankEq installation if applicable, and then carry one producer through its actual topDesWin predicate. '
+ 'Keep the same-ideal rank-four ordinary support producer as a distinct substantial count priority. '
+ 'Do not automatically extend the newest count branch or the Case-III branch when prioritizing ordinary RH.'
+)
+updates = {
+ 'AN1': ('ZW4 now proves the full numerical window consequence of the literal ChainTied record; producing that same-family record and its arithmetic inputs remains. AQ offers a weaker positive-part envelope only as a separate conditional endpoint.', ['ZW4','AQ4']),
+ 'SC2': ('ZW2–ZW4 reconstruct every weighted-slope and error-absorption step from the exact eleven-field ledger to the original window exponent. The upstream geometric SlopeIneq and literal family producers retain their roles.', ['ZW2','ZW3','ZW4']),
+ 'DA1': ('MT supplies the previously separate metric/floor transport. The v0.30 selected-route audit preserves the exact DesignExists and nine Closed-predicate cut and distinguishes shared source identities from sufficient implication edges.', ['MT7']),
+ 'DA2': ('ZW closes the complete numerical consequence of literal ChainTied, and HX closes its host-existence join conditional on VWinAt(401). No additional independently supplied arithmetic-gap record is required after the literal tied family.', ['HX4','ZW4']),
+ 'HC9': ('HX1–HX3 match the least-prime, admission, rank, short-norm and analytic host suppliers to every original hostOfFieldOf clause; HX4 proves the same-field boundedTw and window rescaling joins.', ['HX1','HX2','HX3','HX4']),
+ 'HC10': ('HX4 supplies the actual host-existence implication from the original target VWinAt(401), including floor(x^400) and the fixed scale parameter J. The cohomological premise remains arithmetic.', ['HX4']),
+ 'HV10': ('KA closes CountI aggregation from CorGK at Kstar(pK chi), with PropGK sufficient. For a fixed target of power-of-two order, KA5 makes the same-target Case-III predicate vacuous and KA6 propagates the reduced I/II/V cut through this original consumer.', ['KA4','KA5','KA6']),
+ 'VW3': ('KA6 gives the fixed power-of-two-target specialization of the inherited height/window chain, preserving the original prime-pair conditions and all uniform quantifiers. General targets still need the Case-III producer.', ['KA6']),
+ 'VW4': ('HX4 installs this VWinAt(401) conclusion into the literal host at cutoff400. KA6 gives the reduced power-of-two-target count route, while retaining all original window/prime-pair guards.', ['KA6','HX4']),
+ 'YX2': ('Its complete PMExAlt→CountII chain is unchanged. KA4 narrows CountI to CorGK at the target field, and KA5–KA6 remove Case III only for the fixed power-of-two-order specialization.', ['KA4','KA5','KA6']),
+ 'WB7': ('ZW1–ZW4 now supply the complete exact tied-family identification, weighted ledger, error absorption and scalar hypotheses, conditional only on the literal ChainTied/EFamC data and their fixed constants.', ['ZW1','ZW2','ZW3','ZW4']),
+ 'GH7': ('The selected same-family topDesWin route is audited in v0.30; host and metric joins and the terminal numerical gap are reconstructed. Common-family arithmetic producers and I/II/V counts remain, with III required only beyond the power-of-two-target specialization.', ['HX4','MT7','KA6','ZW4'])
+}
+cfg = dict(artifact_version='0.30', date='2026-11-22', predecessor_version='0.29',
+           components=components, scope=scope, new_in_this_version=new,
+           remaining_major_inputs=remaining, next_local_priority=priority,
+           claim_updates={k:dict(statement=v[0],supplied_by=v[1],scope='Additive current-scope update; original claim and dependencies retained.') for k,v in updates.items()},
+           completed_previous_frontier=[new[i] for i in range(5)],
+           next_steps=[priority,
+             'Keep the graph at exact source interfaces; record the proof of an implication separately from the production of its arithmetic premises.',
+             'For CountI, preserve the narrower CorGK cut and the exact fixed field. For CountII, construct both HidaPropsAlt and P1core on the same ideal with one coefficient threshold.',
+             'For CountV, use the literal Gaussian/quartic endpoint and its marked host predicates. Use shared catalogue methods only after their field and representation matches are proved.',
+             'Treat Case III/SeedIV as a general Dirichlet-GRH branch, absent from the power-of-two-target route. Keep AQ as an alternative endpoint until an arithmetic envelope supplier is established.'],
+           precision_notes=[
+             'The source Lean proof is assumed fully checked and correct, as requested. A D item concerns our human source understanding only.',
+             'The audit is minimal at specified sufficient interfaces, not a proof of mathematical minimality and not an exhaustive Lean dependency graph.',
+             'The same actual host, field, family, maps, lattices, metrics, coefficient rings and quantifier order must be retained; partial producer lists and semantic work-sharing links are not sufficient AND rules.',
+             'Case III is vacuous only for targets of power-of-two order, including the principal target. Counts I, II and V remain nonempty even for RH.',
+             'For the principal target, CountI uses Q(sqrt(-7)); CountV has a distinct Gaussian/quartic field endpoint. Shared rank-three methods do not identify the two.',
+             'An integral positive-part AQ bound must use a fixed positive target family and fixed stretch before eta and the arbitrarily late window; no arithmetic producer is supplied.',
+             'All 245 inherited targets are retained with complete scope dispositions. Their 107 groups and A/B/C/D record counts are navigation statistics, not independent-obligation counts or completion percentages.',
+             'Original claim/source fields and old mathematical edges are preserved. Additive scope updates do not retroactively remove conditional hypotheses.',
+             'No Lean build or kernel replay is performed. Draft-mode TeX checks syntax and cross-references and does not certify visual layout. No new PDF is generated.'])
+(ROOT/'increment_v0_30.json').write_text(json.dumps(cfg,ensure_ascii=False,indent=2)+'\n')
+print('Configured v0.30 with five proof components and the selected-route audit.')

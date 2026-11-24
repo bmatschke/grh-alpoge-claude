@@ -1,0 +1,816 @@
+\section{The symmetric terminal levels and their Hermitian geometry}
+\label{sec:terminal-geometry}
+
+\status{TG1--TG12 construct the previously missing symmetric
+penultimate level, terminal row chart, full and row auxiliary levels,
+terminal incidence and Hermitian carriers. They finish the actual
+\texttt{FormsTiedSym} and \texttt{ColsTiedSym} constructions.
+They use the actual arithmetic
+host and the stated \texttt{TC.Ok}, \texttt{Pins}, \texttt{Laws} and
+\texttt{Later} data. Initial decorated-point realizers are supplied by
+DR3, not retained as an additional hypothesis. Integral lattices,
+specified residue maps, preferred class representatives and the common
+global coordinate frame are preserved throughout.}
+
+\paragraph{Conventions and supplied data.}
+Keep the true column datum $I:\mathrm{TC}(B,X)$ and write
+$D=I.\mathrm{rec7}(l,Z)$. The words $u$ range over the original word
+set; all constructions below use the one auxiliary-prime datum $G$ of
+FC13. Fix $u$ temporarily, put $p=T_u$, $\pi=\pi_u$ and
+$\mathcal O=\mathcal O_E$, and use the standard coordinates of SF2:
+\[
+ h(x,y)=\bar x^{\mathsf T}y,\qquad
+ \pi\bar\pi=p,\qquad(\pi,\bar\pi)=\mathcal O.
+ \tag{TG.1}
+\]
+The selected type primes are $S=\{P:P\mid\pi\}$. Their residue
+maps are the original maps $\operatorname{res}_P$; the selected
+auxiliary primes lie over $g_0,g_1$, are disjoint from $S\cup\bar S$,
+and satisfy $\pi\equiv1$ there. The reference twist has no $Q$-frame
+primes. The supplied rank identities give
+\[
+ s=m/2-1,\quad r=k+2s+1=k+m-1,\quad
+ N_{m-1}=r+(m-1)t,\quad n=N_m-1=r+mt.
+ \tag{TG.2}
+\]
+Here $m\ge2$ is even and $t>0$ is odd. The row space is $E^n$,
+the full terminal space is $E^{n+1}$, and the inclusion $\iota$ is
+$x\mapsto(x,0)$. The distinguished vector spanning its orthogonal
+line is not silently identified with the last basis vector.
+
+\paragraph{TG1: the penultimate symmetric group is the actual residue group.}
+For any relevant matrix size $d$, put
+\[
+ \rho(a)=
+ \begin{cases}s+a&a<k,\\a-k&k\le a<k+s,\\a&a\ge k+s,
+ \end{cases}
+ \qquad
+ \ell(a)=
+ \begin{cases}\rho(a)&a<r,\\r+\lfloor(a-r)/t\rfloor&a\ge r.
+ \end{cases}
+ \tag{TG.3}
+\]
+The group $J_{\rm sym}(d)$ consists of the invertible residue
+matrices $M$ such that both $M$ and $M^{-1}$ satisfy
+\[
+ M_{ab}=0\quad\hbox{if }\ell(b)<\ell(a),\qquad
+ M_{aa}=1\ (a<r),\qquad M_{a,k+s}=0\ (a<k).
+ \tag{TG.4}
+\]
+This is literally \texttt{JSymG} with its final Boolean equal to
+\texttt{false}, hence the source's \texttt{HSym}. At step $m-1$
+the actual finite group $\mathrm{levG}$, transported through the
+specified auxiliary residue-field isomorphism, equals
+$J_{\rm sym}(N_{m-1})$.
+
+Here is a proof of both inclusions. At an auxiliary prime $P$ the
+integer $q=g_a$ is a uniformizer in $\mathcal O_{E,P}$, since the
+prime is completely split and has residue cardinality $g_a$.
+The extra-space parameter at step $m-1$ is zero. Thus the actual
+flag lattice at a head cut $b<r$, or a block cut $b=r+jt$, is
+\[
+ F_b=\{x:\ x_a\in q\mathcal O_{E,P}
+                \text{ if }\rho(a)\ge d(b),\quad
+                x_a\in\mathcal O_{E,P}\text{ otherwise}\},
+ \quad d(b)=\begin{cases}s&b=k+s,\\b&b\ne k+s.\end{cases}
+ \tag{TG.5}
+\]
+The marked vector for the head cut $b$ is $e_{\rho^{-1}(b)}$.
+The local group preserves these lattices and satisfies
+$(g-1)e_{\rho^{-1}(b)}\in F_b$. Taking $b=\rho(a)$ forces the
+head diagonal to be one and every entry below it in the ordering
+$\ell$ to vanish modulo $P$. At $b=k+s$ the cut begins at $s$;
+its marked-vector condition additionally forces
+$M_{a,k+s}=0$ for $a<k$. The block cuts force all lower off-block
+entries to vanish. Applying the same argument to $g^{-1}$ proves
+all of (TG.4) for the inverse as well: preservation of $F_b$ turns
+$(g-1)e\in F_b$ into $(g^{-1}-1)e=-g^{-1}(g-1)e\in F_b$.
+
+Conversely, lift $M$ entry by entry to $\mathcal O_{E,P}$.
+Its determinant is a unit, so the lift $g$ and its inverse are
+integral and reduce to $M,M^{-1}$. If a row lies on the scaled
+side of a cut (TG.5) and a column does not, then
+$\ell(\text{column})<\ell(\text{row})$. Therefore the corresponding
+entry of $g$ is divisible by $q$. These divisibilities prove
+$gF_b\subset F_b$, and the inverse conditions prove equality.
+For a marked head vector, every scaled coordinate of
+$(g-1)e_{\rho^{-1}(b)}$ vanishes modulo $P$: use the diagonal and
+lower-entry conditions, and at the exceptional cut use precisely
+the extra zero block in (TG.4). Division by the uniformizer now
+gives the required membership in $F_b$. Hence the lift belongs
+to the actual local symmetric flag group. The supplied
+\texttt{grpG} and \texttt{last\_h} laws identify its reduction
+image with $\mathrm{levG}$. This proves equality, including
+surjectivity onto the stated finite group; it is not just a
+containment of possible reductions.
+
+\paragraph{TG2: the exact penultimate character and common level.}
+For $b$ complete $t$-blocks after the head, define
+\[
+ \Lambda_b(M)=
+ \psi\!\left(\sum_{\substack{0\le a<r-1\\a+1\ne k}}
+                     M_{a,a+1}\right)
+ \prod_{j=0}^{b-1}\chi_j\!\left(
+       \det M_{[r+jt,r+(j+1)t)}\right).
+ \tag{TG.6}
+\]
+This is exactly \texttt{lamSym}; the omitted edge is the entry
+$(k-1,k)$ in the original coordinate order. The character of the
+actual penultimate finite level is $\Lambda_{m-1}$, after the
+same residue-field transport as in TG1.
+
+Indeed, with extra-space parameter zero, the coordinate matrix
+in the flag character is the original matrix. Its additive
+argument is the two superdiagonal sums separated by the omitted
+edge; its other factors are the displayed determinants. Reduction
+commutes with these sums and determinants. The extra inverse
+character has argument zero and contributes one. Every block
+determinant is nonzero on the group, so the source's extension
+of a multiplicative character by zero contributes its ordinary
+unit value. FC13 identifies $\psi$ and every $\chi_j$ under the
+prescribed residue embeddings. Agreement there on natural
+integer residues suffices because each auxiliary residue field
+is the prime field of order $g_a$. This proves (TG.6) on every
+group element and also proves that it is a character: it is the
+transport of the actual level character.
+
+Take the common level $J$ and finite $J$-set of FC12, obtained
+from the zero-coupling chart. TG1 identifies its auxiliary
+reduction groups with $J_{\rm sym}(N_{m-1})$. FC14 then gives
+the actual \texttt{GLevH}, with frame equal to the identity at
+every auxiliary place and local character (TG.6), $b=m-1$.
+The global character retains the source's inverse convention:
+$\chi_J(x)$ is the product of $\Lambda_{m-1}$ evaluated at the
+inverse reductions of $x$. None of the common-level construction
+is changed. In particular
+\[
+ Y=\coprod_\beta J/U_\beta,\qquad
+ \operatorname{Stab}_J([1]_\beta)=U_\beta,
+ \qquad \chi_J|_{U_\beta}=\chi_\beta.
+ \tag{TG.7}
+\]
+The finite reduction kernel lies in every $U_\beta$, which makes
+all these coset sets finite. This proves the full
+\texttt{stepBefore\_oneLevel} conclusion, including its specified
+$\mathrm{HSym}$ and $\mathrm{lamSym}$ clauses.
+
+\paragraph{TG3: construct the terminal row chart.}
+The raw row action has empty type-prime set and, at the reference
+twist, empty $Q$-frame set. Its valid decoration has a full
+self-dual lattice $N_c\subset E^n$, the prescribed auxiliary
+residue bases, and the actual finite groups
+$\Lambda_P=\mathrm{rowTyG}_P$. Define the row base lattice to be
+$\mathcal O^n$. At auxiliary places impose reduction in
+$\Lambda_P$; elsewhere take the full integral unitary stabilizer.
+Let $U_P$ be this adelic level and give it character
+\[
+ \chi_P(x)=\sigma\!\left(
+       \prod_{Q\in S_G}\lambda_Q(\operatorname{red}_Q(x)^{-1})
+                         \right).
+ \tag{TG.8}
+\]
+Each preferred row decoration has an actual adelic representative
+$y_P(c)$ by DR3, with these exact residue bases. Thus
+$y_P(c)\widehat{\mathcal O}^{n}=\widehat N_c$.
+
+The classes of the original row action identify bijectively with
+the double quotient by the rational unitary group and $U_P$.
+To check this assertion, write the group action as its rational
+factor $\gamma$ and its auxiliary finite factor $a$. A relation
+between two decorations gives, by the exact carried-lattice and
+residue-basis equations, a matrix $x$ with
+$\operatorname{rat}(\gamma)y_P(c')=y_P(c)x$ and $x\in U_P$.
+Conversely this adelic equality recovers the lattice by rational
+intersection (AD4), and recovers the finite factor by reduction;
+it is the original decoration relation. For surjectivity, start
+with any unitary finite adele, intersect its carried lattice
+with $E^n$, and use its reduced inverse coordinates as the
+auxiliary bases. At each place its lattice is a unitary image of
+the self-dual standard lattice; the paired-dual calculation of
+NB1 and the local-global intersection of LP1 make the global
+lattice self-dual. Its reduced inverse coordinates are an actual
+residue basis, so the resulting decoration is valid. Its preferred
+representative is in the same double coset.
+
+The stabilizer map is the actual rational factor $s\mapsto\gamma_s$.
+It is injective: when $\gamma_s=1$, preservation of the auxiliary
+bases forces every finite factor to be one; there are no other
+factors because the reference $Q$-set is empty. Its range is
+exactly the rational unitary elements in
+$y_P(c)U_Py_P(c)^{-1}$. Equation (TG.8) is the corresponding
+character relation, with the inverse already accounted for.
+These statements prove every \texttt{ReadsP} and
+\texttt{ClsPTied} field, not merely the existence of a name for
+such a chart.
+
+Apply CV10 to this actual chart, using its unchanged frame
+identification. It gives the complex, rational and exact integral
+row-value clauses. The constant shift of the terminal weight by
+$m(t+1)/2$ leaves its polynomial weight, integral $\Delta$ lattice
+and Fock pairing unchanged; the determinant factor stays in the
+frame evaluation. FC7 therefore supplies the Petersson and
+\texttt{NormPTie} clauses with the specified embeddings and
+rational basis. We obtain the source's full
+\texttt{clsP\_tie}, with its stipulated identity map on row
+frame functions. No equality between integral $\Delta$ and
+dual-Weyl lattices is used.
+
+\paragraph{TG4: the full and row terminal levels and their frames.}
+On $E^n$, the actual row finite group is the parabolic with
+symmetric head and $m$ blocks of size $t$. By reading its
+head and block conditions, it is $J_{\rm sym}(n)$ of (TG.4).
+On $E^{n+1}$ the terminal finite group is the same parabolic
+with one final block of size one, and with the final column
+fixed. The lower block-zero condition forces the final row to
+vanish away from its diagonal. Consequently it is exactly
+$J_{\rm sym}^{+}(n+1)$, where both the final row and final
+column are those of the identity, for the matrix and its inverse.
+This is \texttt{JSymG true}. Conversely these conditions give
+the original parabolic and fixed-column conditions, so both
+identifications are equalities.
+
+The character in each case is (TG.6) with $b=m$. The same
+skipped-superdiagonal and block-determinant calculation proves
+this, including the coefficient embedding. The full terminal
+base lattice is
+\[
+ L_\pi=\mathcal O^n\oplus\pi\mathcal O,
+ \tag{TG.9}
+\]
+whereas the row base is $\mathcal O^n$. At an auxiliary place
+$v$, $\pi$ is a unit. For its prescribed split projection
+$\phi_v$, choose
+\[
+ F_P(v)=I_n,\qquad
+ F_M(v)=\operatorname{diag}(1,\ldots,1,\phi_v(\pi)).
+ \tag{TG.10}
+\]
+The latter spans the same completed integral lattice as the
+identity and commutes with the full residue group, because that
+group fixes the last row and column. Thus the level description
+and character are unchanged. FC14 supplies both actual
+\texttt{GLevH} records in these frames. Their first columns
+satisfy $F_M\iota=\iota F_P$, and their final column is
+$\phi_v(\pi e_{n+1})$. These are exactly the two
+\texttt{FrExtFr} equations. They hold for every auxiliary place
+and use the one $G$ shared across all words.
+
+\paragraph{TG5: the terminal vector, lattices and residue functional.}
+Put $z_0=\pi e_{n+1}$. For the actual raw terminal extension of a
+row decoration with self-dual lattice $N_c$, its three lattices
+are distinct:
+\[
+ \widetilde N_c=\iota N_c\oplus\mathcal Oe_{n+1},\qquad
+ \widetilde L_c=\iota N_c\oplus\pi\mathcal Oe_{n+1},\qquad
+ \widetilde L_c^{\#}=\iota N_c\oplus\bar\pi^{-1}
+                                      \mathcal Oe_{n+1}.
+ \tag{TG.11}
+\]
+The raw type functional is
+$\widetilde f_P(x)=\operatorname{res}_P(\bar\pi x_{n+1})$.
+These identities also follow directly from the definitions:
+the row type set is empty, so its $N,L,L^{\#}$ coincide;
+the extra $N$ coordinate is integral; the simultaneous kernels
+of $\operatorname{res}_P(\bar\pi x_{n+1})$ require
+$x_{n+1}\in\bigcap_{P\in S}P=\pi\mathcal O$ by FC1;
+and Hermitian duality sends $\pi\mathcal O$ to
+$\bar\pi^{-1}\mathcal O$. Thus the normalization is
+$\bar\pi$, rather than $\pi$.
+
+The source's chosen movement $m_c$ takes the preferred full
+representative of $\widetilde c$ to this raw extension. Let
+$\gamma_c$ be its rational unitary factor. The finite factors
+leave the type kernel lattice unchanged. Consequently
+\[
+ \gamma_c L_{\widetilde c}
+      =\iota N_c+\mathcal O z_0,
+ \qquad h(z_0,z_0)=\bar\pi\pi=p.
+ \tag{TG.12}
+\]
+The vector $z_0$ spans the specified orthogonal line. Indeed,
+any nonzero vector $z_c$ orthogonal to $\iota E^n$ has zero first
+$n$ coordinates, so $z_0=(\pi/(z_c)_{n+1})z_c$. Nonvanishing
+of the last coordinate follows from $z_c\ne0$. This proves the
+required span statement without changing the distinguished
+$z_c$. Applied to the standard row base, (TG.12) is also the
+exact \texttt{TilBaseLat} identity.
+
+For the functional clause, let $x\in L_{\widetilde c}^{\#}$ and
+suppose $a=h(z_0,\gamma_cx)\in\mathcal O$. Set $b=\bar\pi$.
+The dual-lattice identities at the selected and conjugate primes
+give $bL_{\widetilde c}^{\#}\subset N_{\widetilde c}$.
+On this latter lattice, FC5 identifies the quotient projection
+with the original decoration projection, while the period
+extension has exactly the functional in (TG.11). Hence
+\[
+ \operatorname{res}_P(b)\,
+   f_P(\operatorname{pr}_P x)
+   =f_P(\operatorname{pr}_P(bx))
+   =\operatorname{res}_P(ba).
+ \tag{TG.13}
+\]
+Here the rational movement is the same $m_c$ as in (TG.12);
+its finite factors do not rescale the type functional.
+Since $\operatorname{res}_P(b)\ne0$, cancellation gives
+\[
+ f_P(\operatorname{pr}_P x)
+       =\operatorname{res}_P\bigl(h(z_0,\gamma_cx)\bigr).
+ \tag{TG.14}
+\]
+This is the full \texttt{TilTied} functional clause on the
+Hermitian dual, not just on its sublattice $N$. The identical
+calculation on the base lattice, with FC6's exact completed
+functional, gives \texttt{TilBaseFv}.
+
+\paragraph{TG6: the actual terminal adelic incidence and evaluation.}
+For a row unitary matrix $y$, let
+$\operatorname{ext}(y)=\operatorname{diag}(y,1)$. By (TG.11)
+and the integral adelic-span identity of AD4, this extension
+carries $\widehat{\mathcal O}^{n+1}$ to
+$\widehat{\widetilde N}_c$ whenever $y=y_P(c)$.
+Let $k$ be the actual basepoint matrix of AD1. Then
+$\operatorname{ext}(y_P(c))k$ realizes the raw terminal
+decoration, including its exact residue bases. At a type prime
+the inverse last row of $k$ has residue
+$\bar\pi e_{n+1}$, which gives the functional in (TG.11).
+At auxiliary primes $k=1$ and $\pi\equiv1$, so the new last
+residue coordinate $x_{n+1}/\pi$ equals $x_{n+1}$ modulo the
+prime; the other coordinates are the original row residue basis.
+There are no reference $Q$-frames to check. This proves all
+\texttt{IsPtOf} clauses of the extension.
+
+Write $y_M(\widetilde c)$ for the chosen full chart representative.
+The exact level-reading relation, applied to the finite part of
+the same movement $m_c$ used in TG5, gives
+\[
+ x_c=y_M(\widetilde c)^{-1}
+       \operatorname{rat}(\gamma_c)^{-1}
+       \operatorname{ext}(y_P(c))\in U_M,
+ \qquad \chi_M(x_c)=\sigma(\chi_{\rm col}(m_c)).
+ \tag{TG.15}
+\]
+The terminal coupling set is trivial, so this reading introduces
+no further chart condition. Set $\kappa_c=x_c^{-1}$. Then
+\[
+ \operatorname{rat}(\gamma_c)y_M(\widetilde c)
+       =\operatorname{ext}(y_P(c))\kappa_c,
+ \qquad
+ \chi_M(\kappa_c)^{-1}=\sigma(\chi_{\rm col}(m_c)).
+ \tag{TG.16}
+\]
+These equations fix both inverse conventions.
+
+They prove the literal \texttt{TilAd} statement for every matrix
+$g$ satisfying the stated extension conditions. In fact those
+conditions force $g=\operatorname{ext}(y_P(c))$: the equation
+$g\iota=\iota y_P(c)$ determines the first $n$ columns, and
+$g z_0=z_0$ determines the last column because the image of
+the nonzero field element $\pi$ is a unit in every coefficient
+algebra under consideration. Thus no alternative extension is
+being chosen in \texttt{TilAd}.
+
+Finally, on frame functions the source's terminal restriction is
+defined using $m_c$ as
+\[
+ (\operatorname{ev}_{z_0}\varphi)(c,z)
+  =\sigma(\chi_{\rm col}(m_c))\,
+           \varphi(\widetilde c,\gamma_c^{-1}z).
+ \tag{TG.17}
+\]
+With the unchanged frame identification and $eW_z=\mathrm{id}$,
+if $z=\gamma_c z'$ then (TG.16)--(TG.17) give
+$(eW_z\operatorname{ev}_{z_0}\varphi)(c,z)
+=\chi_M(\kappa_c)^{-1}\varphi(\widetilde c,z')$.
+This proves the source's exact \texttt{EvzTie}, together with
+the prescribed identity $eW_z=\mathrm{id}$. TG5--TG6 therefore
+prove \texttt{til\_ties} with its actual chosen $\gamma_c$,
+vector and lattices, not an abstract substitute incidence.
+
+\paragraph{TG7: construct the full simultaneous symmetric forms.}
+Choose $G$ once as in FC13. At every step and every word, DR3
+supplies the decorated realizers used in FC3. Construct those
+charts and apply FC4's functional normalization, which preserves
+their lattice, local and global levels, characters, representatives
+and stabilizer maps. Keep their original chart labels. The finite
+class law and surjectivity of the label map make each label set
+finite; the terminal label set is the one-element set, because
+its coupling data are empty. At the endpoints reindex this
+one-element chart as a \texttt{ClsTied}.
+
+We now assign every part of \texttt{FormsTiedSym} to a construction
+already proved. FC1 supplies the exact type-prime data. CV9 and
+FC7 give the endpoint and middle complex, rational, integral,
+Petersson and norm clauses. FC5--FC6 give their quotient maps
+and normalized completed residue functionals; FC17 gives their
+integral basis comparison. NB7--NB8, with DR3 discharging their
+initial realizer premise, give all up and down naturality clauses.
+FC18 gives endpoint and middle dilation, including preservation
+of the chart label. FC14 gives the middle reduction groups and
+characters, and FC15 gives the prescribed step-zero group.
+TG1--TG2 give the common penultimate group, character, frame and
+finite orbit carrier. TG3 gives the actual row class/value/norm
+objects. TG4 gives the terminal full and row levels and their
+frame extension. TG5--TG6 give every terminal lattice, functional,
+adelic-incidence and evaluation clause. FC8 supplies the period
+map and its metric compatibility with these same frame functions.
+
+All frame identifications are the fixed coordinate identifications
+of SF2; thus the required \texttt{DGam} equality and the identity
+$eW_z$ are literal equalities. The quotient maps retain the
+prescribed formulas on $N_c$ and on the down kernel lattice,
+so \texttt{StdLvC} holds, including its identity penultimate
+frame. The step-zero and row auxiliary frames are identity for
+every word, and every $G$ is the one chosen above. Its
+\texttt{CharacterCompatible} law is FC13. These assignments
+construct the exact conclusion of
+\texttt{formsTiedSym\_std}: a simultaneous family of full
+\texttt{FormsTiedSym}, \texttt{StdF}, \texttt{StdLvC}, finite
+chart sets, a unique terminal chart, a constant $G$, and the
+stated character compatibility. No terminal field remains an
+independent existence premise.
+
+\paragraph{TG8: the discriminant, valuation orientation and projections.}
+For every valid class lattice $L_c$, put $H_c=L_c^{\#}$.
+Then
+\[
+                     H_c/L_c\simeq_{\mathcal O}\mathcal O/(p).
+ \tag{TG.18}
+\]
+To prove this, use the self-dual companion $N_c$ and choose a
+local basis at a selected prime $P$ adapted to its nonzero type
+functional. Then $L_{c,P}$ is obtained from $N_{c,P}$ by
+replacing one summand $\mathcal O_P$ by $P\mathcal O_P$.
+At $\bar P$, $L_{c,\bar P}=N_{c,\bar P}$. Hermitian duality
+between the paired primes therefore gives
+$H_{c,P}=N_{c,P}$, and at $\bar P$ exactly one enlarged dual
+summand. Consequently $(H_c/L_c)_P$ and
+$(H_c/L_c)_{\bar P}$ are one-dimensional residue modules;
+the quotient vanishes at every other prime. The same calculation
+shows $pH_c\subset L_c$. FC1 gives
+$(p)=\prod_{P\in S}P\bar P$ with no repetitions. The Chinese
+remainder idempotents decompose the finite $\mathcal O/(p)$-module
+$H_c/L_c$ into these one-dimensional factors. Choosing one
+nonzero vector in each factor gives (TG.18). This proves the
+source's \texttt{DiscCl}; it is a module equivalence, with no
+claim of an isometry of discriminant pairings.
+
+The source's \texttt{SeenCl} has the original valuation
+orientation. For a coefficient place $w$, pull its valuation back
+along the prescribed embedding
+$E\xrightarrow{\sigma_{\tau(w,v)}}E\xrightarrow{j_E}L$;
+call it $\nu$. The \texttt{tauOf} identity says that the positive
+ideal of its restriction to $\mathcal O_F$ is the prescribed
+$v$. The positive ideal on $\mathcal O_E$ is a nonzero prime:
+all integral elements have nonnegative valuation, and $p$ has
+positive valuation. It is therefore a maximal prime over $v$.
+By FC1 there are exactly the paired primes $P,\bar P$ over $v$.
+The supplied \texttt{seenP} identity gives $\nu(\pi)>0$ in
+the seen case, hence selects $P$; in the other case it gives
+$\nu(\bar\pi)>0$ and selects $\bar P$. Thus
+\[
+ \nu(a)>0\quad\Longleftrightarrow\quad
+ \begin{cases}a\in P&\text{if seen},\\a\in\bar P&\text{otherwise}
+ \end{cases}\qquad(a\in\mathcal O).
+ \tag{TG.19}
+\]
+Injectivity of the distinguished coefficient embedding identifies
+the $L$-element appearing in \texttt{SeenCl} with this precise
+pullback. This rules out changing either the residue prime or
+the embedding in (TG.19).
+
+Let $C_i$ denote the fixed coordinate isometry from the original
+Hermitian space to $E^{N_i}$. Directly from the pairing,
+$C_i(L^{\#})=(C_iL)^{\#}$. Linearity also gives
+$C_i(P L)=P C_i(L)$, commutation with sums, and commutation with
+localization: a witness $az\in L$, $a\notin P$, is sent to the
+same witness $aC_i z\in C_iL$. Therefore the Hermitian
+projections may be defined by
+\[
+ \operatorname{pr}^{H}_P(z)=\operatorname{pr}_P(C_i z),
+ \qquad
+ \operatorname{prk}^{H}_P(z)=\operatorname{prk}_P(C_i z).
+ \tag{TG.20}
+\]
+They have exactly the surjectivity, residue-linearity and kernels
+of FC5. In particular the two kernels are $PH_c$ and
+$P(L_c+PH_c)$, respectively; the kernel of the composed type
+functional is $L_c+PH_c$. The multiplication-by-$p$ relation
+between the two quotients is preserved by $C_i$.
+
+At a middle step the standalone and chart projections are equal
+on the whole required domains. They agree by definition on
+$N_c$ and on the original down lattice. For arbitrary
+$z\in H_c$, multiply by $b=\bar\pi$; then $bz\in N_c$.
+For $z\in L_c+PH_c$, the same multiplication lies in the
+original down lattice, by its local kernel description at $P$
+and the unchanged conditions at other primes. Apply the known
+projection equality there and cancel the nonzero scalar
+$\operatorname{res}_P(b)$. This proves both equalities in
+\texttt{pr\_lvC\_eq\_lv}, including their integral domains.
+
+\paragraph{TG9: Hermitian row carriers and every level-prime move.}
+Pull each row lattice of TG3 back by $C_P=\operatorname{crdP}$,
+and transport its unitary level and rational stabilizer matrices
+through the same rank reindexing. The row base becomes the
+original standard lattice $X'.L_0$, since its orthonormal frame
+has integral coordinates. This gives the row class carrier,
+with identical representatives, double quotient and stabilizer
+range. Its level is hyperspecial away from the two auxiliary
+primes. It contains the required principal congruence subgroup
+at an auxiliary place: if $(x-1)$ sends the standard integral
+lattice into $g_a$ times itself, testing on coordinate vectors
+gives a matrix $x=I+g_a Z$ with $Z$ integral. Its residue is
+$I$, which lies in the row residue group of TG4. Thus the
+literal \texttt{StepLevel0}, \texttt{ClassTie} and
+\texttt{SameCar} conditions all hold. The lattice identity is
+$C_P(\mathrm{lattice}_2(c))=N_c$.
+
+Transport the actual NB up and down matrices by
+$\Gamma=C_i^{-1}\gamma C_i$. Write $L=L_c$, $H=L^{\#}$,
+$K=L+PH$, and let primes and quotient vectors keep their
+original meanings. For an up vector $z\in H$ with
+$f_P(\operatorname{pr}_Pz)=1$, NB5 gives
+\[
+ (\gamma L_{c'})_P=H_P,\qquad
+ (\gamma H_{c'})_P=(H+\mathcal O p^{-1}z)_P,
+ \quad f'_{P}(\operatorname{pr}'_P x)
+      =f_P(\operatorname{pr}_P(p\gamma x)).
+ \tag{TG.21}
+\]
+The last identity is asserted on the exact domain
+$x\in H_{c'}$, $p\gamma x\in H$. For a down functional
+$g\ne0$, the corresponding formulas are
+\[
+ (\gamma H_{c'})_P=L_P,\qquad
+ f'_{P}(\operatorname{pr}'_P x)
+             =g(\operatorname{prk}_P(\gamma x))
+       \quad(x\in H_{c'},\ \gamma x\in K).
+ \tag{TG.22}
+\]
+NB6 gives in both cases the same moving matrix and a factorization
+\[
+       \operatorname{rat}(\gamma)y_{c'}=y_c\eta\kappa,
+       \quad\kappa\in U_\beta,
+       \quad\eta_v=1\text{ for }v\ne P\cap\mathcal O_F.
+ \tag{TG.23}
+\]
+DR3 supplies its realizer hypothesis. At any other place,
+(TG.23) and the level condition show that $\gamma$ carries the
+new completed lattice to the old one and preserves its
+normalized functional. Rational intersection then gives equality
+of localizations off $P,\bar P$; FC1 identifies these as the
+only two primes above the support place. The other type
+functionals agree by the same completed equation and FC6.
+Using (TG.20), and cancelling the coordinate isometry, proves
+all clauses of the literal Hermitian \texttt{UpCl} and
+\texttt{DnCl}.
+
+The diamond case is equally constructive. For $a\in k_P^\times$,
+choose an integer representing $a$. At the split base place,
+take a unit whose residue is $a^{-1}$ and multiply the last
+coordinate in the selected split factor by that unit and in
+the other factor by its inverse. Set the adelic matrix $\delta$
+to be the identity elsewhere. It is unitary, preserves the base
+lattice, and satisfies $a f(\delta x)=f(x)$; thus it is an
+actual \texttt{IsDia} element. FC18 gives the exact diamond
+class and a factorization (TG.23). Both $\delta$ and $\kappa$
+stabilize the completed base lattice, so AD4 gives
+\[
+ \gamma L_{c'}=L_c,\qquad
+ f'_{P}(\operatorname{pr}'_P x)
+        =a f_P(\operatorname{pr}_P(\gamma x)),
+ \tag{TG.24}
+\]
+with equality of every other type functional. These are the
+\texttt{DilCl} clauses after coordinate transport.
+
+NB4 and FC18 preserve the middle chart label. At the terminal
+step its uniqueness supplies the same assertion. Equation
+(TG.23), reindexed without changing its factors, is consequently
+the required \texttt{Ad0S} or \texttt{AdIS} relation for each
+move. This proves all six clauses of
+\texttt{SymmetricAdelicCompatibility}. For indices beyond $m$,
+or move parameters not satisfying their defining nonzero
+condition, choose the identity isometry; the source asserts no
+move identity in those cases.
+
+\paragraph{TG10: the terminal Hermitian carrier and stabilizer map.}
+Define the Hermitian type-prime datum $A_u$ using the original
+$\pi$, primes, residue maps and coefficient-place orientation
+from FC1 and TG8; use projections (TG.20), the move isometries
+of TG9, and the row carrier just constructed. Put
+\[
+ z_0^H=C_m^{-1}z_0,\qquad
+ \widetilde\Gamma_c=C_m^{-1}\gamma_c C_m.
+ \tag{TG.25}
+\]
+Equations (TG.12)--(TG.14), together with
+$C_m\iota_H=\iota C_P$, prove the Hermitian terminal lattice
+and functional clauses. Equation (TG.18) gives its discriminant
+clause and (TG.19) its seen-prime clause. Coordinate transport
+proves all remaining quotient and multiplication clauses as in
+TG8. Thus $A_u$ is the actual \texttt{AtT}, not just selected
+maps without their laws.
+
+Every one of the nine \texttt{CarT} requirements is now fixed:
+$\pi$ and the residue map are unchanged; the row carrier and
+row-lattice identity are TG9; the two endpoint projections are
+(TG.20); the middle projection is TG8's cancellation identity;
+and the vector and matrix are (TG.25). This also proves the
+source's \texttt{hermitianSide\_classes\_eq\_formClasses}
+constructor. The same coordinate construction applies to any
+supplied $H$ with the literal \texttt{CarH} equalities, so the
+\texttt{hermitian\_data\_at\_level\_prime} conclusion does
+not require an additional choice of compatible carriers.
+
+For the stabilizer clause, let $s$ stabilize the preferred row
+class $c$. Its raw extension has rational matrix
+$\operatorname{diag}(\gamma_s,1)$, so it intertwines $\iota$
+and fixes $z_0$. The source's stabilizer map is conjugation by
+the actual movement $m_c$:
+\[
+ \operatorname{stabMap}_c(s)=m_c^{-1}\operatorname{ext}(s)m_c.
+ \tag{TG.26}
+\]
+Taking rational factors yields
+\[
+ \gamma_c\,\gamma_{\operatorname{stabMap}_c(s)}\,
+                      \gamma_c^{-1}
+       =\operatorname{diag}(\gamma_s,1).
+ \tag{TG.27}
+\]
+Transport (TG.27) through $C_m,C_P$. On the hyperplane it is
+the row stabilizer action, and on $z_0^H$ it is the identity.
+These are exactly the two
+\texttt{SymmetricStabilizerMapCompatibility} equations.
+
+For the source's formulation with an arbitrary supplied
+\texttt{FormsTiedSym} satisfying \texttt{StdF}, the same
+$\gamma_c$ is forced, rather than assumed. Its evaluation
+clause has $eW_z=\mathrm{id}$ and the standard frame map.
+Test that clause on the indicator of one invertible frame.
+The nonzero character scalar forces
+$\operatorname{frMul}(\gamma_{m_c}^{-1}\gamma_c)z=z$.
+Cancel the invertible frame and use injectivity of one prescribed
+field embedding to obtain $\gamma_c=\gamma_{m_c}$. Thus
+(TG.27) holds in that formulation too. With TG9, this proves
+the full source conclusion: an $A$ with \texttt{CarT},
+symmetric adelic compatibility and symmetric stabilizer
+compatibility, under the stated supplied data.
+
+\paragraph{TG11: normalize the level-zero functional and all residue ties.}
+There is one functional choice in passing from forms to a
+Hermitian level carrier that \texttt{SameCar} alone does not
+specify. We make it explicit. At level zero replace the
+Hermitian target module and functional by the corresponding
+forms target module and functional, pulled back through the
+fixed rank reindexing. This preserves its base lattice, every
+local and global level, representatives, stabilizer maps,
+auxiliary splittings and auxiliary frames. The stabilizer of
+the functional is preserved because the forms level has
+exactly that stabilizer, and \texttt{SameCar} identifies its
+local group. Nonvanishing, cardinality, the $p$-annihilation
+law and vanishing on the base lattice are transported as well.
+Thus this is a valid replacement of a \texttt{ColLevel},
+with all the equalities required by
+\texttt{stepZeroHermitianLevel\_with\_formsFunctional}.
+
+The new target module $M_v$ is annihilated by the actual
+local image of $\pi$. To check it without assuming an extra
+linearity property of the additive equivalence $M_v\simeq k_P$,
+choose a class and a dual-lattice vector whose projected type
+functional is nonzero. Such a vector exists by surjectivity of
+the projection and nonvanishing of that functional. Let
+$m_0\ne0$ be the corresponding value of the completed base
+functional. Multiplying the vector by $\pi$ multiplies its
+projection by $\operatorname{res}_P(\pi)=0$, so the same
+functional comparison gives $\pi m_0=0$. The additive group
+of $M_v$ has prime order $p$; every nonzero element generates
+it. Since scalar multiplication commutes with integer
+multiplication, $\pi M_v=0$. This is precisely the source's
+\texttt{pi\_kills}, and proves the replacement's additional
+annihilation conclusion.
+
+For clarity, the residue comparison can also be constructed for
+any carrier satisfying that annihilation conclusion, not only
+the replacement just chosen. At $v\mid p$ write
+$S_v=\operatorname{intV}(E,v)$. The prescribed split orientation
+identifies it with the product of the two complete local integer
+rings. The selected component of $\pi$ is a uniformizer and
+the other is a unit. Consequently
+\[
+ S_v/(\pi)\simeq\mathbb F_p,\qquad
+ L_{\pi,v}^{\#}/L_{\pi,v}\simeq S_v/(p),
+ \tag{TG.28}
+\]
+where the second quotient is generated over $S_v$ by the
+class of $\bar\pi^{-1}e_{\mathrm{last}}$. Both nonzero completed
+functionals in question vanish on $L_{\pi,v}$, take values
+in groups of order $p$, and are killed by $\pi$ on the target.
+They therefore factor through the one-dimensional
+$S_v/(\pi)$-quotient of (TG.28). Each induced map is an
+isomorphism of additive groups. Composing one with the inverse
+of the other gives the unique additive equivalence of their
+targets which identifies the two functionals. This proves the
+source's cyclic-kernel argument directly, with its selected
+prime orientation; an arbitrary abstract group of order $p$
+would not determine that orientation by itself.
+
+The resulting $fMe_v$ gives the exact level-zero residue identity
+on every class: if $y_c t=C_0z$ locally, then
+\[
+        f_P(\operatorname{pr}^{H}_P z)=fMe_v(fT_v(t)).
+ \tag{TG.29}
+\]
+For intermediate charts define the residue functional on their
+completed Hermitian dual by first applying the coordinate
+reindexing, then the forms functional, then its prescribed
+$fMe$. The equation $y_ct=C_i z$ is equivalent, after this
+reindexing, to $t=y_c^{-1}C_i z$. FC6 and TG8 therefore prove
+the identical relation (TG.29) there. At the terminal step the
+unique chart identifies this with its endpoint functional.
+These are all the \texttt{SymmetricResidueFieldLevels}
+clauses; no linear-algebra existence theorem for an unspecified
+functional is being substituted for their pointwise equations.
+
+Finally set the level-zero auxiliary generators to the original
+$X.\mathrm{piG}$. Their designated-subfield membership, norms,
+split orientation and scalar-diagonal splitting laws are FC13.
+The frame-lattice equivalence is FC15 transported by the same
+rank reindexing, and the last two fields are the annihilation
+law and (TG.29). This constructs the literal \texttt{ColLevelX}
+for every word, hence \texttt{SymmetricLevelZeroData}, with
+the exact identity $\mathrm{piG}=X.\mathrm{piG}$ for every word.
+
+\paragraph{TG12: the complete symmetric column comparison.}
+Construct the forms family by TG7. FC9 transports its charts to
+a Hermitian carrier $H$, and TG8--TG10 construct $A$ with
+\texttt{CarT} and both symmetric compatibility laws. Now apply
+TG11's level-zero functional replacement. Every \texttt{CarH}
+field survives, as do $\mathrm{CarT}$ and the two compatibility
+laws: their level-zero clauses use only the unchanged group,
+representatives and stabilizer maps. The type-prime indexing,
+residue fields, other levels and class data are also unchanged,
+so the same $A$ remains well typed. This order makes clear that
+the functional normalization is not an input to its own
+Hermitian carrier construction.
+
+Two further displayed identities finish the Hermitian column
+record. The supplied \texttt{Pins.cof} equation, with the
+unchanged $\pi_u$, is exactly
+\[
+                 c_u\pi_u=\pi_{u_0}.
+ \tag{TG.30}
+\]
+For each endpoint or chart base lattice, SF2 and the standard
+base-lattice formula give $L_\pi$ as in (TG.9), in the
+appropriate dimension. Its dual is
+$\mathcal O^{d-1}\oplus\bar\pi^{-1}\mathcal O$, so
+coordinatewise
+\[
+               L_\pi+\bar\pi L_\pi^{\#}=\mathcal O^d.
+ \tag{TG.31}
+\]
+This is SF3's companion identity, and the right side is the
+coordinate image of the original standard lattice. Equation
+(TG.31) is precisely \texttt{SymmetricBaseCompatibility},
+including the version with the principal ideal
+$(\bar\pi)$ multiplying the dual. Together with TG11, these
+prove the actual remaining conclusions of
+\texttt{herm\_rest\_tied}: cofactor compatibility, base
+compatibility, all residue-field levels and level-zero data
+with the prescribed auxiliary generators.
+
+Take these objects as the fields of \texttt{ColsHermS}, with
+SF2's \texttt{StdTied}, and use the TG7 forms as its forms
+family. The carrier equalities are FC9 and TG10; all projection,
+vector and rational-matrix equalities are (TG.20), (TG.25) and
+their stated chart versions. The splitting equality and
+step-zero frame equality come from the same FC9 transport.
+All auxiliary generators agree because TG11 used
+$X.\mathrm{piG}$. All $G$ objects agree because FC13 was chosen
+once. Their character compatibility is FC13. The step-zero
+frames are identity by FC15, and the row frames are identity
+by TG4, so both required frame-constancy assertions hold for
+every pair of words.
+
+This constructs the source's exact endpoint
+\[
+ \exists\,C:\mathrm{ColsTiedSym}(D),\qquad
+       I.\mathrm{StdC}(l,Z,C)\ \land\
+       \forall u\ I.\mathrm{StdLvC}(l,Z,u,C.\mathrm{forms}(u)).
+ \tag{TG.32}
+\]
+It is the conclusion of \texttt{colsTiedSym\_std}. Each
+substantive supplier in this final join has been given above
+or proved in the cited earlier claims. In particular neither
+\texttt{FormsTiedSym}, \texttt{CarT}, initial decorated-point
+realizability, nor terminal incidence remains an independent
+input to (TG.32). The conclusion still concerns the supplied
+arithmetic host and true-column data with their stated laws
+and \texttt{Later}. It does not construct that arithmetic
+host or the later analytic package, and does not by itself
+assert RH or GRH. The stronger \texttt{OneLevelSymmetricColumns}
+assertions about all earlier chart groups and singleton chart
+sets are separate from (TG.32).
+

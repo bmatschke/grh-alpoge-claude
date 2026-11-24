@@ -1,0 +1,1023 @@
+\section{Deriving the column laws and isolating canonical evaluation inputs}
+\label{sec:column-laws}
+
+\status{TL1--TL13 reconstruct the actual implication
+\texttt{TC.Ok}$\Rightarrow$\texttt{TC.Laws}, including its lattice
+finiteness, coefficient, level, and period suppliers. These proofs use the
+literal arithmetic and local-index clauses of \texttt{Ok}; they do not
+use a previously assembled \texttt{Forms0} or a terminal comparison to
+prove its own law hypothesis. TL14--TL21 reconstruct the finite-field,
+orientation, and finite-generation parts of the canonical evaluation
+constructor, with the remaining local nonvanishing and analytic
+algebraicity suppliers identified explicitly. No assertion here produces
+the five independent stages of \texttt{Later}, and no Lean build or
+kernel verification is asserted.}
+
+\paragraph{Conventions.}
+Write $E$ for the fixed number field with involution, $\mathcal O$ for
+its integers, and $h(x,y)=\bar x^{\mathsf T}y$ on $E^n$. The field law
+used below is
+\[
+ \tau(\bar a)=\overline{\tau(a)}
+ \quad\text{for every embedding }\tau:E\hookrightarrow\mathbb C.
+ \tag{TL.1}
+\]
+For coefficient field $K$, embeddings $e_\tau:E\to K$, and
+$\sigma:K\to\mathbb C$, \texttt{FOk} also supplies
+$e_\tau(\bar a)=e_\tau(a)^*$ and
+$\sigma(b^*)=\overline{\sigma(b)}$. It does not assert the latter
+identity for every embedding of an arbitrary larger $K$.
+The rank, prime, character, and index data called \texttt{TC.Ok}
+throughout this section are the actual source data, including
+\texttt{ChIdx.Ok}. Their existence is a separate question, treated
+only to the extent stated in TL14--TL21.
+
+\paragraph{TL1: finitely many self-dual Hermitian lattice classes.}
+Put $d=[E:\mathbb Q]$, $D=nd$, and $q=|\operatorname{disc}(E)|$.
+For a full self-dual $\mathcal O$-lattice $N=N^\#$, its underlying
+integer lattice has the positive integral scalar product
+\[
+ B(x,y)=\operatorname{Tr}_{E/\mathbb Q}h(x,y).
+ \tag{TL.2}
+\]
+Symmetry follows by conjugating the trace, and positivity follows by
+writing the trace as the sum of $|\tau(x_i)|^2$. Let $N^*$ denote the
+dual for $B$. If $y\in N^*$, then, for all $a\in\mathcal O$ and
+$x\in N$, $\operatorname{Tr}(a h(x,y))$ is integral: apply the defining
+condition to $\bar a x$. Thus $h(x,y)$ belongs to the codifferent.
+The inverse of an integral trace matrix has denominator dividing its
+determinant, so $q\mathfrak D^{-1}\subseteq\mathcal O$. Consequently
+\[
+ N\subseteq N^*,\qquad qN^*\subseteq N,\qquad
+ 1\le\det B|_N=[N^*:N]\le q^D.                 \tag{TL.3}
+\]
+In particular nonzero lattice vectors have length at least one and the
+covolume is at most $C=q^{D/2}$.
+
+Here is an elementary uniform bound for independent short vectors.
+Let $v_D$ be the volume of the Euclidean unit ball and choose
+$R\ge1$ with $v_D R>3^{D-1}C$. If the vectors of $N$ of length at
+most $2R$ spanned a subspace of dimension $r<D$, then all the lattice
+points in any translate of a radius-$R$ ball would lie in one affine
+$r$-plane: differences of two such points have length at most $2R$.
+Their disjoint radius-$1/2$ balls in that plane give at most
+$(2R+1)^r\le3^{D-1}R^{D-1}$ points. On the other hand, averaging the
+number of lattice points over a fundamental parallelepiped gives
+$v_D R^D/\operatorname{covol}(N)\ge v_D R^D/C$, a contradiction.
+There are therefore $D$ independent vectors $v_i$ of length at most
+$2R$.
+
+Set $N_0=\sum_i\mathbb Z v_i$. Its integral Gram entries are bounded
+by $4R^2$, and $b=[N:N_0]\le(2R)^D$, since
+$\operatorname{covol}(N)\ge1$. Moreover
+$N_0\subseteq N\subseteq b^{-1}N_0$. For each of the finitely many
+Gram matrices and integers $b$, there are finitely many intermediate
+groups, as they correspond to subgroups of
+$b^{-1}N_0/N_0$.
+
+One must also retain the $\mathcal O$-action, rather than just the
+integer quadratic form. Fix an integral basis $a_s$ of $\mathcal O$.
+Multiplication by $a_s$ has operator norm at most
+$\max_\tau|\tau(a_s)|$ for (TL.2). In the $v_i$ coordinates its
+entries have denominator dividing $b$; they are bounded because the
+Gram entries are bounded and the inverse Gram matrix is bounded by
+the cofactor formula and $\det\operatorname{Gram}(v_i)\ge1$.
+There are consequently only finitely many possible multiplication
+matrices. Identical Gram, intermediate-group, and multiplication data
+give an integer isometry commuting with $\mathcal O$, hence an
+$E$-linear isometry. It preserves $h$ because all the identities
+$\operatorname{Tr}(a h(x,y))$ agree and the field trace pairing is
+nondegenerate. This proves finiteness up to the actual rational
+unitary group. For $n=0$ there is just the zero lattice.
+Finally the automorphism group of any one lattice is finite: images
+of a fixed integer basis lie in finitely many bounded lattice sets.
+
+\paragraph{TL2: decorations, local frames, and coupling cosets preserve
+finiteness.}
+A valid decoration consists of $N=N^\#$, a nonzero residue-linear
+functional at each type prime, and a residue basis at each auxiliary
+prime. Values on finitely many $\mathcal O$-generators of $N$
+determine these maps on $N$. They determine the localized maps by
+clearing a denominator outside the relevant prime; the prescribed
+extension is zero outside that localization. All their possible
+values lie in finite residue fields. Thus there are finitely many
+decorations over each fixed $N$, and TL1 gives finitely many decorated
+orbits.
+
+For a fixed decoration, rational frames for $N_P$ form a torsor under
+$\operatorname{GL}_n(\mathcal O_{(P)})$. Restricting the permitted
+right-frame transformations to a subgroup of finite index leaves
+finitely many frame classes. Taking the product over the finitely
+many twist primes preserves finiteness. At the coupling step the
+additional coordinate is a coset subject to finitely many bounds
+$q_P^{a_P}N_P$ modulo $q_P^{b_P}N_P$. Its possible local cosets are
+finite: if $a_P<b_P$, this is a quotient of a free local module by
+a nonzero power of its maximal ideal, and otherwise there is only
+one coset. The map from global coupling cosets to their family of
+local cosets is injective by the definition of the simultaneous
+local-condition module. Zero supplies a nonempty fiber. At other
+steps the coupling coordinate is the fixed empty set.
+
+The elementary orbit argument being used is this: an equivariant
+map with finitely many base orbits and finite fibers above chosen
+base representatives has finitely many source orbits. Move a source
+point over a chosen representative, then choose within that finite
+fiber. No finite cardinality of the full rational matrix group is
+assumed.
+
+A stabilizer maps injectively into the rational unitary automorphisms
+of its decorated lattice. Indeed, once that rational matrix is known,
+surjectivity of each auxiliary residue basis determines the auxiliary
+matrix, and equality of each rational local frame determines its
+right-frame matrix. Coupling coordinates add a condition, not a new
+kernel. Stabilizers are therefore finite. Their orders divide the
+corresponding lattice-automorphism orders. The finite set of those
+orders, over the finite rank set in \texttt{gamRanks}, has a positive
+least common multiple \texttt{DGam}.
+
+\paragraph{TL3: the actual twist levels have finite index and finite
+characters.}
+For any nonzero integer $c$, the quotient
+$\mathcal O_{(P)}/c\mathcal O_{(P)}$ is finite: it is a localization
+of the finite ring $\mathcal O/c\mathcal O$. A subgroup of
+$\operatorname{GL}_n(\mathcal O_{(P)})$ containing the principal
+congruence kernel modulo $c$ therefore has finite index.
+
+For the actual intermediate index matrix $h$ at step $j$, the
+\texttt{boundQ} clause of \texttt{ChIdx.Ok} says
+\[
+ h^{-1}\Lambda\subseteq\Lambda,
+ \qquad q^j h\Lambda\subseteq\Lambda.             \tag{TL.4}
+\]
+If $\kappa\equiv1\pmod{q^{j+1}}$ on the first coordinate block,
+put $a=h^{-1}\operatorname{diag}(\kappa,1)h$. For $x\in\Lambda$,
+the first coordinates of $q^jh x$ are integral, so
+$(\kappa-1)\operatorname{ini}(h x)\in q\mathcal O_{(P)}^n$.
+The first inclusion in (TL.4), applied to the embedded first block,
+gives $(a-1)\Lambda\subseteq q\Lambda$. The same calculation for
+$\kappa^{-1}$ proves $a^{-1}\Lambda\subseteq\Lambda$ and hence
+$a\Lambda=\Lambda$. Its reduction is the identity on every
+specified residue flag. This is precisely membership in the source's
+\texttt{Jat}, whose first-block projection defines \texttt{levQ}.
+Thus the actual level contains the congruence kernel of depth $j+1$.
+At the top step the level is generated by an extended row level and
+the congruence kernel of its specified depth plus one, so the same
+conclusion holds. The row level itself is a preimage of a subgroup
+of the finite residue general linear group.
+
+The level characters are products of finite residue multiplicative
+characters, finite residue additive characters, and the prescribed
+local additive character on $q^{-D}\mathcal O_{(P)}$ modulo
+$\mathcal O_{(P)}$. Every value is a root of unity: these additive
+quotients and residue multiplicative groups are finite. Products and
+inverses retain that property. The local-index character formula in
+\texttt{ChIdx.Ok} identifies these products with the actual level
+characters. This argument proves their finite order after the index
+data have been supplied; it does not construct those index data.
+
+Combining TL2 and these facts gives all seven clauses of
+\texttt{GStep.Ok}: finite orbits, finite stabilizers, unitary rational
+matrices, root-of-unity characters, exact transport of $L^\#$, fullness
+of that lattice, and stabilizer injectivity. Replacing the preferred
+orbit representative changes none of these seven assertions.
+
+\paragraph{TL4: the zero step is free and all its twists have the same
+classes.}
+At step zero the auxiliary level has unipotent reduction at a prime
+above $g_0$, and the base prime bound is
+\[
+ [E:\mathbb Q]\,k=2fk<g_0-1.                     \tag{TL.5}
+\]
+Let $\gamma$ stabilize a decorated point. By TL2 it has finite order.
+Its prime-to-$g_0$ part is congruent to the identity: a unipotent
+matrix in residue characteristic $g_0$ has $g_0$-power order. A
+finite-order matrix $u=1+X$ with order $r$ prime to $g_0$ and
+$X\in P$ is the identity. Indeed $(1+X)^r=1$ first puts $X$ in
+$P^2$, and iteration puts it in every $P^a$, whose intersection is
+zero. Hence $\gamma$ has $g_0$-power order. If it were nontrivial,
+a power would have order $g_0$ and its rational characteristic
+polynomial on the underlying $[E:\mathbb Q]k$-dimensional space
+would contain $\Phi_{g_0}$, of degree $g_0-1$. This contradicts
+(TL.5). Stabilizer injectivity now kills the auxiliary and local
+frame matrices as well. The zero-step action is free.
+
+The actual index at zero is unique by \texttt{zero\_uniq}; its
+auxiliary level is the same \texttt{colLev 0} for every twist, its
+twist-frame level is the full local general linear group, and its
+coupling coordinate is empty. Forgetting those local frames
+therefore gives a bijection with the same decorated orbit set for
+every twist. To see injectivity directly, any two frames over an
+identical local lattice differ by an allowed integral invertible
+matrix. Adding frames proves surjectivity. The prescribed preferred
+representative minimizes the same decorated-orbit datum, so the
+preferred decorations agree literally. This proves the actual
+\texttt{cl0} bijections and their decoration equality.
+Finally \texttt{tup mu0}=1 and the injective finite-idele reading
+identity imply $\xi_{\mu_0}=1$. Every other read character has finite
+order, hence has complex absolute value one. The defining products
+for $\rho$ and $\rho'$ are therefore of modulus one. TL2's positive
+\texttt{DGam}, its divisibility, and the trivial zero stabilizers
+give the complete chain laws.
+
+\paragraph{TL5: covariance and isometry of the coefficient family.}
+This paragraph starts from a generic \texttt{GStep.Ok}, independently
+of the final column-law record. Let $\lambda$ be any supplied
+dominant tensor weight, $V_\lambda$ its polynomial coefficient space,
+and
+\[
+ R(g)=\chi(g)\,R_\lambda(e_\tau(\gamma(g))) .       \tag{TL.6}
+\]
+Exact lattice transport says
+$L^\#(gd)=\gamma(g)L^\#(d)$. Extension along $e_\tau$ carries this
+to equality of coefficient lattices; taking coordinate duals changes
+the frame by inverse transpose. The defining minor polynomials and
+their divided-power translates then give exactly
+\[
+ \nabla(gd)=R(g)\nabla(d),\qquad
+ \Delta(gd)=R(g)\Delta(d).                         \tag{TL.7}
+\]
+Here the character scalar causes no integral error. If
+$\chi(g)^r=1$, both $\chi(g)$ and its inverse are algebraic integers,
+so multiplication by it preserves every $\mathcal O_K$-module.
+
+The rational matrix is unitary. Under every $e_\tau$ this is the
+unitary identity for the coefficient pairing, since \texttt{FOk}
+commutes with conjugation on $E$. The normalized tensor Fock form
+is invariant under unitary changes of variables; this follows on
+monomials from the tensor symmetric-power scalar product and then
+on the Weyl subspace by restriction. At the distinguished embedding,
+a root of unity has absolute value one. Injectivity of $\sigma$
+and \texttt{FOk.sig\_star} give
+$\chi(g)^*\chi(g)=1$. Thus (TL.6) also preserves the pairing.
+Together with the finite orbit and stabilizer clauses these are all
+the assertions of the actual \texttt{fam.Ok}.
+
+\paragraph{TL6: rational fixed vectors give a basis of the complex
+forms.}
+Choose one representative of each class $c$ and write $\Gamma_c$
+for its finite stabilizer. The rational forms are precisely
+$\prod_c V_\lambda^{\Gamma_c}$. The matrix coefficient realization
+$\operatorname{ev}:V_\lambda\to\operatorname{Val}_{\mathbb C}$ is
+injective and intertwines $R(g)$ with
+$F(Y)\mapsto\sigma(\chi(g))F(\gamma(g)^{-1}Y)$; evaluation of the
+minor generators proves this identity. In a fixed polynomial basis
+its columns remain independent after any field embedding: an
+injective finite matrix has a left inverse, which can be embedded.
+Thus rationally independent form vectors have complexly independent
+evaluations. The defined complex polynomial value space is the
+complex span of the evaluated standard coefficient basis (equivalently
+the complex matrix-coefficient realization of the same Weyl module).
+Thus evaluation after scalar extension is onto this space as well
+as injective; no surjectivity onto a larger function space is assumed.
+
+For spanning, the projector
+\[
+ e_c=|\Gamma_c|^{-1}\sum_{g\in\Gamma_c}R(g)        \tag{TL.8}
+\]
+is a matrix over $K$. Its image is exactly the invariant subspace:
+translation permutes the summands, and it fixes an invariant vector.
+The same identities hold after scalar extension. Hence every complex
+stabilizer-fixed value is a complex linear combination of rational
+fixed values. Apply this separately at the finitely many classes.
+The actual chosen rational basis therefore evaluates to a basis of
+\texttt{Fi}, proving \texttt{LawBasis} and finite dimensionality.
+Division in (TL.8) takes place only in the characteristic-zero
+field; it is not an assertion of integral averaging.
+
+\paragraph{TL7: the full integral forms lattice and the actual
+all-place Hermitian metric.}
+For a full lattice $M\subset E^n$, its extension along each embedding
+and its coordinate dual are full. The corresponding integral Weyl
+lattices are full and finitely generated. One direct verification
+puts $M$ between two nonzero scalar multiples of the standard
+lattice. The finite degrees of the minors and determinant twists
+put its Weyl lattice between two scalar multiples of the standard
+Weyl lattice, whose finite divided-power construction spans the
+coefficient representation. The same argument applies to the
+$\nabla$ lattice and its dual $\Delta$.
+
+For finitely many classes and full coefficient lattices $M_c$, put
+\[
+ \mathcal L=\{x\in\textstyle\prod_cV_\lambda^{\Gamma_c}:
+                         x_c\in M_c\ \forall c\}. \tag{TL.9}
+\]
+Its inclusion in $\prod_c M_c$ makes it finitely generated, since
+$\mathcal O_K$ is Noetherian. For any rational form $x$, choose
+nonzero $a_c\in\mathcal O_K$ with $a_cx_c\in M_c$. The product
+$a=\prod_c a_c$ puts $ax$ in $\mathcal L$ and is nonzero.
+Thus $K\mathcal L$ is the whole forms space.
+
+The all-place positivity needs care about the chosen basis. Define
+\[
+ K^{\rm cm}=\{b\in K:\phi(b^*)=\overline{\phi(b)}
+                       \text{ for every }\phi:K\to\mathbb C\}.
+ \tag{TL.10}
+\]
+This is a subfield. It contains every $e_\tau(E)$ by (TL.1), and
+every character root of unity: first use \texttt{sig\_star} and
+injectivity at $\sigma$ to get $b^*=b^{-1}$, then use $|\phi(b)|=1$
+at any $\phi$. All representation matrices (TL.6) therefore have
+entries in $K^{\rm cm}$. Row reduction of the finite invariant
+equations produces a basis with coefficients in that subfield.
+The source's \texttt{CSD.basis} selects precisely such a basis when
+this rational-basis condition holds. This is not an assertion that
+an arbitrary $K$-basis has conjugation-compatible coefficients.
+
+Let $A_c$ be the matrix of these basis values at $c$, and $G$ the
+standard normalized tensor Fock Gram matrix. The actual class-sum
+matrix is $H=\sum_c |\Gamma_c|^{-1}A_c^*GA_c$. Because only the
+basis coefficients and the fixed representation pairing enter,
+(TL.10) gives for every embedding $\phi$
+\[
+ \phi(H)=\sum_c |\Gamma_c|^{-1}
+               \phi(A_c)^*\phi(G)\phi(A_c).       \tag{TL.11}
+\]
+The matrix $\phi(G)$ is positive definite: the standard Fock
+monomial scalar product is positive and restriction to the Weyl
+space is positive. The stacked matrices $A_c$ have trivial kernel;
+a left inverse shows that they still do so after $\phi$.
+Consequently every nonzero vector has a strictly positive summand
+in (TL.11). This proves positivity at every infinite place and,
+together with (TL.9), the literal \texttt{LawGood}.
+
+At $\sigma$ the evaluation isometry identifies that class sum with
+\[
+ \|x\|^2=\sum_c\frac{1}{|\Gamma_c|}
+               \operatorname{ipVal}(\operatorname{ev}x_c,
+                                     \operatorname{ev}x_c).
+ \tag{TL.12}
+\]
+The normalizing denominator is the product of the Fock
+self-pairings of the highest vectors, hence of their squared
+norms. It is not the product of their norms. The source's infinite
+place representing $\sigma$ may choose its conjugate embedding;
+the real value of the self-pairing is unchanged. The positive square
+root frame of $\phi(H)$ consequently gives exactly the source's
+\texttt{majAt} and \texttt{LawNorm}, with its original normalization.
+
+\paragraph{TL8: the residue ranks, distinguished vector, and dilation
+laws.}
+For a full rank-$n$ lattice $M$, localization at $P$ is free of rank
+$n$ over the discrete valuation ring $\mathcal O_{(P)}$. The natural
+map $M/PM\to M_P/PM_P$ is an isomorphism: a denominator outside
+$P$ is invertible modulo $P$, and if $sx\in PM$ with $s\notin P$,
+choose $t$ with $st\equiv1\pmod P$ to recover $x\in PM$.
+Both residue modules in \texttt{TDat} therefore have dimension $n$.
+The supplied additive, residue-linear $f$ kills $PN$, so it factors
+uniquely to a nonzero linear functional $\mathrm{fv}:N/PN\to k_P$.
+Choose $e\in N$ with $f(e)=1$, by scaling a nonzero value by a lift
+of its residue inverse. The clause \texttt{te\_mem} gives
+$Te\in\mathrm{dn}N\setminus P\mathrm{dn}N$, so its residue class
+$\mathrm{te}$ is nonzero. TL11 verifies that clause for the actual
+decorated lattices.
+
+Dilation by $a\in k_P^\times$ replaces only $f_P$ by $af_P$.
+Its inverse is dilation by $a^{-1}$, it commutes with the acting
+group, and it preserves $N$ and $L^\#$. It therefore induces a
+group action on classes. The raw stabilizer is unchanged; changing
+to the preferred representative conjugates it, so its cardinality
+is also unchanged. If $g$ takes the preferred representative of the
+dilated class to the dilation of the old representative, its
+rational matrix induces an isomorphism
+$e:N_{c_a}/PN_{c_a}\to N_c/PN_c$ and
+\[
+ \mathrm{fv}_{c_a}(v)=a\,\mathrm{fv}_c(e(v)).      \tag{TL.13}
+\]
+This proves all the literal \texttt{TDat.Laws}, with the factor
+$a$ in its correct direction.
+
+\paragraph{TL9: the diamond action preserves complex and integral
+zero-step forms.}
+Since the zero-step action is free, there is a unique group element
+$g_d$ carrying the preferred representative of $[d]$ to $d$.
+It satisfies $g_{hd}=hg_d$ and $g_{\operatorname{rep}c}=1$.
+Extend a class value $F_c$ to points by
+$\widetilde F(d)=\operatorname{tr}(g_d)F_{[d]}$.
+Commutation of dilation with the group action proves directly that
+pullback along dilation has identity and multiplication laws. The
+residue-unit group is commutative, so the order reversal for
+pullbacks causes no change to the source's formula. The evaluation
+intertwining in TL6 shows that it preserves the polynomial value
+space; stabilizer invariance is automatic at this free step.
+
+For integral values, put
+$y_c=R(g_{\operatorname{dia}_a\operatorname{rep}c})
+ x_{[\operatorname{dia}_a\operatorname{rep}c]}$.
+Equation (TL.7), and the fact that dilation leaves $L^\#$ unchanged,
+put $y_c$ in the actual coefficient lattice at $c$. It is a rational
+form by freeness. Its evaluation is the diamond transform of the
+evaluation of $x$. This proves the precise existential
+\texttt{dia\_lat} statement, in addition to complex stability and
+the representation laws.
+
+\paragraph{TL10: spanning at every coefficient place, and
+\texttt{laws\_all}.}
+The same proof as (TL.9) applies to the coefficient lattice built
+from \texttt{ker} at any step and selected prime: \texttt{TDat.Ok}
+supplies its fullness. Thus the actual \texttt{BLat} spans the
+rational forms space. For any coefficient place $w$, its localization
+$\operatorname{loc}_w(\texttt{BLat})$ contains \texttt{BLat}, so it
+has the same full $K$-span. This holds for every place in the supplied
+\texttt{Places} record; no seen-place or residue-characteristic
+restriction is introduced.
+
+Now start with arbitrary number fields and a generic chain
+$I:\texttt{ChainIn}$, level datum $J:\texttt{AtIn}$, period datum
+$Q:\texttt{PerIn}$, coefficient embeddings, dominant weights, and
+places. Under exactly \texttt{FOk}, \texttt{I.Ok}, \texttt{J.Ok},
+and \texttt{Q.Ok}, TL5--TL7 apply at every chain step and also to
+$Q.S'$ with its shifted terminal weight. TL8 supplies every level
+law, TL9 supplies the zero-step diamond laws and integral stability,
+and the preceding denominator argument supplies every
+\texttt{B\_span}. These are precisely all fields of
+\texttt{J.Laws} and \texttt{FmLaws}. In particular the genuine
+proof of \texttt{laws\_all} requires no terminal incidence or
+polynomial-value comparison premise.
+
+\paragraph{TL11: the actual level datum is valid and tied to the
+decorated lattices.}
+We now return to \texttt{TC.Ok}. Its base prime laws give a rational
+prime $T$, selected primes $S_T$ with $|S_T|=f$ and $|k_P|=T$,
+no conjugate pair in $S_T$, and $T\in P\setminus P^2$.
+Auxiliary and twist-frame primes avoid $P,\bar P$: the former have
+different rational residue characteristics, and the tuple excludes
+ramification at $T$. Thus the source's \texttt{MoveHyp} holds.
+
+Here is the local lattice calculation needed for the actual data.
+The elementary duality formula NB1 depends only on lattices and
+LP1, and is used in that form. If $N=N^\#$ and
+$K_P^{\rm gl}=\{x\in N:f_P(x)=0\}$, then the down lattice
+\[
+ D=K_P^{\rm gl}+P(K_P^{\rm gl})^\#                \tag{TL.14}
+\]
+has localizations $D_P=\ker(f_P|_{N_P})$,
+$D_{\bar P}=((K_P^{\rm gl})^\#)_{\bar P}$, and $D_R=N_R$ elsewhere.
+The exceptional two are dual to each other, proving $D=D^\#$.
+Choose a local basis with $f_P$ its last residue coordinate. Then
+$D_P=\mathcal O_{(P)}^{n-1}\oplus T\mathcal O_{(P)}$ in that basis.
+If $f_P(e)=1$, the last coordinate of $Te$ is a unit times $T$;
+it lies in $D_P$ but not in $PD_P$. At $\bar P$ the down lattice
+contains $N_{\bar P}$, and at all other primes it equals $N_R$.
+Hence $Te\in D\setminus PD$ globally. This proves the actual
+\texttt{te\_mem}.
+
+For the up operation with $f_P(x)=1$, put
+$A=N+P^{-1}x$ and $U=A^\#+\bar P A$. Its localizations are
+$U_P=N_P+T^{-1}\mathcal O_{(P)}x$,
+$U_{\bar P}=(A^\#)_{\bar P}$, and $U_R=N_R$ elsewhere.
+Again the two exceptional lattices are dual and $U=U^\#$.
+The updated functional is $f_P^+(y)=f_P(Ty)$ on $U_P$; in the
+displayed basis its kernel is $N_P$. Given the down move's specified
+nonzero residue-linear map $g:D/PD\to k_P$, its actual functional is
+$f_P^-(y)=\rho_P(s)^{-1}g([sy])$ for $y\in D_P$, where
+$s\notin P$ and $sy\in D$, and is zero outside $D_P$.
+More generally, any ambient down functional giving a valid decoration
+descends to such a map on $D/PD$, and its localization and off-lattice
+clauses force this same formula.
+Replacing $s$ by another denominator does not change the value:
+multiply the two numerator equations and use residue-linearity.
+For down after the specified up, (TL.14) returns $D=N$ and the
+specified $g$ is the original residue map induced by $f_P$.
+The displayed formula is then $\rho_P(s)^{-1}f_P(sy)=f_P(y)$.
+Thus both the lattice and its functional return literally to the
+old ones. If $x-x'\in PN$, then
+$P^{-1}(x-x')\subset P^{-1}(PN)\subset N$, so
+$N+P^{-1}x=N+P^{-1}x'$ globally. Their raw up lattices and
+functionals are therefore equal even for invalid inputs. Thus both
+the validity and fallback branches agree, and up depends only on
+the stated residue class without an additional validity assumption.
+
+All remaining decorations and local frames are unchanged, since
+their primes avoid the exceptional pair. The coupling coordinate is
+defined by local conditions at those other primes, so its allowed
+set is unchanged as well. Thus these are literal operations on the
+source points, not only operations on lattice isomorphism classes.
+Applying a rational unitary matrix transports sums, duals, and
+residue maps; hence the up/down action identities hold exactly,
+including their frame and coupling coordinates. Dilation simply
+rescales one functional, proving all its raw identities. Fullness
+of the level kernel follows, for example, by placing it between a
+nonzero integer multiple of $L^\#$ and $L^\#$; the finite residue
+conditions provide such an integer.
+
+These calculations establish all \texttt{TDat.Ok} and
+\texttt{TDat.Tied} clauses for \texttt{tdatAt}. Rechoosing preferred
+representatives changes none of them. The Weil additive character
+is nontrivial because the specified $\xi_0$ is a unit at the selected
+prime; its value on a generator of the inverse-prime quotient has
+nontrivial residue phase. Together with the base prime/cardinality
+laws, TL4's zero-step freeness, and the positive constants already
+in the base data, this gives the literal \texttt{atIn.Ok} for every
+word and every twist. This proof does not use NB7/NB8 or the final
+\texttt{Forms0} constructor.
+
+\paragraph{TL12: the actual period datum and its level-prime overlap.}
+Let $n=N_m$, $n'=n-1$, and $\pi=\pi_T$ with
+$\pi\bar\pi=T$. The row step has no type primes. TL2--TL3 apply to
+its residue row level and its reduced twist level, giving
+\texttt{stepX.Ok}. Extend its rational, auxiliary, and twist acting
+matrices by a last coordinate equal to one. This gives an
+injective acting-group homomorphism: its first block recovers the
+original element. Its rational matrix is
+$\operatorname{diag}(\gamma,1)$, so the first coordinates transform
+by $\gamma$ and the last coordinate stays fixed.
+The point's twist frame, however, extends as
+$\operatorname{diag}(\mathrm{fr},\pi)$. Its exact equivariance is
+\[
+ \operatorname{diag}(\gamma,1)
+ \operatorname{diag}(\mathrm{fr},\pi)
+ \operatorname{diag}(q,1)^{-1}
+ =\operatorname{diag}(\gamma\mathrm{fr}q^{-1},\pi).
+\]
+
+The top auxiliary level is exactly the image of the row level under
+this diagonal embedding. At a twist prime the top level is its
+extended row level times the specified principal congruence group.
+The character is pulled back from reduction, is trivial on that
+congruence group, and on $\operatorname{diag}(g,1)$ equals the row
+character: every old block determinant is unchanged and the added
+block determinant is one. These facts prove the exact
+\texttt{chr\_ext} identity and the equivariance of the extended
+framed decoration. Since $T$ is excluded at every twist prime,
+$\pi$ is a unit there, so the specified extended frames are valid.
+
+For a row lattice $N=N^\#$ the extended decoration has
+\[
+ \widetilde N=N\oplus\mathcal O,\qquad
+ \widetilde f_P(x,z)=\rho_P(\bar\pi z),\qquad
+ \widetilde L=N\oplus\pi\mathcal O,
+ \qquad\widetilde L^\#=N\oplus\bar\pi^{-1}\mathcal O.
+ \tag{TL.15}
+\]
+To check the third equality, the selected primes are exactly the
+prime divisors of $(\pi)$ with exponent one: its norm is $T^f$ and
+the $f$ selected primes each have norm $T$. Their intersection is
+therefore $(\pi)$, and $\bar\pi$ is a unit at each one. The last
+equality follows by taking the Hermitian dual; in particular the
+denominator is $\bar\pi$, not $\pi$.
+With $t_z=\bar\pi$, (TL.15) says exactly
+\[
+ (x,z)\in\widetilde L^\#\iff x\in L^\#\text{ and }t_zz\in\mathcal O,
+ \quad (x,z)\in\widetilde N\iff x\in L^\#\text{ and }z\in\mathcal O,
+ \quad \bar t_z t_z=T.                            \tag{TL.16}
+\]
+
+The terminal preferred-representative predicate asks to lie in the
+image of this extension. Every extended point itself satisfies it,
+so the representative selected in its orbit also lies in that image.
+This proves the actual \texttt{rep\_til}; it is not a claim that
+all terminal orbits lie in the image. The subgroup $H$ in this
+period datum is the full row acting group, so its finite index is
+one and its rational-image condition is immediate.
+The preceding identities prove every field of \texttt{perIn.Ok}
+and \texttt{perIn.Over(atIn)}, for every word and twist, directly
+from \texttt{TC.Ok}. No terminal comparison from TG is used.
+
+\paragraph{TL13: the complete implication \texttt{Ok}$\Rightarrow$
+\texttt{Laws}, and its exact scope.}
+For any actual base $B$, prechoices $X$, and true-column data
+$I:\texttt{TC}(B,X)$, assume only $I.\texttt{Ok}$ in addition to the
+data already built into $B,X,I$. TL3--TL4 give all \texttt{ch} fields
+and nonempty zero indices; TL11 gives \texttt{lev}; TL12 gives
+\texttt{per} and \texttt{ovr}; TL10 gives \texttt{atL} and
+\texttt{fmL} at every word and twist. The base fields and primes
+give \texttt{pr}, TL4 gives \texttt{xi0} and \texttt{bij0}, and
+every decorated level kernel is a full lattice by the finite-residue
+argument in TL11, giving \texttt{lat}. These are all eleven fields
+of the literal \texttt{TC.Laws} record.
+
+Thus the law premise in the previously conditional constructions
+can now be supplied by this proof whenever \texttt{TC.Ok} is
+supplied. The quantifiers are all words, all character indices,
+all natural-number chain steps, all classes, and, in
+\texttt{B\_span}, all coefficient places. No new \texttt{Pins},
+\texttt{Later}, chosen adelic realizer, or terminal comparison is
+needed to derive these laws. This implication alone does not supply
+\texttt{TC.Ok}; in particular its local index nonvanishing clauses
+remain present in that input.
+
+\paragraph{TL14: one number field contains all the normalized frame
+character values.}
+We give the substantive arithmetic argument behind
+\texttt{frame\_values}. Let $\xi$ be a continuous Hecke character
+of a CM field, with infinity type $n_\tau\in\mathbb Z$, and let
+$r\in\mathbb Z$ satisfy $n_\tau-r\in2\mathbb Z$ for every CM
+embedding. Put
+\[
+ a_P=\xi(P)\,\mathrm N(P)^{-r/2}
+ \quad\text{at unramified primes }P.              \tag{TL.17}
+\]
+The complex target has a neighborhood of one containing no
+nontrivial subgroup. Continuity on the finite ideles therefore
+gives a finite set $S$ outside which local units are killed and,
+at each $P\in S$, an open principal-unit subgroup in the kernel.
+One can see this without a global character theorem: choose a
+basic open subgroup inside the inverse image of that neighborhood.
+Its image is a subgroup contained in the neighborhood, hence is
+trivial. The quotient of local units by the resulting congruence
+subgroup is finite. Thus the local character values on units at
+$S$ have bounded root-of-unity orders.
+
+Let $M$ contain all conjugates of $E$ and those finitely many roots
+of unity. The ordinary ideal class group is finite. For clarity,
+its usual lattice proof only needs a uniform short-vector bound:
+for an integral ideal $I$, averaging a ball of volume exceeding
+its Minkowski covolume gives a translated ball containing two
+lattice points. Their difference yields $0\ne a\in I$ with
+$|\mathrm N(a)|\le C_E\mathrm N(I)$. Hence
+$(a)I^{-1}$ is integral of bounded norm. There are finitely many
+ideals of bounded norm, since an ideal of norm $b$ contains
+$b\mathcal O$ and corresponds to a subgroup of the finite group
+$\mathcal O/b\mathcal O$. This proves class-group finiteness.
+
+Let its order be $h$. If unramified primes $P,P'$ have the same
+class, then $P(P')^{h-1}=(a)$ for a nonzero algebraic integer $a$ which is
+a unit at every prime of $S$. The Hecke product formula gives
+\[
+ a_Pa_{P'}^{h-1}
+  =\left(\prod_{Q\in S}\xi_Q(a)\right)^{-1}
+    \prod_\tau \tau(a)^{-n_\tau}
+       \bigl(\tau(a)\overline{\tau(a)}\bigr)^{(n_\tau-r)/2}
+  \ \in M.                                         \tag{TL.18}
+\]
+Indeed $\xi_\infty(a)=\prod_\tau(\tau(a)/|\tau(a)|)^{n_\tau}$,
+and $\mathrm N((a))=\prod_\tau|\tau(a)|^2$; the parity assumption
+is exactly what turns the remaining powers of absolute values
+into the integral powers in (TL.18).
+Choose one unramified prime in each class which occurs. Setting
+$P=P'$ in (TL.18) makes its chosen value algebraic over $M$.
+Adjoin these finitely many nonzero values. Equation (TL.18) now
+places every $a_P$ in this one number field. This proves the
+literal \texttt{ValuesIn(r/2)} assertion, including its uniformity
+over all unramified primes, rather than just individual
+algebraicity.
+
+For the supplied frame, $\mu_j$ has even infinity exponents,
+$\eta$ has exponent one and uses $r=1$, and $\chi_\Psi$ has
+exponent two and uses $r=0$. The finite-order $\delta,\delta'$
+and the finite auxiliary characters require only cyclotomic
+extensions. A finite compositum, then its normal closure, gives
+one finite Galois field containing all five character families,
+all field embeddings, and the auxiliary roots, exactly as in
+\texttt{frame\_values}. A primitive generator may be required
+inside the fixed coefficient field in \texttt{large\_2}; this
+does not amount to enlarging that fixed field automatically.
+
+\paragraph{TL15: finite root data, actual residue characters, and
+finite-idele readings.}
+For a finite-order character $\xi$ of order dividing $N>0$, its
+values are powers of a primitive $N$th root. At each of its
+finitely many ramified primes with norm $q$, adjoin
+$\sqrt q$ and a primitive $q^{2m}$th root. Taking the union for
+a finite family $\Xi$ gives finitely many algebraic generators
+which imply the exact \texttt{Holds} condition for every member.
+This includes the whole character image, not just its values at
+uniformizers. A field containing one primitive $N$th root
+contains every $N$th root by its cyclic list of powers.
+
+At an auxiliary prime above $g_i$, identify its residue field
+with $\mathbb F_{g_i}$ by the prescribed prime-field isomorphism.
+Lift the primitive multiplicative character $\omega_i$ and the
+additive character $b\mapsto\exp(2\pi\mathrm i b/g_i)$ through
+the injective coefficient embedding. Define
+\[
+ \psi_{0,P}(b)=\psi_i(\overline{\xi_0}\,b),\qquad
+ \chi_{j,P}(b)=\omega_i(b)^{2(j+1)}.               \tag{TL.19}
+\]
+Here $\overline{\xi_0}$ means reduction at $P$, not complex
+conjugation. Since $\xi_0$ is a local unit, $\psi_{0,P}$ is
+nontrivial. The primitive $\omega_i$ has order $g_i-1$; the
+inequality $2m<g_i-1$ makes the powers in (TL.19) distinct.
+The powered characters themselves need not be primitive.
+The reductions of $\xi_0$ at the selected primes over a given
+$g_i$ agree under these prime-field maps: $\xi_0$ lies in the
+specified quadratic subfield, and all these primes lie over
+the one selected prime of that subfield. Thus the additive and
+multiplicative compatibility clauses hold with their actual
+residue maps. Tameness makes a local unit character depend only
+on its residue; compare a unit to the natural integer with the
+same residue and use the prescribed formula for $\mu_j$ on that
+integer. This proves the inverse-character tie in
+\texttt{Chars.Tied}. Lift the normalized $\mu_j$ and $\eta$
+prime values using TL14. The exponential in (TL.19) gives
+\texttt{WeilTied} literally. These arguments construct all of
+\texttt{Chars.Ok}, \texttt{Tied}, and \texttt{WeilTied} from the
+stated frame and root data.
+
+For the reading step, a finite-order character is trivial on
+the infinite ideles: every complex unit has an $N$th root, so
+its value under an order-$N$ character is one. Its finite-idele
+restriction therefore determines it. If all its values lie in
+$\sigma(K)$, pull them back uniquely to $K^\times$. Multiplication
+and every triviality identity descend through the injective
+$\sigma$. Continuity provides the open congruence kernel as in
+TL14. The supplied \texttt{IsTwist} conditions say precisely
+finite order, triviality on the base-field ideles, tameness, and
+ramification only at the selected split, degree-one unramified
+primes outside the excluded set. They give the tuple's wild-unit,
+inert-place, and base-field kernel clauses. For an infinite
+product of local units the assertion follows first on the
+finite-support subgroup and then by its density and continuity.
+Conversely the tuple's open kernel gives a continuous finite-idele
+character, and the rational-unit identity descends it to the
+idele class group with trivial infinite component. These two
+constructions are inverse. In particular the read tuple is
+unique and the tuple for the trivial character is one.
+
+\paragraph{TL16: orienting the auxiliary factors and obtaining the
+quotient part of \texttt{Pins}.}
+Suppose an integral $a$ lies in the specified imaginary quadratic
+subfield and satisfies $a\bar a=g$, with $g$ a rational prime.
+Neither $a$ nor $\bar a$ is a unit: conjugation would otherwise
+make both units. Their principal ideals in the quadratic field
+have norms greater than one with product $g^2$, so each has norm
+$g$ and is a maximal ideal. A prescribed prime above $g$ contains
+one of them. Choose $b=a$ or $b=\bar a$ so that the ideal of
+$\bar b$ is that prescribed prime. A prime of $E$ contains
+$\bar b$ if and only if its restriction is that prime. Norm and
+the required congruence to one persist under conjugation. Doing
+this independently at $g_0,g_1$ proves the actual
+\texttt{exists\_oriented} statement.
+
+Under the given $\texttt{Ctx.Over}$ relation replace the type-prime
+factors by the context's own $\pi_T(u)$, preserving the now-oriented
+auxiliary factors. Their prescribed norm and congruence laws make
+this another valid \texttt{PreX}. The context defines
+$c(u)=\pi_T(u_0)/\pi_T(u)$, and its prime norm makes the denominator
+nonzero. Hence
+\[
+ c(u)\pi_T(u)=\pi_T(u_0)\quad\text{for every word }u. \tag{TL.20}
+\]
+This supplies \texttt{Pins.cof}. The other field,
+\texttt{Pins.iX}, is the literal agreement of the supplied row
+frame with the first columns of the full frame; it is still an
+explicit antecedent in \texttt{evLg\_canonical}. No change of
+coordinates here proves an arbitrary supplied frame inclusion.
+
+\paragraph{TL17: finite principalization and the precise period-field
+boundary.}
+For any nonzero ideal $I$ of a number field, class-group finiteness
+gives $I^h=(\beta)$ for some $h>0$. Adjoin a root $x^h=\beta$.
+It is integral, and in the larger integer ring
+$(x)^h=(I\mathcal O')^h$. Unique ideal factorization then gives
+$(x)=I\mathcal O'$ by comparing exponents at every prime.
+Fractional ideals are treated after clearing a denominator.
+Thus finitely many rank-one fractional lattices become principal
+over one finite extension, with algebraic generators. Applied to
+the coordinate-axis sections of the module generated by the
+conjugate vectors, this supplies the algebraic derivative scalars
+$c_D$. Their sections commute with this extension: over a
+Dedekind domain the larger integer ring is torsion-free, hence
+flat, so taking the kernel of the projection to the other
+coordinates commutes with extension. This proves the finite
+principalization content of \texttt{exists\_dgen}.
+
+For the period field, the host identity
+$\mathfrak D_{E/K_0}=\mathfrak b\bar{\mathfrak b}$ gives
+$\mathfrak b^{-1}\mathfrak D_{E/K_0}=\bar{\mathfrak b}$.
+Hence each source period-line lattice is the extension of a
+conjugate of $\bar{\mathfrak b}$. The preceding root construction
+principalizes every one simultaneously. Adjoining also
+$j(\mathbb C/\mathfrak c)$ therefore gives the actual
+\texttt{FieldOK}, provided this CM $j$-value is algebraic.
+The source proves the stronger integrality assertion using the
+modular polynomial/CM-lattice theorem. That analytic modular
+input is retained here; it has not been inferred from ideal
+principalization. The finite extension and its generator are
+constructed once that one algebraicity input is supplied.
+
+Similarly, a full \texttt{AmbIn} includes the chosen period pair,
+the quadratic trace isometry and its complex linear extension,
+and the local correction data, as well as $c_D$ and a discriminant
+twelfth root. TL17 closes its finite principalization part, not
+the separate supplier of these period and trace-isometry data.
+These are recorded as exact inputs in TL21.
+
+\paragraph{TL18: reducing normalized-jet algebraicity to the primitive
+theta inputs.}
+There is a useful elementary step in the analytic supplier which
+can be reconstructed without presuming its conclusion. Consider
+an algebra of smooth germs over $\overline{\mathbb Q}$, generated
+by germs whose derivatives in algebraic coordinate directions
+stay in the same algebra and whose values at zero are algebraic.
+The sum, product, and chain rules prove by induction that every
+iterated derivative of every germ in the algebra is algebraic
+at zero. The same holds after a linear substitution with algebraic
+coefficients.
+
+Suppose the supplied four-copy identity places
+$f(z_1)f(z_2)f(z_3)f(z_4)$ in this algebra. Apply the same
+multi-derivative separately in each copy and set all four
+variables to zero. The result is $(D^\alpha f(0))^4$, which is
+algebraic. Hence $D^\alpha f(0)$ is algebraic too. This argument
+works even when $f(0)=0$; it never divides by a value of $f$.
+If the available algebraic directions are a spanning family,
+choose independent columns and invert their nonsingular minor
+over $\overline{\mathbb Q}$ to express any algebraic direction
+with algebraic coefficients. This proves the source's direction
+descent in the four-copy calculation.
+
+For the actual vacuum, the four-copy identity is a finite sum
+of products of one-dimensional torsion translates of the
+normalized even theta function. Its coefficients are the
+algebraic correction factor $\kappa$, signs, and inverse square
+roots of finite indices. Each factor of $\kappa$ satisfies its
+stated $2h_{K_0}$th-power equation with an algebraic right-hand
+side, so it is algebraic; only finitely many nontrivial factors
+occur. Thus, \emph{given} that four-copy identity and the
+normalized CM torsion-translate Taylor theorem, the preceding
+argument proves algebraicity of the standard vacuum's Taylor
+coefficients.
+
+The remaining transport is also explicit. Two rational
+Heisenberg translations compose with a phase
+$\exp(2\pi\mathrm i q)$, $q\in\mathbb Q$, so their extra factor
+is algebraic. The intertwining operator is a finite sum of such
+translations with coefficients equal to signs times an inverse
+square root of an index. It preserves algebraicity of all
+torsion-translate Taylor coefficients. The source's normalized
+indicator theta function is, by its explicit finite presentation,
+a finite algebraic linear combination of rational translations
+of this moved vacuum. The multi-derivative and coordinate
+reindexing formulas then prove \texttt{JetAlg}, and the supplied
+entirety identities give \texttt{ESmooth}.
+
+The remaining primitive statements are therefore precise: the
+normalized CM theta Taylor theorem, its torsion-translation
+algebraicity theorem, and the vacuum/four-copy and normalized
+indicator identities. This paragraph proves the closure and
+transport steps conditional on those identities. It does not
+claim to have proved those analytic identities from formal
+definitions alone.
+
+\paragraph{TL19: finite generators for all bounded-degree normalized
+jets.}
+Assume the actual smoothness, unitary covariance, normalization
+character law, and \texttt{JetAlg} of the theta family in question;
+also assume its $c_D$ are algebraic, as in TL17. Fix positive
+modulus $M$, a finite prime set, two ranks, and a total degree
+$d$. TL1 gives finitely many self-dual lattice representatives
+in the two ranks. There are finitely many divisors $c\mid M$.
+For fixed representatives and $c$, the permitted rational shift
+is bounded in a fixed fractional Hom lattice, while the theta
+function is unchanged by adding $c$ times its local integral
+Hom lattice. The resulting quotient is finite: localize at the
+finitely many relevant primes, where a bounded lattice modulo
+a deeper full lattice has finite residue cardinality, and use
+the injective map to those local quotients as in TL2.
+There are also finitely many multi-indices of degree at most
+$d$.
+
+Take all normalized derivatives for these finite choices.
+They are algebraic by \texttt{JetAlg}. Adjoin them, the finitely
+many $c_D$, and generators for all embedded copies of $E$.
+For arbitrary self-dual lattices choose rational unitary maps
+to the fixed representatives. The actual covariance identity
+expresses the theta function as the representative function
+composed with its specified linear change of variables, whose
+coefficients are embedded elements of $E$. Repeated chain rule
+expresses each derivative of degree $d$ as a finite sum of
+representative derivatives of that degree times products of
+these coefficients. The normalization-character change is
+the prescribed product of embedded determinants, also in the
+same field. Finally the rescaling by $c_D$ uses algebraic
+factors already adjoined. This proves \texttt{FinAlg(jetSet)}:
+one finite algebraic extension contains the whole infinite
+set of these jets.
+
+For canonical column data the exact modulus is
+\[
+ M(u,S_G)=Q^{m+1}\bigl(T_u Q^{m+1}\bigr),
+ \qquad Q=\prod_{P\in S_G}q_P.                    \tag{TL.21}
+\]
+All prime sets used by the steps are subsets of the finite
+$\texttt{badP}(B,\Xi)$ for the finite character family $\Xi$.
+There are finitely many words, steps $i<m$, and such pairs of
+prime sets. The union of their \texttt{FinAlg} sets is again
+\texttt{FinAlg}, by taking the finite union of generators.
+The source's \texttt{allSet} includes only indices satisfying
+\texttt{FinAlg}; its finiteness proof alone does not show that
+an actual step belongs to it. The analytic inputs and the
+preceding argument supply exactly that missing membership.
+The actual multidegrees have total degree \texttt{totDeg},
+so containment of the chosen generators in the coefficient
+field proves the literal \texttt{JetsIn} for those canonical
+data. This is a finite-generation reduction, not a proof of
+analytic algebraicity by selecting an empty set.
+
+\paragraph{TL20: what the local index and canonicalization really
+require.}
+At an ordinary twist prime the initial index construction selects
+finite representatives recursively. Starting with $F_0=\{1\}$,
+retain at the next step exactly the admitted double cosets which
+have a nonzero first-unfolding coefficient from a member of $F_i$.
+Given finite admitted level-coset representatives, normal-form
+reduction, and invariance of nonvanishing under the indicated
+unipotent/double-coset moves, choose one normalized representative
+in each retained coset. This produces a finite $F_{i+1}$, with
+the exact predecessor, uniqueness, and exhaustivity properties.
+At $m-1$ set $F_{m-1}=\{1\}$ and above it set $F_j=\varnothing$,
+as stipulated by the source. Finite products over the local
+primes give the global index sets. A level character descends
+to its projected group when it is trivial on the kernel:
+define its value using a lift, and compare two lifts by their
+quotient in that kernel. This explains the finite selection
+and character-descent parts of \texttt{exists\_chIdx}; the
+needed local coset, normal-form, kernel-character, and
+first-unfolding theorems remain genuine inputs here.
+
+For an already supplied $I.\texttt{Ok}$ of depth at least $2m$,
+much of the canonical arithmetic can be extracted without an
+existence argument. Its square-root clause gives $\sqrt{q_P}$.
+Its reference local-character formula gives the required
+coefficient-field values of $\mu_j(q_P)^{-1}$. If the old depth
+is $D=2m+a$, evaluate its Weil identity at
+$\xi_0^{-1}/q_P^{2m}$, using the integer $q_P^a$ in that
+identity. The local-unit clause makes this an allowed argument
+and gives exactly $\exp(2\pi\mathrm i/q_P^{2m})$ in the
+coefficient field. Thus the primitive roots required for the
+canonical depth are already present. The base congruences give
+$q_P\equiv1\pmod4$ at auxiliary primes and the tuple separates
+twist primes from them.
+
+Replacing the constants and indices by \texttt{twCst} and
+\texttt{twIdx} now produces \texttt{IsTw} definitionally,
+and leaves the host, character family, tuple readings, selection,
+and ambient theta data unchanged. To assert that the replacement
+still satisfies \texttt{Ok}, however, the source invokes the
+actual twisted first-unfolding nonvanishing and its double-coset
+invariance, together with the corresponding character
+nonvanishing theorem. These do not follow from the root and
+square-root extraction just proved. They remain the exact
+\texttt{twIdx\_ok\_closed} boundary. Canonical replacement
+therefore does not make the local-index hypotheses disappear.
+
+\paragraph{TL21: the quantified canonical evaluation assembly and
+the remaining construction boundary.}
+The phrase \texttt{EvLg} has two nested meanings. Its inner
+\texttt{large\_2} assertion chooses finite algebraic generator
+sets $S_1$ and $S_2$, and finite prime/avoidance conditions,
+before quantifying over a base $B$ lying over the fixed context,
+a frame $f$, and a twist datum $T$. The antecedent requires
+$S_1$ in the \emph{fixed} coefficient field and $S_2$ in the full
+coefficient field. It does not assert the result for an arbitrary
+unchanged coefficient field. In this constructor the additional
+prime and avoidance sets can be empty. The twist family
+\[
+ \Xi=\{1,\delta,\delta'\}\cup
+       \{(\delta'\text{ if }\operatorname{reschar}(w)=p_\delta
+                      \text{ else }\delta)\psi_w:w\}
+ \tag{TL.22}
+\]
+is finite: outside the finite set of supported rational primes
+$\psi_w=1$, and there are only finitely many coefficient places
+over each supported prime.
+
+Choose $S_1$ to contain a primitive generator for TL14's common
+frame-value field. Choose $S_2$ to contain the period-field
+generators of TL17, the roots and square roots of TL15, and the
+jet generators of TL19. Their finite union is algebraic under
+the primitive inputs explicitly retained in TL17--TL20.
+With a nonempty \texttt{PreX}, TL16 gives the required auxiliary
+orientation and type-prime quotient identity. Under the stated
+frame-inclusion antecedent this gives both fields of
+\texttt{Pins}.
+
+The finite character set $\Xi$ itself is the index type. TL15
+gives its unique tuples, the three distinguished indices, the
+trivial reference tuple, and the actual residue character data.
+The local-index suppliers in TL20, applied with initial
+$M=A=B=m$ and twist depth $2m$, then give the actual initial
+\texttt{TC.Ok}; the supplied ambient period/trace-isometry
+constructor supplies its specified \texttt{AmbIn}. The selection,
+frame, excluded set, and range of $\xi$ are exactly the prescribed
+ones, because they were used as these record fields. TL20's
+canonical index supplier preserves \texttt{Ok} and gives
+\texttt{IsTw}; TL19 gives \texttt{JetsIn}. TL14 supplies
+\texttt{ValLL0} for every later assembly with the same base and
+frame, and TL17 supplies \texttt{FieldOK}. Finally TL13 now
+supplies \texttt{Laws} without a further premise.
+
+The outer \texttt{Ev} quantifies a positive $\varepsilon_0$, then
+$\varepsilon,C_8$, a transported lower-bound datum, constants,
+and sufficiently large contexts. The inner construction just
+described works for every such context, so the outer thresholds
+can be chosen trivially (for example $\varepsilon_0=1$ and
+zero size thresholds) while retaining the literal inner
+coefficient-field requirements. This explains the source's
+\texttt{ev\_of\_forall} step; it neither constructs an arithmetic
+host nor removes the existing context hypotheses.
+
+Accordingly, the remaining sources for the full canonical
+existence conclusion are the actual local-index/nonvanishing
+theorems; the period/trace-isometry ambient datum and CM
+$j$-algebraicity; and the primitive normalized-theta identities
+specified in TL18 together with their unitary covariance law.
+The finite fields, coefficient roots, tuple reading, orientation,
+ideal principalization, finite derivative reduction, and the
+entire implication \texttt{Ok}$\Rightarrow$\texttt{Laws} have
+been reconstructed above. The record \texttt{Later} still
+consists of five separately supplied stages. A universal
+statement about all such later assemblies is not an existence
+proof of those stages, of a primitive host, or of RH/GRH.
+

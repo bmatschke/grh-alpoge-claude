@@ -1,0 +1,142 @@
+RANK-TWO ARITHMETIC: NEXT SOURCE HANDOFF AFTER RTC1–RTC25
+Version 0.54; explanatory guide, not an additional numbered proof.
+Accepted source pin: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+All paths below are relative to the pinned repository. For readability,
+V denotes src/Development/AutomorphicArithmetic/AutomorphicVarieties/,
+F denotes V/FrobeniusSmoothVectors/, and C denotes V/CurveDVRSpecialization/.
+
+1. What is now supplied, and the exact consumer
+
+RTC1–RTC9 prove the actual generic weighted-coordinate algebra and
+continuity at both allowed ranks. The endpoints are ContMap.lean:307–402
+(wpres), CoB.lean:8–26 (co_B), IsInternalCongr.lean:81–86 (gr_A), and
+MemPowSmulLe.lean:14–110 (cont_u), all in F. The hypotheses are the
+original coefficient DVR/IsCoef, a frame satisfying F.Ok(C0), rank two
+or three, and the already supplied Space. These proofs do not assume
+FinA, FinPt, FinEnd, AllGood, OffFin, or an automorphic conclusion.
+In particular, the former generic-gr_A obstruction to LocCpl is now
+removed; it must not be replaced by UCE13's FinA-dependent analogue.
+
+RTC10–RTC19 supply the full rank-two preconnected core theorem at
+F/PreconnectedRankTwo.lean:206–264. The actual arbitrary core residue
+field is retained. The point construction works on arbitrary prescribed
+k-algebras, including nonreduced targets, by first constructing a
+deformation over k[[T_i]], proving that its entry algebra has polynomial
+image, and only then evaluating that polynomial image. It does not
+invoke the general PointLoc theorem. A single nonzero strict cocycle
+and its base core point are fixed before the other core primes. For
+each prime, the generic prime of its polynomial family and the two
+specified endpoints lie in the core; no assertion about every
+specialization of that family is needed or made.
+
+The strict-cocycle suppliers RTC11–RTC14 have their original field/frame
+scope: any field k of characteristic ell with F.Ok(C0), without a
+chosen coefficient ring O or Space. F.Ok itself contains finiteness of
+k. The subsequent realization and core statements return to the
+specified O, its residue field, and the supplied rank-two Space.
+
+The direct consumer is C/ComponentsGoodRankTwo.lean:129–163.
+Its line 132 uses gr_A; line 134 uses preconnected_rank_two. Those inputs
+are now supplied. The remaining fields of its GlobData.Ok and LocData.Ok
+are actual arithmetic geometry and dimension statements. The abstract
+LocProp, GlobProp, ChartOfFlat and GlobOfCharts mechanisms are already
+available in ACP; repeating those abstract arguments would not supply
+the remaining arithmetic inputs.
+
+2. Recommended next bounded producer: actual local charts
+
+Start with F/LocCpl.lean:100–161, the cpl_of_univ lemma, and finish
+the literal loc_cpl statement at 162–188. The task is to prove that the
+actual map O' tensor_O A -> L.R is completion at the inverse image of
+the maximal ideal. For each N>0, the residue-compatible quotient by
+the Nth power is an original coefficient algebra: its maximal ideal
+is nilpotent, its residue field is the prescribed one, and it is
+Noetherian. Apply the supplied local universal property to obtain
+inverse maps on the finite quotients. Uniqueness gives both exact
+ideal-power comparison and surjectivity modulo every maximal-ideal
+power. RTC7 supplies the requisite generic Noetherian A; finite type
+of O' supplies Noetherianity of the tensor product. Do not replace
+the supplied map or its residue compatibility with an isomorphic
+unmarked completion without transporting the universal data.
+
+Then F/LocFlat.lean:37–69 proves flatness of L.iota, maximality of
+the actual x, and m_B <= pi(x). Its preliminary flat_dvr argument is
+at 21–35: equality of the extended maximal ideals forces injectivity
+of the coefficient map between DVRs; torsion-freeness then gives
+flatness. Combine scalar-extension flatness with completion flatness
+for the actual tensor-product map. The latter requires the original
+commutative-algebra completion theorem at its literal hypotheses;
+the geometric FCD argument is useful background, not an automatic
+identification of this arithmetic local chart.
+
+Finish F/LocRho.lean:40–66. The output includes all adic continuity
+clauses, exact IsBar for every specified residue map, all three ideal
+comparisons (triP, triM, ee) for every prime/ideal P, and the final
+triangular assertions when triP is not contained in x. The continuity
+and diagonal/ordinary residual entries now follow from RTC9 and
+m_B <= pi(x). The last assertion uses the original types theorem
+from IrrOfConn.lean; its rank-three case must be proved or retained,
+not inferred from RTC17's rank-two product argument.
+
+Local existence is separate: F/ResEqOf.lean:132 onward is loc_ex.
+Its supporting arguments construct the unramified coefficient DVR
+extension with the specified finite residue field, form the actual
+completion, and verify the original local universal property. A good
+next packet can supply LocCpl/LocFlat first with the supplied L, then
+add loc_ex if those construction lemmas can be reconstructed fully.
+
+3. Parallel dimension and incidence work
+
+F/ChainedBot.lean:51–86 supplies sharp2: the actual rank-two complete
+local ring has the required chains of minimal components at threshold
+2d+1, and each minimal component meets the triangularly irreducible
+locus. Its inputs include F.Big, the actual local normalized
+representation, presentation/cohomological bounds, and the prime
+condition triP not <= x. These are stronger premises than RTC19 needs
+and must remain explicit. F/KrullDimLtOfNotLeTriangular.lean:36–58
+and its suppliers give the strict dimension bounds. Their next
+consumer is C/ExistsNicePrimeAboveOfLargeDim.lean:7–69 and then
+ComponentsGoodRankTwo.lean:53–91. ACP13 already supplies the abstract
+nice-prime argument at its stated dimension hypotheses.
+
+An independent bounded card can construct the global incidence
+inputs: F/FibreClosed.lean:45 onward (jac), MinHom.lean:26 onward
+(min_hom), and MonMemPow.lean:81 onward (l41). These turn actual
+graded structure into closed-point density and incidence of each
+relevant irreducible component with the core. F/Seedpt.lean:9–30
+then transports the supplied seed prime and the precise dimension
+equality to the actual local chart. These are used at lines 136–158
+of ComponentsGoodRankTwo; connectedness alone does not supply them.
+
+4. The finite-point join is now explicit
+
+RTC21–RTC24 prove full original FinPtDown. Its literal contract is
+C/EveryPointSatisfiesFrameCondition.lean:133–137 and its implementation
+consumer is C/FinPtDown.lean:113–155. The scope is every prime ell,
+arbitrary rank, original c,c1,f/inclusion/residue compatibility, and
+every original IsCD test ring with its specified scalar tower. A
+compatible common test DVR is constructed explicitly using finite
+residue fields and equal-characteristic power series. Injective
+scalar extension reflects the full characteristic polynomial.
+
+The actual two-run output in
+V/ModularityArgument/ThresholdArguments/DenseThresholdCases/TwoRuns.lean:
+80–109 is FinPt over the extended coefficient frame. LinkedEndE.lean:67
+uses exactly finPtDown to return to the original frame. RTC25 now joins
+this transport to ACP11 and AFE20, without supplying the remaining
+OffFin producer or automorphic premises. Keep the same marked g1 and
+choose G_L before every later ordinary point; retain separate rank-two
+and rank-three spaces, coefficient rings and ideals.
+
+5. Remaining endpoint boundary
+
+The rank-three corner and exceptional ideal still require the actual
+construction in F/QuotientHomNonvanishingBound.lean:15–220, with l53
+at 221–236. The full PropagationTheoremGL3 at C/PropagationTheoremGL3.lean:
+213–229 remains open, as does actual GL2 propagation until the local,
+dimension, incidence and seed inputs above are supplied. Actual Space,
+modularity and CReal existence are not new conclusions of RTC. Original
+P remains at the arithmetic entry, the Host ell=3 scope is preserved,
+and original versus Alt outputs retain WitA/WitAQ. No whole selected
+obligation is newly closed by this packet.

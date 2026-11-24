@@ -1,0 +1,1282 @@
+[AMD_bridge_contract_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/FundamentalEquivalence/AdBridge.lean:13-118
+Range SHA256 2fbea0aa5c62fd30d8b388f293dcccda00484d4cbcd16284c7bf4f62fe0f65c4
+
+variable (I : AutInst)
+
+abbrev HAd : Type := Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) I.cm.sig I.J
+
+abbrev hmat (h : HAd I) : Matrix (Fin I.n) (Fin I.n) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F ⊗[I.F] I.E) :=
+  ((Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA.mat (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) I.cm.sig I.J h :
+    GL (Fin I.n) (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F ⊗[I.F] I.E)) : Matrix (Fin I.n) (Fin I.n) _)
+
+def evV (v : InfinitePlace I.F) : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F →+* ℂ :=
+  (InfinitePlace.Completion.extensionEmbedding v).comp
+    ((Pi.evalRingHom (fun w : InfinitePlace I.F => w.Completion) v).comp
+      (RingHom.fst (InfiniteAdeleRing I.F) (FiniteAdeleRing (𝓞 I.F) I.F)))
+
+theorem evV_algebraMap (v : InfinitePlace I.F) (a : I.F) :
+    evV I v (algebraMap I.F (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) a) = v.embedding a := by
+  first
+    | (exact InfinitePlace.Completion.extensionEmbedding_coe v ((WithAbs.equiv v.1).symm a))
+    | (have h := InfinitePlace.Completion.extensionEmbedding_coe v ((WithAbs.equiv v.1).symm a); simp only [Equiv.apply_symm_apply] at h; exact h)
+    | (simp [evV]; done)
+
+def thetaV (v : InfinitePlace I.F) : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F ⊗[I.F] I.E →+* ℂ :=
+  letI : Algebra I.F ℂ := v.embedding.toAlgebra
+  (Algebra.TensorProduct.lift
+    ({ evV I v with commutes' := fun a => evV_algebraMap I v a } :
+      Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F →ₐ[I.F] ℂ)
+    ({ I.φ v with commutes' := I.φ_over v } : I.E →ₐ[I.F] ℂ)
+    (fun _ _ => Commute.all _ _)).toRingHom
+
+theorem thetaV_tmul (v : InfinitePlace I.F) (a : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) (x : I.E) :
+    thetaV I v (a ⊗ₜ[I.F] x) = evV I v a * I.φ v x := by
+  first
+    | (simp [thetaV]; done)
+    | (exact Algebra.TensorProduct.lift_tmul _ _ _ a x)
+    | rfl
+
+def tauF : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F ⊗[I.F] I.E →+* I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F :=
+  (Algebra.TensorProduct.lift
+    ((Algebra.TensorProduct.includeRight : Formalism.MainNotions.S.Af I.F →ₐ[I.F] I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F).comp
+      (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sndA I.F))
+    (Algebra.TensorProduct.includeLeft : I.E →ₐ[I.F] I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F)
+    (fun _ _ => Commute.all _ _)).toRingHom
+
+theorem tauF_tmul (a : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) (x : I.E) :
+    tauF I (a ⊗ₜ[I.F] x) = x ⊗ₜ[I.F] a.2 := by
+  first
+    | (simp [tauF, Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sndA, Algebra.TensorProduct.tmul_mul_tmul]; done)
+    | (show (1 : I.E) ⊗ₜ[I.F] a.2 * x ⊗ₜ[I.F] (1 : Formalism.MainNotions.S.Af I.F) = _
+       rw [Algebra.TensorProduct.tmul_mul_tmul, one_mul, mul_one])
+
+def ofHAInf (h : HAd I) (v : InfinitePlace I.F) : Matrix (Fin I.n) (Fin I.n) ℂ :=
+  (I.P v)⁻¹ * (hmat I h).map (thetaV I v) * I.P v
+
+def ofHAFin (h : HAd I) : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Formalism.MainNotions.S.Af I.F) :=
+  (hmat I h).map (tauF I)
+
+def IsBridge (e : I.GA ≃ₜ* HAd I) : Prop :=
+  ∀ x : I.GA, (∀ v, uMat (x.1 v) = ofHAInf I (e x) v) ∧ I.fmat x.2 = ofHAFin I (e x)
+
+def AdBridgeIso : Prop := ∃ e : I.GA ≃ₜ* HAd I, IsBridge I e
+
+def ratHA : Set (HAd I) :=
+  {h | Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA.mat (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) I.cm.sig I.J h ∈
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HFin (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) I.cm.sig I.J}
+
+def KinfV (v : InfinitePlace I.F) : Set (Formalism.REAL.UJ (I.ε v)) :=
+  {k | ∀ a b, I.ε v a ≠ I.ε v b → uMat k a b = 0}
+
+def KGA : Set I.GA := {x | (∀ v, x.1 v ∈ KinfV I v) ∧ x.2 ∈ I.Kset}
+
+def majV (v : InfinitePlace I.F) : Matrix (Fin I.n) (Fin I.n) ℂ := ((I.P v)⁻¹)ᴴ * (I.P v)⁻¹
+
+def KinfHA : Set (HAd I) :=
+  {h | ∀ v, ((hmat I h).map (thetaV I v))ᴴ * majV I v * (hmat I h).map (thetaV I v) = majV I v}
+
+def prF : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F ⊗[I.F] I.E →+* Formalism.MainNotions.S.Af I.F ⊗[I.F] I.E :=
+  (Algebra.TensorProduct.map (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.sndA I.F) (AlgHom.id I.F I.E)).toRingHom
+
+def KfHA : Set (HAd I) :=
+  {h | ∀ v : HeightOneSpectrum (𝓞 I.F),
+    Formalism.L2.SG.Sub.compV v (Formalism.UG.bc (prF I)
+      (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA.mat (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) I.cm.sig I.J h)) ∈
+      Formalism.L2.SG.Sub.Kloc v (I.L : Set (Fin I.n → I.E))}
+
+def KHA : Set (HAd I) := KinfHA I ∩ KfHA I
+
+def AdBridgeGF : Prop := ∀ e : I.GA ≃ₜ* HAd I, IsBridge I e → e '' I.GFset = ratHA I
+
+def AdBridgeK : Prop := ∀ e : I.GA ≃ₜ* HAd I, IsBridge I e → e '' KGA I = KHA I
+
+def AdelicIsomorphism : Prop := AdBridgeIso I ∧ AdBridgeGF I ∧ AdBridgeK I
+
+def toHA (hb : AdBridgeIso I) : I.GA ≃ₜ* HAd I := hb.choose
+
+theorem toHA_isBridge (hb : AdBridgeIso I) : IsBridge I (toHA I hb) := hb.choose_spec
+
+theorem thetaV_inclR (v : InfinitePlace I.F) (x : I.E) :
+    thetaV I v (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) x) = I.φ v x := by
+  have h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) x =
+      (1 : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) ⊗ₜ[I.F] x := rfl
+  rw [h, thetaV_tmul, map_one, one_mul]
+
+theorem tauF_inclR (x : I.E) :
+    tauF I (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) x) =
+      Formalism.UG.inclE (F := I.F) (Formalism.MainNotions.S.Af I.F) x := by
+  have h : Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.inclR (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF I.F) x =
+
+
+[AMD_bridge_contract_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/ClosedVolumeStatements/AdelicIsomorphismStatement.lean:1-24
+Range SHA256 1b938e06f56489375237441b8913813c50dab14cd797323ac5d814cdb6bc8fd3
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FundamentalEquivalence.AdBridge
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FundamentalEquivalence.FundamentalContinuity.AdelicIsomorphismStatement
+import Mathlib
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InvariantAlgebraComparison.JRMapTheta
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InvariantAlgebraComparison.ExistsNotMemRange
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InvariantTopologyComparison.ContinuousOfHAInf
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InvariantTopologyComparison.CoordFinInv
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.InvariantTopologyComparison.LatticeOfEntriesIntegral
+import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.BridgeMaxCpt
+import Formalism.PeriodIntegrals.OrbitalBoundsConclusion.BridgeRatPts
+
+namespace Formalism.L2.SG.Closed
+
+theorem AdBridgeIso_holds (I : Formalism.MainNotions.S.AutInst) : Formalism.L2.SG.AdBridge.AdBridgeIso I :=
+  Formalism.L2.SG.Pf.adelic_isomorphism_exists (I := I)
+
+theorem AdBridgeGF_holds (I : Formalism.MainNotions.S.AutInst) : Formalism.L2.SG.AdBridge.AdBridgeGF I := adelic_rational_points I
+
+theorem AdBridgeK_holds (I : Formalism.MainNotions.S.AutInst) : Formalism.L2.SG.AdBridge.AdBridgeK I := adelic_maximal_compact I
+
+theorem adelic_isomorphism_statement (I : Formalism.MainNotions.S.AutInst) : Formalism.L2.SG.AdBridge.AdelicIsomorphism I :=
+  Formalism.L2.SG.Pf.adelic_isomorphism_of_parts (I := I) (adelic_rational_points I) (adelic_maximal_compact I)
+
+end Formalism.L2.SG.Closed
+
+
+[AMD_original_instance_01] src/Formalism/SharpRestriction/CuspSpanNormBounds/GlobAut.lean:16-118
+Range SHA256 4fa79083da8dc27ed18b7c4c4f1a1ccfc0e094e80fee9b214d227c70204b3494
+abbrev Af (F : Type) [Field F] [NumberField F] : Type := FiniteAdeleRing (𝓞 F) F
+
+section Lat
+
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
+
+abbrev IntAf (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] :
+    Subring (E ⊗[F] Af F) :=
+  Formalism.UG.tensInt (F := F) (Af F) (Formalism.UG.intOE E) (Formalism.UG.intAd F)
+
+def lamAf (L : Submodule (𝓞 E) (Fin n → E)) : Submodule (IntAf F E) (Fin n → E ⊗[F] Af F) :=
+  Submodule.span (IntAf F E)
+    (Set.range fun x : L => fun i => Formalism.UG.inclE (F := F) (Af F) ((x : Fin n → E) i))
+
+end Lat
+
+structure AutInst : Type 1 where
+  F : Type
+  E : Type
+  [fF : Field F]
+  [nF : NumberField F]
+  [fE : Field E]
+  [nE : NumberField E]
+  [sE : StarRing E]
+  [aFE : Algebra F E]
+  cm : Formalism.BasicNotions.CMData F E
+  n : ℕ
+
+  J : Matrix (Fin n) (Fin n) E
+  J_herm : Formalism.UG.IsHerm (starRingEnd E) J
+  J_det : J.det ≠ 0
+
+  L : Submodule (𝓞 E) (Fin n → E)
+  L_span : Submodule.span E (L : Set (Fin n → E)) = ⊤
+  L_fg : L.FG
+  L_dual : ∀ x : Fin n → E, x ∈ L ↔
+    ∀ y ∈ L, Formalism.UG.hform (starRingEnd E) J y x ∈ (algebraMap (𝓞 E) E).range
+
+  ε : InfinitePlace F → Fin n → Bool
+  φ : InfinitePlace F → (E →+* ℂ)
+  φ_over : ∀ v (a : F), φ v (algebraMap F E a) = v.embedding a
+  P : InfinitePlace F → Matrix (Fin n) (Fin n) ℂ
+  P_unit : ∀ v, IsUnit (P v)
+  P_spec : ∀ v, (P v)ᴴ * J.map (φ v) * P v = Formalism.REAL.Jm (ε v)
+
+  [topf : TopologicalSpace (Formalism.UG.UPts cm.sig J (Af F))]
+  [topf_group : IsTopologicalGroup (Formalism.UG.UPts cm.sig J (Af F))]
+
+  topf_open : ∀ g : ℕ, 1 ≤ g → IsOpen {x : Formalism.UG.UPts cm.sig J (Af F) |
+    (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
+      ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
+        ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z}
+  topf_basis : ∀ U ∈ nhds (1 : Formalism.UG.UPts cm.sig J (Af F)), ∃ g : ℕ, 1 ≤ g ∧
+    {x : Formalism.UG.UPts cm.sig J (Af F) |
+      (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
+      ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
+        ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z} ⊆ U
+
+attribute [instance] AutInst.fF AutInst.nF AutInst.fE AutInst.nE AutInst.sE AutInst.aFE AutInst.topf
+  AutInst.topf_group
+
+namespace AutInst
+
+variable (I : AutInst)
+
+abbrev Gf : Type := Formalism.UG.UPts I.cm.sig I.J (Af I.F)
+
+instance : MeasurableSpace I.Gf := borel _
+instance : BorelSpace I.Gf := ⟨rfl⟩
+
+abbrev Ginf : Type := ∀ v : InfinitePlace I.F, Formalism.REAL.UJ (I.ε v)
+
+abbrev GA : Type := I.Ginf × I.Gf
+
+abbrev fmat (x : I.Gf) : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F) :=
+  ((x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F))
+
+abbrev Lf : Submodule (IntAf I.F I.E) (Fin I.n → I.E ⊗[I.F] Af I.F) := lamAf (F := I.F) I.L
+
+def Kset : Set I.Gf := {x | (x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) ∈ Formalism.UG.stabGL I.Lf}
+
+def Kg (g : ℕ) : Set I.Gf :=
+  {x | x ∈ I.Kset ∧ ∀ y ∈ I.Lf, ∃ z ∈ I.Lf, (I.fmat x - 1) *ᵥ y = (g : I.E ⊗[I.F] Af I.F) • z}
+
+def UnipMod (l : ℕ) (x : I.Gf) : Prop :=
+  ∀ y ∈ I.Lf, ∃ z ∈ I.Lf, ((I.fmat x - 1) ^ I.n) *ᵥ y = (l : I.E ⊗[I.F] Af I.F) • z
+
+def GFset : Set I.GA :=
+  {x | ∃ γ : GL (Fin I.n) I.E, γ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J ∧
+    (∀ v, uMat (x.1 v) = (I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v) ∧
+    I.fmat x.2 = (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (Formalism.UG.inclE (F := I.F) (Af I.F))}
+
+def muA (μf : Measure I.Gf) [SigmaFinite μf] : Measure I.GA :=
+  (Measure.pi fun v => Formalism.REAL.muG (I.ε v)).prod μf
+
+def IsFundDom (μ : Measure I.GA) (fund : Set I.GA) : Prop :=
+  MeasurableSet fund ∧ (∀ y : I.GA, ∃ γ ∈ I.GFset, γ * y ∈ fund) ∧
+    ∀ γ ∈ I.GFset, γ ≠ 1 → μ ((fun y => γ * y) '' fund ∩ fund) = 0
+
+def rep (fund : Set I.GA) (y : I.GA) : I.GA := by
+  classical
+  exact if h : ∃ γ ∈ I.GFset, γ * y ∈ fund then h.choose * y else y
+
+
+
+[AMD_standard_groups_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/FundamentalEquivalence/LevelIntersectParabolic.lean:149-178
+Range SHA256 660b845786db7cb43ca86fa1938966cf018e5d2ce9189e1d9e3b3eae488604ff
+structure Frame (E : Type) (n r : ℕ) where
+
+  e : Fin r → Fin n → E
+
+  f : Fin r → Fin n → E
+
+  z : Fin n → E
+
+section Frames
+
+variable {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R]
+  (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E)
+
+def Frame.IsStd {r : ℕ} (P : Frame E n r) (T : F) : Prop :=
+  (∀ a b, hE σ J (P.e a) (P.e b) = 0) ∧ (∀ a b, hE σ J (P.f a) (P.f b) = 0) ∧
+  (∀ a b, hE σ J (P.e a) (P.f b) = if a = b then 1 else 0) ∧
+  (∀ a, hE σ J (P.e a) P.z = 0) ∧ (∀ a, hE σ J (P.f a) P.z = 0) ∧
+  hE σ J P.z P.z = algebraMap F E (-T) ∧ T ≠ 0
+
+def F0 {r : ℕ} (P : Frame E n r) : Fin (r + 1) → Fin n → E := Fin.snoc P.e P.z
+
+def tupH {r : ℕ} (P : Frame E n r) : Fin (r + 1 + r) → Fin n → E := Fin.append (F0 P) P.f
+
+def S0 {r : ℕ} (P : Frame E n r) : Subgroup (HA R σ J) := stabT R σ J (F0 P)
+
+def Ssub {r : ℕ} (P : Frame E n r) : Subgroup (HA R σ J) := uniFlag R σ J (F0 P)
+
+def Hsub {r : ℕ} (P : Frame E n r) : Subgroup (HA R σ J) := stabT R σ J (tupH P)
+
+def InXperp {r : ℕ} (P : Frame E n r) (v : Fin n → R ⊗[F] E) : Prop :=
+
+
+[AMD_standard_groups_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/FundamentalEquivalence/LevelIntersectParabolic.lean:225-255
+Range SHA256 a2b6440e92afc97e8e71797ff23ab365ed07bd17279afdf124668478a77d2a5e
+def Nsub {r : ℕ} (P : Frame E n r) : Subgroup (HA R σ J) where
+  carrier := {g | UniC R σ J P.e g ∧
+    ∀ v, InXperp R σ J P v → lin R σ J g v - v ∈ spanR (F := F) R P.e Set.univ}
+  one_mem' := by
+    refine ⟨(uniFlag R σ J P.e).one_mem, fun v _ => ?_⟩
+    simp [lin_one]
+  mul_mem' := by
+    rintro g h ⟨hg1, hg2⟩ ⟨hh1, hh2⟩
+    refine ⟨(uniFlag R σ J P.e).mul_mem hg1 hh1, fun v hv => ?_⟩
+    have h1 : lin R σ J g (lin R σ J h v - v) ∈ spanR (F := F) R P.e Set.univ :=
+      uni_map_le hg1 Set.univ (fun _ _ _ _ => Set.mem_univ _)
+        (Submodule.mem_map_of_mem (hh2 v hv))
+    have := Submodule.add_mem _ h1 (hg2 v hv)
+    rw [map_sub] at this
+    rw [lin_mul]
+    simpa using this
+  inv_mem' := by
+    rintro g ⟨hg1, hg2⟩
+    refine ⟨(uniFlag R σ J P.e).inv_mem hg1, fun v hv => ?_⟩
+    have hw : InXperp R σ J P (lin R σ J g⁻¹ v) := by
+      intro a
+      have hx : lin R σ J g (ratV (F := F) R (P.e a)) ∈ spanR (F := F) R P.e Set.univ :=
+        uni_map_le hg1 Set.univ (fun _ _ _ _ => Set.mem_univ _)
+          (Submodule.mem_map_of_mem (Submodule.subset_span ⟨a, Set.mem_univ _, rfl⟩))
+      rw [← hR_lin g, lin_lin_inv]
+      exact hR_span_perp P v hv _ hx
+    have := Submodule.neg_mem _ (hg2 _ hw)
+    rw [lin_lin_inv] at this
+    simpa using this
+
+def FrameUnipotentSubgroup {r : ℕ} (P : Frame E n r) : Subgroup (HA R σ J) := Nsub R σ J P ⊓ S0 R σ J P
+
+
+[AMD_measure_records_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/Measures.lean:65-128
+Range SHA256 8f8b3930c09db6d6ef92371e79bbdc634a04214364717dab3646ceb063ee75f4
+end Split
+
+abbrev amb {G : Type} [Group G] [MeasurableSpace G] {K : Subgroup G} (μ : Measure K) : Measure G :=
+  μ.map Subtype.val
+
+section Rec
+
+variable {F E : Type} [Field F] [NumberField F] [Field E] [Algebra F E]
+
+structure MeasG (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) (r : ℕ) where
+
+  μG : Measure (HA (AF F) σ J)
+
+  μGinf : Measure (HA (Ainf F) σ J)
+
+  μGf : Measure (HA (Af F) σ J)
+
+  μGv : ∀ v : HeightOneSpectrum (𝓞 F), Measure (HA (Fv F v) σ J)
+
+  μB : ∀ X0 : Fin (2 * r + 2) → Fin n → E, Measure (stabT (AF F) σ J X0)
+
+structure MeasW (σ : E →ₐ[F] E) {n : ℕ} (J : Matrix (Fin n) (Fin n) E) {r : ℕ} (P : Frame E n r) where
+
+  μH : Measure (Hsub (AF F) σ J P)
+
+  μHinf : Measure (Hsub (Ainf F) σ J P)
+
+  μHf : Measure (Hsub (Af F) σ J P)
+
+  μN : Measure (Nsub (AF F) σ J P)
+
+  μNinf : Measure (Nsub (Ainf F) σ J P)
+
+  μNf : Measure (Nsub (Af F) σ J P)
+
+  μSf : Measure (Ssub (Af F) σ J P)
+
+  μSv : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Ssub (Fv F v) σ J P)
+
+variable {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
+
+def MeasG.IsTextNorm {r : ℕ} (M : MeasG σ J r) : Prop :=
+  M.μG.IsHaarMeasure ∧ M.μGinf.IsHaarMeasure ∧ M.μGf.IsHaarMeasure ∧ (∀ v, (M.μGv v).IsHaarMeasure) ∧
+  (∀ X0, (M.μB X0).IsHaarMeasure) ∧
+  M.μG.map (splitA σ J) = M.μGinf.prod M.μGf
+
+def MeasW.IsTextNorm {r : ℕ} {P : Frame E n r} (M : MeasW σ J P) : Prop :=
+  M.μH.IsHaarMeasure ∧ M.μHinf.IsHaarMeasure ∧ M.μHf.IsHaarMeasure ∧
+  M.μN.IsHaarMeasure ∧ M.μNinf.IsHaarMeasure ∧ M.μNf.IsHaarMeasure ∧
+  M.μSf.IsHaarMeasure ∧ (∀ v, (M.μSv v).IsHaarMeasure) ∧
+  (amb M.μH).map (splitA σ J) = (amb M.μHinf).prod (amb M.μHf) ∧
+  (amb M.μN).map (splitA σ J) = (amb M.μNinf).prod (amb M.μNf) ∧
+  amb M.μSf = ((amb M.μNf).prod (amb M.μHf)).map (fun p => p.1 * p.2)
+
+def ratOf {K : Subgroup (HA (AF F) σ J)} : Subgroup K :=
+  (HFinIn (AF F) σ J).comap K.subtype
+
+def covol {K : Subgroup (HA (AF F) σ J)} (μ : Measure K) : ℝ :=
+  haveI := Classical.propDecidable
+  if h : ∃ 𝓕 : Set K, IsFundamentalDomain (ratOf (K := K)) 𝓕 μ then (μ h.choose).toReal else 0
+
+end Rec
+
+end Formalism.L2.SG.Measures
+
+
+[AMD_weak_infinity_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/HidaSetting.lean:24-65
+Range SHA256 ee9ae872e5aaa3d8e4ed2f1a94d840c81d84f7a405e0e8f92e1aef81898c30bd
+def hJ (ε : Fin n → Bool) (x y : Fin n → ℂ) : ℂ := star x ⬝ᵥ (Formalism.REAL.Jm ε *ᵥ y)
+
+def spanLt (e : Fin r → Fin n → ℂ) (a : ℕ) : Submodule ℂ (Fin n → ℂ) :=
+  Submodule.span ℂ (e '' {b | b.1 < a})
+
+def InS (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ) : Prop :=
+  (∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1) ∧ (g - 1) *ᵥ z ∈ spanLt e r
+
+def InN (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ) :
+    Prop :=
+  InS e z g ∧ ∀ y, (∀ a, hJ ε (e a) y = 0) → (g - 1) *ᵥ y ∈ spanLt e r
+
+def nxt {V : Type} (e : Fin r → V) (z : V) (a : Fin r) : V :=
+  if h : a.1 + 1 < r then e ⟨a.1 + 1, h⟩ else z
+
+def rootCoord (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
+    (a : Fin r) : ℂ :=
+  hJ ε (f a) (g *ᵥ nxt e z a)
+
+def psiR (ε : Fin n → Bool) (gg : ℕ) (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+    (g : Matrix (Fin n) (Fin n) ℂ) : ℂ :=
+  Complex.exp (2 * Real.pi * Complex.I *
+    ((∑ a, (rootCoord ε e f z g a + star (rootCoord ε e f z g a))) / (gg : ℂ)))
+
+end Real
+
+section Inst
+
+variable (I : Formalism.MainNotions.S.AutInst)
+
+def rv (v : InfinitePlace I.F) (x : Fin I.n → I.E) : Fin I.n → ℂ :=
+  (I.P v)⁻¹ *ᵥ fun i => I.φ v (x i)
+
+variable {r : ℕ}
+
+def Sinf (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) : Set I.Ginf :=
+  {s | ∀ v, InS (fun a => rv I v (e a)) (rv I v z) (uMat (s v))}
+
+def Ninf (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) : Set I.Ginf :=
+  {s | ∀ v, InN (I.ε v) (fun a => rv I v (e a)) (rv I v z) (uMat (s v))}
+
+def psiInf (g : ℕ) (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) (s : I.Ginf) : ℂ :=
+
+
+[AMD_weak_infinity_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/HidaSetting.lean:136-160
+Range SHA256 abd4fb8ebdf342cfda96f6a2b5bc319c210152dbb5bcf54f2b5b1e9ca5e80313
+def IsRepS (S N : Set I.Ginf) (rho : I.Ginf → (V →L[ℂ] V)) : Prop :=
+  rho 1 = 1 ∧ (∀ s ∈ S, ∀ t ∈ S, rho (s * t) = rho s * rho t) ∧
+    (∀ s ∈ S, ∀ x y : V, ⟪rho s x, rho s y⟫_ℂ = ⟪x, y⟫_ℂ) ∧ (∀ s ∈ N, rho s = 1) ∧
+    ∀ x : V, ContinuousOn (fun s => rho s x) S
+
+def IsSFund (S : Set I.Ginf) (Fd : Set I.Ginf) : Prop :=
+  MeasurableSet Fd ∧ (∀ x, ∃ s ∈ S, s * x ∈ Fd) ∧ ∀ x ∈ Fd, ∀ s ∈ S, s * x ∈ Fd → s = 1
+
+def IsHaarOnSet (S : Set I.Ginf) (μ : Measure I.Ginf) : Prop :=
+  SigmaFinite μ ∧ μ ≠ 0 ∧ μ Sᶜ = 0 ∧ ∀ s ∈ S, μ.map (fun x => s * x) = μ
+
+def IsQuotMeasS (μS ν : Measure I.Ginf) : Prop :=
+  ∀ f : I.Ginf → ℝ≥0∞, Measurable f →
+    ∫⁻ x, f x ∂(Formalism.L2.SG.ProjRows.muInf I) = ∫⁻ x, (∫⁻ s, f (s * x) ∂μS) ∂ν
+
+def IsWu (ph : I.Ginf → ℂ) (S : Set I.Ginf) (psi : I.Ginf → ℂ) (rho : I.Ginf → (V →L[ℂ] V))
+    (ν : Measure I.Ginf) (W : I.Ginf → V) : Prop :=
+  (∀ s ∈ S, ∀ x, W (s * x) = psi s • rho s (W x)) ∧
+    (∀ x, Integrable (fun y => ph y • W (x * y)) (Formalism.L2.SG.ProjRows.muInf I) ∧
+      ∫ y, ph y • W (x * y) ∂(Formalism.L2.SG.ProjRows.muInf I) = W x) ∧
+    Continuous W ∧ ∫⁻ x, ‖W x‖ₑ ∂ν < ⊤ ∧ ∫⁻ x, ‖W x‖ₑ ^ 2 ∂ν = 1
+
+def Hset (S : Set (Fin I.n → I.E)) : Set I.Ginf :=
+  {s | ∀ v, ∀ x ∈ S, uMat (s v) *ᵥ rv I v x = rv I v x}
+
+
+
+[AMD_weak_infinity_03] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/MeasInfCut.lean:1-29
+Range SHA256 f872680fe2e8f2c9007b1f25033c20e6a3592b8100a2088fc730f88e4ee8ba0e
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.HidaSetting
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FundamentalEquivalence.AdBridge
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FundamentalEquivalence.LevelIntersectParabolic
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.Measures
+
+noncomputable section
+
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting
+
+namespace Formalism.L2.SG.Pf.MeasInf
+
+def toInfL (I : AutInst) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso I) (s : I.Ginf) :
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf I.F) I.cm.sig I.J :=
+  (Formalism.L2.SG.Measures.splitA I.cm.sig I.J (Formalism.L2.SG.AdBridge.toHA I hb (s, 1))).1
+
+def InfTransfer : Prop :=
+  ∀ (I : AutInst) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso I) (r : ℕ) (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
+    (T : I.F), (⟨e, f, z⟩ : Formalism.L2.SG.Sub.Frame I.E I.n r).IsStd I.cm.sig I.J T →
+    ∀ muN muH : Measure I.Ginf, IsHaarOnSet I (Ninf I e z) muN →
+      IsHaarOnSet I (Hset I (Set.range e ∪ Set.range f ∪ {z})) muH →
+      ∃ (μNinf : Measure (Formalism.L2.SG.Sub.Nsub (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf I.F) I.cm.sig I.J
+          (⟨e, f, z⟩ : Formalism.L2.SG.Sub.Frame I.E I.n r)))
+        (μHinf : Measure (Formalism.L2.SG.Sub.Hsub (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf I.F) I.cm.sig I.J
+          (⟨e, f, z⟩ : Formalism.L2.SG.Sub.Frame I.E I.n r))),
+        μNinf.IsHaarMeasure ∧ μHinf.IsHaarMeasure ∧
+        Formalism.L2.SG.Measures.amb μNinf = muN.map (toInfL I hb) ∧ Formalism.L2.SG.Measures.amb μHinf = muH.map (toInfL I hb)
+
+end Formalism.L2.SG.Pf.MeasInf
+
+
+[AMD_group_measure_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/MExistsCut.lean:52-64
+Range SHA256 f4b586b6dfbcee152eaea7dbd9fee3d03af6d469b91b4fc28ea2514beaec9781
+def MGExists : Prop :=
+  ∀ (I : AutInst) (μf : Measure I.Gf) [μf.IsHaarMeasure] [SigmaFinite μf] (r : ℕ),
+    ∃ hb : Formalism.L2.SG.AdBridge.AdBridgeIso I, ∃ M : MeasG I.cm.sig I.J r, M.IsTextNorm ∧
+      M.μG = (I.muA μf).map (Formalism.L2.SG.AdBridge.toHA I hb) ∧
+      M.μGinf = (Formalism.L2.SG.ProjRows.muInf I).map (toInfI I hb) ∧ M.μGf = μf.map (toFinI I hb)
+
+def MWExists : Prop :=
+  ∀ (I : AutInst) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso I) (r : ℕ) (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
+    (muN muH : Measure I.Ginf),
+    IsHaarOnSet I (Ninf I e z) muN → IsHaarOnSet I (Hset I (Set.range e ∪ Set.range f ∪ {z})) muH →
+    ∃ W : MeasW I.cm.sig I.J (⟨e, f, z⟩ : Formalism.L2.SG.Sub.Frame I.E I.n r), W.IsTextNorm ∧
+      amb W.μNinf = muN.map (toInfI I hb) ∧ amb W.μHinf = muH.map (toInfI I hb)
+
+
+
+[AMD_group_measure_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/MultiplicityGExists.lean:471-611
+Range SHA256 c3b5a2474d63d45cf1ec438843792e676f058a5fadc1d5c51f265cae2fda36dd
+theorem fv_grp (hE : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F)) :
+    IsTopologicalGroup (HA (Fv F v) σ J) ∧ T2Space (HA (Fv F v) σ J) ∧ LocallyCompactSpace (HA (Fv F v) σ J) ∧
+      SecondCountableTopology (HA (Fv F v) σ J) ∧ BorelSpace (HA (Fv F v) σ J) := by
+  have := fv_locallyCompact (F := F) v
+  have := fv_secondCountable (F := F) v
+  exact ha_facts (Fv F v) hE σ J
+
+theorem stabT_closed (hE : Module.finrank F E = 2) {a : ℕ} (X0 : Fin a → Fin M → E) :
+    IsClosed (stabT (AF F) σ J X0 : Set (HA (AF F) σ J)) := by
+  obtain ⟨a1, a2, a3⟩ := af_facts F
+  obtain ⟨t1, t2, -, -, -⟩ := tens_facts (E := E) (AF F) hE
+  have hs : Continuous (fun g : ↥(HR (AF F) σ J) => (g : GL (Fin M) (AF F ⊗[F] E))) := continuous_subtype_val
+  have hv : Continuous (fun g : HA (AF F) σ J =>
+      ((HA.mat (AF F) σ J g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E))) :=
+    Units.continuous_val.comp hs
+  have hset : (stabT (AF F) σ J X0 : Set (HA (AF F) σ J)) = ⋂ b, {g : HA (AF F) σ J |
+      Matrix.mulVec ((HA.mat (AF F) σ J g : GL (Fin M) (AF F ⊗[F] E)) : Matrix (Fin M) (Fin M) (AF F ⊗[F] E))
+        (ratV (F := F) (AF F) (X0 b)) = ratV (F := F) (AF F) (X0 b)} := by
+    ext g
+    simp only [SetLike.mem_coe, Set.mem_iInter, Set.mem_setOf_eq]
+    rw [mem_stabT]
+    rfl
+  rw [hset]
+  exact isClosed_iInter fun b => isClosed_eq (hv.matrix_mulVec continuous_const) continuous_const
+
+theorem stabT_facts (hE : Module.finrank F E = 2) {a : ℕ} (X0 : Fin a → Fin M → E) :
+    IsTopologicalGroup (stabT (AF F) σ J X0) ∧ LocallyCompactSpace (stabT (AF F) σ J X0) ∧
+      BorelSpace (stabT (AF F) σ J X0) := by
+  obtain ⟨⟨g1, g2, g3, g4, g5⟩, -, -⟩ := grp_facts σ J hE
+  exact ⟨inferInstance, (stabT_closed σ J hE X0).isClosedEmbedding_subtypeVal.locallyCompactSpace, inferInstance⟩
+
+def haarV (hE : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F)) : Measure (HA (Fv F v) σ J) :=
+  haveI := (fv_grp σ J hE v).1
+  haveI := (fv_grp σ J hE v).2.2.1
+  haveI := (fv_grp σ J hE v).2.2.2.2
+  Measure.haar
+
+theorem haarV_isHaar (hE : Module.finrank F E = 2) (v : HeightOneSpectrum (𝓞 F)) : (haarV σ J hE v).IsHaarMeasure := by
+  have := (fv_grp σ J hE v).1
+  have := (fv_grp σ J hE v).2.2.1
+  have := (fv_grp σ J hE v).2.2.2.2
+  unfold haarV
+  infer_instance
+
+def haarB (hE : Module.finrank F E = 2) {a : ℕ} (X0 : Fin a → Fin M → E) : Measure (stabT (AF F) σ J X0) :=
+  haveI := (stabT_facts σ J hE X0).1
+  haveI := (stabT_facts σ J hE X0).2.1
+  haveI := (stabT_facts σ J hE X0).2.2
+  Measure.haar
+
+theorem haarB_isHaar (hE : Module.finrank F E = 2) {a : ℕ} (X0 : Fin a → Fin M → E) :
+    (haarB σ J hE X0).IsHaarMeasure := by
+  have := (stabT_facts σ J hE X0).1
+  have := (stabT_facts σ J hE X0).2.1
+  have := (stabT_facts σ J hE X0).2.2
+  unfold haarB
+  infer_instance
+
+end Loc
+
+end Formalism.L2.SG.Pf.Meas
+
+open MeasureTheory NumberField IsDedekindDomain Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Topology
+open scoped TensorProduct
+
+namespace Formalism.L2.SG.Pf.Meas
+
+open Formalism.L2.SG.Measures Formalism.L2.SG.AdBridge Formalism.L2.SG.MExistsCut Formalism.IndefR.Eqv.G5
+
+variable (I : Formalism.MainNotions.S.AutInst) (hb : AdBridgeIso I)
+
+def mG (μf : Measure I.Gf) [SigmaFinite μf] (r : ℕ) : MeasG I.cm.sig I.J r where
+  μG := (I.muA μf).map (toHA I hb)
+  μGinf := (Formalism.L2.SG.ProjRows.muInf I).map (toInfI I hb)
+  μGf := μf.map (toFinI I hb)
+  μGv := fun v => haarV I.cm.sig I.J (finrank_two I) v
+  μB := fun X0 => haarB I.cm.sig I.J (finrank_two I) X0
+
+section Norm
+
+variable (μf : Measure I.Gf) [μf.IsHaarMeasure] [SigmaFinite μf]
+
+theorem muA_map_toHA :
+    (I.muA μf).map (toHA I hb) =
+      (((Formalism.L2.SG.ProjRows.muInf I).map (toInfI I hb)).prod (μf.map (toFinI I hb))).map
+        (sA I.cm.sig I.J (finrank_two I)).symm := by
+  obtain ⟨⟨g1, g2, g3, g4, g5⟩, ⟨h1, h2, h3, h4, h5⟩, ⟨k1, k2, k3, k4, k5⟩⟩ := grp_facts I.cm.sig I.J (finrank_two I)
+  have hΦ : (I.muA μf).map (Phi I hb) =
+      ((Formalism.L2.SG.ProjRows.muInf I).map (toInfI I hb)).prod (μf.map (toFinI I hb)) := by
+    rw [Phi_eq]
+    have : SigmaFinite (Formalism.L2.SG.ProjRows.muInf I) := inferInstance
+    exact (Measure.map_prod_map (Formalism.L2.SG.ProjRows.muInf I) μf (map_continuous (eInf I hb)).measurable
+      (map_continuous (eFin I hb)).measurable).symm
+  rw [← hΦ, Measure.map_map (map_continuous (sA I.cm.sig I.J (finrank_two I)).symm).measurable
+    (map_continuous (Phi I hb)).measurable]
+  congr 1
+  funext p
+  show toHA I hb p = (sA I.cm.sig I.J (finrank_two I)).symm (sA I.cm.sig I.J (finrank_two I) (toHA I hb p))
+  rw [ContinuousMulEquiv.symm_apply_apply]
+
+theorem mG_norm (r : ℕ) : (mG I hb μf r).IsTextNorm := by
+  obtain ⟨⟨g1, g2, g3, g4, g5⟩, ⟨h1, h2, h3, h4, h5⟩, ⟨k1, k2, k3, k4, k5⟩⟩ := grp_facts I.cm.sig I.J (finrank_two I)
+  have hinf : ((Formalism.L2.SG.ProjRows.muInf I).map (toInfI I hb)).IsHaarMeasure := by
+    show ((Formalism.L2.SG.ProjRows.muInf I).map (eInf I hb)).IsHaarMeasure
+    have : (Formalism.L2.SG.ProjRows.muInf I).IsHaarMeasure := inferInstance
+    have : BorelSpace I.Ginf := inferInstance
+    have : IsTopologicalGroup I.Ginf := inferInstance
+    exact ContinuousMulEquiv.isHaarMeasure_map _ (eInf I hb)
+  have hfin : (μf.map (toFinI I hb)).IsHaarMeasure := by
+    show (μf.map (eFin I hb)).IsHaarMeasure
+    exact ContinuousMulEquiv.isHaarMeasure_map _ (eFin I hb)
+  refine ⟨?_, hinf, hfin, fun v => haarV_isHaar I.cm.sig I.J (finrank_two I) v,
+    fun X0 => haarB_isHaar I.cm.sig I.J (finrank_two I) X0, ?_⟩
+  · show ((I.muA μf).map (toHA I hb)).IsHaarMeasure
+    rw [muA_map_toHA]
+    infer_instance
+  · show ((I.muA μf).map (toHA I hb)).map (splitA I.cm.sig I.J) = _
+    rw [muA_map_toHA, Measure.map_map (splitA_cont I.cm.sig I.J (Formalism.L2.SG.Pf.bas I)).measurable
+      (map_continuous (sA I.cm.sig I.J (finrank_two I)).symm).measurable]
+    have : (splitA I.cm.sig I.J ∘ (sA I.cm.sig I.J (finrank_two I)).symm) = id := by
+      funext k
+      show sA I.cm.sig I.J (finrank_two I) ((sA I.cm.sig I.J (finrank_two I)).symm k) = k
+      exact ContinuousMulEquiv.apply_symm_apply _ k
+    rw [this, Measure.map_id]
+    rfl
+
+end Norm
+
+end Formalism.L2.SG.Pf.Meas
+
+namespace Formalism.L2.SG.Pf
+
+theorem multiplicity_G_exists : Formalism.L2.SG.MExistsCut.MGExists := by
+  intro I μf _ _ r
+  exact ⟨Formalism.L2.SG.Closed.AdBridgeIso_holds I, Meas.mG I _ μf r, Meas.mG_norm I _ μf r, rfl, rfl, rfl⟩
+
+end Formalism.L2.SG.Pf
+
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.SplitPrimeNormLemmas Formalism.L2.SG.MExistsCut
+
+namespace Formalism.L2.SG.Pf.Meas
+
+
+[AMD_frame_measure_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/MeasCore.lean:17-26
+Range SHA256 8d7e04f94f6c56de052a67900b9aa03dffe7605295a8a8227e46546629df3b08
+
+def MWCore : Prop :=
+  ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E) (n : ℕ)
+    (J : Matrix (Fin n) (Fin n) E) (r : ℕ) (P : Frame E n r) (T : F),
+    IsCMExt F E σ → IsHermND σ J → P.IsStd σ J T →
+    ∀ (μNinf : Measure (Nsub (Ainf F) σ J P)) (μHinf : Measure (Hsub (Ainf F) σ J P)),
+      μNinf.IsHaarMeasure → μHinf.IsHaarMeasure →
+      ∃ W : MeasW σ J P, W.IsTextNorm ∧ W.μNinf = μNinf ∧ W.μHinf = μHinf
+
+end Formalism.L2.SG.Pf.MeasCore
+
+
+[AMD_frame_measure_02] src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/WeightedMeasureSplitting/HermitianMeasureSplitting.lean:1-33
+Range SHA256 70b5b73d11bb48f78f0e1104c6a63b84cb029bfd970d74bc558a1cef7e60e325
+import Mathlib
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.MapSplitEq
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.ContinuousHAIff
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.MemSpanRIffSplit
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.ContinuousMeasureSplitting
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.ProductDecompositionHolds
+
+noncomputable section
+
+namespace PI.UnitaryGroupMassFormula.MeasWCore
+
+open Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures NumberField
+
+theorem hermitian_measure_splitting : SplitH := by
+  intro F E _ _ _ _ _ σ n J r P T _ _ _
+  have : Module.Finite F E := PI.VolSemiDirect.W.Lc.finite_nf F E
+  exact splitEquiv _ _ _ (splitA_injective σ J splT_bijective.1)
+    (continuous_haMap σ J (fstA F) (continuous_tensMap (AF F) _ continuous_fstA))
+    (continuous_haMap σ J (sndA F) (continuous_tensMap (AF F) _ continuous_sndA))
+    (mem_Hsub_iff σ J splT_bijective.1 P)
+
+theorem nilpotent_measure_splitting : SplitN := by
+  intro F E _ _ _ _ _ σ n J r P T _ _ _
+  have : Module.Finite F E := PI.VolSemiDirect.W.Lc.finite_nf F E
+  exact splitEquiv _ _ _ (splitA_injective σ J splT_bijective.1)
+    (continuous_haMap σ J (fstA F) (continuous_tensMap (AF F) _ continuous_fstA))
+    (continuous_haMap σ J (sndA F) (continuous_tensMap (AF F) _ continuous_sndA))
+    (mem_Nsub_iff σ J splT_bijective P)
+
+theorem measWCore_main : Formalism.L2.SG.Pf.MeasCore.MWCore :=
+  mwCore_of hermitian_measure_splitting nilpotent_measure_splitting continuous_measure_splitting product_decomposition_holds
+
+end PI.UnitaryGroupMassFormula.MeasWCore
+
+
+[AMD_actual_measured_block_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:209-215
+Range SHA256 7326541eba6a2bd2cd388140785eaaaa1c6be93dc6934b684113a729240037e4
+structure MBlk (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) where
+  measG : Formalism.L2.SG.Measures.MeasG A.I.cm.sig A.I.J D.R.rS
+  measG_norm : measG.IsTextNorm
+  measW : ∀ u, Formalism.L2.SG.Measures.MeasW A.I.cm.sig A.I.J
+    (⟨eC A L, fC A L, zC A L u⟩ : Formalism.L2.SG.Sub.Frame A.I.E A.I.n D.R.rS)
+  measW_norm : ∀ u, (measW u).IsTextNorm
+
+
+
+[AMD_actual_measured_block_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:358-363
+Range SHA256 1f39dab52435770447877a24873c1c214d5445b6e45a5d761d05f4762ad72b4e
+
+def MExists : Prop :=
+  ∀ (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) (P : AdditiveCharacterData A) (Rf : ReferenceFrame A L) (Xu : TransportData A L Rf)
+    (Bu : AutomorphicBundle A P Rf) (Pi : RepresentationData A L) (Mu : MuBlocks A L) (Wb : WBlk A L Bu Pi Mu),
+    ∃ Mb : MBlk A L, ∃ hb : Formalism.L2.SG.AdBridge.AdBridgeIso A.I,
+      (mk A L P Rf Xu Bu Pi Mu Wb Mb).MeasTie hb
+
+
+[AMD_actual_measured_block_03] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/MExistsCut.lean:11-47
+Range SHA256 e2f46b73b306fc36eb298434e91594ceec475b48284bcff6dc34d8223aa7e6f7
+
+variable {D : D7}
+
+def toInfI (I : AutInst) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso I) (s : I.Ginf) :
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf I.F) I.cm.sig I.J :=
+  (Formalism.L2.SG.Measures.splitA I.cm.sig I.J (Formalism.L2.SG.AdBridge.toHA I hb (s, 1))).1
+
+def toFinI (I : AutInst) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso I) (x : I.Gf) :
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af I.F) I.cm.sig I.J :=
+  (Formalism.L2.SG.Measures.splitA I.cm.sig I.J (Formalism.L2.SG.AdBridge.toHA I hb (1, x))).2
+
+def MeasTieCore (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) (μf : Measure A.I.Gf) [SigmaFinite μf] (muN muH : D.what₂.Word → Measure A.I.Ginf)
+    (Mb : MBlk A L) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso A.I) : Prop :=
+  Mb.measG.μG = (A.I.muA μf).map (Formalism.L2.SG.AdBridge.toHA A.I hb) ∧
+    Mb.measG.μGinf = (Formalism.L2.SG.ProjRows.muInf A.I).map (toInfI A.I hb) ∧
+    Mb.measG.μGf = μf.map (toFinI A.I hb) ∧
+    ∀ u, Formalism.L2.SG.Measures.amb (Mb.measW u).μNinf = (muN u).map (toInfI A.I hb) ∧
+      Formalism.L2.SG.Measures.amb (Mb.measW u).μHinf = (muH u).map (toInfI A.I hb)
+
+variable (D)
+
+def MExistsCore : Prop :=
+  ∀ (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) (μf : Measure A.I.Gf) [μf.IsHaarMeasure] [SigmaFinite μf]
+    (muN muH : D.what₂.Word → Measure A.I.Ginf),
+    (∀ u, IsHaarOnSet A.I (Ninf A.I (eC A L) (zC A L u)) (muN u)) →
+    (∀ u, IsHaarOnSet A.I (Hset A.I (Set.range (eC A L) ∪ Set.range (fC A L) ∪ {zC A L u})) (muH u)) →
+    ∃ Mb : MBlk A L, ∃ hb : Formalism.L2.SG.AdBridge.AdBridgeIso A.I, MeasTieCore A L μf muN muH Mb hb
+
+theorem mExists_of_core (h : MExistsCore D) : MExists D := by
+  intro A L P Rf Xu Bu Pi Mu Wb
+  haveI := Bu.haar
+  haveI := Bu.sf
+  obtain ⟨Mb, hb, hT⟩ := h A L Bu.μf Mu.muN Mu.muH Mu.muN_haar Mu.muH_haar
+  exact ⟨Mb, hb, hT⟩
+
+end Formalism.L2.SG.MExistsCut
+
+
+
+[AMD_actual_measured_block_04] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/MultiplicityGExists.lean:638-699
+Range SHA256 57916f2356785b4b1fb074e6d5d8e1ea290d45e5d5b934d4f9c821319d63d336
+theorem hE_crdA (A : UnitaryGroupInstance D) (v w : (VS D).V) :
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE A.I.cm.sig A.I.J (crdOf A.I A.ιE A.bas v) (crdOf A.I A.ιE A.bas w) =
+      A.ιE.symm ((VS D).hT v w) := by
+  show Formalism.UG.hform (starRingEnd A.I.E) A.I.J _ _ = _
+  rw [← hform_crdA A v w, RingEquiv.symm_apply_apply]
+
+theorem frame_std (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) (u : D.what₂.Word) :
+    (⟨eC A L, fC A L, zC A L u⟩ : Formalism.L2.SG.Sub.Frame A.I.E A.I.n D.R.rS).IsStd A.I.cm.sig A.I.J
+      (((D.mem u).A.T : ℕ) : A.I.F) := by
+  refine ⟨fun a b => ?_, fun a b => ?_, fun a b => ?_, fun a => ?_, fun a => ?_, ?_, ?_⟩
+  · show Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE _ _ (crdOf A.I A.ιE A.bas (L.eX a)) (crdOf A.I A.ιE A.bas (L.eX b)) = 0
+    rw [hE_crdA, L.ee, map_zero]
+  · show Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE _ _ (crdOf A.I A.ιE A.bas (L.fY a)) (crdOf A.I A.ιE A.bas (L.fY b)) = 0
+    rw [hE_crdA, L.ff, map_zero]
+  · show Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE _ _ (crdOf A.I A.ιE A.bas (L.eX a)) (crdOf A.I A.ιE A.bas (L.fY b)) = _
+    rw [hE_crdA, L.ef]
+    split_ifs <;> simp
+  · show Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE _ _ (crdOf A.I A.ιE A.bas (L.eX a)) (crdOf A.I A.ιE A.bas (L.zu u)) = 0
+    rw [hE_crdA, (L.zu_orth u a).1, map_zero]
+  · show Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE _ _ (crdOf A.I A.ιE A.bas (L.fY a)) (crdOf A.I A.ιE A.bas (L.zu u)) = 0
+    rw [hE_crdA, (L.zu_orth u a).2, map_zero]
+  · show Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.hE _ _ (crdOf A.I A.ιE A.bas (L.zu u)) (crdOf A.I A.ιE A.bas (L.zu u)) = _
+    rw [hE_crdA, L.zu_norm]
+    simp
+  · exact Nat.cast_ne_zero.2 (D.mem u).A.T_prime.ne_zero
+
+end Formalism.L2.SG.Pf.Meas
+
+namespace Formalism.L2.SG.Pf
+
+attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
+def MWExistsStd : Prop :=
+  ∀ (I : AutInst) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso I) (r : ℕ) (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E)
+    (T : I.F), (⟨e, f, z⟩ : Formalism.L2.SG.Sub.Frame I.E I.n r).IsStd I.cm.sig I.J T →
+    ∀ (muN muH : Measure I.Ginf),
+    IsHaarOnSet I (Ninf I e z) muN → IsHaarOnSet I (Hset I (Set.range e ∪ Set.range f ∪ {z})) muH →
+    ∃ W : Formalism.L2.SG.Measures.MeasW I.cm.sig I.J (⟨e, f, z⟩ : Formalism.L2.SG.Sub.Frame I.E I.n r), W.IsTextNorm ∧
+      Formalism.L2.SG.Measures.amb W.μNinf = muN.map (toInfI I hb) ∧ Formalism.L2.SG.Measures.amb W.μHinf = muH.map (toInfI I hb)
+
+theorem mWExistsStd_of (hC : Formalism.L2.SG.Pf.MeasCore.MWCore) (hT : Formalism.L2.SG.Pf.MeasInf.InfTransfer) :
+    MWExistsStd := by
+  intro I hb r e f z T hS muN muH hN hH
+  obtain ⟨μNinf, μHinf, h1, h2, h3, h4⟩ := hT I hb r e f z T hS muN muH hN hH
+  obtain ⟨W, hW, hW1, hW2⟩ := hC I.F I.E I.cm.sig I.n I.J r ⟨e, f, z⟩ T (Meas.cmExt I) (Meas.hermND I) hS μNinf μHinf h1 h2
+  exact ⟨W, hW, by rw [hW1]; exact h3, by rw [hW2]; exact h4⟩
+
+variable (D : D7)
+
+theorem mExistsCore_of_std (hW : MWExistsStd) : MExistsCore D := by
+  intro A L μf _ _ muN muH hN hH
+  obtain ⟨hb, M, hM, h1, h2, h3⟩ := multiplicity_G_exists A.I μf D.R.rS
+  choose W hW1 hW2 hW3 using fun u => hW A.I hb D.R.rS (eC A L) (fC A L) (zC A L u) _ (Meas.frame_std A L u)
+    (muN u) (muH u) (hN u) (hH u)
+  exact ⟨⟨M, hM, W, hW1⟩, hb, h1, h2, h3, fun u => ⟨hW2 u, hW3 u⟩⟩
+
+theorem mExists_of_std (hW : MWExistsStd) : MExists D :=
+  mExists_of_core D (mExistsCore_of_std D hW)
+
+theorem mExists_of_cuts (hC : Formalism.L2.SG.Pf.MeasCore.MWCore) (hT : Formalism.L2.SG.Pf.MeasInf.InfTransfer) : MExists D :=
+  mExists_of_std D (mWExistsStd_of hC hT)
+
+
+
+[AMD_actual_measured_block_05] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/HidaSetting.lean:364-380
+Range SHA256 e1cd6cae34b1d5104c30051570594f1ef2dc74811064c5374142db600a14d119
+
+def toInf (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (s : X.B.I.Ginf) :
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Ainf X.B.I.F) X.B.I.cm.sig X.B.I.J :=
+  (Formalism.L2.SG.Measures.splitA X.B.I.cm.sig X.B.I.J (Formalism.L2.SG.AdBridge.toHA X.B.I hb (s, 1))).1
+def toFin (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (x : X.B.I.Gf) :
+    Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.HA (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.Af X.B.I.F) X.B.I.cm.sig X.B.I.J :=
+  (Formalism.L2.SG.Measures.splitA X.B.I.cm.sig X.B.I.J (Formalism.L2.SG.AdBridge.toHA X.B.I hb (1, x))).2
+
+def MeasTie (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) : Prop :=
+  X.measG.μG = (X.B.I.muA X.B.μf).map (Formalism.L2.SG.AdBridge.toHA X.B.I hb) ∧
+    X.measG.μGinf = (Formalism.L2.SG.ProjRows.muInf X.B.I).map (toInf X hb) ∧
+    X.measG.μGf = X.B.μf.map (toFin X hb) ∧
+    ∀ u, Formalism.L2.SG.Measures.amb (X.measW u).μNinf = (X.muN u).map (toInf X hb) ∧
+      Formalism.L2.SG.Measures.amb (X.measW u).μHinf = (X.muH u).map (toInf X hb)
+
+end HidaSetting
+
+
+
+[AMD_prescribed_measure_01] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/ExistsHaarMapProdEq.lean:1-28
+Range SHA256 c693bc12ce6ef0900ee582f9a7c3ddbfc568090e4310d899958a6d1b0b68ca28
+import Mathlib
+
+open MeasureTheory Measure
+open scoped NNReal ENNReal
+
+namespace GlobalTheory.St.HaarSplit
+
+theorem exists_haar_map_prod_eq {A B C : Type*} [Group A] [Group B] [Group C]
+    [TopologicalSpace A] [TopologicalSpace B] [TopologicalSpace C]
+    [IsTopologicalGroup A] [IsTopologicalGroup B] [IsTopologicalGroup C]
+    [MeasurableSpace A] [MeasurableSpace B] [MeasurableSpace C]
+    [BorelSpace A] [BorelSpace B] [BorelSpace C]
+    [LocallyCompactSpace A] [LocallyCompactSpace B] [LocallyCompactSpace C]
+    [SecondCountableTopology A] [SecondCountableTopology B] [SecondCountableTopology C]
+    (e : (A × B) ≃ₜ* C) (μA : Measure A) [μA.IsHaarMeasure] (μC : Measure C) [μC.IsHaarMeasure] :
+    ∃ μB : Measure B, μB.IsHaarMeasure ∧ (μA.prod μB).map e = μC := by
+  let ν : Measure B := Measure.haar
+  have : ((μA.prod ν).map e).IsHaarMeasure := ContinuousMulEquiv.isHaarMeasure_map (μA.prod ν) e
+  have h := isMulLeftInvariant_eq_smul μC ((μA.prod ν).map e)
+  have hc : 0 < haarScalarFactor μC ((μA.prod ν).map e) := haarScalarFactor_pos_of_isHaarMeasure _ _
+  refine ⟨haarScalarFactor μC ((μA.prod ν).map e) • ν, IsHaarMeasure.nnreal_smul _ hc.ne', ?_⟩
+  conv_rhs => rw [h]
+  generalize haarScalarFactor μC ((μA.prod ν).map e) = c
+  rw [← Measure.map_smul]
+  congr 1
+  rw [ENNReal.smul_def, ENNReal.smul_def, Measure.prod_smul_right]
+
+end GlobalTheory.St.HaarSplit
+
+
+[AMD_prescribed_measure_02] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/ExistsMeasWPrescribed.lean:1-51
+Range SHA256 935e5c45b806c03f626ae9dfc3e619cfed51b587273869f1a2f62a23b5b39d97
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.Measures
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.HermitianMeasureSplitting
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsHaarMapProdEq
+
+open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures
+open scoped TensorProduct ENNReal
+
+namespace GlobalTheory.St.MeasWord
+
+theorem exists_measW_prescribed :
+    ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
+      IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ (r : ℕ) (P : Frame E n r)
+      (T : F), P.IsStd σ J T → ∀ (μNinf : Measure (Nsub (Ainf F) σ J P))
+      (μHinf : Measure (Hsub (Ainf F) σ J P)) (μN : Measure (Nsub (AF F) σ J P))
+      (μH : Measure (Hsub (AF F) σ J P))
+      (μSv : ∀ v : HeightOneSpectrum (𝓞 F), Measure (Ssub (Fv F v) σ J P)),
+      μNinf.IsHaarMeasure → μHinf.IsHaarMeasure → μN.IsHaarMeasure → μH.IsHaarMeasure →
+      (∀ v, (μSv v).IsHaarMeasure) →
+      ∃ W : MeasW σ J P, W.IsTextNorm ∧ W.μNinf = μNinf ∧ W.μHinf = μHinf ∧ W.μN = μN ∧ W.μH = μH ∧
+        W.μSv = μSv := by
+  intro F E _ _ _ _ _ σ hCM n J hJ r P T hP μNinf μHinf μN μH μSv hNinf hHinf hN hH hSv
+  have : Module.Finite F E := PI.VolSemiDirect.W.Lc.finite_nf F E
+  obtain ⟨eH, heH⟩ := PI.UnitaryGroupMassFormula.MeasWCore.hermitian_measure_splitting F E σ n J r P T hCM hJ hP
+  obtain ⟨eN, heN⟩ := PI.UnitaryGroupMassFormula.MeasWCore.nilpotent_measure_splitting F E σ n J r P T hCM hJ hP
+  have hsm : Measurable (splitA σ J) := (PI.UnitaryGroupMassFormula.MeasWCore.continuous_measure_splitting F E σ n J hCM).measurable
+  have : SecondCountableTopology (Hsub (AF F) σ J P) :=
+    eH.toHomeomorph.symm.isEmbedding.secondCountableTopology
+  have : SecondCountableTopology (Nsub (AF F) σ J P) :=
+    eN.toHomeomorph.symm.isEmbedding.secondCountableTopology
+  obtain ⟨μHf, hHf, hHeq⟩ := GlobalTheory.St.HaarSplit.exists_haar_map_prod_eq eH μHinf μH
+  obtain ⟨μNf, hNf, hNeq⟩ := GlobalTheory.St.HaarSplit.exists_haar_map_prod_eq eN μNinf μN
+  obtain ⟨μSf, hSH, hSeq⟩ := PI.UnitaryGroupMassFormula.MeasWCore.product_decomposition_holds F E σ n J r P T hCM hJ hP μNf μHf hNf hHf
+  have : SigmaCompactSpace (Hsub (Ainf F) σ J P) := inferInstance
+  have : SigmaCompactSpace (Nsub (Ainf F) σ J P) := inferInstance
+  have : SigmaCompactSpace (Hsub (Af F) σ J P) := inferInstance
+  have : SigmaCompactSpace (Nsub (Af F) σ J P) := inferInstance
+  have : SigmaFinite μHinf := inferInstance
+  have : SigmaFinite μNinf := inferInstance
+  have : SigmaFinite μHf := inferInstance
+  have : SigmaFinite μNf := inferInstance
+  refine ⟨{ μH := μH, μHinf := μHinf, μHf := μHf, μN := μN, μNinf := μNinf, μNf := μNf, μSf := μSf,
+            μSv := μSv }, ?_, rfl, rfl, rfl, rfl, rfl⟩
+  refine ⟨hH, hHinf, hHf, hN, hNinf, hNf, hSH, hSv, ?_, ?_, hSeq⟩
+  · show (μH.map Subtype.val).map (splitA σ J) = _
+    rw [← hHeq]
+    exact PI.UnitaryGroupMassFormula.MeasWCore.map_split_eq (splitA σ J) hsm eH eH.continuous.measurable heH μHinf μHf
+  · show (μN.map Subtype.val).map (splitA σ J) = _
+    rw [← hNeq]
+    exact PI.UnitaryGroupMassFormula.MeasWCore.map_split_eq (splitA σ J) hsm eN eN.continuous.measurable heN μNinf μNf
+
+end GlobalTheory.St.MeasWord
+
+
+[AMD_unipotent_covolume_01] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/NsubCocompact.lean:1-81
+Range SHA256 d80e45eded5257ee8a8cc0cdab1ced43fcd6566f592e82b0f6787b6a188e3fa0
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.Measures
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.CocompactOfMemIffAdelic
+
+noncomputable section
+
+namespace GlobalTheory.UnipFlagCore
+
+open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures Matrix
+open scoped TensorProduct ENNReal
+
+theorem mem_spanR_iff {F E : Type} [Field F] [Field E] [Algebra F E] (R : Type) [CommRing R] [Algebra F R] {n r : ℕ}
+    (e : Fin r → Fin n → E) (s : Set (Fin r)) (w : Fin n → R ⊗[F] E) :
+    w ∈ spanR (F := F) R e s ↔
+      ∃ c : Fin r → R ⊗[F] E, (∀ b, b ∉ s → c b = 0) ∧ w = ∑ b, c b • ratTup (F := F) R e b := by
+  classical
+  constructor
+  · intro hw
+    induction hw using Submodule.span_induction with
+    | mem x hx =>
+      obtain ⟨a, ha, rfl⟩ := hx
+      refine ⟨Pi.single a 1, fun b hb => ?_, ?_⟩
+      · exact Pi.single_eq_of_ne (by rintro rfl; exact hb ha) _
+      · rw [Finset.sum_eq_single a]
+        · simp only [Pi.single_eq_same, one_smul]; rfl
+        · intro b _ hb; rw [Pi.single_eq_of_ne hb, zero_smul]
+        · simp
+    | zero => exact ⟨0, fun _ _ => rfl, by simp⟩
+    | add x y _ _ hx hy =>
+      obtain ⟨c, hc, rfl⟩ := hx
+      obtain ⟨d, hd, rfl⟩ := hy
+      refine ⟨c + d, fun b hb => by simp [hc b hb, hd b hb], ?_⟩
+      simp only [Pi.add_apply, add_smul, Finset.sum_add_distrib]
+    | smul t x _ hx =>
+      obtain ⟨c, hc, rfl⟩ := hx
+      refine ⟨t • c, fun b hb => by simp [hc b hb], ?_⟩
+      simp only [Pi.smul_apply, smul_eq_mul, Finset.smul_sum, mul_smul]
+  · rintro ⟨c, hc, rfl⟩
+    refine Submodule.sum_mem _ fun b _ => ?_
+    by_cases hb : b ∈ s
+    · exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨b, hb, rfl⟩)
+    · rw [hc b hb, zero_smul]; exact Submodule.zero_mem _
+
+theorem hE_swap {F E : Type} [Field F] [Field E] [Algebra F E] {σ : E →ₐ[F] E} {n : ℕ} {J : Matrix (Fin n) (Fin n) E}
+    (hσ : ∀ x, σ (σ x) = x) (hJ : IsHermND σ J) (x y : Fin n → E) : hE σ J y x = σ (hE σ J x y) := by
+  simp only [hE, Formalism.UG.hform, map_sum, map_mul, RingHom.coe_coe, hσ]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+  rw [hJ.1 j i]; ring
+
+theorem nsub_cocompact : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E),
+    IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ (r : ℕ) (P : Frame E n r) (T : F),
+    P.IsStd σ J T → ∃ K : Set (Nsub (AF F) σ J P), IsCompact K ∧
+      ∀ m : Nsub (AF F) σ J P, ∃ γ ∈ ratOf (K := Nsub (AF F) σ J P), ∃ k ∈ K, m = γ * k := by
+  intro F E _ _ _ _ _ σ hCM n J hJ r P T hP
+  have hσ := conj_invol hCM
+  obtain ⟨h0, -, hef, -, -, -, -⟩ := hP
+  have he : LinearIndependent E P.e := linearIndependent_of_dual P.e P.f fun a b => by
+    rw [hE_swap hσ hJ (P.e b) (P.f a), hef]
+    split_ifs with h1 h2 h2
+    · simp
+    · exact absurd h1.symm h2
+    · exact absurd h2.symm h1
+    · simp
+  have hlin : ∀ (g : HA (AF F) σ J) (x : Fin n → AF F ⊗[F] E),
+      lin (AF F) σ J g x - x = ((HA.mat _ σ J g).1 - 1) *ᵥ x := fun g x => by
+    rw [Matrix.sub_mulVec, Matrix.one_mulVec]; rfl
+  obtain ⟨K, hK, hm⟩ := cocompact_of_mem_iff_adelic hσ hJ P.e he h0 (Nsub (AF F) σ J P) fun g => by
+    refine and_congr (forall_congr' fun a => ?_) (forall_congr' fun x => imp_congr Iff.rfl ?_)
+    · have := mem_spanR_iff (F := F) (AF F) P.e {b | b < a} (lin (AF F) σ J g (ratV (F := F) (AF F) (P.e a)) - ratV (F := F) (AF F) (P.e a))
+      rw [this, hlin]
+      simp only [Set.mem_setOf_eq, not_lt]
+      rfl
+    · have := mem_spanR_iff (F := F) (AF F) P.e Set.univ (lin (AF F) σ J g x - x)
+      rw [this, hlin]
+      simp only [Set.mem_univ, not_true_eq_false, false_imp_iff, implies_true, true_and]
+  refine ⟨K, hK, fun m => ?_⟩
+  obtain ⟨γ, hγ, k, hk, rfl⟩ := hm m
+  exact ⟨γ, hγ, k, hk, rfl⟩
+
+end GlobalTheory.UnipFlagCore
+
+
+[AMD_unipotent_covolume_02] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/FundamentalDomainCovol.lean:1-18
+Range SHA256 5637bb67645074084a356c671b1bf6f3cc5555623d5434834c27b4cb0b3da39c
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.Measures
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.IsFundamentalDomainSmulIff
+
+open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures
+open scoped TensorProduct ENNReal
+
+namespace GlobalTheory.ClosedSubgroupCovol
+
+theorem fundamentalDomain_covol : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ K : Subgroup (HA (AF F) σ J), IsClosed (K : Set (HA (AF F) σ J)) → ∀ μ : Measure K, μ.IsHaarMeasure → (∃ 𝓕 : Set K, IsFundamentalDomain (ratOf (K := K)) 𝓕 μ) ∧ (∀ 𝓕 : Set K, IsFundamentalDomain (ratOf (K := K)) 𝓕 μ → covol μ = (μ 𝓕).toReal ∧ μ 𝓕 ≠ 0 ∧ ∀ C : Set K, MeasurableSet C → (∀ m : K, ∃ γ ∈ ratOf (K := K), ∃ k ∈ C, m = γ * k) → μ 𝓕 ≤ μ C) ∧ ∀ c : NNReal, c ≠ 0 → covol (c • μ) = (c : ℝ) * covol μ := by
+  intro F E _ _ _ _ _ σ _ n J _ K _ μ hμ
+
+  refine domains_and_covolume F E σ n J K (ratOf (K := K)) rfl covol ?_ μ hμ
+  intro ν hν
+  refine ⟨hν.choose, hν.choose_spec, ?_⟩
+  rw [covol, dif_pos hν]
+
+end GlobalTheory.ClosedSubgroupCovol
+
+
+[AMD_unipotent_covolume_03] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/ExistsHaarMeasureUnipotentRadicalCovolumeOne.lean:1-31
+Range SHA256 b9bfae72c2ccb314ed1375ac67f0ecf554b0cecd47fd7c62f12280989498895e
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.Measures
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.WeightedMeasureSplitting.T2SpaceGeneralLinearGroup
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.NsubCocompact
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FundamentalDomainCovol
+
+open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures
+open scoped TensorProduct ENNReal
+
+namespace GlobalTheory.NsubHaarCovol
+
+theorem exists_haar_covol_one : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ (r : ℕ) (P : Frame E n r) (T : F), P.IsStd σ J T → ∃ μ : Measure (Nsub (AF F) σ J P), μ.IsHaarMeasure ∧ covol μ = 1 := by
+  intro F E _ _ _ _ _ σ hCM n J hJ r P T hP
+  have hcl : IsClosed (Nsub (AF F) σ J P : Set (HA (AF F) σ J)) :=
+    PI.UnitaryGroupMassFormula.MeasWCore.isClosed_Nsub (AF F) σ J P
+  let μ0 : Measure (Nsub (AF F) σ J P) := Measure.haar
+  have hμ0 : μ0.IsHaarMeasure := inferInstance
+  obtain ⟨⟨𝓕, h𝓕⟩, hall, hscale⟩ :=
+    GlobalTheory.ClosedSubgroupCovol.fundamentalDomain_covol F E σ hCM n J hJ _ hcl μ0 hμ0
+  obtain ⟨Kc, hKc, hcov⟩ := GlobalTheory.UnipFlagCore.nsub_cocompact F E σ hCM n J hJ r P T hP
+  obtain ⟨hcv, hne, hle⟩ := hall 𝓕 h𝓕
+  have hfin : μ0 𝓕 ≠ ∞ :=
+    ((hle Kc hKc.isClosed.measurableSet hcov).trans_lt hKc.measure_lt_top).ne
+  have hpos : 0 < (μ0 𝓕).toReal := ENNReal.toReal_pos hne hfin
+  have hc0 : ((μ0 𝓕).toNNReal)⁻¹ ≠ 0 := inv_ne_zero (by
+    intro h; rw [ENNReal.toNNReal_eq_zero_iff] at h; exact h.elim hne hfin)
+  refine ⟨((μ0 𝓕).toNNReal)⁻¹ • μ0, Measure.IsHaarMeasure.nnreal_smul _ hc0, ?_⟩
+  rw [hscale _ hc0, hcv, NNReal.coe_inv, ENNReal.coe_toNNReal_eq_toReal]
+  exact inv_mul_cancel₀ hpos.ne'
+
+end GlobalTheory.NsubHaarCovol
+
+
+[AMD_unipotent_covolume_04] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/ExistsHaarMeasureUnipotentRadicalCovolumeOneStatement.lean:1-8
+Range SHA256 7d3292ad68a3a8fd22357c63643af0760be4fa1aec2442ba7c05e93b72178811
+import Mathlib
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsHaarMeasureUnipotentRadicalCovolumeOne
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.Measures
+open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures
+open scoped TensorProduct ENNReal
+set_option maxHeartbeats 1000000 in
+theorem _root_.GlobalTheory.T.exists_haarMeasure_unipotentRadical_covolume_one : ∀ (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] (σ : E →ₐ[F] E), IsCMExt F E σ → ∀ (n : ℕ) (J : Matrix (Fin n) (Fin n) E), IsHermND σ J → ∀ (r : ℕ) (P : Frame E n r) (T : F), P.IsStd σ J T → ∃ μ : Measure (Nsub (AF F) σ J P), μ.IsHaarMeasure ∧ covol μ = 1 := by
+  first | exact @GlobalTheory.NsubHaarCovol.exists_haar_covol_one | exact GlobalTheory.NsubHaarCovol.exists_haar_covol_one | (intros; apply GlobalTheory.NsubHaarCovol.exists_haar_covol_one <;> assumption)
+
+
+[AMD_rescaling_consumer_01] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/RescaleStep3.lean:1-99
+Range SHA256 0df86e478c31e83d35f6949b6275c62c57025540fc827c7a3d3c7200f97a996c
+import Mathlib
+import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
+import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LevelMatchIff
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.LocVol
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CokernelGLCounts.Volumes
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.StabilizerVolume.SiegelWeilNarrowOfWide
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.StdChar
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FourMulAddFiveLeRank
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LinearIndependentRatTupOfDetNeZero
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.StandardFrameGramDetNeZero
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsMeasWPrescribed
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.SiegelWeilVolumes
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsAdelicTorusMeasureStabiliserHaarStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsFrameStabilizerHaarNormalisedFibreMeasureStatement
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ExistsHaarMeasureUnipotentRadicalCovolumeOneStatement
+
+open NumberField IsDedekindDomain MeasureTheory Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes Formalism.L2.SG.Sub Formalism.L2.SG.Measures
+open scoped TensorProduct ENNReal
+
+namespace GlobalTheory.St.Rescale
+
+theorem rescaleStep3 :
+    HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent → ∀ D : Formalism.BasicNotions.D7, GlobalTheory.St.RescaleStep3 D := by
+  intro hSW D X hb hM
+  obtain ⟨hCM, hH, hsize, hfr⟩ := GlobalTheory.CmHermitianRankFrames.cm_herm_rank_frames D X
+  obtain ⟨hA, hC⟩ := GlobalTheory.St.siegelWeil_volumes hSW X.B.I.F X.B.I.E X.B.I.cm.sig hCM X.B.I.n X.B.I.J hH
+  obtain ⟨ψ, hψ, hstd⟩ := Formalism.L2.SG.Pf.standard_character_exists X.B.I.F hCM.1
+  have hstd' : Formalism.L2.SG.LocVol.IsStdChar ψ := hstd
+  have hG := X.measG_norm
+  have hμG : X.measG.μG.IsHaarMeasure := hG.1
+  have hherm : ∀ {a : ℕ} (X0 : Fin a → Fin X.B.I.n → X.B.I.E) (i j : Fin a),
+      X.B.I.cm.sig (gramE X.B.I.cm.sig X.B.I.J X0 j i) = gramE X.B.I.cm.sig X.B.I.J X0 i j :=
+    fun X0 i j => GlobalTheory.FrameGram.hE_swap (GlobalTheory.FrameGram.conj_invol hCM) hH.1 _ _
+
+  have hB : ∀ X0 : Fin (2 * D.R.rS + 2) → Fin X.B.I.n → X.B.I.E,
+      ∃ μ' : Measure (stabT (AF X.B.I.F) X.B.I.cm.sig X.B.I.J X0), μ'.IsHaarMeasure ∧
+        ((gramE X.B.I.cm.sig X.B.I.J X0).det ≠ 0 →
+          ∃ (hTB : ∀ i j, X.B.I.cm.sig (gramE X.B.I.cm.sig X.B.I.J X0 j i) =
+              gramE X.B.I.cm.sig X.B.I.J X0 i j) (νB : Measure _),
+            Formalism.L2.SG.Volumes.IsOmT X.B.I.F X.B.I.E X.B.I.cm.sig X.B.I.n X.B.I.J ψ _ hTB νB ∧
+            Formalism.L2.SG.Volumes.IsCompatT X.B.I.F X.B.I.E X.B.I.cm.sig X.B.I.n X.B.I.J X0 X.measG.μG μ' νB) := by
+    intro X0
+    by_cases hdet : (gramE X.B.I.cm.sig X.B.I.J X0).det ≠ 0
+    · obtain ⟨νX, μ', h1, h2, h3⟩ := GlobalTheory.T.exists_adelicTorusMeasure_stabiliserHaar X.B.I.F X.B.I.E X.B.I.cm.sig hCM X.B.I.n X.B.I.J hH hA hC ψ hψ
+        (2 * D.R.rS + 2) (by omega) (by omega) X0 (hherm X0) hdet X.measG.μG hμG
+      exact ⟨μ', h2, fun _ => ⟨hherm X0, νX, h1, h3⟩⟩
+    · exact ⟨X.measG.μB X0, hG.2.2.2.2.1 X0, fun h => absurd h hdet⟩
+  choose μB' hμB' hBc using hB
+
+  have hW : ∀ u, ∃ W : MeasW X.B.I.cm.sig X.B.I.J (Formalism.L2.SG.TypedSets.frameOf X u), W.IsTextNorm ∧
+      W.μNinf = (X.measW u).μNinf ∧ W.μHinf = (X.measW u).μHinf ∧
+      (∃ (hT1 : ∀ i j, X.B.I.cm.sig (gramE X.B.I.cm.sig X.B.I.J (tupH (Formalism.L2.SG.TypedSets.frameOf X u)) j i) =
+            gramE X.B.I.cm.sig X.B.I.J (tupH (Formalism.L2.SG.TypedSets.frameOf X u)) i j) (νH : Measure _),
+        Formalism.L2.SG.Volumes.IsOmT X.B.I.F X.B.I.E X.B.I.cm.sig X.B.I.n X.B.I.J ψ _ hT1 νH ∧
+        Formalism.L2.SG.Volumes.IsCompatT X.B.I.F X.B.I.E X.B.I.cm.sig X.B.I.n X.B.I.J
+          (tupH (Formalism.L2.SG.TypedSets.frameOf X u)) X.measG.μG W.μH νH) ∧
+      covol W.μN = 1 ∧
+      ∀ v, Formalism.L2.SG.LocVol.LocTieW X.B.I.cm.sig X.B.I.J ψ v (Formalism.L2.SG.TypedSets.frameOf X u)
+        (X.measG.μGv v) (W.μSv v) := by
+    intro u
+    obtain ⟨T, hP⟩ := hfr u
+    obtain ⟨hdet, hT1, -⟩ := GlobalTheory.FrameGram.std_frame_gram X.B.I.F X.B.I.E X.B.I.cm.sig hCM X.B.I.n X.B.I.J hH
+      D.R.rS (Formalism.L2.SG.TypedSets.frameOf X u) T hP
+    obtain ⟨νH, μH, h1, h2, h3⟩ := GlobalTheory.T.exists_adelicTorusMeasure_stabiliserHaar X.B.I.F X.B.I.E X.B.I.cm.sig hCM X.B.I.n X.B.I.J hH hA hC ψ hψ
+      (D.R.rS + 1 + D.R.rS) (by omega) (by omega) (tupH (Formalism.L2.SG.TypedSets.frameOf X u)) hT1 hdet
+      X.measG.μG hμG
+    obtain ⟨μN, hN, hN1⟩ := GlobalTheory.T.exists_haarMeasure_unipotentRadical_covolume_one X.B.I.F X.B.I.E X.B.I.cm.sig hCM X.B.I.n X.B.I.J hH D.R.rS
+      (Formalism.L2.SG.TypedSets.frameOf X u) T hP
+    have hS : ∀ v : HeightOneSpectrum (𝓞 X.B.I.F),
+        ∃ μS : Measure (Ssub (Fv X.B.I.F v) X.B.I.cm.sig X.B.I.J (Formalism.L2.SG.TypedSets.frameOf X u)),
+          μS.IsHaarMeasure ∧ Formalism.L2.SG.LocVol.LocTieW X.B.I.cm.sig X.B.I.J ψ v
+            (Formalism.L2.SG.TypedSets.frameOf X u) (X.measG.μGv v) μS := fun v =>
+      GlobalTheory.T.exists_frameStabilizerHaar_normalised_fibreMeasure X.B.I.F X.B.I.E X.B.I.cm.sig hCM X.B.I.n X.B.I.J hH hA hC ψ hψ hstd' v D.R.rS
+        (Formalism.L2.SG.TypedSets.frameOf X u) T hP (by omega) (X.measG.μGv v) (hG.2.2.2.1 v)
+    choose μSv hSv hSt using hS
+    have hWn := X.measW_norm u
+    obtain ⟨W, hWt, e1, e2, e3, e4, e5⟩ := GlobalTheory.St.MeasWord.exists_measW_prescribed X.B.I.F X.B.I.E X.B.I.cm.sig hCM
+      X.B.I.n X.B.I.J hH D.R.rS (Formalism.L2.SG.TypedSets.frameOf X u) T hP
+      (X.measW u).μNinf (X.measW u).μHinf μN μH μSv hWn.2.2.2.2.1 hWn.2.1 hN h2 hSv
+    refine ⟨W, hWt, e1, e2, ⟨hT1, νH, h1, ?_⟩, ?_, ?_⟩
+    · rw [e4]; exact h3
+    · rw [e3]; exact hN1
+    · intro v; rw [e5]; exact hSt v
+  choose mw hw hNinf hHinf hOm hCov hLoc using hW
+  let mg : MeasG X.B.I.cm.sig X.B.I.J D.R.rS := { X.measG with μB := μB' }
+  have hg : mg.IsTextNorm := ⟨hG.1, hG.2.1, hG.2.2.1, hG.2.2.2.1, hμB', hG.2.2.2.2.2⟩
+  refine ⟨mg, hg, mw, hw, ?_, ψ, hψ, hstd', ?_, ?_⟩
+  · refine ⟨hM.1, hM.2.1, hM.2.2.1, fun u => ?_⟩
+    have h := hM.2.2.2 u
+    constructor
+    · show amb (mw u).μNinf = _
+      rw [hNinf u]; exact h.1
+    · show amb (mw u).μHinf = _
+      rw [hHinf u]; exact h.2
+  · exact ⟨fun u => ⟨hOm u, hCov u⟩, hBc⟩
+  · intro w v
+    exact hLoc w v
+
+end GlobalTheory.St.Rescale
+
+
+[AMD_rescaling_consumer_02] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/ExistsGlobalSetting.lean:1-83
+Range SHA256 1bbe1585b263346c3b8d7d53214f6e7efe8e490b5b13e3ffee9e9e7d3adb8216
+import Mathlib
+import Formalism.UnipotentAdelicQuotients.SiegelWeilUnitaryConvergent
+import Development.AbelianVarietyTheory.Definitions.SemilocalFrames.LevelMatchIff
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.InstExists
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.LocalAdditiveCharContinuous
+import Formalism.PeriodIntegrals.BesselMapUniq
+import Formalism.LocalToGlobal.SiegelLatticeTheory.WeightedGaugeFactors.FactsDS
+import Formalism.LocalToGlobal.SiegelLatticeTheory.ClosedVolumeStatements.CoefWeightedLocHolds
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.WuDecayClosed
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.JExistsAll
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LatExistsOfForms0
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.MExistsHolds
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RealPlaceFunctionBlockExistsOfBesselCoef
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.GenusMatchHolds
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.HcExistsAll
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.LevelConjHolds
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.WittExistsHolds
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.RescaleStep3
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ColDictCoreHolds
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FullExistsOfLocTied
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.ColumnLevelStabTriv
+import Development.AbelianVarietyTheory.Proofs.FlagMeasures.FinXOfDecay
+
+noncomputable section
+
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting Formalism.L2.SG.PackageTie2 Formalism.L2.SG.ColDict
+
+namespace GlobalTheory.St.SpectralData
+
+attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
+theorem exists_transport {D : D7} (F : ∀ u, Formalism.L2.Forms.Forms0 D u)
+    (X : HidaSetting D) (hK : X.LevelSubgroupCharacter) (hι : ∃ ιA, GlobalTheory.St.IsAdeleIso X ιA) (u : D.what₂.Word) :
+    ∃ Tr : Transport X u (F u), LevelMatch X Tr hK := by
+  obtain ⟨wt, hw⟩ := GlobalTheory.St.WittT.wittExists D X u
+  obtain ⟨ιA, hι⟩ := hι
+  obtain ⟨g0, hg0⟩ := GlobalTheory.St.G.genusMatch_holds D F X u wt ιA hw hι
+  obtain ⟨h0, hL, hKm⟩ := GlobalTheory.St.G.levelConj_holds D F X hK u wt ιA g0 hw hι hg0
+  choose hcf hcr using GlobalTheory.St.G.hcExists_all D F X u wt ιA h0 hw hι
+  obtain ⟨J, hJ1, hJ2, hJ3⟩ := GlobalTheory.jExists_all D F X u wt hw
+  exact ⟨⟨wt, hw.1, hw.2.1, hw.2.2.1, hw.2.2.2, ιA, hι.1, hι.2, h0, hcf, hcr, J, hJ1, hJ2, hJ3⟩, hL, hKm⟩
+
+open Formalism.L2.SG.SplitPrimeNormLemmas in
+
+theorem exists_setting (hSW : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent)
+    (D : D7) (F : ∀ u, Formalism.L2.Forms.Forms0 D u) (hG : Formalism.L2.SG.ConcreteSettingExists.GapHyp D) :
+      ∃ (X : HidaSetting D) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I)
+        (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ), X.B.I = Formalism.L2.SG.InstExistsPf.instOf D ∧
+        (∀ x : X.B.I.E, HEq (X.ιE x) x) ∧ X.MeasTie hb ∧ Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCharAF X.B.I.F ψ ∧
+        Formalism.L2.SG.LocVol.IsStdChar ψ ∧
+        Formalism.L2.SG.MassDataConc.MeasCompatψ X ψ ∧ (∀ w, Formalism.L2.SG.LocVol.LocCompatX X ψ w) ∧
+        ∀ hK : X.LevelSubgroupCharacter, ∀ u, ∃ Tr : Transport X u (F u), LevelMatch X Tr hK := by
+  have hB : BesselNVGap := Formalism.L2.SG.Closed.BesselNVGap_holds
+  have hC : CoefWeightedLoc := Formalism.L2.SG.Closed.CoefWeightedLoc_holds
+  let A := Formalism.L2.SG.InstExistsPf.instanceOfRecord D
+  obtain ⟨L⟩ := GlobalTheory.St.Lat.latExists_of_forms0 D (F D.u₀)
+  obtain ⟨P⟩ := Formalism.L2.SG.Closed.PsiExists_holds D A
+  obtain ⟨Rf⟩ := Formalism.L2.SG.Closed.RefExists_holds D A L
+  obtain ⟨Xu⟩ := Formalism.L2.SG.Closed.XuExists_holds D A L Rf
+  obtain ⟨Bu⟩ := Formalism.L2.SG.Closed.BunExists_holds D hC hG A L P Rf
+  obtain ⟨Pi⟩ := Formalism.L2.SG.Closed.PiExists_holds D A L
+  obtain ⟨Mu⟩ := Formalism.L2.SG.Closed.MuExists_holds D A L
+  obtain ⟨Wb⟩ := GlobalTheory.WBlockExists.realPlaceFunctionBlockExists_of_bessel_coef hB hC D hG A L P Rf Bu Pi Mu
+  obtain ⟨Mb, hb, hM⟩ := GlobalTheory.St.mExists_holds D A L P Rf Xu Bu Pi Mu Wb
+  obtain ⟨mg, hg, mw, hw, hM', ψ, hψ, hstd, hCm, hL⟩ :=
+    GlobalTheory.St.Rescale.rescaleStep3 hSW D (mk A L P Rf Xu Bu Pi Mu Wb Mb) hb hM
+  refine ⟨Formalism.L2.SG.SettingExistsMeasured.withMeas (mk A L P Rf Xu Bu Pi Mu Wb Mb) mg hg mw hw, hb, ψ, rfl,
+    fun _ => HEq.rfl, hM', hψ, hstd, hCm, hL, fun hK u => ?_⟩
+  exact exists_transport F _ hK ⟨RingEquiv.refl _, fun _ => rfl, fun _ => Iff.rfl⟩ u
+
+theorem exists_spectralData : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent → PI.BesselMapUniq.BesselMapUniq → Formalism.L2.SG.RowsDef.RowsFinDim → ∀ (D : D7) (F : ∀ u, Formalism.L2.Forms.Forms0 D u), Formalism.L2.SG.ConcreteSettingExists.GapHyp D → Formalism.L2.SG.Pf.LocCP.LocTied D → ∃ (X : HidaSetting D) (hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I) (ψ : AddChar (Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.AF X.B.I.F) ℂ) (Y : Formalism.L2.SG.Full.Full X) (hF : FinX Y) (tr : ∀ u, Transport X u (F u)), X.B.I = Formalism.L2.SG.InstExistsPf.instOf D ∧ (∀ x : X.B.I.E, HEq (X.ιE x) x) ∧ X.MeasTie hb ∧ Formalism.MainNotions.GlobalTheoryTheory.GenusMassVolumes.IsCharAF X.B.I.F ψ ∧ Formalism.L2.SG.LocVol.IsStdChar ψ ∧ Formalism.L2.SG.MassDataConc.MeasCompatψ X ψ ∧ (∀ w, Formalism.L2.SG.LocVol.LocCompatX X ψ w) ∧ Integrable X.ph (Formalism.L2.SG.ProjRows.muInf X.B.I) ∧ ∀ u, LevelMatch X (tr u) Y.hK ∧ ColDictInto X (tr u) Y.hK ∧ ColDictBij X (tr u) Y.hK ∧ ColDictIsom X (tr u) Y.hK (Y.cs u) (hF.shInj u) := by
+  intro hSW hMU hRF D F hG hLT
+  obtain ⟨X, hb, ψ, hI, hι, hM, hψ, hstd, hCm, hL, hT⟩ := exists_setting hSW D F hG
+  obtain ⟨Y⟩ := GlobalTheory.fullExists_of_locTied D X hLT
+  obtain ⟨hWD, hph⟩ := Formalism.L2.SG.Pf.wuDecayOfGap_of_jsz hMU D hG X
+  have hF : FinX Y := GlobalTheory.FinitenessBundle.finX_of_decay hRF D X Y hWD hph
+  choose tr htr using hT Y.hK
+  refine ⟨X, hb, ψ, Y, hF, tr, hI, hι, hM, hψ, hstd, hCm, hL, hph, fun u => ?_⟩
+  obtain ⟨-, h1, h2, h3⟩ := GlobalTheory.St.colDictCore_holds D X u (F u) (tr u) Y.hK (htr u)
+    (GlobalTheory.columnLevel_stabTriv D X Y.hK u)
+  exact ⟨htr u, h1, h2, h3 _ (Y.cs u) (hF.shInj u) (Y.colReps u)⟩
+
+end GlobalTheory.St.SpectralData
+

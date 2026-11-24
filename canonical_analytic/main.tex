@@ -1,0 +1,914 @@
+\section{The normalized indicators, covariance, and canonical finite jet field}
+\label{sec:canonical-analytic}
+
+\status{The claims in this section reconstruct the actual analytic and finite
+Fourier identities used in \texttt{finAlg\_step}, and then join them to the
+canonical local-index construction on the same data. The finite operator
+claims CA1--CA4 do not assume a theta vacuum. The actual vacuum and its
+algebraic translates are supplied by VI. The normalization in covariance
+is proved, including its determinant character and its inert-prime sign;
+it is not deduced from theta-line uniqueness alone. The final construction
+retains the literal frame-inclusion and raw \texttt{PreX} inputs, and does
+not construct a later geometric stage. All statements are human
+reconstructions from the pinned source, without a Lean build or a
+kernel-verification claim.}
+
+\paragraph{Conventions.}
+Fix the source datum $D$, its CM field $E$, imaginary quadratic subfield
+$K=\mathbb Q(\sqrt{-d})$, induced CM type $\Phi$, and a curve ideal
+$\mathfrak c$ with discriminant normalization $\delta$. Write
+$V=\prod_{\tau\in\Phi}\operatorname{Mat}_{b\times a}(\mathbb C)$ and
+$H$ for the source Hermitian form, linear in its first argument:
+\[
+ H(z,z')=\frac1{\operatorname{area}(\delta\mathfrak c)}
+       \sum_{\tau,i,j}z_{\tau ij}\overline{z'_{\tau ij}},\qquad
+ E_H(z,z')=\operatorname{Im}H(z,z'),\qquad
+ Q(z)=\frac{\sqrt d}{2}H(z,z).
+ \tag{CA.1}
+\]
+The last quantity is real. Rational points mean the image
+$X=\delta\operatorname{Emb}_{\Phi}\operatorname{Mat}_{b\times a}(E)$,
+not arbitrary complex points. For self-dual Hermitian lattices $L,L'$,
+write $\Lambda(L,L')$ for the source period lattice \texttt{La}; under
+this rational identification it is
+$\mathfrak c\,\mathfrak A\operatorname{Hom}_{\mathcal O_E}(L,L')$,
+where $\mathfrak A$ is the source trace-dual ideal. Every assertion about
+this identification uses that same ideal and that same $\delta$.
+For additive lattices $A,B$, set $[B:A\cap B]=n(A,B)$; this is the
+source relative-index convention.
+
+\paragraph{CA1: the exact rational Heisenberg operators.}
+Define
+\[
+ (U_x f)(z)=e^{-\pi H(z,x)-\pi H(x,x)/2}f(z+x),\qquad
+ \alpha(x)=e^{\pi iQ(x)},\qquad W_x=\alpha(x)U_x.
+ \tag{CA.2}
+\]
+Expanding $H(z+x,y)$ and $H(x+y,x+y)$, using
+$H(y,x)=\overline{H(x,y)}$, gives
+\[
+ U_xU_y=e^{-\pi iE_H(x,y)}U_{x+y},\qquad
+ W_xW_y=e^{-2\pi i c(x,y)}W_{x+y},\qquad
+ c(x,y)=\tfrac12\bigl(\sqrt d\,\operatorname{Re}H(x,y)
+                         +E_H(x,y)\bigr).
+ \tag{CA.3}
+\]
+These formulas hold on every function, so they also hold termwise in
+finite sums and under differentiation of entire functions. In particular
+$W_xW_y=e^{-2\pi iE_H(x,y)}W_yW_x$.
+
+The integer $w=(1+\sqrt{-d})/2\in\mathcal O_K\subset\mathcal O_E$
+has $w+\bar w=1$; all embeddings in $\Phi$ send it to
+$(1+i\sqrt d)/2$. Thus the last cocycle in (CA.3) is
+$\gamma(wx,y)$, where
+\[
+ \gamma(x,y)=e^{-2\pi iE_H(x,y)}.
+ \tag{CA.4}
+\]
+It is alternating and biadditive, and
+$\gamma(rx,y)=\gamma(x,\bar r y)$ for $r\in\mathcal O_E$.
+The existence and integrality of $w$ are the actual quadratic-order
+facts in the host, including the prime $2$; no division by $2$ is
+performed in a residue field.
+
+For rational $x,y$, both $E_H(x,y)$ and $\sqrt d\,
+\operatorname{Re}H(x,y)$ are rational. Indeed (CA.1) becomes the
+trace of an element of $E$ to the induced quadratic field, divided
+by the rational ideal norm and by $\sqrt d/2$; its imaginary and
+$\sqrt d$ times its real part are rational. Consequently the phases
+in (CA.2)--(CA.4) are roots of unity. All their algebraic conjugates
+have modulus one. This is the exact rationality used below, not
+algebraicity of an arbitrary complex Gaussian factor.
+
+\paragraph{CA2: a finite presentation of the normalized indicator.}
+Use the literal \texttt{ambOf} datum obtained from a seam $s$, with
+\texttt{Fields.Ok}, \texttt{Seam.Ok}, the above curve data, self-dual
+$L,L'$, an arbitrary finite prime set $S$, and an integer $c>0$.
+Let $\Lambda=\Lambda(L,L')$, $A_c=\texttt{AC}$,
+$B_c=\texttt{BC}$, and choose the actual representative sets
+\[
+ R_A\subset\Lambda\cap A_c\quad\bmod B_c,
+ \qquad R_B\subset B_c\quad\bmod\Lambda.
+ \tag{CA.5}
+\]
+Here ``modulo'' means modulo the intersection when neither lattice
+contains the other. Let $s_x$ be the source's chosen rational lift of
+$x$, let $v=\texttt{volC}$, and put $k=\texttt{chiF}(L,L')$.
+Writing $G=\texttt{thMoved}(L,L')$ in host coordinates, the actual
+definition of the indicator expands to
+\[
+ k^{-1}\operatorname{thInd}_{S,L,L',c,x}
+       =\sum_{y\in R_B}r_yU_{y-s_x}G,
+ \tag{CA.6}
+\]
+where
+\[
+\begin{split}
+ r_y={}&(k^{-1}k)\,\frac{v}{(\sqrt v)^2}\,
+ \left(\frac1{|R_A|}\sum_{t\in R_A}
+       {\bf1}_{B_c}(t)e^{2\pi iE_H(t,y)}\right)\\
+ &\hspace{12mm}\cdot\alpha(s_x)\alpha(y)
+                      e^{\pi iE_H(s_x,y)}.
+\end{split}
+ \tag{CA.7}
+\]
+If a degenerate definition gives $v\le0$, the two inverse square
+roots in the source make their combined factor zero; in the present
+full-lattice situation $v>0$ and the displayed factor is one. Likewise
+$k^{-1}k$ is zero or one, with no algebraicity assumption on $k$.
+For an actual character satisfying \texttt{IsChi}, it is one.
+
+To check the normalization, expand the source finite Fourier
+transform \texttt{hatS}, then its two factors $(\sqrt v)^{-1}$.
+The translation identity
+\[
+ (U_yG)(z-s_x)e^{-\pi H(z,-s_x)-\pi H(-s_x,-s_x)/2}
+       =e^{\pi iE_H(s_x,y)}(U_{y-s_x}G)(z)
+\]
+is CA1. It gives precisely (CA.7); in particular the inverse character
+has canceled before any coefficient is called algebraic.
+
+Every $r_y$ is algebraic and every algebraic embedding sends it to a
+number of modulus at most one: the inner expression is an average
+of zeros and roots of unity, and the remaining nonzero factors have
+modulus one under every embedding. Every $y-s_x$ is rational with
+respect to $\Lambda$.
+
+The representative sets exist and satisfy the concrete estimate
+\[
+ |R_B|\le c^{[E:\mathbb Q]ab}.
+ \tag{CA.8}
+\]
+For completeness, the local exponents defining either half lattice
+lie between $-1$ and $1$. Hence $c\Lambda\subset B_c$ and
+$cB_c\subset\Lambda$. The map $y\mapsto cy$ injects
+$B_c/(B_c\cap\Lambda)$ into $\Lambda/c\Lambda$. A full rational
+lattice has a $\mathbb Z$-basis of size $[E:\mathbb Q]ab$, so the
+latter quotient has $c^{[E:\mathbb Q]ab}$ elements. The same
+inclusions prove finiteness for $R_A$. This argument also covers
+$a=0$ or $b=0$, when the quotients have one element.
+
+Thus (CA.6) is the literal source predicate \texttt{Pres}, with the
+sum of the absolute values of the conjugated coefficients bounded
+by (CA.8). It holds for every $S$ here; the stronger no-conjugate-pair
+hypothesis needed for \texttt{LaHyp} and covariance is not inserted
+into this finite-presentation assertion.
+
+\paragraph{CA3: the finite Hermitian norm Gauss sum, including characteristic two.}
+Let $k/k_0$ be a finite field with nontrivial involution $\sigma$,
+$|k_0|=q$, and let $\eta:k_0\to\mathbb C^\times$ be a nontrivial
+additive character. Then
+\[
+ \sum_{t\in k}\eta(t\sigma(t))=-q=-\sqrt{|k|}.
+ \tag{CA.9}
+\]
+Indeed $k^\times$ is cyclic and the norm $t\mapsto t^{q+1}$ maps
+onto $k_0^\times$, with every nonzero fiber of size $q+1$.
+Translation by a point at which $\eta\ne1$ shows
+$\sum_{u\in k_0}\eta(u)=0$. The left side is consequently
+$1+(q+1)(-1)=-q$.
+
+The precise form needed for the Heisenberg cocycle is as follows.
+Let $\chi:k\to\mathbb C^\times$ be nontrivial, additive, and
+$\sigma$-invariant, and suppose $w+\sigma(w)=1$.
+Then $\chi=\eta\circ\operatorname{Tr}_{k/k_0}$ for a nontrivial
+$\eta$, and
+\[
+ \sum_{t\in k}\chi(wt\sigma(t))=-\sqrt{|k|}.
+ \tag{CA.10}
+\]
+The kernel of the trace is the image of $\sigma-1$, on which
+$\chi$ is trivial. The trace is onto: $X+X^q$ is a nonzero polynomial
+of degree $q<q^2$, even in characteristic two. This proves the
+factorization and shows its character is nontrivial. Since
+$t\sigma(t)\in k_0$ and $\operatorname{Tr}(w)=1$, (CA.10) is
+(CA.9). There is no missing dyadic exception.
+
+\paragraph{CA4: finite intertwiners with their correct signs compose exactly.}
+Let $R=\mathcal O_E$ act on an additive group $X$, let $W_x$ be
+linear operators satisfying (CA.3) in the form
+$W_xW_y=\gamma(wx,y)W_{x+y}$, and let $A,B,C$ be mutually
+commensurable self-dual $R$-submodules for $\gamma$. On an $A$-fixed
+vector define
+\[
+ S_{A,B}v=\sum_{x\in B/(A\cap B)}W_xv,\qquad
+ J_{A,B}v=\lambda(n(A,B))^{-1}S_{A,B}v.
+ \tag{CA.11}
+\]
+The representatives do not matter: changing $x$ by an element of
+$A\cap B$ has phase one. The vector $S_{A,B}v$ is $B$-fixed.
+
+Choose a multiplicative $\lambda:\mathbb N_{>0}\to\mathbb C^\times$
+such that, at every residue field $R/P$,
+\[
+ \lambda(|R/P|)^2=|R/P|,
+ \qquad \bar P=P\Longrightarrow
+              \lambda(|R/P|)=-\sqrt{|R/P|}.
+ \tag{CA.12}
+\]
+The involution on a fixed residue field must be nontrivial. These
+conditions are exactly \texttt{GoodNorm}. For the actual host they
+hold: $E/\mathbb Q$ is abelian and $E/E^+$ is unramified. Over a
+rational prime $p$ all primes have the same residue degree $f_p$,
+and conjugation fixes either all of them or none, since it commutes
+with every Galois automorphism. Set
+\[
+ \lambda(p)=\begin{cases}
+ \sqrt p\,e^{\pi i/f_p},&\text{conjugation fixes the primes over }p,\\
+ \sqrt p,&\text{otherwise},
+ \end{cases}
+\]
+and extend multiplicatively. The fixed residue involution is
+nontrivial by the actual unramified CM condition, as checked in
+DR1/AH. This proves (CA.12) without choosing inconsistent square
+roots at different primes.
+
+With this normalization,
+\[
+ J_{B,C}J_{A,B}v=J_{A,C}v.
+ \tag{CA.13}
+\]
+Here is the finite proof. Self-duality gives perfect pairings between
+the two finite quotients by each intersection. Averaging a nontrivial
+character gives zero, so
+$S_{B,A}S_{A,B}v=n(A,B)v$. If $A,B$ are adjacent, write
+$B/(A\cap B)=R/P$ and $q_P=|R/P|$. There are three cases.
+If $B=(A\cap B)+(B\cap C)$, direct representatives give
+$n(A,C)=q_Pn(B,C)$ and $S_{B,C}S_{A,B}=S_{A,C}$.
+If $A=(A\cap B)+(A\cap C)$, the reverse calculation gives
+$n(B,C)=q_Pn(A,C)$ and $S_{B,C}S_{A,B}=q_PS_{A,C}$.
+The factors in (CA.12) cancel in both cases.
+
+Otherwise $A\cap C=B\cap C$. Let $x$ generate
+$B/(A\cap B)$. The perfect pairing supplies $x=a+c_0$ with
+$a\in A,c_0\in C$. Put $\chi(t)=\gamma(a,tc_0)$. It descends to
+a nontrivial additive character on $R/P$; isotropy of $B$ gives
+$\chi(\bar t)=\chi(t)$. Nontriviality forces $\bar P=P$:
+if some $r\in P$ had $\bar r\notin P$, the inverse of $\bar r$
+modulo $P$ and $\chi(\bar t)=\chi(t)$ would make $\chi$ trivial.
+Expanding $W_{tx}v$ by the cocycle, then using the $C$-invariance of
+$S_{A,C}v$, gives
+\[
+ S_{B,C}S_{A,B}v
+   =\left(\sum_{t\in R/P}\chi(wt\bar t)\right)S_{A,C}v
+   =\lambda(q_P)S_{A,C}v.
+\]
+Here $n(B,C)=n(A,C)$, so (CA.13) again follows. This is the case
+where replacing every signed square root by a positive square root
+would lose a sign.
+
+Finally reduce general $A,B$ to adjacency. Choose a simple nonzero
+$R$-submodule $Rx$ of $B/(A\cap B)$ and set
+$A_1=(A\cap(Rx)^\perp)+Rx$. The perfect pairing proves
+$A_1=A_1^\perp$; its quotient over $A\cap A_1$ is $R/P$ and
+$A_1=(A_1\cap A)+(A_1\cap B)$. Therefore
+$n(A,B)=|R/P|n(A_1,B)$, which strictly decreases the positive
+integer index. Induction, the adjacent calculation, and the
+intermediate-lattice sum formula establish (CA.13) in finitely many
+steps. The argument uses finite modules; it makes no assumption
+that a global ideal or lattice is free.
+
+\paragraph{CA5: even rectangular ranks identify the signed and actual intertwiners.}
+Use VI2's full, self-dual period lattices in the rational space $X$.
+The action of $R=\mathcal O_E$ is entrywise through the embeddings;
+CA1 gives the adjoint identity and the integral element $w$ needed
+by CA4. On a period lattice $A$, $Q(x)$ is integral and
+$\alpha(x)=(-1)^{Q(x)}=\texttt{al}(x)$. Thus its theta functions
+are exactly the entire $A$-fixed vectors for $W$, and the source
+operator is
+\[
+ I_{A,B}=n(A,B)^{-1/2}S_{A,B}.
+ \tag{CA.14}
+\]
+
+Suppose $a,b$ are even. If only $L$ changes in $\Lambda(L,L')$,
+then at a prime $P$ the length of the quotient by the intersection
+is a multiple of $b$. To verify this, choose an
+$\mathcal O_{E,P}$-basis of $L'_P$ and diagonalize the two source
+lattices over that discrete valuation ring. The Hom lattice is a
+direct sum of $b$ copies of the corresponding source dual lattice.
+Tensoring by the common locally principal ideal
+$\mathfrak c\mathfrak A$ does not alter its relative index.
+If only $L'$ changes, the analogous length is a multiple of $a$.
+These are local bases; no global basis is required.
+
+The only nonpositive square-root choices in CA4 occur over the
+conjugation-fixed primes. Their signs are therefore
+$(-1)^{b\ell_P}$ or $(-1)^{a\ell_P}$, both one. At every other
+prime the normalization is already positive. Hence
+\[
+ J_{\Lambda(L,L'),\Lambda(M,L')}=I_{\Lambda(L,L'),\Lambda(M,L')},
+ \qquad
+ J_{\Lambda(L,L'),\Lambda(L,M')}=I_{\Lambda(L,L'),\Lambda(L,M')}.
+ \tag{CA.15}
+\]
+In particular, if $A_0=\Lambda(\mathcal O_E^a,\mathcal O_E^b)$
+and $\theta_0=\texttt{thZero}$, then the actual definition satisfies
+\[
+ \texttt{thMoved}(L,L')
+   =I_{\Lambda(L,\mathcal O_E^b),\Lambda(L,L')}
+      I_{A_0,\Lambda(L,\mathcal O_E^b)}\theta_0
+   =J_{A_0,\Lambda(L,L')}\theta_0.
+ \tag{CA.16}
+\]
+CA4 now proves both one-variable transport laws and independence of
+the order of these two moves. The equality does not claim that
+every positive-normalized intertwiner between arbitrary lattices
+composes without a sign.
+
+Rational unitary changes of coordinates commute with these $J$
+operators in their natural form. If $T$ preserves $H$, $Q$, and
+$X$, then it carries representatives bijectively, preserves the
+index, and
+$P_TW_x=W_{Tx}P_T$, where $P_Tf(z)=f(T^{-1}z)$. Therefore
+\[
+ P_TJ_{A,B}=J_{TA,TB}P_T.
+ \tag{CA.17}
+\]
+This is a direct finite-sum identity, independent of a separately
+constructed adelic Weil representation.
+
+\paragraph{CA6: computing the scalar by a Gaussian trace.}
+We give the scalar calculation used for the actual rational action.
+Let $A$ be a full self-dual period lattice, let $u$ be unitary for
+$H$, put $a_0=u^{-1}$, and suppose $\det_{\mathbb C}(1-a_0)\ne0$.
+Assume $A$ and $uA$ are commensurable and choose $m>0$ such that
+\[
+ mA\subset(1-a_0)(A\cap a_0^{-1}A).
+ \tag{CA.18}
+\]
+Rationality of $u$ supplies such an $m$ by clearing denominators.
+Put $C=\tfrac12(1+a_0)(1-a_0)^{-1}$. For nonzero
+$\theta\in\operatorname{Th}(A)$, theta-line uniqueness and the
+positive-Iop isometry (VI5) give
+\[
+ P_u\theta=c_u I_{A,uA}\theta,\qquad |c_u|=1.
+\]
+The additional information needed to determine its phase is
+\[
+ c_u=r\,\det_{\mathbb C}(1-a_0)^{-1}
+       \sum_{x\in A/mA}\alpha(x)e^{-\pi H(Cx,x)},
+ \qquad r>0.
+ \tag{CA.19}
+\]
+
+Here is a derivation, including the analytic step. Define the kernel
+\[
+ K_A(z,t)=\sum_{x\in A}\alpha(x)
+  \exp\!\left(\pi H(t+x,z)-\pi H(t,x)-\frac\pi2H(x,x)\right).
+ \tag{CA.20}
+\]
+Positive definiteness bounds each summand, uniformly for $z,t$ in
+a compact set, by $C_1e^{-C_2\|x\|^2+C_3\|x\|}$ with $C_2>0$.
+The number of lattice points in a radius-$R$ ball is $O((1+R)^{2\dim V})$,
+by disjoint small balls around lattice points. The bound is summable,
+also after every fixed derivative. Thus the kernel is entire in $t$,
+and shifting $x$ proves that $K_A(z,\cdot)$ lies in the theta line.
+The scalar equation for $\theta$ therefore holds for this kernel.
+
+Take a fundamental domain $F$ for
+$A_m=(1-a_0)^{-1}(mA)\subset A\cap a_0^{-1}A$.
+For fixed $z$, the kernel equation is
+$K_A(z,a_0t)=c_u n(A,uA)^{-1/2}
+\sum_y\alpha(y)U_y(K_A(z,\cdot))(t)$, with $y$ representing
+$uA/(A\cap uA)$. Set $t=z$ and multiply by
+$e^{-\pi H(z,z)}$. For each $y$, expansion of (CA.20) gives
+\[
+ U_y(K_A(z,\cdot))(z)e^{-\pi H(z,z)}
+ =\sum_{x\in A}b(x,y)e^{2\pi iE_H(x+y,z)},
+\]
+where
+$b(x,y)=\alpha(x)\exp(-\pi H(x,y)-\pi H(x,x)/2
+-\pi H(y,y)/2+2\pi iE_H(x,y))$.
+Each character on the right is periodic modulo $A_m$, because
+$x\in A$, $y\in uA$, and $A_m\subset A\cap uA$.
+Its integral on $F$ vanishes unless $x+y=0$: a nonzero real
+linear functional $E_H(x+y,\cdot)$ gives a nontrivial torus
+character, whose Haar integral is zero by translation.
+If $y\notin A$ there is no such $x$. If $y\in A$, the single
+remaining coefficient is $b(-y,y)=\alpha(-y)$; multiplying by
+the outer $\alpha(y)$ gives one. Thus only the zero class of
+$uA/(A\cap uA)$ remains, with integral $\operatorname{vol}(F)$.
+The finite-Iop side is exactly
+$c_u n(A,uA)^{-1/2}\operatorname{vol}(F)$, whereas the other
+side is the integral of $K_A(z,a_0z)e^{-\pi H(z,z)}$.
+
+On the other side write each $x\in A$ uniquely as
+$s-(1-a_0)y$, with $s\in A/mA$ and $y\in A_m$.
+The semicharacter identity converts this shift into $z\mapsto z+y$,
+so the integral unfolds to a finite sum of integrals over $V$.
+Set $B=(1-a_0)^{-1}$. The integral for $s$ is
+\[
+ \frac{\kappa}{\det_{\mathbb C}(1-a_0)}
+       \alpha(s)e^{-\pi i\operatorname{Im}H(Bs,s)},\qquad \kappa>0.
+ \tag{CA.21}
+\]
+To check (CA.21), diagonalize the unitary $a_0$ in an $H$-orthonormal
+basis. Each eigenvalue $\zeta\ne1$ has $\operatorname{Re}(1-\zeta)>0$.
+The elementary complex Gaussian integral with linear terms is
+\[
+ \int_{\mathbb C}e^{-\pi h(1-\zeta)|z|^2+\pi(pz+q\bar z)}\,dz
+   =\frac1{h(1-\zeta)}
+      e^{\pi pq/(h(1-\zeta))}.
+\]
+It follows from the two real Gaussian integrals, first for real
+positive coefficients and then by holomorphic continuation in the
+right half-plane; the dominating Gaussian on compact parameter
+sets justifies that continuation and differentiation. Multiplying
+the one-coordinate formulas and substituting
+$(1-a_0)Bs=s$ leaves precisely the phase in (CA.21).
+Equivalently, the remaining exponent identity is
+$-H(s,s)/2-H(Bs,a_0^{-1}s)=-i\operatorname{Im}H(Bs,s)$.
+Since $C=B-\tfrac12$ and $C$ is skew-adjoint,
+$H(Cs,s)=i\operatorname{Im}H(Bs,s)$. Dividing by the first
+positive volume factor proves (CA.19). All unfolding interchanges
+are justified by the Gaussian bound above and the finite number
+of cosets.
+
+\paragraph{CA7: the finite Gauss factor is nonnegative in the even-rank action.}
+Now $A=A_0$ is the standard rectangular period lattice and $u$
+acts on just one matrix factor. The other factor has even dimension.
+Let $P$ project onto its first half and let $S$ interchange the two
+halves. They preserve $A$, commute with $a_0,C$, and satisfy
+$P^2=P$, $S^2=1$, $SP=(1-P)S$. Both halves are $H$-orthogonal.
+For
+\[
+ \varphi(x)=\alpha(x)e^{-\pi H(Cx,x)}
+           =\exp\!\left(\pi i\left(Q(x)-\operatorname{Im}H(Cx,x)\right)\right),
+ \tag{CA.22}
+\]
+the semicharacter identity, (CA.18), and integrality of $E_H$ on
+$A$ show $\varphi(x+mz)=\varphi(x)$. These same identities give
+$\varphi(x)=\varphi(Px)\varphi((1-P)x)$ and
+$\varphi(Sx)=\varphi(x)$.
+
+There is an integral $\ell\in\mathcal O_E$ with
+\[
+ \ell\bar\ell=-1+4m b_0,\qquad b_0\in\mathcal O_{E^+}.
+ \tag{CA.23}
+\]
+At a split local pair choose components $1,-1$; at a nonsplit
+unramified place, DR1's norm surjectivity gives norm $-1$ modulo
+$4m$. The Chinese remainder theorem combines these finitely many
+choices into $\ell$. The quotient $b_0$ is integral and fixed by
+conjugation. Thus (CA.23) includes all primes dividing $2m$.
+
+Let $L_0$ be entrywise multiplication by $\ell$, and $B_0$ by $b_0$.
+They preserve $A$ and commute with $P,a_0,C$; moreover
+\[
+ H(L_0x,L_0y)=-H(x,y)+4mH(B_0x,y).
+\]
+It follows that $L_0$ induces a bijection of $A/mA$: if
+$L_0x\in mA$, the displayed pairing identity makes
+$E_H(x,y)$ divisible by $m$ for every $y\in A$, and self-duality
+gives $x\in mA$. A direct exponent check gives
+$\varphi(L_0x)=\overline{\varphi(x)}$. In detail, write
+$mx=y-a_0y$ as in (CA.18), so $2mCx=y+a_0y\in A$.
+The difference between the two exponents, divided by $\pi i$, is
+\[
+ 4m\left(\tfrac{\sqrt d}{2}\operatorname{Re}H(B_0x,x)
+                 -\operatorname{Im}H(B_0Cx,x)\right)\in2\mathbb Z.
+\]
+The first term is $2m$ times the integer
+$Q(B_0x+x)-Q(B_0x)-Q(x)$; the second is twice the integral
+pairing of $B_0(y+a_0y)$ with $x$.
+
+The finite quotient $A/mA$ is the direct sum of the image and
+kernel of $P$. Its two Gauss sums are equal by $S$. The first is
+real because the bijection $L_0$ conjugates its summands and
+preserves that half. Therefore their product, the sum in (CA.19),
+is the square of a real number and is nonnegative. It cannot be
+zero, since $|c_u|=1$. Equation (CA.19) consequently gives
+\[
+ c_u=\frac{|\det_{\mathbb C}(1-u^{-1})|}
+               {\det_{\mathbb C}(1-u^{-1})}.
+ \tag{CA.24}
+\]
+This positivity calculation is the step that fixes the phase; a
+unit-modulus assertion alone would not give (CA.24).
+
+\paragraph{CA8: the exact determinant powers for every rational unitary matrix.}
+For $\gamma\in U(a,E)$ and $\gamma'\in U(b,E)$ put
+\[
+ (T_{\gamma,\gamma'}z)_\tau
+       =\tau(\gamma')z_\tau\tau(\gamma)^{-1},\qquad
+ P_{\gamma,\gamma'}f(z)=f(T_{\gamma,\gamma'}^{-1}z).
+ \tag{CA.25}
+\]
+This is exactly the source \texttt{pull}: the inverse on the left
+is the conjugate transpose, whereas the factor on the right is
+$\gamma$. It maps $\Lambda(L,L')$ to
+$\Lambda(\gamma L,\gamma'L')$.
+
+First assume $\det(1-\gamma)\ne0$. For the action on the source
+factor, $\det_{\mathbb C}(1-T_{\gamma,1}^{-1})
+=\prod_\tau\tau(\det(1-\gamma))^b$. Since $a$ is even,
+\[
+ \det\gamma\,\overline{\det(1-\gamma)}=\det(1-\gamma).
+\]
+If $b=2r$ this identity gives
+$|w^{2r}|/w^{2r}=\tau(\det\gamma)^{-r}$ for
+$w=\tau(\det(1-\gamma))$. Equations (CA.15) and (CA.24) prove
+\[
+ P_{\gamma,1}\theta_0
+   =\left(\prod_\tau\tau(\det\gamma)^{-b/2}\right)
+       J_{A_0,T_{\gamma,1}A_0}\theta_0.
+ \tag{CA.26}
+\]
+For the target factor use $\gamma'^{-1}=\bar\gamma'^{t}$.
+The conjugate determinant identity has the opposite phase, yielding
+\[
+ P_{1,\gamma'}\theta_0
+   =\left(\prod_\tau\tau(\det\gamma')^{a/2}\right)
+       J_{A_0,T_{1,\gamma'}A_0}\theta_0.
+ \tag{CA.27}
+\]
+If one rectangular dimension is zero, these are identities on
+constant functions with empty products; the Gaussian argument is
+unnecessary.
+
+The restriction excluding eigenvalue one can be removed exactly.
+There are infinitely many rational norm-one elements
+$z=(1+t\sqrt{-d})/(1-t\sqrt{-d})$, $t\in\mathbb Q$.
+Choose $z\ne1$ outside the finitely many inverse eigenvalues of
+$\gamma$. Then $\gamma=(z\gamma)(z^{-1}1)$ and each factor has
+$1-$factor invertible. Apply (CA.26) to each factor, use
+(CA.17), then compose the two $J$ operators by CA4. Determinants
+multiply, so (CA.26) holds for every $\gamma$. The same argument
+applies to (CA.27). Combining the two commuting actions gives
+\[
+ P_{\gamma,\gamma'}\theta_0
+    =\rho(\gamma,\gamma')J_{A_0,T_{\gamma,\gamma'}A_0}\theta_0,
+ \quad
+ \rho(\gamma,\gamma')=
+       \prod_\tau\tau(\det\gamma)^{-b/2}
+                       \tau(\det\gamma')^{a/2}.
+ \tag{CA.28}
+\]
+
+\paragraph{CA9: all three equivariance laws for the actual normalized family.}
+Let $\chi$ satisfy the literal \texttt{IsChi} laws. For self-dual
+$L,L'$ define the source scalar and actual family
+\[
+ d_\chi(L,L')=
+  \chi(\operatorname{detId}(\mathcal O_E^a,L))^{b/2}
+  \chi(\operatorname{detId}(\mathcal O_E^b,L'))^{-a/2},\qquad
+ e(L,L')=d_\chi(L,L')\,\texttt{thMoved}(L,L').
+ \tag{CA.29}
+\]
+These determinant ideals have norm one. Multiplicativity and the
+principal norm-one law imply that their character values are
+nonzero, and
+\[
+ d_\chi(\gamma L,\gamma'L')=
+       \rho(\gamma,\gamma')d_\chi(L,L').
+ \tag{CA.30}
+\]
+Indeed the determinant ideal of an image is the old ideal times
+$(\det\gamma)$, and \texttt{IsChi} assigns to this principal ideal
+$\prod_\tau\tau(\det\gamma)^{-1}$. This determines both signs of
+the exponents in (CA.30).
+
+Using the actual equality (CA.16), naturality (CA.17), and (CA.28),
+\[
+\begin{split}
+ P_{\gamma,\gamma'}e(L,L')
+  &=d_\chi(L,L')J_{TA_0,T\Lambda(L,L')}
+                        P_{\gamma,\gamma'}\theta_0\\
+  &=\rho(\gamma,\gamma')d_\chi(L,L')
+                        J_{A_0,T\Lambda(L,L')}\theta_0
+   =e(\gamma L,\gamma'L').
+\end{split}
+ \tag{CA.31}
+\]
+For a change in just one lattice, (CA.13), (CA.15), and
+$\operatorname{detId}(L,M)\operatorname{detId}(M,N)=\operatorname{detId}(L,N)$ similarly give
+\[
+\begin{split}
+ e(L,L'')&=\chi(\operatorname{detId}(L',L''))^{-a/2}
+            I_{\Lambda(L,L'),\Lambda(L,L'')}e(L,L'),\\
+ e(M,L')&=\chi(\operatorname{detId}(L,M))^{b/2}
+            I_{\Lambda(L,L'),\Lambda(M,L')}e(L,L').
+\end{split}
+ \tag{CA.32}
+\]
+Equations (CA.31)--(CA.32) are all three clauses of
+\texttt{Base.EqP}, hence of the actual
+\texttt{normalisedFamily\_satisfies\_equivarianceLaws} theorem.
+The construction starts with the supplied Base's own
+$\theta_0=\texttt{thZero}$, furnished by VI10. It neither chooses
+a different family nor assumes the sought covariance of this one.
+
+\paragraph{CA10: lift independence and covariance of the actual indicator.}
+Assume the literal \texttt{LaHyp}, $\mathfrak A\ne0$, and $M>0$.
+Thus $S$ contains no conjugate pair, the period ideal is a unit at
+each $P\in S$, and $e(L,L')$ is fixed by the period lattice.
+Use rational coordinates and put
+$\mathcal P=\mathfrak c\mathfrak A\operatorname{Hom}(L,L')$.
+For $c>0$ the two half lattices have the following local readings:
+\[
+\begin{array}{c|ccc}
+ &P\in S&\bar P\in S&P,\bar P\notin S\\ \hline
+ (A_c)_P&c^{-1}\mathcal P_P&c\mathcal P_P&\mathcal P_P\\
+ (B_c)_P&c\mathcal P_P&c^{-1}\mathcal P_P&\mathcal P_P.
+\end{array}
+ \tag{CA.33}
+\]
+These localizations determine the global modules by LP1. Opposite
+exponents cancel in the conjugate pairing, so both half lattices
+are integral for the cocycle $c(x,y)$ of (CA.3). This follows
+also by applying the integral pairing to $wx,y$, since $w$ is
+integral and preserves each lattice.
+
+Let $x\in M^{-1}\operatorname{Hom}_S(L,L')$. There exists
+$t\in A_{Mc}$ with $t-x\in c\operatorname{Hom}_S(L,L')$.
+To see this without an extra approximation hypothesis, clear a
+common denominator for $x$ and an integral basis of the full
+period module. Chinese remainders in this finitely generated
+module give $y$ congruent to $(Mc)^{-1}x$ modulo $\mathcal P_P$
+at the finitely many $P\in S$, and integral in $\mathcal P_Q$
+at every other prime. Equivalently one may perform the CRT in
+a common integral denominator module; it imposes only finitely
+many residue conditions. Then $t=Mc\,y$ has the stated properties
+by the three cases of (CA.33), using
+$\mathcal P_P=\operatorname{Hom}(L_P,L'_P)$ on $S$.
+
+Take any such $t$ and any representatives
+$R\subset B_c$ modulo $B_c\cap\mathcal P$. Put
+\[
+ n_c=[\mathcal P\cap A_c:B_c\cap\mathcal P\cap A_c]>0.
+\]
+The literal finite Fourier definition reduces to
+\[
+ \operatorname{thInd}_{S,L,L',c,x}
+    =\frac1{n_c}W_{-t}\sum_{y\in R}W_y e(L,L').
+ \tag{CA.34}
+\]
+Indeed its inner representative set is
+$(\mathcal P\cap A_c)/(B_c\cap\mathcal P\cap A_c)$.
+The indicator of $B_c$ selects only its zero class. At that
+class its Fourier phase is one, since $y\in B_c$ and the
+cocycle is integral on $B_c$. Thus the Fourier coefficient is
+$v/(n_c\sqrt v)$; the additional source factor $1/\sqrt v$
+cancels $v>0$, giving exactly $1/n_c$.
+
+The resulting formula is independent of the chosen lift and
+representatives. The sum $F=\sum_{y\in R}W_y e$ is $B_c$-fixed:
+translation permutes its quotient representatives and the period
+and cocycle phases are one. Let $s$ be the source's original
+lift in $A_c$. At $P\in S$, $t-s\in c\mathcal P_P$; at the
+conjugate primes $s\in c\mathcal P_P$ and
+$t\in Mc\mathcal P_P$; elsewhere both are integral.
+Consequently $t\in A_c$ and $t-s\in B_c$.
+The integral cocycle on $A_c$ gives
+$W_{-t}W_{t-s}=W_{-s}$, so $W_{-t}F=W_{-s}F$.
+This proves (CA.34) for the actual chosen-lift definition, not
+just for a conveniently redefined indicator.
+
+Now let $\gamma,\gamma'$ be rational unitary matrices.
+The rational map $\phi(x)=\gamma'x\gamma^{-1}$ carries
+$\mathcal P$, $A_c$, $B_c$, $M^{-1}\operatorname{Hom}_S$,
+and $c\operatorname{Hom}_S$ to the corresponding modules for
+$\gamma L,\gamma'L'$. This follows directly from the defining
+mapping property and from localization; scalar denominators
+commute with $\phi$. It preserves $n_c$, sends $t,R$ to valid
+lift and representative data, and its complex map satisfies
+$P_TW_y=W_{\phi(y)}P_T$. Applying CA9 to (CA.34) proves
+\[
+ \operatorname{thInd}_{S,\gamma L,\gamma'L',c,\phi(x)}(z)
+       =\operatorname{thInd}_{S,L,L',c,x}(T^{-1}z).
+ \tag{CA.35}
+\]
+This is exactly \texttt{ThIndEq}, with the source inverse on
+the target factor. Equation (CA.30) is separately the literal
+\texttt{ChiLaw}. Neither statement discards the determinant
+factor before normalizing the jet.
+
+\paragraph{CA11: the actual step has a finite algebraic jet field.}
+Let $B$ be the given base, $X:\texttt{PreX}(B)$, and
+$I:\texttt{ColIn}(B,X)$ satisfy its literal \texttt{Ok}.
+Fix an index $a_0$, a word $u$, arbitrary steps $i,j$, and
+$M>0,n\ge0$. Then
+\[
+ \operatorname{FinAlg}\!\left(
+  \operatorname{jetSet}(I.A,N_i,N_j,I.S_b(a_0,u),M,n)\right).
+ \tag{CA.36}
+\]
+The source also supplies \texttt{HasLetters}; we retain that
+antecedent when matching \texttt{finAlg\_step}, although the
+analytic proof below does not need an auxiliary stage.
+
+First verify its actual period hypotheses. Every $N_i$ is even.
+The selected set $S=I.S_b(a_0,u)$ is the union of the type-prime
+set and the auxiliary/tuple set. A type prime and its conjugate
+cannot both occur, because the two factors of its prescribed
+norm element are coprime. The same applies to each auxiliary
+factor. Tuple primes are chosen on only one side of a split
+pair; primes of different supported rational types cannot collide.
+This proves that $S$ has no conjugate pair. Their exact local
+conditions say $q_P=\operatorname N P$ is prime and
+$q_P\notin P^2$: for the prescribed norm elements this follows
+by factoring their product and using the degree and norm count;
+for tuple primes it is the literal split, degree-one, unramified
+condition. These are the cases in \texttt{bad\_primes}.
+
+At such a $P$ the relative different of $E/K$ is a unit.
+In fact $q_P\notin P^2$ says that the ramification index over
+$\mathbb Q_{q_P}$ is one; the residue extension is separable,
+so the completed integral extension is unramified and its trace
+pairing is perfect. The same holds over the intermediate field
+$K$. The actual integral half-different $\mathfrak b$ satisfies
+$\mathfrak b\bar{\mathfrak b}=\mathfrak D_{E/K}$.
+Its two nonnegative local valuations must therefore be zero.
+Thus $\mathfrak A=\mathfrak b^{-1}$ localizes to
+$\mathcal O_{E,P}$. Since the curve ideal here is exactly
+$\mathfrak c=\mathcal O_K$, this is the required
+\texttt{AAUnit}; it is not inferred from self-duality alone.
+VI2 supplies full period lattices, their self-duality, integral
+quadratic multiplier, and finite generation. VI10 supplies the
+actual fixed theta vector. Together these prove every
+\texttt{LaHyp} clause, and $\mathfrak A\ne0$.
+
+VI11, using only the independent finite presentation CA2, gives
+\texttt{ESmooth} and \texttt{JetAlg}. CA9--CA10 give the actual
+\texttt{VacEq}, \texttt{ThIndEq}, and \texttt{ChiLaw}.
+The numbers $c_D(\tau)$ are algebraic: \texttt{AmbIn.Ok.dgen}
+places each one in its specified number-field image.
+
+Here is the finite-field argument, making the degree assertion
+explicit. TL1 gives finitely many rational-unitary classes of
+self-dual lattices in each rank. Choose representatives for
+$L,L'$, finitely many positive divisors $c$ of $M$, and then
+representatives for
+\[
+ M^{-1}\operatorname{Hom}_S(L,L')/
+                    c\operatorname{Hom}_S(L,L').
+ \tag{CA.37}
+\]
+The last quotient is finite by localization of a full lattice
+and CRT; only the primes of $S$ dividing $Mc$ contribute.
+Changing $x$ by its denominator module leaves the actual lift
+predicate, hence the chosen indicator, unchanged.
+For each of these finitely many functions retain its normalized
+derivatives at zero of every total order at most $n$.
+VI11 makes this a finite algebraic set. Adjoin also the finitely
+many $c_D(\tau)$ and the images under every $\tau$ of a fixed
+$\mathbb Q$-basis of $E$. The resulting field $K_0$ is generated
+by finitely many algebraic numbers and contains every embedded
+rational-unitary matrix entry and determinant.
+
+For arbitrary $L,L',x$, choose unitary matrices carrying the
+chosen lattice representatives to them. Equation (CA.35)
+expresses their indicator by linear substitution in a selected
+one. Repeated differentiation of a linear substitution is a
+finite sum of derivatives of the same total order, multiplied
+by products of the substitution's matrix entries. All these
+entries lie in $K_0$. Equation (CA.30) shows that the ratio of
+normalizing characters is in $K_0^\times$. Finally
+\texttt{jetC} multiplies by the prescribed product of
+$c_D(\tau)$ powers. Thus every normalized order-$n$ jet lies
+in $K_0$, proving (CA.36). The polynomial here is the finite
+Taylor component of a fixed degree, or its linear substitution;
+no theta function is asserted to be a polynomial.
+
+There is no hidden \texttt{LocStage}/\texttt{NStage} assumption
+in this argument. The source proof of \texttt{finAlg\_step}
+introduces arbitrary complete stages to access notation indexed
+by $D7$. Its host-level \texttt{VacIn} already contains exactly
+the period pair, half-point, rational isometry, complex reading,
+and correction roots used above. It defines the same
+\texttt{thMM}, \texttt{thZero}, \texttt{thMoved}, and
+\texttt{eNat}; the source \texttt{toRec} and \texttt{*\_rec}
+identities simply copy these fields. Every CA1--CA10 and VI
+argument is expressed in those fields, the host, and its
+embeddings. Applying those arguments directly to $I.J.V$ proves
+(CA.36) for the literal $I.A=I.J.\texttt{amb}(B,I.\chi)$.
+No unused complete-stage witness is required or claimed.
+
+\paragraph{CA12: one finite generator set gives all canonical jets.}
+Fix a preliminary datum $P$, character $\chi$, and finite twist
+family $\Xi$. The actual finite bad-prime set is
+$\mathcal B=\texttt{badP}(P,\Xi)$. For each word $u$, step
+$i<m$, and subsets $S,R\subset\mathcal B$, put
+\[
+ q_R=\prod_{Q\in R}\operatorname NQ,\qquad
+ M_{u,R}=q_R^{m+1}\bigl(T_uq_R^{m+1}\bigr).
+ \tag{CA.38}
+\]
+The source \texttt{stepSet} uses this exact modulus, ranks
+$N_i,N_{i+1}$, degree $\operatorname{totDeg}(P,u,i)$, and the
+specific ambient datum $\texttt{amb0}(P.\mathrm{host})$.
+Its \texttt{allSet} is the union only over those indices for
+which \texttt{FinAlg(stepSet)} holds. There are finitely many
+indices: the word and step sets are finite, and $S,R$ range over
+two finite power sets. Taking the union of the finite algebraic
+generator sets proves \texttt{FinAlg(allSet)}. This argument
+does not silently assert finiteness for every arbitrarily chosen
+prime set; the restriction in the actual definition is retained.
+
+Let $Z=\texttt{gens}(P,\chi,\Xi)$ be the actual chosen finite
+generator set. Every element is algebraic, and if a subfield
+$K_0\subset\mathbb C$ contains $Z$, then it contains
+\texttt{allSet}, by the defining universal property of field
+generation. The fallback value $Z=\varnothing$ is never used
+when $\Xi$ is finite.
+
+Now let $I$ satisfy \texttt{Ok}, \texttt{IsTw}, and
+$I.J=\texttt{amb0}(B.\mathrm{host})$, and assume
+\[
+ Z(B.\mathrm{toPre},I.C.\chi_\Psi,\operatorname{range}I.\xi)
+                   \subset B.\mathrm{embLL}(B.LL).
+ \tag{CA.39}
+\]
+Canonicality says that both exponents in $I.\mathrm{cst}$
+are $m+1$, so its literal modulus is exactly (CA.38) for
+$R=\texttt{rowSG}$; the type factor $T_u$ and all $q_Q$ are
+positive. Its $S_b$ and $\texttt{rowSG}$ are subsets of
+$\mathcal B$. Crucially, CA11 proves \texttt{FinAlg} for this
+actual indexed step, so it satisfies the restriction in
+\texttt{allSet}. The weight-to-degree identity of TL19 gives
+$e.\mathrm{degree}=\operatorname{totDeg}(P,u,i)$ for every
+multi-index tested by \texttt{JetsIn}. Therefore each such jet
+lies in \texttt{allSet}, hence in the field image in (CA.39).
+This proves the actual \texttt{jetsIn\_of\_isTw}.
+
+\paragraph{CA13: the same-data canonical evaluation theorem.}
+The preceding arguments close the analytic premises retained in
+CI19/TL21. We spell out the quantifiers of the resulting
+\texttt{EvLg} statement. Fix a source context $K$. Its
+\texttt{large\_2} witnesses may be chosen as follows.
+The fixed coefficient-field requirement contains a generator
+of TL14's common frame-value field. The full coefficient-field
+requirement contains the PA13 period-field generators, TL15's
+finite roots and square roots for the prescribed finite twist
+family, the auxiliary-prime square roots, and CA12's $Z$.
+Take the union of these finite sets; all its entries are
+algebraic. The extra finite prime and avoidance requirements
+can be empty. These sets are chosen before the later base and
+field-containment antecedents, exactly as \texttt{large\_2}
+requires. The twist family is finite by TL21's support argument.
+
+Suppose a base $B$, frame $f$, and twist datum $T$ lie over
+$K$ and satisfy those field requirements. Retain the literal
+frame-inclusion antecedent
+\[
+ i_X'(\operatorname{frame}_{X'}(a))
+       =\operatorname{frame}_{X_m}(b)
+       \quad\text{whenever the finite indices have equal values},
+ \tag{CA.40}
+\]
+and suppose $\texttt{PreX}(B.\mathrm{toPre})$ is nonempty.
+For every prescribed selection $P_v$ satisfying \texttt{IsSel},
+the following construction uses this same $B,f,T,P_v$.
+
+First orient the auxiliary factors of a supplied \texttt{PreX}
+by TL16, choosing each factor or its conjugate according to
+$f.P$. Replace only its type-prime elements by the context's
+actual $\pi_T$. Since $c_u=\pi_T(u_0)/\pi_T(u)$, cancellation
+of the nonzero denominator gives
+$c_u\pi_T(u)=\pi_T(u_0)$; auxiliary orientation is unchanged.
+Together with (CA.40), this is exactly both fields of
+\texttt{Pins}. It asserts no new frame identity for arbitrary
+raw frames.
+
+Choose the actual $J=\texttt{amb0}(B.\mathrm{host})$;
+PA9 proves its \texttt{AmbIn.Ok}. TL14--TL15 and the fixed/full
+field containments supply the actual character values, tuples,
+selected primes, and finite root data. CI15--CI17 construct
+the local index records and all their nonvanishing and character
+clauses, with initial $M=A=B=m$ and depth $2m$ off the auxiliary
+primes. The fieldwise join of CI19 therefore gives a literal
+$I_0:\texttt{ColIn}$ with
+\[
+ I_0.C=f,\quad I_0.\mathrm{sel}=P_v,\quad
+ I_0.S=\{p\in\texttt{offSet}(B):p\ne p_\delta,p_\delta'\},
+ \quad\operatorname{range}I_0.\xi=T.\mathrm{set}(f),\quad I_0.J=J.
+ \tag{CA.41}
+\]
+The depth $2m$ satisfies the exact \texttt{Deep} bound needed
+by CI18. Hence the specified replacement
+$I=\texttt{canon}(I_0)$ satisfies \texttt{Ok} and
+\texttt{IsTw}, preserving every field in (CA.41).
+The same full-field requirement contains CA12's generators,
+so CA12 supplies \texttt{JetsIn} for this $I$, with no change
+of $J$, frame, or twist range. TL13 then also supplies
+\texttt{Laws}, although the literal \texttt{evLg\_canonical}
+conclusion does not require it as an extra conjunct.
+
+TL14 supplies \texttt{ValLL0} for every later assembly
+$C,W,V,S,N,G$ on this same base and frame; PA13 supplies the
+same \texttt{FieldOK}. These are the final two conjuncts of
+the source conclusion. A universal assertion over later
+assemblies is not their existence assertion.
+
+The construction works for every context $K$ already allowed
+by the source. Thus the outer \texttt{Ev} wrapper uses
+$\varepsilon_0=1$ and zero additional size thresholds, as in
+\texttt{ev\_of\_forall}; all its original context and inner
+field-containment quantifiers remain. This proves the actual
+\texttt{evLg\_canonical} implication with its stated antecedents.
+It neither creates an arbitrary preliminary datum, removes
+(CA.40), nor constructs \texttt{Later}. The SE component
+separately describes its stage suppliers and its still-retained
+\texttt{LocStage}/\texttt{NStage} boundary. No inference to an
+unconditional proof of RH or GRH is made here.

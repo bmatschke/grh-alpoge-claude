@@ -1,0 +1,395 @@
+ONE-EDGE SYMBOL REALIZATION — EXPANDED HUMAN PROOF, v0.4
+21 November 2026
+
+Pinned source: CocoSgt/riemann-hypothesis-lean,
+commit 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+Claim tags SY1–SY8 refer to symbols_provenance.json and the merged ledger.
+No Lean build or kernel replay is asserted. The calculations below are human
+proofs of specified source implications, not modifications of the formal code.
+
+0. Scope and exact boundary
+
+This note covers the Type-II source realization feeding InitialLevelMonoWeights.
+edgeStep_of. It proves the finite-field localizer, its coefficient expansion,
+first-order determinant/pairing keys, the residual label-monomial assertion,
+finite correction, and degree accounting. The lift assembly is conditional on
+two explicitly retained assertions: GeneratorSpanInclusion and
+GeneratorImageIsSymbol. The construction/dimension of the selected symbol
+space is separately retained. The complementary representation and dual tests
+are the CL component, not a consequence of this note.
+
+The word 'admitted' in some source interface names is not being read as the
+Lean keyword 'sorry' or as an axiom. Here it names a bundled proposition. We
+record which of its mathematical fields are still inputs to the human text.
+
+SY1. Coordinates, frames, and the exact realization statement
+
+Use a complete unramified p-adic coefficient ring W of residue size p^n',
+with its Frobenius, and a coefficient DVR O in which w is a uniformizer and
+w^2=p. The source also assumes a finite injective W-algebra structure on O.
+The stronger HidaSetting/UnramifiedQuadraticSetting is retained where the
+global application needs it. For the polynomial algebra itself, the relevant
+facts are an integral Frobenius-compatible coordinate change, w^2=p, and
+an embedding of F_(p^n') into the residue field of O.
+
+Positions are s in Z/n'Z, n' even. At even s, the coordinate row is primal;
+at odd s it is dual. The normal set consists of (s,b) with b>=r at even s
+and b<r at odd s. The chart map Phi_g sends the adapted primal or dual
+coordinate to w X_(s,b) on this set and to X_(s,b) otherwise. The coefficients
+of g and g^{-1} are integral, since g has unit determinant. Phi_g is an
+automorphism over Frac(O), and preserves the multidegree at every position.
+
+Consequently, if F is integral, the coefficient of a monomial with normal
+degree v in Phi_g F is divisible by w^v. This stronger coefficient fact is
+essential in SY5. Merely knowing a key's leading congruence is insufficient.
+
+The frame consists of ordered even positions a_(j,1)<...<a_(j,r)=z_j, with
+blocks strictly separated and a_(j+J,l)=a_(j,l)+n'. They are in TT. The full
+FramesOK hypotheses give uniform bounds on the gaps and local density.
+Take Q=p^G', with G'<=n'. All powers p^(z_j-a_(j,l)), Q_j=p^(z_(j+1)-z_j),
+and p^(s-A_l(s)) used below are <=Q. Here A_l(s) are the r most recent even
+selected positions before s. The local density hypothesis bounds the number
+of selected positions in any cyclic window of length G' by N1.
+
+Let R0, Delta_j, Dhat_s be as in SY2/SY4. For c>=0 the exact multiplier is
+
+ SPtrue = R0^c (product_j Delta_j^c)
+                (product_(s in TT) Dhat_s^((2Q+3)c+kQ)).
+
+For P in the allowed Gen set, of position degree d0 and normal degree <=T,
+with d0+E'=dTop, SymbolRealisableAt asks for rational polynomials f_o of
+multidegree dTop such that sigma_o=Phi_g f_o is integral, realizable at
+order o, and sum_(0<=o<=T) sigma_o=P Phi_g(SPtrue).
+
+'Realizable at order o' means there is an INTEGRAL polynomial F_o with
+Phi_g F_o-w^o sigma_o in w^(o+c)O[X], and Phi_(g') F_o in w^(o+c)O[X]
+whenever the rational planes Pi(g') and Pi(g) differ. If sigma_o has a
+specified multidegree, F_o has that same degree. The intermediate f_o need
+not be integral. No assertion is made about vanishing on another basis of
+the SAME plane.
+
+SY2. The finite-field localizer
+
+For a column set I of size r, let M_(j,I) be the determinant of the r rows
+at a_(j,l), after raising row l to p^(z_j-a_(j,l)). Put I0={0,...,r-1},
+Delta_j=M_(j,I0), and let I range through the r(k-r) single exchanges of
+I0 with a column outside I0. The source defines
+
+ Rloc = Delta_0 product_I [product_j Delta_j^(Q_j-1)
+                              - product_j M_(j,I)^(Q_j-1)],
+ R0 = product_j Delta_j^alpha_j,
+ alpha_j = 1_(j=0)+r(k-r)(Q_j-1).
+
+Here and below j ranges over 0,...,J-1. Before using p^z_j, translate the
+finitely many relevant lifted positions by a common multiple of n' so they
+are all nonnegative. All differences and residue positions are unchanged;
+Frobenius on F_(p^n') also has period n'. Reduction in a plane chart gives
+the following situation. Let H be an r by k matrix over F_q, q=p^n', and
+let its row at position a be a linear combination of H^(p^a). After raising
+it to p^(z_j-a), the whole r by k matrix is T_j H^(p^z_j). Thus
+
+ M_(j,I) = det(T_j) det(H_I)^(p^z_j).
+
+This identity holds in any F_q-algebra, including the required polynomial
+ring. It uses only additivity of Frobenius in characteristic p and the
+determinant formula det(AB)=det A det B.
+
+The exponent sum telescopes exactly:
+
+ sum_j p^z_j (Q_j-1) = sum_j[p^z_(j+1)-p^z_j]
+                     = p^z_0 (q-1).
+
+Hence for any I with det(H_I) nonzero,
+product_j M_(j,I)^(Q_j-1)=product_j det(T_j)^(Q_j-1), independent of I.
+There is no division by det(T_j); this is valid even if those polynomials
+vanish or have zero divisors in the coefficient algebra.
+
+If det(H_I0)=0, then Delta_0=0. Otherwise, if H has a nonzero column to
+the right of I0, apply the inverse or adjugate of H_I0 to that column.
+At least one resulting coordinate is nonzero, so Cramer's rule supplies
+an exchanged minor with nonzero determinant. Its difference factor is zero.
+
+For distinct rational plane charts g,g', H is the first r rows of the
+reduction of (g')^{-1}g. Its right block cannot be zero: otherwise the first
+r rows of (g')^{-1} lie in the span of the first r rows of g^{-1}; both
+spaces have rank r, so their planes would coincide. Ordered column sets
+can introduce a sign compared with the replaced-column determinant. The
+exponents Q_j-1 are even because p is odd, so the sign disappears.
+
+This proves Phi_(g') Rloc in w O[X] for every other rational plane. It is a
+statement about coefficients after chart substitution, stronger than pointwise
+vanishing at F_q-rational values.
+
+SY3. Own-chart expansion and its exact budget
+
+In the chosen chart, every frame row is at an even position. In its first r
+columns substitution leaves X unchanged, while in an exchanged column it
+replaces X by wX. In particular Phi_g Delta_j is an integral tangential
+determinant, and Phi_g M_(j,I) is divisible by w.
+
+Expand Rloc over subsets S of the exchanged-column set. The empty subset
+is R0. For a nonempty S the frame-determinant exponent at j is
+
+ alpha_j - b_j,  b_j=|S|(Q_j-1).
+
+Expanding the remaining exchanged minors produces finitely many terms
+
+ w^e X^nu product_j(Phi_g Delta_j)^(alpha_j-b_j) H,
+
+where H is tangential and integral, e>=1, and |nu|<=e. In fact one can keep
+e=|nu| before collecting any additional coefficient divisibility. Each of
+the b_j normal columns contributes at least one w and one normal-variable
+power, so e>=sum_j b_j and therefore b_j<=e for every j. This is the
+coefficient-level content of the source Conclusion2/localiser_expansion_lemma.
+
+The same reasoning for Rloc^c relative to R0^c gives terms with determinant
+exponents c alpha_j-b_j and total error e, again b_j<=e and |nu|<=e.
+All exponents before refactoring are nonnegative. This observation will
+allow the fixed R0^c to be recovered using the spare Delta powers in SY5.
+
+SY4. Order-one keys and RestMon
+
+Fix s in TT and take its most recent r even selected positions A_l(s)<s.
+These exist because the frame repeats periodically. In fact G'<=n' and the
+frame-gap bound place the relevant occurrences in the previous G' positions.
+Let P_l=p^(s-A_l(s))>=p and let T_s have entries X_(A_l(s),b)^P_l,
+b<r. Put D_s=det(T_s)=Phi_g Dhat_s. Every entry is tangential; hence all
+entries and every adjugate entry are integral of normal degree zero.
+
+Even s, normal column b>=r. Form the determinant of the (r+1) by (r+1)
+matrix with the current primal row first, its columns I0 plus b, and older
+rows raised to P_l below it. In the chosen chart the upper-right entry is
+w X_(s,b); the lower-right entries are w^P_l X_(A_l(s),b)^P_l. Expansion
+along the last column therefore gives leading term
+
+ K0=(-1)^r w X_(s,b) D_s
+
+and an error in w^2 O[X]. After reduction in any other chart, the r+1
+Frobenius-adjusted primal rows lie in the same r-dimensional space, so the
+whole determinant vanishes. This supplies one order-one key.
+
+Odd s, normal columns b<r. Pair each older primal row, raised to P_l, with
+the current dual row. Its leading term is
+
+ K0_l = w sum_(b<r) (T_s)_(l,b) X_(s,b).
+
+Terms in columns b>=r contain w^P_l and are in w^2 O[X]. On any residue
+plane the Frobenius-adjusted primal row belongs to that plane and the
+dual row annihilates it, so the pairing vanishes. These are r order-one
+keys. Multiplying by the adjugate of T_s gives the exact identity
+
+ w X_(s,b) D_s = sum_l adj(T_s)_(b,l) K0_l.
+
+Together the two cases give w X_v D_s as a tangential integral linear
+combination of order-one leading keys. Signs in the even case are units.
+The order bound 1<=2Q is automatic. Both keys and coefficients use only
+positions in TT. No inverse determinant or rational coefficient is needed.
+
+A label monomial m satisfies m_(s,b)<p^(dist_j(s)) whenever s is a non-frame
+position of segment j. Each selected position is such a position of one
+segment: choose the first frame endpoint z_j>=s. The preceding endpoint
+is <s. The frame-gap bound makes dist_j(s)<=G', hence m_(s,b)<=Q.
+
+Let v_s be the total number of normal factors of m at s. Then v_s<=kQ.
+Multiply the first-order identities for every normal factor. With
+o=deg_N m=sum_s v_s and DkQ=product_s D_s^(kQ), this proves
+
+ w^o X^m DkQ = sum of products of key leading terms, of total order o,
+                   with integral tangential coefficients.
+
+The unused factors are product_s D_s^(kQ-v_s), so every exponent is
+nonnegative. The entire expression is normal-homogeneous of degree o.
+This is precisely RestMon. In particular, RestMon is no longer a retained
+input to this human reconstruction.
+
+SY5. Finite correction proved directly from the key definition
+
+An order-d key is an integral polynomial K with d<=2Q, leading term K0
+normal-homogeneous of degree d and divisible by w^d, such that
+Phi_g K-K0 is divisible by w^(d+1), and every chart sends K into w^d O[X].
+All keys under discussion are supported at TT. The source permits d=0;
+the proof below covers that case as well.
+
+Consider a monomial in Phi_g K-K0 of normal degree v. Its coefficient is
+divisible by w^(d+1). It is also divisible by w^v: for v different from d
+this follows from integrality of K before chart substitution; for v=d
+the first assertion is stronger. Thus it can be written w^x times an
+integral coefficient, where x=max(d+1,v). Put E=x-d. Then
+
+ E>=1,  v<=x=d+E<=(2Q+1)E.
+
+This gives a finite monomial expansion of the error. No w-adic infinite
+expansion is required; each coefficient is divided only by a power known
+to divide it in the DVR.
+
+Now take a raw term
+ U=w^i product_a K_a Rloc^c product_j Delta_j^lambda product_s Dhat_s^mu Hhat,
+where Hhat is the integral adapted-coordinate polynomial corresponding to
+an integral tangential H. Its symbol S replaces K_a by K0_a, Rloc by R0,
+and applies Phi_g to all the tangential factors. The level is
+ell=i+sum_a d_a. The symbol is in w^ell O[X]. By SY2 and the definition of
+keys, every other plane sends U into w^(ell+c)O[X].
+
+Expand Phi_g U-S by choosing either the leading term or an error in each
+key and in each localizer factor. Every non-leading summand earns a total
+level increase E>=1. Its explicit normal monomial degree is at most
+(2Q+1)E; its loss b_j of frame determinants is at most E. These inequalities
+add under products. The remaining leading keys keep their previous levels.
+
+Fix L=o+c. Terms with ell+E>=L may be discarded directly as elements of
+w^L O[X], before any refactoring. For the other terms assume
+
+ mu>=(2Q+1)(L-1-ell),  lambda>=L-1-ell.
+
+Apply SY4 to replace each explicit normal factor wX_(s,b)D_s by key leading
+terms. This uses v_s<= (2Q+1)E copies of D_s. Of the original w-power, the
+unused part is nonnegative because the explicit normal degree was <= its
+coefficient's w-power. Leave common exponent
+ mu'=mu-(2Q+1)E
+on every D_s. Move the surplus tangential powers into H. Similarly leave
+frame exponent
+ lambda'=lambda-E;
+since b_j<=E, the surplus Delta_j^(E-b_j) is tangential. This recovers the
+same fixed R0^c, and all remaining powers are nonnegative.
+
+The new symbols have level ell+E. They use valid original keys and the
+valid order-one keys from SY4. Their coefficients stay integral and
+tangential, supported at TT. Thus, modulo w^L,
+
+ Phi_g U - S = sum_child S_child,
+ ell_child=ell+E, mu_child=mu-(2Q+1)E, lambda_child=lambda-E.
+
+This proves the content of OrderClaimRemaining directly; the source proves
+the same assertion via the graded sets bc_gen/bc_agen and bc_RestTail.
+The identity preserves the two budget invariants
+
+ mu+(2Q+1)ell,  lambda+ell.
+
+For initial ell>=o, mu=(2Q+3)c and lambda=c, the inequalities above hold
+until level L. Starting at the highest possible child level and proceeding
+downwards, replace every child by its corrected integral lift. More formally,
+if F_child has Phi_g F_child=S_child mod w^L and vanishes to order L in
+all other charts, put F=U-sum_child F_child. It has the same properties
+for S. At ell>=L take F=0. The induction decreases L-ell and has finite
+branching. It terminates after at most c positive level increments from an
+initial term of level o. A finite initial sum is handled by addition.
+
+The assertion includes supported variables automatically: all coordinates,
+keys and coefficients remain at TT. If the desired symbol has a fixed
+position multidegree, project F to it. Phi_g and every other chart commute
+with that projection; coefficient divisibility and integrality are retained.
+
+SY6. Symbol algebra and assembly of the actual lift
+
+Let A_o be the O-module of finite sums of products of leading keys, of total
+key order o, times integral tangential polynomials supported at TT. A normal-
+homogeneous polynomial Z of degree o is a source symbol when w^o Z is in
+A_o. This is exactly Sy at index o: bc_agen(o,0) is defined as a leading-key
+product of total order o times an integral tangential polynomial. Products preserve symbols, adding
+their degrees; integral tangential polynomials are degree-zero symbols.
+The source SyS is the finite additive closure of these homogeneous pieces.
+
+The two retained representation assertions have precise meanings:
+
+(1) GeneratorSpanInclusion: for each frame segment, every MGen0 polynomial
+    belongs to the O-span of the path generators PGen. MGen0 is defined by
+    the primal/tangential factorization and the zero-gap inequalities on
+    successive weights; PGen uses matched standard paths and their minors.
+(2) GeneratorImageIsSymbol: after Frobenius substitution phSeg, every such
+    path generator is a homogeneous symbol Sy. This needs the actual path
+    formulas, not just a dimension count or characteristic-zero spanning.
+
+The allowed nonnegative gap parameter m can be weakened to zero. Expand the
+defining span of XX' into MGen0 using its position-homogeneous components.
+This projection step is elementary: every generic Laurent substitution used
+to define the successive minimum and maximum weights preserves the degree at
+each position. Taking a position-homogeneous component therefore deletes
+some Laurent coefficients; it cannot lower a minimum exponent or raise a
+maximum exponent. Decompose the primal and tangential factors separately and
+retain their homogeneous products. Their support restrictions and the zero-gap
+inequalities survive. This gives the MGen0 span used by xx_span_MGen0.
+Then (1), (2), and linearity put every segment factor phSeg(x_j) into SyS.
+This is the source seg_SyS route, with no additional representation theorem
+needed for the multidegree projection itself.
+
+An element P of Gen is a product of these segment factors times a label
+monomial. For P=0 all lifts are zero. Otherwise the label has no position
+outside TT: P has zero degree there, all monomial degrees are nonnegative,
+and multiplying by a monomial cannot cancel a nonzero coefficient.
+SY4 makes that label times DkQ a symbol. Thus
+
+ Z=P product_s D_s^(kQ)
+
+belongs to SyS. The remaining factor
+
+ Hfix=(Phi_g R0)^c product_j(Phi_g Delta_j)^c product_s D_s^((2Q+3)c)
+
+is integral, tangential, and supported at TT. Therefore
+P Phi_g(SPtrue)=Z Hfix is integral, has the prescribed position degree,
+and has normal degree <=T whenever P does. Its normal components sigma_o
+satisfy w^o sigma_o=(a finite sum of key-product terms) Hfix.
+Apply SY5 to this sum. The output F_o is integral and realizes sigma_o
+at precision o+c, on the chosen plane and all other planes as in SY1.
+
+To match the literal SymbolRealisableAt conclusion, use the invertibility of
+Phi_g over Frac(O) to choose f_o with Phi_g f_o=sigma_o, and take its position-
+homogeneous component. These f_o are only the intermediate symbol preimages.
+This is why a direct inverse substitution must not be mistaken for the
+integral separated realization F_o supplied by SY5.
+For the source's family indexed by every nonnegative o, set both f_o and F_o
+to zero when o>T. The zero polynomials satisfy the same homogeneous and
+realizability conditions.
+
+SY7. Exact multidegree accounting
+
+Let e_j(t)=sum_l p^(z_j-a_(j,l)) 1_(t=a_(j,l) mod n') and
+f_s(t)=sum_l p^(s-A_l(s)) 1_(t=A_l(s) mod n'). Determinant multilinearity
+proves that the exact degree vector of SPtrue is
+
+ E'_t = sum_j(c alpha_j+c)e_j(t)
+              + [(2Q+3)c+kQ] sum_(s in TT) f_s(t).
+
+This is source eSP. It is independent of g and is zero for t outside TT.
+Distinct frame rows in one period give at most one nonzero summand in
+the first sum, bounded by [c(1+rkQ)+c]Q.
+
+If A_l(s)=t mod n', then 0<s-A_l(s)<G' and so s lies in the cyclic window
+of length G' immediately after t. The local density condition bounds the
+number of these s by N1 (the exported source estimate uses N1+1). Each
+f_s(t)<=rQ. Therefore
+
+ E'_t <= [c(1+rkQ)+c]Q +(N1+1)[(2Q+3)c+kQ]rQ.
+
+If k<=c, N1<=k, 1<=N1, r>=2 and Q>=3, then
+[(2Q+3)c+kQ]<=4Qc and N1+1<=2k. The second contribution is <=8crkQ^2.
+Since rkQ>=2, the first is <=2crkQ^2. In particular their sum is
+<=15c(N1+rk)Q^2=E0, exactly the source's safe budget.
+
+With N>=1, Y>=1, k>=1, Q>=1 and C>=30, the size premise
+a>=C k^3 r^2 N Q^5 c Y implies E0<=a because N1+rk<=2rk. The source's
+other numerical premises imply k<=c; it is not assumed for arbitrary c.
+The prescribed flat degree at selected positions is at least a, so its
+difference with E' is a nonnegative integer. Taking d0=dTop-E' completes
+the degree requirement in SY6. No change in the global exponent is inferred
+from the unused numerical slack.
+
+SY8. Actual dependency route and remaining work
+
+Actual route:
+  source generator assertions + SY1–SY7
+  -> sources_realisable_holds / SymbolRealisableBound
+  + large saturated symbol family (symbol_space_at)
+  + complementary family and primitive dual tests (CL)
+  -> InitialLevelMonoWeights.edgeStep_of -> EdgeStep -> JR/LW/LC/SR.
+
+The former residual RestMon input and the whole finite cleaning mechanism
+have now been supplied with human proofs. The retained statements in (1)
+and (2) above cannot be replaced by mere assertions that 'standard monomial
+theory applies': their integral span and allowed path constraints matter.
+Nor does this note prove the quantitative dimension/rank of the chosen
+symbol family. Type I (r=1) has a separate construction and is not covered.
+
+The new derivation is deliberately modular: one can check SY2–SY5 without
+knowing the global arithmetic, while the exact remaining path-generator
+statements say what further input is needed to finish SY6 in the actual
+application. All source references are pinned in the accompanying ledger.

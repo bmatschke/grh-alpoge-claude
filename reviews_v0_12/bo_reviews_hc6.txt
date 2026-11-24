@@ -1,0 +1,122 @@
+INDEPENDENT SCOPED MATHEMATICAL REVIEW — HC6
+Reviewer: /root/readable_sources (BO component owner)
+Date: 21 November 2026
+Result: PASS, after an explanatory threshold clarification now applied.
+
+Reviewed artifacts
+  v0_12/host_tops/main.tex
+  SHA256 a923f22d60d997143be9574c57738761cdbfd4f79ae6463f71f88921e5123c7e
+  v0_12/host_tops/report.txt
+  SHA256 ca3dc41c764ce84d8562bc7995c2e364a1dbdf3e38a687619706d7a34813471b
+
+Exact reviewed HC6 sections (raw bytes, start inclusive, next HC heading exclusive):
+  main.tex: 6fda7a08cd3ee562895b0eda070ac6f740a7c3cc7191b7fa26f3db6e31fdb634
+  report.txt: ac716a3aa5d291d9d528237f267b219a36acba3737d9d258bf9667cca78c0d03
+
+Scope: report HC6, its definitions of n,o,n0 and h, and the corresponding
+HC6 paragraph/equations HC.10–HC.11 in the main fragment. Other HC claims
+were not independently audited in this review. This is a human mathematical
+and source-interface review, not a Lean compilation or kernel replay.
+
+Pinned source commit
+  7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+All 13 directly inspected HC/LI source files were compared byte-for-byte
+with git show at the pin and matched.
+
+Directly inspected source
+  src/Formalism/FrobeniusOrbits/HostThickExists.lean:
+    NoRel and HostThickExists.
+  src/Formalism/FrobeniusOrbits/FrobeniusOrbitsProofs/ThickExists.lean:
+    coeff_zero, map_lt, sphere_rel, noRel_image, card_image,
+    hostThickExists (explicit C=32).
+  src/Development/AutomorphicArithmetic/ThickFrames/ThickFrame2Large.lean:
+    thickFrame2_card, thickFrame2_large, thickFrame2 (CT=2C).
+
+1. Boundary cases and hard-case parameters.
+   For n=0 the empty set satisfies the totalized source statement. For
+   n>0 with Q=n*exp(-32*sqrt(log n*log L))/L<=1, {0} satisfies the strict
+   location condition 4L*0<n and the vacuous NoRel condition.
+   Otherwise, writing x=log n, y=log L>1/2 and s=sqrt(xy), Q>1 implies
+   x>32s+y. Hence s/y>32, S=floor(s/y)>=32 and s>16. The bounds
+   Sy<=s<(S+1)y, a=(x-y-3)/S<=2s, and a>=y+7 are valid. In particular
+   a>=y+7 follows by S<=R=s/y and
+   a>=Ry-y/R-3/R>y+7 for R>32,y>1/2.
+   Consequently exp(a)>=8L, d=floor(exp(a)/(4L)) satisfies
+   exp(a)/(8L)<=d<=exp(a)/(4L), and d>=1. The shortened budget is sound:
+     3+S(7+y)+S+2a <= 3+21s < 32s.
+
+2. Sphere pigeonhole and the signed base-expansion argument.
+   There are at most S(d-1)^2+1<=Sd^2 norm-square values in the box
+   {0,...,d-1}^S. Thus one sphere has at least d^S/(Sd^2) points.
+   The base B=4Ld encoding is injective and lies below B^S. Because
+   B^S<=exp(aS)=n/(L exp(3)) and exp(3)>4, every encoded value obeys
+   the required strict 4L*b(v)<n.
+
+   For nonzero signed integers i,j with |i|,|j|<=L and i!=j, every
+   coefficient of j(b(v2)-b(v1))-i(b(v3)-b(v1)) has absolute value
+   below 2Ld<B. Reducing modulo B and dividing repeatedly proves
+   coefficientwise equality; there is no hidden positivity assumption
+   on i or j and no carrying ambiguity. Three distinct encoded points
+   would therefore give three distinct collinear vectors on one sphere.
+   Equivalently, equal norms yield
+     i(i-j)*sum_m(v3_m-v1_m)^2=0,
+   which forces v3=v1 and then v2=v1. This is precisely literal NoRel.
+
+3. The explicit constant 32.
+   The inequality log(8L)<=7+y, together with log S<=S and the budget
+   above, gives
+     exp(3)*(8L)^S*S*exp(2a)<=exp(32s).
+   Combining d^S>=exp(aS)/(8L)^S, d^2<=exp(2a) and
+   n=exp(aS)*L*exp(3) proves exactly
+     |T|>=n*exp(-32*sqrt(log n*log L))/L.
+   No additional density or analytic theorem is imported here.
+
+4. Uniform large-x specialization and deletion of zero.
+   With n=o*n0, o<=Co, x^h/2<=n<=Co*x^h and h=2+8epsilon, the report
+   correctly obtains x^h/(2Co)<=n0<=Co*x^h. The literal expression
+   Lwv=10*ceil(405 log x)+2*ceil(30/epsilon)+22 yields
+     2<=Lwv<=(4084+60/epsilon)*log x
+   for log x>=1. Thus log E=O(sqrt(log x*log log x))=o(log x),
+   E=exp(32*sqrt(log n0*log Lwv)), with constants fixed before x and
+   all Frames. This gives 4Co*Lwv*E<=x^epsilon eventually.
+
+   One clarification was requested and applied: that upper asymptotic
+   estimate alone does not explain the separate lower inequalities.
+   The report now explicitly derives E>=2 from
+   log n0>=h log x-log(2Co), log Lwv>=log 2, and derives
+   x^(-epsilon)*n>=1 from n>=x^h/2 and h-epsilon>0.
+
+   Put Q0=n0/(Lwv*E). The three estimates give
+     Q0>=4*x^(-epsilon)*n>=4.
+   Erasing zero loses at most one member, so the remaining size is
+   at least Q0-1>=Q0/2, hence at least Q0/E and Q0/4. These are
+   respectively the source lower bound with constant 64 and the
+   required lower bound x^(-epsilon)*n. The strict location and NoRel
+   conditions pass to this subset.
+
+5. Final cardinality cap and scope.
+   The remaining set is nonempty because its target size is at least
+   one, and consists of positive natural numbers. Its cardinality is
+   at most its largest member m. Since 4Lwv*m<n0, this implies exactly
+     4Lwv*|T2|<=n0.
+   This final step would not follow in this form for a set containing
+   zero, so the erasure is mathematically accounted for, rather than
+   merely cosmetic. CT2=64 is uniform and source compatible.
+
+   T2 is a set of natural-number shifts with NoRel, distinct from the
+   Bernoulli-selected TT subset of the Frame group. Neither TT's biased
+   coset shares nor any probabilistic independence is used to assert
+   T2's properties. The reviewed text preserves this distinction.
+
+No remaining substantive correction was found. No HC author files,
+Lean sources, or main document were edited by this reviewer.
+
+FINAL HASH BRIDGE — 21 November 2026
+The final HC frontier paragraph now credits LI for the local completion
+reconstruction. The exact reviewed HC6 main and report section hashes
+above remain unchanged (verified again). The scoped PASS therefore also
+applies to those unchanged sections in the final artifacts below; this
+is not an additional audit of HC claims outside HC6.
+  main.tex SHA256 a923f22d60d997143be9574c57738761cdbfd4f79ae6463f71f88921e5123c7e
+  report.txt SHA256 afcfa7b405b9cc42b8c5e116fdeb6a8afd0b52201924951638b2e91e24ff1326

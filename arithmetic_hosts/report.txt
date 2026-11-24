@@ -1,0 +1,664 @@
+ARITHMETIC HOSTS — HUMAN PROOF RECONSTRUCTION, VERSION 0.16
+=========================================================
+
+Pinned repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Component: arithmetic_hosts
+Claim identifiers: AH1–AH18 (new in version 0.16)
+Proof text: main.tex; exact source ranges and hashes: provenance.json,
+source_manifest.json and source_locators.txt.
+
+1. SCOPE AND READING CONVENTIONS
+------------------------------
+
+This component supplies the actual arithmetic construction that earlier
+HC4/HC10 could use only as a hypothesis. It reconstructs:
+
+  * the finite quotient of a prescribed character group, the minimal
+    modulus and the mixed finite frame;
+  * the three-coordinate CRT Artin map, including the sign correction;
+  * its actual fixed field in a cyclotomic field, the specified Galois
+    isomorphism, and the square roots of -d and -q;
+  * conductor exactness, eventual rank multiplier, kept characters,
+    the exact kernel, and the full quadratic-twist description;
+  * every one of the 30 fields of HostDer for an arbitrary HostRaw;
+  * the selected half-different ideal and trace self-duality of its inverse;
+  * all eight FieldRows fields and the literal fieldChi conclusion.
+
+The source is not changed and no Lean compilation is claimed. The proofs
+are mathematical reconstructions, sometimes shorter than the pinned Lean
+proof. The source ledger identifies both the endpoint and its substantive
+suppliers; a range hash does not itself certify a mathematical proof.
+
+The ambient foundations used are finite abelian groups and their complex
+characters, CRT, elementary quadratic residues, finite Galois theory,
+Dedekind ideal arithmetic, and local number-field ramification. The
+cyclotomic integral-generator and residue-order arguments are explained in
+AH9. The root-discriminant formula is derived in AH15, rather than treated
+as an unexplained input. These are algebraic foundations, not assumptions
+about zeros, prime distributions, period comparison, or reciprocity.
+
+The exact prime hypothesis is HostHyp(q,d):
+
+  q,d prime; q = 3 mod 8; d = 7 mod 16; (-d/q) = 1.
+
+Thus q and d are odd and distinct. AH constructs data once these supplied
+primes also meet the stated coprimality and splitting conditions. It does
+not prove that such primes can be found in the simultaneous analytic
+windows. FieldChi's constants depend only on the prescribed character;
+they precede all choices of e,q,d,b.
+
+Notation: U_a is the unit group modulo the positive integer a; T_e=2^(e+2);
+H_e=U_Te/{±1}; Q=QS; N=Q*q*d. A is written multiplicatively here, while
+the literal Frame transports it to an additive group on Fin(n). Its
+distinguished subgroup A0 is cyclic; it need not be the whole group.
+G={±1}×{±1}×A; c=(-1,-1,1); iod=(1,-1,1); Psi is the kernel of the
+second sign. No TwoGroup hypothesis is silently imposed.
+
+2. AH1 — FINITE DUALITY AND THE TWO-ADIC FACTOR
+---------------------------------------------
+
+For j=0, v2(5-1)=2; for j=1, v2(25-1)=3. Thereafter
+5^(2^j)=1 mod 8, so the factor 5^(2^j)+1 has valuation 1 and each
+doubling of the exponent raises the valuation by exactly one. Thus 5 has
+order 2^e modulo 2^(e+2). Its powers have residue 1 mod 4, whereas -1
+has residue 3. Their product has 2^(e+1) elements, all units modulo T_e,
+and hence is the whole unit group. The quotient by {-1,1} is cyclic of
+order 2^e, including e=0 when it is trivial. This is the same elementary
+calculation used in the existing SZ13 cyclic-frame discussion.
+
+Let Xi be any subgroup of the complex character group of U_M, M>0.
+Define ann(Xi) by simultaneous evaluation 1, and B=U_M/ann(Xi).
+For any finite character lambda, the sum of lambda over its group is
+zero unless lambda=1, by translation of the sum. Applying this twice to
+sum_{u in U_M, chi in Xi} chi(u) gives
+
+  |ann(Xi)| |Xi| = |U_M|,
+
+so |B|=|Xi|. Every member of Xi descends to B. A finite abelian group
+written as a product of cyclic groups has exactly its order many complex
+characters; choosing the image of a cyclic generator gives the count.
+Consequently there are no further characters of B: the double annihilator
+is Xi. This proves all three source facts mem_ann, mem_iff and card_B.
+
+Surjectivity U_b -> U_a for a|b is also explicit. Choose an integer lift
+of a unit mod a; CRT permits it to be 1 at every prime of b absent from
+a. It is already prime to the primes of a, so the resulting integer is
+prime to b. This reduction fact is used in the frame, conductor, and
+order-stabilization arguments; no divisibility between consecutive Q_e
+is assumed.
+
+3. AH2 — MINIMAL MODULUS AND FRAME
+--------------------------------
+
+Put W_e=lcm(T_e,M). The map xiW:U_We -> B is reduction mod M followed
+by the quotient. It is onto. A divisor Q of W_e is good if T_e|Q and
+ker(U_We -> U_Q) lies in ker(xiW). The integer W_e is good, so the
+least good Q exists. Since Q divides a positive integer, it is positive.
+The kernel inclusion and the preceding surjectivity give a unique
+surjection xi:U_Q -> B with xi(reduce_Q(u))=xiW(u).
+
+Take eta=(cl,xi), where cl is reduction to H_e, and A=image(eta).
+Both projections p1:A->H_e and p2:A->B are onto. On ker(p2), p1 is
+injective: the two coordinates determine an element of A. Hence ker(p2)
+is isomorphic to a subgroup of the cyclic H_e. Choose a generator a0.
+The designated subgroup A0=<a0> is exactly ker(p2), and the map to H_e
+is injective on A0. Thus the literal Frame generator axiom holds for
+every integer exponent, not only for nonnegative exponents.
+
+To obtain the actual Frame carrier, choose a bijection between the finite
+set A and Fin(|A|), transport the group operation along it, and transport
+p1 and a0. The source's Frame.ofGroup and ofGroupIso perform exactly
+this operation. The quotient and the Artin map below are transported
+through this isomorphism, so later equalities concern one common frame.
+
+The exact sequence A0 -> A -> B gives n=n0*|B|, whence o=|Xi|.
+The surjection onto H_e gives 2^e|n. If B has 2-power exponent, A is a
+2-group as a subgroup of H_e×B. In the general character construction
+B can have odd-order factors; none of the arguments discard them.
+
+4. AH3 — THE ACTUAL CRT ARTIN MAP
+-------------------------------
+
+The construction applies more generally to any ModData(Q,e,B,xi) with
+T_e|Q, not only to the minimal modulus. Assume HostHyp(q,d), gcd(Q,qd)=1,
+e>=2 and splitting of -d at all odd prime divisors of Q.
+
+For u in U_N, write alpha(u)=(u/q), beta(u)=(u/d) and let a:U_Q->A
+be eta with its frame transport. Define w(s)=a(s) for s=±1. Then
+
+  art(u)=(alpha(u), beta(u), a(u mod Q)*w(alpha(u))).
+
+It is a homomorphism because A is abelian and all displayed maps are
+homomorphisms. For a desired (s,t,b), choose v with a(v)=b*w(s).
+Choose 1 or -1 modulo q and d to obtain signs s and t, since both primes
+are 3 mod 4. CRT independently prescribes these two residues and v mod Q.
+The A coordinate then equals b because w(s)^2=1. This is full
+surjectivity, including both signs and every element of A.
+
+At -1 both signs are -1, while the A coordinate is a(-1)^2=1.
+Thus art(-1)=c, even when xi(-1) is nontrivial. Removing the w factor
+would invalidate this identity for odd characters. Projection to H_e
+kills w(s), so the exact art_h identity follows. If u=1 mod Qq, the
+first sign and A coordinate are 1, leaving only 1 or iod. If u=1 mod Qd,
+the second sign is 1 and the A coordinate is w(alpha), so art(u)^2=1.
+The second-sign Jacobi formula is part of its definition. These facts
+fill every one of CharData's 16 fields, along with its explicitly supplied
+prime, coprimality, positivity and splitting data.
+
+5. AH4 — FIXED FIELD AND GAUSS ROOTS
+---------------------------------
+
+Let L=Q(zeta_N), identify Gal(L/Q) with U_N by exponent on zeta_N,
+and put E=L^ker(art). Galois theory makes E/Q finite Galois and abelian,
+and identifies Gal(E/Q) with U_N/ker(art), then with the literal G.
+Its degree is 4n. Restriction of tau_u is, by construction, the
+automorphism labeled art(u). This proves the exact compatibility of
+the inclusion E->L, the primitive Nth root, gal and art; it does not
+merely prove existence of an abstract field with the same degree.
+
+For p|N, p=3 mod 4, define the quadratic Gauss sum g_p in L.
+The change of variable a -> u^{-1}a proves tau_u(g_p)=(u/p)g_p.
+Complex conjugation is tau_-1, and (-1/p)=-1, so bar(g_p)=-g_p.
+The elementary norm calculation is
+
+  g_p*bar(g_p)
+   = sum_{a,b !=0} (a/p)(b/p) zeta_p^(a-b)
+   = sum_{t !=0} (t/p) sum_{b !=0} zeta_p^((t-1)b)
+   = (p-1)-sum_{t !=0,1}(t/p)=p.
+
+Thus g_p^2=-p. All terms belong to the algebraic cyclotomic field, so
+checking this at its complex embedding proves the algebraic identity.
+If the Legendre character is a coordinate of art, every element of
+ker(art) fixes g_p; it therefore belongs to E with the desired action.
+The second coordinate provides s_d, and the constructed first coordinate
+provides s_q. The former is part of HostRaw; the latter proves the
+separate stronger FieldRows.sqq clause. A general arbitrary HostRaw is
+not assumed to have PsQ or a chosen square root of -q.
+
+This constructs every one of the 26 HostRaw fields, including its two
+typeclass fields: the finite intermediate field is a number field, and
+the extension is Galois because the kernel is normal in the abelian
+cyclotomic Galois group.
+
+6. AH5 — EXACTNESS AND PRIMITIVE CONDUCTOR
+---------------------------------------
+
+For every prime l|Q, one must produce a unit congruent to 1 modulo N/l
+whose Artin image is nontrivial. This is stronger than saying Q divides
+the original modulus and is proved constructively as follows.
+
+If T_e|Q/l, failure to find v=1 mod Q/l with eta(v)!=1 would force
+xiW to vanish on the reduction kernel for Q/l. That smaller modulus
+would be good, contradicting minimality. If T_e does not divide Q/l,
+then l=2 and v2(Q)=e+2. Write Q=T_e*c with c odd, and take
+v=1+Q/2. It is a unit because gcd(1+Q/2,Q)=gcd(1+Q/2,2)=1;
+Q/2 is even. Modulo T_e it equals 1+2^(e+1), neither 1 nor -1 for
+e>=1. Thus its cl coordinate is nontrivial. In both cases CRT lifts v
+to a unit u with residue 1 modulo q,d. The congruences combine to
+u=1 mod (Q/l)*q*d, and art(u)'s A coordinate is the nontrivial a(v).
+
+For primitive psi of conductor M, its cyclic subgroup has annihilator
+ker(psi). For any v=1 mod gcd(Q,M), generalized CRT chooses z=1 mod Q
+and z=v mod M. These congruences make z a unit modulo W_e, because
+T_e divides Q. Goodness gives psi(v)=1. Hence psi factors through
+gcd(Q,M), forcing gcd(Q,M)=M by primitivity. This proves M|Q, and the
+already known T_e|Q|lcm(T_e,M) then shows Q=lcm(T_e,M). Only M|Q is
+needed in the literal KerChi/TwistForm suppliers; the equality is a
+valid extra simplification under the stated primitive cyclic hypothesis.
+
+7. AH6 — EVENTUAL ORDER WITH THE CORRECT QUANTIFIERS
+-------------------------------------------------
+
+Let J_e=xi(ker(cl)) as a subgroup of the fixed finite B. The kernel of
+p1:A->H_e is {(1,b):b in J_e}. Hence |A_e|=2^e*|J_e|, and
+1<=|J_e|<=|B|=|Xi|.
+
+To compare consecutive e, start with a representative in U_Q(e+1), lift
+it to U_W(e+1), reduce modulo W_e and then modulo Q_e. Its two-adic
+residue remains ±1 and its B value remains the same. This proves
+J_(e+1) subset J_e without claiming Q_e divides Q_(e+1). The sequence
+of positive subgroup orders decreases, so the set of its values has an
+attained minimum. Choose e1 at a minimum c0. Every later value equals
+c0, and |A_e|=c0*2^e for all e>=e1. The construction of c0,e1 uses only
+M,Xi. It has no dependence on q,d,b, an analytic scale, or a prime window.
+This matches the literal ordAny quantifier order and its bound c0<=|Xi|.
+
+8. AH7 — KEPT CHARACTERS AND THE EXCEPTIONAL SIGN
+----------------------------------------------
+
+For chi in Xi, descend chi to B and define theta_A=chi_B composed with
+xi_A. Put theta_chi(s,t,a)=theta_A(a*w(s)). It kills A0 and iod, hence
+belongs to Xp. It need not kill c; no evenness is claimed. Composing
+with art cancels the two copies of w(alpha), yielding the original chi
+on units of a common multiple of N,M. The unique primitive characters
+induced by these two imprimitive characters therefore agree.
+
+For clarity, uniqueness of a primitive inducing character is finite
+conductor theory. If two primitive characters become equal on units of
+a common multiple, kernel factorization and the same generalized CRT
+argument used in AH5 make the common character factor through the gcd
+of their conductors. Primitivity forces both conductors to equal that
+gcd; equality after reduction then gives equality at that conductor.
+No assertion about prime values or an analytic identity is required.
+
+Level.ofSub collects exactly these primitive inducing characters. This
+proves KeptInXp. Its psK is none. To prove its exceptional predicate,
+choose u=1 mod Q,1 mod d with first Legendre sign -1. Every theta_chi
+has value 1 on art(u), while psC, the first-sign character, has value -1.
+If psC were kept, equality of primitive inducing characters would imply
+equality on this unit. Thus it is not kept. The branch of the predicate
+for psK=some psi is vacuous, and the psK=none branch is proved. No claim
+of KeptEqXp is made for this general mixed character construction.
+
+9. AH8 — EXACT KERNEL AND ALL TWISTS
+----------------------------------
+
+Take Xi=<psi> with psi primitive. For a coprime to N, art(a)=1 implies
+both Legendre signs are 1. Its A coordinate is then just a(a mod Q).
+The latter is trivial iff cl(a)=1 and xi(a)=1. These say a=±1 mod T_e
+and psi(a)=1. Conversely those four conditions make all coordinates
+trivial. Together with M|Q from AH5 this is the literal KerChi.
+
+For a character theta of G trivial on A0, its restriction to A descends
+through B, hence corresponds by AH1 to one chi in Xi. The restrictions
+to the subgroups s -> (s,1,w(s)) and t -> (1,t,1) have the form s^i,t^j
+with i,j in {0,1}. The product of these two factors and
+(1,1,a(a mod Q)) is exactly art(a). Evaluation gives
+
+  dirAt(theta,a)=chi(a)*(a/q)^i*(a/d)^j,
+  theta(iod)=(-1)^j.
+
+The sign coordinate of iod is retained exactly, and every character
+trivial on A0 is covered. A pure 2-primary quotient or an even-only
+construction would not establish this literal theorem for arbitrary psi.
+
+10. AH9 — INTEGRAL CYCLOTOMIC REDUCTION AND LOCAL GROUPS
+-----------------------------------------------------
+
+This is the substantive ramification supplier, not an appeal to the
+HostCore record. Write N=p^v*m with p prime and p not dividing m.
+
+First, O_L=Z[zeta_N]. Locally at p, the algebra obtained from the
+prime-to-p part is finite etale: the polynomial X^m-1 has invertible
+derivative at its roots. Its completed factors are unramified discrete
+valuation rings. On each factor, adjoining zeta_(p^v)-1 is governed by
+Phi_(p^v)(1+X), an Eisenstein polynomial at p when v>0. Its root is a
+uniformizer, and its power-basis ring is a DVR and thus integrally closed.
+The p-primary and prime-to-p generators together generate zeta_N, and
+conversely are powers of it. Hence the completed tensor of Z[zeta_N]
+with Z_p is the full integral closure at every prime. The finite-index
+quotient O_L/Z[zeta_N] has no p-primary part for any p and is zero.
+The v=0 case uses just the finite-etale part. This explains the
+integral-generator fact invoked by ringHom_ext_zO in the pinned source.
+
+A root of order coprime to p cannot become 1 nontrivially upon reduction:
+the geometric sum would reduce to its nonzero order. Consequently the
+reduction of zeta_N has order exactly m. Its powers are equal modulo a
+prime precisely when their exponents agree modulo m. Since integral
+ring maps are determined by zeta_N, tau_u is inertia iff u=1 mod m,
+and it is arithmetic Frobenius iff u=p mod m. A unit of the latter
+congruence class exists by CRT; there is no need to select a new prime.
+
+To pass to a Galois subfield E, one must justify the reverse inertia
+direction. A lift of an automorphism of E is first adjusted by Gal(L/E)
+to stabilize the chosen prime. The required adjustment exists by
+transitivity on primes above the contraction. If the original
+automorphism acts trivially on the residue field of E, this lift has
+residue action in Gal(kappa(P_L)/kappa(P_E)). Surjectivity of the local
+decomposition action permits a second adjustment by an element over E
+to cancel that residue action. It becomes an inertia lift.
+
+The standard local Galois fact used in that cancellation is the exact
+sequence I -> D -> Gal(residue extension) -> 1. One proof passes to
+completions, takes the maximal unramified subextension (obtained by
+lifting the finite residue field's separable polynomial), and extends
+its residue automorphisms using normality. Thus all residue field
+automorphisms lift and the kernel is exactly inertia. This is the
+standard algebraic prime theorem underlying CycLift.inertia_lift, not
+an additional global genus, class-number, or analytic hypothesis.
+
+Restriction of the cyclotomic congruence groups now gives the literal
+inertia and decomposition equivalences in AH.22. Frobenius lifts form
+one coset of inertia; this proves the Frobenius equivalence even when
+an arbitrary initial lift is not itself Frobenius. At p not dividing N,
+m=N, so inertia is trivial and the Frobenius is exactly art(p).
+
+11. AH10 — CM STRUCTURE FOR EVERY RAW HOST
+----------------------------------------
+
+This argument starts from an arbitrary HostRaw, not just AH4's choice.
+Its cyclotomic embedding and art_spec identify restriction of exponent
+automorphisms with art. Each automorphism of E extends to the normal
+cyclotomic field, so art is onto; the image of E is exactly the fixed
+field of ker(art). The local conclusions of AH9 therefore apply.
+
+The exponent -1 is complex conjugation on the cyclotomic field, and
+art(-1)=c. Every complex embedding of E extends to the cyclotomic field,
+so gal^{-1}(c) is complex conjugation at every embedding. The element
+s_d^2=-d rules out a real embedding. Its fixed field is totally real
+and has index two, so E is CM. An element is real at every embedding
+iff it is fixed by this conjugation. The Galois cardinality is 4n and
+the fixed-field degree is 2n. Injectivity of any embedding proves the
+conj_iff equivalence with an arbitrary automorphism.
+
+The exact CM-type chooses the embeddings sending s_d to i*sqrt(d).
+The only two possible images are ±i*sqrt(d); conjugation exchanges them.
+Its cardinality is therefore 2n. Precomposition by sigma preserves the
+chosen sign exactly when the second sign of gal(sigma) is 1. This
+gives the full three-part cmType field and identifies K as the fixed
+field of Psi.
+
+For ps_root, take the fixed field of the kernel of the first sign.
+Its degree is two and conjugation acts nontrivially. Choose x there
+not fixed by conjugation; x-bar(x) is a nonzero first-sign eigenvector.
+This proves exactly the weak ps_root required for every raw host.
+For the specially constructed host AH4 also proves the stronger s_q^2=-q.
+
+The raw s_d and the quadratic Gauss sum in the containing cyclotomic
+field have the same square and differ by sign. The Gauss transformation
+therefore forces art_ch=(u/d) even though HostRaw does not list art_ch
+as a field. At unramified p, quadratic reciprocity gives (p/d)=(-d/p)
+because p is odd and d=3 mod 4. With the definition of psAt and art_h,
+this establishes all coordinate clauses of the source frob theorem.
+
+12. AH11 — THE TWO DISTINCT RAMIFICATION ARGUMENTS
+-----------------------------------------------
+
+AC8's half-integral quadratic calculation yields
+O_K=Z[(1+sqrt(-d))/2] for the squarefree prime d=3 mod 4. The basis has
+discriminant -d. Its generator has polynomial X^2-X+(d+1)/4. At p=2,
+d=7 mod 16 makes the constant coefficient even and gives distinct roots
+0,1 modulo 2. At odd p not equal d the polynomial has distinct roots
+iff (-d/p)=1, and otherwise is irreducible. At d the discriminant has
+valuation one and the prime ramifies. Thus every p|Qq splits in K.
+The decomposition group of E at such a prime restricts to the trivial
+decomposition group in K, proving decomp_typeI including p=2.
+
+At d, the prime-to-d complement of N is Qq. Hence inertia is art(K_Qq).
+The art_d axiom bounds that image by {1,iod}. CRT chooses a unit equal
+to 1 mod Qq and -1 mod d; art_ch excludes identity for that unit. Thus
+the inertia image is exactly {1,iod}.
+
+The first-sign statement ps_d for an arbitrary raw host is not obtained
+by assuming PsQ. First lift the prescribed square roots of -d through
+all prime powers dividing Qq. At odd primes the derivative 2s is a
+unit. At 2, d=7 mod 8 starts the induction and changing s by 2^(a-1)
+corrects the square modulo 2^(a+1), for a>=3. CRT gives a square root
+mod Qq. The first-sign character factors through U_Qq by art_d, so on
+the residue d=-s^2 its value is the first sign of art(-1), namely -1.
+
+Conjugation cannot stabilize a prime above Qq because its restriction
+to K exchanges the split primes. At d there is a different argument.
+If c were in decomposition, write it as rho*F^j with rho in {1,iod}
+and F a Frobenius lift. F is represented by a unit congruent to d mod Qq.
+The A coordinate and art_h would imply d^j=±1 mod T_e. Since e>=2,
+reduce modulo 16: 7^j is 7 for odd j, so j must be even. Its first sign,
+however, is (-1)^j by ps_d, whereas the first sign of c is -1. This
+contradiction proves decompConj at d. The argument retains the exact
+d=7 mod 16 and e>=2 assumptions.
+
+At p not dividing N the inertia group is trivial; at p dividing N the
+conjugation is absent from decomposition. Hence it is absent from every
+finite inertia group. In the quadratic E/F extension it is the only
+possible nontrivial inertia element, so E/F is everywhere unramified
+at finite primes. This is the complete unramEF field.
+
+13. AH12 — ORDINARY AND ETA ARE EXACTLY THE SOURCE PREDICATES
+----------------------------------------------------------
+
+The quadratic factorization above yields the exact splitK criterion,
+including p=2 and the ramified prime d. The ordinary predicate's
+universal equivalence sigma*tau in Psi iff sigma in Psi, for tau in
+decomposition, reduces to D(P) subset Psi by taking sigma=1; the
+converse is the subgroup cancellation law. Restriction maps this
+decomposition group onto the decomposition group in K. It is trivial
+there exactly when the rational prime splits into two primes of K.
+This proves the whole ordinary equivalence at all primes.
+
+For E/F, finite unramified quadratic splitting leaves only (g,f)=(2,1)
+or (1,2). The second alternative means conjugation fixes P. At a
+rational prime p not dividing N, D(P) is generated by the Frobenius,
+so this says c lies in its cyclic subgroup. At p dividing N, AH11
+excludes c from D(P), so every contracted prime is split and etaF=1.
+These statements fill the three exact eta clauses; they do not assert
+that all rational primes have a prescribed splitting behavior.
+
+14. AH13 — ACTUAL HALF-DIFFERENT, WITHOUT PRINCIPALITY
+---------------------------------------------------
+
+The relative inertia in E/K is I(P) intersect Psi. At d this is trivial
+because iod is not in Psi; outside N it is trivial by AH9. Hence the
+support of the relative different is above Qq. The local equivalence
+between a different prime and ramification is valid in number fields
+because residue extensions are separable; it follows from the trace
+dual in an unramified DVR extension and the ramification filtration.
+
+Every rational prime in this support splits in K. Thus P and bar(P)
+contract to distinct conjugate K-primes. The different is invariant
+under every automorphism of E/Q: such an automorphism preserves K, and
+trace is covariant under its restriction to K. This preserves the
+integrality condition defining the codifferent and hence the different.
+Its exponents at P and bar(P) agree.
+
+Order the finite set of K-primes below the support. Select P exactly
+when its K-contraction precedes the contraction of bar(P), and take the
+product with the original different exponents. Exactly one of each
+conjugate pair is selected. Therefore b*bar(b)=D_E/K, and their
+supports are disjoint, so b+bar(b)=O_E. An automorphism over K preserves
+the contractions and exponents and commutes with conjugation, hence
+preserves the selection and fixes b. The empty-support case gives b=O_E
+and all conclusions still hold.
+
+The Lean theorem is named principal. Its statement does not say b=(x)
+for one element x. It says that this integral ideal exists with the
+factorization, coprimality and Psi-invariance properties. No class-number
+one statement, principal ideal theorem, or unproved choice of generator
+is used anywhere in this reconstruction.
+
+15. AH14 — TRACE DUALITY IN BOTH DIRECTIONS
+----------------------------------------
+
+For a nonzero fractional O_E-ideal J, define
+
+  J*={x in E: Tr_E/K(x*y) in O_K for every y in J}.
+
+The trace condition is equivalent to x*J subset D^-1, because for every
+a in O_E, a*y still belongs to J. Conversely that inclusion certainly
+implies the trace condition by testing a=1. Since J is invertible,
+{x:xJ subset D^-1}=D^-1 J^-1. This is the source's general dual formula.
+
+If D=b*bar(b), both ideals are nonzero. Conjugation maps b^-1 onto
+bar(b)^-1, since y*b subset O_E is equivalent to bar(y)*bar(b) subset
+O_E; conjugating again supplies the reverse implication. Therefore
+testing Tr(x*bar(y)) for all y in b^-1 is exactly testing membership
+in the trace dual of J=bar(b)^-1. Its dual is
+
+  D^-1 J^-1=(b*bar(b))^-1*bar(b)=b^-1.
+
+This proves the full iff in unimodular, for any ideal satisfying the
+factorization. Its pairing is O_K-valued and uses conjugation on y.
+It is not a claim about an arbitrary Hermitian metric or an independently
+chosen lattice. The root PA construction can use this actual inverse
+ideal under its supplied Host hypothesis, without any dependency cycle.
+
+16. AH15 — DERIVING THE ROOT-DISCRIMINANT FORMULA
+----------------------------------------------
+
+Let L=Q(zeta_N), E=L^U. The integral-generator result gives
+O_L=O_E[zeta_N]. The minimal polynomial f_E is monic with coefficients
+in O_E, since its roots are integral and O_E is integrally closed.
+Its powers provide an O_E-basis. Lagrange interpolation gives the
+trace-dual basis with denominator f_E'(zeta_N). Explicitly,
+sum_{f_E(z)=0} z^j/f_E'(z) is 0 for 0<=j<a-1 and 1 for j=a-1;
+reduction of higher j using the monic polynomial gives a triangular
+integral transformation with diagonal ±1. Thus the codifferent is
+(f_E'(zeta_N))^-1 and the different is (f_E'(zeta_N)).
+
+The derivative equals the product over u in U, u!=1, of
+zeta_N-zeta_N^u. The discriminant tower identity follows by taking the
+determinant of the trace matrix using an integral Z-basis of O_E and
+the relative power basis. Subtracting its logarithm from the analogous
+identity for E=Q leaves exactly the factors u not in U.
+
+For such u, h=additive order of u-1 mod N is greater than one.
+The difference zeta_N-zeta_N^u is a root of unity times one minus a
+primitive hth root. Its absolute norm has logarithm
+
+  phi(N)*Lambda(h)/phi(h).
+
+Indeed, the product of one minus all primitive hth roots is Phi_h(1).
+From product_{a|h,a>1} Phi_a(1)=h, induction gives p for h=p^j and
+1 otherwise. Norm transitivity supplies the degree phi(N)/phi(h).
+
+The finite summation identity AH.39 is checked by prime-power cases.
+If h has at least two distinct prime factors, no multiple h|a can be
+a prime power and both sides vanish. If h=p^j and N=p^v*m, the relevant
+totients sum to p^(v-j), giving exactly 1/phi(p^j). The divisibility
+h|a is equivalent to u=1 mod N/a. Hence exchanging the finite sums
+and using |K_f|=phi(N)/phi(f) proves
+
+  log(rd(E))=sum_{a|N} Lambda(a)*rho_U(N/a),
+  rho_U(f)=|K_f outside U|/|K_f|.
+
+This is a finite algebraic identity. It does not use prime number
+theorems, a zero-free region, a zeta-function formula, or an assumed
+root-discriminant bound. The pinned source proves the same identity
+through RdDiff.log_rd and RdArith.abel.
+
+17. AH16 — THE THREE BOUNDS, SUPPORT, AND SQUARED DISCRIMINANT
+-----------------------------------------------------------
+
+(a) Index bound. Choose the least divisor c1 of N such that K_c1 is
+inside U. The identity K_gcd(a,b)=K_a K_b follows from generalized CRT,
+with lifts to U_N. Minimality then forces c1|f whenever K_f subset U.
+If c1 does not divide f, U intersects K_f in a proper subgroup, so at
+least half of K_f is outside U. For each p^v||N and p^b||c1, precisely
+the last b powers p^j have c1 not dividing N/p^j. Their von Mangoldt
+weights sum to b*log(p). Thus 2S(U)>=log(c1). The quotient U_N/U
+is a quotient of U_c1 and has size <=phi(c1)<=c1. This proves
+|U_N/U|<=exp(2S(U)), giving 4n<=rd(E)^2 for the actual host.
+
+(b) Upper bound. In every K_f, identity belongs to U, so
+rho_U(f)<=1-phi(f)/phi(N). At f=N/d, the Artin image has order two,
+giving rho=1/2. At f=N/q, the reduction kernel is cyclic (it is U_q
+by CRT); art_q makes its image exponent at most two, hence size at
+most two, giving rho<=1/2. Start from sum Lambda(a)=log N. The q,d
+terms save half their logarithms. Among the other terms retain the
+identity correction at every power 2^j dividing N. Their total is
+
+  log(2)*sum_{j=1}^v phi(2^(v-j))/phi(2^v)=log(2).
+
+The terms are disjoint because q,d are distinct odd primes. Thus
+log rd <= log N - log 2 - (log q+log d)/2, which is precisely
+rd <= Q/2*sqrt(qd).
+
+(c) Lower bound. Write N=2^v*m, m odd, v>=e+2. Because art_h is the
+quotient by ±1, every element of ker art reduces to ±1 modulo T_e.
+For 0<=i<=e+1, reduction of K_(2^i m) onto the kernel in U_Te has
+equal fibers and image order 2^(e+1)/phi(2^i). The signs ±1 both lie
+in that image only for i=0,1. For i>=2 just +1 does. Hence the fraction
+inside U is bounded by
+
+  [phi(2^i)+1_{i<2}]/2^(e+1).
+
+The corresponding a=2^(v-i) are distinct positive powers of two.
+Summing their lower bounds gives (e+1-2^-e)*log(2), since
+sum_{i=0}^{e+1}phi(2^i)=2^(e+1) and there are two exceptional indices.
+The separate d term supplies log(d)/2. This gives
+rd >= 2^(e+1-2^-e)*sqrt(d), with exactly the source exponent.
+
+(d) Support. Outside N inertia is trivial. At d it has order two.
+At 2, CRT lets the inertia congruence group map onto H_e via art_h;
+e>=2 makes H_e nontrivial. Ramification and discriminant support are
+equivalent, so all discriminant primes divide N and both 2 and d occur.
+Since E/F is unramified at every finite prime, its relative different
+is the unit ideal. The discriminant tower identity yields the square
+of disc(F) in absolute value. E has 2n conjugate pairs, an even number,
+so its signed discriminant is positive. Therefore disc(E)=disc(F)^2
+as the literal signed integer identity.
+
+18. AH17 — COMPLETE HOSTDER COVERAGE
+----------------------------------
+
+There are exactly 30 HostDer fields. They are supplied as follows:
+
+  AH10: art_surj, cm, conj_iff, finrank_E, finrank_F, mem_F,
+        cmType, ps_root, art_ch.
+  AH9 with AH10: frob, frob_any, inertia, decomp.
+  AH11: ps_d, inertia_d, decomp_typeI, decompConj, unramEF.
+  AH12: splitK, ordinary, eta.
+  AH13: diffSupport, principal.
+  AH14: unimodular.
+  AH15–AH16: discr_sq, discr_primes, rd_ge, rd_le, rd_sq_ge.
+  AC2–AC3 (already proved in v0.15): norm_mu.
+
+For the last item, the raw Galois data already imply [E:Q]=4n and the
+raw quadratic data give K=Q(sqrt(-d)), d>3 prime. AC2 proves the norm
+identity for every root of unity from exactly these inputs, including
+its 2-primary analysis through K(i). AC3 identifies the required norm
+with the raw-host coordinate. This use is acyclic: it does not call a
+HostDer.norm_mu assumption.
+
+The source HostRaw.der is a record assembly of these results. Here the
+results have been proved beforehand; the final assembly adds no theorem
+about fields by fiat. HostAx.ofRaw retains exactly the same raw host,
+so HC4 can now choose a CM embedding and the proved half-different ideal
+for the actual host construction.
+
+19. AH18 — FULL FIELDCHI AND ITS RETAINED BOUNDARY
+-----------------------------------------------
+
+Given primitive psi of conductor M, choose Xi=<psi> and write o=|Xi|.
+AH6 supplies c0,e1 with 1<=c0<=o and n_e=c0*2^e for e>=e1.
+Choose e0=max(e1,2,4M,64o). These choices depend only on psi.
+For every e>=e0 and every q,d,b satisfying the literal hypotheses,
+construct the common frame, CRT Artin map, fixed field and HostAx.
+
+Since Q|lcm(T_e,M)|4M*2^e and n>=2^e, Q<=4M*n. Since e>=4M and
+e<2^e, Q<=4M*2^e<=2^(2e)<=n^2. Since o<=2^o and e>=64o,
+o^64<=2^e. Every odd prime divisor l of Q divides M, so 4l<=4M<=b.
+The supplied splitting condition below b gives the required QS_split.
+The eight FieldRows fields now have exact suppliers:
+
+  psQ: AH3; sqq: AH4; QS_exact: AH5;
+  QS_le and o_pow: the displayed inequalities;
+  q_ne_three and split_small: the literal given hypotheses;
+  small_le: the divisor argument.
+
+All other fieldChi conjuncts are literal: frame.e=e, frame.ord=c0*2^e,
+host.q=q, host.d=d, frame.o=Level.cyc(psi).o, Q dividing the lcm and
+Q<=4M*frame.ord, KeptInXp and ExceptionalCharacterKept from AH7,
+KerChi and TwistForm from AH8. No independent model with matching
+cardinalities has been substituted at any join.
+
+RETAINED INPUTS AND NEXT-SOURCE SCOPE
+
+No residual premise remains inside the five assigned conditional
+arithmetic endpoints: fieldChi, ModData.charData/AnyGrp.host,
+HostRaw.der, KcDiff.principal and KcDiffSmulMem.unimodular.
+The associated finite-conductor, order, kernel and twist suppliers are
+also proved here. The standard Galois/Dedekind foundations described
+above are not new RH or GRH hypotheses.
+
+The following distinct tasks are not conclusions of AH:
+
+  * selection of q,d in the simultaneous analytic pair window with
+    the required splitting conditions and analytic VVle estimate;
+  * the analytic top-window conditions and prime-distribution inputs
+    retained in HC and the current global frontier;
+  * HostGood/WinOK for the full geometric/automorphic construction,
+    the separate LevelPrime hypothesis and du–Ds window;
+  * the remaining Over, RecExP/RecOK and four global branches.
+
+SZ13 already constructs ranks over a supplied frame in its required
+order window. AH supplies the arithmetic frame and field; it does not
+assume a new rank theorem or reopen the completed PN/SZ numerical
+families. HC10 may now use the actual fieldChi supplier, while its
+analytic window hypotheses continue to be stated separately.
+
+Reproduction: run build_provenance.py with --repo pointing to the pinned
+source clone. It reads Git blobs without changing the source checkout,
+checks any present checkout bytes against the pin, regenerates exact
+inclusive source ranges and hashes, audits literal record-field counts,
+and records this component's proof hashes. It does not invoke Lean.

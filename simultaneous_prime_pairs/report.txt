@@ -1,0 +1,209 @@
+SIMULTANEOUS PRIME PAIRS — QP1–QP25
+Version 0.22, 2026-11-22
+Pinned source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+STATUS
+
+This is a conditional classical-input reconstruction of the actual analytic
+prime-choice endpoints. The complete proofs are in main.tex, QP1–QP25.
+Each paragraph and each source range is separately hashed in provenance.json.
+The component obtains PrimesRel, twistK, meanSqK, the continuum bad-share
+bound, tailK, kappa4, count_bad_core, both prime-selection stages,
+pair_exists and PairEx. It obtains RealBox on the specified compatible host
+and composes it with CC's ThinH. It does not prove RH/GRH or a missing global
+geometric/cohomological window.
+
+NAMED CLASSICAL INPUTS, NOT RECONSTRUCTED HERE
+
+CN: the quadratic analytic class-number formula, including the real
+regulator convention. It gives L(1,chi)>=c/sqrt(f) for real primitive
+nonprincipal chi of conductor f. The elementary derivative calculation in
+QP1 then gives the effective gap >=c/(m^2 log m) when f<=m.
+
+BD: Bombieri's log-free density estimate and its exceptional-zero factor.
+For the family of primitive conductors and heights <=R, its zero count in
+Re(s)>=sigma is <=C R^(A(1-sigma)). If beta=1-delta is the exceptional
+zero at scale R, deleting that one zero gives <=C delta log(R)
+R^(A(1-sigma)). The constants are absolute. Reference: Bombieri, Le grand
+crible dans la theorie analytique des nombres, Asterisque 18, section 6,
+Theorem 14; first edition 1974, second edition 1987.
+
+HD: Heath-Brown's hybrid density theorem, Canadian Journal of Mathematics
+31 (1979), 231–240, Theorem 1. For fixed h>0 the primitive sum is
+O_h((Q^2 T)^(2(1-sigma)+h)), uniformly for sigma>=11/14. Only the fixed
+choice sigma=399/400, T=Q, h=1/100 is needed. The exponent is 9/200,
+which is strictly less than the source endpoint's 1/4.
+
+These inputs are established classical theorems but their full proofs have
+not been expanded in this manuscript. Their precise hypotheses and roles
+are retained in the ledgers. Neither a citation nor an interface wrapper is
+counted as a newly reconstructed proof of them. The source's particular
+large numerical density constants are not inferred from existential C.
+
+1. RELATIVE PROGRESSION ESTIMATES
+
+QP1 proves the effective exceptional-zero gap using CN, periodic character
+sums and a uniform derivative bound near one. QP2 gives the across-modulus
+Page uniqueness argument from the nonnegative logarithmic derivative of
+zeta L(chi1) L(chi2) L(chi1 chi2); equality of primitive characters is
+distinguished from merely having the same character values at one level.
+
+QP3 applies BD at the cutoff R=m(T+3). If the fixed-modulus exceptional
+zero is still exceptional there, its delta log R factor is retained.
+Otherwise that factor is bounded below and the ordinary estimate suffices.
+An exact integration of the density function proves the weighted zero-sum
+bound. This is a relative estimate: discarding the exceptional factor would
+lose control when the positive main term is small.
+
+QP4 takes T=m^8 exp(sqrt(log u)). The right-half explicit formula is
+obtained from CC by combining near-zero terms with the pole-at-zero
+constant before bounding them. The signed local identity is
+b0=sum_(rho in Z_chi(1)) m_rho/rho+O(log(N+2)); the minus sign in the
+explicit-formula zero sum therefore gives -m_rho(u^rho-1)/rho.
+The right-half constant terms have |rho|>=1/2 and are harmless.
+The small denominator is replaced by
+(u^rho-1)/rho, whose integral representation is harmless. Character
+orthogonality then yields a relative error for
+  phi(m) psi(u;m,a), main = u-theta u^beta/beta.
+The main term is >=u min(1,(1-beta)log u)/4; BD supplies that same small
+factor in the zero error, while QP1 absorbs the remaining contour error.
+
+QP5 removes prime powers and applies partial summation on [sqrt(u),u].
+It checks the exact main term
+  Li(u)-theta Li(u^beta), Li(u)=integral_2^u dt/log(t).
+There is no 1/beta in this expression. All constants precede the modulus,
+the residue class and the exceptional character. This proves PrimesRel at
+u>=m^C under CN and BD. The stronger-looking source wrapper PNTAPRelW has
+a fixed 1/(8 log m) definition of exception; this manuscript does not
+identify that literal wrapper. The prime-correlation proof uses PrimesRel
+with its sufficiently small existential c1 directly.
+
+2. FROM PROGRESSIONS TO MEAN SQUARES
+
+QP6 derives the actual U^(9/10) lower count in every admitted progression.
+It remains valid when an exceptional zero suppresses the main term because
+the effective gap is polynomial in the modulus and log(m)=o(log U).
+
+QP7 sums relative progression errors over CRT fibers. Orthogonality kills
+the exceptional contribution unless its character restricts to the
+specified Jacobi character on the fiber. Page uniqueness allows at most
+one squarefree index to be both aligned and very exceptional. Outside
+that index the normalized correlation is O(Y^-B) for any fixed B. Relative
+errors are summed against positive main terms, avoiding a spurious
+phi(s) loss. This is the actual twistK conclusion.
+
+QP8 proves coefficient estimates from Chebyshev's elementary bound. For
+c_y(n)=Lambda(n)min(1,y/n), prime-power blocks have size O(log y), their
+squared sum is O(y log y), and the square or modulus-supported block is
+O(sqrt(y)+w log y). It also derives the Mertens upper bound with leading
+coefficient exactly one, by the factorial identity.
+
+QP9 partitions every prime power into its square/modulus-supported block
+or its odd prime component. The square expansion then has only two
+possible exceptional shapes: one prime, or a product of two distinct
+primes. Their contributions are bounded explicitly by 2BR+2B^2. This works
+for every bounded coefficient sequence; multiplicativity is not required.
+QP10 applies it on [Y,Y^K] with cutoff (Y^K)^400, proving meanSqK with
+one absolute constant and a threshold depending on epsilon,K.
+
+QP11 addresses the real continuum rather than a discretized substitute.
+The exact right derivative D satisfies
+  y D(y)=S(y, kappa times indicator(n>y)).
+The all-bounded-sequences mean square therefore controls D as well.
+The fundamental theorem of calculus and Cauchy–Schwarz allow each prime
+to choose its own witness y in a dyadic interval. QP12 then sums Markov
+bounds over dyadic intervals, obtaining a bad proportion at most
+32C/[tau(1-2^-tau)] Y^-tau. Finite base-character families are handled
+by a union bound with the threshold chosen before the family varies.
+
+3. A SHORTER PROOF OF TRUNCATION AND THE EXACT DERIVATIVE CONSTANT
+
+QP13 extends CC's contour argument to heights T>u while retaining the
+left-edge term that CC had absorbed under T<=u. The Perron nearest-term
+error remains O(log u), and the good contour heights lie below Q. A box
+free of zeros with real part >399/400 also excludes reflected zeros with
+real part <1/400 at those heights. Thus reciprocal zero weights are
+uniformly controlled.
+
+QP14 splits the tail of sum Lambda(n)chi(n)/n at
+  V=exp(B (log Q)^2).
+Below V, the finite-height box and explicit formula give the required
+power saving. Above V, the real-zero exclusion from the same box permits
+CC's uniform global estimate. Choosing fixed B sufficiently large makes
+that last integral polynomially small in Q. The result, for 3<=Z<=V, is
+  |tail(Z)| <= C [Z^(-1/400)(log Q)^2 + (log Q)^6/Q
+                     + Z^-1 log^2(QZ)].
+For an imprimitive nonprincipal character, the primitive inducer has the
+same box in Re(s)>0. The difference of the tails at its original level is
+at most 2 log(N)/Z, obtained by summing the geometric tails at the deleted
+primes. This is already absorbed by the displayed estimate. Consequently
+the bound holds for literal GoodC, without a primitivity assumption.
+At Z=(Y^K)^400 this proves tailK. The exact centered identity includes
+the term -y tail(Z); it is not an absolute-convergence assertion.
+
+QP15 instead takes Z=(log Q)^1000. The tail is bounded, so the leading
+coefficient-one Mertens estimate gives
+  |L'/L(1,chi)| <= 1000 log log Q + C.
+The original height window and epsilon<1/52 imply the exact 4 log Y
+bound, since 200epsilon<50/13<4. This leaves a fixed margin 2/13 to
+absorb log log Y and constants. An unspecified coefficient C log Y
+would not suffice for PairGood; the exact four is checked.
+
+4. CHOOSE BOTH PRIMES AND TRANSFER ALL QUANTIFIERS
+
+QP16 uses HD to bound bad primitive boxes by O(Q^(1/4)). The primitive
+principal character can be counted separately, so the source's totalized
+pole convention cannot add an uncounted exception. A prime q>F assigned
+conductor f q with f<=F is determined by that conductor. This injection
+controls the number of bad primes even when a different witness character
+is selected for each prime.
+
+QP17 proves primitivity of coprime-conductor quadratic twists and the
+uniqueness of every primitive inducer allowed by the source Ind relation
+at a positive ambient modulus, as required by the literal ind_unique.
+QP18 combines the bad-box count with the continuum bad-share estimate;
+the former costs O(U^(3/8)) while the progression contains at least
+U^(9/10) primes. The truncation formula supplies the centered square-root
+bound for all y in the polynomial interval.
+
+QP19 chooses q=3 mod 8 in its first exponential window, simultaneously
+over all characters of the fixed base modulus. QP20 chooses d=7 mod 16
+and d=-1 modulo q times the odd primes <=Y^(epsilon/5). The modulus has
+logarithm <=4Y^(epsilon/5). Applying the generic stage with exponent
+6epsilon/5 preserves every admitted inequality and accommodates q as the
+one modulus prime larger than the truncation. Both stages have positive
+good proportions and thresholds uniform in the previously chosen prime.
+
+QP21 chooses an actual pair from these nonempty subsets. QP22 applies
+the result with base modulus 8M and checks every PairGood field: exact
+windows and congruences, coprimality, all primitive twisted-character
+quantifiers, centered bounds throughout [Y,Y^A], derivative coefficient
+four, and the prescribed j-dependent heights of the zero boxes.
+
+QP23 splits each real primitive host character into its base factor and
+its q,d quadratic components. Odd conductor exponents are <=1 and the
+two-adic exponent is <=3. This supplies RealBox and the exact conductor
+bound on the already specified compatible host. QP24 uses it to discharge
+the real-zero-exclusion premise of CC's ThinH for that same host.
+
+QP25 checks the exact rescaling in winPairs, including its 401-to-400
+cutoff and [Z,Z^(3/2)] interval. The geometric VWinAt(psi,401) premise
+remains genuine. It is not supplied by a mean square or by PairEx.
+
+REMAINING WORK
+
+Expand CN, BD and HD if a wholly self-contained analytic chapter is
+required. The source's explicit numerical density interface and fixed-1/8
+PNTAPRelW wrapper remain distinct optional source-route reconstructions.
+Supply a genuine compatible host and its independent VWinAt/geometric
+window, the cohomological windows, the global gain-to-prime-sum passage
+and the final RH/Dirichlet-GRH parameter contradiction. No global branch
+is advanced merely because a conditional composition is now available.
+
+VERIFICATION LIMITS
+
+This component is derived from pinned source declarations and independently
+reviewed ordinary mathematics. Source and paragraph hashes verify identity
+and navigation. They are not a Lean build or kernel replay. No new PDF is
+required; the cumulative TeX and updated ZIP contain the full argument.

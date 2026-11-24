@@ -1,0 +1,1406 @@
+\section{Universal section bases and the two global section laws}
+\label{sec:global-section-laws-v052}
+
+\status{GSL1--GSL26 reconstruct the finite-complex and geometric
+arguments supplying the original section laws.  The conclusions concern
+arbitrary coefficient rings and the actual line-bundle sections, including
+every residue-section lift in \texttt{SecTwistSt}.  The precise upstream
+geometric premises are recorded below; they are not silently promoted to
+proved global laws.  All source references use the accepted formal proof
+at commit \texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.}
+
+The purpose of this section is to remove the linear-algebra and
+section-transport work from the premises retained in NFL22 and TDR13.
+Its central construction is an identity of matrices over the original
+ring.  Consequently, neither the coefficient ring nor a later base
+change is required to be Noetherian, reduced or flat.  The final
+statements preserve the original polarized abelian scheme, its line
+bundle, the chosen point and every subsequent affine test map.
+
+Here and below, a line bundle $M$ is the source's actual cocycle
+\texttt{LB}: an open cover $U_i$, units $g_{ij}$ on intersections,
+and $g_{ij}g_{jk}=g_{ik}$.  A section is an actual family $s_i$ with
+$s_i=g_{ij}s_j$.  We write $\Gamma(X,M)$ for this module; this is
+\texttt{LB.Sec} with its module structure, or \texttt{SecM} after
+the specified \texttt{LPow} chart conversion.  We identify
+$\Gamma(\operatorname{Spec}R,\mathcal O)$ with $R$ by the canonical
+ring isomorphism, and transport back through that isomorphism whenever
+the original statement uses its literal coefficient ring.
+
+For $f:X\to\operatorname{Spec}R$, let $c_f:R\to\Gamma(X,\mathcal O)$
+be the structure map.  The source's $\operatorname{pw}(M,t)$ has
+transition functions $g_{ij}^{t}$, for any integer $t$; thus negative
+powers cause no difficulty.  The source's
+$\operatorname{tw}(M,H,t)$ is $M\otimes H^t$, on the intersection
+cover.  All isomorphisms used below are represented by actual units on
+the appropriate common charts.  An equality of classes in a Picard group
+alone is not used as a section comparison.
+
+We abbreviate \texttt{FirstCohomologyVanishes} by $\mathrm{V}(M)$.
+Its meaning is the following explicit assertion, for \emph{every}
+open cover $V_a\subseteq U_{i(a)}$: if
+\[
+ \phi_{ab}+g_{i(a)i(b)}\phi_{bd}=\phi_{ad}
+ \quad\hbox{on }V_a\cap V_b\cap V_d,
+\]
+then $\phi_{ab}=\psi_a-g_{i(a)i(b)}\psi_b$ for suitable actual
+functions $\psi_a\in\Gamma(V_a,\mathcal O)$.  This notation does
+not introduce an extra cohomology comparison theorem.
+
+\subsection{One kernel basis before every base change}
+
+% BEGIN GSL1
+\paragraph{GSL1: section coordinates, pullback and uniqueness.}
+\label{claim:GSL1}
+Compatible functions on any open refinement of a line-bundle cover
+determine a unique section.  The construction is additive, commutes with
+multiplication by a function from the base, and commutes with pullback.
+For a finite linear combination of pulled line bundles, these assertions
+hold for the literal \texttt{LinComb} charts and the source's
+\texttt{IsPullSecLC}; for a single power they give \texttt{IsPullSec}.
+
+\begin{proof}
+Suppose $W_a\subseteq U_{i(a)}$ cover $X$ and the prescribed coordinates
+are $v_a$.  On $W_a\cap U_j$, the coordinate in chart $j$ must be
+$g_{j,i(a)}v_a$.  The cocycle identity shows that these functions agree
+on overlaps.  The sheaf axiom glues them on $U_j$; the same identity gives
+the section compatibility between $U_j$ and $U_k$.  This also proves
+uniqueness, since equality on the $W_a$ forces equality after changing
+to every other chart.  Addition and scalar multiplication commute with
+restrictions and multiplication by transition units, so uniqueness gives
+the asserted linearity.
+
+If $\pi:X'\to X$, pull back every coordinate and every transition unit.
+The functions still satisfy the same compatibility equation, now on
+$\pi^{-1}U_i$.  Repeating a pullback gives the pullback by the composite,
+because the maps of structure sheaves compose.  For
+$\bigotimes_{k\in K}\phi_k^*L^{\epsilon_k}$ the chart indexed by
+$j:K\to\operatorname{Charts}(L)$ is
+$\bigcap_k\phi_k^{-1}U_{j(k)}$, and its transition is the product
+$\prod_k\phi_k^*g_{j(k)j'(k)}^{\epsilon_k}$.  Pullback of this
+product is the transition on the corresponding literal common chart.
+The coordinate equality just established is exactly
+\texttt{IsPullSecLC}.  Taking $K=\{1\}$ gives the power version.
+The redundant one-element index in \texttt{LB.pull} is removed by the
+mutually inverse chart maps $j\mapsto(\ast\mapsto j)$ and
+$J\mapsto J(\ast)$, so no choice of a different section is involved.
+\end{proof}
+% END GSL1
+
+% BEGIN GSL2
+\paragraph{GSL2: a denominator and a left inverse over the original ring.}
+\label{claim:GSL2}
+Let $R$ be a commutative ring, $K$ a field, $\gamma:R\to K$ a ring
+map, and $A:R^l\to R^m$ a matrix.  If $A_K$ is injective, there are
+$r\in R$ and a matrix $T:R^m\to R^l$ such that
+\[
+ \gamma(r)\ne0,\qquad TA=rI_l. \tag{GSL.1}
+\]
+
+\begin{proof}
+Choose $l$ rows whose restriction $N$ of $A_K$ has nonzero determinant;
+they exist because $A_K$ has rank $l$.  Let $J:R^m\to R^l$ select
+these same rows over $R$, set $N=JA$, $r=\det N$, and
+$T=\operatorname{adj}(N)J$.  The adjugate identity over an arbitrary
+commutative ring gives $TA=rI_l$.  Determinants commute with ring maps,
+so $\gamma(r)=\det N_K\ne0$.  For $l=0$ use the empty determinant
+$r=1$ and the unique empty matrix.  No cancellation in $R$ has been used.
+\end{proof}
+% END GSL2
+
+% BEGIN GSL3
+\paragraph{GSL3: the universal kernel certificate.}
+\label{claim:GSL3}
+Suppose
+\[
+ R^a\xrightarrow{D_0}R^b\xrightarrow{D_1}R^c,
+ \qquad D_1D_0=0,
+\]
+is exact at $K^b$ after applying a ring map $\gamma:R\to K$ to a
+field.  There are $n\ge0$, $r\in R$, and matrices
+$B:R^n\to R^a$, $C:R^a\to R^n$, $H:R^b\to R^a$ with
+\[
+ \gamma(r)\ne0,\qquad
+ D_0B=0,\qquad CB=rI_n,\qquad BC+HD_0=rI_a. \tag{GSL.2}
+\]
+
+\begin{proof}
+Select columns of $(D_0)_K$ that form a basis of its image, and let
+$S:R^k\to R^a$ be their coordinate inclusion.  GSL2 applied to $D_0S$
+gives $r_0,T_0$ with $\gamma(r_0)\ne0$ and
+$T_0D_0S=r_0I_k$.  The stacked matrix
+\[
+ A=\begin{pmatrix}T_0\\D_1\end{pmatrix}:R^b\longrightarrow R^{k+c}
+\]
+is injective over $K$.  Indeed, if $A_Kw=0$, exactness puts $w$ in
+$\operatorname{im}(D_0)_K=\operatorname{im}(D_0S)_K$; write
+$w=(D_0S)_Kv$.  Then $0=(T_0)_Kw=\gamma(r_0)v$, hence $v=w=0$.
+Apply GSL2 again to obtain $T_1A=r_1I_b$, with $\gamma(r_1)\ne0$.
+
+Set $Q=r_0I_a-ST_0D_0$.  Then
+\[
+ QS=0,\qquad T_0D_0Q=0,\qquad D_1D_0Q=0.
+\]
+Multiplying the last two equalities by $T_1$ gives $r_1D_0Q=0$;
+this is why the second denominator is retained even when $R$ has
+zero divisors.  Let $E:R^n\to R^a$ include the complementary
+coordinates to those selected by $S$, where $n=a-k$.  Thus
+$E^tE=I_n$, $E^tS=0$ and $SS^t+EE^t=I_a$.  Consequently
+$QEE^t=Q$ and $E^tQE=r_0I_n$.  Define
+\[
+ r=r_1r_0,\qquad B=r_1QE,\qquad C=E^t,\qquad H=r_1ST_0.
+\]
+The first three identities in (GSL.2) now follow directly, and
+\[
+ BC+HD_0=r_1Q+r_1ST_0D_0=r_1r_0I_a.
+\]
+Both field images of $r_0,r_1$ are nonzero.  The construction also
+covers $k=0$ and $n=0$, using empty matrices throughout.
+\end{proof}
+% END GSL3
+
+% BEGIN GSL4
+\paragraph{GSL4: a kernel basis after every permitted ring map.}
+\label{claim:GSL4}
+Choose $r,n,B,C,H$ as in GSL3, once and for all.  For every commutative
+ring $R'$ and every $\varphi:R\to R'$ for which $\varphi(r)$ is a
+unit, the map
+\[
+ R'^n\longrightarrow\ker(D_0)_{R'},\qquad z\longmapsto B_{R'}z
+ \tag{GSL.3}
+\]
+is an isomorphism, where $\ker(D_0)_{R'}$ means the kernel of the
+\emph{base-changed matrix}.  Its inverse on a vector $v$ in that kernel
+is $\varphi(r)^{-1}C_{R'}v$.
+
+If $R$ is local, $\kappa$ its residue field, $K/\kappa$ a field
+extension and $\gamma:R\to\kappa\hookrightarrow K$, then the
+same $r$ is already a unit of $R$.  The basis therefore works over $R$
+and $\kappa$, and every vector in $\ker(D_0)_\kappa$ lifts to a
+vector in $\ker D_0$.
+
+\begin{proof}
+All identities (GSL.2) remain true after applying $\varphi$.  Thus
+$D_0B=0$ makes (GSL.3) well defined.  If $D_0v=0$, then
+$BCv=\varphi(r)v$, which gives existence of the displayed coordinates.
+The identity $CB=\varphi(r)I_n$ gives uniqueness.  These identities
+also prove the assertion if $R'$ is the zero ring.  Nothing asserts
+that tensoring an arbitrary kernel is exact; the identities prove the
+needed conclusion for these particular matrices.
+
+In the local case, $\gamma(r)\ne0$ implies that the residue of $r$
+is nonzero, hence $r$ lies outside the maximal ideal and is a unit.
+Express a residue vector uniquely as $\overline B\,\overline z$.
+Lift its finitely many coordinates along the surjection
+$R\to\kappa$, obtaining $z\in R^n$.  Then $Bz$ is a cycle over $R$
+and reduces to the prescribed vector.  The basis is chosen before the
+residue vector, not anew for each one.
+\end{proof}
+% END GSL4
+
+\subsection{Finite complexes with the required universal coordinates}
+
+% BEGIN GSL5
+\paragraph{GSL5: replacing three finite projectives by three finite matrices.}
+\label{claim:GSL5}
+Let $P^0\xrightarrow{d_0}P^1\xrightarrow{d_1}P^2$ be a complex
+of finite projective $R$-modules.  There are finite free modules
+$F^0,F^1,F^2$, matrices $D_0,D_1$ with $D_1D_0=0$, and a fixed
+map $p:F^0\to P^0$ such that, after \emph{every} ring map out of $R$,
+$p$ induces an isomorphism on the degree-zero kernels.  Exactness at
+the middle term of the projective complex implies exactness at the
+middle term of the free complex.  The same assertions hold after
+tensoring with an arbitrary $R$-module.
+
+\begin{proof}
+Choose split presentations
+$p_i:E_i=R^{n_i}\to P^i$, $s_i:P^i\to E_i$ with $p_is_i=1$.
+Put $F^0=E_0$, $F^1=E_1\oplus E_0$,
+$F^2=E_2\oplus E_1\oplus E_0$, and set
+\begin{align*}
+ D_0(v)&=(s_1d_0p_0v,\ v-s_0p_0v),\\
+ D_1(w_1,w_0)&=(s_2d_1p_1w_1,\ w_1-s_1p_1w_1,\ s_0p_0w_0).
+\end{align*}
+Each component of $D_1D_0$ vanishes, by $d_1d_0=0$ and the
+splitting identities.  A vector in $\ker D_0$ satisfies
+$v=s_0p_0v$ and $d_0p_0v=0$, so $p_0$ identifies this kernel with
+$\ker d_0$, with inverse $s_0$.
+
+Suppose $D_1(w_1,w_0)=0$.  Then $w_1=s_1p_1w_1$,
+$d_1p_1w_1=0$, and $p_0w_0=0$ (apply $p_0$ to the third
+component).  If the projective complex is exact, choose $x\in P^0$
+with $d_0x=p_1w_1$.  The vector $v=s_0x+w_0$ satisfies
+$D_0v=(w_1,w_0)$.  Conversely $D_1D_0=0$ gives the other inclusion.
+All displayed maps and identities tensor to the same formulas; the
+splittings survive arbitrary tensor products.  Finally, if $e_k$ are
+the standard basis of $E_0$, the fixed elements $u_k=p_0e_k$
+give the kernel comparison by
+$v\mapsto\sum_kv_k\otimes u_k$ after base change.  These fixed
+coordinates will become the \texttt{Perf.u} functions.
+\end{proof}
+% END GSL5
+
+% BEGIN GSL6
+\paragraph{GSL6: a finite complex over a Noetherian ring.}
+\label{claim:GSL6}
+Let $R$ be Noetherian and $C^\bullet$ a nonnegative cochain complex,
+zero in degrees above $d$, whose cohomology modules are finite.
+There exist a complex $K^\bullet$, also zero above $d$, and a
+quasi-isomorphism $\phi:K^\bullet\to C^\bullet$, with every $K^p$
+finite and every $K^p$ for $p\ge1$ finite free.  No finiteness of the
+individual $C^p$ is assumed.
+
+\begin{proof}
+We give the finite lifting step underlying a descending construction.
+Suppose finite $F^1$, maps $\phi_1:F^1\to C^1$ and
+$\delta_1:F^1\to F^2$ have already been chosen.  In
+$C^0\oplus F^1$ consider
+\[
+ N=\{(c,k):d_Cc=\phi_1k,\ \delta_1k=0\}.
+\]
+Its projection $J$ to $F^1$ is finite because $R$ is Noetherian.
+Choose finitely many generators of $J$ and lift them to $N$.  Also
+choose cycles in $C^0$ lifting generators of
+$\ker d_C/(B\cap\ker d_C)$, where $B$ is the boundary submodule
+at the current stage.  This quotient is finite by the assumed
+cohomology finiteness.  Take a finite free module on both sets of
+chosen lifts, with maps $\phi_0$ and $\delta_0$ given by their first
+and second coordinates (the second coordinate of the cycle lifts is
+zero).  Then
+\[
+ d_C\phi_0=\phi_1\delta_0,\quad
+ \delta_1\delta_0=0,
+\]
+and for every $(c,k)\in N$ there is $x$ with
+$\delta_0x=k$ and $c-\phi_0x\in B$.  Indeed first match $k$ using
+the selected generators of $J$; the remaining first coordinate is a
+cycle, and the selected cohomology generators match it modulo $B$.
+
+Start with zero modules above degree $d$ and apply this step downward,
+using $B=\operatorname{im}d_C^{p-1}$ at degree $p>0$, and $B=0$
+at degree zero.  It produces finite free modules $F^p$, a chain map
+$\psi:F^\bullet\to C^\bullet$, and the following lifting
+properties:
+\begin{enumerate}
+ \item If $d_Cc=\psi_1k$ and $\delta_1k=0$ in degree zero,
+ there is $x\in F^0$ with $\psi_0x=c$, $\delta_0x=k$.
+ \item At degree $p+1$, if $d_Cc=\psi_{p+2}k$ and
+ $\delta_{p+2}k=0$, there are $c'\in C^p$, $k'\in F^{p+1}$
+ such that $d_Cc'+\psi_{p+1}k'=c$ and $\delta_{p+1}k'=k$.
+\end{enumerate}
+These are just the preceding lifting step applied successively to the
+shifted complex; the boundary error at a positive degree supplies $c'$.
+
+Replace $F^0$ by
+$K^0=\operatorname{im}(\psi_0,\delta_0)\subset C^0\oplus F^1$,
+and set $K^p=F^p$ for $p\ge1$.  Define $\phi_0$ and $d_K^0$
+by the two projections.  The module $K^0$ is finite since it is an
+image of $F^0$.  The map $(\phi_0,d_K^0)$ is injective by its
+definition; the first lifting property says that its image is the
+kernel of the next cone differential.  The second property gives
+exactness at all subsequent cone terms.  Explicitly, the resulting
+exact sequence is
+\[
+ 0\longrightarrow K^0\xrightarrow{(\phi_0,d_K)}
+ C^0\oplus K^1\xrightarrow{(c,k)\mapsto(d_Cc-\phi k,-d_Kk)}
+ C^1\oplus K^2\longrightarrow\cdots . \tag{GSL.4}
+\]
+The same lifting properties show surjectivity and injectivity on each
+cohomology module: a cycle lifts modulo a boundary by the second
+property with $k=0$, and a cycle mapping to a boundary is a boundary
+by that property with the given $k$.  In degree zero the first
+property and the initial injection apply.  Thus $\phi$ is a
+quasi-isomorphism, as claimed.
+\end{proof}
+% END GSL6
+
+% BEGIN GSL7
+\paragraph{GSL7: flat cones give a universally valid projective model.}
+\label{claim:GSL7}
+Under GSL6, assume in addition that every $C^p$ is flat over $R$.
+Then $K^0$ is finite projective, all $K^p$ are finite projective,
+and $\phi$ remains a quasi-isomorphism after tensoring with
+\emph{any} $R$-module.  In particular it remains one after every
+ring map $R\to R'$.
+
+\begin{proof}
+For a short exact sequence $0\to A\to B\to C\to0$ with $B,C$
+flat, $A$ is flat and this short exact sequence remains exact after
+every tensor product.  To see the latter statement, the only possible
+failure is injectivity on the left, measured by
+$\operatorname{Tor}_1(C,-)=0$.  The same long exact Tor sequence
+gives $\operatorname{Tor}_1(A,-)=0$ since both adjacent higher Tor
+groups of $B,C$ vanish.  These are precisely the elementary flatness
+criteria used here.
+
+All terms $C^p\oplus K^{p+1}$ in (GSL.4) are flat and the sequence
+is bounded on the right.  Starting with its terminal zero image and
+working leftward, apply the preceding fact to each short exact sequence
+formed by an image, a cone term and the next image.  Every image is
+flat, including the initial copy of $K^0$.  Every such short exact
+sequence is tensor-exact.  Therefore (GSL.4) stays exact after any
+tensor product, and its lifting characterization again says that
+$1\otimes\phi$ is a quasi-isomorphism.
+
+Finally $K^0$ is finite over the Noetherian ring $R$, hence finitely
+presented.  A finitely presented flat module is projective: localize
+at a prime, lift a basis of its residue vector space, use flatness to
+show that the kernel of the resulting finite free surjection has
+zero residue module, and apply Nakayama to this finite kernel.
+Thus the localization is free.  Finite presentation spreads this
+basis to a principal neighborhood.  On a finite such cover, clear
+denominators in the local dual-basis identities; powers of the
+covering elements still generate the unit ideal.  A linear
+combination of these identities is a global dual-basis identity,
+which splits a finite free surjection onto the module.
+This proves projectivity and applies to $K^0$.  The positive
+terms were already finite free.  Thus the exact universal
+finite-projective-complex theorem holds, including its
+tensor-by-any-module clause.
+\end{proof}
+% END GSL7
+
+% BEGIN GSL8
+\paragraph{GSL8: arbitrary-base transfer from the original Noetherian cube model.}
+\label{claim:GSL8}
+Let $I$ be a finite linearly ordered set, $R_0\to R$ a ring map
+with $R_0$ Noetherian, and $C_0$ and $A$ cubes of modules over
+$R_0$ and $R$, respectively.  Suppose a cube map
+$\theta:R\otimes_{R_0}C_0\to A$ is an isomorphism at every
+nonempty subset of $I$, each corresponding $C_0(J)$ is flat,
+and every cohomology module of the unaugmented \v Cech complex
+of $C_0$ is finite over $R_0$.  There is a finite-projective
+nonnegative complex $K$ over $R$ and a map
+$\phi:K\to\check C(A)$ that is a quasi-isomorphism after every
+ring map out of $R$.  Moreover $K^p=0$ for $p\ge |I|$.
+
+\begin{proof}
+The degree-$p$ term of $\check C(C_0)$ is the finite direct sum of
+$C_0(J)$ over the $(p+1)$-element subsets $J$.  It is flat and
+vanishes for $p\ge |I|$.  If $I$ is empty, take the zero complex
+and zero map.  Otherwise GSL6--GSL7 provide a finite-projective
+complex $K_0$ and a universally tensor-valid quasi-isomorphism
+$K_0\to\check C(C_0)$, with the same upper bound.  Put
+$K=R\otimes_{R_0}K_0$.  Finite projectives remain finite
+projective under arbitrary extension of scalars, since their split
+finite free presentations tensor to split presentations.
+
+Tensor product commutes with these finite direct sums and their
+alternating restriction differentials.  Hence $\theta$ supplies
+an actual isomorphism
+$R\otimes_{R_0}\check C(C_0)\simeq\check C(A)$.  The empty
+vertex is not a term of this unaugmented complex, so no assertion
+about $\theta(\varnothing)$ is needed.  Compose the base-changed
+map with this isomorphism.  If $R\to R'$ is any subsequent map,
+associativity identifies the resulting map with the one obtained by
+tensoring $K_0\to\check C(C_0)$ directly by $R'$ over $R_0$.
+GSL7 proves it is a quasi-isomorphism.  This proves the source's
+full \texttt{exists\_finite\_projective\_complex\_of\_noetherian\_model}
+conclusion without a flatness hypothesis on either ring map.
+\end{proof}
+% END GSL8
+
+% BEGIN GSL9
+\paragraph{GSL9: the actual section \v Cech complex under arbitrary base change.}
+\label{claim:GSL9}
+Let $X\to\operatorname{Spec}R$ have a finite ordered open cover
+$D_i$, with every nonempty finite intersection affine, and let $M$
+be an actual line bundle.  The complex
+\[
+ C^p=\bigoplus_{i_0<\cdots<i_p}
+       \Gamma(D_{i_0}\cap\cdots\cap D_{i_p},M)
+ \tag{GSL.5}
+\]
+with alternating restriction differential commutes with every ring
+base change.  Its degree-zero kernel is the module of actual global
+sections.  If $\mathrm V(M)$ holds, it is exact in degree one.
+All these identifications respect restrictions and the actual local
+coordinates of sections.
+
+\begin{proof}
+On an affine intersection $D=\operatorname{Spec}A$, the line bundle
+is represented by its invertible $A$-module $Q=\Gamma(D,M)$.
+For any $R\to R'$, its pullback to
+$\operatorname{Spec}(R'\otimes_R A)$ is represented by
+\[
+ (R'\otimes_R A)\otimes_AQ\simeq R'\otimes_RQ.
+\]
+This follows directly by localizing on charts where $Q$ is free of
+rank one and gluing the transition units; no flatness of $R'$ is
+needed.  These comparisons commute with restriction to smaller affine
+intersections, so they give an isomorphism of the whole complexes.
+
+A degree-zero cycle is a family of sections on the $D_i$ agreeing
+on pairwise intersections.  GSL1 glues it uniquely to a global
+section.  For the degree-one statement, extend an alternating
+\v Cech cocycle $\alpha_{ij}$ to all ordered pairs, putting
+$\alpha_{ii}=0$ and $\alpha_{ji}=-\alpha_{ij}$.  Its cocycle
+equation reads $\alpha_{ij}+\alpha_{jk}=\alpha_{ik}$ as sections
+of the same line bundle on a triple intersection.  Refine each $D_i$
+by $D_i\cap U_a$, where $U_a$ is an $M$-chart, and express
+$\alpha_{ij}$ in the first chart.  This is exactly a cocycle in
+the definition of $\mathrm V(M)$.  Its solution gives sections
+$\beta_{ia}$ on the refinement.  For fixed $i$, the differences
+between $\beta_{ia}$ and $\beta_{ib}$ are $\alpha_{ii}=0$,
+so they glue to $\beta_i$ on $D_i$.  Then
+$\alpha_{ij}=\beta_i-\beta_j$, proving exactness.  This argument
+also explains why the literal all-cover version of $\mathrm V$
+is sufficient even when the $D_i$ themselves do not trivialize $M$.
+\end{proof}
+% END GSL9
+
+% BEGIN GSL10
+\paragraph{GSL10: constructing every field of the literal \texttt{Perf} record.}
+\label{claim:GSL10}
+In GSL9 suppose there is a nonnegative complex $P^\bullet$ of
+finite projective $R$-modules and a map
+$\phi:P^\bullet\to C^\bullet$ that is a quasi-isomorphism after
+every ring map out of $R$.  Then the source's actual
+$\texttt{Perf}(f,M)$ record exists.  In particular this conclusion
+holds from the Noetherian cube-model data of GSL8 for the actual
+section cube of GSL9.
+
+\begin{proof}
+Apply GSL5 to $P^0\to P^1\to P^2$, obtaining matrices
+$D_0,D_1$ and fixed elements $u_k\in P^0$.  For each cover index
+$i$ and each line-bundle chart $j$, use
+\[
+ W_{ij}=D_i\cap U_j,\qquad \operatorname{ch}(i,j)=j.
+\]
+These opens cover $X$.  The $i$-component of $\phi^0(u_k)$ is
+an actual section of $M$ on $D_i$; let $u_{k,ij}$ be its coordinate
+function on $W_{ij}$.  These functions, fixed over the original
+ring, are the \texttt{Perf.u} data.
+
+For any $R\to R'$ and any specified Cartesian model
+$X'\to X$ of the base change, GSL5 identifies
+$\ker(D_0)_{R'}$ with $\ker(d_P^0)_{R'}$.  The assumed
+quasi-isomorphism identifies the latter with $\ker d_C^0$
+(degree zero has no incoming boundary).  GSL9 identifies that kernel
+with $\Gamma(X',M')$, where $M'$ is the actual pullback.  Their
+composite is the required set equivalence $E_{R'}$.  On the inverse
+image of $W_{ij}$ its coordinate is precisely
+\[
+ E_{R'}(v)|_{W_{ij}'}
+   =\sum_k c_{f'}(v_k)\,\pi^*u_{k,ij}. \tag{GSL.6}
+\]
+The equality holds because $\phi$ is a linear map, its scalar
+extension acts by tensoring, and the GSL9 comparison uses the
+actual pulled coordinates.  Thus it is the printed
+\texttt{Perf.sec} equality, not merely an abstract dimension
+comparison.
+
+If $\mathrm V(M')$ holds, GSL9 gives $H^1(C_{R'})=0$.
+The universal quasi-isomorphism gives exactness of
+$P^0_{R'}\to P^1_{R'}\to P^2_{R'}$, and GSL5 gives exactness
+of the two matrices.  This is exactly \texttt{Perf.exact}.
+The fields $a,b,c,D_0,D_1,\mathrm{comp},I,W,\mathrm{ch},
+\mathrm{le},\mathrm{cover},u,\mathrm{sec},\mathrm{exact}$ have
+all been constructed.  Every assertion holds for arbitrary $R'$ and
+for every specified pullback square, since its unique comparison
+isomorphism with the standard tensor-product model transports the
+same chart equalities.
+
+To apply this result to a \texttt{VeryAmpleBy} presentation,
+take $D_i=D(s_i)$.  On $D_i$ the nonvanishing section $s_i$
+trivializes the presenting line bundle, so
+$D_i\cap D_j$ is the principal open defined by $s_j/s_i$ in
+the affine $D_i$.  More generally every nonempty finite
+intersection is obtained by inverting a product of these
+ratios in one $D_i$, hence is affine.  The finite cover and
+all hypotheses of GSL9 therefore hold.  Consequently the
+source's universally valid finite-projective model for this
+actual section complex, whenever supplied, proves the whole
+\texttt{nonempty\_perf\_of\_smooth\_isProjBy} implication.
+\end{proof}
+% END GSL10
+
+% BEGIN GSL11
+\paragraph{GSL11: linearity and naturality forced by \texttt{Perf}'s coordinates.}
+\label{claim:GSL11}
+Let an actual $\texttt{Perf}(f,M)$ be given, without choosing a
+preferred family of its set equivalences.  Its coordinate equation
+forces every equivalence $E_{R'}$ to be linear and uniquely determines
+it.  For a subsequent ring map $R'\to R''$, the pullback of
+$E_{R'}(v)$ is $E_{R''}(v_{R''})$.  The same statements hold after
+the literal \texttt{LPow} and \texttt{LinComb} chart conversions.
+
+\begin{proof}
+The inverse images of the fixed $W_i$ cover every pullback scheme.
+The right side of (GSL.6) is additive in $v$ and linear over the
+base ring.  GSL1 therefore identifies the section for $v+v'$ with
+the sum of the sections for $v,v'$, and the section for $av$ with
+$a$ times the section for $v$.  It also proves that two purported
+sections with those coordinates are equal.  Thus the set equivalence
+is both linear and uniquely determined by its coordinate formula.
+
+Pull (GSL.6) through the subsequent map.  Pullback commutes with the
+finite sum, products, structure maps and the fixed functions $u_{ki}$.
+The resulting expression is exactly (GSL.6) for the base-changed
+vector.  Uniqueness gives the asserted naturality.  The chart maps
+in GSL1 preserve this equation by restrictions, hence preserve its
+uniqueness and all these operations.  In particular, the argument
+does not assume that an arbitrarily selected equivalence in the
+definition of \texttt{Perf} was natural to begin with.
+\end{proof}
+% END GSL11
+
+% BEGIN GSL12
+\paragraph{GSL12: a single local section basis valid on every affine test.}
+\label{claim:GSL12}
+Let $F=\texttt{Perf}(f,M)$ and $\gamma:R\to K$ be a field point
+at which the actual pulled line bundle has $\mathrm V(M_K)$.
+There are $r\in R$ with $\gamma(r)\ne0$ and actual sections
+$b_1,\ldots,b_m\in\Gamma(X,M)$ whose restrictions form a basis
+after \emph{every} map $R\to R'$ inverting $r$.  Here
+$m=\dim_K\Gamma(X_K,M_K)$.  If $R$ is local and $\gamma$ factors
+through an extension of its residue field, they already form a basis
+over $R$.
+
+\begin{proof}
+The \texttt{Perf.exact} field gives middle exactness at $K$ for
+$D_0,D_1$.  Apply GSL3--GSL4, and let $b_i$ be the actual section
+represented by the $i$th column of $B$.  This column is a cycle
+over $R$ itself, since $D_0B=0$ before localization.  GSL11 says
+that any actual pulled section satisfying \texttt{IsPullSec} or
+\texttt{IsPullSecLC} is represented by the pulled column.  GSL4
+gives unique coordinates in these columns for every kernel vector;
+GSL11 transfers them, with their uniqueness, to the actual section
+module.  Thus the sections are independent and span on every test.
+At $K$ they form a basis of length $m$, so that length is the stated
+dimension.  The final assertion is the local-unit clause of GSL4.
+\end{proof}
+% END GSL12
+
+% BEGIN GSL13
+\paragraph{GSL13: lifting actual sections through a surjective coefficient map.}
+\label{claim:GSL13}
+Let $F=\texttt{Perf}(f,M)$, where $M$ may be the literal
+$\operatorname{LinComb}(L,\phi,\epsilon)$, and let
+$\rho:R\to\overline R$ be a surjective ring map.  Suppose a fixed
+matrix $B$ has $D_0B=0$ over $R$ and its columns span
+$\ker(D_0)_{\overline R}$.  Then every section of the actual pulled
+$M$ over $\overline R$ lifts to a section over $R$.  For a
+\texttt{LinComb}, the lift satisfies the printed
+\texttt{IsPullSecLC} coordinate equalities.
+
+\begin{proof}
+Use the coordinate equivalence for the specified pullback square
+to represent a given section $\overline s$ by
+$\overline v\in\ker(D_0)_{\overline R}$.  Write
+$\overline v=\overline B\,\overline z$ and lift each coordinate
+of $\overline z$ to $z\in R^m$.  The vector $v=Bz$ is a cycle
+over $R$.  The identity-base-change equivalence, followed by the
+inverse of the harmless identity-pullback chart conversion in GSL1,
+gives an actual section $s$ of $M$.  By GSL11 its pullback has the
+same coordinates as $\overline s$ on the inverse images of all
+$W_i$, hence equals $\overline s$.
+
+For clarity, if $M=\operatorname{LinComb}(L,\phi,\epsilon)$ and
+$\pi$ is the map on total spaces, the target in the source is the
+line bundle with maps $\pi\phi_k$ on the same finite index set, not
+the syntactically nested bundle $M.\mathrm{pull}(\pi)$.  The chart
+conversions of GSL1 identify these bundles by the identity map on
+each common coordinate function.  Accordingly the equality just
+proved reads, for every such chart $j$,
+\[
+ \overline s_j
+   =\operatorname{res}\bigl(\pi^*s_j\bigr).
+ \tag{GSL.7}
+\]
+This is exactly \texttt{IsPullSecLC}.  Surjectivity of $\rho$ and
+the single fixed spanning matrix are all that the argument needs;
+neither locality nor a field hypothesis enters this lifting lemma.
+\end{proof}
+% END GSL13
+
+\subsection{The geometric inputs and their proved reductions}
+
+The next arguments use the original \texttt{PolAV} record $P/S$.
+It contains a commutative abelian scheme $A/S$, its relative dimension
+$g$, and an actual rigidified symmetric relatively ample line bundle
+$L$.  Its \texttt{KTriv} condition tests the translation kernel over
+every affine base: local triviality of $t_x^*L\otimes L^{-1}$ forces
+$x$ to be the identity.  In particular we do not replace this record
+by the data of an arbitrary ample bundle or by complex fibers alone.
+
+We state the upstream inputs when they are used.  The original
+\texttt{PolBaseChangeSt}, denoted $\mathcal P$, says: for every map
+$t:S'\to S$ and every $P/S$, there is a polarized record $P'/S'$
+and a Cartesian map $G:A'\to A$ with $g'=g$, preserving multiplication
+on every test scheme, together with an actual generated
+line-bundle isomorphism $G^*L\simeq L'$.  This entire record remains
+an input here.
+
+% BEGIN GSL14
+\paragraph{GSL14: transport of sections, bases and the all-cover vanishing law.}
+\label{claim:GSL14}
+Let $e:X'\to X$ be a scheme isomorphism and let $M',M$ be actual
+line bundles, with a generated isomorphism $M'\simeq e^*M$.
+It induces a linear equivalence of section modules, preserving
+specified coefficient-ring actions when $e$ is over the base.
+It transports bases and their unique coordinate expressions.
+Moreover $\mathrm V(M)$ implies $\mathrm V(M')$, with the exact
+all-cover meaning used above.
+
+\begin{proof}
+Refine the charts of $M'$ by inverse images of charts of $M$.
+On a common chart the generated isomorphism is multiplication by
+a specified unit $u$.  Send a coordinate function $s$ to
+$u\,e^*s$ (or to $u^{-1}e^*s$, according to the displayed direction
+of the isomorphism).  The defining unit compatibility is exactly
+the equation ensuring that these functions form a section.
+GSL1 glues them.  The inverse scheme map and inverse units give
+the inverse section map.  Both maps are linear, commute with the
+base structure maps, and are mutual inverses on every chart.
+They therefore transport bases and unique coefficients.
+
+For vanishing, start with a cocycle for $M'$ on an arbitrary
+subordinate cover $V_a$.  Refine it by the inverse images of
+the $M$-charts and transport the cocycle through the inverse units.
+The unit compatibility turns its cocycle equation into the one
+for $e^*M$.  Transporting across the isomorphism $e$ gives a
+cocycle for $M$; solve it using $\mathrm V(M)$ and pull the
+solution back.  Multiply by the original units.  This gives a
+solution on the refinement for the initial cocycle.
+
+For fixed $a$, its solutions on two refined pieces of $V_a$
+agree: their required difference is the diagonal cocycle
+$\phi_{aa}$, which is zero by the cocycle equation with three
+equal indices and $g_{i(a)i(a)}=1$.  Thus the solutions glue to
+one function on each $V_a$.  The coboundary equation holds
+locally and hence on every $V_a\cap V_b$.  This proves the
+original \texttt{h1Zero\_of\_isIso} statement, including changes
+of both the scheme and the literal line-bundle charts.
+\end{proof}
+% END GSL14
+
+% BEGIN GSL15
+\paragraph{GSL15: the required projective presentation after any affine base change.}
+\label{claim:GSL15}
+Assume $\mathcal P$.  For every $P/S$, every commutative $R$,
+$t:\operatorname{Spec}R\to S$, and every specified Cartesian model
+\[
+ \begin{array}{ccc}
+ X&\xrightarrow{\pi}&A\\
+ f\downarrow&&\downarrow\\
+ \operatorname{Spec}R&\xrightarrow{t}&S,
+ \end{array}
+\]
+there exist $N\ge1$, $m\ge0$ and $m+1$ actual sections of
+$(\pi^*L)^N$ giving the source's \texttt{VeryAmpleBy} presentation
+of $f$.  In particular $f$ satisfies \texttt{IsProjBy}.
+
+\begin{proof}
+Apply $\mathcal P$ to obtain $P'/\operatorname{Spec}R$.
+The two Cartesian models are uniquely isomorphic over
+$\operatorname{Spec}R$, and the generated isomorphism in
+$\mathcal P$ identifies their actual pulled line bundles.
+Apply the \texttt{RelAmple} field of $P'$ on the whole affine
+base $\operatorname{Spec}R$.  It supplies a positive power,
+$m+1$ sections whose nonzero loci cover, an affine nonzero
+locus for each section, and on each such locus ratios $r_j$
+with $s_j=r_js_i$ and a surjection
+\[
+ R[X_0,\ldots,X_m]\longrightarrow
+ \Gamma(D(s_i),\mathcal O),\qquad X_j\longmapsto r_j.
+ \tag{GSL.8}
+\]
+This is the original definition of relative ampleness used here.
+
+Transport all these sections to $X$ by GSL14, also converting
+the repeated-factor power to the actual $\operatorname{pw}$
+charts.  Multiplication by a transition unit preserves whether
+the germ of a section is a unit; consequently the nonzero
+loci are the inverse images of the old ones.  They cover and
+remain affine under the scheme isomorphism.  The section
+isomorphism multiplies numerator and denominator by the
+same unit, so the ratios are pulled functions $r_j$.
+The corresponding map (GSL.8) is conjugate through ring
+isomorphisms to the old surjection.  It remains surjective.
+These are every field of \texttt{VeryAmpleBy}, with the same
+positive integer $N$.  No restriction on $R$ or $S$ was imposed.
+\end{proof}
+% END GSL15
+
+% BEGIN GSL16
+\paragraph{GSL16: descent of first-cocycle vanishing by a finite average.}
+\label{claim:GSL16}
+Let $f:Y\to X$, let a finite group $G$ act on $Y$ by maps
+$\tau_g$ over $X$, with the composition convention
+$\tau_g\tau_h=\tau_{gh}$, and suppose $|G|$ is a unit in
+$\Gamma(X,\mathcal O)$.  Assume that on every open $U\subseteq X$
+pullback identifies $\Gamma(U,\mathcal O)$ with the functions on
+$f^{-1}U$ invariant under every $\tau_g$: each invariant function
+has a unique preimage.  If $\mathrm V(f^*M)$ holds, then
+$\mathrm V(M)$ holds.
+
+\begin{proof}
+First this function-descent premise makes every pullback
+$\Gamma(U,\mathcal O)\to\Gamma(f^{-1}U,\mathcal O)$ injective.
+Indeed a pulled function is invariant because $f\tau_g=f$,
+and uniqueness of its descended preimage proves injectivity.
+
+Pull an arbitrary cocycle $\phi_{ab}$ for $M$ on a subordinate
+cover $V_a$ to $Y$.  Vanishing there gives
+\[
+ f^*\phi_{ab}=\psi_a-f^*g_{i(a)i(b)}\psi_b.
+\]
+Set $\Psi_a=\sum_{g\in G}\tau_g^*\psi_a$.  Reindexing the sum
+by group multiplication proves that $\Psi_a$ is invariant,
+so it descends uniquely to a function $\chi_a$ on $V_a$.
+Every pulled transition function and every $f^*\phi_{ab}$ is
+invariant.  Sum the displayed coboundary identity, and use the
+injectivity just proved to descend the resulting equation:
+\[
+ |G|\phi_{ab}=\chi_a-g_{i(a)i(b)}\chi_b.
+\]
+Multiply each $\chi_a$ by the restriction of $|G|^{-1}$.
+The resulting functions solve the original cocycle.  The argument
+uses every original cover without a refinement or a separability
+assumption on $f$ beyond the stated invariant-function law.
+\end{proof}
+% END GSL16
+
+% BEGIN GSL17
+\paragraph{GSL17: positive-power vanishing from the original geometric suppliers.}
+\label{claim:GSL17}
+Assume $\mathcal P$ and the following original inputs.
+
+\begin{enumerate}
+ \item \emph{Serre input.}  For every Noetherian $R$, every actual
+ $\texttt{VeryAmpleBy}(f,H,s)$ and every actual line bundle $M$,
+ there is $t_0\in\mathbb Z$ such that
+ $\mathrm V(M\otimes H^t)$ for all integers $t\ge t_0$.
+ \item \emph{Multiplication pullback.}  For every $S,P,n$ there
+ is an actual generated trivialization of
+ $L^{n^2}\otimes([n]^*L)^{-1}$.
+ \item \emph{Multiplication geometry.}  For every locally Noetherian
+ $S$, $P/S$ and $n\ge1$, the map $[n]$ is finite, flat and
+ surjective, and is etale if $n$ is a unit on $S$.
+ \item \emph{Torsion-invariant descent.}  For every algebraically
+ closed $K$, $P/K$ and $n$ nonzero in $K$, functions on
+ $[n]^{-1}U$ invariant under all translations by $A[n](K)$
+ descend uniquely to $U$, for every open $U\subseteq A$.
+\end{enumerate}
+Then for every algebraically closed field $K$, every original
+$P/K$ and every $n\ge1$, one has $\mathrm V(L^n)$.
+
+\begin{proof}
+By GSL15 choose $N\ge1$ with $H=L^N$ very ample in the printed
+sense.  Apply the Serre input to $L^r$ for each
+$0\le r<N$.  Choose a nonnegative integer $T$ at least all
+the resulting bounds.  Choose a prime $q$ sufficiently large
+that $q$ is nonzero in $K$ and $q^2n/N\ge T+1$.
+There are arbitrarily large primes, so this choice works also
+in positive characteristic by avoiding that characteristic.
+Write
+\[
+ q^2n=r+Nt,\qquad 0\le r<N.
+\]
+Then $t\ge T$ and the Serre input gives
+$\mathrm V(L^r\otimes(L^N)^t)=\mathrm V(L^{q^2n})$.
+The multiplication-pullback generator, raised to its $n$th
+power and combined with the identity $q^2n=r+Nt$, gives an
+actual generated isomorphism
+$[q]^*L^n\simeq L^{q^2n}$.  On common charts its unit is the
+$n$th power of that generator times the necessary transition
+units; equality of the exponents makes the cocycle equation
+identical on both sides.  GSL14 therefore gives
+$\mathrm V([q]^*L^n)$.
+
+Let $G=A[q](K)$.  It is finite: its points belong to the finite
+fiber over the identity of the finite map $[q]$.  It is an
+abelian group killed by the prime $q$, hence a finite vector
+space over $\mathbb F_q$ and has order $q^a$ for some $a\ge0$.
+Because $q\ne0$ in $K$, this order is a unit in $K$ and hence
+in $\Gamma(A,\mathcal O)$.  Translation by $G$ is an action
+over $[q]$, since $[q](x+y)=[q]x$ for $y\in G$.
+The invariant-function input is exactly the descent premise
+of GSL16.  Apply that claim with $f=[q]$ and $M=L^n$.
+It yields $\mathrm V(L^n)$.  This proves the entire original
+positive-power vanishing supplier, uniformly over all
+algebraically closed characteristics, from the four displayed
+inputs; no characteristic-zero vanishing theorem was inserted.
+\end{proof}
+% END GSL17
+
+% BEGIN GSL18
+\paragraph{GSL18: the exact exponent forced by growth and square dilation.}
+\label{claim:GSL18}
+Let $h:\mathbb N\to\mathbb N$ be nondecreasing, $h(1)=1$, and
+$G\subseteq\mathbb N$ satisfy $0\notin G$ and, for every $m$,
+at least one of $m,m+1$ belongs to $G$.  Suppose
+\[
+ h(n^2j)=h(n^2)h(j)\quad(n\in G,\ j\ge1), \tag{GSL.9}
+\]
+and there are $N\ge1$, $c,C\in\mathbb N$ and $g\ge0$ such that
+\[
+ t^g\le c\,h(Nt),\qquad h(Nt)\le Ct^g\quad(t\ge1).
+ \tag{GSL.10}
+\]
+Then $h(j)=j^g$ for every $j\ge1$.
+
+\begin{proof}
+Fix $n\in G$ and put $a=n^2\ge1$.  Iterating (GSL.9) gives
+$h(a^ki)=h(a)^kh(i)$ for every $i\ge1$.  By monotonicity and
+the upper bound in (GSL.10),
+\[
+ h(a)^k=h(a^k)\le h(Na^k)\le C(a^g)^k.
+\]
+Since a ratio greater than one has unbounded powers, this
+forces $h(a)\le a^g$.  The lower bound in (GSL.10) gives
+\[
+ (a^g)^k\le c\,h(Na^k)=c\,h(N)h(a)^k.
+\]
+Here $h(a)\ge1$, so the same argument forces $a^g\le h(a)$.
+Thus $h(n^2)=n^{2g}$ for every $n\in G$.
+
+There are arbitrarily large $n\in G$.  Fix $j\ge1$ and for each
+such $n$ choose $m_-,m_+\in G$ immediately below and above
+$n\sqrt j$.  They can be chosen with
+$0\le n\sqrt j-m_-\le2$ and
+$0\le m_+-n\sqrt j\le2$, because $G$ meets every pair of
+consecutive integers.  For large $n$ both are positive.
+Monotonicity and (GSL.9) yield
+\[
+ m_-^{2g}\le n^{2g}h(j)\le m_+^{2g}.
+\]
+Divide by $n^{2g}$ and let these $n$ tend to infinity.
+Both bounds tend to $(\sqrt j)^{2g}=j^g$.
+This proves the assertion, including $g=0$.  The use of real
+limits merely shortens the source's equivalent integer estimates.
+\end{proof}
+% END GSL18
+
+% BEGIN GSL19
+\paragraph{GSL19: the original geometric rank is exactly \(n^g\).}
+\label{claim:GSL19}
+Assume the following source inputs for every original $P/K$ over
+an algebraically closed field.
+
+\begin{enumerate}
+ \item Its geometric total space is integral (the source obtains this
+ from smoothness and geometric connectedness).
+ \item $h^0(L)=1$.
+ \item For $n\ne0$ in $K$ and $j\ge1$ there is an actual
+ coefficient-linear equivalence
+ \[
+ \Gamma(A,L^{n^2j})\simeq
+       \prod_{x\in A[n](K)}\Gamma(A,L^j).
+ \tag{GSL.11}
+ \]
+ \item Every $\Gamma(A,L^j)$ for $j\ge0$ is finite, and for some
+ $N,c,C\in\mathbb N$ with $N,c\ge1$ its dimensions obey
+ (GSL.10) with the original $g=P.g$.
+\end{enumerate}
+Then \texttt{GlobalSectionsRankAlgClosed} holds: for every such
+$P$ and every $j\ge1$ the literal \texttt{SecM} has dimension $j^g$
+over $\Gamma(\operatorname{Spec}K,\mathcal O)$.
+
+\begin{proof}
+Use GSL1 and the identity-base product isomorphism to identify
+the displayed modules with the literal \texttt{SecM} modules,
+preserving the canonical base coefficient ring.  Put
+$h(j)=\dim_K\Gamma(A,L^j)$.  The rank-one input gives a nonzero
+actual section $s$ of $L$.  Multiplication by $s$ maps
+$\Gamma(A,L^j)$ injectively into $\Gamma(A,L^{j+1})$.
+Indeed, on an integral scheme a nonzero section of a line bundle
+is nonzero in every nonempty trivializing open: otherwise its
+zero coordinate, transferred across a nonempty intersection,
+would make it zero in every chart.  The coordinate rings of
+nonempty opens of an integral scheme are domains, so
+$fs=0$ forces every local coordinate of $f$ to vanish.
+Thus $h$ is nondecreasing, using the finite-dimensionality input.
+
+Let $G=\{n:(n:K)\ne0\}$.  It omits zero and meets each pair
+of consecutive integers, since both cannot vanish in a field.
+For $n\in G$, the $j=1$ instance of (GSL.11) implies that
+$A[n](K)$ is finite: otherwise its product with the nonzero
+one-dimensional space $\Gamma(A,L)$ would contain arbitrarily
+large independent families of coordinate vectors, contradicting
+the finite dimension of $\Gamma(A,L^{n^2})$.
+The same instance gives $h(n^2)=|A[n](K)|$.  The general $j$
+instance therefore gives
+$h(n^2j)=|A[n](K)|h(j)=h(n^2)h(j)$.
+Apply GSL18 with the stated growth bounds.  The resulting
+$h(j)=j^g$ is preserved by the canonical coefficient-ring
+isomorphism, proving the printed rank law.  The proof uses the
+actual section equivalences, not an independently assumed
+degree formula for $[n]$.
+\end{proof}
+% END GSL19
+
+% BEGIN GSL20
+\paragraph{GSL20: rank and vanishing on every actual geometric fiber.}
+\label{claim:GSL20}
+Assume $\mathcal P$, positive-power vanishing on every $P'/K$,
+and \texttt{GlobalSectionsRankAlgClosed}.  Then for every scheme
+$S$, original $P/S$, algebraically closed $K$, point
+$t:\operatorname{Spec}K\to S$ and $n\ge1$,
+\[
+ \dim_{\Gamma(\operatorname{Spec}K,\mathcal O)}
+    \operatorname{SecM}(P.A,P.L,n,\operatorname{Over.mk}t)
+       =n^{P.g}. \tag{GSL.12}
+\]
+The actual positive power on any specified Cartesian model of this
+fiber has $\mathrm V$.  The same assertions apply after any
+intermediate base scheme $T\to S$ and any geometric point of $T$.
+
+\begin{proof}
+Apply $\mathcal P$ to $t$ and obtain $P'/K$, its Cartesian
+map $G:A'\to A$, $P'.g=P.g$, and its actual line-bundle
+isomorphism.  Every specified fiber model is uniquely
+isomorphic over $K$ to $A'$.  Raise the generated isomorphism
+to the $n$th power and apply GSL14.  This transports both
+the section module and the all-cover vanishing assertion
+from $(L')^n$.  The one-factor \texttt{LinComb} chart maps
+of GSL1 identify the section module with the exact
+\texttt{SecM} in (GSL.12), so the closed-field rank law gives
+the stated integer.
+
+For $T\to S$ and $\sigma:\operatorname{Spec}K\to T$, apply
+the same construction to their composite.  The universal
+property of the two successive pullbacks gives a Cartesian
+map from $A'$ to $T\times_S A$.  Its composite to $A$ is
+$G$, so the actual pulled powers and their chart isomorphisms
+are precisely those already used.  Neither $S$ nor $T$ has
+been assumed Noetherian or reduced.  This proves the exact
+full-fiber rank and vanishing inputs of the two section-law
+theorems, not only their instances at a chosen affine chart.
+\end{proof}
+% END GSL20
+
+% BEGIN GSL21
+\paragraph{GSL21: the geometric root and the actual translated-power generator.}
+\label{claim:GSL21}
+Assume the multiplication geometry of GSL17 and the original
+square input: for every $S,P$, every $T\to S$, points $x,y\in A(T)$
+and point of $T$, the bundle
+\[
+ t_{x+y}^*L\otimes L\otimes(t_x^*L)^{-1}
+                    \otimes(t_y^*L)^{-1}
+ \tag{GSL.13}
+\]
+has a generated trivialization after restriction above some open
+neighborhood of that point.  Here the notation is on $T\times_S A$.
+Then, for every locally Noetherian $S$, every $P/S$, every
+algebraically closed field $K$, $t:\operatorname{Spec}K\to S$,
+$q\ge1$ and $c\in A(K)$ above $t$, there exist $d$ with $qd=c$
+and an actual generated trivialization of
+\[
+ L^{q-1}\otimes t_c^*L\otimes(t_d^*L)^{-q}. \tag{GSL.14}
+\]
+This is the full original \texttt{twisted\_pow\_translate} supplier.
+
+\begin{proof}
+The fiber of the finite surjective map $[q]$ above the $K$-point
+$c$ is a nonempty finite $K$-scheme.  It has a closed point with
+residue field finite over $K$, hence equal to $K$ because $K$ is
+algebraically closed.  Its point gives $d$ with $qd=c$.  This
+argument does not require $q$ to be invertible in $K$.
+
+On $\operatorname{Spec}K$ any neighborhood of its unique point
+is the whole base.  Thus the square input gives an actual
+global generator for (GSL.13) for each pair of $K$-points.
+Put $M_x=t_x^*L$ on the geometric fiber.  The generator
+identifies $M_{x+y}\otimes M_0$ with $M_x\otimes M_y$.
+Multiplying these generators successively with $(x,y)=(ad,d)$
+proves by induction that
+\[
+ M_{qd}\otimes M_0^{q-1}\otimes M_d^{-q}
+\]
+has an actual generator.  The starting case $q=1$ is the
+identity generator; the step multiplies the previous generator
+by the square generator and cancels the common factors.
+All cancellations are products or inverses of the specified
+units on a common chart, so they yield a generated
+\texttt{LinComb} isomorphism, not just a numerical identity.
+Since $qd=c$, this is (GSL.14) with the exact maps
+$[\mathrm{snd},\mathrm{translPt}(c),\mathrm{translPt}(d)]$
+and exponents $[q-1,1,-q]$.
+\end{proof}
+% END GSL21
+
+% BEGIN GSL22
+\paragraph{GSL22: a pure-power model of each twisted geometric fiber.}
+\label{claim:GSL22}
+Assume $\mathcal P$ and the conclusion of GSL21 at its printed
+locally Noetherian scope.  Let $S$ now be \emph{arbitrary},
+$P/S$ original, $T\to S$ any base, $c\in A(T)$, $q\ge1$ and
+$\sigma:\operatorname{Spec}K\to T$ an algebraically closed point.
+Put $X=T\times_S A$ and
+$M=L_T^{q-1}\otimes t_c^*L$ on $X$.  There are a polarized
+$P'/K$ with $g'=g$ and a Cartesian map
+$\pi:A'\to X$ over $\sigma$ for which
+\[
+ \pi^*M\simeq (L')^q \tag{GSL.15}
+\]
+is an actual generated isomorphism.  One may equally use the
+literal $\operatorname{baseOver}(K)\times_K A'$ model and its
+$\operatorname{LPow}$ in (GSL.15).  Thus, under the rank and
+vanishing inputs of GSL20, $\pi^*M$ has dimension $q^g$ and
+has $\mathrm V$.
+
+\begin{proof}
+Apply $\mathcal P$ to the composite $\operatorname{Spec}K\to S$,
+obtaining $P'/K$, its multiplication-preserving Cartesian
+map $G:A'\to A$, and $G^*L\simeq L'$.  The point $c$ lifts
+uniquely to $c'\in A'(K)$.  The resulting Cartesian map
+$j:A'\to X$ satisfies, on every test scheme,
+\[
+ j^*L_T\simeq L',\qquad
+ j^*(t_c^*L)\simeq t_{c'}^*L'.
+ \tag{GSL.16}
+\]
+The second equality uses the actual multiplication-preserving
+field of $\mathcal P$: $G(x+c')=G(x)+c$.
+Take the powers and tensor products of its given units to
+obtain these actual generated isomorphisms.
+
+Apply GSL21 to the new base $\operatorname{Spec}K$ and $P'$.
+This base is Noetherian regardless of the original $S$.
+It gives $d\in A'(K)$ with $qd=c'$ and a generated
+isomorphism
+$(L')^{q-1}\otimes t_{c'}^*L'\simeq t_d^*((L')^q)$.
+Let $\tau=t_{-d}:A'\to A'$.  It is an isomorphism over $K$
+with inverse $t_d$.  Set $\pi=j\circ\tau$.
+Precomposing a Cartesian square by this isomorphism over the
+base keeps it Cartesian.  Pulling the preceding line-bundle
+isomorphism by $\tau$ gives (GSL.15), because
+$t_d\circ t_{-d}=1$.
+
+For the source's literal \texttt{baseOver} product, compose
+with its canonical isomorphism to $A'$ and use the one-factor
+chart maps of GSL1.  This is the exact source construction
+$\pi=\tau\gg j$, including its inverse-translation sign.
+GSL14 transports the rank and all-cover vanishing of $(L')^q$
+to this actual $\pi^*M$.  In particular no locally Noetherian
+assumption on $S$ has entered through the geometric twist input.
+\end{proof}
+% END GSL22
+
+\subsection{The original global laws, with their exact quantifier order}
+
+The remaining geometric model premise, denoted $\mathcal F$, is the
+literal source statement
+\[
+ \begin{gathered}
+ \text{for every commutative }R,\quad
+ f:X\to\operatorname{Spec}R\text{ smooth and }\texttt{IsProjBy},\\
+ \text{and every actual line bundle }M,\quad
+        \operatorname{Nonempty}(\texttt{Perf}(f,M)).
+ \end{gathered} \tag{GSL.17}
+\]
+GSL5--GSL10 prove its complete finite-complex construction once the
+actual section cube has the stated Noetherian flat model with finite
+cohomology.  The global existence of that geometric model is a retained
+supplier.  More precisely, the original source supplies it through
+\texttt{exists\_noetherian\_model\_grCube} and the dehomogenization
+comparison with the actual section cube, followed by
+\texttt{exists\_finite\_projective\_complex\_cechLB}.  Its graded
+presentation, smooth finite-presentation descent and finite graded
+cohomology inputs are not proved by the matrix argument alone.
+
+Write $\mathcal V$ for positive-power $\mathrm V$ over every
+algebraically closed field, $\mathcal R$ for
+\texttt{GlobalSections\allowbreak RankAlgClosed}, and $\mathcal T$ for the
+full locally Noetherian geometric translated-power conclusion in
+GSL21.  GSL17, GSL19 and GSL21 respectively give their complete
+reductions from the displayed original geometric inputs.
+
+% BEGIN GSL23
+\paragraph{GSL23: both original section base-change laws.}
+\label{claim:GSL23}
+Assume $\mathcal F,\mathcal P,\mathcal V,\mathcal R$.
+Then \texttt{SecBaseChangeAnySt} and \texttt{SecBaseChangeSt} both
+hold.  Explicitly, for every scheme $S$, every original $P/S$,
+$n\ge1$ and point $p\in S$, there exist an open $V\ni p$
+and actual sections $b_i$, $i\in\operatorname{Fin}(n^g)$,
+of the specified $\operatorname{LPow}$ over $V$, such that
+for every commutative ring $R'$ and every
+$t:\operatorname{Spec}R'\to V$, \emph{every} tuple $b_i'$
+satisfying the literal \texttt{IsPullSec} equalities is
+linearly independent and spans the literal \texttt{SecM}
+over $\Gamma(\operatorname{Spec}R',\mathcal O)$.
+
+\begin{proof}
+Choose an affine open neighborhood of $p$, written
+$t_0:\operatorname{Spec}R\hookrightarrow S$, and let
+$\mathfrak p\subset R$ be its point above $p$.
+On the actual pullback $X=\operatorname{Spec}R\times_S A$
+let $M=\operatorname{LPow}(A,L,n,\operatorname{Over.mk}t_0)$.
+The morphism $X\to\operatorname{Spec}R$ is smooth by base
+change.  GSL15 supplies its \texttt{IsProjBy} presentation.
+Thus $\mathcal F$ provides an actual $\texttt{Perf}(f,M)$.
+
+Take $K$ to be an algebraic closure of the residue field
+$\kappa(\mathfrak p)$ and let $\gamma:R\to K$ be the
+canonical map.  Its kernel is $\mathfrak p$.
+GSL20 gives $\mathrm V$ on an actual Cartesian model of
+the geometric pullback and gives its section dimension
+$n^g$.  Apply GSL12 to obtain a scalar $r\notin\mathfrak p$
+and exactly $n^g$ actual sections $b_i^0$ over $X$.
+The columns representing these sections were chosen over
+$R$ and satisfy $D_0B=0$ there.
+
+Let $V$ be the image of $D(r)\subseteq\operatorname{Spec}R$
+under the chosen open immersion.  It contains $p$ and
+is canonically isomorphic to $\operatorname{Spec}R[r^{-1}]$.
+Pull the $b_i^0$ to the specified restriction object over
+$V$ to obtain $b_i$.  For any later $t:\operatorname{Spec}R'\to V$,
+the corresponding map $R\to R'$ sends $r$ to a unit.
+GSL12 therefore gives unique section coordinates in the
+pulled columns.  A tuple $b_i'$ satisfying the original
+\texttt{IsPullSec} conditions consists of exactly those
+sections by GSL1 and GSL11.  Its unique-coordinate property
+is equivalent to linear independence and full span in
+$\operatorname{SecM}$: the map from $R'^{n^g}$ taking
+coefficients to the linear combination of $b_i'$ is a
+linear bijection.  The canonical $\Gamma\operatorname{Spec}$
+ring isomorphism gives the printed coefficient action.
+
+The same $V$ and tuple $b_i$ were selected before all
+$R',t,b'$.  This proves \texttt{SecBaseChangeAnySt} with
+arbitrary original $S$ and arbitrary coefficient ring $R'$.
+Restricting the original $S$ to locally Noetherian schemes
+gives \texttt{SecBaseChangeSt}.  Thus every premise in the
+original \texttt{secBaseChange\_of\_perf} theorem has either
+been retained exactly or supplied above: projectivity by
+GSL15, isomorphism invariance by GSL14, the universal matrix
+theorem by GSL3--GSL4 and the full geometric-fiber rank
+statement by GSL20.
+\end{proof}
+% END GSL23
+
+% BEGIN GSL24
+\paragraph{GSL24: the actual twisted basis over every local coefficient ring.}
+\label{claim:GSL24}
+Assume $\mathcal F,\mathcal P,\mathcal V,\mathcal R,\mathcal T$.
+For every arbitrary scheme $S$, original $P/S$, $q\ge1$,
+commutative local ring $R$, $t:\operatorname{Spec}R\to S$
+and $c\in A(R)$ above $t$, the actual bundle
+\[
+ M=\operatorname{twistLB}(A,L,q,c)
+     =L_R^{q-1}\otimes t_c^*L
+\]
+has a basis of $q^g$ actual sections $b_i$ over $R$.
+For every actual section $s$ there is a unique
+$a:\operatorname{Fin}(q^g)\to\Gamma(\operatorname{Spec}R,\mathcal O)$
+such that on each literal common chart $j$,
+\[
+ s_j=\sum_i c_f(a_i)b_{i,j}. \tag{GSL.18}
+\]
+The same sections remain a basis after every ring map $R\to R'$.
+
+\begin{proof}
+Set $X=\operatorname{Spec}R\times_S A$ with its actual projection
+$f$.  Smoothness is stable under base change, and GSL15 makes
+$f$ \texttt{IsProjBy}.  The tensor formula for $M$ uses the
+given transition units, so $M$ is an actual line bundle.
+Obtain $F=\texttt{Perf}(f,M)$ from $\mathcal F$.
+
+Let $\kappa$ be the residue field of $R$ and $K$ an algebraic
+closure of $\kappa$, with $\gamma:R\to\kappa\hookrightarrow K$.
+GSL22 produces a specified Cartesian model of $M_K$ as a
+positive power of an original $P'/K$, with dimension $q^g$
+and $\mathrm V$.  Apply GSL3--GSL4 to the matrices of $F$
+at this geometric model.  The resulting $r$ has nonzero
+image in $K$, hence is a unit of $R$, since $\gamma$ factors
+through the residue field.  Let $b_i$ be the sections
+represented by the fixed columns of $B$.
+
+Over $K$ these sections form a basis.  Their number is
+therefore $q^g$ by GSL22, and we reindex the fixed columns
+once by $\operatorname{Fin}(q^g)$.  GSL11 and GSL4 give
+unique coordinates over $R$, yielding (GSL.18).
+Because $r$ is already a unit, its image is a unit under
+every ring map $R\to R'$, so the same proof gives the stated
+universal basis.  The source's identity-pullback comparison
+is removed by the coordinate-preserving chart isomorphism
+of GSL1; the resulting $b_i$ belong to the literal
+\texttt{twistLB}, and (GSL.18) is its exact \texttt{IsSecBasis}.
+\end{proof}
+% END GSL24
+
+% BEGIN GSL25
+\paragraph{GSL25: every residue section lifts, giving the full \texttt{SecTwistSt}.}
+\label{claim:GSL25}
+Under GSL24, let $\overline X=\operatorname{Spec}\kappa\times_S A$
+and $\rho_X:\overline X\to X$ be the prescribed map induced by
+the residue homomorphism $R\to\kappa$.  For \emph{every} actual
+section $\overline s$ of the literal bundle
+\[
+ \operatorname{LinComb}\!\left(
+   L,\ [\,\mathrm{snd}\circ\rho_X,
+              \mathrm{translPt}(c)\circ\rho_X\,],\
+          [\,q-1,1\,]\right),
+ \tag{GSL.19}
+\]
+where composition has its usual right-to-left meaning,
+there is a section $s$ of
+$\operatorname{twistLB}(A,L,q,c)$ with
+$\operatorname{IsPullSecLC}(s,\overline s)$.
+Together with GSL24 this is the complete original
+\texttt{SecTwistSt}, with no condition on $S$ and no
+Noetherian, reduced or flatness condition on the local $R$.
+
+\begin{proof}
+The columns $B$ constructed in GSL24 form a basis after the
+residue map, because their denominator was a unit of $R$.
+The residue homomorphism is surjective.  Apply GSL13 to
+this same matrix and the actual bundle $M$.  It lifts every
+$\overline s$, with exactly the chart formula (GSL.7).
+Equivalently, pull the basis $b_i$ to obtain $\overline b_i$,
+write uniquely $\overline s=\sum_i\overline a_i\overline b_i$,
+choose arbitrary lifts $a_i\in R$, and set $s=\sum_i a_i b_i$.
+Pullback preserves this sum and its coefficients, giving
+$\overline s$ on every chart.
+
+The target bundle (GSL.19) is precisely the original
+\texttt{LinComb} obtained by composing the two maps with the
+whiskered residue map.  GSL1 identifies it with the nested
+pullback of $M$ by equality of the local coordinate functions,
+so the equality just established is the required
+\texttt{IsPullSecLC}, not an equality only after an unspecified
+line-bundle isomorphism.  No lift of the geometric root $d$
+to $R$ is needed: that root was used only to prove geometric
+exactness and rank before choosing the matrix $B$.
+The original section, point $c$, local ring and residue
+section remain unchanged throughout.
+\end{proof}
+% END GSL25
+
+% BEGIN GSL26
+\paragraph{GSL26: the exact conditional installation and the remaining boundary.}
+\label{claim:GSL26}
+The literal inputs $\mathcal F,\mathcal P,\mathcal V,\mathcal R$
+supply both global section base-change laws; adding the original
+$\mathcal T$ supplies the full twisted law.  The constructions
+above establish this implication on the original arbitrary bases,
+all affine target rings and all local coefficient rings, with
+the quantified choices and actual section objects of the source.
+Equivalently, $\mathcal V,\mathcal R,\mathcal T$ may be supplied
+by the exact upstream packages in GSL17, GSL19 and GSL21.
+The finite-complex part of $\mathcal F$ is supplied by
+GSL5--GSL10 from its original geometric section-cube model.
+
+Consequently these law instances may be installed in the already
+proved TDR/NFR/NFL arguments for the \emph{same} supplied
+\texttt{Moduli} record and actual normalized family.
+This removes no other premise of those arguments and does not
+assert existence of that moduli record or of a new common bundle.
+
+\begin{proof}
+GSL23 proves each quantifier of \texttt{SecBaseChangeAnySt};
+its restriction proves \texttt{SecBaseChangeSt}.  GSL24 and
+GSL25 prove the two conjuncts of \texttt{SecTwistSt}, with
+the same $P,q,R,t,c$ in both.  In GSL23 the open and its
+basis precede every affine test map.  In GSL24 the geometric
+root is allowed only inside the proof, whereas the resulting
+sections lie on the original bundle over $R$; GSL25 lifts
+every residue section with that same fixed basis.  These
+are precisely the clauses consumed by TDR13 and NFL22.
+Substitution of the supplied laws in those proved implications
+therefore keeps their original objects and quantifier order.
+
+For the upstream form, GSL15 derives the projectivity premise
+from $\mathcal P$, GSL14 supplies the full isomorphism-invariance
+premise, and GSL3--GSL4 supply the original universally quantified
+matrix premise.  GSL17 supplies $\mathcal V$; GSL19 supplies
+$\mathcal R$; GSL20 makes their full original-fiber versions.
+GSL21 supplies $\mathcal T$, and GSL22 explains why its
+locally Noetherian original scope suffices for an arbitrary
+$S$ in the final twisted law.  Finally GSL8--GSL10 give
+every field of $\mathcal F$ whenever the geometric
+Noetherian model of the actual section cube is provided.
+
+The remaining global suppliers are thus explicitly geometric:
+the universal section-cube model, polarization base change,
+the Serre and multiplication/descent inputs of GSL17,
+the initial rank-one, section-decomposition and growth inputs
+of GSL19, and the square input of GSL21.  Their formal proofs
+are accepted; their complete human reconstructions are not
+claimed by this packet.  The separate supplied \texttt{Moduli}
+and inherited HUF/PUN foundations likewise remain.  This is
+the strongest complete original-scope conditional section-law
+join proved here, and supplies no automatic closure of
+\texttt{IsUnf} on unsupplied data or of a selected RH/GRH leaf.
+\end{proof}
+% END GSL26
+
+\subsection*{Exact source correspondence}
+
+{\small\raggedright
+All paths in this paragraph are relative to the pinned repository's
+\path{src/Development/AbelianVarietyTheory/} unless explicitly
+stated otherwise.  Write $A$ for
+\path{Proofs/AbelianSchemeLawProofs/} and $C$ for
+\path{Proofs/CoherentCohomologyProofs/}.  The complete source files,
+exact ranges and SHA-256 bindings are provided in this component's
+\path{source_manifest.json} and \path{provenance.json}.
+
+\begin{itemize}
+ \item GSL1, GSL11--GSL12 and GSL23:
+ $A$\path{SecBaseChangeOfPerf.lean}, lines 22--170,
+ 241--287 and 305--401.  The original complete conditional
+ join is \texttt{secBaseChange\_of\_perf}, lines 333--401.
+ \item GSL2--GSL4:
+ $A$\path{ExistsMulEqSmulOneOfMulVecInjective.lean},
+ lines 9--53, 55--156 and 158--181, respectively.
+ \item GSL5:
+ $C$\path{ExistsMatricesOfProjectiveComplex.lean},
+ especially lines 7--52 and 90--170.
+ \item GSL6--GSL7:
+ $C$\path{ExistsFiniteProjectiveComplexQuasiIso.lean},
+ lines 14--91, 124--244, 255--348 and 521--624.
+ \item GSL8:
+ $C$\path{ExistsFiniteProjectiveComplexOfNoetherianModel.lean},
+ lines 25--60.  The geometric Noetherian-model producer retained
+ above is $C$\path{DehomogenisingCompOfSaturating.lean},
+ lines 44--114; it is not counted as proved here.
+ \item GSL9--GSL10:
+ $C$\path{ThreeTermComplexOfProjectiveCechModel.lean},
+ lines 24--156; the common-chart and model inputs also appear in
+ $C$\path{VeryAmpleCompactQuasiSeparatedAffineCharts.lean},
+ lines 24--50, and
+ $C$\path{ExistsFiniteProjectiveCechComplexLineBundle.lean},
+ lines 19--43.  The last geometric producer remains a premise.
+ \item GSL13, GSL14 and GSL22--GSL25:
+ $A$\path{FinrankOfIsSecBasis.lean}, lines 62--110,
+ 126--216, 231--310 and 312--421.  In particular
+ \texttt{geometric\_fibre} uses the inverse translation,
+ and \texttt{secTwist\_of\_perf} includes every residue lift.
+ \item The all-cover isomorphism argument of GSL14 is
+ $A$\path{FirstCohomologyVanishesOfIsoOfIsGen.lean},
+ lines 129--224.  GSL15 is
+ $A$\path{VeryAmpleByOfRelAmple.lean}, lines 29--121.
+ \item GSL16--GSL17:
+ $A$\path{FirstCohomologyVanishesDescent.lean},
+ lines 65--119 and 123--228.  The retained Serre input is the
+ first conjunct in
+ $A$\path{SerreVanishingVeryAmpleStatement.lean}.
+ \item GSL18--GSL19:
+ $A$\path{FinrankSectionsLineBundlePowEqPow.lean},
+ lines 13--123 and 125--260.  GSL20 uses the base-change
+ section equivalence in
+ $A$\path{SecMInvariantEqBotOrUnivAtGeometricPoint.lean},
+ lines 222--243 and 304--423, and
+ $A$\path{SecBaseChangeOfPerf.lean}, lines 305--325.
+ \item GSL21:
+ $A$\path{TwistedPowTranslate.lean}, lines 63--121.
+ The precise assembly boundary in GSL26 is recorded in
+ $A$\path{LawsOfH0EqOneClosedFields.lean}, lines 64--91.
+\end{itemize}
+
+The literal contracts are in
+\path{Definitions/AbelianSchemeLaws/FirstCohomologyVanishesSpecOfIsLocalRing.lean},
+lines 16--88, and, relative to the repository's \texttt{src/},
+\path{ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/ExtensionDescent/}:
+\path{NonzeroLocus.lean}, lines 15--75;
+\path{GlobalSectionsRankAlgClosed.lean}, lines 19--41 and 160--166;
+and \path{SecBaseChangeAnySt.lean}, lines 16--58.
+These give the actual \texttt{PolAV}, \texttt{Perf}, basis and lifting
+definitions used throughout.  No source declaration is counted as a
+human proof merely because its formal verification is accepted.
+\par}

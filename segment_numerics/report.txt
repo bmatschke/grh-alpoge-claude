@@ -1,0 +1,295 @@
+SW12. Literal standard hypotheses imply the three numerical lift interfaces
+==========================================================================
+Source pin: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+Status. This is a complete elementary proof of the following implications
+from the literal Std(C0,Cde,CE1,CE2,1,X) of BinomialRatio/Transported.lean:
+
+ (i) Every actual kept segment block satisfies BLk(C0,Cde,CE1,CE2,X,0,j,b).
+ (ii) Every such block has oPlus <= localOrderCap <= (147/250)a <= aPlus.
+ (iii) If all blocks of a family are kept and Ct>=30, then
+       sum_j blockOrd(p,S_j,b_j) <= X.t0(C0,Ct).
+
+The third assertion in fact needs only Std with any real H in place of 1,
+because none of its steps uses the Hb or Hc lower bounds. Assertion (ii)
+proves the numerical conclusion in OPlusAt_of once its explicit hypothesis
+supplying Std is given. This report does not prove universal HIext => Std,
+the quantified threshold supply called thr_std, or t0 <= the expanded tI.
+The scalar, parity and finite-count arguments below are proved here; SW10
+is a compatible earlier result, not a dependency of this claim.
+
+1. Exact notation, kept blocks and the consumed Std clauses
+-----------------------------------------------------------
+Put p=X.p, k=X.m+1, N=|TT|, N1=X.N1, a=X.a, b'=X.b',
+lambda=X.La(C0), delta=X.de(C0,Cde), beta=be(X,C0), Q=p^(X.G'),
+E0=X.E0(C0,CE1,CE2), epsilon=N1*lambda/k, and c=X.c.
+Here a,c,N1 are natural numbers, while lambda,delta,beta,b',Q are real.
+Std in particular supplies
+
+ p>=5, n'>=2 even, Y>=1, k^2 Y^2<=p,
+ N1>=1, 2N1+3<=k, N>=2, lambda>=1, 2N*lambda<=k,
+ 40epsilon<=delta<1/6, 0<=beta<=delta/2-18epsilon,
+ b'>0, p<a/b', E0>=0,
+ k^3 N Q^4 Y<=b',
+ a<=aT(x) on TT, and b'(1-beta)<=bT(x)<=b'(1+beta) on TT.
+
+The omitted Std clauses remain hypotheses; they are not silently replaced
+by weaker assumed numerical conditions. The displayed subset suffices.
+There are at least two segments, their lengths G_j satisfy G_j<=X.G',
+and their interior counts s_j satisfy s_j<=N1. The excluded-band clause is
+
+ p^d not in [(a/b')(1-2delta),(a/b')(1+2delta)] for every odd d.       (1)
+
+Segments are the forward cyclic intervals between successive selected
+even points of TT. Interior selected odd points have distinct increasing
+distances 0<d_0<...<d_(s-1)<G. As n' is even, G is positive even and each
+d_i is odd. Thus G>=2 and successive d_i differ by at least two. This is
+immediate by subtracting endpoint indices, adding n' only for a wrapping
+interval. Sorting the interior points gives strict monotonicity. Put
+
+ P_i=p^(G-d_i),  g_i=bT(segPos(j,i)),  bPlus=bT(segNext(j)),
+ aStart=aT(segStart(j)),  aPlus=aT(segNext(j)),
+ A0=floor((a-E0)/p^G),
+ A_i=(g_i-sum_c rz_(i,c))/P_i,
+ C_i=(aTop_i-sum_c ry_(i,c))/P_i.
+
+The last two are the source natural quotients. DigitsOK says that every
+digit rz_(i,c),ry_(i,c) is <P_i, their sums do not exceed the corresponding
+degree, and the indicated residual is divisible by P_i. Consequently
+
+             g_i-kP_i < A_i P_i <= g_i.                            (2)
+
+The split sigma counts the distances with p^d_i<a/b'. Since those distances
+are strictly increasing, i<sigma is equivalent to this inequality.
+Define the effective order and signed integer cap by
+
+ e_i = w_i+sg_i if i<sigma, and e_i=o_i otherwise;
+ cap_l=A0+sum_(i<l)(A_i-e_i).                                      (3)
+
+The cap and A0 are integers, not necessarily nonnegative. Every estimate
+below uses an upper bound for them, so no positivity assumption is hidden.
+
+The literal Kept inequalities, in addition to DigitsOK, are:
+
+ late i>=sigma:
+   o_i<=A_i, o_i<=cap_i+(lambda/k)A_i, w_i=sg_i=0;
+ early i<sigma:
+   o_i=0, w_i<=A_i, sg_i<=C_i,
+   w_i+sg_i<=A_i(1+4/p^2)+(lambda/k)cap_i,
+   sg_i<=2lambda*A0/k;
+ terminal:
+   oPlus<=Oplus,
+   Oplus=cap_s+(lambda/k+4/p^2)sum_i(2a/P_i)+lambda*bPlus/k.          (4)
+
+BLk(0) keeps DigitsOK, the displayed late o_i<=A_i and zero conditions,
+and the early o_i,w_i,sg_i bounds except for the bound on w_i+sg_i. Its
+additional requirements are o_i<=A_i(1-delta/4) in the late case and
+oPlus<=aPlus, oPlus<=localOrderCap. We prove exactly these missing clauses.
+
+2. The geometric cap estimate and the late upper cutoff
+-------------------------------------------------------
+Since A0<=a/p^G and A_h P_h<=g_h<=2b', (3) gives
+
+ P_i cap_i <= a/p^d_i+2b' sum_(h<i) p^(d_h-d_i)
+              <= a/p^d_i+2b'/p.                                  (5)
+
+For the last inequality, the odd distance gaps give
+sum_(h<i) p^(d_h-d_i)<=sum_(n>=1)p^(-2n)=1/(p^2-1)<=1/p.
+In particular this is a bound independent of the number of frames.
+The inequality g_h<=2b' follows from beta<=delta/2<1/12.
+
+We need three other immediate Std consequences:
+
+ lambda/k<=epsilon,  2/p<=epsilon,  kP_i<=epsilon*b'.               (6)
+
+Indeed epsilon>=1/k and k>=5. Since p>=k^2, 2/p<=1/k. Also Q>=1,
+N,Y>=1 and k^3 N Q^4 Y<=b' give k^3 Q<=b'; hence
+kP_i<=kQ<=b'/k<=epsilon*b'. No claim that Q is an integer is needed.
+
+Suppose i>=sigma. By (1), the failed strict test p^d_i<a/b' improves to
+       p^d_i>(a/b')(1+2delta).
+Writing t=a/p^d_i, A=A_i, P=P_i, (2), (5), (6) therefore give
+
+ t(1+2delta)<b',
+ P cap_i<=t+epsilon*b',
+ AP>g_i-kP>=b'(1-beta-epsilon)
+                 >=b'(1-delta/2+17epsilon).                       (7)
+
+Put u=1-delta/2+17epsilon and v=1-delta/4-epsilon. Both are positive.
+The two required polynomial inequalities have explicit nonnegative
+remainders:
+
+ uv-epsilon-(1-delta/2)(1-delta/4)
+     =epsilon(15-15delta/4-17epsilon)>=0,
+ (1+2delta)(1-delta/2)(1-delta/4)-1
+     =delta(5/4-11delta/8+delta^2/4)>=0.                            (8)
+
+Here 0<=epsilon<=delta/40 and 0<=delta<1/6. Thus
+1/(1+2delta)+epsilon<=uv. From (7),
+
+ P cap_i < b'uv < APv.
+
+Adding P(lambda/k)A<=epsilon*AP and dividing by P>0 proves
+
+       cap_i+(lambda/k)A_i <= A_i(1-delta/4).                      (9)
+
+The literal kept late bound now gives the late BLk(0) clause. The early
+BLk clauses are already present in Kept. These are exactly the source
+PolyUpperBoundDelta.kept_upper_level_bound and the nonterminal part of
+keptBL_of_std, with the scalar expansion displayed rather than deferred.
+
+3. Extra order, the 147/250 bound and OPlusAt
+--------------------------------------------
+The positive integers G-d_i are distinct. Therefore
+
+          sum_i P_i^(-1)<=sum_(n>=1)p^(-n)
+             =1/(p-1)<=5/(4p).                                   (10)
+
+Since A0<=a/p^G<=a/p^2, A_i<=2b'/P_i, and e_i>=0, (3) and (10) imply
+
+ cap_s<=a/p^2+3b'/p,       sum_i 2a/P_i<=4a/p.
+
+Also bPlus<=2b'. Substituting these bounds in (4) proves
+
+ Oplus<=Lcap:=a/p^2+3b'/p
+              +(lambda/k+4/p^2)(4a/p)+2lambda*b'/k.               (11)
+
+Lcap is precisely the source localOrderCap(C0,X), with no rescaling.
+The bounds p>=5, p<a/b', and 2Nlambda<=k with N>=2 give
+b'<=a/p<=a/5 and lambda/k<=1/4. Each summand in (11) is thus bounded by
+
+ a/25, 3a/25, (1/4+4/25)(4a/5), a/10,
+
+respectively. Their sum is exactly (147/250)a=0.588a. Since aPlus>=a,
+
+              oPlus<=Oplus<=Lcap<=147a/250<=aPlus.                 (12)
+
+This supplies both terminal BLk(0) conditions and the OPlusAt conclusion.
+The published OPlusAt_of uses a longer pointwise bound with s; (10)--(12)
+are a proved alternative using the same literal quantities. The bound
+147/250 strengthens the source maximal_order_le_a, which states only <=a.
+The source OPlusAt universally quantifies X under D1num,HIext,CBound.
+Here its conditional proof is: supply Std for that X, then apply (12).
+Supplying Std uniformly is not part of SW12.
+
+4. A kept segment's order: the minimum term and all error coefficients
+---------------------------------------------------------------------
+Define five nonnegative real quantities, common to all actual segments:
+
+ Aerr=a/p^2, Berr=b'/p, Cerr=lambda*a/(pk),
+ Derr=lambda*b'/k, Eerr=kQ, R=Aerr+Berr+Cerr+Derr+Eerr.                (13)
+
+The source errTop is
+
+ T=2b'/p+2lambda*b'/k+8b'/p^2
+                  +lambda*a/(pk)+2lambda*b'/(pk).
+
+We first prove the exact pointwise source bound
+
+    P_i e_i <= min(g_i,aStart/p^d_i)+T.                            (14)
+
+Early case. The excluded band improves p^d_i<a/b' to
+p^d_i<(a/b')(1-2delta). Because
+(1+beta)(1-2delta)<=1 and aStart>=a, it follows that
+g_i<=aStart/p^d_i, so this is the minimum in (14). Multiply the early
+kept bound in (4) by P_i, use A_iP_i<=g_i, g_i<=2b', (5), and d_i>=1:
+
+ P_i e_i<=g_i+8b'/p^2+lambda*a/(pk)+2lambda*b'/(pk)<=g_i+T.
+
+Late case. The excluded band gives a/p^d_i<b'/(1+2delta).
+Since (1-beta)(1+2delta)>=1, this is <=b'(1-beta)<=g_i; it is also
+<=aStart/p^d_i. Multiplying the late kept bound in (4) by P_i yields
+
+ P_i e_i<=a/p^d_i+2b'/p+2lambda*b'/k
+             <=min(g_i,aStart/p^d_i)+T.
+
+The two scalar product inequalities just used follow from
+0<=beta<=delta/2 and 0<=delta<1/6. For the second one,
+(1-delta/2)(1+2delta)=1+(3/2)delta-delta^2>=1.
+
+For each i, the digit contribution in blockOrd is
+       q_i=sum_(c!=0)rz_(i,c)+ry_(i,0).
+DigitsOK and P_i<=Q imply q_i<=2kQ=2Eerr. (Counting the k terms exactly
+would improve this, but the literal source's weaker bound is retained.)
+
+For this total-order estimate it is useful to use the coarser terminal
+bound that retains s. From P_i>=p and (4),
+
+ Oplus <= a/p^2+2s*b'/p
+              +(lambda/k+4/p^2)(2s*a/p)+2lambda*b'/k
+       <= (1+2s)Aerr+2s*Berr+2s*Cerr+2Derr,                        (15)
+
+because 8/p<=8/5<=2. Also
+       T<=4Berr+Cerr+4Derr,                                      (16)
+since 1/p<=1/5. The literal blockOrd is
+       sum_i(P_i e_i+q_i)+oPlus.
+Adding (14)--(16) and the digit bound gives its exact error coefficients:
+
+ blockOrd <= sum_i min(g_i,aStart/p^d_i)
+      +(1+2s)Aerr+6s*Berr+3s*Cerr+(4s+2)Derr+2s*Eerr
+   <= sum_i min(g_i,aStart/p^d_i)+30(s+1)R.                        (17)
+
+Every coefficient is nonnegative and at most 30(s+1). In fact the
+displayed calculation permits 6(s+1), but SW12 retains the archival 30
+and does not propagate a changed source constant. This proves the actual
+SegHyp.top_ord, dig, oplus and seg_ord estimates. It is valid even when
+s=0: the pointwise sum is empty and the terminal bound still applies.
+
+5. Sum the actual segments and identify t0 exactly
+-------------------------------------------------
+Each segment contributes one distinct selected even start and s_j odd
+interior points. The open forward intervals between successive even
+starts are disjoint on the cyclic orbit. Thus their odd selected points
+are disjoint, and are disjoint from all even starts. The injection into TT
+gives
+                    sum_j(s_j+1)<=|TT|.                          (18)
+This proves the exact counting fact sum_segS; it does not replace the
+cyclic segments by a different cover or count repeated endpoints twice.
+
+Summing (17) over the actual kept family and using (18), R>=0, c>=0 and
+Ct>=30 gives
+
+ sum_j blockOrd
+  <= sum_(j,i) min(bT(segPos(j,i)),aT(segStart(j))/p^d_(j,i))
+         +30|TT|R
+  <= sum_(j,i) min(bT(segPos(j,i)),aT(segStart(j))/p^d_(j,i))
+         +Ct|TT|(R+Qc)
+   = X.t0(C0,Ct).                                                 (19)
+
+The last equality is the literal definition t0G4 in ObjSeg and Loc.t0
+in ColumnSystems. In particular R contains lambda*a/(pk), not the
+lambda*N1*a/(pk) appearing in the distinct E0 definition. The extra Qc
+term in t0 is merely nonnegative here; it is not an additional order loss
+introduced by the proof.
+
+Equation (19) is ord_all, with all floor operations, natural-number block
+orders, integer caps, segment windows and the full minimum term retained.
+It leaves the separate comparison t0<=tI explicitly unproved.
+
+6. Source correspondence and completion boundary
+------------------------------------------------
+Exact declarations, inclusive line ranges, pinned URLs and full-file/range
+SHA256 values are regenerated in provenance.json and source_locators.txt.
+
+Core targets:
+  CoarseMultiplicity/PolyUpperBoundDelta:
+    kept_upper_level_bound, extra_order_le_maximal,
+    maximal_order_le_a, keptBL_of_std.
+  BinomialRatio/TopDegreeLeTwoB:
+    SegHyp.Pcap, SegHyp.top_ord, SegHyp.dig, SegHyp.oplus,
+    SegHyp.seg_ord, segHyp_of, ord_all; errTop and Rerr definitions.
+  CoarseMultiplicity/CoarseMultiplicityAtIdentity:
+    localOrderCap, BLk.
+  CoarseMultiplicity/OPlusAtOf: oPlusAt_of.
+  CoarseMultiplicity/WeightWLet: OPlusAt.
+  ObjSeg: exact SegData/SegBlock/Kept, blockOrd and t0G4.
+  BinomialRatio/Transported: literal Std.
+  BinomialRatio/SegmentStatementHolds: parity, sigma and sum_segS.
+
+Completed: the three literal Std numerical consequences needed by RL's
+actual paired-lift construction. No additional probability, rank, field,
+lattice, or representation-theoretic premise is consumed by this claim.
+Unchanged boundaries: supply of Std from the arithmetic parameters with
+the required quantifier order; t0<=tI; the other global branches toward
+RH and Dirichlet GRH. This is a human proof reconstruction, not a claim of
+Lean compilation or kernel replay.

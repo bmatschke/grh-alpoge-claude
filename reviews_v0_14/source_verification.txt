@@ -1,0 +1,113 @@
+FINAL INDEPENDENT PINNED-SOURCE BYTE AND RANGE AUDIT — v0.14
+Reviewer: /root/global_frame
+Date: 2026-11-21
+Result: PASS
+
+PINNED SOURCE AND INPUT SNAPSHOT
+
+Repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+The source repository HEAD matched this commit before and after the audit.
+Its tracked worktree was clean before and after; no checkout, reset, source
+edit, build, or other worktree mutation was performed.
+
+Exact audited merged-input SHA256 values:
+  provenance.json: 6443522411387d072b9074175800710a79c0fb65e90e07207ea02715a543d369
+  source_index.json: 9996137b0f6a3c574307a3f2a87fd2dbf60551b14fb6df156fbc032f785e9b95
+  next_source_targets.json: 6c02eaefb7d0ed88ef9f368c649a4841eb871b1bc33d014dea1f9a9377bd733f
+  backtrack.py: 2ad7bd7425e1bd0f43b8c75b3ffb8f43bdd8a8476677f480fce031e22d790753
+
+All four audited input files remained byte-identical throughout the audit.
+The source_index.json source-file record array was exactly equal to the
+merged provenance.json source_files array, including record order and fields.
+
+ACTUAL COVERAGE
+
+  claims: 536
+  claim source ranges: 8431
+  next target ranges: 50
+  indexed source files: 1228
+  next target source files: 50
+  distinct pinned source blobs: 1253
+  distinct range tuples: 6633
+  target only source files: 25
+  total pinned source bytes: 16817858
+  lookup tests: 8
+
+The distinct source-file count exceeds the indexed count because the
+continuation targets introduce additional paths. Every such target-only
+path was read from the same pinned commit and fully checked.
+
+METHOD
+
+1. Loaded the current merged provenance.json, source_index.json and
+   next_source_targets.json; checked their commit IDs and stable-claim-ID
+   uniqueness. Collected every source-file record, all claim sources, and
+   every recursively recorded next-target range. Every path was checked to
+   be relative, under src/, and free of parent-directory traversal.
+2. Read each distinct source blob once with a single git cat-file --batch
+   process, requesting the exact <commit>:<path> object. The working tree
+   was not used as the authoritative source. Checked the blob type, exact
+   byte length, and Git blob object ID against the returned raw bytes.
+3. Computed SHA256 on the original complete file bytes and each literal
+   one-indexed inclusive line slice using splitlines(keepends=True). No
+   Unicode, whitespace, line-ending, or newline normalization was applied.
+   Checked every required hash and 1 <= first <= last <= file line count.
+   Checked the additional full_file_sha256, range_bytes, first_line,
+   declaration-line bounds, and indexed byte/line-count fields wherever
+   present. All checks passed.
+4. Wrote exactly the required pinned source files, and no extras, under
+   work/source_verification_v0_14. Re-read every copy and compared it with
+   its original Git blob. This separate verification tree allowed the
+   unchanged user backtrack.py to read all needed files without modifying
+   the sparse Lean checkout.
+
+Successful auxiliary metadata checks:
+  declaration line bounds checks: 8469
+  explicit full file sha checks: 958
+  file line count checks: 2798
+  file size checks: 2506
+  first line checks: 8481
+  inclusive range sha checks: 8481
+  indexed full file checks: 2506
+  range byte count checks: 958
+
+UNCHANGED USER BACKTRACK CHECK
+
+Executed:
+  python work/v0_14/backtrack.py --repo work/source_verification_v0_14 --check-all
+
+Exit code: 0. Exact output:
+Verified 1253 distinct source files, 8431 claim-source ranges, and 50 next-target ranges against the SHA256 records for pinned commit 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+This checks recorded source bytes and ranges; it does not compile Lean or replay its kernel.
+
+Also executed --list: all 536 stable claim IDs appeared in exactly the
+merged-ledger order. Eight representative read-only source lookups passed:
+  AN1 --entry 1 --max-lines 3
+  SF7 --entry 1 --max-lines 3
+  FC19 --entry 1 --max-lines 3
+  DR3 --entry 6 --max-lines 3
+  CV9 --entry 1 --max-lines 3
+  NB8 --entry 1 --max-lines 3
+  VE11 --entry 1 --max-lines 3
+  RF16 --entry 1 --max-lines 3
+
+Each lookup used --repo work/source_verification_v0_14, returned exit code 0,
+and displayed the requested declaration, exact source path/range hash,
+and correctly numbered initial source lines. The selections cover the
+original RH endpoint, a prior common-frame claim, the new direct Forms0
+assembly, full IsPtOf interface, chart values, down naturality, the final
+realizability-based comparison join, and refill closure.
+
+REPRODUCIBILITY AND LIMITS
+
+The independent audit script and machine-readable results are retained as
+work/source_verification_v0_14_audit.py and
+work/source_verification_v0_14_audit.json. The exact checker/list/lookup
+outputs are in work/source_verification_v0_14_backtrack.log. The verification
+directory contains only the pinned source files necessary for this audit.
+
+This verifies source provenance, complete bytes, exact inclusive ranges,
+recorded metadata, and the preserved backtracking interface. It does not
+compile Lean, replay the Lean kernel, prove the mathematical statements,
+or establish the wider RH/GRH conclusion. No PDF was built or rendered.

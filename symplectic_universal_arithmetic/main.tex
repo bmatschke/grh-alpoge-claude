@@ -1,0 +1,636 @@
+% Version 0.29. Complete arithmetic suppliers for the ordinary universal rings.
+% Pinned source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+\section{The actual level, weight and ordinary determinant rings}
+\label{sec:symplectic-universal-arithmetic}
+
+\status{KX1--KX9 close the complete literal predicates
+\texttt{LevEx}, \texttt{LocCFTAll}, \texttt{LamEx},
+\texttt{PhiAll}, and \texttt{ProModularRingExists}.
+The last statement retains its actual nonempty-pair antecedent.
+The proof constructs the characters, universal maps and defining ideal;
+it does not infer existence of a modular-support ideal from existence of
+a deformation ring.  Classical local reciprocity and Chenevier's
+determinant representability theorem are used in their precise scopes.}
+
+Throughout this section, $\ell$ is a prime, $L$ is a CM number field,
+$F=L^+$, and $\Omega$ is the original algebraic closure.
+A source \texttt{HidaSetting} $s$ includes the chosen complex
+conjugation, the places and valuations above $F$, the auxiliary place
+$v_0$, and the splitting and unramifiedness hypotheses recorded in
+\texttt{ContinuousResP}.  A level $V$ uses the quotient
+$\Gamma=G_{F,S'}$ for its specified finite set $S'$;
+$G_0=\ker\eta$ is the CM subgroup of this quotient.
+For $v\mid\ell$ we always use the source group
+$G_v=\operatorname{Dec}_{L}(s.A(v))$ and its actual inertia $I_v$.
+The coefficient ring $O=c.O$ is the ring of integers of the given
+finite extension of $\mathbb Q_\ell$, with residue field $k$.
+Objects of $\mathcal C_O$ are exactly the source \texttt{IsCO}
+algebras: complete Noetherian local $O$-algebras with local structure
+map inducing the specified isomorphism of residue fields with $k$.
+All occurrences of continuity below mean the maximal-ideal topology.
+
+% BEGIN KX1
+\begin{lemma}[KX1: morphisms and principal-unit coordinates]
+\label{claim:KX1}
+Every $O$-algebra homomorphism between objects of $\mathcal C_O$
+is local, induces the identity on $k$, and is continuous.
+For $R\in\mathcal C_O$, continuous characters
+$\mathbb Z_\ell^d\longrightarrow 1+\mathfrak m_R$
+are in bijection with $d$-tuples of elements of $\mathfrak m_R$,
+by the images $1+x_j$ of the standard basis vectors.
+Consequently $O[[X_1,\ldots,X_d]]$ represents this character functor
+for all the algebra homomorphisms occurring in the source.
+\end{lemma}
+\begin{proof}
+If $f:R\to R'$ is an $O$-algebra map, the composite
+$R\to R'\to k$ is surjective, since its restriction to $O$ is the
+residue map.  Its kernel is therefore a maximal ideal of $R$ and
+equals $\mathfrak m_R$.  Thus $f$ is local, and its residue map is
+the identity because $O\to k$ is surjective.  The inclusions
+$f(\mathfrak m_R^a)\subseteq\mathfrak m_{R'}^a$ prove continuity.
+This establishes the required assertion about \emph{all} algebra
+maps; no extra continuous-map restriction is being inserted into
+the universal properties.
+
+The quotients $R/\mathfrak m_R^a$ are finite.  Indeed their
+successive maximal-ideal quotients are finite dimensional over the
+finite field $k$, by Noetherianity.  The successive quotients of
+$1+\mathfrak m_R$ are subquotients of these additive $k$-spaces.
+Hence $1+\mathfrak m_R$ is an abelian pro-$\ell$ group.
+For later use there is an elementary uniform estimate: if
+$u\in1+\mathfrak m_R$, then
+\[
+             u^{\ell^a}-1\in\mathfrak m_R^{a+1}.
+                                                               \tag{KX.1}
+\]
+For the induction step factor $z^\ell-1$ as
+$(z-1)(1+z+\cdots+z^{\ell-1})$; the second factor belongs to
+$\mathfrak m_R$ whenever $z\equiv1\pmod {\mathfrak m_R}$.
+
+If integers $b_m$ converge to $b\in\mathbb Z_\ell$, (KX.1)
+shows that $u^{b_m}$ has a well-defined limit $u^b$ independent
+of the approximating sequence.  The same estimate proves continuity
+and the identity $u^{b+b'}=u^bu^{b'}$.  Thus the character belonging
+to $(x_1,\ldots,x_d)$ is
+\[
+          (b_1,\ldots,b_d)\longmapsto
+                       \prod_{j=1}^d(1+x_j)^{b_j}.
+                                                               \tag{KX.2}
+\]
+Uniqueness follows from the density of $\mathbb Z^d$ and the
+Hausdorff property of $R$.  Evaluation of a power series at elements
+of $\mathfrak m_R$ converges, and defines the unique continuous
+$O$-algebra map sending $X_j$ to $x_j$.  Conversely every algebra
+map is local by the first paragraph and so has such images.
+The argument includes $d=0$ and $\ell=2$.
+\end{proof}
+% END KX1
+
+% BEGIN KX2
+\begin{theorem}[KX2: the complete level existence predicate]
+\label{claim:KX2}
+For every source $s$ and every finite $S'\supseteq s.S$ satisfying
+the source splitting condition at each of its places, there is
+$V:s.\texttt{Lev}$ with $V.S'=S'$.  In particular the entire
+predicate \texttt{LevEx} holds, with the original cyclotomic
+character and the original complex conjugation.
+\end{theorem}
+\begin{proof}
+Let $G=\operatorname{Gal}(\Omega/F)$ and let
+$H=\operatorname{Gal}(\Omega/L)$, viewed through the source
+restriction-of-scalars inclusion.  The fixed-field description gives
+$H=\ker(G\to\operatorname{Gal}(L/F))$ and $[G:H]=2$.
+This is a closed open normal subgroup.  Define
+$\eta_0(g)=1$ on $H$ and $\eta_0(g)=-1$ outside $H$.
+The quotient of order two shows that this is a continuous character.
+The chosen $c$ acts as complex conjugation under the embedding in
+the definition of $s$.  If $c\in H$, that embedding would make
+$L$ real.  This contradicts $L$ being totally imaginary; hence
+$\eta_0(c)=-1$.  The same embedding proves $c^2=1$.
+
+Let $N_{S'}$ be the closed normal subgroup generated by the inertia
+groups at finite places outside $S'$.  The field $L/F$ is unramified
+at the finite places by $s.\texttt{unr}$, so every generator of
+$N_{S'}$ belongs to $H$.  Since $H$ is closed and normal,
+$N_{S'}\subseteq H$.  Also $S'$ contains all places above
+$\ell$.  At a finite place of residue characteristic different from
+$\ell$, inertia acts trivially on all $\ell$-power roots of unity:
+such roots are obtained by lifting roots over the maximal unramified
+extension, since their orders are units there.  Thus $N_{S'}$ lies
+in the kernel of the original cyclotomic character
+$\epsilon_0:G\to\mathbb Z_\ell^\times$.
+
+Both characters therefore descend to $G/N_{S'}=G_{F,S'}$.
+Write them as $\eta$ and $\epsilon$.  Their pullbacks are exactly
+$\eta_0$ and $\epsilon_0$, so the source fields
+\texttt{h\ensuremath{\eta}}, \texttt{\ensuremath{\eta}\_c}, and
+\texttt{h\ensuremath{\epsilon}} hold.  The quotient topology gives
+continuity of $\epsilon$ and openness of $\ker\eta$.
+Together with the given finite set, inclusion and splitting proofs,
+these are all the fields of \texttt{Lev}; the underlying $S'$ was
+never altered.
+\end{proof}
+% END KX2
+
+% BEGIN KX3
+\begin{theorem}[KX3: local abelian coordinates on the actual decomposition groups]
+\label{claim:KX3}
+For each $v\mid\ell$ there is a number
+$d_v=[F_v:\mathbb Q_\ell]$ and an actual
+$\texttt{LocAb}(\ell,G_v,I_v,d_v)$.  Moreover
+\[
+                      \sum_{v\mid\ell}d_v=[F:\mathbb Q].
+                                                               \tag{KX.3}
+\]
+These choices supply the whole predicate \texttt{LocCFTAll}.
+\end{theorem}
+\begin{proof}
+Completion at the chosen valuation identifies
+$\operatorname{Dec}_L(s.A(v))$ with the
+absolute Galois group of $K=L_{s.w(v)}$, carrying the original
+inertia subgroup to $I_K$.  This identification can be made by
+extending the embedding of $L$ to the chosen valued algebraic
+closure; restriction and completion are inverse on finite
+extensions.  The splitting assumption in $s$ identifies $K$ with
+$F_v$.  It is essential here to use this chosen decomposition group,
+rather than an unrelated copy of a local Galois group.
+
+Local reciprocity identifies the topological abelianization
+$G_K^{\mathrm{ab}}$ with the profinite completion of $K^\times$,
+and the image of inertia with $\mathcal O_K^\times$.
+We use the arithmetic Frobenius normalization, although reversing
+reciprocity changes none of the existence or inertia assertions
+below.\footnote{J. S. Milne, \emph{Class Field Theory},
+Chapter I, Theorem 1.1 and the local existence theorem,
+\url{https://www.jmilne.org/math/CourseNotes/CFT.pdf}.
+The classical input is the profinite reciprocity isomorphism and
+its identification of units with inertia.}
+
+Here is the necessary group structure.  A uniformizer splits the
+valuation sequence for $K^\times$.  The unit group is the product
+of the prime-to-$\ell$ Teichm\"uller roots and its principal units.
+On a sufficiently deep principal-unit subgroup the convergent
+logarithm and exponential give an isomorphism with a nonzero ideal
+of $\mathcal O_K$, which is free of rank $d_v$ over
+$\mathbb Z_\ell$.  All principal units form a finitely generated
+$\mathbb Z_\ell$-module: the deep subgroup has finite index, and
+finitely many lifts of generators of the finite quotient suffice.
+Its torsion is precisely the finite group $\mu_{\ell^\infty}(K)$.
+The structure theorem over $\mathbb Z_\ell$ consequently gives
+\[
+ G_K^{\mathrm{ab}}\simeq
+ \widehat{\mathbb Z}\ \times\mu_{q-1}(K)\ \times P\ \times
+                                      \mathbb Z_\ell^{d_v},
+ \qquad P=\mu_{\ell^\infty}(K),
+                                                               \tag{KX.4}
+\]
+where $q$ is the residue-field cardinality.  Inertia is exactly the
+last three factors.  The logarithm was used only sufficiently deep,
+so the assertion also accounts for $2$-power roots of unity.
+
+The $\ell$-primary torsion of the entire topological abelianization
+is exactly $P$: $\widehat{\mathbb Z}$ is torsion free and
+$\mu_{q-1}(K)$ has order prime to $\ell$.  Projecting (KX.4) gives
+continuous maps
+\[
+ a:G_v\twoheadrightarrow\mathbb Z_\ell^{d_v}\times\mathbb Z_\ell,
+       \qquad b:G_v\longrightarrow P.
+                                                               \tag{KX.5}
+\]
+The last coordinate of $a$ is valuation, and
+$a(I_v)=\mathbb Z_\ell^{d_v}\times\{0\}$.  The finite-valued
+map $b$ has open kernel and restricts to the quotient map on
+$\mu_v$, the inverse image of $P$ in $G_v$.
+Every continuous map to a finite abelian $\ell$-group factors
+through the maximal pro-$\ell$ quotient of (KX.4).  If it kills
+$\mu_v$, it kills $P$, and hence factors through $a$.
+This verifies, individually, the fields \texttt{cont},
+\texttt{surj}, \texttt{inertia}, \texttt{univ},
+\texttt{b\_open}, and \texttt{b\_mu} of \texttt{LocAb}.
+Finally (KX.3) is the dimension identity in
+$F\otimes_{\mathbb Q}\mathbb Q_\ell=\prod_{v\mid\ell}F_v$.
+Thus the exact degree sum and every original local object required
+by \texttt{LocCFTAll} have been supplied.
+\end{proof}
+% END KX3
+
+% BEGIN KX4
+\begin{proposition}[KX4: prescribed torsion and every local character lift]
+\label{claim:KX4}
+For every actual residual datum $r:\texttt{Resid}$, every $v,i$
+has a character $\psi^0_{v,i}:G_v\to O^\times$ satisfying the
+entire predicate $r.\texttt{IsPsi}\,v\,i$.
+For any $R\in\mathcal C_O$, all characters satisfying this
+predicate are uniquely
+\[
+ \psi_{v,i}(g)=\psi^0_{v,i}(g)
+                 \chi_{v,i}(a_v(g)),\qquad
+ \chi_{v,i}:\mathbb Z_\ell^{d_v+1}\to1+\mathfrak m_R
+                         \text{ continuous}.
+                                                               \tag{KX.6}
+\]
+Here $\psi^0$ on the right is transported by the original
+$O$-algebra structure map, and $a_v$ is the actual map in KX3.
+\end{proposition}
+\begin{proof}
+Let $q=|k|$.  Hensel's lemma applied to $X^{q-1}-1$ gives a unique
+multiplicative lift $[\ ]:k^\times\to O^\times$.
+Its multiplicativity follows from uniqueness of the lifted root
+with each residue.  The residual character $\bar\psi_{v,i}$ has
+open kernel and therefore finite image.  It kills $\mu_v$:
+it kills the closed commutator subgroup by continuity, and its
+remaining image of the $\ell$-primary torsion has order dividing
+both an $\ell$-power and $q-1$.
+
+Write $P_v$ for the finite torsion group in KX3.  The map
+$\mu_v\to P_v$ is onto, with kernel the closed commutator
+subgroup.  The source assumption \texttt{th\_comm} therefore
+descends the prescribed character $\theta_{v,i}$ to a character
+$t_{v,i}:P_v\to O^\times$.  Every value of $t_{v,i}$ has
+$\ell$-power order; its residue in $k^\times$ is consequently $1$.
+Set
+\[
+            \psi^0_{v,i}(g)
+              =[\bar\psi_{v,i}(g)]\,t_{v,i}(b_v(g)).
+                                                               \tag{KX.7}
+\]
+Both factors have open kernels, so this is continuous.  Its
+reduction is $\bar\psi_{v,i}$, and on $\mu_v$ its first factor is
+$1$ while its second factor is exactly $\theta_{v,i}$ by
+\texttt{b\_mu}.  These are precisely the three fields
+\texttt{cont}, \texttt{red}, and \texttt{mu} of \texttt{IsPsi}.
+In particular the prescribed torsion condition has not been
+discarded in passing to free coordinates.
+
+For another lift $\psi$ in $R$, put
+$\delta=\psi/(\psi^0\otimes_OR)$.  It has values in
+$1+\mathfrak m_R$ and kills $\mu_v$.  Reduce it modulo
+$\mathfrak m_R^a$.  Its image is a finite abelian $\ell$-group,
+by KX1, and its kernel is open.  The \texttt{univ} field of
+KX3 shows that it kills $\ker a_v$.  This holds for every $a$;
+separatedness of $R$ therefore shows that $\delta$ itself kills
+$\ker a_v$.  It factors uniquely through the surjection $a_v$.
+This factor is continuous: a continuous surjection from a compact
+space to the Hausdorff space $\mathbb Z_\ell^{d_v+1}$ is a
+quotient map, and the same is true after testing each finite
+quotient of the target units.  Conversely any character $\chi$
+in (KX.6) has residue $1$ and is trivial on $a_v(\mu_v)=0$.
+The product in (KX.6) thus satisfies all three original conditions.
+Surjectivity of $a_v$ proves the asserted uniqueness.
+\end{proof}
+% END KX4
+
+% BEGIN KX5
+\begin{theorem}[KX5: the full inertial weight algebra and its universal maps]
+\label{claim:KX5}
+For every source $s,V,c,n,r$, including $n=0$, there is a
+$\texttt{LamObj}\,r$ with
+\[
+ \Lambda\simeq O[[X_{v,i,j}:v\mid\ell,\ 1\le i\le n,
+                                      \ 1\le j\le d_v]]
+       \simeq O[[X_1,\ldots,X_{n[F:\mathbb Q]}]].
+                                                               \tag{KX.8}
+\]
+Its universal characters satisfy the exact \texttt{IsInert}
+predicate, and its universal property quantifies over all the
+$O$-algebra homomorphisms in \texttt{LamObj}.
+Consequently the entire source predicate \texttt{LamEx} holds.
+\end{theorem}
+\begin{proof}
+Write $a_v=(a_v^{\mathrm{in}},a_v^{\mathrm{ur}})$ as in (KX.5)
+and form the first power-series ring in (KX.8).  For $g\in I_v$
+define
+\[
+ \kappa_{v,i}(g)=\psi^0_{v,i}(g)
+                    \prod_{j=1}^{d_v}(1+X_{v,i,j})^{
+                                                   a^{\mathrm{in}}_{v,j}(g)}.
+                                                               \tag{KX.9}
+\]
+The expression in KX1 defines its powers.  The same formula on all
+of $G_v$, with the last coordinate ignored, is an \texttt{IsPsi}
+character by KX4.  Thus each $\kappa_{v,i}$ has an actual extension,
+which is precisely \texttt{IsInert}.  This also supplies the
+universal character before invoking any universal property.
+
+Let $\kappa'_{v,i}$ be an arbitrary \texttt{IsInert} system in
+$R$.  Choose its witnessing full character $\psi'_{v,i}$, and
+factor it using (KX.6).  Restrict the factor to
+$\mathbb Z_\ell^{d_v}\times\{0\}$ and let $u_{v,i,j}$ be its
+value at the $j$th basis vector.  Then
+$u_{v,i,j}-1\in\mathfrak m_R$, so KX1 gives an evaluation map
+$X_{v,i,j}\mapsto u_{v,i,j}-1$.  Formula (KX.9) shows that this
+map carries the universal inertial system to $\kappa'$.
+
+For uniqueness, choose for each basis vector $e_j$ an element
+$g_{v,j}\in I_v$ with $a_v(g_{v,j})=(e_j,0)$, using the exact
+inertia image in KX3.  At this element (KX.9) reads
+\[
+       \kappa_{v,i}(g_{v,j})
+                   =\psi^0_{v,i}(g_{v,j})(1+X_{v,i,j}).
+                                                               \tag{KX.10}
+\]
+Every competing $O$-map preserves the first, invertible factor;
+hence its image of each $X_{v,i,j}$ is forced.  KX1 proves equality
+of the maps.  This proves independence of the initially chosen
+extensions $\psi'$, as well as uniqueness in the literal source
+category.  There are $n\sum_vd_v=n[F:\mathbb Q]$ variables by
+KX3; renaming their finite index set gives the second isomorphism
+in (KX.8).  For $n=0$ the system is empty and the ring is $O$.
+Finally any other \texttt{LamObj} is uniquely isomorphic to this
+one by its two universal maps; their composites fix all the
+universal characters and are the identities by uniqueness.
+\end{proof}
+% END KX5
+
+% BEGIN KX6
+\begin{theorem}[KX6: the actual global and local finiteness predicates]
+\label{claim:KX6}
+The cohomology chain already supplied in BX8 gives, for every
+source $s$ and $V$,
+\[
+ \Phi_\ell(\Gamma),\qquad\Phi_\ell(G_0),\qquad
+                                \Phi_\ell(G_v)\quad(v\mid\ell).
+                                                               \tag{KX.11}
+\]
+Here $\Phi_\ell(G)$ means that every open subgroup $H$ has only
+finitely many continuous homomorphisms $H\to\mathbb F_\ell$,
+exactly as in \texttt{PhiCond}.  Thus the complete predicate
+\texttt{PhiAll} is supplied.
+\end{theorem}
+\begin{proof}
+We first give the finite-cohomology implication on a compact
+profinite group $G$.  For an open $H$, let $M$ be the finite
+permutation module of $\mathbb F_\ell$-valued functions on the
+left cosets $G/H$, with $(g f)(x)=f(g^{-1}x)$.
+Choose representatives $s_x$, choosing $s_H=1$.
+For $\varphi:H\to\mathbb F_\ell$ define
+\[
+       c_\varphi(g)(x)
+             =\varphi(s_x^{-1}g s_{g^{-1}x}).
+                                                               \tag{KX.12}
+\]
+The argument of $\varphi$ belongs to $H$.  Multiplication inside
+that argument proves the cocycle identity.  A finite set of cosets
+and the open kernel of $\varphi$ show that $c_\varphi$ is locally
+constant: intersect the finitely many conjugates of this kernel
+inside $H$ to obtain an open neighborhood on which all coordinates
+are unchanged.  If $c_\varphi-c_{\varphi'}$ is a coboundary,
+evaluate at $h\in H$ and the fixed coset $H$.  Every such
+coboundary has value $f(h^{-1}H)-f(H)=0$, whereas (KX.12) gives
+$\varphi(h)-\varphi'(h)$.  Thus
+\[
+           \operatorname{Hom}_{\mathrm{cont}}
+                    (H,\mathbb F_\ell)\hookrightarrow H^1(G,M).
+                                                               \tag{KX.13}
+\]
+Finite first cohomology for these finite continuous modules proves
+$\Phi_\ell(G)$.
+
+Apply (KX.13) first to the original quotient
+$\Gamma=G_{F,S'}$.  The set $S'$ is finite and contains all places
+over $\ell$, exactly the hypotheses of the global finiteness
+field in BX8.  That field applies to the actual permutation
+representation, so gives the first assertion of (KX.11).
+The subgroup $G_0=\ker\eta$ is open by KX2 or by the given
+level record.  Any open subgroup of $G_0$ is also open in
+$\Gamma$, which proves the second assertion without a new
+cohomology theorem.  Finally the local finiteness field in BX8,
+transported to the original chosen decomposition group as in
+KX3, applies to the same permutation construction on $G_v$.
+This gives the last assertion for every $v$.
+Only the two finite-cohomology fields of BX8 were used; no
+automorphy or image-density hypothesis occurs in this argument.
+\end{proof}
+% END KX6
+
+% BEGIN KX7
+\begin{theorem}[KX7: universal determinants over the original coefficient ring]
+\label{claim:KX7}
+Let $G$ be one of the original profinite groups satisfying
+$\Phi_\ell$, and let
+$\bar D=\det(\bigoplus_{i=1}^n\bar\chi_i)$ be the actual
+continuous residual determinant.  There is
+$R_{\bar D}\in\mathcal C_O$ and a continuous determinant
+$D^{\mathrm{univ}}$ reducing to $\bar D$ such that
+\[
+ \operatorname{Hom}_{O\text{-alg}}(R_{\bar D},R)
+       \longleftrightarrow
+ \{D\text{ continuous of degree }n\text{ on }G:
+                                      D\bmod\mathfrak m_R=\bar D\}
+                                                               \tag{KX.14}
+\]
+is a natural bijection.  This is the complete \texttt{DetObj}
+interface in the present arithmetic coefficient scope.
+\end{theorem}
+\begin{proof}
+A source \texttt{GDet} is a multiplicative homogeneous
+polynomial law on the group algebra, with its full base-change
+naturality.  This is precisely the meaning of determinant in
+Chenevier's representability theorem.  Its continuity is the
+continuity of the characteristic-polynomial coefficients on
+$G$.  In the source those coefficients are
+$\lambda_i(g)=(-1)^i[X^{n-i}]D(X-[g])$.  For $0\le i\le n$
+they are the same coefficients; the source's extra indices
+$i>n$ give signed multiples of the constant coefficient and impose
+no additional continuity requirement.
+
+For $n\ge1$, Chenevier's Propositions 3.3 and 3.7, with Remark 3.5,
+give a complete Noetherian local $W(k)$-algebra representing
+continuous determinant deformations of $\bar D$.
+The finiteness condition (F) of that paper is exactly
+$\Phi_\ell(G)$, supplied by KX6; no irreducibility or inequality
+$\ell>n$ is required.\footnote{G. Chenevier,
+\emph{The $p$-adic analytic space of pseudocharacters of a profinite
+group and pseudorepresentations over arbitrary rings},
+\url{https://arxiv.org/abs/0809.0415}, version 2,
+\S3.1--3.3, especially Propositions 3.3 and 3.7.
+The polynomial-law definition, rather than a trace definition
+requiring division by $n!$, is the one used here.}
+The residual representation here is the given finite direct sum
+of characters with open kernels.  Thus its continuity and its
+semisimplicity are explicit, including when $\ell\le n$.
+
+Let this universal $W(k)$-algebra be $A$.  The maximal unramified
+subring of the given finite coefficient ring $O$ is canonically
+$W(k)$.  Set
+\[
+                    R_{\bar D}=A\widehat\otimes_{W(k)}O.
+                                                               \tag{KX.15}
+\]
+One may present $A$ as $W(k)[[Z_1,\ldots,Z_t]]/J$;
+then (KX.15) is $O[[Z_1,\ldots,Z_t]]/JO[[Z_1,\ldots,Z_t]]$.
+It is complete Noetherian local with residue $k$.
+The universal law base changes to this ring.  If $R$ is in
+$\mathcal C_O$, a determinant over $R$ first gives the unique
+continuous $W(k)$-map $A\to R$, and the fixed structure map
+$O\to R$ extends it uniquely across (KX.15).  Conversely that
+extension pulls the universal law back to the given determinant.
+For complete $R$ this assertion follows either directly from the
+profinite version of the theorem or by reducing modulo
+$\mathfrak m_R^a$ and taking the compatible inverse limit.
+KX1 shows that the resulting bijection includes every algebra map
+in the literal source interface, proving (KX.14).
+
+If $n=0$, homogeneity applied with scalar $0$ shows that every
+value of a degree-zero determinant equals its value at $0$;
+multiplicativity and the value at $1$ make this constant $1$.
+There is therefore just one degree-zero law and its universal
+ring is $O$.  In subsequent equations we still use the source's
+literal coefficient functions, which use truncated natural
+subtraction $n-i$; no rank-zero convention for their function
+\texttt{tr} is silently substituted.
+\end{proof}
+% END KX7
+
+% BEGIN KX8
+\begin{theorem}[KX8: the actual ordinary pair ring]
+\label{claim:KX8}
+For the original $s,V,c,n,r$, suppose that there is a
+$\texttt{Pair}\,r\,R_0$ for some $R_0\in\mathcal C_O$.
+Then there is an actual \texttt{UniversalOrdinaryDeterminantRing}
+for $r$, with all its \texttt{Pair} fields and its unique-map
+property.  Thus the complete predicate
+\texttt{ProModularRingExists} holds in exactly its stated scope.
+\end{theorem}
+\begin{proof}
+Use KX7 on $G_0$ and $\bar D=r.\texttt{Dbar}$, obtaining
+$R_{\bar D}$ and $D^{\mathrm{univ}}$.
+Use KX4 and KX1 to represent all the full local character lifts by
+\[
+ T=O[[Y_{v,i,j}:v\mid\ell,\ 1\le i\le n,
+                                         \ 1\le j\le d_v+1]].
+                                                               \tag{KX.16}
+\]
+The last variable for each $v,i$ records the unramified coordinate.
+Its universal character is $\psi^0$ times the product (KX.2)
+in all $d_v+1$ coordinates.  This is the full \texttt{LamTObj}
+universal property, distinct from the inertial ring of KX5.
+The finite completed coproduct with the determinant ring is simply
+\[
+                 A=R_{\bar D}[[Y_{v,i,j}]].
+                                                               \tag{KX.17}
+\]
+It is in $\mathcal C_O$.  The two constructions prove, directly,
+that it represents pairs consisting of a continuous determinant
+lifting $\bar D$ and all the prescribed local character lifts,
+before imposing the ordinary equations.  Indeed a pair gives a
+unique map on $R_{\bar D}$ and forced images in
+$\mathfrak m_R$ for every $Y$; evaluation gives the unique map
+from (KX.17).
+
+Write $D,\psi$ for this preliminary universal system.  For a group
+element $g$ write $[g]$ for its basis element in the group algebra.
+Retain exactly the source anti-involution
+\[
+                 [g]^*=\epsilon(g)^{1-n}[cgc]^{-1}.
+                                                               \tag{KX.18}
+\]
+For $\mathbf g=(g_1,\ldots,g_n)\in G_v^n$, let
+\[
+       o_v(\psi,\mathbf g)
+             =\prod_{i=1}^n([\phi_v(g_i)]-\psi_{v,i}(g_i)[1]),
+                                                               \tag{KX.19}
+\]
+with the product taken in the original order.  Also retain the
+literal tame subgroup
+$I_p(u)=I_u\cap\bigcap_i\ker\bar\chi_i$.
+Let $\mathfrak a\subseteq A$ be the ideal generated by the
+following elements, for all of the indicated indices:
+\[
+ \begin{aligned}
+ \lambda_j([g]^*)-\lambda_j([g])
+                                      &\quad(j\in\mathbb N, g\in G_0),\\
+ \operatorname{tr}_D([h]o_v(\psi,\mathbf g))
+                                      &\quad(v,\ \mathbf g\in G_v^n,\ h\in G_0),\\
+ \operatorname{tr}_D([h]([g]-[1]))
+                                      &\quad(u, g\in I_p(u), h\in G_0).
+ \end{aligned}                                                 \tag{KX.20}
+\]
+In the middle line $\mathbf g\in G_v^n$ and $h\in G_0$;
+$\operatorname{tr}_D$ is exactly $\lambda_1$ of the source.
+The ideal is closed: every ideal of a complete Noetherian local
+ring is closed for its maximal-ideal topology, as follows from
+Krull intersection applied to the quotient.
+
+The hypothesized pair over $R_0$ supplies a map $A\to R_0$.
+Its \texttt{P}, \texttt{Ord}, and \texttt{I} fields kill,
+respectively, the three lines of (KX.20).
+Hence $\mathfrak a$ is proper, and lies in $\mathfrak m_A$.
+Set
+\[
+                              B=A/\mathfrak a.
+                                                               \tag{KX.21}
+\]
+It is again an object of $\mathcal C_O$.
+Base change of $D,\psi$ gives the universal pair on $B$.
+Their continuity, residual determinant and the three
+\texttt{IsPsi} fields are preserved under the local quotient map.
+The three remaining \texttt{Pair} fields are precisely (KX.20),
+so hold by construction.  This verifies every field of the
+universal pair rather than only its characteristic polynomial
+at unramified Frobenius elements.
+
+For an arbitrary pair $p$ over $R$, the preliminary universal
+property gives a unique $f:A\to R$.  Naturality of a determinant
+commutes with characteristic-polynomial coefficients; the star
+operation and (KX.19) commute with an $O$-algebra map because
+their scalars come from $O$ and the local characters.
+Thus the three fields of $p$ kill each generator of
+$\mathfrak a$, and $f$ factors uniquely through $B$.
+Conversely such a factor carries the universal determinant and
+every full local character to those of $p$.
+If two factors do this, their composites with $A\to B$ coincide
+by the preliminary unique-map property, and the factors coincide
+by surjectivity.  These are exactly the existence and uniqueness
+clauses of \texttt{UniversalOrdinaryDeterminantRing}.
+
+Nothing in this argument requires $n>0$: KX7 supplied the
+rank-zero preliminary law, and any possible degeneracy of the
+literal trace equations is controlled by the actual nonempty-pair
+antecedent.  Conversely the proof has made no claim that such
+a pair exists for arbitrary residual data.  The source predicate
+\texttt{ProModularRingExists} includes this same antecedent.
+\end{proof}
+% END KX8
+
+% BEGIN KX9
+\begin{corollary}[KX9: fixed universal maps for the subsequent modular argument]
+\label{claim:KX9}
+For every actual input in KX8, the inertial ring $\Lambda$ of KX5
+has its prescribed map to the universal pair ring $B$, and for
+every $p:\texttt{Pair}\,r\,R$ one has a commuting triangle
+\[
+                    \Lambda\longrightarrow B\longrightarrow R,
+ \qquad \Lambda\longrightarrow R
+                         =\Lambda.\texttt{toPair}(p).
+                                                               \tag{KX.22}
+\]
+All the level, local-character, finiteness and universal-ring
+suppliers used in these constructions have now been proved on
+the same original arithmetic objects.
+\end{corollary}
+\begin{proof}
+Restrict the full universal characters of KX8 to each actual
+$I_v$.  Their \texttt{IsPsi} fields supply the witnesses for
+\texttt{IsInert}; KX5 gives a unique map $\Lambda\to B$.
+After composing with the unique map $B\to R$ of KX8, their
+restrictions become the local characters of $p$.  The uniqueness
+in KX5 therefore identifies the composite with the exact
+$\Lambda.\texttt{toPair}(p)$ of the source.  The same argument
+proves compatibility with every further $O$-algebra map, and
+identifies these maps with those for any originally chosen
+universal rings via their unique universal isomorphisms.
+
+Thus a later argument may fix its original $s,V,c,r,\Lambda,B$
+once and use these actual maps.  KX2 supplies the entire
+\texttt{LevEx}; KX3 the entire \texttt{LocCFTAll}; KX5 the
+entire \texttt{LamEx}; KX6 the entire \texttt{PhiAll}; and KX8
+the entire \texttt{ProModularRingExists}.
+This does not supply the extra \texttt{RingProps} conditions
+on an ideal $J\subset B$, the automorphic support statements,
+or the seed and component-reaching assertions of \texttt{PMExAlt}.
+In particular, (KX.20) is the precise \texttt{Pair} presentation;
+full determinant annihilation and polarized identities over all
+base rings in \texttt{RingProps} require their own suppliers.
+\end{proof}
+% END KX9

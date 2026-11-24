@@ -1,0 +1,564 @@
+FINITE COEFFICIENT EXTENSION AND THE ACTUAL STANDARD SUBRING — v0.11
+
+Pinned repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Claim IDs: BC1–BC8. This report and its source ledger are a human reconstruction;
+no Lean source edit, compilation, or independent kernel replay is asserted.
+
+RESULT AND EXACT SCOPE
+
+Two different assertions are closed here.
+
+(1) A literal LPprime certificate extends from a coefficient DVR O to a finite
+compatible coefficient DVR S with exactly the same parameters (t,D,kappa,c*).
+The base unramified ring W, its fraction field Q, its Frobenius sigma and its
+lattice edges remain fixed. The mapped element omega'=phi(omega) still satisfies
+omega'^2=p; it need not be a uniformizer of S. No ramification multiplier is
+inserted into t, D or c*: these parameters occur in actual powers of omega and p.
+
+(2) The literal recC construction does contain the required standard coefficient
+subring at every specified place. We construct that ring, its finite extension
+and an embedding inducing the desired number-field place. Hence StdSubAt holds
+for a recC datum, and for an eventually recC family. More generally it follows
+under the literal RingCompatibleAt identifications, including those supplied
+by GroupCompatibilityFamily. IsRecCEv is one sufficient interface and is not
+required by every family construction. The name StdSubAt means a
+standard coefficient SUBRING, not a theorem asserting arbitrary invariant
+submodules are standard. The lattice statements needed with it are proved below.
+
+We do not prove existence of all the global levels, local identifications,
+characters, comparison maps or families that enter recC/IsRecCEv. Those are
+separate global family-existence inputs. The LPprime certificate to be extended
+is supplied by the completed local constructions and the parent assembly.
+HM12 concerns isomorphisms of quadratic coefficient settings; the finite
+extension here is a different result and is not deduced from HM12.
+
+Classical background is finite-dimensional linear algebra, finite fields and
+Witt rings with their Teichmuller expansions, the elementary facts that integers
+of a number field form a Dedekind domain and that a characteristic-zero finite
+field extension is separable. The particular complete-DVR normalization,
+faithful-flatness, place-selection and lattice arguments are proved below.
+CB1–CB2 and CB7 supply the already reconstructed universal monic tableau basis
+and its change-of-basis convention; no integral semisimplicity is assumed.
+
+1. BC1 — THE CONCRETE STANDARD COEFFICIENT RING
+
+Let p>=5 be prime, f>=2 even, q=p^f, k=F_q and k2=F_(q^2). Set
+
+  W=W(k), Q=Frac(W), W2=W(k2),
+  O_s=W2[omega]/(omega^2-p), K_s=Frac(O_s).                 (BC1.1)
+
+The residue-field inclusion gives j_W:W->W2 and then j_s:W->O_s.
+The induced fraction-field inclusion is iota_s:Q->K_s. On Q use the lift
+sigma of a->a^p. The source names are F1,F2,WQ,W2,QQ,OO,KO,jW,jO,iota,wU,sig.
+
+For clarity, O_s/W is NOT an unramified quadratic extension. W2/W is
+unramified of degree two; adjoining omega is a totally ramified quadratic
+extension. The combined extension has rank four over W, residue field k2,
+and omega is a uniformizer. This is precisely the source record named
+UnramifiedQuadraticSetting.
+
+Here are the actual checks. A Witt vector has a unique convergent expansion
+sum_(i>=0) p^i[a_i], with [a] the Teichmuller representative; the p-adic topology
+is the topology of successively fixed Witt digits. Thus W and W2 are complete
+DVRs, with residue k and k2, and p is their uniformizer. Frobenius applies
+ a_i->a_i^p, so it is congruent to x->x^p modulo p and sigma^f=1.
+
+Choose a k-basis b_1,b_2 of k2 and lifts e_1,e_2 in W2. Given x in W2, express
+its residue in that basis, subtract the lifted combination and divide by p.
+Repeat. The coefficient sums converge in W and give x=c_1e_1+c_2e_2.
+If a relation existed, divide all coefficients by their smallest p-power and
+reduce modulo p: a nonzero relation between b_1,b_2 would result. Hence these
+lifts form a W-basis. This proves the finiteness in jW_finite and more.
+
+X^2-p is irreducible over Frac(W2): the p-valuation of a square is even and
+v_p(p)=1. The quotient O_s is consequently a domain and is free over W2 on
+1,omega. For a+b omega !=0, the two candidate omega-orders 2v_p(a) and
+2v_p(b)+1 have opposite parity. Factor their smaller power of omega. The
+remaining factor has nonzero constant residue and is a unit: its inverse is
+obtained from its norm a^2-pb^2, or from a convergent geometric series. Every
+nonzero element is therefore a unit times a power of omega. This proves the
+DVR assertion, O_s/(omega)=k2, and omega^2=p. Its p-adic completeness follows
+from W2^2 and is the same as omega-adic completeness because omega^2=p.
+
+Finally every integer z has a square root in O_s. For z!=0 write z=p^m u,
+p not dividing u. Every nonzero element a of k is a square in k2, because
+(q^2-1)/2=((q+1)/2)(q-1). Lift a square root of the residue of u to y in W2
+by Newton/Hensel iteration for Y^2-u; its derivative 2y is a unit. Then
+(omega^m y)^2=z. The case z=0 is immediate. All the literal fields of
+settingStd have now been checked, including residue cardinal q^2 and the
+finite map j_s. The hypotheses f>=2 and Even f are retained, even though
+several of these ring facts need less.
+
+2. BC2 — FINITE NORMALIZATION AND A PRESCRIBED NUMBER-FIELD PLACE
+
+2.1 Finite normalization over a complete DVR.
+
+Let R be a complete DVR of characteristic-zero fraction field K. Let E/K
+be finite and let S be the integral closure of R in E. We prove that S is
+a finite free complete DVR, with fraction field E.
+
+Choose a primitive element theta and multiply it by a sufficiently large
+power of the uniformizer pi so that theta is integral. A=R[theta] is finite
+free and spans E. The trace form is nondegenerate by separability. If x is
+integral over R, then Tr(xa) is integral over R for every a in A: it is a
+sum of conjugates of the integral element xa. It belongs to K, hence to R,
+since a DVR is integrally closed. Therefore
+
+  A subset S subset A^#={x in E: Tr(xA) subset R}.          (BC2.1)
+
+The trace-dual A^# is a finite free fractional lattice. Since R is
+Noetherian, S is finite. It is torsion free and hence free over the PID R.
+Every element of E has an integral nonzero R-multiple, by clearing the
+coefficients of its monic polynomial over K; thus Frac(S)=E and S has
+R-rank [E:K]. In particular S is pi-adically complete and separated.
+It is integrally closed by transitivity of integrality.
+
+Here is why there is just one maximal ideal. S/piS is a finite-dimensional
+algebra over the residue field, hence Artinian. If it had two or more
+maximal ideals, the Chinese remainder theorem for powers of those ideals
+would supply a nontrivial idempotent. Such an idempotent lifts to S. Every element of 1+piS is a unit by the
+convergent geometric series. For an approximate idempotent e, 2e-1 is
+therefore a unit since (2e-1)^2 is 1 modulo pi;
+replace e by e-(e^2-e)/(2e-1). The error is squared and the iterations
+converge. A domain has only the idempotents 0 and 1, a contradiction.
+All maximal ideals of S lie above (pi), by integrality; hence S is local.
+
+For completeness, the standard one-dimensional normal-local-ring criterion
+can also be seen directly here. Every nonzero prime of S meets R nontrivially:
+for a nonzero x in that prime, the nonzero constant term of its minimal monic
+polynomial lies in R and is x times an element of S. Thus every nonzero prime
+is maximal. Let m be the unique maximal ideal. For 0!=a in m, radical(a)=m;
+finite generation of m therefore gives m^N subset (a) for some N. Choose the least
+n>=1 with m^n subset (a), and choose b in m^(n-1) outside (a). Then t=b/a
+is not in S but t m subset S. If t m subset m, the determinant trick applied
+to the finite faithful S-module m makes t integral over S, a contradiction.
+Consequently tx is a unit for some x in m, and y=x(ty)/(tx) for every y in m.
+So m=(x). Since S/piS is Artinian, m^N subset piS for some N; separation
+ensures no nonzero element lies in every m^n. Repeated division by x now
+shows that S is a DVR. Write pi S=m^e with e>=1. The pi- and m-adic
+topologies are equivalent, proving completeness in the required topology.
+
+The determinant trick just used is elementary: write multiplication by t
+on finite generators of m as a matrix over S, apply its characteristic
+polynomial, and use that m contains a nonzero element in the field E.
+No unproved uniqueness-of-valuation extension is needed in this argument.
+
+2.2 Put the number field at the specified finite place.
+
+Use R=O_s, K=K_s from BC1, and let Omega be an algebraic closure of K_s.
+Let L be the source number field and let v be a prime of its integer ring
+above p. For each embedding tau:L->Omega, form
+
+  E_tau=K_s tau(L),  S_tau=integral closure of O_s in E_tau. (BC2.2)
+
+The extension E_tau/K_s is finite: if L=Q(theta), then
+E_tau=K_s(tau(theta)) and its degree is at most [L:Q]. By 2.1, S_tau is
+a finite free complete DVR. Its maximal ideal pulls back on O_L to a
+prime P_tau over p. All global integers map into S_tau by integrality.
+
+We prove P_tau=v for at least one tau. There are finitely many embeddings
+and at least one, since Omega is algebraically closed of characteristic zero.
+Suppose none induces v. The distinct primes P_tau and v are pairwise
+comaximal. By CRT choose a in O_L which is 0 modulo v and 1 modulo every
+P_tau. Then each tau(a) is a unit in S_tau, so every tau(a)^(-1) is integral
+over O_s. Their product is N_(L/Q)(a)^(-1), by the norm-as-product identity.
+The nonzero integer N_(L/Q)(a) is divisible by p: the norm is an O_L-multiple
+of a (use the constant term of the multiplication characteristic polynomial),
+so it lies in v, whose contraction to Z is (p). Write the norm as p m.
+Then p^(-1)=m N_(L/Q)(a)^(-1) is integral over O_s. But it belongs to K_s
+and not to the integrally closed DVR O_s. This contradiction proves existence.
+This is a CRT simplification of the prime-avoidance argument in ExtWEx.exists_emb.
+
+For that tau, the exact integrality statement is
+
+  tau(x) in S_tau  iff  x in O_(L,v)  iff  v(x)>=0.         (BC2.3)
+
+The forward inclusion O_(L,v)->S_tau follows by writing a/b with b outside v,
+since tau(b) is a unit. Conversely, if x is outside the local DVR O_(L,v),
+then x^(-1) belongs to its maximal ideal and maps to the maximal ideal of S_tau;
+tau(x) therefore cannot be integral. This proves the literal embRec_int
+statement after applying the source's additive/multiplicative valuation dictionary.
+
+The source tauRec, KfRec, ORec, embRec and extRec are precisely these objects
+and maps, with E_tau defined as an intermediate-field compositum. The chosen
+tau is noncanonical; no later proof requires embeddings at different places
+to agree beyond separately stated global comparison data.
+
+3. BC3 — FAITHFUL FLATNESS, DESCENT, INTERSECTIONS, DUALS AND VALUATIONS
+
+Now let R->S be any finite compatible inclusion of DVRs with fraction fields
+K->K'. In the application R=O_s and S=S_tau. An arbitrary finite map of the
+source's DVRs is injective because it is compatible with an injective field
+map. S is finite torsion free over the PID R, hence finite free of positive
+rank. It is faithfully flat. It has fraction algebra S[1/pi]=K': the left
+side is a finite-dimensional domain over K and thus a field containing S.
+
+The element 1 is primitive in the free R-module S. Indeed pi cannot be a
+unit of S: otherwise pi^(-1), integral over R and lying in K, would belong
+to R. Hence 1 is not in piS. Extend 1 to an R-basis
+
+  b_1=1,b_2,...,b_d of S.                                 (BC3.1)
+
+For any K-vector space V, use the associated K-basis of K' to identify
+V'=K' tensor_K V with the direct sum of d copies of V as an R-module.
+For every R-submodule M of V its scalar extension is exactly
+
+  S M = direct_sum_(a=1)^d b_a M.                         (BC3.2)
+
+Consequently scalar extension commutes with sums, kernels of R-defined
+linear maps, and ANY intersection of such submodules, even an infinite one:
+compare the d coordinates. In particular
+
+  S(intersection_i M_i)=intersection_i(S M_i),
+  (S M) intersection V=M.                                (BC3.3)
+
+The second equality uses b_1=1. Thus inclusions and equalities descend.
+This arbitrary-intersection assertion uses finite freeness; flatness alone
+would only justify finite intersections in this generality.
+
+For a lattice L and submodule M subset L, saturation also ascends and descends.
+If L/M is torsion free, it is finite free over R and the sequence splits;
+its scalar extension is a free S-quotient. Conversely if SM is saturated
+in SL and pi x lies in M, then x maps into SM and (BC3.3) brings x back to M.
+Ranks are unchanged, since the corresponding fraction-field spaces are
+ordinary scalar extensions.
+
+For a full lattice M in finite-dimensional V, take an R-basis m_i. The
+algebraic dual lattice M^vee is the R-span of the K-linear dual basis m_i^*.
+Define the semilinear dual map delta by
+
+  delta(G)(a tensor x)=a phi_K(G(x)).                      (BC3.4)
+
+The images m_i^* form the S-dual basis to the images m_i. Therefore
+
+  S delta(M^vee)=(SM)^vee,   (M^vee)^vee=M.                (BC3.5)
+
+This dual uses the K'-valued evaluation pairing. It is NOT the dual of
+restriction of scalars under Tr_(K'/K). No different or trace-discriminant
+factor enters (BC3.5). For a non-full module the same forward integrality
+inclusion is immediate from testing finite S-linear combinations; that is
+all the original LPBase.dual_mem proof needs.
+
+Invariants of any fixed family of R-linear operators commute with this
+extension by the kernel statement. Polynomial invariants in the actual
+Weyl module mean universal identities with an indeterminate, not invariance
+at the finitely many residue-field points. Their coefficient equations
+are R-defined. BC4 additionally identifies their actual integral basis.
+
+For normalized integer valuations choose uniformizers pi_R,pi_S and write
+phi(pi_R)=u pi_S^e, with u a unit and e>=1. Units remain units, so
+
+  ord_S(phi_K(x))=e ord_R(x),
+  ord_S(phi_K(x))/ord_S(p)=ord_R(x)/ord_R(p).              (BC3.6)
+
+The second expression is the p-normalized valuation. If R=O_s,
+ord_R(omega)=1 and ord_R(p)=2; hence ord_S(phi(omega))=e and ord_S(p)=2e.
+The mapped omega has p-normalized valuation 1/2, even if e>1.
+
+A finite-length R-module has a Smith decomposition into R/(pi_R^a).
+After extension, S/(pi_R^a) has S-length e a. Thus length_S(S tensor T)
+=e length_R(T), while length/ord(p), ranks, and p-normalized determinant
+valuations are unchanged. For a selected number-field place v, if e_v=v(p)
+and E_v=ord_S(tau(pi_v)), the same argument gives
+
+  ord_S(tau(x))/ord_S(p)=v(x)/e_v,  ord_S(p)=E_v e_v.       (BC3.7)
+
+These equations are the precise ramification dictionary. One must not
+identify the two integer valuations or declare phi(omega) a uniformizer.
+
+4. BC4 — THE ACTUAL INTEGRAL WEYL LATTICE AND BASIS-INDEPENDENT TWIST
+
+Let X be a k by k variable matrix. For a partition mu, let nabla_mu(R) be
+the polynomials of column degrees mu which satisfy
+f(...,C_j+T C_i,...)=f(...,C_j,...) for every i<j as identities in R[X,T].
+This is exactly StatementA.dualWeyl. CB1–CB2 prove
+
+  nabla_mu(R)=direct_sum_T R b_T,                         (BC4.1)
+
+where b_T is the product of initial-column minors associated to a
+semistandard tableau. The b_T are integer polynomials with distinct monic
+leading monomials. The same family is a basis over every domain. Consequently
+coefficient mapping gives the exact identification
+
+  S tensor_R nabla_mu(R) = nabla_mu(S).                   (BC4.2)
+
+This is the substantive input in NablaLTwEqMap.bc_dualWeyl; it is already
+proved in CB, rather than reintroduced as an unexpanded basis hypothesis.
+Row substitution T(g)f(X)=f(gX) commutes with the generic column operations
+and preserves column degrees. Thus GL_k(R) preserves (BC4.1). Notice the
+composition convention T(g)T(h)=T(hg).
+
+For a decreasing integer weight lambda, put mu_i=lambda_i-lambda_k>=0.
+If Lambda=gR^k, g invertible over K, define
+
+  H_lambda(Lambda)=det(g)^(-lambda_k) T(g^(-1)) nabla_mu(R).
+                                                               (BC4.3)
+
+This is exactly nablaLTw, not a newly chosen Schur lattice. If another basis
+is gh with h in GL_k(R), then
+T((gh)^(-1))=T(g^(-1))T(h^(-1)); the latter inner operator preserves
+nabla_mu(R), and det(h)^(-lambda_k) is an R-unit. Hence (BC4.3) is independent
+of g. The source defines H0 as an intersection over all bases; every term
+of that intersection equals (BC4.3), so it is exactly H0.
+
+Coefficient maps commute with determinants, inverses and the polynomial
+substitution. Therefore
+
+  S H_lambda(Lambda)=H_lambda(S Lambda).                 (BC4.4)
+
+It has the expected basis obtained by applying the invertible operator
+in (BC4.3) to the b_T. Its K-span is the full dual-Weyl space, since that
+space is GL_k(K)-stable. Tensor products in distinct matrix blocks likewise
+have the products of the individual bases as bases: spanning is expansion,
+and distinct blockwise leading monomials prove independence before twisting.
+There is no loss of rank or integral scalar in these identifications.
+
+5. BC5 — THE LITERAL TENSOR, EDGE, CLEAN AND DUAL LATTICES
+
+Keep the source unramified DVR W with residue cardinal q=p^f, its fraction
+field Q, Frobenius sigma, and a coefficient setting (O,K,iota,j,omega).
+Write s=0,...,f-1. For the dominant source weight lambda^0_s, its actual
+signed weight is
+
+  lambda_s=lambda^0_s               if s is even,
+  lambda_s,i= -lambda^0_s,k+1-i      if s is odd.           (BC5.1)
+
+Both are decreasing. Put A_r=sum_s sum_(i<=r) lambda_s,i. A_r is an integer;
+no nonnegativity assumption is silently added. Define
+
+  Lambda_s(L)=O-span of iota(sigma^s L),
+  Lambda_s(e)=Lambda_s(e.src)+omega^(-1)Lambda_s(p e.tgt),
+  H(L)=tensor_s H_(lambda_s)(Lambda_s(L)),
+  H(e)=tensor_s H_(lambda_s)(Lambda_s(e)),
+  R_e=omega^(-A_r) H(e),  R_e'=omega^(-A_r) H(e)^vee,
+  b(F,G)=p^(A_r) G(F).                                  (BC5.2)
+
+The tensors are embedded as products in distinct variable blocks; H(L)
+and H(e) are then regarded inside the source's Vsp, exactly the toV comap.
+The edge condition is e.src subset e.tgt, p e.tgt subset e.src and
+#(e.tgt/e.src)=p^(fr), with both W-modules full lattices. Equivalently an
+adapted Q-basis has e.src=gW^k and
+ e.tgt=g diag(p^(-1)I_r,I_(k-r))W^k.
+This follows by choosing a basis of the r-dimensional subspace
+p e.tgt/p e.src inside e.src/p e.src and lifting it, or by Smith normal form. In that basis
+
+  Lambda_s(e)=iota(sigma^s g) diag(omega^(-1)I_r,I)O^k.    (BC5.3)
+
+Indeed the first r added generators are omega^(-1) times the old ones;
+in the other coordinates the added generator is omega^(-1)p=omega.
+Thus every input to H_lambda is an actual full lattice. Lambda_s(L) is
+similarly full because sigma is a field automorphism and iota is injective.
+
+Let phi:O->S and phi_K:K->K' commute with the field inclusions. Let nu map
+polynomial coefficients by phi_K, restricted to Vsp, and let delta be (BC3.4).
+From (BC4.2) the same tensor tableau family is a field basis on both sides,
+so Vsp'=K' tensor_K Vsp and dim Vsp'=dim Vsp. The span definitions give
+Lambda_s(L)'=S Lambda_s(L) and Lambda_s(e)'=S Lambda_s(e). BC4 gives
+H(L)'=S nu(H(L)) and H(e)'=S nu(H(e)). This also justifies the toV passage:
+the polynomial lattice already lies in its displayed representation space.
+
+Set
+
+  N_src(L)=omega^(-t) H(L) intersection
+                 intersection_(e.src=L) R_e,
+  N_tgt(L)=omega^(-t) H(L)^vee intersection
+                 intersection_(e.tgt=L) R_e'.            (BC5.4)
+
+Under the finite extension, (BC3.3) and (BC3.5) give exact equalities for
+all four scaled edge lattices and both clean lattices after applying nu
+or delta. In particular every old source vector and dual test remains
+allowed. The optional c*-divisibility condition in a different outgoing
+edge also survives, because phi_K(omega^a)=phi(omega)^a for every integer a.
+
+The source proof of LPBase.lpAt_dom needs only these forward inclusions,
+proved term by term, so it does not rely on exchanging an arbitrary
+intersection and a merely flat tensor product. Our equality refinement
+uses the finite freeness established in BC3. A finite compatible map is
+therefore fully sufficient for either route.
+
+Finally the exact pairing commutes:
+
+  b'(nu F,delta G)=phi_K(b(F,G)).                          (BC5.5)
+
+This follows from delta(G)(nu F)=phi_K(G(F)) and phi_K(p)=p, including
+negative A_r. Both sides use the same positive power p^D in the rank
+certificate below. Neither a trace-dual nor a residue-field cardinal
+from the larger coefficient field is substituted into this formula.
+
+6. BC6 — GOODRANKK TRANSFER, WITH AN OPTIONAL DESCENT CRITERION
+
+For a finite family of K-linear functionals ell_i on a lattice A, literal
+GoodRankK(p,A,ell,n,D) asks for an O-linear map u:O^n->A and an O-matrix M
+with n rows such that
+
+  sum_i M_(j,i) ell_i(u(x))=p^D x_j  for every x in O^n.   (BC6.1)
+
+In the application A=N_tgt(L) and ell_i(G)=b(F_i,G). All products are in K;
+the right side is viewed via the coefficient-ring embedding.
+
+Define M'=phi(M) and, writing epsilon_l for the standard coordinate vectors,
+
+  u'(y)=sum_l y_l delta(u(epsilon_l)),  y in S^n.          (BC6.2)
+
+BC5 proves that every summand is an element of the actual target clean lattice.
+It follows that u' is S-linear and has the required codomain. For its jth
+paired coordinate, bilinearity, (BC5.5) and (BC6.1) give
+
+ sum_i phi(M_(j,i)) b'(nu(F_i),u'(y))
+   =sum_l y_l phi_K(sum_i M_(j,i)b(F_i,u(epsilon_l)))
+   =sum_l y_l p^D delta_(j,l)=p^D y_j.                   (BC6.3)
+
+Thus the same n and D work. This is exactly the substantive matrix calculation
+at the end of lpAt_dom. No primitive-vector assertion is inferred merely
+from an enlarged fraction-field rank.
+
+A useful derived strengthening explains descent as well. Suppose the clean
+lattice is finite free and the tests are fixed scalar extensions. Choose a
+basis and let B be their rectangular evaluation matrix, with entries in K.
+Its fractional Smith form has nonzero diagonal pi^s_1,...,pi^s_h, where
+s_1<=...<=s_h are integers, possibly negative. Put a=D ord_O(p). Then
+
+  GoodRankK(p,A,ell,n,D) iff n<=h and s_n<=a.             (BC6.4)
+
+For sufficiency take the first n Smith coordinates and multiply the ith
+column by the integral scalar p^D/pi^s_i; undo the two integral invertible
+Smith changes. For necessity, if fewer than n diagonal entries have s_i<=a,
+choose a primitive row in the left kernel of the n-by-(number of such entries)
+block of the witness M after its Smith change. Such a row exists: take a
+nonzero field-kernel row and divide all coordinates by their minimum
+valuation. All remaining terms have valuation at least a+1, whereas its
+product with p^D I has an entry of valuation exactly a. Contradiction.
+The case n=0 is automatic.
+
+Finite extension multiplies every s_i and a by the same ramification index.
+Hence (BC6.4) is equivalent over O and S. The actual N_tgt(L) is finite free
+because it is a submodule of the finite free lattice omega^(-t)H(L)^vee;
+BC5 gives its exact scalar extension. So this optional descent criterion
+applies to any FIXED family of old source vectors. It does not assert that
+an arbitrary new collection of source vectors chosen only over K' descends.
+The forward theorem (BC6.3), sufficient for LPBaseChange, needs no such
+extra assertion and does not use Smith normal form.
+
+7. BC7 — THE COMPLETE ACTUAL LPBASECHANGE STATEMENT
+
+Assume the two compatible source HidaSetting records, the finite coefficient
+map O->S and its compatible field map. For every m,r,lambda^0,t,D,kappa,c*,
+
+  LPprime_O(t,D,kappa,c*) => LPprime_S(t,D,kappa,c*).       (BC7.1)
+
+The source record is: 4(D+1)<=c*, and for every full W-lattice L there is a
+finite list of edges e_i with target L, source vectors F_i in N_src(e_i.src),
+extra omega^c* divisibility for every other edge out of that source, and
+GoodRankK on N_tgt(L) of rank n>=(1-kappa)dim Vsp.
+
+If lambda^0 is dominant, use exactly the same W-edges and map each F_i by nu.
+BC5 proves every source and alternative-edge membership. BC6 transports the
+rank witness and its matrix. The dimensions agree by the common tableau
+basis, so its numerical rank inequality is unchanged. The leading condition
+4(D+1)<=c* is identical. This proves (BC7.1) for each L and then for all L.
+If a weight is not dominant, the literal definition of Vsp contains a zero
+factor (the odd signed reversal preserves the equivalence of dominance).
+Thus dim Vsp=0; the empty edge list and n=0 give the required trivial witness
+on either side. This is the exact lpAt_nondom branch, not a tacit positivity
+assumption on weights or kappa.
+
+All discrete edge data stay over W and Q. In particular q=#(W/pW) is unchanged
+when the coefficient residue field grows. The parameters t,D,c* continue to
+measure powers of the mapped omega and p; BC3 supplies the integer-valuation
+scaling if a later argument rewrites them using a new uniformizer.
+
+The core forward proof actually needs only compatible injective coefficient
+and field maps, the appropriate lattice/model definitions and the two setting
+records. Finiteness is present in the formal LPBaseChange interface but is
+not used by LPBase.lpAt_dom. We keep it in (BC7.1), as needed for the actual
+application, and use it honestly for the stronger equalities and descent.
+
+8. BC8 — THE ACTUAL STDSUBAT SUPPLIER AND ITS REMAINING FAMILY BOUNDARY
+
+For the source D7 datum, a word u, a served place v and a local orbit index a,
+StdSubAt asks for O_s,K_s,iota_s,j_s,omega_s and a finite map into the actual
+coefficient DVR, compatible with its fraction-field map, such that O_s is
+an UnramifiedQuadraticSetting on the SAME W,Q,sigma and
+
+  phi_K iota_s=iota,  phi j_s=j,  phi(omega_s)=omega.       (BC8.1)
+
+BC1 supplies the standard setting. BC2 supplies the actual finite extension
+ORec=integral closure of OO in KO tau(LL) and extRec at the chosen place.
+LevelGatherings.setting_ext is then checked directly: the W/Q/Frobenius,
+period, residue and completeness properties on W are unchanged; compatibility
+of iota and j follows by composition; finiteness is transitive; ORec is
+complete with the displayed fraction field; and (phi omega_s)^2=p.
+The target setting requires this last equation, not irreducibility of phi omega_s.
+
+More generally suppose e_W:WQ->W and e_Q:QQ->Q are compatible ring/field
+isomorphisms, and the actual coefficient rings are compatibly isomorphic to
+ORec,KfRec. Compose extRec with the latter isomorphisms, and set
+
+  iota_s=iota_std composed with e_Q^(-1),
+  j_s=j_std composed with e_W^(-1).                        (BC8.2)
+
+Keep the actual sigma on Q. Its Frobenius and period clauses come from the
+actual HidaSetting; an extra conjugacy assertion about sigma is unnecessary.
+The literal RingCompatibleAt identities are exactly (BC8.1) after these
+compositions. Finite isomorphisms preserve the finiteness of extRec. This
+proves stdSub_of_iso and stdSubAt_of_ring with every map specified.
+
+For the actual locPackC/recC construction those isomorphisms are all the
+identity. The four fields are literally
+
+  WQ(p,f), QQ(p,f), ORec(D,v,f), KfRec(D,v,f),               (BC8.3)
+
+and iota,j,omega are the composites just displayed. This is why
+FullTiedCBase.ringTied_recC is reflexive. It is not an assumption that an
+arbitrary actual DVR contains the standard residue-field extension. The
+construction deliberately put that subring into (BC8.3).
+
+The period is f=nFr(D,p). The source nFr_spec gets Even f and f>=2 from the
+GIdx even-order condition: order(zH)=addOrder(hP), equal to the order of the
+selected central Frobenius component; a positive even group order is at least
+two. The prime lower bound p>=5 is also part of the local-index data. Thus
+the precise hypotheses of BC1 are available wherever locPackC is formed.
+Other recC inputs, such as its level Lc, local identification I, character psi
+and rank compatibility hd, do not enter the standard-ring argument.
+
+Consequently every well-formed recC datum satisfies StdSubAt. If a family is
+eventually identified with recC, the same conclusion is eventual with the
+same supplied threshold: for each large x and index, replace its datum by
+the identified recC and use the pointwise construction. In particular the
+literal IsRecCEv record is sufficient; its much stronger metric/form payload
+is not needed merely for StdSubAt. The source route through
+GroupCompatibilityFamily -> stdSubF_of_tied directly supplies the compatible
+ring field, without requiring an IsRecCEv identification. The active linked-
+family/threshold-selection route supplies this stronger family record;
+expanding its construction is a continuation task, not a BC premise that
+has been silently discharged. AdmissibleFamilyNoKernel passes this property and
+lpBaseChange to Joints.linear_programming_input_of_hypotheses.
+
+RETAINED INPUTS AND NONCLAIMS
+
+The eight BC claims prove the standard-ring construction, finite normalization,
+place realization, exact lattice transport and actual LPprime base change.
+They leave no new local representation or ramification hypothesis unstated.
+They retain the global assertion that the family under consideration has
+the displayed compatible ring identifications. A recC/IsRecCEv identification
+is sufficient, as is the ring field of GroupCompatibilityFamily; these are
+alternative interfaces, not simultaneous requirements. Constructing the full
+globally compatible local levels,
+characters, Hermitian identifications, metric comparisons and families is
+not supplied by this argument. Nor does it prove abundance of good orbits,
+theta/spectral identities, cohomological windows or prime selection.
+
+The stronger clean-intersection equalities and fixed-family GoodRankK descent
+are explicit derived results. They are not attributed to the source's weaker
+forward-inclusion proof. All exact source paths, declaration ranges, file/range
+SHA256 hashes, and pinned URLs are generated in provenance.json.
+
+INDEPENDENT REVIEW TARGETS
+
+1. BC2: trace-bound finiteness, idempotent-lift locality, the DVR criterion,
+   and the CRT/norm proof that the embedding induces the selected place.
+2. BC3 and BC5: finite-free arbitrary intersections; algebraic versus trace
+   dual; determinant-twist orientation; exact source/dual normalization.
+3. BC6–BC8: negative fractional Smith exponents, primitive-kernel necessity,
+   unchanged LP parameters, and the exact pointwise/ev family boundary.

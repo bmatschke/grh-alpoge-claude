@@ -1,0 +1,394 @@
+PRIMITIVE SYMBOL SELECTION, NORMAL DEGREE, AND THE DENSITY FRONTIER
+Working reconstruction 0.6 — 21 November 2026
+Pinned source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+Purpose and status
+==================
+The selected-symbol theorem is SelectionLemmas.Conclusion2, defined in
+GrowthBounds/ValuationLowestDegreeRename.lean. It has both a quantitative
+rank conclusion and a normal-degree conclusion. The rank concerns an
+integral direct summand whose basis consists of actual allowed generators.
+The degree assertion concerns the entire span of those generators.
+
+This note proves the integral selection, determinant nonvanishing, and
+normal-degree assertions. It also gives elementary proofs of several
+finite-dimensional and counting steps used in the rank argument. It does
+not claim the entire quantitative selected-symbol rank theorem proved.
+In particular, a primitive selection lemma cannot establish the number
+of generators left after the path restrictions. All remaining hypotheses
+are identified below and in provenance.json.
+
+SD1. Selecting a primitive lattice without enlarging the generator set
+=====================================================================
+Let O be a DVR with uniformizer pi and residue field f. Let S be a finite
+set of monomials, M=O^S the corresponding coefficient module, and G a
+set of polynomials supported on S. Let d be the dimension of the span of
+their reductions in f^S. Choose g_1,...,g_d from G whose reductions form
+a basis of that span. This is possible by elementary vector-space basis
+selection from a spanning set; G itself need not be finite.
+
+Write the g_i as the columns of an |S|-by-d matrix C. Reduction has column
+rank d, so some d coefficient rows form a square matrix A with determinant
+nonzero modulo pi. Therefore det A is a unit of O, and A^{-1} has entries
+in O. Let pr be the map that reads those d coefficients from ANY polynomial
+in the ambient polynomial module. Set R=A^{-1} pr and T=ker R. If
+i:O^d -> O[X] sends e_i to g_i, then R i=id. Thus
+
+             O[X] = i(O^d) direct-sum T.
+
+The g_i are a basis of i(O^d), all belong to G, and rank i(O^d)=d. The zero
+rank case uses the empty matrix and the zero summand. This is precisely
+the source RestSel. It also shows saturation directly: if a x lies in the
+summand and a != 0, the T-coordinate of x is zero because O[X] is torsion
+free. No completion of O, characteristic-zero argument, or integral
+isotypic decomposition is involved.
+
+Source route: SelIsComplRestrictSupport.sel_key, sel_li, sel_sat, restSel.
+The source divides relations by pi, proves independence/saturation, and
+then obtains a complement. The unit-minor proof above is our shorter
+replacement; it proves the same conclusion with the same generator set.
+
+SD2. Residue independence and product assembly
+=============================================
+First suppose L is a finite free saturated submodule of a polynomial
+module and b_1,...,b_h is an O-basis of L. If a relation among the reduced
+b_i vanishes, lift its coefficients to c_i in O. Then sum c_i b_i=pi P,
+because each coefficient of that polynomial is divisible by pi. Saturation
+gives P in L; expressing it in the b_i basis shows c_i is divisible by pi
+for every i. Hence the reductions of the b_i are independent. This is
+also the familiar equality L intersect pi M = pi L.
+
+A support restriction is saturated over any domain: a nonzero scalar
+cannot erase a nonzero coefficient. Intersections of saturated modules
+are saturated. Therefore an already saturated segment module remains
+saturated after imposing its fixed multidegree and digit support bounds.
+The source uses this in LamSatRestrict.restLamA_of. Its input is the
+specific saturation assertion in NestedTypeBound for XX'. The general
+argument here does not silently replace that identification: the actual
+XX' identification must either be proved from its integral path basis
+or retained explicitly.
+
+Here is the precise tensor-product argument used next. For each family
+index f and segment j, let V_fj be a finite-dimensional polynomial space
+over f with allowed monomial support S_fj and basis v_fji. A substitution
+maps a monomial m to X^{E_j m}. Suppose
+
+     (f,(m_j)_j) |-> ell_f + sum_j E_j m_j
+
+is injective when m_j belongs to S_fj. The direct sum over f of tensor
+products of the free monomial spaces f^{S_fj} has a monomial basis indexed
+by those tuples. The indicated substitution/product map takes that basis
+injectively into distinct monomials of the target ring. It is therefore
+injective. Its restriction to the tensor products of the V_fj is injective
+as well, giving a family of sum_f product_j dim(V_fj) independent products.
+This is the content of lam_li_fixed and lam_li_all. It is a linear
+statement; no assertion that products of arbitrary polynomial bases are
+automatically independent is being made.
+
+The actual source exponent map is lamL(la)+sum_j imgMon(lamG_j,lamE_j,m_j),
+where lamE_j(x,c)=p^(dist(j,x)+R_j). Its local recovery equation is
+
+                  n = ell + P(u+Q v).
+
+Here 0<=ell<P; at a terminal-frame plane coordinate 0<=u<Q. Reading n
+modulo P recovers ell, then dividing and reducing modulo Q recovers u,
+and division recovers v. A non-frame late letter has no old-frame copy,
+so v=0 and no upper bound on u is needed. At normal coordinates old-frame
+variables are absent, again v=0. The source LamGeo conditions guarantee
+one late occurrence, at most one old-frame occurrence, and the factor
+P_old=P_late*Q at an overlap. Row sums then recover the family parameter e.
+These conditions explain why simple tensor multiplication is legitimate.
+The full verification of LamGeo, the row-degree matching RestLamDeg, and
+the specific XX' saturation input have not all been expanded here. SD2
+is a proved product-assembly lemma under these explicit data, not a claim
+that the entire source RestLam has already been discharged.
+
+SD3. A nonzero determinant multiplier in every residue characteristic
+=====================================================================
+We spell out the geometric input. A valid periodic frame F has r ordered
+even frame letters fr(j,0)<...<fr(j,r-1), consecutive frames are disjoint
+and ordered, and fr(j+J,i)=fr(j,i)+n', with J>=1. All frame letters belong
+to the periodically lifted selected set TT. Segment j consists of the
+selected letters from the first letter of frame j-1 to the last of frame
+j. Its late letters lie after the last letter of frame j-1.
+
+For a late letter x, take the last r even selected letters before x in
+that segment; call them y_1<...<y_r. At least r exist, namely frame j-1.
+The r entries of any frame occupy distinct residue positions modulo n':
+the whole frame lies strictly before the next frame, and hence before
+the start of its translate J frames later, which is n' further on.
+Consequently every interval [u,u+n') contains r distinct periodic
+translates of the entries of a fixed frame, all even and selected.
+
+Suppose y_r >= y_1+n'. Choose those r frame translates in [y_1,y_1+n').
+They all lie in the segment and before x, and are distinct from y_r.
+Together with y_r they give at least r+1 even selected letters in
+[y_1,x). But by construction y_1,...,y_r are exactly the last r such
+letters. This contradiction proves y_r-y_1<n', and hence the y_i occupy
+distinct residue positions modulo n'. This is the mathematical content
+of late_vectors_distinct_tops.
+
+Consider det(X_{y_i,c})_{i,c=1}^r after embedding in plane coordinates
+and substituting X_(y_i,c) -> Z_(y_i mod n',c)^{p^{dist(j,y_i)}}. Distinct
+residue rows make it possible to assign diagonal variables 1 and all
+off-diagonal variables 0. All exponents are positive. The resulting
+matrix is the identity, so the substituted determinant is not zero over
+any nonzero field. This proof does not require that its total degree be
+less than the field size: it proves a formal polynomial is nonzero by
+one explicit evaluation.
+
+The source multiplier is
+
+ Delta = product_j product_(late x in j)
+         ph_j(det(X_(row(j,x,i),c))^{s(j,x)}),
+ s(j,x)=floor(Bo(j,x)/(k^2 Y)).
+
+Every reduced factor is nonzero. The residue polynomial ring is a domain,
+so their finite product is nonzero. The result is exactly
+DiscriminantNonzeroModUniformiser. Different determinant factors need not
+be simultaneously made 1 by a single evaluation; their product is
+nonzero because the polynomial ring is a domain.
+
+SD4. The normal-degree estimate, with a slightly sharper intermediate bound
+============================================================================
+Let k=r+K, N=|TT|, and Lcal=CLa Ns^2 log a. The source degree vsDeg counts
+the final K coordinates in even rows and the first r coordinates in odd
+rows. As n' is even, parity is preserved on reduction of a row modulo n'.
+For a segment monomial m, define ordDeg_x by the same parity convention.
+
+Every monomial in XX'_j is supported on segment letters, and its normal
+variables are supported only on late letters. The old-frame letters are
+even: the validity condition excludes selected letters between adjacent
+frame letters, so the selected letters in the old-frame interval are
+exactly those even frame letters. Old-frame plane variables therefore
+have normal weight zero. For every support monomial m,
+
+ vsDeg(ph_j m) <= sum_(late x) p^{dist(j,x)} ordDeg_x(m).
+
+In fact the nonzero-weight terms give the displayed sum directly; the
+inequality formulation is sufficient and matches the source. By the
+definition of XX', ordDeg_x(m)<=o(j,x), where
+
+ o(j,x) = Lcal*a/(p*k*p^{dist(j,x)})
+          + (10 if x is even, 1 if x is odd)*a*p^{-(L1+dist(j,x))}.
+
+It follows term by term that
+
+ p^{dist(j,x)} o(j,x) <= A+10B,
+ A=Lcal*a/(p*k),  B=a*p^{-L1}.
+
+Let e_j=fr(j,r-1). The late letters of segment j are exactly the selected
+letters in (e_{j-1},e_j]. These intervals partition (e_{-1},e_{-1}+n']
+as j runs over one period 0,...,J-1. Reduction modulo n' is injective on
+this interval and covers the selected positions, so each member of TT
+is counted once. The source only needs the weaker total count <=N.
+Thus the product of all segment factors has normal degree <=N(A+10B).
+
+The full generator is that product times a permitted label monomial X^ell,
+and has fixed row degree d_t=deg_t-E'_t on TT and zero degree outside TT.
+For a nonzero generator, every surviving monomial of the full generator
+contains X^ell, so ell is bounded coordinatewise by that monomial. The
+zero-generator case is vacuous. Hence ell vanishes outside TT. At a selected row t,
+choose its late representative x in some segment. The label definition
+gives ell_(t,c)<p^{dist(j,x)}<=Q. Counting at most k coordinates per row
+therefore gives vsDeg(ell)<=NkQ.
+
+Consequently every generator, and hence every polynomial in its O-span,
+has support of normal degree at most
+
+             N(A+10B+kQ) <= 10N(A+B+kQ).
+
+The last step uses nonnegativity of A,B,Q, which follows from the source
+hypotheses (in particular a>=1 and CLa>=0). Multiplication adds the weighted
+degree; taking a sum or multiplying by a scalar can only remove support.
+This proves RestDeg and the degree clause of Conclusion2 with Cdeg=10.
+The sharper first expression is our retained simplification; none of the
+downstream source constants is changed.
+
+SD5. Rank transfer through a nonzero multiplier
+==============================================
+Let Nbar be the residue-field span of the actual integral generators and
+Lambdabar the residue-field span of the source coarse generators. Suppose
+that for each coarse generator u there exists an actual generator g with
+
+                         overline(Delta*u)=overline(g).
+
+Then multiplication by overline(Delta) maps Lambdabar into Nbar. SD3 shows
+that this multiplication is injective, so dim(Nbar)>=dim(Lambdabar). SD1
+produces a direct summand Sg in the actual integral span with
+
+                 rank_O Sg = dim_f Nbar >= dim_f Lambdabar.
+
+All these spaces lie in finite monomial-degree blocks where needed, so
+their dimensions are finite. The congruence is precisely the separate
+source GeneratorModuloUniformiser; it is not automatic from a nonzero
+Delta or from characteristic-zero generation.
+
+The coarse generators have the form X^ell product_j phc_j(y_j), where
+y_j belongs to a segment space M_j with fixed row degrees and bounded
+terminal-frame plane exponents. phc_j raises exponents by
+p^(dist(j,x)+R_j), and labels have the corresponding enlarged digit bound.
+The source proves the congruence by splitting a coarse label into its low
+digits and the next R_j digits, then replacing the segments modulo the
+uniformizer by integral allowed path combinations after multiplication
+by the determinant powers. The latter step uses ColumnWordReductionOfFour,
+SegmentReductionLiftsMultihomogeneous, and the exact NestedTypeBound lift.
+Those statements require a further human expansion.
+
+If dim(Lambdabar)>=q^{-rK} B0, then the same is true for rank Sg. For the
+alternative bound B0/nPl, there are at least q^{rK} r-planes in f_q^k:
+the graphs of all linear maps f_q^r -> f_q^K are distinct. If B0>=0 this
+implies B0/nPl<=q^{-rK}B0; if B0<0 the desired lower bound is automatic
+from nonnegativity of rank. This is the final finite-field-plane conversion
+in second_estimate_of_rank_bound, and uses no exact Grassmannian formula.
+
+SD6. Residue classes in a truncated cube, and terminal path degrees
+=================================================================
+Fix integers r>=2, Q>2b>=0, and c,rho. There are Q^{r-1} tuples
+(u_1,...,u_r) in {0,...,Q-1}^r satisfying c+sum_i u_i=rho mod Q: freely
+choose r-1 entries and the remaining entry is uniquely determined.
+For any one coordinate, imposing a specified value leaves Q^{r-2}
+solutions, again by solving for a different coordinate. There are 2b
+forbidden values in [Q-2b,Q). The union bound therefore leaves at least
+
+                  Q^{r-1}-2rb Q^{r-2}
+                = Q^{r-1}(1-2rb/Q)
+
+solutions in the truncated cube. The bound is valid even when its right
+side is negative. This is exactly ResidueClassCount. The source derives
+it through the longer LDdigits recursion; the union-bound proof is our
+replacement. The restriction r>=2 matters when counting a fixed
+coordinate; Q need not be prime and the residue ring need not be a field.
+
+For a positive horizontal-strip step mu -> mu' of total degree d,
+interlacing gives mu'_(i+1)<=mu_i, so summing and telescoping yields
+
+                  d=sum_i(mu'_i-mu_i)<=mu'_1-mu_k.
+
+In the source terminal-frame construction, mu'_1=b=beS. All preceding
+negative steps have total degree at most b: the terminal frame steps
+are all positive, and the sum defining beS includes all earlier degrees.
+Starting from zero, no coordinate can be less than minus the total
+negative degree, so mu_k>=-b. Hence d<=2b. This proves the exact
+TauDegreeOnPathBound independently of any quantitative good-path count.
+
+Now assume 4Yb<=Q and Y>=1. For each terminal-frame row, append an r-tuple
+of auxiliary exponents u_ic<Q-2b and prescribe
+d_i+sum_c u_ic=rho_i mod Q. The count above is at least
+Q^{r-1}(1-r/(2Y)). The rows can be chosen independently. The resulting
+e_i=d_i+sum_c u_ic is less than rQ, and u_ic+2b<Q as required by Idx.
+The original path and its standard terminal normal index are retained,
+so this map to the disjoint union over e of Idx is injective. Thus the
+source RestMon factor is
+
+             [Q^{r-1} max(0,1-r/(2Y))]^r
+
+per good path. If the displayed inner factor is nonpositive, the source
+bound is simply zero. The good-path definition and its threshold depend
+only on the earlier degrees, so changing the terminal-frame row degrees
+to e_i preserves it. This is why the congruence count can be made for each
+good path separately. The actual parameter estimate 4Y beS<=Qc, called
+BetaRatioBound, remains separate; the preceding proof does not supply it.
+
+SD7. Compressing the final multiplicative losses
+===============================================
+Let integers J,N,r and real k,Y,alpha satisfy J<=N, N>=1, r>=2, k>=5,
+Y>=1, and 1-1/(32Y)<=alpha<=1. Set
+
+                eta=(1-5/Y)(1-1/Y)(1-r/(2Y)).
+
+Suppose 1-Nr^2 k/Y>0. Then Y>Nr^2 k>=r^2 k, so every factor of eta and
+the lower bound on alpha is in [0,1]. The elementary inequality
+product_i(1-x_i)>=1-sum_i x_i for 0<=x_i<=1 gives
+
+ alpha eta >= 1-(1/32+5+1+r/2)/Y >= 1-(7+r/2)/Y.
+
+Let b0=7+r/2. The hypotheses imply b0<=r^2 k, hence b0/Y<1. As alpha<=1
+and J<=N,
+
+ alpha^J eta^N >= (alpha eta)^N
+                 >= (1-b0/Y)^N
+                 >= 1-Nb0/Y
+                 >= 1-Nr^2 k/Y.
+
+The third inequality is Bernoulli's inequality. This is sum_total_loss.
+If the desired final rank lower bound has nonpositive coefficient, it
+follows from rank>=0 without using this product estimate. One should not
+apply the displayed product estimate unconditionally when eta could have
+negative factors: the positive-target case is part of the argument.
+
+The source alpha is 1-a^{-Ns^2}. The step alpha>=1-1/(32Y), together with
+the individual multiplicative bounds 1-5/Y,1-1/Y,1-r/(2Y), is established
+by the separate SumFacts/RestSum computation. Our proof compresses their
+final combination and explains Crk=1, but does not assume those preceding
+estimates have thereby been proved for the actual data.
+
+SD8. Exact theorem and remaining dependencies
+============================================
+The literal numerical hypotheses of Dat.Hyp / Conclusion2 include:
+
+* prime p>=13, even n', r>=2, k=r+K and a valid periodic frame;
+* a<=deg_t<=2a for t in TT;
+* at most Ns letters in each segment, Ns<=N1 and Ns<=2|TT|,
+  and Ns+r<=K;
+* p^{dist(j,x)}<=Q, Y>=1;
+* Ck Ns^2 log a<=k;
+* 128 k^2 Ns Y^2<=p^{L1-1};
+* E'_t<=E0 and 32 p Y k^2 Ns Q^2(E0+mStar+1)<=a.
+
+The source SegmentDegree.secondPartClosed chooses the uniform threshold
+C0=1088 and gives Crk=1, Cdeg=10 once CLa,Ck>=1088, under the stated AdmB
+interfaces. In the unramified quadratic setting of Conclusion2, it yields
+a complemented Sg with a basis in the actual generator set, satisfying
+
+ rank_O Sg >= q^{-rK}(1-|TT|r^2 k/Y)
+                  product_(t in TT) choose(deg_t+k-1,k-1),
+ q=p^{n'},
+
+and the corresponding denominator nPl(f_q,k,r) lower bound. SD4 proves
+the degree conclusion; SD1 supplies the exact primitive selection once
+the residue rank has been bounded; SD3 supplies multiplier nonvanishing.
+
+The remaining rank construction has the following explicit frontier.
+
+1. GeneratorModuloUniformiser: multiply coarse generators by Delta and
+   lift their reductions into the allowed integral generator set. Its
+   current source route is generator_modulo_uniformiser_of_adm ->
+   column_word_reduction_of_four -> segment_reduction_of_column_words,
+   with numerical column bounds and the specific NestedTypeBound lift.
+
+2. RestLam: the actual segment spaces have the claimed saturated residue
+   bases, and the allowed label/degree families give injective mixed-radix
+   monomial assembly and exact total row degree. SD2 proves the abstract
+   linear algebra and explains the two division steps. The complete
+   geometric and degree-identification verification is still retained.
+
+3. RestSeg: construct enough independent famEl in M_j. It uses RestMem,
+   RestInd, the GoodPathWeight abundance estimate, and RestMon. SD6 proves
+   the residue count and path-head bound, and the deduction of RestMon
+   once BetaRatioBound is supplied. The quantitative abundance estimate
+   is the major remaining combinatorial part: its admissible paths retain
+   at least 1-a^{-Ns^2} of the indicated product of binomial dimensions.
+
+4. RestPad and RestSum: the selected digit families obey the row-padding
+   hypotheses, and summing their products yields the claimed global
+   factor q^{-rK} and binomial product. SD7 proves the final error
+   combination; it does not prove the preceding factor estimates or
+   the degree-family summation identities.
+
+RestCountOf.restCount_of combines items 2--4 by finite sums and products;
+Coarse.restRank_of then combines them with item 1 and SD3; finally
+NonemptyDvrSettingOfStandard.second_estimate_of_rank_bound invokes SD1
+and SD4. This dependency description narrows the next local target without
+presenting the source theorem as an already reconstructed human proof.
+
+Scope and validation
+====================
+All arguments concern the pointwise local symbol construction under the
+exact supplied frame/size data. They do not construct the global frames,
+prove the Type-I alternative, or discharge the global theta/cohomology
+and spectral estimates. They also do not enlarge Dirichlet GRH to general
+automorphic or Dedekind GRH. The source locators and hashes are generated
+from unchanged bytes at the pinned commit. No Lean build or independent
+kernel replay is claimed.

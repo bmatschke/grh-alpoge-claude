@@ -1,0 +1,395 @@
+COMMON PERIOD AND LATTICE RECONSTRUCTION — v0.2
+Owner: lean_audit subagent. Date: 21 November 2026.
+Repository: CocoSgt/riemann-hypothesis-lean.
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+All source paths below are relative to that repository.
+
+WHAT THIS PASS ACTUALLY PROVES
+
+The section fragment period_lattice_section.tex proves a complete algebraic
+piece of the intended RH argument. Given finite class models, rational common
+theta quotients, the period comparison identity, local divisibility bounds,
+and archimedean operator bounds, it constructs the K-bilinear maps B_u, proves
+that they take all shifted source lattices into the dual of ONE row lattice,
+and derives the precise quotient/chain norm bound. The lattice is constructed
+explicitly by an intersection of localizations. The B_u are explicitly finite
+algebraic class sums followed by canonical quotient descent.
+
+This is stronger than naming a “common integral target” as an interface: the
+descent and integrality mechanism is completely proved, and every object is
+traced to concrete definitions. It does not prove the theta identity, the
+rationality of the theta comparison matrices, or the local gains themselves.
+The corresponding remaining inputs are PL6, PL13, PL15, and PL16 in the ledger.
+No Lean compilation, kernel replay, or formal checking of the reconstruction
+was performed. “Faithful translation” means checked against the cited source,
+not independently verified from the Lean kernel in this session.
+
+The fragment uses only v0.1 macros/environments and is sized for a 3–4 page
+section before later integration edits. The provenance JSON records exact source
+declarations, ranges, hashes, dependencies, and the distinction between
+translated statements and our derived simplifications.
+
+1. THE COEFFICIENT MODULES ARE CONCRETE POLYNOMIAL MODULES [PL1]
+
+Let lambda_1 >= ... >= lambda_n be an integral dominant weight. Put
+c=lambda_n and nu_i=lambda_i-c >= 0. For a matrix of variables Z=(z_ij), the
+module nabla_nu over a coefficient ring A consists of polynomials which have
+column multidegree nu and are unchanged by replacing column j by column j+t
+times column l for every l<j, with t an indeterminate. This is an exact
+translation of dualWeyl in GradedWeylDivisibility/StatementA.lean:24–29.
+
+Write D_s(Z) for the determinant of the leading s by s submatrix and nu_{n+1}=0.
+The highest-weight polynomial is
+
+  h_nu(Z) = product_{s=1}^n D_s(Z)^(nu_s-nu_{s+1}).
+
+For two row indices a,b, substitute row_b -> row_b+t row_a and take the
+coefficient of t^k. This coefficient operator is the divided row operator
+rowDiv(a,b,k). The integral Weyl module Delta_nu is the A-span of all finite
+compositions of these operators applied to h_nu. This is literally the
+definition of weyl, not an appeal to an unspecified representation-theoretic
+construction. The determinant twist c is carried in the action separately.
+
+For the CM-type embeddings tau:E->K, VV(K,lambda) is the tensor product of the
+nabla_{nu_tau} over K, realized as polynomials in separate tau-blocks. The
+standard integral companions NabStd and DelStd are the corresponding tensor
+products over O_K of the dual-Weyl and Weyl modules. The polynomial action is
+the product of determinant twists times block substitutions by transposed
+matrices (CoefMod.actP). Source coefficients use the contragredient action,
+implemented by inverse transpose; row coefficients use the direct action.
+
+For a lattice L in E^n, tauLat(tau,L) is the O_K-span of its coordinatewise
+image under tau. To transport NabStd or DelStd to a family of K-lattices M_tau,
+the definition imposes the following at every finite place w and every
+tuple B_tau of local basis matrices of M_tau:
+
+  rho(B^{-1}) f belongs to the localization of NabStd (respectively DelStd).
+
+The intersection of these conditions is transLat. Thus these coefficient
+lattices are defined even when there is no global free O_K-basis. Independence
+of the local basis and lattice/fullness properties are proved in the source;
+their quantitative denominator and duality estimates are not reconstructed
+in this pass [PL16].
+
+For a decorated lattice d, define L(d) by the residue-functional kernel
+conditions and Lsharp(d) as its hermitian dual. The column coefficient lattice
+is DelAtr(lambda,Lsharp(d)); DelAtr applies Del to the ordinary bilinear duals
+of tauLat(tau,Lsharp(d)). The row coefficient lattice is NabAt(sigma,N(d)).
+This specifies precisely which of the two integral modules occurs on which
+side. Replacing every lattice by a generic “integral automorphic form” would
+lose information needed for divisibility.
+
+2. THE FINITE CLASS MODEL AND THE PERIOD SUM [PL2, PL3, PL17]
+
+The decorated point set is generally infinite. A point consists of a full
+unimodular O_E-lattice N in E^n, a nonzero residue functional at each prime in
+S_T, and a residue frame at each prime in S_G. The functionals/frames are
+linear on the corresponding localizations; the formal definitions extend
+them by zero off that localization. The rational isometry group of
+sum_i conjugate(x_i)y_i acts, together with a finite residue level group.
+The source proves finiteness of the orbit set and of each stabilizer, then
+uses a choice of representative in each orbit. The finite-class assertion is
+a real arithmetic fact; it is not implied merely by having written a quotient.
+
+For any such G-set D with coefficient representation rho on V, define
+
+  A = { f:D->V : f(gd)=rho(g)f(d) }.
+
+Evaluation at orbit representatives d_c identifies A with the direct sum of
+V^{Gamma_c}, where Gamma_c is the stabilizer. The integral function lattice
+is specified pointwise using Nab(d) or Del(d). Fullness has a short independent
+proof once the coefficient lattices are full: intersect each coefficient
+lattice with V^{Gamma_c}; clearing denominators of a K-basis of this invariant
+space proves it spans the invariant space. It is finitely generated because
+O_K is Noetherian. Taking the finite direct sum proves the assertion. This
+does not require averaging by 1/|Gamma_c| and introduces no new denominator.
+
+A covariant kernel k(d,d'):V->V' acts by
+
+  (T_k f)(d') = sum_c |Gamma_c|^{-1} k(d_c,d') f(d_c).
+
+Its covariance is k(gd,g'd')=rho'(g') k(d,d') rho(g^{-1}). If d_c is replaced
+by g d_c, equivariance of f cancels rho(g^{-1}), and the stabilizer order is
+unchanged under conjugation. Thus the expression is independent of the
+representatives and is equivariant at the target. Linearity is immediate.
+The source uses matrices of these kernels for finite families of models.
+The final coupled kernel has one further finite sum over an auxiliary set
+Y(d_c), and the same intermediate stabilizer factor. All these sums are over
+finite sets after the stated finiteness results; they are not infinite theta
+series at this algebraic stage.
+
+For the final period the coefficient pairing is
+
+  b_alg(f,g) = c_lambda^{-1} sum_alpha alpha! f_alpha g_alpha,
+  c_lambda = product_tau sum_alpha alpha! (h_{nu_tau})_alpha^2.
+
+It is K-bilinear, with NO conjugation of f_alpha. The hermitian Fock pairing
+used in the metrics is a different pairing. This distinction is necessary:
+the rational period is to define an element of the algebraic dual, while a
+complex conjugate-linear row realization later reconciles it with a Hilbert
+inner product.
+
+The branching map br_u in the final pairing is brAt evaluated at
+tau(conjugate(pi_T(u))). Its domain is the terminal highest-weight module and
+its codomain is the row highest-weight module. The finite period sums the
+pairing of br_u applied to the terminal column value with the row value,
+weighted by inverse stabilizer orders. DivisionHeightBoundStatement.colPer_eq
+identifies this concrete period with the abstract chain-plus-final-pairing
+factorization used by the norm theorem. The individual arithmetic theta
+kernels inside the chain remain a separate reconstruction task [PL15].
+
+3. SOURCE LATTICES: WHAT IS IDENTIFIED AND WHAT IS NOT [PL4, PL12–PL14]
+
+The initial ramified source C_u is the intersection, inside the stage-zero
+equivariant function space, of the kernels of Nm_P=sum_{a in kappa(P)^x}<a>
+for P in Pr.vT(u). This set is defined as the prime divisors of the chosen
+element piT(u); it is not automatically all primes above the rational T_u.
+The underlying initial full lattice is MramL=ColL intersect C_u, interpreted
+as a lattice in C_u. The coordinate basis ramBas is a K-basis of this subspace,
+and the coordinate dimension ramDim is exactly dim_K C_u.
+
+The coordinate lattice Nu in the final divisibility bridge is
+
+  Cons.nuOf(L,u,eNu) = eNu^{-1}(L.NuLat(u)).
+
+The record field L.NuLat is NOT definitionally MramL. NuDef says that, away
+from the word's own type prime T_u, it is locally contained in MramL, and it
+is locally equal to MramL at the specified discarded/non-inert places. It
+also records the normalized local length. The theorem's main norm/rank
+space is still C_u. Local inclusion at T_u is a separate hypothesis; one
+must not silently deduce it from NuDef.
+
+NprimeDef says that the final HLat source lattice D.div.Nu(u).L is
+I_u L.NuLat(u), where
+
+  I_u = product_w p_w^{-floor(e_w s_u(w))}.
+
+The coordinate pullback commutes with ideal multiplication. This is proved
+by shift_nuOf in DivisibilityConstruction/ShiftOfColTie.lean:53–79. The floor
+is taken after multiplying by e_w. A positive shift enlarges the lattice at
+that place; a negative shift shrinks it. Both cases are covered by the
+common-integrality theorem.
+
+There is a concrete global source-lattice constructor in NZColD.lean:
+nuLat is the intersection of cond(u,w), where cond is
+
+  at type prime T_u:    {x : nuIn(x) lies in the local scaled ramified lattice};
+  at chosen gate primes: {x : cmpN(x) lies in the local gate lattice NPf};
+  elsewhere:             the localization of MramL.
+
+The scaled ramified lattice in the column model is the image of MramL under
+
+  T_u^{expTc(u,w)} ( product_{P seen at w} U_P )^m,
+  expTc(u,w)=m sum_{tau in topsP(u,w)} bTop(u,tau).
+
+The U_P are finite neighbor-sum operators. The constructor uses finite-support,
+local fullness/absorption, and saturation hypotheses. HOWEVER, the present
+symbol search found sizeDataNu only in its defining file, and did not establish
+that this constructor is the particular witness supplied along the headline
+RH path. It is therefore reported as a concrete constructor available in the
+repository [PL14], not asserted to be the chosen final witness. The exact
+bridge witness L.NuLat and the transport of its gate conditions remain PL13.
+
+Rank caution for integration with the local-cost section: duS is the full
+complex dimension of Mu0, while du is the dimension of its ramified part.
+The source's RamRank formula is
+
+  du = duS (1 - 1/(T_u-1))^f.
+
+The local length bound uses duS and the slope denominator uses the retained
+ramified rank. Do not set their ratio to 1. Parent has independently detected
+and corrected this issue in the local-cost reconstruction. Exact references
+are included under PL4 and PL13.
+
+4. THE ROW QUOTIENT, ITS LATTICE, AND THE COMMON K-SPACE [PL5, PL6]
+
+Let G_0 be the finite residue group, X a finite set of selected irreducible
+characters, P a level subgroup, and psi its one-dimensional level character.
+The selected row space is the image of the product of two group-algebra
+projectors:
+
+  e_X = sum_{chi in X} (chi(1)/|G_0|) sum_{g in G_0} chi(g^{-1})g,
+  e_{P,psi} = |P|^{-1} sum_{h in P} psi(h^{-1})h.
+
+The source calls their product goodAt. These are auxiliary finite-group and
+level characters; taking the target Dirichlet character to be trivial does
+not by itself make these projectors trivial.
+
+Let W_t be this selected space. Its lattice is the intersection of W_t with
+the pointwise Nab lattice, in a chosen basis. Its hermitian form has the
+additional 1/|P| normalization displayed in goodPartHermitianForm. Let Z_t be
+the rational part of the range of the complex theta adjoint, and then take
+its part inside W_t. The map pi_t is orthogonal projection to that part,
+expressed in its own coordinates. If H is the metric matrix and Z a column
+basis matrix, then
+
+  pi_t = (Z^* H Z)^{-1} Z^* H.
+
+The row quotient lattice is pi_t(M_t). It is NOT M_t intersect Z_t. The source
+defines the latter separately (cutZ) and uses it to track denominator/index
+costs. Confusing image and intersection would erase real arithmetic losses.
+
+At the distinguished embedding the theta map on the selected quotient is
+J_t=iC(t). Hypothesis H2 gives injectivity, equality of the images for all t,
+and identification of that common image with the selected Hilbert row space.
+RATmu says the comparison matrix J_0^{-1}J_t is K-rational. Then rowMat is that
+matrix over K and furnishes iota_t. Its base value is the identity. The formal
+definition kMat can select a fallback if rationality is absent, so reading
+rowMat alone is NOT a proof of rationality. The H2 and RATmu hypotheses must
+be carried explicitly.
+
+5. CANONICAL B_u AND THE COMPLEX SCALAR BRANCH [PL7, PL8, PL15, PL18]
+
+The actual rational definition is
+
+  B_u(phi,y) = P_{u,t0}(phi, r y),  pi_{t0} r = 1.
+
+The source chooses some right inverse using existence; uniqueness of descent
+shows that the result is independent of that choice. The kernel-annihilation
+proof reduces to orthogonality to theta-adjoint images, as proved in the main
+fragment. This is a genuine simplification of the source's coordinate proof.
+
+The input comparison identity MIid is more precise than an equality of
+unscaled operators. In its notation,
+
+  xi_{u,t} sigma(P_{u,t}(phi,F))
+    = a_u < sEE(V Theta_t(jR(eV_t F))), Pu_u(U_u sigma(phi)) >.
+
+Here U_u and V are norm-preserving on the required spaces, sEE is
+conjugate-linear with a specified common normalization, and a_u is nonzero.
+There is no assertion that a_u has absolute value 1. The conjugate-linearity
+of sEE is what makes the right hand side bilinear in phi and F, under the
+source's inner-product convention. The common-image/rationality facts and
+orthogonal quotient compatibility turn this into equation (pl-complex) in
+the main fragment.
+
+MIUnit2 is weaker than the earlier root-of-unity condition MIUnit. It requires
+nonzero complex xi and, when xi is the image of an element of K at the selected
+finite-place parameter, that element must have valuation zero. It does not
+require rationality of every xi as a separate hypothesis. The formal proof
+uses exactly the zero-period branch reconstructed in Proposition pl-descent.
+If a period value is nonzero, xi is forced to be a quotient of two K-values.
+If no such value exists, the factorization holds with xi replaced by 1.
+
+The scalar in PairingFactorsThroughPeriods is eta=xi^{-1}, rather than xi.
+Both orientations have valuation zero, but the inversion matters in an exact
+formula. The main fragment uses eta consistently.
+
+6. THE COMMON ROW LATTICE AND INTEGRAL PAIRING [PL9, PL10]
+
+The source's RR is exactly
+
+  R = intersection_w ( iota_{mu(w)} pi_{mu(w)} M_{mu(w)} )_w.
+
+All localizations are inside the same rational K-vector space, over the DVR
+O_{K,w}; these are not completions. The map mu equals the base parameter away
+from a finite set. Surjectivity of pi and invertibility of iota imply fullness
+of all candidate lattices. The complete gluing proof in the main fragment
+uses the primary decomposition of d^{-1}L_0/dL_0 and proves both the exact
+localization identities and uniqueness. It is a basis-free reconstruction of
+the source's LatticeGlue/RR_spec arguments.
+
+The global integrality proof uses only:
+
+  (i)   eta_{u,mu(w)} is a w-unit;
+  (ii)  the local period valuation is >=sigma_u(w), unless it vanishes;
+  (iii) N'_u=I_u N_u and ord_w(I_u)=-floor(sigma_u(w));
+  (iv)  R_w is the selected projected row lattice at w.
+
+After localization, (i) transfers the period bound to B_u. Valuations are
+integer-valued, so the bound is actually ceil(sigma_u(w)). The shift in (iii)
+leaves a nonnegative valuation. Intersecting all valuation rings gives O_K.
+The vanishing case is essential because the formal valuation function is
+not being interpreted as +infinity at zero in all source interfaces.
+
+The same theorem works for arbitrary finitely supported integer shifts
+k_u(w)<=ceil(sigma_u(w)), including ceil itself. This is already allowed by
+the formal DivIntoDualShift statement. The use of floor in the actual family
+must therefore be attributed to its chosen gain/rounding bookkeeping, not
+to a limitation of the integrality argument. This pass does not propose
+changing the global source construction to ceiling shifts; other tied records
+and quantitative estimates would need to be checked first.
+
+7. ARCHIMEDEAN QUOTIENT NORM AND HEIGHT [PL11, PL20]
+
+For a surjective linear map pi:W->Q with the quotient metric, every q has a
+unique lift in (ker pi)^perp of the same norm. If a functional kills ker pi,
+its descended functional has exactly the same operator norm: one inequality
+uses the contraction pi, the other this minimal lift. This is the exact norm
+descent in the source, not an extra estimate hiding a dimension factor.
+
+For a chain T_r...T_1 and final bilinear pairing P_end, the main fragment
+therefore gives
+
+  ||B_u||_v^2 <= p_v^2 product_j a_{j,v}^2 / s_v,
+
+where p_v bounds the final pairing norm, a_{j,v} bounds each chain operator
+norm, and iota_0 expands squared quotient norm by at least s_v. Although
+iota_0 is the identity in coordinates, its two metric spaces differ.
+
+The source obtains s_v=kappa_v min_p product_j lambda_{j,p,v} from its spectral
+scalar comparisons. Here p ranges over a finite nonempty set, kappa_v>0, and
+every lambda_{j,p,v}>0. To use this with an orthogonal decomposition, the pieces
+must span the quotient; the source's broader
+IsScalarOn formulation supplies the same lower singular-value conclusion.
+In either formulation one must establish the lower norm comparison. It is
+not justified merely by listing positive numbers called eigenvalues.
+
+Taking the mean over ALL infinite places of the logarithm of this inequality
+is precisely the pointwise chain-height bound in DivisionHeightBoundStatement.
+The average of the minimum over p occurs; interchanging mean and minimum
+would give an unjustified stronger bound. Our formula keeps the correct order.
+For B_u=0, the pointwise norm inequality remains valid but the ordinary
+logarithmic height is not defined via log 0. The source handles this by choosing
+positive majorants cu(v), with a specified mean logarithm, in DivClauses.
+
+8. THE EXACT OUTSTANDING RECONSTRUCTION TASKS
+
+A. [PL6, PL15] Expand the proofs that the selected complex theta-adjoint images
+are rational, that the J_t images coincide, and that J_0^{-1}J_t lies in K.
+Then derive MIid and its finite-place unit comparison property from the actual
+theta/period construction. The present work follows them to their exact
+interfaces and gives the complete consequences; it has not proved them.
+
+B. [PL13] Identify the concrete witness L.NuLat supplied by the final family
+construction and transport its local gate lattices to the ramified source
+coordinates. The available NZColD constructor is useful, but its connection
+to the headline route is unproved in this reconstruction. Do not substitute
+it silently. Once tied, its global gluing requires no new conceptual theorem.
+
+C. [PL15, PL16] Expand the individual kernel formulas and prove their local
+division and archimedean norm estimates. Stabilizer orders, Weyl versus
+dual-Weyl lattices, the row projected-lattice denominators, and type-prime
+scaled U-operators are all concrete locations where losses can arise. Parent
+owns the local accounting/valuation reconstruction, so this report does not
+duplicate those estimates or presume they vanish in ordinary RH.
+
+D. [PL19, PL20] Check the final record ties and uniform parameter quantifiers.
+DIVRecBridgeSel is a compatibility/package bridge, not a new explicit kernel
+formula. Its DivisionKernelConstantBounds requires a package for every late
+family member and supplies rationality/fullness fields; linkDIVt_of_bridge_kernel
+then transports these to LinkDIVt. DivisionHeightBoundStatement.DivClauses
+exports common integrality, pointwise positive norm majorants with the required
+mean logarithm, the numerical row/divisibility inequality, and the exact shift
+slope identity. Those four conclusions should remain distinct in the final
+provenance, rather than being summarized as a single unexamined “theta bound.”
+
+9. ORDINARY RH SPECIALIZATION
+
+The present gluing/descent proof is independent of the order o of the target
+Dirichlet character. Setting o=1 reduces the outer analytic target to zeta,
+but does not itself delete the auxiliary type primes, residue-unit averaging,
+the finite-group good-part projector, the local row choice mu(w), or the
+theta chain. No new claim that these inputs disappear has been made. This
+section is useful for ordinary RH because it isolates a short reusable algebraic
+argument whose hypotheses can now be checked in that specialization.
+
+INTEGRATION FILES
+
+  period_lattice_section.tex      Main 3–4 page section fragment.
+  period_lattice_report.txt       This expanded technical/source report.
+  period_lattice_provenance.json  Machine-readable claims and source ranges.
+  source_manifest.json           Exact source paths, SHA-256 hashes, line counts.
+
+All files are working research artifacts in the requested scratch subdirectory.
+No edits were made to the main PDF, its LaTeX source, or Library files.

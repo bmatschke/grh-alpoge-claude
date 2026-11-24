@@ -1,0 +1,823 @@
+\section{The original adelic chart, rational counts and uniform Sobolev bound}
+\label{sec:adelic-sobolev}
+
+We reconstruct the actual fixed-level Sobolev producer at source commit
+\[
+ \text{\ttfamily 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+\]
+The formal source is assumed correct.  This chapter gives independent
+human proofs and asserts no Lean replay.
+Its final assertion is conditional on the original target
+\(\mathrm{FinPair}\); neither that finite-volume datum nor boundedness
+of an initial theta integral is produced here.
+
+Fix the original \(D,\theta,V\), with \(\mathrm{IsInfFam}(\theta)\).
+Write \(F=D.\mathrm{host}.F\), \(E=D.\mathrm{host}.E\),
+\(n=V.\mathrm{rank}\), \(I=D.\mathrm{what}_2.\mathrm{Tau}\),
+\(G=\mathrm{GA}(D,V)\), and \(\Gamma=\mathrm{GQ}(V)\).
+Put \(H_\tau=\mathrm{gramAt}(D,V,\tau)\).
+The actual real component of \(g\) is \(g_\tau=\mathrm{archM}(V,\theta_\tau,g)\).
+We use exactly the source height
+\[
+ \mathcal N(g)=\mathrm{normInf}(\theta,V,g)
+   =\sum_{\tau\in I}\sum_{a,b<n}
+       \bigl(|(g_\tau)_{ab}|+|(g_\tau^{-1})_{ab}|\bigr).
+ \tag{ASB.1}
+\]
+The absolute values are complex norms; no \(1+\mathcal N\), equivalent
+height, or rescaled measure is substituted.
+
+For a pair \(p=(\tau,X)\), \(X^*H_\tau+H_\tau X=0\), write
+\[
+ c_p(t)=\mathrm{oneP}(\theta,V,\tau,X,t),\qquad
+ R_p\psi(g)=\left.\frac{d}{dt}\right|_{0}\psi(gc_p(t)).
+ \tag{ASB.2}
+\]
+For a list \(l=[p_1,\ldots,p_k]\), \(R_l\) is the original right fold
+\(R_{p_1}\cdots R_{p_k}\), with the rightmost operator acting first.
+The Hilbert derivative word \(d_l\) has the same convention.
+
+% BEGIN ASB1
+\paragraph{ASB1: the actual real coordinates and one-place Lie basis.}
+\label{claim:ASB1}
+The real group of the original target is
+\[
+ G_{\mathbb R}=\prod_{\tau\in I}U(H_\tau),\qquad
+ \mathfrak g=\prod_{\tau\in I}
+       \{X:X^*H_\tau+H_\tau X=0\}.
+ \tag{ASB.3}
+\]
+There is a real basis \(Y_1,\ldots,Y_r\) of \(\mathfrak g\), each
+supported at one place: \(Y_j=\mathrm{single}_{\tau_j}X_j\).
+The ordered product
+\[
+ \Theta_{\mathbb R}(t)=\prod_{j=1}^r e^{t_jY_j},
+ \qquad
+ \Theta(t)=\prod_{j=1}^r c_{(\tau_j,X_j)}(t_j)
+ \tag{ASB.4}
+\]
+uses the displayed order.  It consists of the actual original
+one-parameter subgroups and is continuous.  The actual lift
+\(L:G_{\mathbb R}\to G_\infty\) satisfies
+\(L(\Theta_{\mathbb R}(t))=\Theta(t)\).
+
+\emph{Proof.}
+HCU14 identifies the original tensor product at infinity with its
+matrix components, proves that every \(H_\tau\) is Hermitian
+nonsingular, and constructs the actual continuous real lift \(L\).
+It preserves products on \(G_{\mathbb R}\), is inverse to the real
+component map on \(G_\infty\), and agrees with the literal
+\(\mathrm{atTau}\) on one-place matrices.
+These are identities on the original group, not an abstract
+isomorphism chosen for this chapter.
+
+Multiplication by \(H_\tau\) identifies its Lie space with the
+skew-Hermitian matrices, since
+\((H_\tau X)^*=X^*H_\tau=-H_\tau X\).
+It therefore has a real basis, of size \(n^2\).  Take a basis in each
+place and concatenate them; these vectors are independent and span
+the direct product.  Thus \(r=|I|n^2\), although only finiteness is
+needed.  Differentiating
+\(e^{tX^*}H_\tau e^{tX}\) gives zero, so \(e^{tX}\in U(H_\tau)\).
+The exponential identities for a fixed matrix give
+\(c_p(0)=1\) and \(c_p(s+t)=c_p(s)c_p(t)\); continuity follows
+from the matrix exponential and the actual lift.
+The product identity in (ASB.4) follows from the homomorphism law of
+\(L\).  HCU14 also gives the continuous finite part
+\[
+ a(g)=gL((g_\tau)_\tau)^{-1}\in G_f,
+ \qquad g=a(g)L((g_\tau)_\tau),
+ \tag{ASB.5}
+\]
+and commutation of every finite-supported and real-supported element.
+RQC1 supplies the original locally compact, second-countable group
+topology and Borel structure used below.
+% END ASB1
+
+% BEGIN ASB2
+\paragraph{ASB2: uniformly controlled shifted second-kind coordinates.}
+\label{claim:ASB2}
+For the same ordered basis there are \(s>0\), \(R>0\), \(K\ge1\),
+and a neighborhood \(\mathcal V\) of \(1\) in \(G_{\mathbb R}\)
+such that, for each \(v\in\mathcal V\), one map
+\(f_v:\mathbb R^r\to\mathbb R^r\) satisfies, on \(Q=[0,s]^r\),
+\[
+ \|f_v(t)\|_\infty\le R,\qquad
+ \Theta_{\mathbb R}(f_v(t))v=\Theta_{\mathbb R}(t),\qquad
+ \|t-t'\|_\infty\le K\|f_v(t)-f_v(t')\|_\infty.
+ \tag{ASB.6}
+\]
+The constants precede \(v,t,t'\).
+
+\emph{Proof.}
+We construct the necessary group chart explicitly.  Near zero in
+\(\mathfrak g\), the Cayley map
+\[
+ \mathcal C(X)=(1+X)(1-X)^{-1}
+ \tag{ASB.7}
+\]
+has values in \(G_{\mathbb R}\).  Indeed
+\((1+X)^*H(1+X)=(1-X)^*H(1-X)\), place by place.
+Its inverse near \(1\) is \((v-1)(v+1)^{-1}\); substituting
+\(v^*Hv=H\) proves that this inverse is in \(\mathfrak g\).
+These maps are smooth because matrix inversion is a rational map
+where its determinant is nonzero.
+
+In this chart the derivative at zero of
+\(t\mapsto\Theta_{\mathbb R}(t)\) is
+\(\frac12\sum_jt_jY_j\), an isomorphism.
+The finite-dimensional inverse function theorem therefore makes
+\(\Theta_{\mathbb R}\) a smooth bijection from a neighborhood of
+zero onto a group neighborhood, with smooth inverse \(b\).
+Choose concentric closed sup-norm balls, the largest still inside
+this coordinate neighborhood.  By continuity and compactness,
+after shrinking a neighborhood of \(1\), both
+\[
+ f_v(t)=b(\Theta_{\mathbb R}(t)v^{-1}),\qquad
+ g_v(z)=b(\Theta_{\mathbb R}(z)v)
+ \tag{ASB.8}
+\]
+are defined on the required smaller balls, uniformly in \(v\).
+Choose \(Q\) sufficiently small that all \(f_v(Q)\) lie in one
+closed ball \(B_R\), while \(g_v\) is defined on a neighborhood of
+the larger closed ball \(B_{2R}\).
+These choices are possible because \(f_1(0)=0\).
+
+The derivative of \(g_v\) in \(z\) is continuous jointly in \(v,z\).
+Restrict \(v\) to a neighborhood with compact closure inside the
+previous one.  Compactness of that closure times \(B_{2R}\)
+gives one operator-norm bound \(K\ge1\).
+The line segment between \(f_v(t)\) and \(f_v(t')\) lies in
+\(B_R\).  The mean-value integral along the segment and
+\(g_v(f_v(t))=t\) prove the final inequality in (ASB.6).
+The first two assertions follow from (ASB.8).
+Extend \(f_v\) arbitrarily outside its coordinate domain; the
+source contract only restricts it on \(Q\).
+For \(r=0\), the real group and parameter space are singletons.
+Take \(s=R=K=1\), the unique map, and the whole group as
+\(\mathcal V\).  Every assertion then holds literally.
+% END ASB2
+
+% BEGIN ASB3
+\paragraph{ASB3: the full original adelic chart on one open level.}
+\label{claim:ASB3}
+For every original open subgroup \(U\le G\), the preceding
+\(r,\tau_j,X_j,s,R,K\) and a neighborhood \(W\) of \(1\) in \(G\)
+can be chosen so that for every \(x\in W\) there are
+one \(a_x\in U\cap G_f\) and one \(f_x\) satisfying
+\[
+ \begin{gathered}
+ \|\!f_x(t)\!\|_\infty\le R,\qquad
+             \Theta(f_x(t))x=\Theta(t)a_x\quad(t\in Q),\\
+ \|t-t'\|_\infty\le K\|f_x(t)-f_x(t')\|_\infty
+                       \quad(t,t'\in Q).
+ \end{gathered}
+ \tag{ASB.9}
+\]
+In particular \(a_x\) is independent of \(t\).  This is the entire
+original \texttt{SobLoc.exists\_adelic\_chart} conclusion.
+
+\emph{Proof.}
+Let \(\operatorname{ar}(x)=(x_\tau)_\tau\) be the actual real
+component map and let \(a(x)\) be (ASB.5).
+Both are continuous, \(\operatorname{ar}(1)=1\), and \(a(1)=1\).
+Set
+\[
+ W=\operatorname{ar}^{-1}(\mathcal V)\cap a^{-1}(U).
+ \tag{ASB.10}
+\]
+This is a neighborhood of \(1\).  For \(x\in W\), take
+\(a_x=a(x)\), \(v=\operatorname{ar}(x)\), and \(f_x=f_v\).
+The finite part belongs to \(U\cap G_f\).
+Lift the middle identity of (ASB.6) through \(L\), and commute
+the finite part past \(\Theta(f_x(t))\).  Using
+\(x=a_xL(v)\), the result is precisely
+\(\Theta(f_x(t))x=\Theta(t)a_x\).
+The two bounds are unchanged.  The matrices \(X_j\), ordered
+products and one-place lifts are exactly those of ASB1.
+No subgroup replacing the supplied \(U\) has been introduced.
+% END ASB3
+
+% BEGIN ASB4
+\paragraph{ASB4: the scalar cube-to-Haar comparison.}
+\label{claim:ASB4}
+For the fixed original \(D,\theta,V,U\) and any original left Haar
+measure \(\mu\) on \(G\), there are a compact \(\Omega\subset G\)
+and \(C_{\mathrm{ch}}\ge0\), chosen before the function, such that
+every continuous nonnegative \(h:G\to\mathbb R\) satisfying
+\(h(ga)=h(g)\) for \(a\in U\cap G_f\) obeys
+\[
+          \int_Q h(\Theta(t))\,dt
+              \le C_{\mathrm{ch}}\int_\Omega h(g)\,d\mu(g).
+ \tag{ASB.11}
+\]
+This is the actual scalar comparison required by the original
+smooth-representative construction.
+
+\emph{Proof.}
+First recall, with a proof, the finite-dimensional distortion
+estimate being used.  A \(K\)-Lipschitz map between subsets of
+\(\mathbb R^r\), for the sup norm, increases Lebesgue outer
+measure by at most \(K^r\).  Cover an open set containing its
+domain subset by a disjoint dyadic-cube decomposition.  The image
+of the portion in a cube of side \(d\) has coordinate ranges of
+length at most \(Kd\), so it is covered, with arbitrarily small
+enlargement, by a box of volume at most \(K^rd^r\).
+Sum these bounds and take the infimum over open covers.
+This proves the estimate even for a map defined only on a subset.
+For \(r=0\) both spaces are singletons and the same assertion
+uses \(K^0=1\).
+
+Consequently, if \(f:A\to B_R\) satisfies the inverse Lipschitz
+inequality in (ASB.9), and \(h_1(t)\le h_2(f(t))\) with both
+functions nonnegative, then
+\[
+                   \int_A h_1(t)\,dt
+                         \le K^r\int_{B_R}h_2(z)\,dz.
+ \tag{ASB.12}
+\]
+Apply the outer-measure estimate to the inverse of \(f\) on the
+image of each superlevel set of \(h_1\).  That image is contained
+in the corresponding superlevel set of \(h_2\) in \(B_R\).
+Integrating the level-set measures proves (ASB.12) by Tonelli.
+No measurability of a separately chosen extension of \(f\) is
+needed.
+
+Choose a compact neighborhood \(B\) of \(1\) contained in the
+neighborhood \(W\) of ASB3.  Local compactness from RQC1 gives
+such a \(B\).  Haar positivity and compact finiteness give
+\(0<\mu(B)<\infty\).
+For each \(x\in B\), (ASB.9) and the level invariance of \(h\)
+give \(h(\Theta(t))=h(\Theta(f_x(t))x)\).
+Thus (ASB.12) gives
+\[
+       A:=\int_Qh(\Theta(t))\,dt
+                  \le K^r\int_{B_R}h(\Theta(z)x)\,dz .
+ \tag{ASB.13}
+\]
+Integrate this inequality over \(x\in B\).
+Every integrand is continuous on the relevant compact products,
+so Fubini applies.  Left Haar invariance gives
+\[
+ \begin{split}
+ \mu(B)A
+ &\le K^r\int_{B_R}\int_{\Theta(z)B}h(g)\,d\mu(g)\,dz\\
+ &\le K^r\operatorname{vol}(B_R)
+                       \int_{\Theta(B_R)B}h(g)\,d\mu(g).
+ \end{split}
+ \tag{ASB.14}
+\]
+Take \(\Omega=\Theta(B_R)B\), a compact set, and
+\(C_{\mathrm{ch}}=K^r\operatorname{vol}(B_R)/\mu(B)\).
+Only left Haar invariance was used; neither a quotient finite
+volume nor right Haar invariance is required for this claim.
+% END ASB4
+
+% BEGIN ASB5
+\paragraph{ASB5: the ordered-word endpoint Sobolev inequality.}
+\label{claim:ASB5}
+Let \(c_1,\ldots,c_r\) be continuous one-parameter subgroups of
+any topological group.  Suppose continuous functions \(F_l\),
+indexed by finite words in \(1,\ldots,r\), satisfy
+\[
+ \left.\frac{d}{dt}\right|_0F_l(gc_j(t))=F_{j::l}(g).
+ \tag{ASB.15}
+\]
+For \(s>0\), if
+\[
+ \int_{[0,s]^r}|F_l(yc_1(t_1)\cdots c_r(t_r))|^2\,dt\le M
+                   \quad(|l|\le r),
+ \tag{ASB.16}
+\]
+then
+\[
+               |F_{[]}(y)|^2\le(2/s+2s)^rM.
+ \tag{ASB.17}
+\]
+No commutation of the curves or their derivatives is assumed.
+
+\emph{Proof.}
+For a continuously differentiable complex function \(f\) on
+\([0,s]\), the fundamental theorem and Cauchy--Schwarz give,
+for every \(t\in[0,s]\),
+\[
+ |f(0)|^2\le2|f(t)|^2+2s\int_0^s|f'(u)|^2\,du.
+ \tag{ASB.18}
+\]
+Integrating in \(t\) and dividing by \(s\) proves the
+one-dimensional bound with coefficients \(2/s\) and \(2s\).
+For \(f(t)=F_l(gc_j(t))\), (ASB.15) and the subgroup law
+give its derivative at every \(t\), namely
+\(F_{j::l}(gc_j(t))\).  Continuity supplies the fundamental
+theorem hypotheses.
+
+Induct on the number of curves.  In dimension zero, the cube
+has measure one and (ASB.16) is already the conclusion.
+For \(r>0\), apply (ASB.18) in the last curve \(c_r\) to
+every word \(l\) in the first \(r-1\) letters with \(|l|\le r-1\),
+at \(g=yc_1(t_1)\cdots c_{r-1}(t_{r-1})\).
+After integration in the first \(r-1\) variables, the two
+full-cube integrals are those of \(F_l\) and \(F_{r::l}\).
+They are bounded by \(M\), so the shorter-cube integral is
+at most \((2/s+2s)M\).
+Apply the induction hypothesis to the first \(r-1\) curves.
+This gives (ASB.17), and explains why the derivative is
+prepended to the word rather than moved past its other letters.
+Our constant is a valid direct choice for the source's
+existential constant in
+\texttt{sobolev\_iterated\_one\_parameter\_subgroups\_words}.
+% END ASB5
+
+% BEGIN ASB6
+\paragraph{ASB6: the complete original local Sobolev inequality.}
+\label{claim:ASB6}
+For the same fixed \(D,\theta,V,U,\mu\), there exist one finite
+list \(\mathcal S\) of admissible original Lie words, one compact
+\(\Omega\), and \(C_0\ge0\), such that
+\[
+ |\psi(y)|^2\le C_0\sum_{l\in\mathcal S}
+                    \int_\Omega|R_l\psi(yo)|^2\,d\mu(o)
+                       \qquad(y\in G).
+ \tag{ASB.19}
+\]
+This holds for every continuous \(\psi\) which is right invariant
+under \(U\cap G_f\), is smooth along every original ordered
+product of one-place curves, and has continuous \(R_l\psi\) for
+every admissible word.  These are precisely the original
+\texttt{SobLoc.local\_sobolev} hypotheses.
+
+\emph{Proof.}
+Take the ordered basis and cube of ASB3 and the compact set and
+constant of ASB4.  List all words of length at most \(r\) in the
+finite alphabet \(1,\ldots,r\), and replace each letter \(j\)
+by \(p_j=(\tau_j,X_j)\).  This gives one finite list
+\(\mathcal S\), with its original right-fold order.
+Set \(F_l=R_{p_l}\psi\).
+
+The assumed curve-product smoothness makes the function on
+each real slice \(u\mapsto\psi(gL(u))\) smooth in the
+second-kind chart of ASB2, and hence in its translates.
+Differentiation along \(u\mapsto ue^{tY_j}\) is a smooth vector
+field in those coordinates.  Its iterates remain smooth.
+Thus (ASB.15) holds for these \(F_l\), with the actual
+derivatives of (ASB.2).  Their continuity on all of \(G\)
+is exactly the separately assumed word-continuity condition.
+
+Every \(a\in U\cap G_f\) commutes with each \(c_p(t)\), by ASB1.
+Induction on the word, differentiating the equal functions,
+therefore gives \(F_l(ga)=F_l(g)\).
+For fixed \(y\), apply ASB4 to the continuous nonnegative
+function \(g\mapsto|F_l(yg)|^2\).
+Each cube integral in (ASB.16) is at most
+\[
+ M=C_{\mathrm{ch}}\sum_{l\in\mathcal S}
+                             \int_\Omega|R_l\psi(yo)|^2\,d\mu(o).
+ \tag{ASB.20}
+\]
+All summands are nonnegative.  ASB5 now proves (ASB.19) with
+\(C_0=(2/s+2s)^rC_{\mathrm{ch}}\).
+All these choices precede \(\psi\) and \(y\).
+If \(r=0\), \(\mathcal S\) consists of the empty word and the
+same proof applies with the zero-dimensional cube.
+% END ASB6
+
+% BEGIN ASB7
+\paragraph{ASB7: one denominator for a finite-adelic compact set.}
+\label{claim:ASB7}
+For a number field \(F_0\) and compact
+\(K\subset\mathbb A_{F_0,f}\), there is a positive integer \(m\)
+such that every \(a\in F_0\) whose diagonal finite adele belongs
+to \(K\) has \(ma\in\mathcal O_{F_0}\).
+
+\emph{Proof.}
+The product \(\widehat{\mathcal O}_{F_0}\) of local integer
+rings is an open additive subgroup of the finite adeles.
+For any finite adele \(z\), only finitely many coordinates are
+nonintegral.  A sufficiently large power of each rational prime
+below one of these places clears its negative valuation.
+The product of those rational prime powers is a positive integer
+\(m_z\) with \(m_zz\in\widehat{\mathcal O}_{F_0}\).
+
+Cover \(K\) by finitely many cosets
+\(z_j+\widehat{\mathcal O}_{F_0}\), and take \(m=\prod_jm_{z_j}\).
+Multiplication by an integer preserves every local integer ring,
+so \(mK\subset\widehat{\mathcal O}_{F_0}\).
+A rational element integral at all finite places is an algebraic
+integer.  To see this directly, take its monic minimal polynomial
+over \(\mathbb Q\).  For each rational prime \(p\), each root in
+\(\overline{\mathbb Q}_p\) is the image of the element under an
+embedding of its generated field; that embedding extends to
+\(F_0\), since the extension is algebraic and the target is
+algebraically closed.  The resulting \(p\)-adic absolute value
+on \(F_0\) is one of its finite places.  All these roots therefore
+have \(p\)-adic absolute value at most one.  The elementary
+symmetric polynomials in the roots show that every rational
+coefficient of the minimal polynomial lies in \(\mathbb Z_p\)
+for every \(p\).  A rational number with that property has no
+prime in its reduced denominator, so is an integer.
+This proves the claimed intersection with the global field.
+The argument gives the source's
+\texttt{exists\_den\_of\_isCompact}, indeed a denominator for
+the whole compact adelic set before restricting to rational points.
+% END ASB7
+
+% BEGIN ASB8
+\paragraph{ASB8: the exact original tensor-product denominator.}
+\label{claim:ASB8}
+Let \(E_0/F_0\) be number fields and give
+\(\mathbb A_{F_0,f}\otimes_{F_0}E_0\) its original module topology.
+For every compact \(K\) in this tensor product there is one
+positive integer \(m\) such that
+\[
+                 1\otimes a\in K\quad\Longrightarrow\quad
+                       ma\in\mathcal O_{E_0}.
+ \tag{ASB.21}
+\]
+
+\emph{Proof.}
+Choose an \(F_0\)-basis \(\beta_1,\ldots,\beta_d\) of \(E_0\).
+Its tensor coordinates are continuous in the original module
+topology, so the union of the finitely many coordinate images of
+\(K\) is compact in \(\mathbb A_{F_0,f}\).
+ASB7 gives one denominator \(m_1\) for all rational coordinates.
+Choose a positive integer \(m_2\) making every \(m_2\beta_j\)
+integral over \(\mathbb Z\).
+Such an integer exists: if a monic polynomial for \(\beta_j\)
+has rational coefficients, clearing their denominators by \(q\)
+makes \(q\beta_j\) a root of a monic integer polynomial.
+
+For \(a=\sum_j a_j\beta_j\), the tensor coordinates of
+\(1\otimes a\) are exactly the finite diagonal images of \(a_j\).
+Thus every \(m_1a_j\) is integral over \(\mathbb Z\), and
+\[
+                 m_1m_2a=\sum_j(m_1a_j)(m_2\beta_j)
+ \tag{ASB.22}
+\]
+is integral, since algebraic integers are closed under sums
+and products and under field inclusion.
+Take \(m=m_1m_2\).
+This is the full original
+\texttt{exists\_den\_of\_isCompact\_tensor}; no comparison with
+a differently topologized adelic tensor product is used.
+% END ASB8
+
+% BEGIN ASB9
+\paragraph{ASB9: integral coordinates bounded by the actual house.}
+\label{claim:ASB9}
+For a number field \(E_0\) of degree \(d\), write
+\(\mathrm{house}(a)=\max_{\sigma:E_0\hookrightarrow\mathbb C}
+|\sigma(a)|\).
+There is an integral basis \(\omega_1,\ldots,\omega_d\) and
+\(c\ge0\) such that every
+\(a=\sum_jz_j\omega_j\in\mathcal O_{E_0}\) satisfies
+\[
+                         |z_j|\le c\,\mathrm{house}(a).
+ \tag{ASB.23}
+\]
+The same conclusion holds for any fixed integral basis, including
+the basis stored by the source.
+
+\emph{Proof.}
+Here is the algebraic construction behind the coordinate estimate.
+Choose a rational basis \(\beta_j\) consisting of algebraic integers
+by the denominator argument of ASB8.
+The trace Gram matrix \(T_{ij}=\operatorname{Tr}(\beta_i\beta_j)\)
+has integer entries and nonzero determinant \(\Delta\).
+Nondegeneracy follows directly from separability: in a power basis
+of a primitive element the embedding matrix is Vandermonde with
+distinct roots, and changing a rational basis preserves
+nonsingularity.  A primitive element can be obtained by successively
+replacing two generators \(a,b\) with \(a+qb\): only finitely many
+rational \(q\) fail to separate their distinct embeddings.
+
+For an algebraic integer \(a=\sum_iq_i\beta_i\), all traces
+\(\operatorname{Tr}(a\beta_j)\) are integers.  They are sums of
+algebraic integers and are rational; a rational algebraic integer
+is an integer by the rational-root test.  Hence
+\[
+ \sum_j\mathbb Z\beta_j\ \subset\ \mathcal O_{E_0}\
+           \subset\ \Delta^{-1}\sum_j\mathbb Z\beta_j.
+ \tag{ASB.24}
+\]
+A subgroup of \(\mathbb Z^d\) is free of rank at most \(d\):
+project to the first coordinate, choose a generator of its image,
+and apply induction to the kernel.  This also proves finite
+generation.  The two inclusions in (ASB.24) therefore give a
+free integral basis of rank exactly \(d\).
+
+For any such basis, let \(M_{\sigma j}=\sigma(\omega_j)\).
+It is invertible by the same embedding-matrix argument.
+The coordinate equation
+\[
+             (z_j)_j=M^{-1}(\sigma(a))_\sigma
+ \tag{ASB.25}
+\]
+gives (ASB.23) with
+\(c=\max_j\sum_\sigma|(M^{-1})_{j\sigma}|\).
+The proof uses the actual maximum over all complex embeddings,
+so it proves the original \texttt{exists\_repr\_le\_house}
+without inserting a lattice-covolume normalization.
+% END ASB9
+
+% BEGIN ASB10
+\paragraph{ASB10: complete polynomial counting of integral-denominator matrices.}
+\label{claim:ASB10}
+Put \(d=[E_0:\mathbb Q]\) and \(b=dn^2\).
+For every positive integer \(m\) there is \(C_m\ge0\) such that,
+for every \(R\ge1\), the set
+\[
+ \mathcal A(m,R)=
+ \{A\in M_n(E_0):mA_{ij}\in\mathcal O_{E_0},\
+                         \mathrm{house}(A_{ij})\le R\}
+ \tag{ASB.26}
+\]
+is finite and has at most \(C_mR^b\) elements.
+The exponent is chosen before \(m\) and \(R\).
+
+\emph{Proof.}
+Use the integral basis and constant \(c\) of ASB9.
+Every integral coordinate of every \(mA_{ij}\) has absolute value
+at most \(cmR\), because
+\(\mathrm{house}(ma)=m\,\mathrm{house}(a)\).
+These \(b\) integers determine the matrix injectively, since
+\(m\ne0\).  With \(M=\lceil cmR\rceil\), there are at most
+\((2M+1)^b\) possible arrays.  Since
+\[
+             2M+1\le2cmR+3\le(2cm+3)R\quad(R\ge1),
+ \tag{ASB.27}
+\]
+we may take \(C_m=(2cm+3)^b\).
+For \(n=0\), the set consists of the unique empty matrix and
+the same formula gives exponent zero and constant one.
+This proves all quantifiers of the original
+\texttt{RatCount.count\_matrices}.
+% END ASB10
+
+% BEGIN ASB11
+\paragraph{ASB11: the precise original \(\mathrm{normInf}\) estimates.}
+\label{claim:ASB11}
+For the original group, \(\mathcal N\) is continuous and
+nonnegative, and
+\[
+ \mathcal N(g^{-1})=\mathcal N(g),\qquad
+ \mathcal N(gh)\le\mathcal N(g)\mathcal N(h).
+ \tag{ASB.28}
+\]
+If \(n>0\), then \(\mathcal N(g)\ge1\).
+If the actual adelic matrix of \(g\) is the diagonal image of
+\(A\in M_n(E)\), then
+\[
+                         \mathrm{house}(A_{ij})\le\mathcal N(g).
+ \tag{ASB.29}
+\]
+
+\emph{Proof.}
+Continuity follows from the actual continuous real component map,
+matrix entries and inversion.  Nonnegativity is termwise.
+Inversion interchanges the two summands in (ASB.1).
+For a complex matrix write \(|A|_1=\sum_{i,j}|A_{ij}|\).
+Expanding entries and applying the triangle inequality gives
+\(|AB|_1\le|A|_1|B|_1\).
+At each place apply this both to \(gh\) and to
+\((gh)^{-1}=h^{-1}g^{-1}\), then sum.
+The product of the two sums in (ASB.28) contains these
+nonnegative terms, as well as additional nonnegative terms.
+
+HCU14's original CM-type dictionary shows that the place set is
+nonempty and contains one choice of an extension of every real
+embedding of \(F\).
+For \(n>0\), choose a place and a diagonal entry of
+\(g_\tau g_\tau^{-1}=1\).  It gives
+\[
+       1\le |g_\tau|_1|g_\tau^{-1}|_1
+                 \le\frac14(|g_\tau|_1+|g_\tau^{-1}|_1)^2.
+ \tag{ASB.30}
+\]
+Thus \(\mathcal N(g)\ge2\), which implies the stated bound.
+For the house assertion, each complex embedding of the CM field
+\(E\) is either the chosen extension at one real place or its
+complex conjugate: \(E/F\) is quadratic and \(F\) is totally real.
+The absolute values of these two images agree.
+The original \(\mathrm{IsInfFam}\) condition evaluates a rational
+entry \(A_{ij}\) at the chosen component exactly as that field
+embedding.  Each such absolute value is one of the summands in
+(ASB.1), proving (ASB.29).
+For \(n=0\), \(\mathcal N=0\); no positive-rank assertion is
+used in that case.
+% END ASB11
+
+% BEGIN ASB12
+\paragraph{ASB12: the full quantitative rational-point multiplicity bound.}
+\label{claim:ASB12}
+For every compact \(\Omega\subset G\), one may take
+\[
+                         N=2[E:\mathbb Q]\,n^2
+ \tag{ASB.31}
+\]
+so that for every \(x\in G\) there is \(C_x\ge0\) for which,
+for every \(u\in G_\infty\) and \(y\in G\), the set
+\[
+ \mathcal R(x,u,y)=
+ \{\gamma\in\Gamma:\exists o\in\Omega,\ \gamma y=xuo\}
+ \tag{ASB.32}
+\]
+is finite and has cardinal at most \(C_x\mathcal N(u)^N\).
+This proves
+\texttt{RatCount.}\allowbreak\texttt{ncard\_rational\_le}.
+
+\emph{Proof.}
+For \(n=0\) the matrix group is a singleton.  Its relevant set
+has at most one element; take \(N=0,C_x=1\), with
+\(0^0=1\) as in the source.
+Suppose \(n>0\), and put \(b=[E:\mathbb Q]n^2\).
+The set \(K=\Omega\Omega^{-1}\) is compact.
+Choose \(B\ge0\) with \(\mathcal N(w)\le B\) on \(K\).
+For fixed \(x\), the finite components of all entries of
+\(xwx^{-1}\), \(w\in K\), form a compact subset of the
+original finite tensor product.  ASB8 supplies one positive
+denominator \(m_x\) for this entire set.  In particular this
+choice does not depend on \(u,y\) or a rational point.
+Set
+\[
+                       c_x=\mathcal N(x)^2B+1\ge1.
+ \tag{ASB.33}
+\]
+
+If (ASB.32) is empty there is nothing to prove.  Otherwise choose
+one \(\gamma_0\) and \(o_0\in\Omega\) with
+\(\gamma_0y=xuo_0\).  For \(\gamma y=xuo\), cancellation gives
+\[
+ \delta_\gamma=\gamma\gamma_0^{-1}
+                =xu(oo_0^{-1})u^{-1}x^{-1}\in\Gamma.
+ \tag{ASB.34}
+\]
+The map \(\gamma\mapsto\delta_\gamma\) is injective.
+Since the finite component of \(u\) is the identity, the finite
+component of (ASB.34) is exactly that of
+\(x(oo_0^{-1})x^{-1}\).
+Therefore the rational matrix \(A_\gamma\) representing
+\(\delta_\gamma\) has every \(m_x(A_\gamma)_{ij}\) integral.
+By ASB11,
+\[
+ \begin{split}
+ \mathrm{house}((A_\gamma)_{ij})
+ &\le\mathcal N(\delta_\gamma)\\
+ &\le\mathcal N(x)^2B\,\mathcal N(u)^2
+ \le c_x\mathcal N(u)^2 .
+ \end{split}
+ \tag{ASB.35}
+\]
+The last radius is at least one by ASB11.
+All matrices \(A_\gamma\) consequently lie in
+\(\mathcal A(m_x,c_x\mathcal N(u)^2)\).
+ASB10 bounds their number by
+\[
+              C_{m_x}c_x^b\mathcal N(u)^{2b}.
+ \tag{ASB.36}
+\]
+The original matrix realization is injective, so this bounds
+(ASB.32).  Take \(C_x=C_{m_x}c_x^b\).
+The auxiliary \(\gamma_0,o_0\) only prove an injection; the
+constant was chosen without them.  The bound is therefore
+uniform in \(y\) and \(u\), with one exponent before \(x\).
+% END ASB12
+
+% BEGIN ASB13
+\paragraph{ASB13: exact multiplicity-to-\(L^2\) unfolding.}
+\label{claim:ASB13}
+Fix an original \(\mathrm{FinPair}(V,\mu,\mathcal F)\) and put
+\(\nu=(\mu|_{\mathcal F})_*\mathrm{autMk}\).
+Let compact \(\Omega\), \(z\in G\) and \(M\) satisfy
+\[
+          \#\{\gamma\in\Gamma:\gamma y\in z\Omega\}\le M
+                       \quad(y\in G),
+ \tag{ASB.37}
+\]
+with each set finite.  If a continuous \(\psi\) represents
+\(F_0\in L^2(\Gamma\backslash G,\nu)\) in the original global
+almost-everywhere sense, then
+\[
+                 \int_\Omega|\psi(zo)|^2\,d\mu(o)
+                                   \le M^2\|F_0\|_2^2.
+ \tag{ASB.38}
+\]
+
+\emph{Proof.}
+Let \(h(g)=|F_0(\mathrm{autMk}(g))|^2\), using the measurable
+representative of the \(L^2\) class.  It is exactly left rational
+invariant.  RQC2's countable unfolding, with the indicator of
+the compact measurable set \(z\Omega\), gives
+\[
+ \int_{z\Omega}h(g)\,d\mu(g)
+  =\int_{\mathcal F}h(y)
+           \#\{\gamma\in\Gamma:\gamma y\in z\Omega\}\,d\mu(y).
+ \tag{ASB.39}
+\]
+For a nonnegative integer \(k\le M\), one has
+\(k\le k^2\le M^2\); this also covers \(k=0\).
+Thus the right side is at most
+\(M^2\int_{\mathcal F}h=M^2\|F_0\|_2^2\), with exactly the
+given quotient-measure scale.
+The global representative identity gives \(h=|\psi|^2\)
+almost everywhere on \(G\), hence on \(z\Omega\).
+Left Haar translation turns that integral into the left side of
+(ASB.38).  Continuity of \(\psi\) and compactness supply its
+ordinary integrability; equivalently the nonnegative argument
+already proves finiteness.
+This is the original \texttt{integral\_le\_adelic} comparison.
+No new fundamental domain or normalized Haar measure is chosen.
+% END ASB13
+
+% BEGIN ASB14
+\paragraph{ASB14: one exponent and one word list before every vector.}
+\label{claim:ASB14}
+Fix the original \(D,\theta,V\), \(\mathrm{IsInfFam}(\theta)\),
+one \(\mathrm{FinPair}(V,\mu,\mathcal F)\), any original
+\(\mathrm{IsReg}\) on its quotient, and one open subgroup \(U\).
+There exist \(N\in\mathbb N\) and a finite list \(\mathcal S\)
+of admissible original Lie words such that
+\[
+ \begin{gathered}
+ \forall x\in G\ \exists C_x\in\mathbb R\
+ \forall F_0,\psi\
+ \forall u\in G_\infty,\\
+ |\psi(xu)|\le
+        C_x\mathcal N(u)^N\sum_{l\in\mathcal S}\|d_lF_0\|_2 .
+ \end{gathered}
+ \tag{ASB.40}
+\]
+Here the universally quantified \(F_0,\psi\) satisfy exactly:
+\(F_0\) is an original \(\mathrm{IsSmoothVector}'\);
+\(\rho(k)F_0=F_0\) for all \(k\in U\cap G_f\);
+\(\psi\) is continuous; and \(\mathrm{Repr}(F_0,\psi)\) holds
+globally almost everywhere.
+This proves the complete original
+\texttt{SobolevGrowth.pointwise\_growth} endpoint.
+
+\emph{Proof.}
+Apply ASB6 first, obtaining \(\mathcal S,\Omega,C_0\), with
+\(C_0\ge0\), independently of \(F_0,\psi,x\).
+Apply ASB12 to this compact \(\Omega\), obtaining one \(N\)
+and constants \(B_x\ge0\) before \(F_0,\psi,u\) are given.
+
+Now take arbitrary \(F_0,\psi\) satisfying the stated hypotheses.
+The incoming SPR13 theorem, the exact original
+\(\mathrm{SmoothRep.exists\_smooth\_repr}\) producer, constructs
+one continuous automorphic representative \(\psi_0\) of this
+same \(F_0\), smooth along all original products, such that
+every \(R_l\psi_0\) is continuous and represents \(d_lF_0\).
+HCU16's uniqueness of continuous representatives, or the
+global-AE/full-support argument of RQC6, gives
+\(\psi=\psi_0\) everywhere.
+This is the only incoming smooth-representative endpoint here;
+no subsequent multiplicity-map construction is used.
+
+For each \(l\in\mathcal S\), ASB13 with \(z=xu\) and
+\(M=B_x\mathcal N(u)^N\) gives
+\[
+       \int_\Omega|R_l\psi(xuo)|^2\,d\mu(o)
+           \le B_x^2\mathcal N(u)^{2N}\|d_lF_0\|_2^2.
+ \tag{ASB.41}
+\]
+The hypotheses needed for ASB6 now hold for \(\psi\), from
+SPR13 on the same fixed level.  Substituting (ASB.41) into
+(ASB.19), and using
+\(\sum_l a_l^2\le(\sum_l a_l)^2\) for \(a_l\ge0\), gives
+\[
+ |\psi(xu)|^2
+ \le\left(\sqrt{C_0}\,B_x\,\mathcal N(u)^N
+                           \sum_{l\in\mathcal S}\|d_lF_0\|_2\right)^2.
+ \tag{ASB.42}
+\]
+The quantity in parentheses is nonnegative, so taking square
+roots proves (ASB.40) with \(C_x=\sqrt{C_0}B_x\).
+The same proof works for rank zero, using the exponent-zero
+convention already checked in ASB12.
+
+The order of choices is explicit:
+\[
+       (D,\theta,V,\mu,\mathcal F,\rho,U)
+       \ \longrightarrow\ (N,\mathcal S)\
+       \longrightarrow\ x,C_x\
+       \longrightarrow\ F_0,\psi,u.
+ \tag{ASB.43}
+\]
+In particular neither \(N\), the list, nor \(C_x\) is chosen
+again for a new vector or representative.  Applying the same
+statement to a smooth derivative vector fixed by the same
+level leaves \(N,\mathcal S\) unchanged.
+It does not assert an exponent uniform over a different
+previously chosen level, target or parameter-dependent datum.
+% END ASB14
+
+\paragraph{Application boundary.}
+ASB3--ASB4 supply the actual chart and scalar integration
+comparison used before the smooth-representative producer.
+ASB14 consumes only its output SPR13.  The later construction
+of an original \(\mathrm{MMap}\) may consume ASB14, so the
+dependency order is acyclic.
+All claims preserve the original group, \(\mathrm{oneP}\),
+ordered derivatives, \(\mathrm{normInf}\), Haar measure and
+quotient measure.  Initial boundedness, the actual target
+\(\mathrm{FinPair}\), the selected Bundle and its readings
+and rational tests remain separate original producer obligations.

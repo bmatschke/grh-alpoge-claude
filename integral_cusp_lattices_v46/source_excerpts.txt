@@ -1,0 +1,2830 @@
+[ICL_SRC_VALUATION_LATTICE] Original latIn, supLat, FullAt and every-DVR mem_supLat
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/KappaLatticeEvaluation.lean#L16-L84
+def latIn (C : Submodule K R) (Vs : HeightOneSpectrum (𝓞 K) → Set (R → EReal))
+    (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v) : Submodule (𝓞 K) R :=
+  (latOf C Vs hV).map (C.subtype.restrictScalars (𝓞 K))
+
+theorem mem_latIn (C : Submodule K R) (Vs : HeightOneSpectrum (𝓞 K) → Set (R → EReal))
+    (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v) (f : R) :
+    f ∈ latIn C Vs hV ↔ f ∈ C ∧ ∀ la, ∀ v ∈ Vs la, 0 ≤ v f := by
+  unfold latIn latOf
+  rw [Submodule.mem_map]
+  constructor
+  · rintro ⟨F, hF, rfl⟩
+    exact ⟨F.2, hF⟩
+  · rintro ⟨hC, hv⟩
+    exact ⟨⟨f, hC⟩, hv, rfl⟩
+
+end Generic
+
+variable {D : D7}
+
+def IsKappa (D : D7) (j : ℕ) (w : WeightFamilies.Wt D j) : Prop :=
+  (∀ τ (i : Fin (D.R.sigW j).1), ((w.aP τ i : ℕ) : ℚ) = DV.aPlusQ D j τ i) ∧
+    (∀ τ (c : Fin (D.R.sigW j).2), ((w.aM τ (Fin.rev c) : ℕ) : ℚ) = DV.aMinusQ D j τ c) ∧
+    w.n = D.R.nV
+
+abbrev cuspW (T : Core D) (j : ℕ) (w : WeightFamilies.Wt D j) : Submodule T.Q.c.F (T.R j) := T.cuspA j (wtA w) w.n
+
+def supLat (T : Core D) (j : ℕ) (w : WeightFamilies.Wt D j) : Submodule (𝓞 T.Q.c.F) (T.R j) :=
+  latIn (cuspW T j w) (valSet (T.Q.Xo j) T.Q.c (algCls (T.Q.Xo j) T.Q.c)) isVal_valSet
+
+def FullAt (T : Core D) (j : ℕ) (w : WeightFamilies.Wt D j) : Prop :=
+  (supLat T j w).FG ∧ Submodule.span T.Q.c.F (supLat T j w : Set (T.R j)) = cuspW T j w
+
+def FullKappa (T : Core D) : Prop :=
+  ∀ j, InR D j → ∀ w : WeightFamilies.Wt D j, IsKappa D j w → FullAt T j w
+
+structure Pinned (T : Core D) : Prop where
+  pins : T.Q.Pins
+  half : (∀ k, ((D.host.g k : ℕ) : 𝓞 D.host.K) ∈ (T.pb k).asIdeal) ∧
+    T.Q.l.Mb = ∏ k, (T.pb k).asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E))
+  evalWD : ∀ j, InR D j →
+    EvalWD (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z)
+  unf : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → IsUnf (T.U j σ)
+  unTest : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → ∀ k x,
+    FromTest (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) ((T.U j σ).un k x)
+
+def SupLatticeFull : Prop := ∀ (D : D7) (T : Core D), Pinned T → FullKappa T
+
+def SupLatticeFullLaws : Prop := ∀ (D : D7) (T : Core D), LawsM T → FullKappa T
+
+theorem Pinned.of_laws {T : Core D} (h : LawsM T) : Pinned T := ⟨h.pins, h.half, h.evalWD, h.unf, h.unTest⟩
+
+theorem SupLatticeFull.laws (h : SupLatticeFull) : SupLatticeFullLaws := fun D T hL => h D T (Pinned.of_laws hL)
+
+theorem mem_supLat (T : Core D) (j : ℕ) (w : WeightFamilies.Wt D j) (f : T.R j) :
+    f ∈ supLat T j w ↔ f ∈ cuspW T j w ∧
+      ∀ (la : HeightOneSpectrum (𝓞 T.Q.c.F)) (V : CDVR) (io : T.Q.c.F →+* V.Fr) (e : ℕ),
+        OverLa la V.V io e → ∀ y : IntFr (T.Q.Xo j) T.Q.c V io, y.IsAlg → 0 ≤ nval V.V e (evI y f) := by
+  refine (mem_latIn _ _ _ f).trans (and_congr_right fun _ => ?_)
+  unfold valSet algCls
+  simp only [Set.forall_mem_range]
+  constructor
+  · intro h la V io e hO y hy
+    exact h la ⟨_, V, io, e, hO, y, hy, (), trivial, rfl⟩
+  · intro h la i
+    obtain ⟨⟨v, u⟩, V, io, e, hO, y, hy, eta, -, hv⟩ := i
+    obtain rfl : v = _ := congrArg Prod.fst hv
+    exact h la V io e hO y hy
+
+end GlobalTheory.IndefiniteRowSideFullHecke.KappaLatticeEvaluation
+
+
+[ICL_SRC_INTEGRAL_FRAMES] Whole integral eigenspace bases, theta generator, rigidifications, IntFr and every finite-residue test
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/VAtVNeBot.lean#L44-L101
+variable (Xo : Moduli Dw l) (c : Coeff l)
+
+def IsEigV {V Fr : Type} [CommRing V] [Field Fr] [Algebra V Fr] (io : c.F →+* Fr) (G : SAB H (Sp V))
+    (τ : E →+* ℂ) (v : epsOver V V ⟶ G.G) : Prop :=
+  ∀ (a : 𝓞 E) (z : V), algebraMap V Fr z = io (embK c τ a) →
+    (v ≫ G.act.act a).left = spMap (epsMul z) ≫ v.left
+
+variable {Xo c}
+
+def Integral (T : CDVR) (io : c.F →+* T.Fr) (y : letI := io.toAlgebra; FrPt Xo c T.Fr) : Prop :=
+  letI := io.toAlgebra
+  ∃ (G : SAB H (Sp T.V)) (t' : SAB H (Sp T.Fr)) (m1 : SABMap t' Xo.univ.t y.x)
+    (m2 : SABMap t' G (spMap (algebraMap T.V T.Fr))),
+    (∃ ub : ∀ τ : E →+* ℂ, Fin (Dw.mult τ) → (epsOver T.V T.V ⟶ G.G),
+      (∀ τ i, IsTan (ub τ i)) ∧ (∀ τ i, IsEigV c io G τ (ub τ i)) ∧
+      (∀ τ (w : epsOver T.V T.V ⟶ G.G), IsTan w → IsEigV c io G τ w →
+        ∃! a : Fin (Dw.mult τ) → T.V, IsComb (ub τ) a w) ∧
+      ∀ τ i, ∃ u' : Sp (DualNumber T.Fr) ⟶ t'.G.left, u' ≫ m1.φ = y.u τ i ∧
+        u' ≫ m2.φ = spMap (dualMap (algebraMap T.V T.Fr)) ≫ (ub τ i).left) ∧
+    ∃ θ : LB.Sec G.PP.L,
+      (∀ σ : LB.Sec G.PP.L, ∃! a : T.V, ∀ i,
+        σ.f i = resG G.G.left le_top ((G.G.hom).appTop.hom (toΓ T.V a)) * θ.f i) ∧
+      ∃ (w1 : LB.Iso t'.PP.L (Xo.univ.t.PP.L.pull m1.φ)) (w2 : LB.Iso t'.PP.L (G.PP.L.pull m2.φ))
+        (σ : LB.Sec t'.PP.L) (s1 : LB.Sec (Xo.univ.t.PP.L.pull m1.φ)) (θ2 : LB.Sec (G.PP.L.pull m2.φ)),
+        RigIso m1 w1 ∧ RigIso m2 w2 ∧ IsoMaps w1 σ s1 ∧ IsoMaps w2 σ θ2 ∧ PullSec m2.φ θ θ2 ∧
+        ∀ g : t'.G.left ⟶ Gx y.x, g ≫ (CartesianMonoidalCategory.snd (Over.mk y.x) Xo.univ.t.G).left = m1.φ →
+          g ≫ (CartesianMonoidalCategory.fst (Over.mk y.x) Xo.univ.t.G).left = t'.G.hom →
+          ∀ j (h : (Xo.univ.t.PP.L.pull m1.φ).U j ≤ g ⁻¹ᵁ (PPx y.x).U (fun _ => j PUnit.unit)),
+            s1.f j = (g.appLE _ _ h).hom (y.s.f (fun _ => j PUnit.unit))
+
+variable (Xo c)
+
+def IntFr (T : CDVR) (io : c.F →+* T.Fr) : Type :=
+  letI := io.toAlgebra
+  {y : FrPt Xo c T.Fr // FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y ∧
+    Integral T io y}
+
+variable {Xo c}
+
+def IntFr.IsAlg {T : CDVR} {io : c.F →+* T.Fr} (_y : IntFr Xo c T io) : Prop := T.FinRes
+
+def evI {T : CDVR} {io : c.F →+* T.Fr} (y : IntFr Xo c T io) (f : Rul Xo c) : T.Fr :=
+  letI := io.toAlgebra
+  evR Xo c f y.1
+
+theorem evI_add {T : CDVR} {io : c.F →+* T.Fr} (y : IntFr Xo c T io) (f g : Rul Xo c) :
+    evI y (f + g) = evI y f + evI y g := by
+  let := io.toAlgebra
+  exact evalAt_add _ _ f g y.1
+
+theorem evI_smul {T : CDVR} {io : c.F →+* T.Fr} (y : IntFr Xo c T io) (a : c.F) (f : Rul Xo c) :
+    evI y (a • f) = io a * evI y f := by
+  let := io.toAlgebra
+  exact evalAt_smul _ _ a f y.1
+
+theorem evI_mul {T : CDVR} {io : c.F →+* T.Fr} (y : IntFr Xo c T io) (f g : Rul Xo c) :
+    evI y (f * g) = evI y f * evI y g := by
+  let := io.toAlgebra
+
+
+[ICL_SRC_TEST_ALGEBRAS] Reduced finite-type TRing and the original FromTest/evaluation interface
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/AlgebraMapCAt.lean#L9-L58
+structure TRing (K : Type) [Field K] : Type where
+  n : ℕ
+  I : Ideal (MvPolynomial (Fin n) K)
+  rad : I.IsRadical
+
+namespace TRing
+
+variable {K : Type} [Field K]
+
+abbrev R (p : TRing K) : Type := MvPolynomial (Fin p.n) K ⧸ p.I
+
+end TRing
+
+section Rules
+
+variable {K : Type} [Field K] {ι : Type}
+variable (pts : ∀ (S : Type) [CommRing S] [Algebra K S], Type)
+variable (mapR : ∀ {S T : Type} [CommRing S] [Algebra K S] [CommRing T] [Algebra K T],
+  (S →ₐ[K] T) → pts S → pts T → Prop)
+variable (borR : ∀ {S : Type} [CommRing S] [Algebra K S], (ι → Sˣ) → pts S → pts S → Prop)
+
+abbrev Rules : Type := ∀ p : TRing K, pts p.R → p.R
+
+def wchar [Fintype ι] {S : Type} [CommRing S] (e : ι → ℕ) (t : ι → Sˣ) : S :=
+  ∏ i, ((t i : Sˣ) : S) ^ e i
+
+def IsNatural (f : Rules pts) : Prop :=
+  ∀ (p q : TRing K) (φ : p.R →ₐ[K] q.R) (y : pts p.R) (z : pts q.R), mapR φ y z → f q z = φ (f p y)
+
+def IsWeight [Fintype ι] (e : ι → ℕ) (f : Rules pts) : Prop :=
+  ∀ (p : TRing K) (t : ι → (p.R)ˣ) (y y' : pts p.R), borR t y y' → f p y' = wchar e t * f p y
+
+def secW [Fintype ι] (e : ι → ℕ) : Submodule K (Rules pts) where
+  carrier := {f | IsNatural pts mapR f ∧ IsWeight pts borR e f}
+  zero_mem' := ⟨fun p q φ y z _ => by simp, fun p t y y' _ => by simp⟩
+  add_mem' := fun {f g} hf hg =>
+    ⟨fun p q φ y z h => by simp [hf.1 p q φ y z h, hg.1 p q φ y z h],
+     fun p t y y' h => by simp [hf.2 p t y y' h, hg.2 p t y y' h, mul_add]⟩
+  smul_mem' := fun c f hf =>
+    ⟨fun p q φ y z h => by simp [hf.1 p q φ y z h],
+     fun p t y y' h => by simp [hf.2 p t y y' h]⟩
+
+def FromTest {S : Type} [CommRing S] [Algebra K S] (y : pts S) : Prop :=
+  ∃ (p : TRing K) (φ : p.R →ₐ[K] S) (y' : pts p.R), mapR φ y' y
+
+def evalAt (f : Rules pts) {S : Type} [CommRing S] [Algebra K S] (y : pts S) : S :=
+  open Classical in
+  if h : FromTest pts mapR y then h.choose_spec.choose (f h.choose h.choose_spec.choose_spec.choose)
+  else 0
+
+
+
+[ICL_SRC_VALUATION_NORMALIZATION] Exact positive ramification-index OverLa condition
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/OneLtAbsNormReal.lean#L122-L126
+def OverLa (la : HeightOneSpectrum R) (V : Type) {K' : Type} [CommRing V] [IsDomain V]
+    [IsDiscreteValuationRing V] [Field K'] [Algebra V K'] [IsFractionRing V K'] (ι : K →+* K')
+    (e : ℕ) : Prop :=
+  0 < e ∧ ∀ a : K, vV V (ι a) = (e : ℤ) * vLa la a
+
+
+
+[ICL_SRC_ALL_VALUATION_TESTS] algCls and literal valSet range
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/NonnegIffOfLiesTotal.lean#L15-L30
+def algCls (T : CDVR) (ι : c.F →+* T.Fr) (y : IntFr Xo c T ι) : Prop := y.IsAlg
+
+def valSet (la : HeightOneSpectrum (𝓞 c.F)) : Set (Rul Xo c → EReal) :=
+  Set.range (vAtV : PtV Xo c cls Unit (fun _ _ _ _ => True) la → Rul Xo c → EReal)
+
+variable {Xo c cls}
+
+theorem isVal_vAt {PY : Type} {lies : ∀ (T : CDVR) (ι : c.F →+* T.Fr), IntFr Xo c T ι → PY → Prop}
+    {la : HeightOneSpectrum (𝓞 c.F)} (y : PtV Xo c cls PY lies la) : IsVal la (vAtV y) :=
+  ⟨vAtV_zero y, vAtV_ne_bot y, vAtV_add y, fun a f ha => vAtV_smul y a f ha, vAtV_mul y⟩
+
+theorem isVal_valSet (la : HeightOneSpectrum (𝓞 c.F)) : ∀ v ∈ valSet Xo c cls la, IsVal la v := by
+  rintro _ ⟨y, rfl⟩
+  exact isVal_vAt y
+
+variable (Xo c cls)
+
+
+[ICL_SRC_FINITE_INTEGRAL_FUNCTIONALS] Original integral-functional finite-generation theorem; ICL2 gives finite separating-family proof
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/FgIntOfForallIsIntegral.lean#L1-L53
+import Mathlib
+
+open NumberField
+
+namespace GlobalTheory
+
+theorem fg_int_of_forall_isIntegral (K' : Type) [Field K'] [NumberField K']
+    (M : Submodule ℤ K') (hM : ∀ y ∈ M, IsIntegral ℤ y) : M.FG := by
+  let f : 𝓞 K' →ₗ[ℤ] K' := (algebraMap (𝓞 K') K').toIntAlgHom.toLinearMap
+  have hle : M ≤ LinearMap.range f := fun y hy => ⟨⟨y, hM y hy⟩, rfl⟩
+  have hfg : (M.comap f).FG := IsNoetherian.noetherian _
+  have hmap := hfg.map f
+  rwa [Submodule.map_comap_eq, inf_eq_right.mpr hle] at hmap
+
+theorem fg_of_integral_functionals (K : Type) [Field K] [NumberField K] (C : Type)
+    [AddCommGroup C] [Module K C] [FiniteDimensional K C] [Module (𝓞 K) C]
+    [IsScalarTower (𝓞 K) K C] (L : Submodule (𝓞 K) C)
+    (h : ∀ x : C, x ≠ 0 → ∃ (K' : Type) (_ : Field K') (_ : NumberField K') (_ : Algebra K K')
+      (φ : C →ₗ[K] K'), φ x ≠ 0 ∧ ∀ y ∈ L, IsIntegral ℤ (φ y)) : L.FG := by
+  apply Submodule.FG.of_restrictScalars ℤ
+  suffices H : ∀ W : Submodule K C, (L.restrictScalars ℤ ⊓ W.restrictScalars ℤ).FG by
+    simpa using H ⊤
+  intro W
+  induction W using WellFoundedLT.induction with
+  | _ W ih =>
+    by_cases hW : W = ⊥
+    · subst hW
+      have hbot : L.restrictScalars ℤ ⊓ (⊥ : Submodule K C).restrictScalars ℤ = ⊥ := by
+        ext y
+        simp
+      rw [hbot]
+      exact Submodule.fg_bot
+    · obtain ⟨x, hxW, hx0⟩ := Submodule.exists_mem_ne_zero_of_ne_bot hW
+      obtain ⟨K', _, _, _, φ, hφx, hφL⟩ := h x hx0
+      let f : C →ₗ[ℤ] K' := φ.toAddMonoidHom.toIntLinearMap
+      have hlt : W ⊓ LinearMap.ker φ < W := by
+        refine lt_of_le_of_ne inf_le_left fun heq => hφx ?_
+        have hx : x ∈ W ⊓ LinearMap.ker φ := by rw [heq]; exact hxW
+        exact LinearMap.mem_ker.mp (Submodule.mem_inf.mp hx).2
+      apply Submodule.fg_of_fg_map_of_fg_inf_ker f
+      · apply fg_int_of_forall_isIntegral K'
+        intro z hz
+        obtain ⟨y, hy, rfl⟩ := Submodule.mem_map.mp hz
+        exact hφL y (Submodule.mem_inf.mp hy).1
+      · have heq : L.restrictScalars ℤ ⊓ W.restrictScalars ℤ ⊓ LinearMap.ker f
+            = L.restrictScalars ℤ ⊓ (W ⊓ LinearMap.ker φ).restrictScalars ℤ := by
+          ext y
+          simp [f, and_assoc]
+          exact fun _ _ => Iff.rfl
+        rw [heq]
+        exact ih _ hlt
+
+end GlobalTheory
+
+
+[ICL_SRC_GENERIC_POWER_AND_FG] Original exists_smul_nonneg_of_pow and generic fg_latIn
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSmulNonnegOfPow.lean#L25-L70
+variable {K : Type} [Field K] [NumberField K] {R : Type} [CommRing R] [Algebra K R] [Algebra (𝓞 K) R]
+  [IsScalarTower (𝓞 K) K R]
+
+theorem exists_smul_nonneg_of_pow (Vs : HeightOneSpectrum (𝓞 K) → Set (R → EReal))
+    (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v) (S : Set R)
+    (hS : ∀ g ∈ S, ∃ s : K, s ≠ 0 ∧ ∀ la, ∀ v ∈ Vs la, 0 ≤ v (s • g)) (f : R) (k : ℕ)
+    (hf : f ^ (k + 1) ∈ Submodule.span K S) : ∃ s : K, s ≠ 0 ∧ ∀ la, ∀ v ∈ Vs la, 0 ≤ v (s • f) := by
+  have h1 : Submodule.span K S ≤ Submodule.span K (latIn ⊤ Vs hV : Set R) := by
+    refine Submodule.span_le.2 fun g hg => ?_
+    obtain ⟨s, hs, h⟩ := hS g hg
+    rw [← inv_smul_smul₀ hs g]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span ((mem_latIn _ _ _ _).2 ⟨trivial, h⟩))
+  obtain ⟨t, ht⟩ := multiple_mem_span_of_mem_localization_span (nonZeroDivisors (𝓞 K)) K _ _ (h1 hf)
+  rw [Submodule.span_eq, Submonoid.smul_def, ← algebraMap_smul K] at ht
+  have ht0 : algebraMap (𝓞 K) K t ≠ 0 := by
+    simpa using nonZeroDivisors.ne_zero t.2
+  refine ⟨_, ht0, fun la v hv => ?_⟩
+  have h2 := ((mem_latIn _ _ _ _).1 ht).2 la v hv
+  have hv' := hV la v hv
+  rw [hv'.smul _ _ ht0] at h2 ⊢
+  by_cases htop : v f = ⊤
+  · rw [htop, EReal.coe_add_top]; exact le_top
+  obtain ⟨x, hx⟩ : ∃ x : ℝ, v f = x := ⟨_, (EReal.coe_toReal htop (hv'.ne_bot f)).symm⟩
+  have h3 : ∀ m : ℕ, v (f ^ (m + 1)) = ((((m : ℝ) + 1) * x : ℝ) : EReal) := fun m => by
+    induction m with
+    | zero => simpa using hx
+    | succ m ih =>
+      rw [pow_succ, hv'.mul, ih, hx, ← EReal.coe_add]
+      congr 1; push_cast; ring
+  have h4 : (0 : ℝ) ≤ (vAdd la (algebraMap (𝓞 K) K t) : ℤ) := by exact_mod_cast vAdd_int_nonneg la ht0
+  rw [h3, ← EReal.coe_add, EReal.coe_nonneg] at h2
+  rw [hx, ← EReal.coe_add, EReal.coe_nonneg]
+  rcases le_total 0 x with h | h
+  · linarith
+  · nlinarith [mul_nonneg (Nat.cast_nonneg (α := ℝ) k) (neg_nonneg.2 h)]
+
+theorem fg_latIn (C : Submodule K R) [FiniteDimensional K C] (Vs : HeightOneSpectrum (𝓞 K) → Set (R → EReal))
+    (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v)
+    (h : ∀ x ∈ C, x ≠ 0 → ∃ (K' : Type) (_ : Field K') (_ : NumberField K') (_ : Algebra K K') (φ : R →ₗ[K] K'),
+      φ x ≠ 0 ∧ ∀ y ∈ C, (∀ la, ∀ v ∈ Vs la, 0 ≤ v y) → IsIntegral ℤ (φ y)) : (latIn C Vs hV).FG := by
+  refine Submodule.FG.map _ (GlobalTheory.fg_of_integral_functionals K C _ fun x hx => ?_)
+  obtain ⟨K', _, _, _, φ, h0, h1⟩ := h x.1 x.2 fun e => hx (Subtype.ext e)
+  exact ⟨K', inferInstance, inferInstance, inferInstance, φ ∘ₗ C.subtype, h0, fun y hy => h1 y.1 y.2 hy⟩
+
+end Generic
+
+
+
+[ICL_SRC_RATIONAL_CM_FLAGS] Exact qualitative LamBasis fields; no quantitative radius is claimed
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/FundamentalDomains/NonvanishingNearMaximum.lean#L17-L25
+def LamBasis {r : ℕ} (X : DataX E r) (La : ℝ) (x : Frame X.Ψ r) (lam : Fin r → Fin r → E) : Prop :=
+  (∀ j, lam j ∈ X.L') ∧ LinearIndependent E lam ∧
+  (∀ j k : Fin r, (j : ℕ) < X.p0 → X.p0 ≤ (k : ℕ) → herm X.Gm (lam j) (lam k) = 0) ∧
+  (∀ j : Fin r, (j : ℕ) < X.p0 → ∀ τ : X.Ψ, 0 < (τ.1 (herm X.Gm (lam j) (lam j))).re) ∧
+  (∀ j : Fin r, X.p0 ≤ (j : ℕ) → ∀ τ : X.Ψ, (τ.1 (herm X.Gm (lam j) (lam j))).re < 0) ∧
+  (∀ j (τ : X.Ψ), ‖τ.1 (herm X.Gm (lam j) (lam j))‖ ≤ La ^ 2) ∧
+  ∀ τ : X.Ψ, Submodule.span ℂ (Set.range fun a : Fin X.p0 => col (mat x τ) (Fin.castLE X.p0_le a)) =
+    Submodule.span ℂ (Set.range fun a : Fin X.p0 => Data.emb τ.1 (lam (Fin.castLE X.p0_le a)))
+
+
+
+[ICL_SRC_CM_POINT_AT_FRAME] Original CM point construction at a rational Hermitian frame
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/ExistsGoodCmPointAtCmBasisFrame.lean#L21-L43
+theorem exists_good_cmPt_at_frame : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)], (∀ a : 𝓞 E, star a = H.bar a) → ∀ (r : ℕ) (U : Unf Xo c c.F.val.toRingHom r), IsUnf U → 0 < r → ∀ (k : U.Comp) (x₀ : (U.X k).dom) (Xx : FD.DataX E r) (hX : Xx.toData = U.X k) (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E), 𝔄 ≠ 0 → Xx.Λ = Submodule.span (𝓞 E) {v | ∃ a ∈ 𝔄, ∃ u ∈ Xx.L', v = a • u} → ∀ (La : ℝ) (lam : Fin r → Fin r → E), FD.LamBasis Xx La (hX ▸ x₀.1) lam → ∃ (z : CMPt Xo c) (σ₁ : z.K →ₐ[c.F] CAt c.F.val.toRingHom), z.Good (Module.finrank ℚ E / 2) La ∧ spMap σ₁.toRingHom ≫ z.y.x = (U.un k x₀).x := by
+  intro E _ _ _ H Dw l Xo c _ hstar r U hU hr k x₀ Xx hX 𝔄 h𝔄 hΛ La lam hlam
+  obtain ⟨W⟩ := PullbackSections.nonempty_unfAt hU k x₀
+  obtain ⟨Z, hZ⟩ := GlobalTheory.T.exists_cmPoint_lattice_data_of_adapted_basis E H Dw l Xo c r U hU hr k x₀ W Xx hX 𝔄 h𝔄 hΛ La lam hlam
+  have hfd : FiniteDimensional ℚ c.F := inferInstance
+  obtain ⟨K₁, nf, hk, ρ, X, y, t₀, m, m', -, -, -, -, -, hle, hρ, hhh, hy, hpt, -⟩ :=
+    GlobalTheory.CM.cmExists_holds E H Dw l Xo W.g _ W.F (W.ik k) W.Pm W.per Z c.F hfd
+  letI : Algebra c.F K₁ := (IntermediateField.inclusion hle).toRingHom.toAlgebra
+  obtain ⟨Φ⟩ := GlobalTheory.LamT.nonempty_fibKey E H Dw l Xo K₁ y (by have := hU.1; omega)
+  obtain ⟨n, -⟩ := (GlobalTheory.sabMap_cancel_and_comp_over E H _ _ _ Xo.univ.t t₀ Φ.T.t y y (𝟙 _) m Φ.m
+    (Category.id_comp _).symm).1
+  obtain ⟨mB⟩ : Nonempty (SABMap Φ.T.t X.B.t (spMap (algebraMap (𝓞 K₁) K₁))) := by
+    obtain ⟨mm, -⟩ := sabComp pullCubComp E H _ _ _ X.B.t t₀ Φ.T.t _ _ m' n
+    rw [Category.id_comp] at mm
+    exact ⟨mm⟩
+  let σ₁ : K₁ →ₐ[c.F] CAt c.F.val.toRingHom :=
+    { (algebraMap K₁ ℂ : K₁ →+* ℂ) with commutes' := fun _ => rfl }
+  obtain ⟨z, σ', hz, he⟩ := GlobalTheory.T.exists_good_cm_point_of_integral_cm_object E H Dw l Xo c hstar K₁ ρ (algebraMap K₁ ℂ) X La y Φ mB
+    (fun τ => by
+      show τ (H.rt : E) = H.rt0 ↔ _
+      rw [← hρ, Subtype.ext_iff]
+      exact Iff.rfl)
+    (fun j τ => by rw [hhh]; exact hZ j τ) hy _ σ₁
+
+
+[ICL_SRC_CM_OBJECT] Original CM object, abelian model, action and polarized-frame interface
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/CmPointObjectExistsOfLaws.lean#L105-L192
+theorem cmExists : CMCurve → CMPoint → ThetaUnifAV → Out.Laws → Out.Laws2 → HomExtDvr → Published.KernelFiniteFlatSt →
+    CMExistsSt := by
+  intro h1 h2 hT hL hL2 hH hK E _ _ _ H D l Xo g ty FU i Pe hP Z k hkf
+  obtain ⟨⟨k₀, hk₀, hconj⟩, hsplit, -⟩ := splits_basic E
+  obtain ⟨K₁, inst, hk, ω, C, ε, h, B, y, t₀, m, m', ψ, ω', C', π, u₀, c, hkK, hy, hyu, hb⟩ :=
+    GlobalTheory.T.exists_goodReduction_model_cmPeriod_fibre h1 h2 hT hL hL2 hH hK E H D l Xo g ty FU i Pe hP _ _ Z (k ⊔ k₀) inferInstance
+  choose hω hε hh hψ hm hc hu htie using hb
+  set σ : 𝓞 K₁ →+* ℂ := (algebraMap K₁ ℂ).comp (algebraMap (𝓞 K₁) K₁) with hσ
+  have hσi : Function.Injective σ := (algebraMap K₁ ℂ).injective.comp (FaithfulSMul.algebraMap_injective _ _)
+  have hσω : ∀ b, σ (2 * ω b - 1) = if b then H.rt0 else -H.rt0 := fun b => by
+    rw [map_sub, map_mul, map_ofNat, map_one, (hm b).1, hω]
+  choose h₁ T t gA tyA PA e hh₁ hty he hee hF using fun b : Bool =>
+    exists_ten_exp hT hL (C b) σ (C' b) (π b) (u₀ b) (c b) (Z.D₁ b) (ε b) (hm b) (hc b) (hu b) (hε b) (by
+      cases b
+      · exact Or.inr ⟨Z.sigM.1, hω false⟩
+      · exact Or.inl ⟨Z.sigP.2, hω true⟩)
+  choose Φ hΦl hΦt hΦp using fun j : Fin D.p ⊕ Fin D.q =>
+    exists_famLift E H _ _ (C j.isLeft) (Z.D₁ j.isLeft) (FU.Di i) (ε j.isLeft) (h₁ _) (h _) (T _) B (t _) _ (ψ j.isLeft)
+      ((Z.f j).codRestrict _ (Z.pure j)) (Z.hh j) (hh₁ _) (hh _) (Z.form j) (hψ _)
+  choose F hFP using fun j : Fin D.p ⊕ Fin D.q =>
+    hF j.isLeft (Fin g → ℂ) (Pe.comp (Z.f j).toAddMonoidHom) (fun a => by
+      show Pe (Z.f j (H.w0 • a)) = _ • Pe (Z.f j a)
+      rw [map_smul, PureType.period_w0_smul hP (Z.pure j a), ← hω]
+      congr 1
+      ring)
+  replace hFP : ∀ j a, F j (PA _ a) = Pe (Z.f j a) := hFP
+  obtain ⟨κ', hκ'⟩ := LiePull.exists_pushEquiv m'.cart (Over.mk (spMap (algebraMap K₁ ℂ))) (spMap σ)
+    (Spec.map_comp (CommRingCat.ofHom (algebraMap (𝓞 K₁) K₁)) (CommRingCat.ofHom (algebraMap K₁ ℂ)))
+  obtain ⟨κ, hκ⟩ := LiePull.exists_pushEquiv m.cart (Over.mk (spMap (algebraMap K₁ ℂ))) (FU.u i Pe) hyu.symm
+  have hadd : ∀ (j : Fin D.p ⊕ Fin D.q) z w, e _ (z + w) ≫ Φ j = (e _ z ≫ Φ j) * (e _ w ≫ Φ j) := fun j z w => by
+    have := (hΦl j).1
+    rw [(he _).2.2.1, MonObj.mul_comp]
+  have tie : ∀ (j : Fin D.p ⊕ Fin D.q) z, κ (κ'.symm (e _ z ≫ Φ j)) = FU.ex i Pe (F j z) := fun j z => by
+    refine additive_ext (he j.isLeft).1.2.2.2.1 (u := fun z => κ (κ'.symm (e _ z ≫ Φ j)))
+      (v := fun z => FU.ex i Pe (F j z)) (fun z w => ?_) (fun z w => ?_) (fun a s => ?_) z
+    · simp only [hadd, map_mul]
+    · simp only [map_add, FU.ex_add i Pe hP]
+    · apply Over.OverMorphism.ext
+      simp only [map_smul, hFP, hκ]
+      refine htie j.isLeft ⟨Z.f j a, Z.pure j a⟩ s _ (Over.w _) ?_
+      refine (hκ' _).symm.trans ?_
+      rw [κ'.apply_symm_apply, Over.comp_left, hee, Category.assoc, Category.assoc, ← Over.comp_left, hΦt]
+      rfl
+  have hρ : σ (2 * ω true - 1) = H.rt0 := hσω true
+  have hsq : (2 * ω true - 1) ^ 2 = -(H.d : 𝓞 K₁) := hσi (by rw [map_pow, hρ, H.sqrt_neg_disc_sq, map_neg, map_natCast])
+  have hneg : 2 * ω false - 1 = -(2 * ω true - 1) := hσi (by rw [map_neg, hρ, hσω]; rfl)
+  have tP := hasType_of_isTen hL.polBaseChange E H _ _ (C true) _ _ _ ⟨t true⟩
+  have tM := hasType_of_isTen hL.polBaseChange E H _ _ (C false) _ _ _ ⟨t false⟩
+  rw [Z.sigP.1, Z.sigP.2] at tP
+  rw [Z.sigM.1, Z.sigM.2, hneg] at tM
+  refine ⟨K₁, inst, hk, 2 * ω true - 1,
+    { split := hsplit K₁ fun τ a => hkK ((le_sup_right : k₀ ≤ k ⊔ k₀) (hconj τ a))
+      ρ_sq := hsq
+      A := T
+      B := B
+      typeP := tP
+      typeM := (hasType_neg_iff E H _ _ _ _ 0 1 hsq).2 tM
+      typeB := hasType_of_moduli Xo K₁ hk (2 * ω true - 1) hρ B.t y t₀ m m' hy
+      hh := Z.hh
+      φ := Φ
+      lin := hΦl
+      onto := fun w => ?_
+      weil := fun j => ?_ }, y, t₀, m, m', gA, tyA, PA, e, F, le_sup_left.trans hkK, hρ, rfl, hy, hyu,
+    fun b => ⟨hty b, he b⟩, hFP, fun j z x hx hxe => ?_⟩
+  · obtain ⟨v, hv⟩ := FU.ex_onto i Pe hP (κ (κ'.symm w))
+    obtain ⟨n, hn, hs⟩ := Z.span
+    obtain ⟨z, rfl⟩ := exists_sum F hP.2.2.2.1 hn (fun a => by
+      obtain ⟨x, hx⟩ := hs a
+      exact ⟨fun j => PA _ (x j), by simp only [hFP, ← map_sum, ← hx, map_nsmul]⟩) v
+    refine ⟨fun j => e _ (z j), κ'.symm.injective (κ.injective ?_)⟩
+    let ex : Multiplicative (Fin g → ℂ) →* (Over.mk (FU.u i Pe) ⟶ Xo.univ.t.G) :=
+      MonoidHom.mk' (fun s => FU.ex i Pe s.toAdd) fun a b => FU.ex_add i Pe hP _ _
+    rw [← hv, map_list_prod, map_list_prod, List.map_ofFn, List.map_ofFn]
+    simp only [Function.comp_def, tie]
+    have := map_list_prod ex (List.ofFn fun r : Fin (D.p + D.q) =>
+      Multiplicative.ofAdd (F (finSumFinEquiv.symm r) (z (finSumFinEquiv.symm r))))
+    rw [List.map_ofFn, List.prod_ofFn, ← ofAdd_sum,
+      Equiv.sum_comp finSumFinEquiv.symm fun j => F j (z j)] at this
+    exact this
+  · exact (PairingFibre.lamEq_weilEq_over_ring hL _ (T j.isLeft).pol (T j.isLeft).pol B.pol (T j.isLeft).pol
+      (Φ j) (Φ j) ((T j.isLeft).t.act.act (Z.hh j)) (𝟙 _) (hΦl j).1 (hΦl j).1 ((T j.isLeft).t.act.hom _)
+      inferInstance ℂ σ).1 (hΦp j)
+  · have hx' : κ'.symm (e _ z ≫ Φ j) = Over.homMk x hx :=
+      κ'.symm_apply_eq.2 (Over.OverMorphism.ext (hxe.symm.trans (hκ' (Over.homMk x hx)).symm))
+    rw [← tie, hx', hκ]
+    rfl
+
+end GlobalTheory.CM.ExObj
+
+
+[ICL_SRC_INTEGRAL_CM_OBJECT] Integral CM object to original framed moduli point
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/ExistsGoodCmPointOfIntegralCmObject.lean#L30-L58
+theorem exists_cmPt_good_of_cmObj : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)], (∀ a : 𝓞 E, star a = H.bar a) → ∀ (K : Type) [Field K] [NumberField K] [Algebra c.F K] (ρ : 𝓞 K) (σ : K →+* ℂ) (X : CMObj H K ρ σ Dw.p Dw.q) (La : ℝ) (x : Sp K ⟶ Xo.X) (Φ : FibKey Xo K x) (_ : SABMap Φ.T.t X.B.t (spMap (algebraMap (𝓞 K) K))), (∀ τ, τ ∈ LamF.psiSet H ↔ LamF.labK c K τ (H.rt : E) = (ρ : K)) → (∀ j (τ : E →+* ℂ), ‖τ (X.hh j : E)‖ ≤ La ^ 2) → x ≫ Xo.s = sOf c K → ∀ (S : Type) [CommRing S] [Algebra c.F S] (σ₁ : K →ₐ[c.F] S), ∃ (z : CMPt Xo c) (σ' : z.K →ₐ[c.F] S), z.Good (Module.finrank ℚ E / 2) La ∧ spMap σ'.toRingHom ≫ z.y.x = spMap σ₁.toRingHom ≫ x := by
+  intro E _ _ _ H Dw l Xo c _ hstar K _ _ _ ρ σ X La x Φ m' hρ hLa hx S _ _ σ₁
+  have hfib : LamF.IsFibreOf X.B.pol Φ.key (LamF.gmap K) m'.φ :=
+    (LamF.isFibreOf_iff_isPolFibre (𝓞 K) K (algebraMap (𝓞 K) K) X.B.pol Φ.key m'.φ).2
+      ((GlobalTheory.T.principalTriple_pullback E H (𝓞 K) K (algebraMap (𝓞 K) K) X.B).2 Φ.T m' inferInstance).2.1
+  obtain ⟨oa, oaΨ, oa', xΨ, x', φΨ, φ', τΨ, τ', ℓΨ, ℓ', Tl, LamL, hoa, -, -, hgood⟩ :=
+    LamF.exists_lamObjGood_of_cmObj GlobalTheory.firstFiveLaws.2.1.secTwist GlobalTheory.thetaUnifAV_all GlobalTheory.firstFiveLaws.1
+      GlobalTheory.homExtension_semiAbelian_dvr_unconditional E H l c hstar K ρ σ Dw.p Dw.q X La hρ hLa Φ.key m'.φ hfib
+  obtain ⟨L, hL, hm⟩ := LamF.exists_lamLetters_isGood E H l c _ _ _ _ La hgood
+  have hdet := LamF.Ind.lamInd E H l c hstar _ _ _ _ La hgood L hL
+  have heig := LamF.LetterEigen.letter_eigen E H l c _ _ _ _ La hgood L hL
+  obtain ⟨mm, e, src, U, ℓ⟩ := L
+  have hmm : mm = Dw.mult := by
+    funext b
+    unfold Datum.mult
+    split_ifs with h
+    · exact (hm b).1 h
+    · exact (hm b).2 h
+  subst hmm
+  choose w hw hU using hL.2.2.1
+  obtain ⟨y, hy, htie, hu⟩ := GlobalTheory.T.exists_framedPoint_of_lie_eigenbasis E H Dw l Xo c K x Φ e U w hx hdet hU (fun τ i =>
+    GlobalTheory.T.isEigenvectorAt_of_model E H Dw l Xo c K x Φ.T.t X.B.t Φ.m m' τ (w (e ⟨τ, i⟩)) (fun a => by
+      have h := heig τ i (w (e ⟨τ, i⟩)) (hw _) a
+      rw [← hoa]
+      exact h))
+  refine ⟨CMPt.mk K x Φ X.B m' oa (X.A true).pol oaΨ (X.A false).pol oa' (fun i => X.φ (Sum.inl i))
+    (fun i => X.φ (Sum.inr i)) (fun i => X.hh (Sum.inl i)) (fun i => X.hh (Sum.inr i)) xΨ x' φΨ φ' τΨ τ' ℓΨ ℓ' Tl LamL
+    e src U ℓ y, σ₁, ⟨hgood, hL, hoa, hy, htie, fun τ i => ⟨w (e ⟨τ, i⟩), hw _, hu τ i⟩⟩, ?_⟩
+  exact congrArg (fun t => spMap σ₁.toRingHom ≫ t) hy
+
+
+[ICL_SRC_CM_DETECTION] Original stronger quantitative nonzero CM evaluation; ICL3-7 replace only its qualitative role
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsGoodCmPtFrPolyNeZero.lean#L70-L111
+theorem exists_cm_frame (X : FD.DataX E r) (Y : FD.Data E r) (hX : X.toData = Y) (hr : 0 < r) (la : FD.Wt Y.Ψ r)
+    (P : FD.Frame Y.Ψ r → ℂ) (hP : Y.IsBddSec la P) {x₁ : FD.Frame Y.Ψ r} (hx₁ : x₁ ∈ Y.dom) (hne : P x₁ ≠ 0) :
+    ∃ (La : ℝ) (x : FD.Frame Y.Ψ r) (lam : Fin r → Fin r → E), x ∈ Y.dom ∧ FD.LamBasis X La (hX ▸ x) lam ∧
+      P x ≠ 0 := by
+  subst hX
+  obtain ⟨hS, C, hC⟩ := hP
+  have hpos : 0 < X.pnorm la P x₁ := by
+    have hd : ∀ (τ : X.Ψ) (i : Fin (r + 1)), FD.dmin X.Gm x₁ τ i ≠ 0 := fun τ i h => by
+      have := (hx₁ τ).2 i
+      rw [h, Complex.zero_re, mul_zero] at this
+      exact lt_irrefl _ this
+    refine mul_pos (norm_pos_iff.2 hne) (Finset.prod_pos fun τ _ => Finset.prod_pos fun i _ =>
+      Real.rpow_pos_of_pos ?_ _)
+    exact norm_pos_iff.2 (div_ne_zero (hd τ _) (hd τ _))
+  obtain ⟨z, hz, hhalf, hzpos⟩ := exists_half_max X.dom (X.pnorm la P) C hC hx₁ hpos
+  obtain ⟨s, hs0, hs1, hs⟩ := exists_maj_lower X hr hz
+  obtain ⟨x, lam, hx, hB, hPx, -⟩ := Formalism.L2.Pj.FundamentalDomainD5.t41H_statement r X la P z s (max 1 (∑ τ, X.spread la τ)) hS hz
+    hhalf hzpos (le_max_right _ _) (le_max_left _ _) hr hs0 hs1 hs
+  exact ⟨_, x, lam, hx, hB, hPx⟩
+
+theorem exists_good_cmPt_frPoly_ne_zero : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) [StarRing (𝓞 E)], (∀ a : 𝓞 E, star a = H.bar a) → ∀ (r : ℕ) (U : Unf Xo c c.F.val.toRingHom r), IsUnf U → 0 < r → (∀ k, ∃ (Xx : FD.DataX E r) (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 E)) E), Xx.toData = U.X k ∧ 𝔄 ≠ 0 ∧ Xx.Λ = Submodule.span (𝓞 E) {v | ∃ a ∈ 𝔄, ∃ u ∈ Xx.L', v = a • u}) → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), ∀ F ∈ sec Xo c a n, F ≠ 0 → (∀ k, (U.X k).IsBddSec (laU U a n k) (rdU U F k)) → ∃ (z : CMPt Xo c) (La : ℝ), z.Good (Module.finrank ℚ E / 2) La ∧ ∀ G, IsFrPoly F z.y G → G ≠ 0 := by
+  intro E _ _ _ H Dw l Xo c _ hstar r U hU hr hdat a n F hF hF0 hbdd
+  classical
+  have hinj := (GlobalTheory.reading_linearIndependent_and_injective GlobalTheory.lawsFieldsSeparately.2.1 E H Dw l Xo c _ r
+    (Formalism.L2.PjFree.Unf.ofPj U) ((Formalism.L2.PjFree.isUnf_ofPj U).2 hU) a n).2 F hF
+  have hex : ∃ k, ∃ x ∈ (U.X k).dom, rdU U F k x ≠ 0 := by
+    by_contra h
+    push Not at h
+    exact hF0 (hinj h)
+  obtain ⟨k, x₁, hx₁, hne₁⟩ := hex
+  obtain ⟨Xx, 𝔄, hX, h𝔄, hΛ⟩ := hdat k
+  obtain ⟨La, x, lam, hx, hB, hne⟩ := exists_cm_frame Xx (U.X k) hX hr _ _ (hbdd k) hx₁ hne₁
+  obtain ⟨z, σ₁, hz, hzx⟩ := GlobalTheory.LamT.exists_good_cmPt_at_frame E H Dw l Xo c hstar r U hU hr k ⟨x, hx⟩ Xx hX 𝔄 h𝔄 hΛ
+    La lam hB
+  have hev : evR Xo c F (U.un k ⟨x, hx⟩) ≠ 0 := by
+    intro h0
+    apply hne
+    change (if h : x ∈ (U.X k).dom then toC (evR Xo c F (U.un k ⟨x, h⟩)) else 0) = 0
+    rw [dif_pos hx]
+    exact h0
+  exact ⟨z, La, hz, fun G hG =>
+    (GlobalTheory.LamT.isFrPoly_equiv_and_ne_zero E H Dw l Xo c z.K z.y a n F hF G hG).2 _ σ₁ _ hzx hev⟩
+
+
+[ICL_SRC_CM_INTEGRAL_FRAME] Original integral CM frame/section construction used by source finite-generation branch
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/ExistsRankOneCuspLatticeDataOfPrincipal.lean#L1-L106
+import Mathlib
+import Formalism.LocalToGlobal.ProjectiveLattices.ArchimedeanQuadraticData.ArcWitnessExistence.DataXOfModel
+import Formalism.LocalToGlobal.ProjectiveLattices.FreeBridge
+import Formalism.LocalToGlobal.ProjectiveLattices.HostInt
+import Formalism.LocalToGlobal.ProjectiveLattices.FamilyUniformisationBasePointOrthogonal
+import Formalism.LocalToGlobal.IndefiniteReal.FinitePlaces.FactPrincipalDatum
+import Development.AbelianVarietyTheory.Definitions.RegularCharts.BaseNorm
+import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.EqOrEqNegOfPurelyImaginaryOfNormEq
+import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.TraceFormIntegralPerfectOfIsUnf
+import Development.AbelianVarietyTheory.Proofs.CubicalLineBundles.ExistsPosNatMemFractionalIdeal
+import Development.AbelianVarietyTheory.Proofs.GenericRegularity.NumericalConsequencesOfPins
+
+open NumberField IsDedekindDomain ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.BasicNotions Formalism.MainNotions Formalism.L2.Pj
+
+namespace GlobalTheory.LatticeData
+
+theorem cc_eq_conj (D : D7) (x : D.host.E) : ReciprocityTheory.ChartRestriction.G.FD.cc x = D.host.conj x :=
+  bridge_star_holds D.R D.host x
+
+theorem flagDomainConj_hostXi_eq_neg (D : D7) : ReciprocityTheory.ChartRestriction.G.FD.cc D.host.xi0 = -D.host.xi0 :=
+  conj_xi0_alt D
+
+theorem halfDifferent_ne_bot (D : D7) : D.host.𝔟 ≠ ⊥ := by
+  intro h
+  exact (bB_ne D).1 (by rw [h]; simp)
+
+theorem absNorm_halfDifferent_le (D : D7) :
+    (Ideal.absNorm D.host.𝔟 : ℝ) ≤ |(NumberField.discr D.host.E : ℝ)| := by
+  have ht : differentIdeal ℤ (𝓞 D.host.E) = differentIdeal (𝓞 D.host.K) (𝓞 D.host.E) *
+      (differentIdeal ℤ (𝓞 D.host.K)).map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) :=
+    differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 D.host.K) (𝓞 D.host.E)
+  have hdvd : D.host.𝔟 ∣ differentIdeal ℤ (𝓞 D.host.E) := by
+    rw [ht, D.host.𝔟_spec.1, mul_assoc]
+    exact dvd_mul_right _ _
+  have h1 := map_dvd Ideal.absNorm hdvd
+  rw [NumberField.absNorm_differentIdeal D.host.E (𝓞 D.host.E)] at h1
+  have h2 := Nat.le_of_dvd (Int.natAbs_pos.2 (NumberField.discr_ne_zero D.host.E)) h1
+  rw [← Int.cast_abs, ← Nat.cast_natAbs]
+  exact_mod_cast h2
+
+theorem absNorm_mul_mem_one (D : D7) {a : D.host.E} (ha : a ∈ D.host.AA) :
+    ∃ z : 𝓞 D.host.E, algebraMap (𝓞 D.host.E) D.host.E z = (Ideal.absNorm D.host.𝔟 : D.host.E) * a := by
+  unfold Formalism.BasicNotions.Host.AA Formalism.BasicNotions.Host.AA0 at ha
+  rw [← div_eq_mul_inv, FractionalIdeal.mem_div_iff_of_ne_zero (bB_ne D).1] at ha
+  obtain ⟨w, -, hw⟩ := (FractionalIdeal.mem_coeIdeal _).1
+    (ha _ ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, Ideal.absNorm_mem D.host.𝔟, rfl⟩))
+  exact ⟨w, by rw [hw, map_natCast, mul_comm]⟩
+
+theorem absNorm_ccK_mem (D : D7) : (Ideal.absNorm D.host.ccK : D.host.E) ∈ D.host.AA := by
+  unfold Formalism.BasicNotions.Host.AA Formalism.BasicNotions.Host.AA0
+  rw [← div_eq_mul_inv, FractionalIdeal.mem_div_iff_of_ne_zero (bB_ne D).1]
+  intro y hy
+  obtain ⟨z, -, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hy
+  have h : ((Ideal.absNorm D.host.ccK : ℕ) : 𝓞 D.host.E) ∈ D.host.ccE := by
+    have := Ideal.mem_map_of_mem (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) (Ideal.absNorm_mem D.host.ccK)
+    rwa [map_natCast] at this
+  exact (FractionalIdeal.mem_coeIdeal _).2 ⟨_, Ideal.mul_mem_right z _ h, by rw [map_mul, map_natCast]⟩
+
+theorem exists_dataX_of_hasPrinc : ∀ (D : D7) (T : Core D) (h : LawsCore T) (j : ℕ) (hj : InR D j), ∀ σ, GoodEmb T.Q.c σ → GlobalTheory.FrameNorm.HasPrinc (Formalism.L2.PjFree.Unf.ofPj (T.U j σ)) T.Q.l.M → ∀ k : (T.U j σ).Comp, ∃ Xx : ReciprocityTheory.ChartRestriction.G.FD.DataX D.host.E D.R.r, Xx.toData = (T.U j σ).X k ∧ Xx.g = T.Q.l.M ∧ Xx.Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ Xx.L', v = a • u} ∧ Xx.k0 = 2 * xiR D ∧ (Xx.NA : ℝ) ≤ |(NumberField.discr D.host.E : ℝ)| ∧ Xx.NC ≤ Ideal.absNorm D.host.ccK := by
+  intro D T h j hj σ hσ hP k
+  obtain ⟨-, -, -, hx0, hx1, -⟩ := GlobalTheory.PinNum.numerics_of_pins D T.Q h.pins
+  have habs := h.xiAbs j hj σ hσ k
+  have hperf := GlobalTheory.traceForm_integral_perfect_of_isUnf _ _ _ _ _ _ σ _ (Formalism.L2.PjFree.Unf.ofPj (T.U j σ))
+    ((Formalism.L2.PjFree.isUnf_ofPj _).2 (h.unf j hj σ hσ)) k
+  have hξ := GlobalTheory.eq_or_eq_neg_of_purelyImaginary_of_norm_eq _ D.host.xi0 ((T.U j σ).X k).ξ0 D.host.φ₀
+    (flagDomainConj_hostXi_eq_neg D) ((T.U j σ).X k).ξ0_im (habs _).symm
+  have hone : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 D.host.E)) ((T.U j σ).X k).ξ0 * D.host.AA *
+      D.host.AAbar * (differentIdeal ℤ (𝓞 D.host.E) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) = 1 := by
+    have h1 := Formalism.IndefR.Fin.factPrincipalDatum D.R D.host
+    rcases hξ with e | e
+    · rw [e]; exact h1
+    · rw [e, show -D.host.xi0 = (-1 : (𝓞 D.host.E)ˣ) • D.host.xi0 by simp,
+        ← (FractionalIdeal.spanSingleton_eq_spanSingleton.2 ⟨-1, rfl⟩)]
+      exact h1
+  have hM : 0 < T.Q.l.M := by have := T.Q.l.three_le; omega
+  obtain ⟨Xx, h1, h2, h3⟩ := GlobalTheory.exists_dataX_of_perfect_traceForm _ _ ((T.U j σ).X k) D.host.AA D.host.AAbar
+    (xiR D) T.Q.l.M
+    (fun a => by
+      rw [cc_eq_conj]
+      exact ⟨conj_mem_AA D, fun ha => by simpa only [conj_conj] using conj_mem_AAbar D ha⟩)
+    hone habs hx1 hperf.1 hperf.2 hM (hP k)
+  refine ⟨{ Xx with
+    k0 := 2 * xiR D
+    minWeight_pos := by positivity
+    k0_le := by linarith
+    ξ0_abs := fun τ => by rw [show Xx.ξ0 = ((T.U j σ).X k).ξ0 from congrArg _ h1, habs]; ring
+    NA := Ideal.absNorm D.host.𝔟
+    NC := Ideal.absNorm D.host.ccK
+    NA_pos := Nat.pos_of_ne_zero fun e => halfDifferent_ne_bot D (Ideal.absNorm_eq_zero_iff.1 e)
+    NC_pos := Nat.pos_of_ne_zero fun e => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 e)
+    NA_sub := fun x hx => ?_
+    NC_sub := fun x hx => ?_ }, h1, h2, h3, rfl, absNorm_halfDifferent_le D, le_rfl⟩
+  · rw [h3] at hx
+    induction hx using Submodule.span_induction with
+    | mem v hv =>
+      obtain ⟨a, ha, u, hu, rfl⟩ := hv
+      obtain ⟨z, hz⟩ := absNorm_mul_mem_one D ha
+      rw [smul_smul, ← hz, algebraMap_smul]
+      exact Xx.L'.smul_mem z hu
+    | zero => simp
+    | add v w _ _ hv hw => rw [smul_add]; exact add_mem hv hw
+    | smul c v _ hv => rw [smul_comm]; exact Xx.L'.smul_mem c hv
+  · rw [h3]
+    exact Submodule.subset_span ⟨_, absNorm_ccK_mem D, x, hx, rfl⟩
+
+end GlobalTheory.LatticeData
+
+
+[ICL_SRC_READING_INDEPENDENCE] Exact original complex reading and finite K-linear-independence preservation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/UnitaryExistence/ReadingLinearIndependentAndInjective.lean#L22-L56
+theorem reading_linearIndependent_and_injective : Out.SecBaseChangeSt → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r), IsUnf U → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), (∀ (m : ℕ) (b : Fin m → Rul Xo c), (∀ i, b i ∈ sec Xo c a n) → LinearIndependent c.F b → LinearIndependent ℂ (fun i => rdU U (b i))) ∧ ∀ f ∈ sec Xo c a n, (∀ k, ∀ x ∈ (U.X k).dom, rdU U f k x = 0) → f = 0 := by
+  intro hS E _ _ _ H Dw l Xo c σ r U hU a n
+  have h : ∀ (p : TRing c.F) (y : FrPt Xo c p.R) (ψ : p.R →ₐ[c.F] CAt σ),
+      ∃ (k : U.Comp) (x : (U.X k).dom) (u : ℂ), ∀ f ∈ sec Xo c a n,
+        cvalR σ (ψ (f p y)) = u * rdU U f k x.1 :=
+    fun p y ψ => GlobalTheory.T.test_point_value_eq_const_mul_reading hS E H Dw l Xo c σ r U hU a n p y ψ
+  have : CharZero c.F := RingHom.charZero σ
+  refine ⟨fun m b hb hli => ?_, fun f hf h0 => ?_⟩
+  · rw [Fintype.linearIndependent_iff]
+    intro w hw
+    have hθ : ∀ θ : Module.Dual c.F (CAt σ), ∀ i, θ (toCAt σ (w i)) = 0 := by
+      intro θ
+      have hz : ∑ i, θ (toCAt σ (w i)) • b i = 0 := by
+        funext p y
+        have hpt := descend_cpts σ p (fun i => b i p y) w (fun ψ => by
+          obtain ⟨k', x, u, hk⟩ := h p y ψ
+          have e1 : ∀ i, w i * cvalR σ (ψ (b i p y)) = u * (w i * rdU U (b i) k' x.1) := by
+            intro i; rw [hk (b i) (hb i)]; ring
+          have e2 := congrFun (congrFun hw k') x.1
+          simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul, Pi.zero_apply] at e2
+          simp_rw [e1]
+          rw [← Finset.mul_sum, e2, mul_zero]) θ
+        simpa [Finset.sum_apply] using hpt
+      exact fun i => Fintype.linearIndependent_iff.1 hli _ hz i
+    intro i
+    exact (Module.forall_dual_apply_eq_zero_iff c.F (toCAt σ (w i))).1 fun θ => hθ θ i
+  · funext p y
+    show f p y = 0
+    refine eq_zero_of_cpts σ p _ fun ψ => ?_
+    obtain ⟨k, x, u, hk⟩ := h p y ψ
+    have e := hk f hf
+    rw [h0 k x.1 x.2, mul_zero] at e
+    exact e
+
+end GlobalTheory
+
+
+[ICL_SRC_FINITE_DIMENSIONAL_CUSPS] Fixed-weight finite-dimensionality from original reading and actual analytic cusp components
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/UnitaryExistence/CuspFormsDominantWeightFiniteDimensional.lean#L24-L72
+
+theorem _root_.GlobalTheory.cuspForms_finiteDimensional_of_isUnf : _root_.ReciprocityTheory.ChartRestriction.G.Out.SecBaseChangeSt → ∀ (E : Type) [Field E]
+    [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (l : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Level H)
+    (Xo : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Moduli Dw l) (c : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, _root_.Formalism.L2.PjFree.Unf Xo c σ r)
+    (σ : c.F →+* ℂ), _root_.Formalism.L2.PjFree.GoodEmb c σ → _root_.Formalism.L2.PjFree.IsUnf (U σ) → _root_.Formalism.L2.PjFree.CuspFD Xo c U := by
+  intro hB E _ _ _ H Dw l Xo c r U σ hgood hunf
+  unfold _root_.Formalism.L2.PjFree.CuspFD
+  intro a n _
+  obtain ⟨hind, -⟩ := _root_.GlobalTheory.reading_linearIndependent_and_injective hB E H Dw l Xo c σ r (U σ) hunf a n
+  set V := _root_.Formalism.L2.PjFree.cusp Xo c U a n with hV
+  set W : Submodule ℂ (_root_.Formalism.L2.PjFree.FDSec (U σ).X) :=
+    Submodule.span ℂ ((_root_.Formalism.L2.PjFree.rdU (U σ)) '' (V : Set (_root_.Formalism.L2.Pj.Rul Xo c))) with hWdef
+  have hWle : W ≤ _root_.Formalism.L2.PjFree.holSub (U σ).X (_root_.Formalism.L2.PjFree.laU (U σ) a n) := by
+    refine Submodule.span_le.mpr ?_
+    rintro _ ⟨f, hf, rfl⟩
+    exact ((_root_.Formalism.L2.PjFree.mem_cusp Xo c U a n f).mp hf).2 σ hgood
+  have hoff : ∀ P ∈ W, ∀ k, ∀ x ∉ ((U σ).X k).dom, P k x = 0 := by
+    intro P hP k x hx
+    induction hP using Submodule.span_induction with
+    | mem g hg =>
+      obtain ⟨f, -, rfl⟩ := hg
+      simp [_root_.Formalism.L2.PjFree.rdU, hx]
+    | zero => rfl
+    | add g h _ _ hg hh =>
+      show g k x + h k x = 0
+      rw [hg, hh, add_zero]
+    | smul z g _ hg =>
+      show z • g k x = 0
+      rw [hg, smul_zero]
+  haveI : FiniteDimensional ℂ W :=
+    _root_.GlobalTheory.CuspSecFinData.finiteDimensional_of_le_holSub E r (U σ).Comp (U σ).X
+      (_root_.Formalism.L2.PjFree.laU (U σ) a n) W hWle hoff
+  have hrank : Module.rank c.F V ≤ Module.finrank ℂ W := by
+    apply rank_le
+    intro s hs
+    let e := s.equivFin
+    let b : Fin s.card → _root_.Formalism.L2.Pj.Rul Xo c := fun i => ((e.symm i : s) : V).1
+    have hbV : ∀ i, b i ∈ _root_.Formalism.L2.Pj.sec Xo c a n := fun i =>
+      _root_.Formalism.L2.PjFree.cusp_le_sec Xo c U a n ((e.symm i : s) : V).2
+    have hbind : LinearIndependent c.F b :=
+      (hs.comp e.symm e.symm.injective).map' V.subtype V.ker_subtype
+    have himg := hind s.card b hbV hbind
+    let b' : Fin s.card → W := fun i =>
+      ⟨_root_.Formalism.L2.PjFree.rdU (U σ) (b i), Submodule.subset_span ⟨b i, ((e.symm i : s) : V).2, rfl⟩⟩
+    have hb' : LinearIndependent ℂ b' := LinearIndependent.of_comp W.subtype himg
+    simpa using hb'.fintype_card_le_finrank
+  exact Module.rank_lt_aleph0_iff.mp (lt_of_le_of_lt hrank (Cardinal.nat_lt_aleph0 _))
+
+end GlobalTheory
+
+
+[ICL_SRC_GOOD_EMBEDDING_FINITE_DIM] Literal good-embedding finite-dimensionality endpoint
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/UnitaryExistence/CuspFormsFiniteDimensionalOfGoodEmb.lean#L11-L19
+theorem cuspForms_finiteDimensional_of_goodEmb :
+    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, Formalism.L2.Pj.Unf Xo c σ r) (σ : c.F →+* ℂ), Formalism.L2.Pj.GoodEmb c σ → Formalism.L2.Pj.IsUnf (U σ) → Formalism.L2.Pj.CuspFD Xo c U := by
+  intro E _ _ _ H Dw l Xo c r U σ hσ hU
+  exact (Formalism.L2.PjFree.cuspFD_ofPj U).1
+    (GlobalTheory.cuspForms_finiteDimensional_of_isUnf GlobalTheory.abelianSchemeLaws_all.1.secBaseChange E H Dw l Xo c r
+      (fun σ => Formalism.L2.PjFree.Unf.ofPj (U σ)) σ ((Formalism.L2.PjFree.goodEmb_iff σ).2 hσ)
+      ((Formalism.L2.PjFree.isUnf_ofPj (U σ)).2 hU))
+
+end GlobalTheory
+
+
+[ICL_SRC_CUSP_PRODUCT] Literal dominant cusp power with summed exponent
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSmulNonnegOfPow.lean#L74-L85
+    ∃ a', Dom a' ((k + 1) * n) ∧ f ^ (k + 1) ∈ cusp Xo c U a' ((k + 1) * n) := by
+  have hM : CuspMul Xo c U := (Formalism.L2.PjFree.cuspMul_ofPj U).1 (GlobalTheory.CuspProduct.cuspMul_holds E H Dw l Xo c r _)
+  induction k with
+  | zero => exact ⟨a, by simpa using hd, by simpa using hf⟩
+  | succ k ih =>
+    obtain ⟨a', h1, h2⟩ := ih
+    rw [Nat.succ_mul, pow_succ]
+    exact ⟨a' + a, ⟨fun τ => (h1.1 τ).add (hd.1 τ), h1.2.add hd.2⟩, hM _ _ _ _ _ _ h1 hd h2 hf⟩
+
+theorem exists_unf (D : D7) (Q : Par D) (hQ : Q.Pins) (j : ℕ) (hj : InR D j) :
+    ∃ U : Formalism.L2.PjFree.Unf (Q.Xo j) Q.c Q.c.F.val.toRingHom D.R.r, Formalism.L2.PjFree.IsUnf U ∧
+      (∀ k k', (U.X k).Gm = (U.X k').Gm ∧ (U.X k).ξ0 = (U.X k').ξ0) ∧ (∀ k, GlobalTheory.Dict.HasPrinc (U.X k) Q.l.M) ∧
+
+
+[ICL_SRC_IDENTITY_COVER_DATA] DeltaDat, IsLev, UnitC, PhiPin, PsiTie and original half-quotient character conventions
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/ThShort.lean#L114-L234
+structure DeltaDat (n : ℕ) : Type 1 where
+
+  pd : ℕ
+
+  I : Ideal (𝓞 E)
+
+  l₂ : Level H
+
+  Xo₂ : Moduli Dw l₂
+
+  c₂ : Coeff l₂
+
+  hF : c₂.F = c.F
+
+  r : Xo₂.X ⟶ Xo.X
+
+  m : SABMap Xo₂.univ.t Xo.univ.t r
+
+  nab₂ : NabV Xo₂ c₂
+
+  cδ : Rul Xo₂ c₂
+
+  φδ : (Fin n → LevQ Dw l₂) → c.F
+
+variable {Xo c} in
+
+def DeltaDat.eF {n : ℕ} (d : DeltaDat Xo c n) : c.F ≃ₐ[ℚ] d.c₂.F := IntermediateField.equivOfEq d.hF.symm
+
+variable {Xo c} in
+
+def DeltaDat.w {n : ℕ} (d : DeltaDat Xo c n) (x0 : Fin n → Dw.La) : (Fin n → LevQ Dw d.l₂) → d.c₂.F :=
+  fun q => d.eF (zetaM c ^ pairL (l := l) x0 (fun b => levRep (q b)) * d.φδ q)
+
+def SecMaps {X : Scheme.{0}} {A B : LB X} (w : LB.Iso A B) (a : LB.Sec A) (b : LB.Sec B) : Prop :=
+  ∀ p : B.ι × A.ι, (X.presheaf.map (homOfLE (inf_le_left : B.U p.1 ⊓ A.U p.2 ≤ B.U p.1)).op).hom (b.f p.1) =
+    ((@id (Γ(X, B.U p.1 ⊓ A.U p.2)ˣ) (w.s p) : Γ(X, B.U p.1 ⊓ A.U p.2)ˣ) : Γ(X, B.U p.1 ⊓ A.U p.2)) *
+      (X.presheaf.map (homOfLE (inf_le_right : B.U p.1 ⊓ A.U p.2 ≤ A.U p.2)).op).hom (a.f p.2)
+
+variable {Xo c} in
+
+def DeltaDat.EtaOK {n : ℕ} (d : DeltaDat Xo c n) : Prop :=
+  (∀ a, (d.Xo₂.univ.eta a ^ d.pd).left ≫ d.m.φ = d.r ≫ (Xo.univ.eta a).left) ∧
+    ∀ a, (d.Xo₂.univ.etaA a ^ (d.l₂.A / l.A)).left ≫ d.m.φ = d.r ≫ (Xo.univ.etaA a).left
+
+variable {Xo c} in
+
+def FrOver {n : ℕ} (d : DeltaDat Xo c n) {k : Type} [CommRing k]
+    [Algebra c.F k] [Algebra d.c₂.F k] (y₂ : FrPt d.Xo₂ d.c₂ k) (y : FrPt Xo c k) : Prop :=
+  y₂.x ≫ d.r = y.x ∧ (∀ τ i, y₂.u τ i ≫ d.m.φ = y.u τ i) ∧
+  ∃ (w₀ : LB.Iso d.Xo₂.univ.t.PP.L (Xo.univ.t.PP.L.pull d.m.φ)) (pm : Gx y₂.x ⟶ Gx y.x)
+    (t : LB.Sec (LB.LinComb (Xo.univ.t.PP.L.pull d.m.φ) (K := Fin 1)
+      (fun _ => (snd (Over.mk y₂.x) d.Xo₂.univ.t.G).left) (fun _ => 1))),
+    w₀.IsGen ∧
+    LB.Gen.Maps (LB.linCombIso w₀ (K := PUnit) (fun _ => eSec d.Xo₂.univ.t.G) (fun _ => 1))
+      d.Xo₂.univ.t.PP.rig (d.m.cm.rigPull Xo.univ.t.PP.L Xo.univ.t.PP.rig) ∧
+    pm ≫ (snd (Over.mk y.x) Xo.univ.t.G).left = (snd (Over.mk y₂.x) d.Xo₂.univ.t.G).left ≫ d.m.φ ∧
+    pm ≫ (fst (Over.mk y.x) Xo.univ.t.G).left = (fst (Over.mk y₂.x) d.Xo₂.univ.t.G).left ∧
+    SecMaps (LB.linCombIso w₀ (K := Fin 1) (fun _ => (snd (Over.mk y₂.x) d.Xo₂.univ.t.G).left) (fun _ => 1))
+      y₂.s t ∧
+    ∀ (i : Fin 1 → Xo.univ.t.PP.L.ι)
+      (h : (LB.LinComb (Xo.univ.t.PP.L.pull d.m.φ) (K := Fin 1)
+        (fun _ => (snd (Over.mk y₂.x) d.Xo₂.univ.t.G).left) (fun _ => 1)).U (fun _ _ => i 0) ≤
+          pm ⁻¹ᵁ (PPx y.x).U i),
+      (pm.appLE _ _ h).hom (y.s.f i) = t.f (fun _ _ => i 0)
+
+variable {Xo c} in
+
+def DeltaDat.IsLev {n : ℕ} (d : DeltaDat Xo c n) : Prop :=
+  l.Dvd d.l₂ ∧ d.l₂.M = l.M * d.pd ∧ Nat.Coprime d.pd l.M ∧ d.l₂.Mb = l.Mb * d.I ∧
+    d.I ⊔ d.I.map (H.bar : 𝓞 E →+* 𝓞 E) = ⊤ ∧
+    d.EtaOK ∧
+    (∀ (k : Type) [Field k] [IsAlgClosed k] [Algebra c.F k] [Algebra d.c₂.F k],
+        (∀ a : c.F, algebraMap d.c₂.F k (d.eF a) = algebraMap c.F k a) →
+        ∀ y : FrPt Xo c k, ∃ y₂ : FrPt d.Xo₂ d.c₂ k, FrOver d y₂ y) ∧
+    d.cδ ∈ sec d.Xo₂ d.c₂ 0 0 ∧
+    (∀ (k : Type) [Field k] [IsAlgClosed k] [Algebra d.c₂.F k] (y₂ : FrPt d.Xo₂ d.c₂ k), evR d.Xo₂ d.c₂ d.cδ y₂ ≠ 0)
+
+open Classical in
+
+def cHalf (H : Host E) (I : Ideal (𝓞 E)) : 𝓞 E :=
+  if h : ∃ c, c ∈ I.map (H.bar : 𝓞 E →+* 𝓞 E) ∧ c - 1 ∈ I then h.choose else 0
+
+def qRep {K : Submodule (𝓞 E) Dw.La} (q : Dw.La ⧸ K) : Dw.La := Classical.choose (Submodule.Quotient.mk_surjective _ q)
+
+abbrev LaJ {n : ℕ} (d : DeltaDat Xo c n) : Type := Dw.La ⧸ (d.I.map (H.bar : 𝓞 E →+* 𝓞 E) • ⊤ : Submodule (𝓞 E) Dw.La)
+
+abbrev LaI {n : ℕ} (d : DeltaDat Xo c n) : Type := Dw.La ⧸ (d.I • ⊤ : Submodule (𝓞 E) Dw.La)
+
+variable {Xo c} in
+
+def DeltaDat.PhiPin {n : ℕ} (d : DeltaDat Xo c n) (ph : (Fin n → LaJ Xo c d) → c.F)
+    (ψ : (LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) →* c.Fˣ) (x₀ : Fin n → LaJ Xo c d) : Prop :=
+  (∀ x x' : Fin n → LaJ Xo c d, (∀ b : Fin n, b.val < Dw.p + Dw.q → x b = x' b) → ph x = ph x') ∧
+  (∀ x, ph x ≠ 0 → Submodule.span (𝓞 E) (x '' {b | b.val < Dw.p + Dw.q}) = ⊤) ∧
+  (∀ (k : LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) (kst : LaJ Xo c d ≃ₗ[𝓞 E] LaJ Xo c d),
+    (∀ u v : Dw.La, ((d.pd : ℤ) ∣ Dw.EF (qRep (kst (Submodule.Quotient.mk u))) (cHalf H d.I • v) -
+      Dw.EF u (cHalf H d.I • qRep (k (Submodule.Quotient.mk v))))) →
+    ∀ x, ph (fun b => kst (x b)) = (((ψ k)⁻¹ : c.Fˣ) : c.F) * ph x) ∧
+  ph x₀ = 1 ∧ Submodule.span (𝓞 E) (x₀ '' {b | b.val < Dw.p + Dw.q}) = ⊤ ∧
+  ∀ q : Fin n → LevQ Dw d.l₂, d.eF (d.φδ q) =
+    ∑ᶠ x : Fin n → LaJ Xo c d, d.eF (ph x) *
+      ((⟨zeta d.l₂.M', d.c₂.zeta_mem⟩ : d.c₂.F) ^ (d.l₂.M' / d.pd)) ^
+        (∑ b, Dw.EF (qRep (x b)) (cHalf H d.I • levRep (q b)))
+
+variable {Xo c} in
+
+def DeltaDat.PsiTie {n : ℕ} (d : DeltaDat Xo c n) (ψ : (LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) →* c.Fˣ) : Prop :=
+  ∀ (k : LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) (g : Sim Dw) (ρ : d.Xo₂.X ≅ d.Xo₂.X),
+    g.InGam l d.l₂ → (∀ a, Dw.ModN d.l₂.A (g.f d.l₂.A a - a)) → d.Xo₂.LevAut g ρ →
+    (∀ a : Dw.La, (Submodule.Quotient.mk (g.f d.l₂.M a) : LaI Xo c d) = k (Submodule.Quotient.mk a)) →
+    ∀ (K : Type) [Field K] [IsAlgClosed K] [Algebra d.c₂.F K] (y y' : FrPt d.Xo₂ d.c₂ K),
+      y'.x = y.x ≫ ρ.hom →
+      evR d.Xo₂ d.c₂ d.cδ y' = algebraMap d.c₂.F K (d.eF ((ψ k : c.Fˣ) : c.F)) * evR d.Xo₂ d.c₂ d.cδ y
+
+def letB {n : ℕ} (σ : E →+* ℂ) (i : Fin (Dw.mult σ)) (b : Fin n → E) : MvPolynomial (LtN Dw n) c.F :=
+  ∑ j, C (embF c σ (b j)) * X (⟨σ, i, j⟩ : LtN Dw n)
+
+def symO {n : ℕ} (Λ : GenLat E n) : Subring (MvPolynomial (LtN Dw n) c.F) :=
+  Subring.closure ((Set.range fun o : integralClosure ℤ c.F => C (o : c.F)) ∪
+    {f | ∃ (σ : E →+* ℂ) (i : Fin (Dw.mult σ)) (b : Fin n → E), b ∈ Λ.La ∧ f = letB c σ i b})
+
+
+
+[ICL_SRC_SHORT_RULES] harmL, exact shortGen, IsShortRule and ShortValTot
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/ThShort.lean#L235-L299
+def harmL {n : ℕ} (Λ : GenLat E n) (a : (E →+* ℂ) × ℕ → ℕ) : Set (MvPolynomial (LtN Dw n) c.F) :=
+  {P | P ∈ HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) ∧
+    P ∈ symO c Λ}
+
+def GeoInj {S : Type} [CommRing S] (x0 : Sp S ⟶ Xo.X) {n : ℕ} {J : Type}
+    (z : J → Fin n → (ptO Xo x0 ⟶ Xo.univ.t.G)) : Prop :=
+  ∀ (k : Type) [Field k] (ψ : S →+* k) (g : ptO Xo (spMap ψ ≫ x0) ⟶ ptO Xo x0), g.left = spMap ψ →
+    Function.Injective fun i b => g ≫ z i b
+
+def ShortValAt (nab : NabV Xo c) {n : ℕ} (w : (Fin n → LevQ Dw l) → c.F) (Λ : GenLat E n) (β : c.F) (N : ℕ)
+    (P : MvPolynomial (LtN Dw n) c.F) {S : Type} [CommRing S] [Algebra c.F S]
+    (y : FrPt Xo c S) (v : S) : Prop :=
+  ∃ (S' : Type) (_ : CommRing S') (_ : Algebra c.F S') (φ : S →ₐ[c.F] S') (y' : FrPt Xo c S')
+    (z : Fin (Λ.zCard N (Dw.p + Dw.q)) → Fin n → (ptO Xo y'.x ⟶ Xo.univ.t.G))
+    (tp : (Fin n → LevQ Dw l) → Fin n → (ptO Xo y'.x ⟶ Xo.univ.t.G))
+    (F : (Fin n → LevQ Dw l) → Fin (Λ.zCard N (Dw.p + Dw.q)) → Fin n →
+      LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L ((N : ℤ) ^ 2) (ptO Xo y'.x))),
+    φ.toRingHom.FaithfullyFlat ∧ FrMap φ y y' ∧
+    (∀ i, InZh Xo Λ N (z i)) ∧ GeoInj Xo y'.x z ∧
+    (∀ q b, tp q b ^ N = levPt Xo y'.x (levRep (q b)) ∧ ∃ j : ℕ, KilledBy Xo (l.Mb ^ j) (tp q b)) ∧
+    (∀ q i b, IsUUOver Xo.univ.t.G Xo.univ.t.PP N y'.s (z i b) (tp q b) (F q i b)) ∧
+    φ v = algebraMap c.F S' (β⁻¹ * ((Λ.mIdx N (Dw.p + Dw.q) : c.F))⁻¹ *
+        ((Nat.card (Fin n → LevQ Dw l) : c.F))⁻¹ *
+        ((N : c.F) ^ P.totalDegree)⁻¹) *
+      ∑ᶠ q : Fin n → LevQ Dw l, algebraMap c.F S' (w q) *
+        ∑ i, ∑ m ∈ P.support, algebraMap c.F S' (P.coeff m) *
+          ∏ b, nab y' ((N : ℤ) ^ 2) (F q i b) (colOf m b)
+
+def IsShortRule {n : ℕ} (dδ : DeltaDat Xo c n) (Λ : GenLat E n) (N : ℕ)
+    (x0 : Fin n → Dw.La) (P : MvPolynomial (LtN Dw n) c.F) (f : Rul Xo c) : Prop :=
+  ∀ (k : Type) [Field k] [IsAlgClosed k] [Algebra c.F k] [Algebra dδ.c₂.F k],
+    (∀ a : c.F, algebraMap dδ.c₂.F k (dδ.eF a) = algebraMap c.F k a) →
+    ∀ (y : FrPt Xo c k) (y₂ : FrPt dδ.Xo₂ dδ.c₂ k), FrOver dδ y₂ y →
+      ∃ v : k, ShortValAt dδ.Xo₂ dδ.c₂ dδ.nab₂ (dδ.w x0) Λ (dδ.eF (betaH (Dw := Dw) c Λ)) N (MvPolynomial.map (dδ.eF : c.F →+* dδ.c₂.F) P) y₂ v ∧
+        evR Xo c f y = evR dδ.Xo₂ dδ.c₂ dδ.cδ y₂ * v
+
+def shortGen (_nab : NabV Xo c) (bad nV : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (dδ : DeltaDat Xo c n) :
+    Set (Rul Xo c) :=
+  {f | f ∈ sec Xo c a n ∧ ∃ (Λ : GenLat E n) (N : ℕ) (x0 : Fin n → Dw.La) (P : MvPolynomial (LtN Dw n) c.F),
+    Λ.Unimod ∧ Λ.TrivAt bad ∧ Λ.TrivAt dδ.l₂.M ∧ Λ.LevOK N dδ.l₂.M ∧
+    AdmX (l := l) (decide (n = nV)) x0 ∧ P ∈ harmL c Λ a ∧ IsShortRule Xo c dδ Λ N x0 P f}
+
+def KPsiIn : Prop :=
+  ∀ 𝔞 : Ideal (𝓞 E), 𝔞 ≠ ⊥ → ∃ β : c.F, β ≠ 0 ∧
+    Submodule.span (𝓞 c.F) {β} =
+      ∏ τ : E →+* ℂ, Submodule.span (𝓞 c.F) ((embK c τ) '' (𝔞 : Set (𝓞 E))) ^ Dw.mult τ ∧
+    ∀ σ : c.F →+* ℂ, ‖σ β‖ ^ 2 = (Ideal.absNorm 𝔞 : ℝ) ^ (Dw.p + Dw.q)
+
+def BetaExists (n bad : ℕ) : Prop :=
+  KPsiIn (Dw := Dw) c → ∀ Λ : GenLat E n, Λ.Unimod → Λ.TrivAt bad →
+    ∃ β : c.F, β ≠ 0 ∧ BetaIs (Dw := Dw) c Λ β ∧ BetaAbs (Dw := Dw) c Λ β
+
+def ShortValTot (_nab : NabV Xo c) (bad nV : ℕ) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ)
+    (dδ : DeltaDat Xo c n) : Prop :=
+  ∀ (Λ : GenLat E n) (N : ℕ) (x0 : Fin n → Dw.La) (P : MvPolynomial (LtN Dw n) c.F),
+    Λ.Unimod → Λ.TrivAt bad → Λ.TrivAt dδ.l₂.M → Λ.LevOK N dδ.l₂.M →
+    AdmX (l := l) (decide (n = nV)) x0 → P ∈ harmL c Λ a →
+      (∀ (S : Type) [CommRing S] [Algebra dδ.c₂.F S] (y₂ : FrPt dδ.Xo₂ dδ.c₂ S),
+        ∃! v, ShortValAt dδ.Xo₂ dδ.c₂ dδ.nab₂ (dδ.w x0) Λ (dδ.eF (betaH (Dw := Dw) c Λ)) N (MvPolynomial.map (dδ.eF : c.F →+* dδ.c₂.F) P) y₂ v) ∧
+      ∃ f ∈ sec Xo c a n, IsShortRule Xo c dδ Λ N x0 P f
+
+def ShortInCusp (nab : NabV Xo c) (bad nV : ℕ) (cusp : ((E →+* ℂ) × ℕ → ℕ) → ℕ → Submodule c.F (Rul Xo c))
+    (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (dδ : DeltaDat Xo c n) : Prop :=
+  Dom a n → LastPos Dw a → shortGen Xo c nab bad nV a n dδ ⊆ cusp a n
+
+
+
+[ICL_SRC_CANONICAL_CONNECTION] Original canonical IsNab producer retained as input to the identity-cover construction
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/ExistsIsNab.lean#L1-L45
+import Mathlib
+import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ExpTie
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.CIndBC
+import Formalism.LocalToGlobal.ProjectiveLattices.ThExpBC
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.BirationalGeometry.ToroidalCompactification.UniformisationConclusion
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.GermFunPf
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsBiextensionChartWithGermsFramedPointStatement
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+attribute [local instance] Over.cartesianMonoidalCategory
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor.Germ (PS Pt ev pt comp1 FGLaw)
+open MvPolynomial (X)
+
+namespace GlobalTheory.CanonConn
+
+theorem exists_isNab : Laws → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∃ (_ : StarRing (𝓞 E)) (nab : NabV Xo c), IsNab Xo c nab := by
+  intro hL E _ _ _ H Dw l Xo c
+  classical
+  letI : StarRing (𝓞 E) := H.starRing
+  have hs : ∀ a : 𝓞 E, star a = H.bar a := fun _ => rfl
+  have hC := GlobalTheory.T.exists_biextension_chart_with_germs_framed_point hL E H Dw l Xo c hs
+  choose C _hT hg using hC
+  choose g hg using hg
+  let val : ∀ (S : Type) [CommRing S] [Algebra c.F S] [Algebra ℚ S] (y : FrPt Xo c S) (k : ℤ),
+      LB.Sec (LPow Xo.univ.t.G Xo.univ.t.PP.L k (ptO Xo y.x)) → (Lt1 Dw →₀ ℕ) → S :=
+    fun S _ _ _ y k => match k with
+      | Int.ofNat k => fun F α =>
+          (C S y).B.nabVal S (C S y).h H.w0 k (g S y k F) (C S y).uvec (MvPolynomial.monomial α 1)
+      | Int.negSucc _ => fun _ _ => 0
+  let nab : NabV Xo c := fun {S} _ _ y k F α =>
+    if h : Nonempty (Algebra ℚ S) then @val S _ _ h.some y k F α else 0
+  refine ⟨inferInstance, nab, hs, ?_⟩
+  intro S _ _ iQ y
+  refine ⟨C S y, fun k F => ⟨_, hg S y k F⟩, ?_⟩
+  intro k F f hf α
+  have hne : Nonempty (Algebra ℚ S) := ⟨iQ⟩
+  have h1 : nab y k F α = @val S _ _ hne.some y k F α := dif_pos hne
+  have h2 : hne.some = iQ := Subsingleton.elim _ _
+  refine h1.trans ?_
+  rw [h2, isGermFun_holds E H Dw l Xo c S y _ _ _ _ _ k F f _ hf (hg S y k F)]
+
+end GlobalTheory.CanonConn
+
+
+[ICL_SRC_HIGHER_COVER_CONSTRUCTION] Original higher-cover producer; not reconstructed by the identity-cover proof
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/UnitaryExistence/ExistsDeltaDatumHigherLevel.lean#L85-L96
+  · rw [hdiv] at he; exact he
+  · intro k _ _ _ i₂ hk y
+    obtain ⟨x₂, hx, hs⟩ := @exists_point_over E _ _ _ H Dw l l₂ Xo c Xo₂ c₂ hF.symm r rF hfin hsur h₁ h₂
+      k _ _ _ i₂ hk y.x y.x_over
+    obtain ⟨y₂, -, hy⟩ := (GlobalTheory.T.framedPoints_lift_to_levelCover hL E H Dw l Xo c n d).1 k hk y x₂ hx hs
+    exact ⟨y₂, hy⟩
+  · intro k _ _ _ y₂
+    have h := GlobalTheory.Frames.allTest_of_secBaseChange hL.secBaseChange E H Dw l₂ Xo₂ c₂ k y₂
+    have e : evR d.Xo₂ d.c₂ d.cδ y₂ = 1 := evalAt_one _ _ y₂ h
+    rw [e]; exact one_ne_zero
+
+end GlobalTheory.LevelCover
+
+
+[ICL_SRC_PRINCIPAL_CHART] Actual same-Gram/same-xi principal-chart construction retained explicitly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSmulNonnegOfPow.lean#L87-L137
+      ∀ k, ∃ (Xx : DataX D.host.E D.R.r) (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E),
+        Xx.toData = U.X k ∧ 𝔄 ≠ 0 ∧
+        Xx.Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ 𝔄, ∃ u ∈ Xx.L', v = a • u} := by
+  obtain ⟨-, -, hM', -, hx1, -, hnum⟩ := GlobalTheory.PinNum.numerics_of_pins D Q hQ
+  obtain ⟨hr, hr1, -⟩ := hnum j hj
+  have hP := Formalism.IndefR.Fin.factPrincipalDatum
+  have hξ : cc (-D.host.xi0) = -(-D.host.xi0) := by
+    have : cc (-D.host.xi0) = -cc D.host.xi0 := by simp [cc]
+    rw [this, GlobalTheory.LatticeData.flagDomainConj_hostXi_eq_neg D]
+  have hneg : ∀ τ : D.host.E →+* ℂ, τ (Q.H.rt : D.host.E) = Q.H.rt0 → (τ (-D.host.xi0)).im < 0 := by
+    intro τ hτ
+    rw [hQ.1.2.1, hQ.1.2.2.1] at hτ
+    have h := xi0_embedding_im_pos D τ ((mem_cm_type_iff D τ).2 hτ)
+    have h0 : D.host.φ₀ D.host.sqrtMinusD = Complex.I * (Real.sqrt D.host.d : ℂ) := D.host.φ₀_mem
+    have hpos : 0 < (D.host.φ₀ D.host.sqrtMinusD).im := by
+      rw [h0]
+      simpa using d_pos D
+    rw [if_pos hpos, Int.cast_one, one_mul] at h
+    simpa using h
+  obtain ⟨Gm, φ, hφ⟩ := GlobalTheory.exists_herm_coord_of_datum _ Q.H (Q.Dw j) (-(-D.host.xi0))
+    (by rw [neg_neg, GlobalTheory.LatticeData.flagDomainConj_hostXi_eq_neg D]) (by rw [neg_neg]; exact cmHost_imaginaryGenerator_ne_zero hP D) _ hr.symm
+  obtain ⟨U, hU, hPr, -, hχ, hG, -⟩ := GlobalTheory.FrameUnif.exists_unf_hasPrinc _ Q.H (Q.Dw j) Q.l (Q.Xo j) Q.c
+    Q.c.F.val.toRingHom D.R.r (-D.host.xi0) Gm φ (by omega) rfl hξ hneg hφ
+  rw [hM'] at hPr
+  refine ⟨U, hU, fun k k' => ⟨(hG k).1.trans (hG k').1.symm, (hG k).2.trans (hG k').2.symm⟩,
+    fun k ga hga h => ?_, hχ, fun k => ?_⟩
+  · refine hPr k ga hga fun x hx => ?_
+    obtain ⟨u, hu, e⟩ := h x hx
+    exact ⟨u, hu, by rw [e, add_sub_cancel_left, Nat.cast_smul_eq_nsmul]⟩
+  · have hperf := GlobalTheory.traceForm_integral_perfect_of_isUnf _ _ _ _ _ _ _ _ U hU k
+    have hone : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 D.host.E)) (U.X k).ξ0 * D.host.AA *
+        D.host.AAbar * (differentIdeal ℤ (𝓞 D.host.E) :
+          FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) = 1 := by
+      rw [(hG k).2, show -D.host.xi0 = (-1 : (𝓞 D.host.E)ˣ) • D.host.xi0 by simp,
+        ← (FractionalIdeal.spanSingleton_eq_spanSingleton.2 ⟨-1, rfl⟩)]
+      exact hP D.R D.host
+    have hM : 0 < Q.l.M := by have := Q.l.three_le; omega
+    obtain ⟨Xx, h1, -, h3⟩ := GlobalTheory.exists_dataX_of_perfect_traceForm _ _ (U.X k) D.host.AA D.host.AAbar
+      (xiR D) Q.l.M
+      (fun a => by
+        rw [GlobalTheory.LatticeData.cc_eq_conj]
+        exact ⟨conj_mem_AA D, fun ha => by simpa only [conj_conj] using conj_mem_AAbar D ha⟩)
+      hone (fun τ => by rw [(hG k).2, map_neg, norm_neg]; exact xiConst_holds D τ) hx1 hperf.1 hperf.2 hM (hPr k)
+    exact ⟨Xx, _, h1, AA_ne_zero hP D, h3⟩
+
+set_option synthInstance.maxHeartbeats 400000 in
+set_option maxHeartbeats 1000000 in
+
+theorem fullAt_of_pins (D : D7) (T : Core D) (hQ : T.Q.Pins) (j : ℕ) (hj : InR D j)
+    (hU : IsUnf (T.U j T.σ₀)) (w : WeightFamilies.Wt D j) (hn : 0 < w.n) : FullAt T j w := by
+  obtain ⟨-, hA, -, -, -, -, hnum⟩ := GlobalTheory.PinNum.numerics_of_pins D T.Q hQ
+
+
+[ICL_SRC_METRIC_COMPARISON] Actual metric at orthogonal frames and boundedness transfer to the same principal charts
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/IsMetricOfIsOrtho.lean#L14-L163
+
+theorem hm_eq_diagonal : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r), GoodEmb c σ → IsUnf U → ∀ (k : U.Comp) (x : (U.X k).dom) (W : PullbackSections.UnfAt U k x) (Wu : PullbackSections.UnitAt W), (U.X k).IsOrtho x.1 → Wu.Hm = Matrix.diagonal fun j => ((2 * ‖relab c σ (W.e j).1 (U.X k).ξ0‖ : ℝ) : ℂ) := by
+  intro E _ _ _ H Dw l Xo c σ r U hσ hU k x W Wu hx
+  obtain ⟨hbij, hrt, -, -⟩ := GlobalTheory.Relab.relab_good E H l c σ hσ
+  obtain ⟨hp0, hty⟩ := hU.2.1 k
+  obtain ⟨f, hf⟩ := GlobalTheory.FrameUnif.exists_letter_equiv (U.X k).Ψ (U.X k).cmType Dw.p Dw.q r hU.1 (relab c σ) hbij
+    Dw.mult
+    (fun τ h => by unfold Datum.mult; rw [if_pos ((hrt τ).1 ((hty _).1 h))])
+    (fun τ h => by unfold Datum.mult; rw [if_neg (fun h' => h ((hty _).2 ((hrt τ).2 h')))])
+  have hper : ∀ (v : Fin r → E) j, perFr (U.X k) x.1 v (relab c σ (W.e j).1) (W.e j).2 =
+      if (((W.e.trans f) j).2 : ℕ) < (U.X k).p0 then
+        FD.hermC ((W.e.trans f) j).1.1 (U.X k).Gm
+          (FD.col (FD.mat x.1 ((W.e.trans f) j).1) ((W.e.trans f) j).2) (FD.Data.emb ((W.e.trans f) j).1.1 v)
+      else ((FD.mat x.1 ((W.e.trans f) j).1)⁻¹.mulVec (FD.Data.emb ((W.e.trans f) j).1.1 v))
+        ((W.e.trans f) j).2 := by
+    intro v j
+    have h := hf (W.e j)
+    rw [Equiv.trans_apply]
+    generalize f (W.e j) = t at h ⊢
+    obtain ⟨⟨τ, hτ⟩, ⟨n, hn⟩⟩ := t
+    generalize ((W.e j).2 : ℕ) = i at h ⊢
+    dsimp only at h ⊢
+    rw [← hp0] at h
+    rcases h with ⟨a, rfl, rfl⟩ | ⟨a, rfl, rfl, d⟩
+    · rw [if_neg (by omega)]
+      unfold perFr
+      rw [dif_pos a, dif_pos hn]
+    · rw [if_pos (by omega)]
+      unfold perFr
+      rw [dif_neg a, dif_pos (show conjEmb (relab c σ (W.e j).1) ∈ (U.X k).Ψ from hτ), dif_pos hn]
+      rfl
+  have hcc : FD.cc (-(U.X k).ξ0) = -(-(U.X k).ξ0) := by
+    have h := (U.X k).ξ0_im
+    unfold FD.cc at h ⊢
+    rw [map_neg, h]
+  have key : Wu.Hm = Matrix.diagonal fun j => ((2 * (((W.e.trans f) j).1.1 (-(U.X k).ξ0)).im : ℝ) : ℂ) := by
+    refine PullbackSections.UH.herm_eq_of_im W.Pm W.per.2.2.2.1 _ _ fun a b => ?_
+    rw [Wu.c1, OrthoHerm.im_diag_eq_trace (U.X k).p0 _ (U.X k).Gm (U.X k).Ψ (U.X k).cmType (W.e.trans f) hcc x.1 hx
+      (W.φ k a) (W.φ k b) _ _ (fun j => (W.pm_eq a j).trans (hper _ j)) (fun j => (W.pm_eq b j).trans (hper _ j)),
+      ← W.isom, Rat.cast_intCast]
+  have hd : ∀ j, (((W.e.trans f) j).1.1 (-(U.X k).ξ0)).im = ‖relab c σ (W.e j).1 (U.X k).ξ0‖ := by
+    intro j
+    have hn : ‖relab c σ (W.e j).1 (U.X k).ξ0‖ = ‖((W.e.trans f) j).1.1 (U.X k).ξ0‖ := by
+      rcases hf (W.e j) with ⟨-, h, -⟩ | ⟨-, h, -⟩
+      · rw [Equiv.trans_apply, h]
+      · rw [Equiv.trans_apply, h]
+        exact (Complex.norm_conj _).symm
+    rw [hn]
+    clear hn
+    have hpos := Wu.pos (Pi.single j 1) (by simp)
+    rw [key, hermForm, single_dotProduct, Matrix.mulVec_diagonal, Pi.star_apply, Pi.single_eq_same, star_one,
+      _root_.one_mul, _root_.mul_one, Complex.ofReal_re] at hpos
+    generalize ((W.e.trans f) j).1.1 = τ at hpos ⊢
+    have hre : (τ (-(U.X k).ξ0)).re = 0 := by
+      have h := congrArg τ hcc
+      rw [FD.cc, IsCMField.complexEmbedding_complexConj, map_neg τ (-(U.X k).ξ0)] at h
+      have := congrArg Complex.re h
+      simp only [Complex.conj_re, Complex.neg_re] at this
+      linarith
+    have hp : 0 < (τ (-(U.X k).ξ0)).im := by linarith
+    rw [← norm_neg, ← map_neg, ← Complex.abs_im_eq_norm.mpr hre, abs_of_pos hp]
+  rw [key]
+  simp only [hd]
+
+theorem isMetric_of_isOrtho : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r), GoodEmb c σ → IsUnf U → 1 ≤ Dw.p + Dw.q → ∀ (k : U.Comp) (x : (U.X k).dom), (U.X k).IsOrtho x.1 → IsMetric (U.un k x) 1 (fun b => ((2 * Real.pi * ‖relab c σ b (U.X k).ξ0‖ : ℝ) : ℂ) • 1) := by
+  intro E _ _ _ H Dw l Xo c σ r U hσ hU hpq k x hx
+  obtain ⟨W⟩ := PullbackSections.nonempty_unfAt hU k x
+  obtain ⟨Wu⟩ := PullbackSections.nonempty_unitAt W (PullbackSections.PfSupAtUnit.dmin_ortho _ hx)
+  have hH := hm_eq_diagonal E H Dw l Xo c σ r U hσ hU k x W Wu hx
+  obtain ⟨Φ₀⟩ := nonempty_fibKey E H Dw l Xo ℂ (U.un k x).x hpq
+  obtain ⟨-, h₁, h₂⟩ := SecTieEx.secTie_exists_unique E H Dw l Xo ℂ (U.un k x).x Φ₀.T.t Φ₀.m
+  obtain ⟨th, ht⟩ := h₁ (U.un k x).s
+  have hne := (h₂ th _ ht).2.1 (secNZ_of_secGen lawsFieldsSeparately.2.1 E H Dw l Xo ℂ _ _ (U.un k x).gen)
+  let Φ : FibKey Xo ℂ (U.un k x).x := { Φ₀ with th := th, th_ne := hne }
+  obtain ⟨u, χ, hΛ, hA, hR, hF, hg, hD⟩ := exists_unif W.F (W.ik k) W.per W.pt Φ ht Wu.herm Wu.pos Wu.c2 Wu.c3 Wu.c4
+    Wu.c5 Wu.c6 Wu.c7
+  choose w hw using fun τ i => hD _ _ ((U.un k x).tan τ i) (W.der τ i)
+  have hFd : IsAddFundamentalDomain u.Λ Wu.Fd volume := hΛ ▸ Wu.c8
+  have hN := Wu.c9.symm
+  have hG : ∀ (b : E →+* ℂ) (i j : Fin (Dw.mult b)),
+      (((2 * Real.pi * ‖relab c σ b (U.X k).ξ0‖ : ℝ) : ℂ) • (1 : Matrix (Fin (Dw.mult b)) (Fin (Dw.mult b)) ℂ)) i j =
+        Real.pi * hermForm Wu.Hm (Pi.single (W.e.symm ⟨b, j⟩) 1) (Pi.single (W.e.symm ⟨b, i⟩) 1) := by
+    intro b i j
+    rw [hH]
+    simp [hermForm, Matrix.mulVec_diagonal, Pi.single_apply, Matrix.one_apply]
+    split_ifs <;> simp_all <;> ring
+  exact isMetricAt_of Φ hg u Wu.Hm χ Wu.θ Wu.Fd w (fun b i => Pi.single (W.e.symm ⟨b, i⟩) 1)
+    ⟨ht, hA, hR, hF, hFd, hN, hw, hG⟩
+
+theorem isBddSec_of_isUnf : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U U' : Unf Xo c σ r), GoodEmb c σ → IsUnf U → IsUnf U' → 1 ≤ Dw.p + Dw.q → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), Dom a n → ∀ f ∈ sec Xo c a n, (∀ k, (U.X k).IsBddSec (laU U a n k) (rdU U f k)) → ∀ k, (U'.X k).IsBddSec (laU U' a n k) (rdU U' f k) := by
+  intro E _ _ _ H Dw l Xo c σ r U U' hσ hU hU' hpq a n hd f hf hb k'
+  have hB : Out.SecBaseChangeSt := GlobalTheory.lawsFieldsSeparately.2.1
+  obtain ⟨-, -, -, -, -, -, hwt⟩ := GlobalTheory.Frames.algebraic_laws hB E H Dw l Xo c
+  have hs' := hU'.2.2.2.2.1 a n hd f hf k'
+  choose C hC using fun k => (hb k).2
+  have hpos : ∀ (X : FD.Data E r) (b : E →+* ℂ), 0 < 2 * Real.pi * ‖relab c σ b X.ξ0‖ := fun X b =>
+    mul_pos (by positivity) (norm_pos_iff.2 ((map_ne_zero _).2 X.ξ0_ne))
+  let κ : U.Comp → (E →+* ℂ) → ℝ := fun k b =>
+    2 * Real.pi * ‖relab c σ b (U.X k).ξ0‖ / (2 * Real.pi * ‖relab c σ b (U'.X k').ξ0‖)
+  let B : U.Comp → ℝ := fun k =>
+    (∏ p : Σ τ : E →+* ℂ, Fin (Dw.mult τ), (Real.sqrt (κ k p.1))⁻¹ ^ a (p.1, p.2)) * |C k|
+  refine ⟨hs', ∑ k, B k, fun x₁ hx₁ => ?_⟩
+  obtain ⟨b, hbB, ho⟩ := (FD.orthonormalFlagTranslate_holds r (U'.X k')).1 x₁ hx₁
+  have hx' := FD.OrthogonalFrameDomain.rmul_mem_dom (U'.X k') hx₁ hbB
+  rw [← (FD.orthonormalFlagTranslate_holds r (U'.X k')).2.1 _ _ hs'.2.1 x₁ hx₁ b hbB,
+    PullbackSections.PfSupAtUnit.pnorm_unit _ _ _ (PullbackSections.PfSupAtUnit.dmin_ortho _ ho)]
+  have hN := isMetric_of_isOrtho E H Dw l Xo c σ r U' hσ hU' hpq k' ⟨_, hx'⟩ ho
+  have hrd' : ‖rdU U' f k' (FD.rmul x₁ b)‖ = cabs (evR Xo c f (U'.un k' ⟨_, hx'⟩)) := by
+    have e : rdU U' f k' (FD.rmul x₁ b) = toC (evR Xo c f (U'.un k' ⟨_, hx'⟩)) := dif_pos hx'
+    rw [e]; rfl
+  rw [hrd']
+  generalize U'.un k' ⟨_, hx'⟩ = y at hN ⊢
+  obtain ⟨k, x, t, hx, ht⟩ := GlobalTheory.T.exists_orthonormalFrame_borelChange_complexFramedPoint E H Dw l Xo c σ r U hU y
+  obtain ⟨g, hg0, hgd, hchg⟩ :=
+    ((GlobalTheory.Frames.frBor_calculus E H Dw l Xo c (CAt σ) (U.un k x) y y).1 t).1 ht
+  have hm0 := isMetric_of_isOrtho E H Dw l Xo c σ r U hσ hU hpq k x hx
+  have hm1 := GlobalTheory.T.metric_change_of_frame E H Dw l Xo c σ (U.un k x) y 1 _
+    (fun b => Matrix.transpose (show Matrix (Fin (Dw.mult b)) (Fin (Dw.mult b)) ℂ from g b))
+    (show ℂ from (t none : CAt σ)) (Units.ne_zero (M₀ := ℂ) (t none)) hchg hm0
+  obtain ⟨hNN, hG⟩ := GlobalTheory.T.metric_data_unique E H Dw l Xo c σ y _ _ _ _ hN hm1
+  have hnone : cabs (t none : CAt σ) = 1 := by
+    rw [_root_.mul_one] at hNN
+    exact (pow_eq_one_iff_of_nonneg (norm_nonneg _) two_ne_zero).1 hNN.symm
+  have hsome : ∀ p : Σ τ : E →+* ℂ, Fin (Dw.mult τ), cabs (t (some p) : CAt σ) = (Real.sqrt (κ k p.1))⁻¹ := by
+    rintro ⟨τ, i⟩
+    rw [← hgd τ i]
+    refine OrthoBound.norm_diag_of_triangular
+      (Matrix.transpose (show Matrix (Fin (Dw.mult τ)) (Fin (Dw.mult τ)) ℂ from g τ)) _
+      (div_pos (hpos _ _) (hpos _ _)) (fun i j hij => hg0 τ j i hij) ?_ i
+    have h1 := (congrFun hG τ).symm
+    have h2 : ((2 * Real.pi * ‖relab c σ τ (U'.X k').ξ0‖ : ℝ) : ℂ) ≠ 0 := Complex.ofReal_ne_zero.2 (hpos _ _).ne'
+    dsimp only at h1
+    rw [Complex.ofReal_div, div_eq_inv_mul, mul_smul, Matrix.mul_smul, Matrix.smul_mul, h1, smul_smul,
+      inv_mul_cancel₀ h2, one_smul]
+  have hev := hwt (CAt σ) (GlobalTheory.FrameNorm.Comparison₂.isReduced_cAt σ) a n f hf t _ _ ht
+  have hw : cabs (wchar (ex Dw a n) t) =
+      ∏ p : Σ τ : E →+* ℂ, Fin (Dw.mult τ), (Real.sqrt (κ k p.1))⁻¹ ^ a (p.1, p.2) := by
+    rw [GlobalTheory.FrameNorm.Comparison₂.cabs_wchar, Fintype.prod_option, hnone, one_pow, _root_.one_mul]
+    exact Finset.prod_congr rfl fun p _ => by rw [hsome p]; rfl
+  have hrd : ‖rdU U f k x.1‖ = cabs (evR Xo c f (U.un k x)) := by
+    have e : rdU U f k x.1 = toC (evR Xo c f (U.un k x)) := dif_pos x.2
+    rw [e]; rfl
+  have hle := hC k x.1 x.2
+  rw [PullbackSections.PfSupAtUnit.pnorm_unit _ _ _ (PullbackSections.PfSupAtUnit.dmin_ortho _ hx), hrd] at hle
+  have hB0 : ∀ k, 0 ≤ B k := fun k => mul_nonneg (Finset.prod_nonneg fun p _ => by positivity) (abs_nonneg _)
+  rw [hev, GlobalTheory.FrameNorm.Comparison₂.cabs_mul, hw]
+  exact (mul_le_mul_of_nonneg_left (hle.trans (le_abs_self _)) (Finset.prod_nonneg fun p _ => by positivity)).trans
+    (Finset.single_le_sum (f := B) (fun k _ => hB0 k) (Finset.mem_univ k))
+
+end GlobalTheory.SupFull
+
+
+[ICL_SRC_LEVEL_SYSTEM] Original kernel, invariant families, slab, IsSystem and all IsForm fields
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/SpanningFamilies/IsSystem.lean#L99-L147
+  ∀ u : T → GL (Fin n) ℂ, (∀ t, (u t : Matrix (Fin n) (Fin n) ℂ) ∈ Matrix.unitaryGroup (Fin n) ℂ) →
+    ∀ z w : Harm.Var T p q (Fin n) → ℂ,
+      ∑ j, MvPolynomial.eval z (Harm.colActHom u (P j)) *
+        conj (MvPolynomial.eval w (Harm.colActHom u (P j))) =
+      ∑ j, MvPolynomial.eval z (P j) * conj (MvPolynomial.eval w (P j))
+
+def sgnM : Matrix (Fin r) (Fin r) ℂ := Matrix.diagonal fun a : Fin r => ((sgn X.p0 (a : ℕ) : ℝ) : ℂ)
+
+def slab (δ : ℝ) : Set (Frame X.Ψ r) :=
+  {x | ∀ τ : X.Ψ, ∀ a b, ‖gram τ.1 X.Gm (mat x τ) a b - sgnM X a b‖ < δ}
+
+def mapL (γ : GL (Fin r) E) (L : Lt E r) : Lt E r :=
+  L.map ((Matrix.toLin' (γ : Matrix (Fin r) (Fin r) E)).restrictScalars (𝓞 E))
+
+structure IsSystem (M : ℕ) (Δ : Subgroup (GL (Fin r) E)) (𝓛 : Set (Lt E r))
+    (Φ : Lt E r → Lt E n → TF n g) (μ : GL (Fin r) E → Lt E r → ℂ) : Prop where
+  un : ∀ γ ∈ Δ, IsUn X γ
+  lat : ∀ L ∈ 𝓛, L.FG ∧ Submodule.span E (L : Set (Fin r → E)) = ⊤
+  stab : ∀ γ ∈ Δ, ∀ L ∈ 𝓛, mapL γ L ∈ 𝓛
+  sb : ∀ L ∈ 𝓛, ∀ Λ ∈ Vset E n M, IsSB (Φ L Λ)
+  norm : ∃ a : ℝ, 0 < a ∧ (∀ L ∈ 𝓛, ∀ Λ ∈ Vset E n M, ip (Φ L Λ) (Φ L Λ) = a) ∧
+    ∃ (b : Lt E r → Lt E r → ℝ) (θ : ℝ), θ < 1 ∧
+      (∀ L ∈ 𝓛, ∀ L' ∈ 𝓛, ∀ Λ ∈ Vset E n M, ‖ip (Φ L Λ) (Φ L' Λ)‖ ≤ a * b L L') ∧
+      ∀ L ∈ 𝓛, Summable (fun L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L} => b L L'.1) ∧
+        ∑' L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L}, b L L'.1 ≤ θ
+  mu : ∀ γ ∈ Δ, ∀ L ∈ 𝓛, ‖μ γ L‖ = 1 ∧
+    ∀ Λ ∈ Vset E n M, wG X bas idx γ (Φ L Λ) = μ γ L • Φ (mapL γ L) Λ
+  supp : ∀ γ, IsUn X γ → γ ∉ Δ → ∀ L ∈ 𝓛, ∀ L' ∈ 𝓛, ∀ Λ ∈ Vset E n M,
+    ip (Φ L Λ) (wG X bas idx γ (Φ L' Λ)) = 0
+  cusp : ∀ ξ : Fin r → E, ξ ≠ 0 → herm X.Gm ξ ξ = 0 → ∀ L ∈ 𝓛, ∀ Λ ∈ Vset E n M,
+    ∃ (s : Finset (Fin n → E)) (a : (Fin n → E) → ℂ), ∑ v ∈ s, a v ≠ 0 ∧
+      ∑ v ∈ s, a v • heisG X bas (vecMulVec v ξ) (Φ L Λ) = 0
+  adm : ∀ L ∈ 𝓛, ∀ L' ∈ 𝓛, ∃ R, admitted M R fun Λ => dbl X bas idx (Φ L Λ) (Φ L' Λ)
+
+structure IsForm (Δ : Subgroup (GL (Fin r) E)) (𝓛 : Set (Lt E r)) (μ : GL (Fin r) E → Lt E r → ℂ)
+    (la : Wt X.Ψ r) (F : Lt E r → Frame X.Ψ r → ℂ) : Prop where
+  hol : ∀ L ∈ 𝓛, DifferentiableOn ℂ (F L) X.dom
+  bor : ∀ L ∈ 𝓛, ∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, F L (rmul x b) = bchar la b * F L x
+  aut : ∀ γ ∈ Δ, ∀ L ∈ 𝓛, ∀ x ∈ X.dom, F (mapL γ L) (lact γ x) = (μ γ L)⁻¹ * F L x
+  bdd : ∃ C : ℝ, ∀ L ∈ 𝓛, ∀ x ∈ X.dom, X.pnorm la (F L) x ≤ C
+
+def InSpan (M : ℕ) (𝓛 : Set (Lt E r)) (Φ : Lt E r → Lt E n → TF n g)
+    (𝓗 : Set (Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n))) (F : Lt E r → Frame X.Ψ r → ℂ) : Prop :=
+  ∃ (m : ℕ) (Λ : Fin m → Lt E n) (P : Fin m → Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n)) (a : Fin m → ℂ),
+    (∀ i, Λ i ∈ Vset E n M ∧ P i ∈ 𝓗) ∧
+    ∀ L ∈ 𝓛, ∀ x ∈ X.dom, F L x = ∑ i, a i * thP X hr bas idx (Φ L (Λ i)) (P i) x
+
+def SelfD (L : Lt E r) : Prop := L.FG ∧ ∀ x, x ∈ L ↔ ∀ y ∈ L, ∃ k : ℤ, EF X x y = k
+
+
+
+[ICL_SRC_OPERATOR_COEFFICIENTS] Original positive class weights, mass, covariance and class-sum coefficient estimates
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/LatticeOperatorCoefficients.lean#L15-L114
+theorem ip_smul_smul {K κ ι : Type} [Field K] [NumberField K] [Fintype κ] [Fintype ι]
+    {φ ψ : Matrix κ ι K → ℂ} (hφ : IsSB φ) (hψ : IsSB ψ) (a b : ℂ) :
+    ip (a • φ) (b • ψ) = a * conj b * ip φ ψ := by
+  have hc : IsSB fun x => conj (ψ x) :=
+    (isSB_algebra_haar_linear K κ ι ψ ψ hψ hψ).2.2.2.1
+  have hp : IsSB (φ * fun x => conj (ψ x)) :=
+    (isSB_algebra_haar_linear K κ ι φ _ hφ hc).2.2.1
+  have hs := (isSB_algebra_haar_linear K κ ι _ _ hp hp).2.2.2.2.2.1 (a * conj b)
+  have key : (fun x => (a • φ) x * conj ((b • ψ) x)) =
+      (a * conj b) • (φ * fun x => conj (ψ x)) := by
+    funext x
+    simp only [Pi.smul_apply, smul_eq_mul, Pi.mul_apply, map_mul]
+    ring
+  unfold ip
+  rw [key, hs]
+  rfl
+
+theorem classSum_eq_sum {M : ℕ} [Fintype (Cls E n M)] (f : Lt E n → ℂ) :
+    classSum M f = ∑ c : Cls E n M, (wt M (Quot.out c).1 : ℂ) * f (Quot.out c).1 := by
+  unfold classSum
+  exact finsum_eq_sum_of_fintype _
+
+theorem exists_mass {M : ℕ} (hM : 0 < M) : ∃ m : ℝ, 0 < m ∧
+    (∀ (f : Lt E n → ℂ) (a : ℂ), (∀ Λ ∈ Vset E n M, f Λ = a) → classSum M f = m * a) ∧
+    ∀ (f : Lt E n → ℂ) (b : ℝ), (∀ Λ ∈ Vset E n M, ‖f Λ‖ ≤ b) → ‖classSum M f‖ ≤ m * b := by
+  classical
+  obtain ⟨hfin, hstd, hwt, -, -⟩ := finite_cls_and_stab E n M hM
+  let _ : Fintype (Cls E n M) := Fintype.ofFinite _
+  refine ⟨∑ c : Cls E n M, wt M (Quot.out c).1, ?_, ?_, ?_⟩
+  · apply Finset.sum_pos
+    · intro c _
+      exact (hwt _ (Quot.out c).2).2
+    · exact ⟨(Quot.mk _ ⟨stdL E n, hstd⟩ : Cls E n M), Finset.mem_univ _⟩
+  · intro f a hf
+    rw [classSum_eq_sum, Complex.ofReal_sum, Finset.sum_mul]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    rw [hf _ (Quot.out c).2]
+  · intro f b hf
+    rw [classSum_eq_sum, Finset.sum_mul]
+    refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun c _ => ?_)
+    have hw := (hwt _ (Quot.out c).2).2
+    rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg hw.le]
+    exact mul_le_mul_of_nonneg_left (hf _ (Quot.out c).2) hw.le
+
+theorem classSum_mul {M : ℕ} (hM : 0 < M) (f : Lt E n → ℂ) (a : ℂ) :
+    classSum M f * a = classSum M fun Λ => f Λ * a := by
+  classical
+  have := (finite_cls_and_stab E n M hM).1
+  let _ : Fintype (Cls E n M) := Fintype.ofFinite _
+  rw [classSum_eq_sum, classSum_eq_sum, Finset.sum_mul]
+  exact Finset.sum_congr rfl fun c _ => mul_assoc _ _ _
+
+end GlobalTheory.SW.Coef
+
+namespace GlobalTheory.SW
+
+open Coef
+
+private theorem classSum_congr_of_eqOn_Vset {E : Type} [Field E] [NumberField E] [IsCMField E]
+    {n M : ℕ} {f g : Lt E n → ℂ} (h : ∀ Λ ∈ Vset E n M, f Λ = g Λ) :
+    classSum M f = classSum M g := by
+  unfold classSum
+  exact finsum_congr fun c => by rw [h _ (Quot.out c).2]
+
+theorem lattice_operator_coefficients : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g : ℕ) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → ∀ (M : ℕ) (Δ : Subgroup (GL (Fin r) E)) (𝓛 : Set (Lt E r)) (Φ : Lt E r → Lt E n → TF n g) (μ : GL (Fin r) E → Lt E r → ℂ), 0 < M → IsSystem X bas idx M Δ 𝓛 Φ μ → ∃ (a θ : ℝ), 0 < a ∧ θ < 1 ∧ (∀ L ∈ 𝓛, classSum M (fun Λ => ip (Φ L Λ) (Φ L Λ)) = a ∧ Summable (fun L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L} => ‖classSum M (fun Λ => ip (Φ L Λ) (Φ L'.1 Λ))‖) ∧ ∑' L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L}, ‖classSum M (fun Λ => ip (Φ L Λ) (Φ L'.1 Λ))‖ ≤ θ * a) ∧ ∀ γ ∈ Δ, ∀ L ∈ 𝓛, ∀ L' ∈ 𝓛, classSum M (fun Λ => ip (Φ (mapL γ L) Λ) (Φ (mapL γ L') Λ)) * μ γ L * conj (μ γ L') = classSum M (fun Λ => ip (Φ L Λ) (Φ L' Λ)) := by
+  intro E _ _ _ r X g bas idx n hs hn M Δ 𝓛 Φ μ hM hsys
+  obtain ⟨m, hm, hconst, hbd⟩ := Coef.exists_mass (E := E) (n := n) hM
+  obtain ⟨a, ha, hdiag, b, θ, hθ, hoff, hbt⟩ := hsys.norm
+  have hma : 0 < m * a := mul_pos hm ha
+  refine ⟨m * a, θ, hma, hθ, fun L hL => ?_, ?_⟩
+  · have hb : ∀ L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L},
+        ‖classSum M (fun Λ => ip (Φ L Λ) (Φ L'.1 Λ))‖ ≤ m * a * b L L'.1 := fun L' => by
+      rw [mul_assoc]
+      exact hbd _ (a * b L L'.1) fun Λ hΛ => hoff L hL L'.1 L'.2.1 Λ hΛ
+    have hS : Summable fun L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L} => m * a * b L L'.1 :=
+      (hbt L hL).1.mul_left (m * a)
+    have hT := Summable.of_nonneg_of_le (fun _ => norm_nonneg _) hb hS
+    refine ⟨?_, hT, ?_⟩
+    · rw [hconst _ (a : ℂ) fun Λ hΛ => hdiag L hL Λ hΛ]
+      exact (Complex.ofReal_mul m a).symm
+    · calc _ ≤ ∑' L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L}, m * a * b L L'.1 :=
+            Summable.tsum_le_tsum hb hT hS
+        _ = m * a * ∑' L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L}, b L L'.1 := tsum_mul_left
+        _ ≤ m * a * θ := mul_le_mul_of_nonneg_left (hbt L hL).2 hma.le
+        _ = θ * (m * a) := mul_comm _ _
+  · intro γ hγ L hL L' hL'
+    have hun := hsys.un γ hγ
+    have key : ∀ Λ ∈ Vset E n M, ip (Φ L Λ) (Φ L' Λ) =
+        ip (Φ (mapL γ L) Λ) (Φ (mapL γ L') Λ) * (μ γ L * conj (μ γ L')) := by
+      intro Λ hΛ
+      have hw := wG_laws E r X g bas idx n hs hn γ hun (Φ L Λ) (hsys.sb L hL Λ hΛ)
+      rw [← (hw.2.2.1 (Φ L' Λ) (hsys.sb L' hL' Λ hΛ)).1, (hsys.mu γ hγ L hL).2 Λ hΛ,
+        (hsys.mu γ hγ L' hL').2 Λ hΛ,
+        Coef.ip_smul_smul (hsys.sb _ (hsys.stab γ hγ L hL) Λ hΛ)
+          (hsys.sb _ (hsys.stab γ hγ L' hL') Λ hΛ)]
+      ring
+    rw [mul_assoc, Coef.classSum_mul hM]
+    exact classSum_congr_of_eqOn_Vset fun Λ hΛ => (key Λ hΛ).symm
+
+end GlobalTheory.SW
+
+
+[ICL_SRC_KERNEL_IDENTITY] Original raw theta/Gaussian kernel identity and its exact normalizing scalar; retained producer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/KernelIdentity.lean#L181-L343
+theorem kernel_identity : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → 4 * r < n → ∀ (M : ℕ) (Δ : Subgroup (GL (Fin r) E)) (𝓛 : Set (Lt E r)) (Φ : Lt E r → Lt E n → TF n g) (μ : GL (Fin r) E → Lt E r → ℂ), 0 < M → IsSystem X bas idx M Δ 𝓛 Φ μ → ∃ a : ℂ, a ≠ 0 ∧ ∀ (c : X.Ψ → Fin q0 → ℕ) (c' : X.Ψ → Fin X.p0 → ℕ), ∀ (m : ℕ) (P : Fin m → Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n)), (∀ j, P j ∈ Harm.rowHighest ℂ c c') → InvFam P → ∀ L₁ ∈ 𝓛, ∀ L₂ ∈ 𝓛, ∀ x₁ ∈ X.dom, ∀ x₂ ∈ X.dom, HasSum (fun γ : Δ => a * classSum M (fun Λ => ip (Φ L₁ Λ) (Φ (mapL γ L₂) Λ)) * conj (μ γ L₂) * kern X hr idx P x₁ (lact γ x₂)) (classSum M (fun Λ => ∑ j, thP X hr bas idx (Φ L₁ Λ) (P j) x₁ * conj (thP X hr bas idx (Φ L₂ Λ) (P j) x₂))) := by
+  intro E _ _ _ r X g q0 hr bas idx n hb hn h4 M Δ 𝓛 Φ μ hM hS
+  obtain ⟨a, ha0, b, -, hab⟩ := GlobalTheory.T.doubledHermitianTestFunction_zero_and_norm E r X g bas idx n hb hn
+  refine ⟨a, ha0, ?_⟩
+  intro c c' m P hP hInv L₁ h₁ L₂ h₂ x₁ hx₁ x₂ hx₂
+  have ha : ∀ φ₁ φ₂ : TF n g, IsSB φ₁ → IsSB φ₂ → dbl X bas idx φ₁ φ₂ 0 = a * ip φ₁ φ₂ :=
+    fun φ₁ φ₂ e₁ e₂ => (hab φ₁ φ₂ e₁ e₂).1
+  have hT : IsType X.Ψ := Base.isType_data X
+  have : Fintype (Cls E n M) := @Fintype.ofFinite _ (finite_cls_and_stab E n M hM).1
+  have hcs : ∀ f : Lt E n → ℂ, classSum M f =
+      ∑ cl : Cls E n M, (wt M (Quot.out cl).1 : ℂ) * f (Quot.out cl).1 :=
+    fun f => finsum_eq_sum_of_fintype _
+  have hu : ∀ s : Harm.Var X.Ψ q0 X.p0 (Fin n), star (letterDir X hr idx s) = letterDir X hr idx s := by
+    intro s
+    funext k i
+    unfold letterDir
+    simp only [Pi.star_apply, Pi.single_apply]
+    split_ifs
+    · simp only [Pi.single_apply]
+      split_ifs <;> simp
+    · simp
+  have hφ : ∀ (L : Lt E r), L ∈ 𝓛 → ∀ cl : Cls E n M, IsSB (Φ L (Quot.out cl).1) :=
+    fun L hL cl => hS.sb L hL _ (Quot.out cl).2
+  have hthA : ∀ (j : Fin m) (L : Lt E r), L ∈ 𝓛 → ∀ cl : Cls E n M, ∀ x ∈ X.dom, ∀ p,
+      AnalyticAt ℂ (thA X bas idx (Φ L (Quot.out cl).1) x) p := by
+    intro j L hL cl x hx p
+    exact (GlobalTheory.T.thetaSeries_testFunction_holomorphic_weight E r X g q0 hr bas idx n hb hn c c' _ (hφ L hL cl) (P j) (hP j)).2.2.2
+      x hx p (Set.mem_univ p)
+  have hq := fun γ : Δ => KernSum.kZero_quad (n := n) X idx x₁ (lact (γ : GL (Fin r) E) x₂)
+  choose A B hAB using hq
+  have hK0 : ∀ γ : Δ, ∀ p, AnalyticAt ℂ (fun q : (Fin n → Fin g → ℂ) × (Fin n → Fin g → ℂ) =>
+      kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) q.1 q.2) p := by
+    intro γ p
+    have e : (fun q : (Fin n → Fin g → ℂ) × (Fin n → Fin g → ℂ) =>
+        kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) q.1 q.2) = fun q => A γ * cexp (B γ q q) :=
+      funext (hAB γ)
+    rw [e]
+    exact analyticAt_mul_cexp_bilin_diag (A γ) (B γ) p
+  obtain ⟨S, hSd⟩ : ∃ S : (Fin n → Fin g → ℂ) × (Fin n → Fin g → ℂ) → ℂ, ∀ p, S p =
+      ∑ cl : Cls E n M, (wt M (Quot.out cl).1 : ℂ) * (kZero X idx x₁ x₂ p.1 p.2 *
+        eis X.Ψ (dbl X bas idx (Φ L₁ (Quot.out cl).1) (Φ L₂ (Quot.out cl).1)) (dblZ X x₁ x₂)
+          (dblz X idx x₁ x₂ p.1 p.2) (dblz' X idx x₁ x₂ p.1 p.2)) := ⟨_, fun p => rfl⟩
+  obtain ⟨T, hTd⟩ : ∃ T : (Fin n → Fin g → ℂ) × (Fin n → Fin g → ℂ) → ℂ, ∀ p, T p =
+      ∑ cl : Cls E n M, (wt M (Quot.out cl).1 : ℂ) *
+        (thA X bas idx (Φ L₁ (Quot.out cl).1) x₁ p.1 *
+          conj (thA X bas idx (Φ L₂ (Quot.out cl).1) x₂ (star p.2))) := ⟨_, fun p => rfl⟩
+  have hpt : ∀ p : (Fin n → Fin g → ℂ) × (Fin n → Fin g → ℂ), HasSum (fun γ : Δ =>
+      (a * classSum M (fun Λ => ip (Φ L₁ Λ) (Φ (mapL γ L₂) Λ)) * conj (μ γ L₂)) *
+        kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) p.1 p.2) (S p) := by
+    intro p
+    have h := hasSum_sum (s := (Finset.univ : Finset (Cls E n M))) fun cl _ =>
+      (KernSum.hasSum_eis hb hn h4 hS ha h₁ h₂ hx₁ hx₂ (Quot.out cl).2 p.1 p.2).mul_left
+        (wt M (Quot.out cl).1 : ℂ)
+    have e : ∀ γ : Δ, (a * classSum M (fun Λ => ip (Φ L₁ Λ) (Φ (mapL γ L₂) Λ)) *
+        conj (μ γ L₂)) * kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) p.1 p.2 =
+        ∑ cl : Cls E n M, (wt M (Quot.out cl).1 : ℂ) * (a * ip (Φ L₁ (Quot.out cl).1)
+          (Φ (mapL γ L₂) (Quot.out cl).1) * conj (μ γ L₂) *
+            kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) p.1 p.2) := by
+      intro γ
+      rw [hcs, Finset.mul_sum, Finset.sum_mul, Finset.sum_mul]
+      refine Finset.sum_congr rfl fun cl _ => ?_
+      ring
+    simp only [e]
+    rw [hSd p]
+    exact h
+  have hHS : ∀ j, (∀ p, AnalyticAt ℂ S p) ∧ HasSum (fun γ : Δ =>
+      KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) (fun p =>
+        (a * classSum M (fun Λ => ip (Φ L₁ Λ) (Φ (mapL γ L₂) Λ)) * conj (μ γ L₂)) *
+          kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) p.1 p.2))
+      (KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) S) := by
+    intro j
+    refine analyticAt_and_hasSum_bd_of_hasSum_gaussian (P j) (barP (P j)) (letterDir X hr idx) _ S
+      (fun γ => (a * classSum M (fun Λ => ip (Φ L₁ Λ) (Φ (mapL γ L₂) Λ)) * conj (μ γ L₂)) * A γ)
+      B (fun γ p => ?_) hpt
+    beta_reduce
+    rw [hAB γ p]
+    ring
+  have eT : T = fun q : (Fin n → Fin g → ℂ) × (Fin n → Fin g → ℂ) =>
+      ∑ cl : Cls E n M, (fun cl => (wt M (Quot.out cl).1 : ℂ)) cl *
+        ((fun cl => thA X bas idx (Φ L₁ (Quot.out cl).1) x₁) cl q.1 *
+          conj ((fun cl => thA X bas idx (Φ L₂ (Quot.out cl).1) x₂) cl (star q.2))) :=
+    funext hTd
+  have hTP := fun j : Fin m => bd_sum_prod_lemma_4 (P j) (letterDir X hr idx) hu
+    (fun cl : Cls E n M => (wt M (Quot.out cl).1 : ℂ))
+    (fun cl => thA X bas idx (Φ L₁ (Quot.out cl).1) x₁)
+    (fun cl => thA X bas idx (Φ L₂ (Quot.out cl).1) x₂)
+    (fun cl => hthA j L₁ h₁ cl x₁ hx₁) (fun cl => hthA j L₂ h₂ cl x₂ hx₂)
+  have hTa : ∀ j : Fin m, ∀ p, AnalyticAt ℂ T p := by
+    intro j p
+    rw [eT]
+    exact (hTP j).1 p
+  have hTj : ∀ j : Fin m, KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) T =
+      ∑ cl : Cls E n M, (wt M (Quot.out cl).1 : ℂ) *
+        (thP X hr bas idx (Φ L₁ (Quot.out cl).1) (P j) x₁ *
+          conj (thP X hr bas idx (Φ L₂ (Quot.out cl).1) (P j) x₂)) := by
+    intro j
+    rw [eT]
+    exact (hTP j).2
+  obtain ⟨R, hAdm⟩ := hS.adm L₁ h₁ L₂ h₂
+  have hheat := GlobalTheory.T.isHeat_swd_of_adm E X.Ψ hT n r hn h4 M R _ hAdm
+  have hsw : ∀ Z ∈ Hn X.Ψ r, swd X.Ψ M (fun Λ => dbl X bas idx (Φ L₁ Λ) (Φ L₂ Λ)) Z 0 0 = 0 :=
+    fun Z hZ => GlobalTheory.T.siegelWeil_definiteHermitian_of_four_mul_lt E X.Ψ hT n r hn h4 M R _ hAdm Z hZ
+  have hrn : r ≤ n := by omega
+  have h0 := GlobalTheory.T.invariant_polyDeriv_kills_doubled_heat_solution E r X g q0 hr idx n m P hrn hInv _ hheat hsw x₁ hx₁ x₂ hx₂
+  have hTS : (fun p => T p + (-1) * S p) = fun p : (Fin n → Fin g → ℂ) × (Fin n → Fin g → ℂ) =>
+      kZero X idx x₁ x₂ p.1 p.2 * swd X.Ψ M (fun Λ => dbl X bas idx (Φ L₁ Λ) (Φ L₂ Λ))
+        (dblZ X x₁ x₂) (dblz X idx x₁ x₂ p.1 p.2) (dblz' X idx x₁ x₂ p.1 p.2) := by
+    funext p
+    have e : swd X.Ψ M (fun Λ => dbl X bas idx (Φ L₁ Λ) (Φ L₂ Λ)) (dblZ X x₁ x₂)
+        (dblz X idx x₁ x₂ p.1 p.2) (dblz' X idx x₁ x₂ p.1 p.2) = classSum M (fun Λ =>
+          thH X.Ψ (dbl X bas idx (Φ L₁ Λ) (Φ L₂ Λ)) (dblZ X x₁ x₂) (dblz X idx x₁ x₂ p.1 p.2)
+            (dblz' X idx x₁ x₂ p.1 p.2) -
+          eis X.Ψ (dbl X bas idx (Φ L₁ Λ) (Φ L₂ Λ)) (dblZ X x₁ x₂) (dblz X idx x₁ x₂ p.1 p.2)
+            (dblz' X idx x₁ x₂ p.1 p.2)) := rfl
+    rw [hTd p, hSd p, e, hcs, Finset.mul_sum, Finset.mul_sum, ← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl fun cl _ => ?_
+    have hD := (GlobalTheory.T.doubledHermitianTestFunction_spec E r X g bas idx n hb hn _ _ (hφ L₁ h₁ cl) (hφ L₂ h₂ cl)).2.1
+      x₁ hx₁ x₂ hx₂ p.1 p.2
+    have hst : star p.2 = fun k i => conj (p.2 k i) := rfl
+    rw [hst, hD]
+    ring
+  have hsplit : ∀ j, KernSum.bd (P j) (barP (P j)) (letterDir X hr idx)
+      (fun p => T p + (-1) * S p) = KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) T +
+        (-1) * KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) S := by
+    intro j
+    have e1 := KernSum.bd_add (P j) (barP (P j)) (letterDir X hr idx) (hTa j)
+      (fun p => (analyticAt_const.mul ((hHS j).1 p) : AnalyticAt ℂ (fun q => (-1 : ℂ) * S q) p))
+    have e2 := KernSum.bd_const_mul (P j) (barP (P j)) (letterDir X hr idx) (-1) ((hHS j).1)
+    rw [← e2]
+    exact e1
+  have hzero : ∑ j, KernSum.bd (P j) (barP (P j)) (letterDir X hr idx)
+      (fun p => T p + (-1) * S p) = 0 := by
+    rw [hTS]
+    exact h0
+  simp only [hsplit, Finset.sum_add_distrib, ← Finset.mul_sum] at hzero
+  have hval : classSum M (fun Λ => ∑ j, thP X hr bas idx (Φ L₁ Λ) (P j) x₁ *
+      conj (thP X hr bas idx (Φ L₂ Λ) (P j) x₂)) =
+      ∑ j, KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) S := by
+    have e : ∑ j, KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) T =
+        ∑ j, KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) S := by
+      linear_combination hzero
+    rw [← e, hcs]
+    simp only [hTj]
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun cl _ => ?_
+    rw [Finset.mul_sum]
+  have hfun : ∀ γ : Δ, a * classSum M (fun Λ => ip (Φ L₁ Λ) (Φ (mapL γ L₂) Λ)) *
+      conj (μ γ L₂) * kern X hr idx P x₁ (lact (γ : GL (Fin r) E) x₂) =
+      ∑ j, KernSum.bd (P j) (barP (P j)) (letterDir X hr idx) (fun p =>
+        (a * classSum M (fun Λ => ip (Φ L₁ Λ) (Φ (mapL γ L₂) Λ)) * conj (μ γ L₂)) *
+          kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) p.1 p.2) := by
+    intro γ
+    have e : kern X hr idx P x₁ (lact (γ : GL (Fin r) E) x₂) = ∑ j, KernSum.bd (P j)
+        (barP (P j)) (letterDir X hr idx)
+          (fun p => kZero X idx x₁ (lact (γ : GL (Fin r) E) x₂) p.1 p.2) := rfl
+    rw [e, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun j _ => ?_
+    exact (KernSum.bd_const_mul (P j) (barP (P j)) (letterDir X hr idx) _ (hK0 γ)).symm
+  simp only [hfun]
+  rw [hval]
+  exact hasSum_sum fun j _ => (hHS j).2
+
+end GlobalTheory.SW
+
+
+[ICL_SRC_KERNEL_UNFOLDING] Source finite-rank unfolding, thin-slab integrability and bounded inverse/reproducer argument
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/HermitianThetaSeriesSpanBoundedForms.lean#L22-L256
+theorem unfold_span (Γ I Y A J : Type) [Group Γ] [Countable Γ] [Countable I] [MeasurableSpace Y]
+    [MulAction Γ I] [MulAction Γ Y] [Fintype J] (ν : Measure Y) [SFinite ν]
+    (hν : ∀ γ : Γ, MeasurePreserving (fun y : Y => γ • y) ν ν) (D : I → Set Y)
+    (hD : ∀ i, MeasurableSet (D i)) (hD' : ∀ i, ∀ᵐ y ∂ν, ∃! γ : Γ, γ • y ∈ D (γ • i))
+    (S : Set A) (f : A → I → Y → ℂ) (hf : ∀ a ∈ S, ∀ i, Integrable (f a i) ν)
+    (hs : ∀ a ∈ S, Summable fun i => ∫ y, ‖f a i y‖ ∂ν) (e : J → A → ℂ) (t : J → I → Y → ℂ)
+    (hk : ∀ a ∈ S, ∀ i, ∀ᵐ y ∂ν, ∑' γ : Γ, f a (γ • i) (γ • y) = ∑ j, e j a * t j i y) :
+    ∃ (m : ℕ) (k : Fin m → J) (b : Fin m → ℂ), ∀ a ∈ S,
+      ∑' i, ∫ y, f a i y ∂ν = ∑ j, b j * e (k j) a := by
+  let k : Fin (Fintype.card J) ≃ J := (Fintype.equivFin J).symm
+  have hk' : ∀ a ∈ S, ∀ i, (fun y => ∑' γ : Γ, f a (γ • i) (γ • y)) =ᵐ[ν.restrict (D i)]
+      fun y => ∑ j, e (k j) a * t (k j) i y := fun a ha i => by
+    refine ae_restrict_of_ae ((hk a ha i).mono fun y hy => ?_)
+    exact hy.trans (k.sum_comp fun j => e j a * t j i y).symm
+  obtain ⟨b, hb⟩ := finiteRank_integral_mem_span A I Y ν D S _ (fun j => e (k j))
+    (fun j => t (k j)) fun a ha => by
+      obtain ⟨h1, h2, -⟩ := unfolding_abstract Γ I Y ν hν D hD hD' (f a) (hf a ha) (hs a ha)
+      refine ⟨fun i => (h1 i).congr (hk' a ha i), h2.congr fun i => ?_⟩
+      exact integral_congr_ae ((hk' a ha i).mono fun y hy => congrArg norm hy)
+  refine ⟨_, k, b, fun a ha => ?_⟩
+  obtain ⟨-, -, h3⟩ := unfolding_abstract Γ I Y ν hν D hD hD' (f a) (hf a ha) (hs a ha)
+  rw [← h3, ← hb a ha]
+  exact tsum_congr fun i => integral_congr_ae (hk' a ha i)
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {r : ℕ} (X : Data E r)
+
+theorem pnorm_of_gram (la : Wt X.Ψ r) (F : Frame X.Ψ r → ℂ) {x : Frame X.Ψ r}
+    (hx : ∀ τ : X.Ψ, gram τ.1 X.Gm (mat x τ) = sgnM X) : X.pnorm la F x = ‖F x‖ := by
+  have h : ∀ τ i, ‖dmin X.Gm x τ i‖ = 1 := fun τ i => by
+    unfold dmin lminor
+    rw [hx τ, sgnM, Matrix.submatrix_diagonal _ _ (Fin.castLE_injective _), Matrix.det_diagonal,
+      norm_prod]
+    refine Finset.prod_eq_one fun a _ => ?_
+    simp only [Function.comp_apply, sgn]
+    split_ifs <;> simp
+  unfold Data.pnorm
+  simp [h]
+
+omit [NumberField E] [IsCMField E] in
+
+theorem norm_bchar_le {Ψ : Finset (E →+* ℂ)} (la : Wt Ψ r) (C : ℝ) {b : Frame Ψ r}
+    (hb : ∀ τ i, ‖b τ i i‖ ≤ C ∧ ‖(b τ i i)⁻¹‖ ≤ C) :
+    ‖bchar la b‖ ≤ ∏ τ, ∏ i, C ^ (la τ i).natAbs := by
+  unfold bchar
+  rw [norm_prod]
+  refine Finset.prod_le_prod (fun _ _ => norm_nonneg _) fun τ _ => ?_
+  rw [norm_prod]
+  refine Finset.prod_le_prod (fun _ _ => norm_nonneg _) fun i _ => ?_
+  obtain ⟨k, hk | hk⟩ := Int.eq_nat_or_neg (la τ i)
+  · rw [hk, zpow_natCast, Int.natAbs_natCast, norm_pow]
+    exact pow_le_pow_left₀ (norm_nonneg _) (hb τ i).1 _
+  · rw [hk, _root_.zpow_neg, zpow_natCast, Int.natAbs_neg, Int.natAbs_natCast, ← inv_pow, norm_pow]
+    exact pow_le_pow_left₀ (norm_nonneg _) (hb τ i).2 _
+
+theorem summable_of_ne {α : Type} (𝓛 : Set α) (L : α) (u : α → ℝ)
+    (h : Summable fun L' : {L' // L' ∈ 𝓛 ∧ L' ≠ L} => u L'.1) : Summable fun L' : 𝓛 => u L'.1 := by
+  have h1 : Summable (u ∘ ((↑) : (𝓛 \ {L} : Set α) → α)) := h
+  have h2 : Summable (u ∘ ((↑) : (𝓛 ∩ {L} : Set α) → α)) :=
+    ((Set.finite_singleton L).subset Set.inter_subset_right).summable u
+  rw [summable_subtype_iff_indicator] at h1 h2
+  change Summable (u ∘ ((↑) : 𝓛 → α))
+  rw [summable_subtype_iff_indicator]
+  refine (h2.add h1).congr fun x => ?_
+  by_cases hx : x ∈ 𝓛 <;> by_cases hL : x = L <;> simp [Set.indicator, hx, hL]
+
+theorem bound_on (la : Wt X.Ψ r) (S : Set (Frame X.Ψ r)) (K B : ℝ)
+    (hd : ∀ x : Frame X.Ψ r, (∀ τ : X.Ψ, gram τ.1 X.Gm (mat x τ) = sgnM X) → x ∈ X.dom)
+    (hK : ∀ x ∈ S, ∃ x' : Frame X.Ψ r, (∀ τ : X.Ψ, gram τ.1 X.Gm (mat x' τ) = sgnM X) ∧
+      ∃ b ∈ Bor X.Ψ r, x = rmul x' b ∧ ∀ τ i j, ‖b τ i j‖ ≤ K ∧ ‖(b τ i i)⁻¹‖ ≤ K) :
+    ∃ B' : ℝ, ∀ F : Frame X.Ψ r → ℂ,
+      (∀ x ∈ X.dom, ∀ b ∈ Bor X.Ψ r, F (rmul x b) = bchar la b * F x) →
+      (∀ x ∈ X.dom, X.pnorm la F x ≤ B) → ∀ x ∈ S, ‖F x‖ ≤ B' := by
+  refine ⟨(∏ τ, ∏ i, K ^ (la τ i).natAbs) * B, fun F h1 h2 x hx => ?_⟩
+  obtain ⟨x', hx', b, hb, rfl, hbK⟩ := hK x hx
+  have h3 := norm_bchar_le la K fun τ i => hbK τ i i
+  rw [h1 x' (hd _ hx') b hb, norm_mul]
+  refine mul_le_mul h3 ?_ (norm_nonneg _) ((norm_nonneg _).trans h3)
+  rw [← pnorm_of_gram X la _ hx']
+  exact h2 x' (hd _ hx')
+
+@[reducible] noncomputable def frameAct (Δ : Subgroup (GL (Fin r) E)) :
+    MulAction Δ (Frame X.Ψ r) where
+  smul γ x := lact γ x
+  one_smul x := by
+    funext τ
+    change (1 : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ = mat x τ
+    rw [Matrix.map_one _ (map_zero _) (map_one _), Matrix.one_mul]
+  mul_smul γ' γ x := by
+    funext τ
+    change (((γ' : GL (Fin r) E) : Matrix (Fin r) (Fin r) E) *
+      ((γ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E)).map τ.1 * mat x τ =
+      ((γ' : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 *
+        (((γ : GL (Fin r) E) : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ)
+    rw [Matrix.map_mul, Matrix.mul_assoc]
+
+omit [IsCMField E] in
+
+theorem countable_gl : Countable (GL (Fin r) E) := by
+  have : Countable E := Countable.of_equiv _ (Module.finBasis ℚ E).equivFun.toEquiv.symm
+  have : Countable (Matrix (Fin r) (Fin r) E) := inferInstanceAs (Countable (Fin r → Fin r → E))
+  exact (Units.val_injective (α := Matrix (Fin r) (Fin r) E)).countable
+
+theorem sFinite_frame : SFinite (volume : Measure (Frame X.Ψ r)) := by
+  have : SigmaFinite (volume : Measure (Fin r → ℂ)) := inferInstance
+  have : SigmaFinite (volume : Measure (Fin r → Fin r → ℂ)) := inferInstance
+  have : SigmaFinite (volume : Measure (X.Ψ → Fin r → Fin r → ℂ)) := inferInstance
+  infer_instance
+
+theorem unfold_frames (Δ : Subgroup (GL (Fin r) E)) (𝓛 : Set (Lt E r)) (hun : ∀ γ ∈ Δ, IsUn X γ)
+    (hlat : ∀ L ∈ 𝓛, L.FG ∧ Submodule.span E (L : Set (Fin r → E)) = ⊤)
+    (hstab : ∀ γ ∈ Δ, ∀ L ∈ 𝓛, mapL γ L ∈ 𝓛) (S : Set (Frame X.Ψ r)) (hmeas : MeasurableSet S)
+    (hsub : S ⊆ X.dom)
+    (hmp : ∀ γ ∈ Δ, MeasurePreserving (lact γ : Frame X.Ψ r → Frame X.Ψ r)
+      (volume.restrict S) (volume.restrict S))
+    (A J : Type) [Fintype J] (T : Set A) (f : A → Lt E r → Frame X.Ψ r → ℂ)
+    (hf : ∀ a ∈ T, ∀ L ∈ 𝓛, Integrable (f a L) (volume.restrict S))
+    (hs : ∀ a ∈ T, Summable fun L : 𝓛 => ∫ y in S, ‖f a L y‖)
+    (e : J → A → ℂ) (t : J → Lt E r → Frame X.Ψ r → ℂ)
+    (hk : ∀ a ∈ T, ∀ L ∈ 𝓛, ∀ y ∈ S,
+      ∑' γ : Δ, f a (mapL γ L) (lact γ y) = ∑ j, e j a * t j L y) :
+    ∃ (m : ℕ) (k : Fin m → J) (b : Fin m → ℂ), ∀ a ∈ T,
+      ∑' L : 𝓛, ∫ y in S, f a L y = ∑ j, b j * e (k j) a := by
+  obtain ⟨hcount, hmul, hone, D, hD, hD'⟩ :=
+    LatFrame.exists_fundamentalDomain E r X Δ 𝓛 hun hlat hstab
+  have : Countable 𝓛 := hcount.to_subtype
+  have : Countable (GL (Fin r) E) := countable_gl
+  have := sFinite_frame X
+  letI : MulAction Δ 𝓛 :=
+    { smul := fun γ L => ⟨mapL γ L, hstab γ γ.2 L L.2⟩
+      one_smul := fun L => Subtype.ext (hone _)
+      mul_smul := fun γ γ' L => Subtype.ext (hmul _ _ _) }
+  have hae : ∀ᵐ y ∂(volume.restrict S), y ∈ S := ae_restrict_mem hmeas
+  exact @unfold_span Δ 𝓛 (Frame X.Ψ r) A J _ _ _ MeasureSpace.toMeasurableSpace _ (frameAct X Δ) _
+    (volume.restrict S) _ (fun γ => hmp γ γ.2) (fun L => D L) (fun L => (hD L).1)
+    (fun L => hae.mono fun y hy => hD' L L.2 y (hsub hy)) T (fun a L => f a L)
+    (fun a ha L => hf a ha L L.2) hs e (fun j L => t j L)
+    (fun a ha L => hae.mono fun y hy => hk a ha L L.2 y hy)
+
+omit [NumberField E] [IsCMField E] in
+
+theorem mp_restrict {Ψ : Finset (E →+* ℂ)} (S : Set (Frame Ψ r)) (hmeas : MeasurableSet S)
+    (f : Frame Ψ r → Frame Ψ r) (h3 : MeasurePreserving f volume volume)
+    (h4 : ∀ x, f x ∈ S ↔ x ∈ S) : MeasurePreserving f (volume.restrict S) (volume.restrict S) := by
+  have h5 := h3.restrict_preimage hmeas
+  rwa [show f ⁻¹' S = S from Set.ext h4] at h5
+
+theorem theta_span : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → 4 * r < n → ∀ (M : ℕ) (Δ : Subgroup (GL (Fin r) E)) (𝓛 : Set (Lt E r)) (Φ : Lt E r → Lt E n → TF n g) (μ : GL (Fin r) E → Lt E r → ℂ), 0 < M → IsSystem X bas idx M Δ 𝓛 Φ μ → ∀ (c : X.Ψ → Fin q0 → ℕ) (c' : X.Ψ → Fin X.p0 → ℕ) (F : Lt E r → Frame X.Ψ r → ℂ), IsForm X Δ 𝓛 μ (wtOf X hr c c' n) F → InSpan X hr bas idx M 𝓛 Φ (Harm.rowHighest ℂ c c' : Submodule ℂ (Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n))) F := by
+  intro E _ _ _ r X g q0 hr bas idx n hs hn hrn M Δ 𝓛 Φ μ hM hS c c' F hF
+  obtain ⟨m, P, hP, hP0, hPi⟩ := exists_invFam_rowHighest X.Ψ q0 X.p0 n c c' (by omega)
+  obtain ⟨a, θ, ha, hθ, hC1, hC2⟩ := lattice_operator_coefficients E r X g bas idx n hs hn M Δ 𝓛 Φ μ hM hS
+  obtain ⟨κ, hκ, hker⟩ := kernel_identity E r X g q0 hr bas idx n hs hn hrn M Δ 𝓛 Φ μ hM hS
+  replace hker := hker c c' m P hP hPi
+  obtain ⟨C, hC⟩ : ∃ C : Lt E r → Lt E r → ℂ,
+      ∀ L L', classSum M (fun Λ => ip (Φ L Λ) (Φ L' Λ)) = C L L' := ⟨_, fun _ _ => rfl⟩
+  simp only [hC] at hC1 hC2 hker
+  obtain ⟨F', hF', hFF⟩ := Neumann.main E r X Δ 𝓛 μ (wtOf X hr c c' n) C a θ ha hθ
+    (fun γ hγ L hL => ⟨hS.stab γ hγ L hL, (hS.mu γ hγ L hL).1⟩)
+    (fun γ hγ x hx => (hS.un γ hγ).lact_mem hx) hC1 hC2 F hF
+  obtain ⟨δ₀, hδ₀, hslab⟩ := thin_slab E r X
+  obtain ⟨δ₁, hδ₁, hint⟩ := kern_integrableOn_slab E r X g q0 hr idx n c c' m P hn hP (by omega)
+  obtain ⟨δ₂, hδ₂, hrep⟩ := kern_reproducing E r X g q0 hr idx n c c' m P hn hP (by omega) hP0
+  obtain ⟨δ, hδ, h0, h1, h2⟩ : ∃ δ : ℝ, 0 < δ ∧ δ ≤ δ₀ ∧ δ ≤ δ₁ ∧ δ ≤ δ₂ :=
+    ⟨min δ₀ (min δ₁ δ₂), by positivity, min_le_left _ _,
+      (min_le_right _ _).trans (min_le_left _ _), (min_le_right _ _).trans (min_le_right _ _)⟩
+  obtain ⟨hopen, hsub, horth, -, hun, ⟨K, hK⟩, -⟩ := hslab δ hδ h0
+  replace hint := hint δ hδ h1
+  obtain ⟨ρ, hρ, hrep⟩ := hrep δ hδ h2
+  have hmeas : MeasurableSet (slab X δ) := hopen.measurableSet
+  obtain ⟨B, hB⟩ := hF'.bdd
+  obtain ⟨B', hB0⟩ := bound_on X (wtOf X hr c c' n) (slab X δ) K B
+    (fun x hx => hsub (horth x hx)) hK
+  have hB' : ∀ L ∈ 𝓛, ∀ x ∈ slab X δ, ‖F' L x‖ ≤ B' := fun L hL =>
+    hB0 _ (hF'.bor L hL) (hB L hL)
+  have : Finite (Cls E n M) := (finite_cls_and_stab E n M hM).1
+  letI : Fintype (Cls E n M) := Fintype.ofFinite _
+  have hae : ∀ᵐ y ∂(volume.restrict (slab X δ)), y ∈ slab X δ := ae_restrict_mem hmeas
+  have hi : ∀ x₁ ∈ X.dom, ∀ L ∈ 𝓛, Integrable (fun y => kern X hr idx P x₁ y * F' L y)
+      (volume.restrict (slab X δ)) := fun x₁ hx₁ L hL =>
+    Integrable.mul_bdd (c := B') (hint x₁ hx₁).1
+      (((hF'.hol L hL).continuousOn.mono hsub).aestronglyMeasurable hmeas)
+      (hae.mono fun y hy => hB' L hL y hy)
+  have hmp : ∀ γ ∈ Δ, MeasurePreserving (lact γ : Frame X.Ψ r → Frame X.Ψ r)
+      (volume.restrict (slab X δ)) (volume.restrict (slab X δ)) := fun γ hγ => by
+    have e : (lact γ : Frame X.Ψ r → Frame X.Ψ r) =
+        X.lmulC fun τ => (γ : Matrix (Fin r) (Fin r) E).map τ.1 := rfl
+    have h3 := hun (fun τ => (γ : Matrix (Fin r) (Fin r) E).map τ.1)
+      fun τ v w => by rw [PerMove.hermC_unitary _ _ _ (hS.un γ hγ)]
+    rw [e]
+    exact mp_restrict _ hmeas _ h3.1 h3.2.1
+  generalize kern X hr idx P = Kr at hker hint hrep hi
+  have hsum : ∀ p ∈ 𝓛 ×ˢ X.dom,
+      Summable fun L : 𝓛 => ∫ y in slab X δ, ‖C p.1 L * (Kr p.2 y * F' L y)‖ := fun p hp => by
+    refine Summable.of_nonneg_of_le (fun L => integral_nonneg fun y => norm_nonneg _)
+      (fun L => ?_) ((summable_of_ne 𝓛 p.1 (fun L => ‖C p.1 L‖) (hC1 p.1 hp.1).2.1).mul_right
+        (∫ y in slab X δ, ‖Kr p.2 y‖ * B'))
+    simp only [norm_mul]
+    rw [integral_const_mul]
+    refine mul_le_mul_of_nonneg_left (integral_mono_ae ?_ ((hint p.2 hp.2).1.norm.mul_const _)
+      (hae.mono fun y hy => ?_)) (norm_nonneg _)
+    · simpa only [norm_mul] using (hi p.2 hp.2 L L.2).norm
+    · exact mul_le_mul_of_nonneg_left (hB' L L.2 y hy) (norm_nonneg _)
+  obtain ⟨th, hth⟩ : ∃ th : Lt E r → Lt E n → Fin m → Frame X.Ψ r → ℂ,
+      ∀ L Λ j x, thP X hr bas idx (Φ L Λ) (P j) x = th L Λ j x := ⟨_, fun _ _ _ _ => rfl⟩
+  simp only [hth] at hker
+  obtain ⟨N, k, b, hb⟩ := unfold_frames X Δ 𝓛 hS.un hS.lat hS.stab (slab X δ) hmeas hsub hmp
+    (Lt E r × Frame X.Ψ r) (Cls E n M × Fin m)
+    (𝓛 ×ˢ X.dom) (fun p L y => C p.1 L * (Kr p.2 y * F' L y))
+    (fun p hp L hL => (hi p.2 hp.2 L hL).const_mul _) hsum
+    (fun j p => th p.1 (Quot.out j.1).1 j.2 p.2)
+    (fun j L y => κ⁻¹ * (wt M (Quot.out j.1).1 : ℂ) *
+      conj (th L (Quot.out j.1).1 j.2 y) * F' L y)
+    (fun p hp L hL y hy => by
+      have h3 := ((hker p.1 hp.1 L hL p.2 hp.2 y (hsub hy)).mul_left κ⁻¹).mul_right (F' L y)
+      refine Eq.trans (tsum_congr fun γ => ?_) (h3.tsum_eq.trans ?_)
+      · rw [hF'.aut γ γ.2 L hL y (hsub hy), Complex.inv_eq_conj (hS.mu γ γ.2 L hL).1]
+        field_simp
+      · rw [classSum, finsum_eq_sum_of_fintype, Fintype.sum_prod_type]
+        simp only [Finset.mul_sum, Finset.sum_mul]
+        refine Finset.sum_congr rfl fun _ _ => Finset.sum_congr rfl fun _ _ => ?_
+        ring)
+  refine ⟨N, fun i => (Quot.out (k i).1).1, fun i => P (k i).2, fun i => (ρ : ℂ)⁻¹ * b i,
+    fun i => ⟨(Quot.out (k i).1).2, hP _⟩, fun L hL x hx => ?_⟩
+  have h3 := hb (L, x) ⟨hL, hx⟩
+  have hρ' : (ρ : ℂ) ≠ 0 := ofReal_ne_zero.2 hρ.ne'
+  have h4 : ∀ L' : 𝓛, ∫ y in slab X δ, C L L' * (Kr x y * F' L' y) =
+      ρ * (C L L' * F' L' x) := fun L' => by
+    rw [integral_const_mul, hrep (F' L') (hF'.hol _ L'.2) (hF'.bor _ L'.2)
+      ⟨B, hB _ L'.2⟩ x hx]
+    ring
+  simp only [h4] at h3
+  rw [tsum_mul_left, ← hFF L hL x hx] at h3
+  simp only [mul_assoc, hth]
+  rw [← Finset.mul_sum, ← h3, inv_mul_cancel_left₀ hρ']
+
+end GlobalTheory.SW.SpanMain
+
+
+[ICL_SRC_STABLE_RANGE] Exact original stable exponent threshold
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/LevelThetaSpan.lean#L1-L20
+import Mathlib
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsSystem
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsHeatZero
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HermitianThetaSeriesSpanBoundedFormsStatement
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.HermitianThetaLevelDataFormsSystemStatement
+
+open Matrix Complex NumberField MeasureTheory GlobalTheory GlobalTheory.SW GlobalTheory.ThFr ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.FD
+open scoped ComplexConjugate ComplexOrder Real Classical
+
+theorem GlobalTheory.SW.level_theta_span : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → 4 * (Module.finrank ℚ E * r) + 4 ≤ n → ∀ (D : Level X) (hn : r ≤ n) (M : ℕ), 0 < M → (M : 𝓞 E) ∈ D.𝔪 → ∀ v₀ : Lt E r → TF n g, (∀ L ∈ D.lats, IsVac X bas D.w (tens (stdL E n) (D.sh L)) (v₀ L)) → ∀ μ : GL (Fin r) E → Lt E r → ℂ, (∀ γ ∈ D.grp, ∀ L ∈ D.lats, ∀ k : D.J, D.Red (fun i => (γ : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k → wG X bas idx γ (v₀ L) = (μ γ L * (D.lam k : ℂˣ)) • v₀ (mapL γ L)) → ∀ (c : X.Ψ → Fin q0 → ℕ) (c' : X.Ψ → Fin X.p0 → ℕ) (F : Lt E r → Frame X.Ψ r → ℂ), IsForm X D.grp D.lats μ (wtOf X hr c c' n) F → InSpan X hr bas idx M D.lats (D.phi bas hn v₀) (Harm.rowHighest ℂ c c' : Submodule ℂ (Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n))) F := by
+  intro E _ _ _ r X g q0 hr bas idx n hS hE hn4 D hn M hM hMD v₀ hv μ hμ c c' F hF
+
+  have hd : 0 < Module.finrank ℚ E := Module.finrank_pos
+  have hr1 : r ≤ Module.finrank ℚ E * r := Nat.le_mul_of_pos_left r hd
+  have h4 : 4 * r < n := by
+    generalize Module.finrank ℚ E * r = k at hr1 hn4
+    omega
+
+  exact GlobalTheory.T.hermitianTheta_series_span_bounded_forms E r X g q0 hr bas idx n hS hE h4 M D.grp D.lats (D.phi bas hn v₀) μ hM
+    (GlobalTheory.T.hermitianThetaLevelData_forms_system E r X g bas idx n hS hE hn4 D hn M hM hMD v₀ hv μ hμ) c c' F hF
+
+
+[ICL_SRC_INTEGRAL_HARMONIC_SPAN] Original coefficient field and literal integral harmonic highest-weight lattice
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/HarmonicRowHighestEqSpanIntegralHarmonic.lean#L1-L102
+import Mathlib
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsBaseClassLevelAdapted
+import Formalism.LocalToGlobal.ProjectiveLattices.CuspFree
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.PullbackSections.HolomorphicFamilies.AnChartAsm
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
+open GlobalTheory.SW hiding Level
+open Formalism.L2.Pj Formalism.L2.PjFree
+open scoped ComplexConjugate Classical
+attribute [local instance] Over.cartesianMonoidalCategory
+open GlobalTheory.Dict
+
+namespace GlobalTheory.Dict
+
+theorem natCast_mul_X_mem_symO {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H}
+    {l : Geo.Tor.Level H} (c : Coeff l) {n : ℕ} (Λ : Lt E n) (N : ℕ)
+    (hΛ : Ideal.span {(N : 𝓞 E)} • Formalism.L2.Pj.stdLat E n ≤ Λ) (ℓ : LtN Dw n) :
+    (N : MvPolynomial (LtN Dw n) c.F) * MvPolynomial.X ℓ ∈ Formalism.L2.Pj.symO c (⟨Λ⟩ : GenLat E n) := by
+  obtain ⟨τ, i, j⟩ := ℓ
+  refine Subring.subset_closure (Or.inr ⟨τ, i, Pi.single j (N : E), hΛ ?_, ?_⟩)
+  · have h1 : (Pi.single j (1 : E) : Fin n → E) ∈ Formalism.L2.Pj.stdLat E n := by
+      intro k _
+      by_cases hk : k = j
+      · subst hk
+        rw [Pi.single_eq_same]
+        exact Submodule.mem_one.2 ⟨1, map_one _⟩
+      · rw [Pi.single_eq_of_ne hk]
+        exact Submodule.zero_mem _
+    have h2 := Submodule.smul_mem_smul (Ideal.mem_span_singleton_self (N : 𝓞 E)) h1
+    have h3 : (N : 𝓞 E) • (Pi.single j (1 : E) : Fin n → E) = Pi.single j (N : E) := by
+      rw [Nat.cast_smul_eq_nsmul, ← Pi.single_nsmul]
+      simp
+    rwa [h3] at h2
+  · unfold letB
+    rw [Finset.sum_eq_single j]
+    · simp
+    · intro k _ hk
+      simp [Pi.single_eq_of_ne hk]
+    · simp
+
+theorem exists_natCast_mul_mem_symO {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E}
+    {Dw : Datum H} {l : Geo.Tor.Level H} (c : Coeff l) {n : ℕ} (Λ : Lt E n) (N : ℕ) (hN : 0 < N)
+    (hΛ : Ideal.span {(N : 𝓞 E)} • Formalism.L2.Pj.stdLat E n ≤ Λ) (P : MvPolynomial (LtN Dw n) c.F) :
+    ∃ M : ℕ, 0 < M ∧ (M : MvPolynomial (LtN Dw n) c.F) * P ∈ Formalism.L2.Pj.symO c (⟨Λ⟩ : GenLat E n) := by
+  haveI := c.fin
+  induction P using MvPolynomial.induction_on with
+  | C x =>
+    obtain ⟨y, hy, h⟩ := exists_integral_multiples ℤ ℚ (L := c.F) {x}
+    have h1 := h x (Finset.mem_singleton_self x)
+    have h2 : MvPolynomial.C (y • x) ∈ Formalism.L2.Pj.symO (Dw := Dw) c (⟨Λ⟩ : GenLat E n) :=
+      Subring.subset_closure (Or.inl ⟨⟨y • x, h1⟩, rfl⟩)
+    refine ⟨(y * y).natAbs, Int.natAbs_pos.2 (mul_ne_zero hy hy), ?_⟩
+    have h3 : (((y * y).natAbs : ℕ) : MvPolynomial (LtN Dw n) c.F) = ((y * y : ℤ) : MvPolynomial (LtN Dw n) c.F) := by
+      rw [← Int.cast_natCast, Int.natAbs_of_nonneg (mul_self_nonneg y)]
+    have h4 := Subring.mul_mem _ (intCast_mem (Formalism.L2.Pj.symO (Dw := Dw) c (⟨Λ⟩ : GenLat E n)) y) h2
+    rw [h3]
+    convert h4 using 1
+    rw [zsmul_eq_mul, map_mul, map_intCast]
+    push_cast
+    ring
+  | add p q hp hq =>
+    obtain ⟨M, hM, h⟩ := hp
+    obtain ⟨M', hM', h'⟩ := hq
+    refine ⟨M * M', Nat.mul_pos hM hM', ?_⟩
+    have := Subring.add_mem _ (Subring.mul_mem _ (natCast_mem _ M') h) (Subring.mul_mem _ (natCast_mem _ M) h')
+    convert this using 1
+    push_cast
+    ring
+  | mul_X p ℓ hp =>
+    obtain ⟨M, hM, h⟩ := hp
+    refine ⟨M * N, Nat.mul_pos hM hN, ?_⟩
+    have := Subring.mul_mem _ h (natCast_mul_X_mem_symO c Λ N hΛ ℓ)
+    convert this using 1
+    push_cast
+    ring
+
+theorem rowHighest_eq_sum_harmL : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (c : Coeff l) (σ : c.F →+* ℂ) (r g q0 n : ℕ) (X : Data E r) (a : (E →+* ℂ) × ℕ → ℕ) (Dc : Dic Dw c σ X g q0 n a) (Λ : Lt E n) (N : ℕ), 0 < N → Ideal.span {(N : 𝓞 E)} • stdLat E n ≤ Λ → ∀ Q ∈ Harm.rowHighest ℂ Dc.k Dc.k', ∃ (m : ℕ) (t : Fin m → ℂ) (P : Fin m → MvPolynomial (LtN Dw n) c.F), (∀ i, P i ∈ harmL c (⟨Λ⟩ : GenLat E n) a) ∧ Q = ∑ i, t i • MvPolynomial.rename Dc.eL (MvPolynomial.map σ (P i)) := by
+  intro E _ _ _ H Dw l c σ r g q0 n X a Dc Λ N hN hΛ Q hQ
+  obtain ⟨m, t, v, hv⟩ := Submodule.mem_span_set'.1 (Dc.span hQ)
+  have hP : ∀ i, ∃ P : MvPolynomial (LtN Dw n) c.F,
+      P ∈ HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)) ∧
+      MvPolynomial.rename Dc.eL (MvPolynomial.map σ P) = (v i).1 := fun i => (v i).2
+  choose P hP hPv using hP
+  choose M hM hMP using fun i => exists_natCast_mul_mem_symO c Λ N hN hΛ (P i)
+  refine ⟨m, fun i => t i / (M i : ℂ), fun i => (M i : MvPolynomial (LtN Dw n) c.F) * P i,
+    fun i => ⟨?_, hMP i⟩, ?_⟩
+  · have e : (M i : MvPolynomial (LtN Dw n) c.F) * P i = (M i : c.F) • P i := by
+      rw [Nat.cast_smul_eq_nsmul, nsmul_eq_mul]
+    change (M i : MvPolynomial (LtN Dw n) c.F) * P i ∈ _
+    rw [e]
+    exact ⟨Submodule.smul_mem _ _ (hP i).1,
+      fun s k k' h u => by rw [map_smul, (hP i).2.1 s k k' h u],
+      fun mm hm => (hP i).2.2 mm (MvPolynomial.support_smul hm)⟩
+  · rw [← hv]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    have h0 : (M i : ℂ) ≠ 0 := Nat.cast_ne_zero.2 (hM i).ne'
+    rw [map_mul, map_mul, map_natCast, map_natCast, hPv, ← nsmul_eq_mul, ← Nat.cast_smul_eq_nsmul ℂ, smul_smul,
+      div_mul_cancel₀ _ h0]
+
+end GlobalTheory.Dict
+
+
+[ICL_SRC_LOWER_ROW_DICTIONARY] Original lower-row/lattice translation dictionary retained explicitly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/StableFormsEqSumThetaSeriesFreeLowerRows.lean#L1-L51
+import Mathlib
+import Development.AbelianVarietyTheory.Definitions.SpanningFamilies.IsStabForm
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.LevelThetaSpan
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.LevelStructureProperties
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ThetaSeriesLowerRowsZeroEqFreeLowerRowsStatement
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.VacuumMultiplierUnitaryCocycleStatement
+import Development.AbelianVarietyTheory.Proofs.SiegelThetaTransformation.ExistsFormExtendToAllLatticesStatement
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField Matrix Complex
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.FD GlobalTheory GlobalTheory.ThFr
+open ReciprocityTheory.ChartRestriction.G.Geo.Tor hiding Level
+open GlobalTheory.SW hiding Level
+open Formalism.L2.Pj Formalism.L2.PjFree
+open scoped ComplexConjugate Classical
+attribute [local instance] Over.cartesianMonoidalCategory
+open GlobalTheory.Dict
+
+private theorem thP_smul' {E : Type} [Field E] [NumberField E] [IsCMField E] {r g q0 n : ℕ}
+    (X : Data E r) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ)
+    (idx : Fin g ≃ X.Ψ × Fin r) (φ : SW.TF n g) (c : ℂ) (P : Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n))
+    (x : Frame X.Ψ r) : thP X hr bas idx φ (c • P) x = c * thP X hr bas idx φ P x := by
+  unfold thP
+  by_cases hc : c = 0
+  · subst hc
+    simp [ReciprocityTheory.ChartRestriction.G.I2.polyDeriv]
+  · simp only [ReciprocityTheory.ChartRestriction.G.I2.polyDeriv, MvPolynomial.support_smul_eq hc,
+      MvPolynomial.coeff_smul, smul_eq_mul, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun m _ => mul_assoc _ _ _
+
+theorem GlobalTheory.Dict.stabForms_eq_sum_thP : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (g q0 : ℕ) (hr : X.p0 + q0 = r) (bas : (Fin g ⊕ Fin g → ℤ) ≃ₗ[ℤ] X.Λ) (idx : Fin g ≃ X.Ψ × Fin r) (n : ℕ), IsSympl X bas → Even n → 4 * (Module.finrank ℚ E * r) + 4 ≤ n → ∀ (D : SW.Level X) (hn : r ≤ n) (M : ℕ) (𝔐 𝔍 : Ideal (𝓞 E)), 0 < M → (M : 𝓞 E) ∈ D.𝔪 → D.𝔪 = 𝔐 * 𝔍 → IsCoprime 𝔐 𝔍 → ∀ v₀ : Lt E r → TF n g, (∀ L ∈ D.lats, IsVac X bas D.w (tens (stdL E n) (D.sh L)) (v₀ L)) → ∀ mu : GL (Fin r) E → Lt E r → ℂ, (∀ ga ∈ D.grp, ∀ L ∈ D.lats, ∀ k : D.J, D.Red (fun i => (ga : Matrix (Fin r) (Fin r) E) *ᵥ D.β i) k → wG X bas idx ga (v₀ L) = (mu ga L * (D.lam k : ℂˣ)) • v₀ (mapL ga L)) → ∀ (k : X.Ψ → Fin q0 → ℕ) (k' : X.Ψ → Fin X.p0 → ℕ) (Jx : Type) [Finite Jx] (L : Jx → Lt E r) (Q : Jx → Frame X.Ψ r → ℂ), (∀ i, L i ∈ D.lats) → (∀ i i', ∀ ga ∈ D.grp, mapL ga (L i) = L i' → i = i') → (∀ i, ∀ ga ∈ D.grp, mapL ga (L i) = L i → mu ga (L i) = 1) → (∀ i, IsStabForm X D.grp (L i) (wtOf X hr k k' n) (Q i)) → ∃ (m : ℕ) (Λ : Fin m → Lt E n) (P : Fin m → Harm.Poly ℂ X.Ψ q0 X.p0 (Fin n)), (∀ j, Λ j ∈ Vset E n M ∧ P j ∈ Harm.rowHighest ℂ k k') ∧ ∀ i, ∀ x ∈ X.dom, Q i x = ∑ j, thP X hr bas idx (phiF bas D 𝔐 hn v₀ (L i) (Λ j)) (P j) x := by
+  intro E _ _ _ r X g q0 hr bas idx n hS hE hn4 D hn M 𝔐 𝔍 hM hMm hmf hcop v₀ hv mu hmu k k' Jx _ L Q
+    hL hinj hfix hQ
+
+  obtain ⟨hnorm, -, hcoc⟩ := GlobalTheory.T.vacuum_multiplier_unitary_cocycle E r X g bas idx n hS hE D v₀ hv mu hmu
+
+  have hsys := GlobalTheory.T.hermitianThetaLevelData_forms_system E r X g bas idx n hS hE hn4 D hn M hM hMm v₀ hv mu hmu
+
+  obtain ⟨F, hF, hFL⟩ := GlobalTheory.T.exists_form_extend_to_all_lattices E r X D.grp D.lats mu (wtOf X hr k k' n) Jx L Q hsys.un
+    (fun ga hga L' hL' => ⟨hsys.stab ga hga L' hL', hnorm ga hga L' hL'⟩) hcoc hL hinj hfix hQ
+
+  obtain ⟨m, Λ, P, a, hΛP, hFsum⟩ :=
+    GlobalTheory.SW.level_theta_span E r X g q0 hr bas idx n hS hE hn4 D hn M hM hMm v₀ hv mu hmu k k' F hF
+
+  have h97 := fun j => GlobalTheory.T.thetaSeries_lowerRowsZero_eq_freeLowerRows E r X g q0 hr bas idx n hS hE D hn M 𝔐 𝔍 hM hMm hmf hcop v₀ hv
+    k k' (Λ j) (hΛP j).1 (P j) (hΛP j).2
+  choose Λ' hΛ' P' hP' heq using h97
+  refine ⟨m, Λ', fun j => a j • P' j, fun j => ⟨hΛ' j, Submodule.smul_mem _ _ (hP' j)⟩, ?_⟩
+  intro i x hx
+  rw [← hFL i x hx, hFsum (L i) (hL i) x hx]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  rw [heq j (L i) (hL i) x hx, thP_smul']
+
+
+[ICL_SRC_SHORT_READING] Original simultaneous short-rule reading with component-independent nonzero scalar
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/ShortSeriesReadingsEqClassicalThetaSeries.lean#L88-L160
+theorem GlobalTheory.Dict.rdU_short_eq_thP : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2 → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n) (σ : c.F →+* ℂ) (r : ℕ) (U : Unf Xo c σ r), GoodEmb c σ → IsUnf U → 1 ≤ r → d.IsLev → (∃ _ : StarRing (𝓞 E), IsNab d.Xo₂ d.c₂ d.nab₂) → UnitC d → ∀ (ph : (Fin n → LaJ Xo c d) → c.F) (ψ : (LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) →* c.Fˣ) (x₀ : Fin n → LaJ Xo c d), d.PhiPin ph ψ x₀ → ∀ (W : UW U) (X : Data E r) (a : (E →+* ℂ) × ℕ → ℕ), Dom a n → ∀ (Dc : Dic Dw c σ X W.g Dw.p n a) (D : SW.Level X) (hn : r ≤ n), Dc.e = W.e → LevTie d σ ph D hn → ∀ v₀ : Lt E r → TF n W.g, (∀ L ∈ D.lats, IsVac X Dc.bas D.w (tens (stdL E n) (D.sh L)) (v₀ L)) → ∀ x0 : Fin n → Dw.La, ∃ u : Lt E n → ℕ → ℂ, (∀ Λ ∈ Vset E n d.l₂.M, ∀ N, NOK Λ N d.l₂.M → u Λ N ≠ 0) ∧ ∀ (k : U.Comp) (h : SameSp (U.X k) X) (ga : GL (Fin r) E) (δ : Dw.La →ₗ[𝓞 E] (Fin r → E)), IsUn X ga → mapL ga (U.X k).Λ ∈ D.lats → IsMark l (mapL ga (U.X k).Λ) (mvMap ga (W.mark k)) → IsDual X l (σ (zetaM c)) (mapL ga (U.X k).Λ) (mvMap ga (W.mark k)) δ → IsBaseClassLevelAdapted d D hn x0 δ → ∃ C : ℂ, C ≠ 0 ∧ ∀ Λ ∈ Vset E n d.l₂.M, ∀ N, NOK Λ N d.l₂.M → ∀ P ∈ HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i)), ∀ f ∈ sec Xo c a n, IsShortRule Xo c d (⟨Λ⟩ : GenLat E n) N x0 P f → ∀ x ∈ (U.X k).dom, rdU U f k x = C * u Λ N * thP X Dc.hr Dc.bas Dc.idx (phiF Dc.bas D (Mfr l) hn v₀ (mapL ga (U.X k).Λ) Λ) (MvPolynomial.rename Dc.eL (MvPolynomial.map σ P)) (lact ga (castFr h.psi x)) := by
+  intro hCI E _ _ _ H Dw l Xo c n d σ r U hg hU hr hlev hnab hunitC ph ψ x₀ hpin W X a hdom Dc D hn hDe
+    htie v₀ hvac x0
+  letI : Algebra c.F ℂ := σ.toAlgebra
+  letI : Algebra d.c₂.F ℂ := (σ.comp d.eF.symm.toAlgHom.toRingHom).toAlgebra
+  have hU' := hU
+  unfold Formalism.L2.PjFree.IsUnf at hU'
+  obtain ⟨hrpq, hk, -, -, hsec, -⟩ := hU'
+  obtain ⟨u, hu0, hmain⟩ := GlobalTheory.Dict.ShortPt.shortRule_value hCI E H Dw l Xo c n d
+    (fun t => by show σ (d.eF.symm (d.eF t)) = σ t; rw [AlgEquiv.symm_apply_apply])
+    hlev hnab (fun y₂ => hunitC _ y₂) ph ψ x₀ hpin r W.g Dw.p X a Dc D hn hdom.2 hrpq htie v₀ hvac x0
+  refine ⟨u, hu0, ?_⟩
+  intro k h ga δ hUn hlat hmark hdual hx0
+  obtain ⟨ρ, hρ, hall⟩ := hmain _ hlat _ δ hmark hdual hx0
+  rw [hDe] at hall
+  have hself : SelfD (U.X k) (U.X k).Λ := (GlobalTheory.Dict.uw_lattice E H Dw l Xo c σ r U hg hU hr W k).2.1
+  have hvL : IsSB (v₀ (mapL ga (U.X k).Λ)) := (hvac _ hlat).1
+  have hwt : ∀ (τ : X.Ψ) (i : Fin r),
+      wtOf X Dc.hr Dc.k Dc.k' n τ i = laU U a n k ⟨τ.1, by rw [h.psi]; exact τ.2⟩ i := by
+    intro τ i
+    rw [Dc.wt_eq]
+    unfold wtX Formalism.L2.PjFree.laU
+    simp only [h.p0]
+  let Jx := {q : Lt E n × ℕ × (HHa Dw.mult n c.F ComplexEmbedding.conjugate (InPsi H) (fun τ i => a (τ, i))) ×
+      (sec Xo c a n) // q.1 ∈ Vset E n d.l₂.M ∧ NOK q.1 q.2.1 d.l₂.M ∧
+        IsShortRule Xo c d (⟨q.1⟩ : GenLat E n) q.2.1 x0 q.2.2.1.1 q.2.2.2.1}
+  let R : Jx → Frame (U.X k).Ψ r → ℂ := fun i => rdU U i.1.2.2.2.1 k
+  let T : Jx → Frame (U.X k).Ψ r → ℂ := fun i x => u i.1.1 i.1.2.1 *
+    thP X Dc.hr Dc.bas Dc.idx (phiF Dc.bas D (Mfr l) hn v₀ (mapL ga (U.X k).Λ) i.1.1)
+      (MvPolynomial.rename Dc.eL (MvPolynomial.map σ i.1.2.2.1.1)) (lact ga (castFr h.psi x))
+  have hol : ∀ i, DifferentiableOn ℂ (R i) (U.X k).dom ∧ DifferentiableOn ℂ (T i) (U.X k).dom ∧
+      ∀ x ∈ (U.X k).dom, ∀ b ∈ Bor (U.X k).Ψ r,
+        R i (rmul x b) = bchar (laU U a n k) b * R i x ∧ T i (rmul x b) = bchar (laU U a n k) b * T i x := by
+    intro i
+    have hs := hsec a n hdom i.1.2.2.2.1 i.1.2.2.2.2 k
+    have ht := GlobalTheory.SW.theta_holomorphic_weight E r X W.g Dw.p Dc.hr Dc.bas Dc.idx n Dc.sympl hdom.2 Dc.k Dc.k' _
+      (GlobalTheory.Dict.ReadAll.isSB_phiF Dc.idx Dc.sympl hdom.2 D (Mfr l) hn v₀ _ i.1.1 hvL) _ (Dc.mem _ i.1.2.2.1.2)
+    obtain ⟨hd, hw⟩ := GlobalTheory.Dict.ReadAll.differentiableOn_and_bchar_equivariant_lact_castFr h hUn hwt _ ht.1 ht.2.1 (u i.1.1 i.1.2.1)
+    exact ⟨hs.1, hd, fun x hx b hb => ⟨hs.2.1 x hx b hb, hw x hx b hb⟩⟩
+  have unit : ∀ x ∈ (U.X k).dom, IsUnitFr (U.X k) x → ∃ κ : ℂ, ‖κ‖ = ρ ∧ ∀ i, R i x = κ * T i x := by
+    intro x hx hunit
+    obtain ⟨Dc', hDe', -⟩ := GlobalTheory.Dict.exists_dic E H Dw l c σ r W.g n (U.X k) a W.e hg hrpq (hk k).1 (hk k).2
+      hself hdom
+    have hpv' : ∀ x v j, pv (U.X k) Dc'.idx x v j =
+        perFr (U.X k) x v (Formalism.L2.PjFree.relab c σ (W.e j).1) (W.e j).2 := by
+      rw [← hDe']; exact Dc'.per_eq
+    have hrt' : ∀ j, rowType (U.X k) (Dc'.idx j) = Formalism.L2.PjFree.relab c σ (W.e j).1 := by
+      rw [← hDe']; exact Dc'.ty_eq
+    obtain ⟨A, hMk, θ, hRd, hMn⟩ := GlobalTheory.Dict.uw_anFib E H Dw l Xo c σ r U hg hU hr W k Dc'.bas Dc'.idx
+      Dc'.sympl hpv' hrt' ⟨x, hx⟩ hunit
+    have hpv : ∀ v, pv (U.X k) Dc'.idx x v = pv X Dc.idx (castFr h.psi x) v := by
+      intro v
+      funext j
+      rw [hpv', Dc.per_eq, hDe, GlobalTheory.Dict.ReadAll.perFr_cast h]
+    have hrow : ∀ j, rowType (U.X k) (Dc'.idx j) = rowType X (Dc.idx j) := by
+      intro j
+      rw [hrt', Dc.ty_eq, hDe]
+    obtain ⟨hxm, hun, -, A', hRd', hMn', hMk'⟩ := GlobalTheory.Dict.anFib_move E H Dw l Xo c r W.g (U.X k) X h Dc'.bas
+      Dc'.idx Dc.bas Dc.idx W.e x (U.X k).Λ (unC U k ⟨x, hx⟩) A ga Dc'.sympl Dc.sympl hx hself hUn hpv hrow
+    obtain ⟨κ, hκn, hκ⟩ := hall _ hxm (hun hunit) _ A' θ (hMk' _ hMk) (hRd' θ hRd) (hMn' θ hMn)
+    refine ⟨κ, hκn, fun i => ?_⟩
+    have hev := hκ i.1.1 i.2.1 i.1.2.1 i.2.2.1 i.1.2.2.1.1 i.1.2.2.1.2 i.1.2.2.2.1 i.2.2.2
+    have hrd : rdU U i.1.2.2.2.1 k x = evR Xo c i.1.2.2.2.1 (unC U k ⟨x, hx⟩) := by
+      simp only [Formalism.L2.PjFree.rdU, LinearMap.coe_mk, AddHom.coe_mk, dif_pos hx]
+      rfl
+    simp only [R, T]
+    rw [hrd]
+    exact hev.trans (_root_.mul_assoc _ _ _)
+  obtain ⟨C, hC0, hC⟩ := GlobalTheory.Dict.const_of_norm_factor_unitFr E r (U.X k) (laU U a n k) Jx R T ρ hρ hol unit
+  refine ⟨C, hC0, fun Λ hΛ N hN P hP f hf hsr x hx => ?_⟩
+  have hx' := hC ⟨(Λ, N, ⟨P, hP⟩, ⟨f, hf⟩), hΛ, hN, hsr⟩ x hx
+  simp only [R, T] at hx'
+  rw [hx', _root_.mul_assoc]
+
+
+[ICL_SRC_SHORT_GLUING] Original short-rule gluing and chart independence retained explicitly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CuspFormEvaluations/ShortValTotOfPinned.lean#L1-L99
+import Mathlib
+import Formalism.LocalToGlobal.ProjectiveLattices.ThShort
+import Formalism.LocalToGlobal.ProjectiveLattices.IsLevMove
+import Formalism.LocalToGlobal.ProjectiveLattices.AllTest
+import Formalism.LocalToGlobal.ProjectiveLattices.FrameCharts
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.ThExprUniqOfChartIndep2
+import Formalism.SharpRestriction.Divisibility.GeneratorPowers.CIndBC
+import ReciprocityTheory.ReductiveGroups.ArithmeticGeometry.ExtensionDescent.SecBaseChangeAnySt
+import Development.AbelianVarietyTheory.Proofs.ModuliProofs.ExistsObjTwistBySimilitude
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FramedPointBaseChangeLaws
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ExistsFramedPointBaseChangeAlgHom
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ThetaValueWeightTriangularFrame
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.AdmissibleColumnsLeAndHarmonicMapCover
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.ShortThetaValueExistsUniqueNaturalOfLawsStatement
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.FramedPointsLiftToLevelCoverStatement
+import Development.AbelianVarietyTheory.Proofs.CuspFormEvaluations.EvaluationLemmaForNablaLevelsStatement
+
+open AlgebraicGeometry CategoryTheory Limits MonoidalCategory CartesianMonoidalCategory MonObj NumberField
+open ReciprocityTheory.ChartRestriction.G ReciprocityTheory.ChartRestriction.G.Semi ReciprocityTheory.ChartRestriction.G.Out ReciprocityTheory.ChartRestriction.G.Geo.Tor Formalism.L2.Pj Formalism.MainNotions.ModuliIntegralCharts.H1
+attribute [local instance] Over.cartesianMonoidalCategory
+
+set_option autoImplicit false
+
+noncomputable section
+
+namespace GlobalTheory.ShortDescent
+
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+
+def oneSim (D : Datum H) : Sim D where
+  f _ := LinearMap.id
+  ν _ := 1
+  tower _ _ _ _ _ := ⟨0, by simp⟩
+  inv _ _ := ⟨LinearMap.id, fun _ => ⟨⟨0, by simp⟩, ⟨0, by simp⟩⟩⟩
+  mult _ _ _ _ := by simp
+
+variable {Xo : Moduli Dw l} {c : Coeff l} {n : ℕ}
+
+theorem evR_eq_of_point_eq (d : DeltaDat Xo c n) {ψ : (LaI Xo c d ≃ₗ[𝓞 E] LaI Xo c d) →* c.Fˣ} (hψ : d.PsiTie ψ)
+    {k : Type} [Field k] [IsAlgClosed k] [Algebra d.c₂.F k] (y y' : FrPt d.Xo₂ d.c₂ k) (h : y'.x = y.x) :
+    evR d.Xo₂ d.c₂ d.cδ y' = evR d.Xo₂ d.c₂ d.cδ y := by
+  have e := hψ 1 (oneSim Dw) (Iso.refl _)
+    ⟨by simp [oneSim], fun a => by simp [oneSim], fun a => ⟨0, by simp [oneSim]⟩⟩
+    (fun a => ⟨0, by simp [oneSim]⟩)
+    ⟨Category.id_comp _, GlobalTheory.LevelTwist.sabMapId _,
+      fun _ => (Category.comp_id _).trans (Category.id_comp _).symm,
+      fun _ => (Category.comp_id _).trans (Category.id_comp _).symm⟩
+    (fun _ => rfl) k y y' (h.trans (Category.comp_id _).symm)
+  simpa using e
+
+theorem map_wchar {J : Type} [Fintype J] {K S T : Type} [Field K] [CommRing S] [Algebra K S] [CommRing T] [Algebra K T]
+    (χ : S →ₐ[K] T) (e : J → ℕ) (t : J → Sˣ) :
+    χ (wchar e t) = wchar e (fun i => Units.map (χ : S →* T) (t i)) := by
+  simp [wchar, map_prod, map_pow]
+
+end GlobalTheory.ShortDescent
+
+namespace GlobalTheory
+
+open ShortDescent in
+
+theorem shortValTot_of_pinned : Laws → ChartIndepSt2 → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n), @ToroidalLevelCompatibility E _ _ _ H Dw → EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) → AllTest Xo c → EvalWD (K := d.c₂.F) (fun S _ _ => FrPt d.Xo₂ d.c₂ S) (fun φ y z => FrMap φ y z) → AllTest d.Xo₂ d.c₂ → d.IsLev → d.l₂.A = l.A → (∃ _ : StarRing (𝓞 E), IsNab d.Xo₂ d.c₂ d.nab₂) → (Dw.p + Dw.q ≤ n → ∃ ph ψ x₀, d.PhiPin ph ψ x₀ ∧ d.PsiTie ψ) → ∀ (nab : NabV Xo c) (bad nV : ℕ) (a : (E →+* ℂ) × ℕ → ℕ), ShortValTot Xo c nab bad nV a n d := by
+  intro hL hC E _ _ _ H Dw l Xo c n d hN _ hAll hW₂ hAll₂ hLev hA hnab hpin nab bad nV a Λ N x0 P hU _ hT hO hX hP
+  obtain ⟨_, hnab⟩ := hnab
+  obtain ⟨hle, hmap⟩ := GlobalTheory.admissible_columns_le_and_harmonic_map_cover E H Dw l Xo c n d
+  have hpin' := hpin (hle _ _ hX)
+  have hP₂ := hmap a P hP.1
+  obtain ⟨hex, -⟩ := GlobalTheory.T.shortThetaValue_existsUnique_natural_of_laws hL hC E H Dw d.l₂ d.Xo₂ d.c₂ d.nab₂ hnab n Λ N hU hT hO a _ hP₂ (d.w x0)
+    (d.eF (betaH (Dw := Dw) c Λ))
+  have hd := GlobalTheory.T.evaluation_lemma_for_nabla_levels hL hC E H Dw l Xo c n d hW₂ hAll₂ hN hLev hA hnab hpin' Λ N hU hT hO a _ hP₂ x0
+    (d.eF (betaH (Dw := Dw) c Λ))
+  obtain ⟨hlift, -, hbor⟩ := GlobalTheory.T.framedPoints_lift_to_levelCover hL E H Dw l Xo c n d
+  obtain ⟨_, ψ, _, -, hψ⟩ := hpin'
+  refine ⟨hex, fun p y => (hd p y).exists.choose, ⟨fun p q φ y z h => ?_, fun p t y y' h => ?_⟩, ?_⟩
+  · refine (hd q z).unique (hd q z).exists.choose_spec ?_
+    intro k _ _ _ _ hk χ w w₂ hw ho v hv
+    exact (hd p y).exists.choose_spec k hk (χ.comp φ) w w₂ (GlobalTheory.FramedBaseChange.trans φ χ h hw) ho v hv
+  · refine (hd p y').unique (hd p y').exists.choose_spec ?_
+    intro k _ _ _ _ hk χ w' w₂' hw' ho' v' hv'
+    obtain ⟨w, hw⟩ := GlobalTheory.FramedBaseChange.exists_frMap hL E H Dw l Xo c p.R k χ y
+    have hb := frBorBC _ _ χ t y y' w w' h hw hw'
+    obtain ⟨w₂, hx₂, ho⟩ := hlift k hk w w₂'.x (ho'.1.trans hb.1) w₂'.x_over
+    have hb₂ := hbor k hk _ w w' w₂ w₂' ho ho' hx₂.symm hb
+    obtain ⟨v, hv, -⟩ := hex k w₂
+    have hv₂ := (GlobalTheory.thetaValue_weight hL hC E H Dw d.l₂ d.Xo₂ d.c₂ d.nab₂ hnab k w₂ w₂' _ hb₂ n a _).2 hP₂
+      _ Λ _ N v hv
+    have e := (hd p y).exists.choose_spec k hk χ w w₂ hw ho v hv
+    rw [(hex k w₂').unique hv' hv₂, map_mul, map_wchar, evR_eq_of_point_eq d hψ w₂ w₂' hx₂.symm]
+    refine (congrArg (_ * ·) e).trans ?_
+    ring
+  · intro k _ _ _ _ hk y y₂ ho
+    obtain ⟨v, hv, -⟩ := hex k y₂
+    refine ⟨v, hv, ?_⟩
+    have hy := hAll k y
+    unfold evR evalAt
+    rw [dif_pos hy]
+    exact (hd _ _).exists.choose_spec k hk _ y y₂ hy.choose_spec.choose_spec.choose_spec ho v hv
+
+end GlobalTheory
+
+
+[ICL_SRC_EXACT_SHORT_SPAN] Literal bounded-section shortGen span and identity-cover exists_datum_span consumer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/BddMemSpanShortGen.lean#L29-L165
+  intro hci E _ _ _ H Dw l Xo c n d σ r U hσ hU hr1 hA hG hpr hlev hnab huc h3 hpin nab bad nV a hbad hdom hbig
+    hchi htot P hP1 hP0
+  rcases isEmpty_or_nonempty U.Comp with hemp | ⟨⟨k₀⟩⟩
+  · have : P = 0 := funext fun k => (hemp.false k).elim
+    rw [this]
+    exact Submodule.zero_mem _
+  obtain ⟨W⟩ := nonempty_uw hU
+  have hrpq : r = Dw.p + Dw.q := hU.1
+  have hn : r ≤ n := by
+    have := Module.finrank_pos (R := ℚ) (M := E)
+    nlinarith
+  have hev : Even n := by
+    unfold Formalism.L2.Pj.Dom at hdom
+    tauto
+  have huw := GlobalTheory.T.uniformisation_component_lattices_markings E H Dw l Xo c σ r U hσ hU hr1 W
+  have hsame : ∀ k, SameSp (U.X k) (U.X k₀) := fun k =>
+    ⟨Finset.ext fun τ => ((hU.2.1 k).2 τ).trans ((hU.2.1 k₀).2 τ).symm, (hG k k₀).1,
+      (hU.2.1 k).1.trans (hU.2.1 k₀).1.symm, (hG k k₀).2, by rw [(huw k).1, (huw k₀).1, (hG k k₀).2]⟩
+  obtain ⟨ph, ψ, x₀, hph⟩ := hpin (hrpq ▸ hn)
+  obtain ⟨Dc, hDe, -⟩ := GlobalTheory.T.exists_letterRowWeightDictionary E H Dw l c σ r W.g n (U.X k₀) a W.e hσ hrpq (hU.2.1 k₀).1 (hU.2.1 k₀).2
+    (huw k₀).2.1 hdom
+  obtain ⟨D, hD⟩ := GlobalTheory.T.exists_classicalLevelData_coverSelfDual E H Dw l Xo c n d σ r (U.X k₀) hn hrpq (huw k₀).2.1 hlev h3 ph ψ x₀ hph
+  obtain ⟨v₀, mu, hv₀, hmu⟩ := GlobalTheory.SW.exists_vacua_and_multipliers E r (U.X k₀) W.g Dc.bas Dc.idx n Dc.sympl hev D
+  obtain ⟨x0, ga, δ, hadm, hset, hsep⟩ := GlobalTheory.T.exists_components_lattices_moved_to_level_family E H Dw l Xo c n d σ r U hσ hU hr1 hA hlev W k₀ hsame ph D hn hD
+  obtain ⟨u, hu, hread⟩ := GlobalTheory.T.short_series_readings_eq_classical_thetaSeries hci E H Dw l Xo c n d σ r U hσ hU hr1 hlev hnab huc ph ψ x₀ hph W (U.X k₀) a
+    hdom Dc D hn hDe hD v₀ hv₀ x0
+  choose C hC hrd using fun k => hread k (hsame k) (ga k) (δ k) (hset k).1 (hset k).2.1 (hset k).2.2.1
+    (hset k).2.2.2.1 (hset k).2.2.2.2
+  have hmu1 := GlobalTheory.T.vacuum_multiplier_eq_one_on_stabiliser E H Dw l Xo c n d σ r W.g (U.X k₀) Dc.bas Dc.idx D hn ph Dc.sympl hev hD
+    (W.F.Di (W.ik k₀)) (W.emb k₀) (huw k₀).2.2.2.1 (huw k₀).2.2.2.2.1 (huw k₀).2.2.2.2.2.1 (huw k₀).2.2.2.2.2.2
+    v₀ hv₀ mu hmu
+  have hgrp := (GlobalTheory.SW.level_laws E r (U.X k₀) W.g Dc.bas Dc.idx n Dc.sympl hev D hn).2.2.1
+  have hpull := fun k => GlobalTheory.T.isStabiliserInvariant_pull_bounded_section E r (U.X k) (U.X k₀) (hsame k) (ga k) (Formalism.L2.PjFree.laU U a n k)
+    (wtOf (U.X k₀) Dc.hr Dc.k Dc.k' n) D.grp l.M ((C k)⁻¹ • P k) (hset k).1
+    (fun τ i => by
+      rw [Dc.wt_eq]
+      simp only [wtX, Formalism.L2.PjFree.laU, (hsame k).p0])
+    (fun g' hg' => ⟨((hgrp g').1 hg').1, fun hfix => (hmu1 _ (hset k).2.1 g' hg' hfix).2⟩)
+    (hpr k) (hchi k) (isBddSec_smul _ (hP1 k))
+  have hM2 : 0 < d.l₂.M := lt_of_lt_of_le (by norm_num) d.l₂.three_le
+  have hMm : ((2 * bad * d.l₂.M : ℕ) : 𝓞 E) ∈ D.𝔪 := by
+    rw [hD.m, Nat.cast_mul]
+    refine Ideal.mul_mem_left _ _ ?_
+    have h1 : (d.l₂.M : 𝓞 E) ∈ d.l₂.Mb * d.l₂.Mb.map (H.bar : 𝓞 E →+* 𝓞 E) := by
+      rw [d.l₂.prod]
+      exact Ideal.mem_span_singleton_self _
+    unfold Mfr
+    exact (Submodule.mem_inf.1 (Ideal.mul_le_inf h1)).2
+  obtain ⟨m, Λ, Pj, hΛ, hQ⟩ := GlobalTheory.T.stableForms_eq_sum_thetaSeries_freeLowerRows E r (U.X k₀) W.g Dw.p Dc.hr Dc.bas Dc.idx n Dc.sympl hev hbig D hn
+    (2 * bad * d.l₂.M) (Mfr l) (Jd d) (by positivity) hMm hD.prod hD.cop v₀ hv₀ mu hmu Dc.k Dc.k' U.Comp
+    (fun k => mapL (ga k) (U.X k).Λ) _ (fun k => (hset k).2.1) hsep
+    (fun k g' hg' hfix => (hmu1 _ (hset k).2.1 g' hg' hfix).1) (fun k => (hpull k).1)
+  have hgl := fun j => GlobalTheory.Dict.GenLatCmp.genLat_vset E n (Λ j)
+  have hg1 := fun j => (hgl j).1 bad d.l₂.M hbad d.l₂.odd (hΛ j).1
+  choose N hN using fun j => (hg1 j).2.2.2
+  have hV : ∀ j, Λ j ∈ Vset E n d.l₂.M := fun j => (hgl j).2.2.1 _ _ (Dvd.intro_left _ rfl) (hΛ j).1
+  choose mj t R hR hPj using fun j => GlobalTheory.T.harmonicRowHighest_eq_span_integral_harmonic E H Dw l c σ r W.g Dw.p n (U.X k₀) a Dc (Λ j) (N j)
+    (hN j).1.pos ((hN j).2.2.trans inf_le_left) (Pj j) (hΛ j).2
+  choose f hf hfr using fun j i => (htot ⟨Λ j⟩ (N j) x0 (R j i) (hg1 j).1 (hg1 j).2.1 (hg1 j).2.2.1 (hN j)
+    (hadm _) (hR j i)).2
+  have hPe : P = ∑ j, ∑ i, (t j i * (u (Λ j) (N j))⁻¹) • Formalism.L2.PjFree.rdU U (f j i) := by
+    funext k x
+    simp only [Finset.sum_apply, Pi.smul_apply, smul_eq_mul]
+    by_cases hx : x ∈ (U.X k).dom
+    · obtain ⟨hx1, hx2, -⟩ := ((hpull k).2 0 (differentiableOn_const 0) (by simp)).2 x hx
+      have e1 := hQ k _ hx1
+      rw [hx2, Pi.smul_apply, smul_eq_mul, inv_mul_eq_iff_eq_mul₀ (hC k)] at e1
+      rw [e1, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun j _ => ?_
+      rw [hPj j, theta_sum_smul, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun i _ => ?_
+      rw [hrd k (Λ j) (hV j) (N j) (hN j) (R j i) (hR j i).1 (f j i) (hf j i) (hfr j i) x hx]
+      have := hu (Λ j) (hV j) (N j) (hN j)
+      field_simp
+    · rw [hP0 k x hx]
+      refine (Finset.sum_eq_zero fun j _ => Finset.sum_eq_zero fun i _ => ?_).symm
+      have : Formalism.L2.PjFree.rdU U (f j i) k x = 0 := dif_neg hx
+      rw [this, mul_zero]
+  rw [hPe]
+  refine Submodule.sum_mem _ fun j _ => Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ ?_
+  exact Submodule.subset_span ⟨f j i, ⟨hf j i, ⟨Λ j⟩, N j, x0, R j i, (hg1 j).1, (hg1 j).2.1, (hg1 j).2.2.1, hN j,
+    hadm _, hR j i, hfr j i⟩, rfl⟩
+
+set_option maxHeartbeats 1000000 in
+
+theorem exists_datum_span : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (σ : c.F →+* ℂ) (U : Formalism.L2.PjFree.Unf Xo c σ r), 1 ≤ r → l.A = 1 → Formalism.L2.PjFree.GoodEmb c σ → Formalism.L2.PjFree.IsUnf U → (∀ k k', (U.X k).Gm = (U.X k').Gm ∧ (U.X k).ξ0 = (U.X k').ξ0) → (∀ k, HasPrinc (U.X k) l.M) → ∀ (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ), Dom a n → 4 * (Module.finrank ℚ E * r) + 4 ≤ n → (∀ k, ChiOne (U.X k) (Formalism.L2.PjFree.laU U a n k)) → ∃ (d : DeltaDat Xo c n) (nab : NabV Xo c), d.IsLev ∧ (∃ _ : StarRing (𝓞 E), IsNab d.Xo₂ d.c₂ d.nab₂) ∧ (∀ (k : Type) [Field k] [Algebra d.c₂.F k] (y₂ : FrPt d.Xo₂ d.c₂ k), evR d.Xo₂ d.c₂ d.cδ y₂ ^ 1 = 1) ∧ d.l₂ = l ∧ (∃ ph ψ x₀, d.PhiPin ph ψ x₀) ∧ ∀ f ∈ sec Xo c a n, (∀ k, (U.X k).IsBddSec (Formalism.L2.PjFree.laU U a n k) (Formalism.L2.PjFree.rdU U f k)) → f ∈ Submodule.span c.F (shortGen Xo c nab 1 0 a n d) := by
+  intro E _ _ _ H Dw l Xo c r σ U hr hA hσ hU hG hP a n hdom hn hχ
+  have hC : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2 := GlobalTheory.ChartFree.chartIndep
+  have hrk : r = Dw.p + Dw.q := hU.1
+  have h1 : 1 ≤ Dw.p + Dw.q := hrk ▸ hr
+  have hL : Out.Laws := GlobalTheory.firstFiveLaws.1
+  have hB : Out.SecBaseChangeSt := hL.secBaseChange
+  have hnr : Dw.p + Dw.q ≤ n := by
+    have h0 : 0 < Module.finrank ℚ E := Module.finrank_pos
+    have : r ≤ Module.finrank ℚ E * r := Nat.le_mul_of_pos_left r h0
+    omega
+  have hd : ∃ d : DeltaDat Xo c n, d.IsLev ∧ (∃ _ : StarRing (𝓞 E), IsNab d.Xo₂ d.c₂ d.nab₂) ∧ d.cδ = 1 ∧
+      d.pd = 1 ∧ d.l₂ = l ∧ ∃ ph x₀, d.PhiPin ph 1 x₀ := by
+    obtain ⟨d, e1, -, e2, -, -, hδ, hlev, hnab⟩ :=
+      GlobalTheory.LevelCover.exists_deltaDat_isLev E H Dw l Xo c h1 n 1 ⊤ l Xo c rfl
+        ⟨dvd_rfl, le_rfl, dvd_rfl⟩ (Nat.mul_one _).symm (Nat.coprime_one_left _) (Ideal.mul_top _).symm
+        (top_sup_eq _)
+    obtain ⟨f, ph, x₀, hpin⟩ := GlobalTheory.exists_phiPin_of_character E H Dw l Xo c n d hlev hnr 1
+    exact ⟨{ d with φδ := f }, hlev, hnab, hδ, e1, e2, ph, x₀, hpin⟩
+  obtain ⟨d, hlev, hnab, hδ, hpe, hle, ph, x₀, hpin⟩ := hd
+  have hAe : d.l₂.A = l.A := congrArg (·.A) hle
+  have hT : AllTest d.Xo₂ d.c₂ := GlobalTheory.Frames.allTest_of_secBaseChange hB E H Dw d.l₂ d.Xo₂ d.c₂
+  obtain ⟨_, nab, -⟩ := GlobalTheory.CanonConn.exists_isNab hL E H Dw l Xo c
+  have hunit : UnitC d := fun A y => by
+    have : evR d.Xo₂ d.c₂ d.cδ y = 1 := by
+      rw [hδ]
+      exact evalAt_one _ _ _ (hT _ _)
+    rw [this, norm_one]
+  have h3 : ¬ 3 ∣ d.pd := by rw [hpe]; decide
+  have htie : d.PsiTie 1 := by
+    intro k g ρ _ _ _ _ K _ _ _ y y' _
+    have h : ∀ z : FrPt d.Xo₂ d.c₂ K, evR d.Xo₂ d.c₂ d.cδ z = 1 := fun z => by
+      rw [hδ]
+      exact evalAt_one _ _ _ (hT _ _)
+    change evR d.Xo₂ d.c₂ d.cδ y' =
+      algebraMap d.c₂.F K (d.eF ((1 : c.Fˣ) : c.F)) * evR d.Xo₂ d.c₂ d.cδ y
+    rw [h y, h y']
+    simp
+  have htot : ShortValTot Xo c nab 1 0 a n d :=
+    GlobalTheory.shortValTot_of_pinned hL hC E H Dw l Xo c n d (GlobalTheory.levelMaps_closed hL E H Dw h1)
+      (GlobalTheory.Frames.algebraic_laws hB E H Dw l Xo c).2.2.1 (GlobalTheory.Frames.allTest_of_secBaseChange hB E H Dw l Xo c)
+      (GlobalTheory.Frames.algebraic_laws hB E H Dw _ _ _).2.2.1 hT hlev hAe hnab (fun _ => ⟨ph, 1, x₀, hpin, htie⟩)
+      nab 1 0 a
+  refine ⟨d, nab, hlev, hnab, fun k _ _ y => ?_, hle, ⟨ph, 1, x₀, hpin⟩, fun f hf hb => ?_⟩
+  · rw [pow_one, hδ]
+    exact evalAt_one _ _ _ (hT _ _)
+  · exact mem_span_of_map_mem_span_image (Formalism.L2.PjFree.rdU U) (sec Xo c a n)
+      (GlobalTheory.reading_linearIndependent_and_injective hB E H Dw l Xo c σ r U hU a n).1 _ (fun g hg => hg.1) hf
+      (bdd_mem_span_shortGen hC E H Dw l Xo c n d σ r U hσ hU hr hA hG hP hlev hnab hunit h3
+        (fun _ => ⟨ph, 1, x₀, hpin⟩) nab 1 0 a Nat.one_pos hdom hn hχ htot _ hb fun k x hx => dif_neg hx)
+
+end GlobalTheory.SupFull
+
+
+[ICL_SRC_READING_COEFFICIENT_DESCENT] Original independence-based coefficient descent to the same K
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/SiegelThetaTransformation/CuspFormsLeSpanShortThetaSeries.lean#L22-L66
+    [Module K C] {W : Type*} [AddCommGroup W] [Module ℂ W] (j : C →ₛₗ[σ] W) (V : Submodule K C)
+    (hj : ∀ (m : ℕ) (b : Fin m → C), (∀ i, b i ∈ V) → LinearIndependent K b →
+      LinearIndependent ℂ (fun i => j (b i)))
+    (S : Set C) (hS : S ⊆ V) {f : C} (hf : f ∈ V) (hjf : j f ∈ Submodule.span ℂ (j '' S)) :
+    f ∈ Submodule.span K S := by
+  let V' : Submodule K C := V ⊓ (Submodule.span ℂ (j '' S)).comap j
+  have hSV : S ⊆ V' := fun s hs => ⟨hS hs, Submodule.subset_span ⟨s, hs, rfl⟩⟩
+  have hind : ReciprocityTheory.ChartRestriction.G.PullbackSections.IndepToC (j.domRestrict V') := by
+    intro m b hb
+    exact hj m (fun i => (b i : C)) (fun i => (b i).2.1) (hb.map' V'.subtype (Submodule.ker_subtype V'))
+  have himg : (j.domRestrict V') '' (V'.subtype ⁻¹' S) = j '' S := by
+    ext w
+    constructor
+    · rintro ⟨x, hx, rfl⟩
+      exact ⟨x, hx, rfl⟩
+    · rintro ⟨x, hx, rfl⟩
+      exact ⟨⟨x, hSV hx⟩, hx, rfl⟩
+  have htop := ReciprocityTheory.ChartRestriction.G.PullbackSections.span_eq_top_of_indepToC (j.domRestrict V') hind (V'.subtype ⁻¹' S)
+    (fun g => by rw [himg]; exact g.2.2)
+  have h1 : (⟨f, hf, hjf⟩ : V') ∈ Submodule.span K (V'.subtype ⁻¹' S) := by
+    rw [htop]; exact Submodule.mem_top
+  have h2 := Submodule.mem_map_of_mem (f := V'.subtype) h1
+  rw [Submodule.map_span] at h2
+  exact Submodule.span_mono (Set.image_preimage_subset _ _) h2
+
+theorem cusp_le_span_shortGen : Formalism.MainNotions.ModuliIntegralCharts.H1.ChartIndepSt2 → ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Geo.Tor.Level H) (Xo : Moduli Dw l) (c : Coeff l) (r : ℕ) (U : ∀ σ : c.F →+* ℂ, Formalism.L2.PjFree.Unf Xo c σ r) (σ : c.F →+* ℂ), Formalism.L2.PjFree.GoodEmb c σ → Formalism.L2.PjFree.IsUnf (U σ) → 1 ≤ r → l.A = 1 → (∀ k k', ((U σ).X k).Gm = ((U σ).X k').Gm ∧ ((U σ).X k).ξ0 = ((U σ).X k').ξ0) → (∀ k, HasPrinc ((U σ).X k) l.M) → (∀ a n, Dom a n → ∀ k, ChiOne ((U σ).X k) (Formalism.L2.PjFree.laU (U σ) a n k)) → ∀ (nab : NabV Xo c) (bad nV : ℕ) (dδ : ∀ n, DeltaDat Xo c n), 0 < bad → (∀ n, (dδ n).IsLev ∧ (∃ _ : StarRing (𝓞 E), IsNab (dδ n).Xo₂ (dδ n).c₂ (dδ n).nab₂) ∧ UnitC (dδ n) ∧ ¬ 3 ∣ (dδ n).pd ∧ (Dw.p + Dw.q ≤ n → ∃ ph ψ x₀, (dδ n).PhiPin ph ψ x₀) ∧ ∀ a, Dom a n → ShortValTot Xo c nab bad nV a n (dδ n)) → SpanningAtDominantWeight Xo c nab bad nV (Formalism.L2.PjFree.cusp Xo c U) dδ := by
+  intro hC E _ _ _ H Dw l Xo c r U σ hσ hU hr hA hG hP hχ nab bad nV dδ hbad hd a n hDom _ hn f hf
+  obtain ⟨h1, h2, h3, h4, h5, h6⟩ := hd n
+  have hrk : 4 * (Module.finrank ℚ E * r) + 4 ≤ n := by
+    have he : Module.finrank ℚ E = 2 * NumberField.InfinitePlace.nrComplexPlaces E :=
+      NumberField.IsTotallyComplex.finrank E
+    have hr' : r = Dw.p + Dw.q := hU.1
+    rw [he, Nat.mul_div_cancel_left _ (by norm_num : 0 < 2), ← hr'] at hn
+    rw [he]
+    calc 4 * (2 * NumberField.InfinitePlace.nrComplexPlaces E * r) + 4
+        = 8 * NumberField.InfinitePlace.nrComplexPlaces E * r + 4 := by ring
+      _ ≤ n := hn
+  have hsp := GlobalTheory.Dict.holSub0_le_span_shortGen hC E H Dw l Xo c n (dδ n) σ r (U σ) hσ hU hr hA hG hP h1 h2 h3 h4 h5 nab bad nV a
+    hbad hDom hrk (hχ a n hDom) (h6 a hDom)
+  have hf' := (Formalism.L2.PjFree.mem_cusp Xo c U a n f).1 hf
+  have hind := (GlobalTheory.reading_linearIndependent_and_injective GlobalTheory.lawsFieldsSeparately.2.1 E H Dw l Xo c σ r
+    (U σ) hU a n).1
+  refine mem_span_of_map_mem_span_image (Formalism.L2.PjFree.rdU (U σ)) (sec Xo c a n) hind _ (fun g hg => hg.1) hf'.1 (hsp ?_)
+  refine ⟨hf'.2 σ hσ, fun k x hx => ?_⟩
+  exact dif_neg hx
+
+
+[ICL_SRC_SHORT_VALUE_ON_COVER] Actual finite DVR extension and short_value_on_cover, including torsion and phase data
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/RingsOfIntegers/EvROfFrMapFromTest.lean#L24-L92
+
+theorem GlobalTheory.PlaceInt.evR_of_frMap_fromTest {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H}
+    {l : Level H} {Xo : Moduli Dw l} {c : Coeff l}
+    (hWD : EvalWD (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z)) (f : Rul Xo c)
+    (hf : IsNatural (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) f)
+    {K₁ K₂ : Type} [CommRing K₁] [Algebra c.F K₁] [CommRing K₂] [Algebra c.F K₂] (φ : K₁ →ₐ[c.F] K₂)
+    (y₁ : FrPt Xo c K₁) (hT : FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) y₁)
+    (y₂ : FrPt Xo c K₂) (hm : FrMap φ y₁ y₂) : evR Xo c f y₂ = φ (evR Xo c f y₁) := by
+  obtain ⟨p, ψ, y', hy'⟩ := hT
+  unfold evR
+  rw [ReciprocityTheory.ChartRestriction.G.PullbackSections.evalAt_eq_of _ _ hWD f hf p ψ y' y₁ hy',
+    ReciprocityTheory.ChartRestriction.G.PullbackSections.evalAt_eq_of _ _ hWD f hf p (φ.comp ψ) y' y₂ (ReciprocityTheory.ChartRestriction.G.PullbackSections.frMap_trans ψ φ hy' hm)]
+  rfl
+
+set_option maxHeartbeats 1000000 in
+
+theorem GlobalTheory.PlaceInt.short_value_on_cover : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n) [StarRing (𝓞 E)], d.IsLev → IsNab d.Xo₂ d.c₂ d.nab₂ → ∀ m₀ : ℕ, (∀ (k : Type) [Field k] [Algebra d.c₂.F k] (y₂ : FrPt d.Xo₂ d.c₂ k), evR d.Xo₂ d.c₂ d.cδ y₂ ^ m₀ = 1) → ∀ (Λ : GenLat E n) (N : ℕ), Λ.Unimod → Λ.TrivAt d.l₂.M → Λ.LevOK N d.l₂.M → ∀ (w : (E →+* ℂ) × ℕ → ℕ) (P : MvPolynomial (LtN Dw n) c.F), P ∈ harmL c Λ w → ∀ (x0 : Fin n → Dw.La) (g : Rul Xo c), g ∈ sec Xo c w n → IsShortRule Xo c d Λ N x0 P g → ∀ (T : CDVR) (io : c.F →+* T.Fr) (y : IntFr Xo c T io), T.FinRes → ∃ (T' : CDVR) (iT : T.Fr →+* T'.Fr) (e : ℕ) (io₂ : d.c₂.F →+* T'.Fr) (y₂ : IntFr d.Xo₂ d.c₂ T' io₂) (C : IntegralChartA3 d.Xo₂ d.c₂ T' io₂ y₂) (ζ : T'.Fr) (z : Fin (Λ.zCard N (Dw.p + Dw.q)) → Fin n → (ptO d.Xo₂ (xOf y₂) ⟶ d.Xo₂.univ.t.G)) (tp : (Fin n → LevQ Dw d.l₂) → Fin n → (ptO d.Xo₂ (xOf y₂) ⟶ d.Xo₂.univ.t.G)) (F : (Fin n → LevQ Dw d.l₂) → Fin (Λ.zCard N (Dw.p + Dw.q)) → Fin n → LB.Sec (LPow d.Xo₂.univ.t.G d.Xo₂.univ.t.PP.L ((N : ℤ) ^ 2) (ptO d.Xo₂ (xOf y₂)))), 0 < e ∧ (∀ a : T.Fr, vV T'.V (iT a) = (e : ℤ) * vV T.V a) ∧ T'.FinRes ∧ (∀ a : c.F, io₂ (d.eF a) = iT (io a)) ∧ Good3 C ∧ AllRat d.Xo₂ (xOf y₂) (N ^ 2) ∧ ζ ^ m₀ = 1 ∧ (∀ i, InZh d.Xo₂ Λ N (z i)) ∧ GeoInj d.Xo₂ (xOf y₂) z ∧ (∀ q b, tp q b ^ N = levPt d.Xo₂ (xOf y₂) (levRep (q b)) ∧ ∃ j : ℕ, KilledBy d.Xo₂ (d.l₂.Mb ^ j) (tp q b)) ∧ (∀ q i b, IsUUOver d.Xo₂.univ.t.G d.Xo₂.univ.t.PP N (sOf1 y₂) (z i b) (tp q b) (F q i b)) ∧ (letI := io₂.toAlgebra; iT (evI y g) = ζ * (io₂ ((d.eF (betaH (Dw := Dw) c Λ))⁻¹ * ((Λ.mIdx N (Dw.p + Dw.q) : d.c₂.F))⁻¹ * ((Nat.card (Fin n → LevQ Dw d.l₂) : d.c₂.F))⁻¹ * ((N : d.c₂.F) ^ (MvPolynomial.map (d.eF : c.F →+* d.c₂.F) P).totalDegree)⁻¹) * ∑ᶠ q : Fin n → LevQ Dw d.l₂, io₂ (d.w x0 q) * ∑ i, hv d.Xo₂ d.c₂ d.nab₂ y₂.1 (N ^ 2) (fun b => sqN d.Xo₂ N (F q i b)) (MvPolynomial.map (d.eF : c.F →+* d.c₂.F) P))) := by
+  intro E _ _ _ H Dw l Xo c n d _ hlev hnab m₀ hm₀ Λ N hU hT hL w P hP x0 g hg hsh T io y hfin
+  have laws : Laws := GlobalTheory.firstFiveLaws.1
+  obtain ⟨T₁, i₁, e₁, y₁, io₁, z₁, ⟨he₁, hv₁, φ₁, hφ₁, hm₁⟩, hfin₁, hio₁, hover⟩ :=
+    GlobalTheory.T.exists_finiteExtension_integralFramedPoint_lift_cover E H Dw l Xo c n d hlev T io y hfin
+  have hN : 0 < N := hL.1.pos
+  obtain ⟨T₂, i₂, e₂, z₂, C, ⟨he₂, hv₂, φ₂, hφ₂, hm₂⟩, hfin₂, hgood, hrat⟩ :=
+    GlobalTheory.T.exists_finiteExt_uniformisedChart_rationalTorsion E H Dw d.l₂ d.Xo₂ d.c₂ hnab.1 T₁ io₁ z₁ hfin₁ (N ^ 2) (pow_pos hN 2)
+  letI a0 : Algebra c.F T.Fr := io.toAlgebra
+  letI a1 : Algebra c.F T₁.Fr := (i₁.comp io).toAlgebra
+  letI b1 : Algebra d.c₂.F T₁.Fr := io₁.toAlgebra
+  letI b2 : Algebra d.c₂.F T₂.Fr := (i₂.comp io₁).toAlgebra
+  obtain ⟨z, tp, F, hz, hinj, htp, hF⟩ :=
+    (GlobalTheory.RatData.exists_thetaVal_data E H Dw d.l₂ d.Xo₂ d.c₂ T₂.Fr z₂.1).2 n Λ N hU hL hrat
+  obtain ⟨k, _, _, jk, -⟩ : ∃ (k : Type) (_ : Field k) (_ : IsAlgClosed k) (jk : T₂.Fr →+* k), True :=
+    ⟨AlgebraicClosure T₂.Fr, inferInstance, inferInstance, algebraMap _ _, trivial⟩
+  letI ak : Algebra c.F k := ((jk.comp i₂).comp (i₁.comp io)).toAlgebra
+  letI bk : Algebra d.c₂.F k := (jk.comp (i₂.comp io₁)).toAlgebra
+  let ψ₁ : T₁.Fr →ₐ[c.F] k := { jk.comp i₂ with commutes' := fun _ => rfl }
+  let ψ₂ : T₂.Fr →ₐ[d.c₂.F] k := { jk with commutes' := fun _ => rfl }
+  obtain ⟨yk, hyk⟩ := GlobalTheory.FramedBaseChange.exists_frMap laws E H Dw l Xo c _ _ ψ₁ y₁.1
+  obtain ⟨zk, hzk⟩ := GlobalTheory.FramedBaseChange.exists_frMap laws E H Dw d.l₂ d.Xo₂ d.c₂ _ _ ψ₂ z₂.1
+  have hc1 : ∀ a : c.F, algebraMap d.c₂.F T₁.Fr (d.eF a) = algebraMap c.F T₁.Fr a := hio₁
+  have hck : ∀ a : c.F, algebraMap d.c₂.F k (d.eF a) = algebraMap c.F k a := fun a =>
+    congrArg (fun t => jk (i₂ t)) (hio₁ a)
+  have hoverk : FrOver d zk yk :=
+    (GlobalTheory.frames_lift_to_cover laws E H Dw l Xo c n d).2.1 T₁.Fr hc1 k hck ψ₁ (ψ₂.comp φ₂)
+      (by
+        show jk.comp φ₂.toRingHom = jk.comp i₂
+        rw [hφ₂])
+      y₁.1 z₁.1 yk zk hover hyk (ReciprocityTheory.ChartRestriction.G.PullbackSections.frMap_trans φ₂ ψ₂ hm₂ hzk)
+  obtain ⟨v, hv, hev⟩ := hsh k hck yk zk hoverk
+  have hPh := ((GlobalTheory.PlaceInt.eF_transfer E H Dw l Xo c n d Λ).2.1 w P hP).1.1
+  have hval := GlobalTheory.T.shortThetaValue_field_eq_map_subfield_data E H Dw d.l₂ d.Xo₂ d.c₂ hnab.1 d.nab₂ hnab n Λ N hU hT hL w _ hPh (d.w x0) _
+    T₂.Fr k ψ₂ z₂.1 zk hzk z tp F hz hinj htp hF v hv
+  have e1 : evR Xo c g yk = (ψ₁.comp φ₁) (evR Xo c g y.1) :=
+    GlobalTheory.PlaceInt.evR_of_frMap_fromTest (GlobalTheory.Frames.algebraic_laws laws.secBaseChange E H Dw l Xo c).2.2.1 g hg.1 _ y.1 y.2.1 yk
+      (ReciprocityTheory.ChartRestriction.G.PullbackSections.frMap_trans φ₁ ψ₁ hm₁ hyk)
+  have e2 : evR d.Xo₂ d.c₂ d.cδ zk = ψ₂ (evR d.Xo₂ d.c₂ d.cδ z₂.1) :=
+    GlobalTheory.PlaceInt.evR_of_frMap_fromTest (GlobalTheory.Frames.algebraic_laws laws.secBaseChange E H Dw d.l₂ d.Xo₂ d.c₂).2.2.1 d.cδ hlev.2.2.2.2.2.2.2.1.1 _ z₂.1 z₂.2.1 zk hzk
+  refine ⟨T₂, i₂.comp i₁, e₂ * e₁, i₂.comp io₁, z₂, C, evR d.Xo₂ d.c₂ d.cδ z₂.1, z, tp, F, Nat.mul_pos he₂ he₁, ?_, hfin₂,
+    fun a => congrArg i₂ (hio₁ a), hgood, hrat, hm₀ _ _, hz, hinj, htp, hF, ?_⟩
+  · intro a
+    rw [RingHom.comp_apply, hv₂, hv₁]
+    push_cast
+    ring
+  · apply jk.injective
+    rw [e1, e2, hval, ← map_mul] at hev
+    have e3 : jk ((i₂.comp i₁) (evI y g)) = (ψ₁.comp φ₁) (evR Xo c g y.1) := by
+      show jk (i₂ (i₁ (evR Xo c g y.1))) = jk (i₂ (φ₁.toRingHom (evR Xo c g y.1)))
+      rw [hφ₁]
+    rw [e3, hev]
+    rfl
+
+
+[ICL_SRC_JET_CLASS_BOUND] Original class_bound without beta in Xq; ramified integral-jet estimate retained
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSmulShortNonneg.lean#L217-L269
+    (hα : (¬ ℓ ∣ l.M ∧ α = 1) ∨ (ℓ ∣ l.M ∧ α * H.bar α = (ℓ : 𝓞 E) ∧ l.Mb ≤ Ideal.span {H.bar α}) ∨
+      (ℓ ∣ l.M ∧ α = (ℓ : 𝓞 E))) :
+    letI := io.toAlgebra
+    ((-ρ : ℝ) : EReal) ≤ nval T.V e (io (nrm Dw c w α) *
+      io (((Λ.mIdx N (Dw.p + Dw.q) : c.F))⁻¹ * ((N : c.F) ^ P.totalDegree)⁻¹) *
+        ∑ i, hv Xo c nab y.1 (N ^ 2) (fun b => sqN Xo N (F i b)) P) := by
+  have hk : ∀ b, KilledBy Xo l.Mb (tp b ^ N) := fun b => by rw [(htp b).1]; exact levPt_killed Xo _ _
+  obtain ⟨t1, t2⟩ := GlobalTheory.TorsFac.factorisation E H Dw l Xo N ℓ hN.1 hN.2.1 hℓ
+  have lev : ∀ A : ℕ, ℓ ∣ l.M → α * H.bar α = (A : 𝓞 E) →
+      ((A = ℓ ∧ l.Mb ≤ Ideal.span {H.bar α}) ∨ (α = (ℓ : 𝓞 E) ∧ ℓ ∣ l.M)) →
+      letI := io.toAlgebra
+      ((-ρ : ℝ) : EReal) ≤ nval T.V e (io (nrm Dw c w α) *
+        io (((Λ.mIdx N (Dw.p + Dw.q) : c.F))⁻¹ * ((N : c.F) ^ P.totalDegree)⁻¹) *
+          ∑ i, hv Xo c nab y.1 (N ^ 2) (fun b => sqN Xo N (F i b)) P) := by
+    intro A hd hA hor
+    obtain ⟨n', Bn, j, β₀, h1, h2, h3, h4, h5⟩ := t2 α A hA hsq hor
+    obtain ⟨k, hk1, hk2⟩ := hT
+    rw [← map_mul]
+    exact bound_of_trivAt E H Dw l Xo c hst T io y C hC nab hnab e ρ w n he hch ℓ hℓ hu Λ N l.M hΛ hN P hP z tp F
+      hz hg (fun b => (h5 _ _ (hk b) (htp b).2).1) hF ⟨k, hk1.coprime_dvd_right hd, hk2⟩ n' A Bn j α β₀ h1 h2 hA h3 h4
+      (fun b => (h5 _ _ (hk b) (htp b).2).2)
+  rcases hα with ⟨hd, rfl⟩ | ⟨hd, hA, hM⟩ | ⟨hd, hA⟩
+  · obtain ⟨n', j, -, -, h5⟩ := t1 hd
+    rw [nrm_one, map_one, _root_.one_mul]
+    choose i hi using fun b => (h5 _ _ (hk b) (htp b).2).2.2
+    refine bound_of_coprime E H Dw l Xo c hst T io y C hC nab hnab e ρ w n he hch ℓ hℓ hu Λ N l.M hΛ hN P hP z tp F
+      hz hg (fun b => (h5 _ _ (hk b) (htp b).2).1) hF hR ⟨l.M ^ (∑ b, i b),
+        Nat.Coprime.pow_left _ ((Nat.Prime.coprime_iff_not_dvd hℓ).2 hd).symm, fun b => ?_⟩
+    obtain ⟨m, hm⟩ : l.M ^ i b ∣ l.M ^ (∑ b, i b) :=
+      pow_dvd_pow _ (Finset.single_le_sum (f := i) (fun _ _ => Nat.zero_le _) (Finset.mem_univ b))
+    rw [hm, pow_mul, hi b, one_pow]
+  · exact lev ℓ hd hA (Or.inl ⟨rfl, hM⟩)
+  · exact lev (ℓ ^ 2) hd (by rw [hA, map_natCast]; push_cast; ring) (Or.inr ⟨hA, hd⟩)
+
+end Point
+
+section Run
+open IsDedekindDomain Formalism.BasicNotions Formalism.MainNotions GlobalTheory.ShortBound
+
+theorem vV_prod_nat (T : CDVR) (s : Finset ℕ) (hs : ∀ p ∈ s, p ≠ 0) :
+    vV T.V ((∏ p ∈ s, p : ℕ) : T.Fr) = ∑ p ∈ s, vV T.V (p : T.Fr) := by
+  classical
+  haveI : CharZero T.Fr := algebraRat.charZero _
+  induction s using Finset.induction_on with
+  | empty => simpa using vV_one
+  | insert a s ha ih =>
+    have h1 := fun p hp => hs p (Finset.mem_insert_of_mem hp)
+    rw [Finset.prod_insert ha, Finset.sum_insert ha, Nat.cast_mul,
+      vV_mul (Nat.cast_ne_zero.2 (hs a (Finset.mem_insert_self _ _))) (Nat.cast_ne_zero.2 (Finset.prod_ne_zero_iff.2 h1)),
+      ih h1]
+
+theorem exists_smul_short_nonneg (D : D7) (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host D.host.E) (Dw : Datum H) (l : Level H)
+    (Xo : Moduli Dw l) (c : Coeff l) (n : ℕ) (d : DeltaDat Xo c n) (hlev : d.IsLev)
+
+
+[ICL_SRC_HOST_CHART_BOUND] Actual chBound_host at all finite places and original half-discriminant term
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/RingsOfIntegers/HarmonicValuationLowerBoundHostFieldAllPlaces.lean#L39-L71
+  have hd0 : (NumberField.discr D.host.E).natAbs ≠ 0 := Int.natAbs_ne_zero.2 (NumberField.discr_ne_zero _)
+  have hnn : ∀ p ∈ D.host.condN.primeFactors, (0 : ℝ) ≤ (vV T.V (p : T.Fr) : ℝ) / e * D.host.vdH p * (DFw : ℝ) / 2 := by
+    intro p _
+    have h1 : (0 : ℝ) ≤ (vV T.V (p : T.Fr) : ℝ) := by exact_mod_cast vV_nat_nonneg T p
+    have h2 := D.host.vdH_nonneg p
+    positivity
+  by_cases hu : ∀ p ∈ D.host.condN.primeFactors, IsUnit (p : T.V)
+  · refine chBound_mono (GlobalTheory.T.harmonic_value_integral_of_unit_discriminant D.host.E H Dw l Xo c hstar T io y C ?_ e w n) (Finset.sum_nonneg hnn)
+    have h1 : IsUnit (((NumberField.discr D.host.E).natAbs : ℕ) : T.V) := by
+      rw [← Nat.factorization_prod_pow_eq_self hd0, Finsupp.prod, Nat.cast_prod]
+      refine IsUnit.prod_iff.2 fun p hp => ?_
+      have hp' := Nat.mem_primeFactors.1 (Nat.support_factorization _ ▸ hp)
+      rw [Nat.cast_pow]
+      exact (hu p (Nat.mem_primeFactors.2 ⟨hp'.1, hD p hp'.1 (Int.natCast_dvd.2 hp'.2.1), D.host.condN_ne_zero⟩)).pow _
+    rcases Int.natAbs_eq (NumberField.discr D.host.E) with h | h
+    · rw [h, Int.cast_natCast]; exact h1
+    · rw [h, Int.cast_neg, Int.cast_natCast]; exact h1.neg
+  · push Not at hu
+    obtain ⟨p, hp, hpu⟩ := hu
+    have hpp := (hP p hp).1
+    haveI : Fact p.Prime := ⟨hpp⟩
+    have hm : ¬ p ∣ ordCompl[p] (NumberField.discr D.host.E).natAbs := Nat.not_dvd_ordCompl hpp hd0
+    have hDa := (Nat.ordProj_mul_ordCompl_eq_self (NumberField.discr D.host.E).natAbs p).symm
+    refine chBound_mono (GlobalTheory.T.harmonicValue_bound_integralChart_ramified D.host.E H Dw l Xo c hstar T io y C hG p _ _ hpp hpu hm hDa
+      (hP p hp).2 e he w n) (le_trans ?_ (Finset.single_le_sum hnn hp))
+    rw [Nat.factorization_def _ hpp]
+    have h1 : (0 : ℝ) ≤ (vV T.V (p : T.Fr) : ℝ) := by exact_mod_cast vV_nat_nonneg T p
+    have h2 := D.host.vdH_nonneg p
+    have h3 : (Formalism.L2.Pj.DF Dw w : ℝ) ≤ DFw := by exact_mod_cast hDF
+    show (vV T.V (p : T.Fr) : ℝ) / e * D.host.vdH p * _ / 2 ≤ _
+    gcongr
+
+end GlobalTheory.PlaceInt.HostChart
+
+
+[ICL_SRC_AVERAGE_AND_SCALAR] Normalized finite-average inequality and literal nrm_nat identity
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/RingsOfIntegers/ShortGeneratorPlaceValuationBoundProof.lean#L71-L124
+theorem le_nval_avg (e : ℕ) {J : Type} [Finite J] (w X : J → K') (ζ u cc b : K') (m : ℕ) (hm : 0 < m) (hζ : ζ ^ m = 1)
+    (hu : u ≠ 0) (hcc : cc ≠ 0) (hw : ∀ q, IsIntegral ℤ (w q)) (ρ : ℝ)
+    (hX : ∀ q, ((-ρ : ℝ) : EReal) ≤ nval V e (u * b * X q)) :
+    ((-(ρ + (vV V u : ℝ) / e + (vV V cc : ℝ) / e) : ℝ) : EReal) ≤ nval V e (ζ * (cc⁻¹ * b * ∑ᶠ q, w q * X q)) := by
+  classical
+  have := Fintype.ofFinite J
+  have hζ0 : ζ ≠ 0 := by rintro rfl; rw [zero_pow hm.ne'] at hζ; exact zero_ne_one hζ
+  have hv : vV V ζ = 0 := by
+    have := vV_pow (V := V) hζ0 m
+    rw [hζ, vV_one] at this
+    rcases mul_eq_zero.1 this.symm with h | h
+    · exact absurd (by exact_mod_cast h) hm.ne'
+    · exact h
+  rw [nval_mul_unit e hζ0 hv, finsum_eq_sum_of_fintype]
+  have : cc⁻¹ * b * ∑ q, w q * X q = (cc⁻¹ * u⁻¹) * ∑ q, w q * (u * b * X q) := by
+    rw [Finset.mul_sum, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun q _ => ?_
+    field_simp
+  rw [this, nval_mul, nval_of_ne (mul_ne_zero (inv_ne_zero hcc) (inv_ne_zero hu)),
+    vV_mul (inv_ne_zero hcc) (inv_ne_zero hu), vV_inv hcc, vV_inv hu]
+  have h2 : ((-ρ : ℝ) : EReal) ≤ nval V e (∑ q, w q * (u * b * X q)) := by
+    refine le_nval_sum e _ _ _ fun q _ => ?_
+    rw [nval_mul]
+    calc ((-ρ : ℝ) : EReal) = 0 + ((-ρ : ℝ) : EReal) := (zero_add _).symm
+      _ ≤ _ := add_le_add (nval_nonneg e (hw q)) (hX q)
+  refine le_trans (le_of_eq ?_) (add_le_add le_rfl h2)
+  rw [← EReal.coe_add]
+  congr 1
+  push_cast
+  ring
+end Val
+
+theorem exists_resChar (T : CDVR) (h : T.FinRes) : ∃ ℓ : ℕ, ℓ.Prime ∧ ¬ IsUnit (ℓ : T.V) := by
+  haveI : Finite (ResidueField T.V) := h
+  obtain ⟨p, hp⟩ := CharP.exists (ResidueField T.V)
+  haveI := Fintype.ofFinite (ResidueField T.V)
+  refine ⟨p, (CharP.char_is_prime_or_zero (ResidueField T.V) p).resolve_right
+    (CharP.char_ne_zero_of_finite (ResidueField T.V) p), fun hu => ?_⟩
+  have := hu.map (residue T.V)
+  rw [map_natCast, CharP.cast_eq_zero] at this
+  exact not_isUnit_zero this
+
+section Point
+variable {E : Type} [Field E] [NumberField E] [IsCMField E] {H : Host E} {Dw : Datum H} {l : Level H}
+
+theorem nrm_one (c : Coeff l) (w : (E →+* ℂ) × ℕ → ℕ) : nrm Dw c w 1 = 1 := by simp [nrm]
+
+theorem nrm_mul (c : Coeff l) (w : (E →+* ℂ) × ℕ → ℕ) (a b : 𝓞 E) :
+    nrm Dw c w (a * b) = nrm Dw c w a * nrm Dw c w b := by
+  simp [nrm, mul_pow, Finset.prod_mul_distrib]
+
+theorem nrm_nat (c : Coeff l) (w : (E →+* ℂ) × ℕ → ℕ) (p : ℕ) :
+    nrm Dw c w (p : 𝓞 E) = (p : c.F) ^ Formalism.L2.Pj.DF Dw w := by
+  simp [nrm, Formalism.L2.Pj.DF, Finset.prod_pow_eq_pow_sum]
+
+
+[ICL_SRC_NONNEGATIVE_DEGREE] DF is the natural sum of row degrees
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/ThProps.lean#L28-L28
+def DF (Dw : Datum H) (a : (E →+* ℂ) × ℕ → ℕ) : ℕ := ∑ τ : E →+* ℂ, ∑ i : Fin (Dw.mult τ), a (τ, i)
+
+
+[ICL_SRC_HOST_DISCRIMINANT_DEFINITION] Literal vdH is ord_p(abs(disc E)) divided by the positive field degree
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/PrimeDiscriminants/SlopeTestRemainingChoices.lean#L28-L32
+def vdH (p : ℕ) : ℝ := (padicValNat p (NumberField.discr H.E).natAbs : ℝ) / (Module.finrank ℚ H.E : ℝ)
+
+def vdS : ℝ := ((H.small.sup fun l => padicValNat l (NumberField.discr H.E).natAbs : ℕ) : ℝ) / (Module.finrank ℚ H.E : ℝ)
+
+theorem vdH_nonneg (p : ℕ) : 0 ≤ H.vdH p := by unfold vdH; positivity
+
+
+[ICL_SRC_DISCRIMINANT_BOUND] Original host vdH nonnegativity and absolute discriminant upper bound
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/CyclotomicBounds/RamifiedDiscriminants/VdHLeNatAbs.lean#L1-L11
+import Mathlib
+import Development.AutomorphicArithmetic.PrimeDiscriminants.SlopeTestRemainingChoices
+
+theorem Formalism.HC.HostRaw.vdH_le_natAbs {φ : Formalism.HC.Frame} (H : Formalism.HC.HostRaw φ) (p : ℕ) :
+    H.vdH p ≤ ((NumberField.discr H.E).natAbs : ℝ) := by
+  unfold Formalism.HC.HostRaw.vdH
+  have h1 : (1 : ℝ) ≤ (Module.finrank ℚ H.E : ℝ) := by exact_mod_cast Module.finrank_pos
+  have h2 : padicValNat p (NumberField.discr H.E).natAbs ≤ (NumberField.discr H.E).natAbs :=
+    (padicValNat_le_nat_log _).trans (Nat.log_le_self _ _)
+  have h3 : (padicValNat p (NumberField.discr H.E).natAbs : ℝ) ≤ ((NumberField.discr H.E).natAbs : ℝ) := by exact_mod_cast h2
+  exact (div_le_self (Nat.cast_nonneg _) h1).trans h3
+
+
+[ICL_SRC_UNIFORM_DENOMINATOR] Source global clearing scalar and every-place cancellation, with normalized ramification
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSmulShortNonneg.lean#L275-L375
+  obtain ⟨hsec, Λ, N, x0, P, hU, hTb, hTM, hN, hadm, hP, hR⟩ := hg
+  obtain ⟨inst, hnab⟩ := hnab
+  obtain ⟨ph, ψ, x₀, hph⟩ := hph
+  have hβ : betaH (Dw := Dw) c Λ ≠ 0 := by
+    unfold betaH
+    split_ifs with h
+    exacts [h.choose_spec.1, one_ne_zero]
+  have hM0 : d.l₂.M ≠ 0 := hsf.ne_zero
+  have hc0 : Nat.card (Fin n → LevQ Dw d.l₂) ≠ 0 := by
+    rw [GlobalTheory.PlaceInt.card_fun_levQ]; exact pow_ne_zero _ hM0
+  have hs0 : ∀ p ∈ D.host.condN.primeFactors, p ≠ 0 := fun p hp =>
+    (Nat.prime_of_mem_primeFactors hp).ne_zero
+  obtain ⟨P₀, hP₀⟩ : ∃ P₀ : ℕ, P₀ = ∏ p ∈ D.host.condN.primeFactors, p := ⟨_, rfl⟩
+  have hP0 : P₀ ≠ 0 := hP₀ ▸ Finset.prod_ne_zero_iff.2 hs0
+  obtain ⟨K, hK⟩ : ∃ K : ℕ, K = P₀ ^ ((NumberField.discr D.host.E).natAbs * Formalism.L2.Pj.DF Dw w) * d.l₂.M ^ Formalism.L2.Pj.DF Dw w *
+    Nat.card (Fin n → LevQ Dw d.l₂) := ⟨_, rfl⟩
+  have hK0 : K ≠ 0 := hK ▸ mul_ne_zero (mul_ne_zero (pow_ne_zero _ hP0) (pow_ne_zero _ hM0)) hc0
+  refine ⟨(K : c.F) * betaH (Dw := Dw) c Λ, mul_ne_zero (Nat.cast_ne_zero.2 hK0) hβ, ?_⟩
+  rintro la _ ⟨⟨_, Tc, io, e, ho, yI, hy, eta, heta, rfl⟩, rfl⟩
+  show 0 ≤ nval Tc.V e (evI yI _)
+  rw [evI_smul]
+  have hwi := GlobalTheory.PlaceInt.datum_isIntegral _ _ _ _ Xo c n d hlev ph ψ x₀ hph x0
+  obtain ⟨-, ef2, -⟩ := GlobalTheory.PlaceInt.eF_transfer _ _ _ _ Xo c n d Λ
+  obtain ⟨T', iT, r, io₂, y₂, C, ζ, z, tp, F, hr, hiT, hfr, hio, hC, hrat, hζ, hz, hgi, htp, hF, hval⟩ :=
+    GlobalTheory.PlaceInt.short_value_on_cover _ _ _ _ Xo c n d hlev hnab 1 hroot Λ N hU hTM hN w P hP x0 g hsec hR
+      Tc io yI hy
+  haveI : CharZero T'.Fr := algebraRat.charZero _
+  have he' : 0 < r * e := Nat.mul_pos hr ho.1
+  have heR : (0 : ℝ) < ((r * e : ℕ) : ℝ) := by exact_mod_cast he'
+  rw [← nval_bc iT hr hiT e, map_mul, hval, ← hio]
+  obtain ⟨ℓ, hℓ, hu⟩ := exists_resChar T' hfr
+  have hsq : ¬ ℓ ^ 2 ∣ d.l₂.M := fun hd => hℓ.prime.not_unit (hsf ℓ (by rwa [← pow_two]))
+  obtain ⟨α, hαM, hα⟩ : ∃ α : ℕ, α ∣ d.l₂.M ∧ ((¬ ℓ ∣ d.l₂.M ∧ (α : 𝓞 D.host.E) = 1) ∨
+      (ℓ ∣ d.l₂.M ∧ (α : 𝓞 D.host.E) * H.bar α = (ℓ : 𝓞 D.host.E) ∧ d.l₂.Mb ≤ Ideal.span {H.bar α}) ∨
+      (ℓ ∣ d.l₂.M ∧ (α : 𝓞 D.host.E) = (ℓ : 𝓞 D.host.E))) := by
+    by_cases hd : ℓ ∣ d.l₂.M
+    · exact ⟨ℓ, hd, Or.inr (Or.inr ⟨hd, rfl⟩)⟩
+    · exact ⟨1, one_dvd _, Or.inl ⟨hd, Nat.cast_one⟩⟩
+  obtain ⟨α', hα'⟩ := hαM
+  have ha0 : α ≠ 0 := left_ne_zero_of_mul (hα' ▸ hM0)
+  have ha0' : α' ≠ 0 := right_ne_zero_of_mul (hα' ▸ hM0)
+  have hch := GlobalTheory.PlaceInt.HostChart.chBound_host D _ Dw _ d.Xo₂ d.c₂ hnab.1 T' io₂ y₂ C (r * e) he' w n _ le_rfl
+  haveI := Nat.finite_of_card_ne_zero hc0
+  have hu0 : io₂ (nrm Dw d.c₂ w (α : 𝓞 D.host.E)) ≠ 0 :=
+    (map_ne_zero io₂).2 (nrm_ne_zero _ _ (Nat.cast_ne_zero.2 ha0))
+  have key := le_nval_avg (V := T'.V) (r * e) (fun q => io₂ (d.w x0 q)) _ ζ _
+    ((Nat.card (Fin n → LevQ Dw d.l₂) : ℕ) : T'.Fr) _ 1 one_pos hζ hu0 (by exact_mod_cast hc0)
+    (fun q => map_isIntegral_int io₂ (hwi q)) _
+    (fun q => class_bound d.Xo₂ d.c₂ hnab.1 T' io₂ y₂ C hC _ hnab (r * e) _ w n he' hch ℓ hℓ
+      hu Λ N hU hTM hN _ (ef2 _ P hP).1 z (tp q) (F q) hz hgi
+      (fun b => levRep (q b)) (htp q) (hF q) hrat hsq α hα)
+  have hb0 : io₂ (d.eF (betaH (Dw := Dw) c Λ)) ≠ 0 := (map_ne_zero io₂).2 ((map_ne_zero d.eF).2 hβ)
+  have hKv := add_le_add (le_refl (nval T'.V (r * e) (K : T'.Fr))) key
+  rw [← nval_mul, nval_of_ne (Nat.cast_ne_zero.2 hK0), ← EReal.coe_add] at hKv
+  refine le_trans (EReal.coe_nonneg.2 ?_) (hKv.trans (le_of_eq ?_))
+  · have b0 : ∀ p : ℕ, (0 : ℝ) ≤ vV T'.V (p : T'.Fr) := fun p => by
+      exact_mod_cast GlobalTheory.PlaceInt.HostChart.vV_nat_nonneg T' p
+    have b1 : (vV T'.V (K : T'.Fr) : ℝ) = ((NumberField.discr D.host.E).natAbs * Formalism.L2.Pj.DF Dw w : ℕ) *
+        (∑ p ∈ D.host.condN.primeFactors, (vV T'.V (p : T'.Fr) : ℝ)) +
+        (Formalism.L2.Pj.DF Dw w : ℕ) * ((vV T'.V (α : T'.Fr) : ℝ) + vV T'.V (α' : T'.Fr)) +
+        vV T'.V ((Nat.card (Fin n → LevQ Dw d.l₂) : ℕ) : T'.Fr) := by
+      rw [hK, Nat.cast_mul, Nat.cast_mul, Nat.cast_pow, Nat.cast_pow,
+        vV_mul (mul_ne_zero (pow_ne_zero _ (Nat.cast_ne_zero.2 hP0)) (pow_ne_zero _ (Nat.cast_ne_zero.2 hM0)))
+          (Nat.cast_ne_zero.2 hc0),
+        vV_mul (pow_ne_zero _ (Nat.cast_ne_zero.2 hP0)) (pow_ne_zero _ (Nat.cast_ne_zero.2 hM0)),
+        vV_pow (Nat.cast_ne_zero.2 hP0), vV_pow (Nat.cast_ne_zero.2 hM0), hP₀, vV_prod_nat T' _ hs0]
+      conv_lhs => rw [show ((d.l₂.M : ℕ) : T'.Fr) = (α : T'.Fr) * (α' : T'.Fr) by rw [hα', Nat.cast_mul],
+        vV_mul (Nat.cast_ne_zero.2 ha0) (Nat.cast_ne_zero.2 ha0')]
+      generalize (NumberField.discr D.host.E).natAbs = A
+      push_cast
+      ring
+    have b2 : (vV T'.V (io₂ (nrm Dw d.c₂ w (α : 𝓞 D.host.E))) : ℝ) = (Formalism.L2.Pj.DF Dw w : ℕ) * vV T'.V (α : T'.Fr) := by
+      rw [nrm_nat, map_pow, map_natCast, vV_pow (Nat.cast_ne_zero.2 ha0)]
+      push_cast
+      ring
+    have b3 : ∑ p ∈ D.host.condN.primeFactors, (vV T'.V (p : T'.Fr) : ℝ) / (r * e : ℕ) *
+        D.host.vdH p * (Formalism.L2.Pj.DF Dw w : ℝ) / 2 ≤
+        ((NumberField.discr D.host.E).natAbs * Formalism.L2.Pj.DF Dw w : ℕ) *
+          (∑ p ∈ D.host.condN.primeFactors, (vV T'.V (p : T'.Fr) : ℝ)) / (r * e : ℕ) := by
+      rw [Finset.mul_sum, Finset.sum_div]
+      refine Finset.sum_le_sum fun p _ => ?_
+      have h1 := D.host.vdH_le_natAbs p
+      have h2 : (0 : ℝ) ≤ (vV T'.V (p : T'.Fr) : ℝ) / (r * e : ℕ) * (Formalism.L2.Pj.DF Dw w : ℝ) :=
+        mul_nonneg (div_nonneg (b0 p) heR.le) (Nat.cast_nonneg _)
+      have h3 := mul_le_mul_of_nonneg_left h1 h2
+      have h4 := mul_nonneg h2 (show (0 : ℝ) ≤ ((NumberField.discr D.host.E).natAbs : ℝ) by positivity)
+      have h5 : (((NumberField.discr D.host.E).natAbs * Formalism.L2.Pj.DF Dw w : ℕ) : ℝ) * (vV T'.V (p : T'.Fr) : ℝ) / (r * e : ℕ) =
+          (vV T'.V (p : T'.Fr) : ℝ) / (r * e : ℕ) * (Formalism.L2.Pj.DF Dw w : ℝ) * ((NumberField.discr D.host.E).natAbs : ℝ) := by
+        rw [Nat.cast_mul (NumberField.discr D.host.E).natAbs]; ring
+      rw [h5]
+      linarith
+    have b4 : (0 : ℝ) ≤ (Formalism.L2.Pj.DF Dw w : ℕ) * (vV T'.V (α' : T'.Fr) : ℝ) / (r * e : ℕ) :=
+      div_nonneg (mul_nonneg (Nat.cast_nonneg _) (b0 _)) heR.le
+    rw [b1, b2, add_div, add_div, mul_add, add_div]
+    linarith
+  · congr 1
+    simp only [map_mul, map_inv₀, map_natCast]
+    field_simp
+end Run
+
+end GlobalTheory.SupFull
+
+
+[ICL_SRC_FULL_AT] Whole literal positive-weight fullAt_of_pins target; only conditional span installation supplied here
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSmulNonnegOfPow.lean#L142-L178
+    isBddSec_of_isUnf _ _ _ _ (T.Q.Xo j) T.Q.c T.σ₀ _ (T.U j T.σ₀) U'.toPj T.good_σ₀ hU hU' (by omega) a n hd f
+      (cusp_le_sec _ _ _ _ _ hf) fun k =>
+        (Formalism.L2.Pj.abelian₂.holSub_SS siegelSpaceAlgebra_holds _ _ (((mem_cusp _ _ _ _ _ f).1 hf).2 _ T.good_σ₀) k).1
+  constructor
+  · haveI : FiniteDimensional T.Q.c.F (cuspW T j w) :=
+      GlobalTheory.cuspForms_finiteDimensional_of_goodEmb _ _ _ _ _ _ _ (T.U j) T.σ₀ T.good_σ₀ hU _ _ (dom_wtA w)
+    refine fg_latIn _ _ _ fun x hx hx0 => ?_
+    letI := T.Q.H.starRing
+    have hs := cusp_le_sec _ _ _ _ _ hx
+    obtain ⟨z, La, hz, hG0⟩ := GlobalTheory.CMDetect.exists_good_cmPt_frPoly_ne_zero _ _ _ _ (T.Q.Xo j) T.Q.c (fun _ => rfl) _
+      U'.toPj hU' hr1 hX _ _ x hs hx0 (hbdd _ _ (dom_wtA w) x hx)
+    obtain ⟨y, N, h0, hint⟩ := GlobalTheory.LatFull.CMInt.exists_frame_bounded_denom _ _ _ _ (T.Q.Xo j) T.Q.c z _ La hz _ _ x
+      hs hG0
+    refine ⟨z.K, inferInstance, inferInstance, inferInstance,
+      { toFun := fun F => N * evR (T.Q.Xo j) T.Q.c F y
+        map_add' := fun F G => ?_
+        map_smul' := fun s F => ?_ }, h0, fun F hF => hint F (cusp_le_sec _ _ _ _ _ hF)⟩
+    · rw [← mul_add]
+      exact congrArg _ (evalAt_add _ _ F G y)
+    · have e : evR (T.Q.Xo j) T.Q.c (s • F) y = algebraMap T.Q.c.F z.K s * evR (T.Q.Xo j) T.Q.c F y :=
+        evalAt_smul _ _ s F y
+      rw [e, RingHom.id_apply, Algebra.smul_def, mul_left_comm]
+  · refine le_antisymm (Submodule.span_le.2 fun f hf => ((mem_latIn _ _ _ f).1 hf).1) fun f hf => ?_
+    obtain ⟨a', hd', hf'⟩ := pow_mem_cusp (T.U j) (dom_wtA w) hf (4 * (Module.finrank ℚ D.host.E * D.R.r) + 3)
+    obtain ⟨d, nab, hlev, hnab, hroot, hle, hph, hspan⟩ := exists_datum_span _ _ _ _ (T.Q.Xo j) T.Q.c _ _ U' hr1 hA
+      T.good_σ₀ hU' hG hPr a' _ hd' (Nat.le_mul_of_pos_right _ hn) fun k ga _ => hχ k _ ga
+    have hsf : Squarefree d.l₂.M := by
+      rw [hle, hQ.2.1.1,
+        Nat.squarefree_mul ((Nat.coprime_primes (D.host.g_prime 0) (D.host.g_prime 1)).2 D.host.g_ne)]
+      exact ⟨(D.host.g_prime 0).prime.squarefree, (D.host.g_prime 1).prime.squarefree⟩
+    obtain ⟨s, hs, h⟩ := exists_smul_nonneg_of_pow (valSet (T.Q.Xo j) T.Q.c (algCls (T.Q.Xo j) T.Q.c)) isVal_valSet _
+      (exists_smul_short_nonneg D _ _ _ (T.Q.Xo j) T.Q.c _ d hlev hnab hroot hsf hph nab 1 0 a') f _
+      (hspan _ (cusp_le_sec _ _ _ _ _ hf') (hbdd _ _ hd' _ hf'))
+    rw [← inv_smul_smul₀ hs f]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span ((mem_latIn _ _ _ _).2 ⟨Submodule.smul_mem _ _ hf, h⟩))
+
+end GlobalTheory.SupFull
+
+
+[ICL_SRC_FULL_LATTICE_DEFINITION] Original FullLat and exact transport through the existing source map
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/IndefiniteReal/FWExist.lean#L222-L239
+def FullLat (Cs : Submodule K Rg) (Vs : HeightOneSpectrum (𝓞 K) → Set (Rg → EReal)) (hV : ∀ la, ∀ v ∈ Vs la, IsVal la v) : Prop :=
+  Submodule.IsLattice K (latOf Cs Vs hV)
+
+theorem mkFull_of [Fintype G] [Module (𝓞 K) WL] [IsScalarTower (𝓞 K) K WL] (F : FormsL L K WL W G) {Cs : Submodule K Rg}
+    {Vs : HeightOneSpectrum (𝓞 K) → Set (Rg → EReal)} {hV : ∀ la, ∀ v ∈ Vs la, IsVal la v} (ι : Cs →ₗ[K] WL)
+    (hW : F.WK = LinearMap.range ι) (hM : ∀ x, x ∈ F.MK ↔ ∃ f : Cs, (∀ la, ∀ v ∈ Vs la, 0 ≤ v (f : Rg)) ∧ ι f = x)
+    (h : FullLat Cs Vs hV) : F.MKFull := by
+  have e : F.MK = (latOf Cs Vs hV).map (ι.restrictScalars (𝓞 K)) := by
+    ext x
+    rw [hM, Submodule.mem_map]
+    rfl
+  refine ⟨e ▸ h.fg.map _, ?_⟩
+  rw [e, hW]
+  show Submodule.span K (ι '' (latOf Cs Vs hV : Set Cs)) = _
+  rw [Submodule.span_image, h.span_eq_top, Submodule.map_top]
+
+end Ext
+
+
+
+[ICL_SRC_LATFULL_DEFINITION] Original all-row LatFull predicate
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/IndefiniteReal/FWExist.lean#L723-L727
+def LatFull : Prop :=
+  ∀ i : Fin D.R.m, FullLat (T.cuspA ((i : ℕ) + 1) (wtA (κ i)) (κ i).n)
+    (valSet (T.Q.Xo _) T.Q.c (algCls (T.Q.Xo _) T.Q.c)) fun la => isVal_valSet la
+
+theorem indep_bOr (hu : JUnif T R κ v₀) {i : Fin D.R.m} {m : ℕ} (hb : HasB T.Q.c.F (Cu T κ i) m) (σ : D.what₂.LL →+* ℂ) :
+
+
+[ICL_SRC_LITERAL_ENDPOINTS] Actual fullLat, canonical weight, LatFull and original FWTie/MKFull/both Boolean MLat endpoints
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/IntegralCuspFormsFullLattice.lean#L11-L54
+
+theorem nV_pos (D : D7) : 0 < D.R.nV := by
+  have := D.R.three_m_lt_t
+  rw [Ranks.nV]
+  omega
+
+theorem fullLat {D : D7} (T : Core D) (hT : LawsM T) {j : ℕ} (hj : InR D j) (w : WeightFamilies.Wt D j) (hn : 0 < w.n) :
+    FullLat (T.cuspA j (wtA w) w.n) (valSet (T.Q.Xo j) T.Q.c (algCls (T.Q.Xo j) T.Q.c)) fun la => isVal_valSet la :=
+  (GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.supIn_full_iff _ _ _).1
+    (GlobalTheory.SupFull.fullAt_of_pins D T hT.pins j hj (hT.unf j hj _ T.good_σ₀) w hn)
+
+theorem integralCuspFormsFullLattice : GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.IntegralCuspFormsFullLattice := fun D hK hn T hT j hj => by
+  have h := GlobalTheory.SupFull.fullAt_of_pins D T hT.pins j hj (hT.unf j hj _ T.good_σ₀) (DIV.Cons.kaWt D hK hn j)
+    (by rw [DIV.Cons.kaWt_n]; exact nV_pos D)
+  have h' : GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.SupLatticeFullAt T j (GlobalTheory.IndefiniteRowSideFullHecke.SupremumLattice.kappaExp D hK hn j) (DIV.Cons.kaWt D hK hn j).n := h
+  rwa [DIV.Cons.kaWt_n] at h'
+
+theorem mLat : GlobalTheory.IndefiniteRowSideFullHecke.GoodBasisCentralIdempotents.MLat :=
+  GlobalTheory.GoodLat.Road.mLat_of_fullLattice integralCuspFormsFullLattice
+
+section Real
+
+open Formalism.BasicNotions.TH Formalism.L2.Theta Formalism.L2.DIV Formalism.IndefR.Links
+
+attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
+variable {D : D7} {G : Type} [Group G] [Fintype G] {Pl0 T0 : Type} {A : FamIn D.what₂.LL G Pl0 T0 D.R.m}
+
+theorem latFull (T : CoreJ D) (hT : LawsJ T) {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)} (hκ : KapIs κ) :
+    LatFull T κ := fun i =>
+  fullLat T.toCore hT.toLawsM (inR i) (κ i) (by rw [(hκ i (D.eTau.symm 1)).2.2]; exact nV_pos D)
+
+variable {T : CoreJ D} [Algebra T.Q.c.F D.what₂.LL] {R : RealDat D A T.Q.c.F}
+  {κ : ∀ i : Fin D.R.m, WeightFamilies.Wt D ((i : ℕ) + 1)} {v₀ : ∀ (i : Fin D.R.m) (σ : D.what₂.LL →+* ℂ), (R.MW i σ).Vec}
+
+theorem mkFull_of_tie (t : FWTie T R κ v₀) (i : Fin D.R.m) : (R.FW i).MKFull :=
+  GlobalTheory.GoodLat.mkFull_of_tie t (latFull T t.laws t.kap) i
+
+theorem mLat_of_tie (t : FWTie T R κ v₀) (F : Face D A) (b : Bool) : (R.toCx F).MLat b :=
+  GlobalTheory.GoodLat.mLat_of_tie t (latFull T t.laws t.kap) F b
+
+end Real
+
+end GlobalTheory.GoodLat.Obj

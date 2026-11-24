@@ -1,0 +1,806 @@
+\section{The actual denominator table and its uniform global export}
+\label{sec:denominator-export-v050}
+
+\status{DNE1--DNE14 reconstruct the full implications
+\texttt{ConclF}$\Rightarrow$\texttt{AdmF}$\Rightarrow$
+\texttt{LinkN}, including the actual local table, its coefficient-place
+weights and the global prime sum.  The original common arithmetic
+supplier of \texttt{ConclF} is retained.  Consequently
+\texttt{GLOBAL\_DENOMINATOR} remains open.  A deliberate simplification
+replaces the source's particular pointwise \texttt{Large} cutoff by a
+uniform eventual cutoff; the original \texttt{LinkN} conclusion and
+its constant $2000(|C|+1)^3$ are unchanged.}
+
+The notation in this chapter always denotes the objects of one original
+$D:\texttt{D7}$, $L:\texttt{SizeData}_2(D)$ and
+$P:\texttt{ParameterChoice}'(D,L)$.  No free module, table on a different
+host, or replacement coefficient field is introduced.  Put
+\[
+ x=L.\mathrm{sc}.x,\quad \epsilon=L.\mathrm{sc}.\epsilon,
+ \quad z=x^\epsilon,\quad b=e^z,\quad X'=e^{z^{1/3}},
+ \quad b'=xb/X',\quad w''=b/(nX').                         \tag{DNE.1}
+\]
+Here $n=D.R.n$, $f=2n$, $m=D.R.m$, $k=D.R.k$,
+$r=k+m-1$, $t=D.R.t$, $N=k+m(t+1)$ and $n_V=r+t$.
+We have $m\ge2$, $m\le f\le k$, $r\le2k$, $t\ge r+5$,
+and $tr$ is odd.  Write $S=L.\mathrm{Sc}$, $\eta=L.\mathrm{etaSz}$,
+$\delta=L.\mathrm{de2}$ and
+\[
+\begin{split}
+ \mathcal D&=nt^2(N+t)z^2+kn^2(S+t+z),\\
+ p_*&=mb/\mathcal D,\qquad A=kz/(m\delta),\qquad R_0=n/z,\\
+ H&=b+S+\eta+t+2,\qquad \eta_3=\eta+t+2,\\
+ w_B&=\max\{w''+\eta,\ \sup_{a\in D.\mathrm{host}.TT}b_a+b'/x+\eta\},\\
+ w_P&=w_B+(t+1)/2,\qquad G_P=w_P+S+\eta_3,\\
+ e_p&=C\left(1+H/p+\frac{\log H}{\log p}\right),\qquad
+ j_p=\max\{1,\lceil\log_{p-1}A\rceil\}.
+\end{split}                                                       \tag{DNE.2}
+\]
+The source names are respectively \texttt{Den}, \texttt{lStar},
+\texttt{lA}, \texttt{R0}, \texttt{hB}, \texttt{eta3},
+\texttt{wB}, \texttt{wP}, \texttt{GP}, \texttt{eP} and \texttt{jA}.
+The empty supremum in $w_B$ has the source's zero convention.
+The host field is $E$, with $[E:\mathbb Q]=2f$; the coefficient
+field of the rows is denoted $K$, and need not be $E$.
+The two generator primes form $G=\{g_0,g_1\}$, the small primes
+are the divisors of $Q_S$, and $q,d$ are the two distinct ramified
+auxiliary primes.  The host embeds in
+$\mathbb Q(\zeta_M)$ for $M=Q_Sqd$, and $4\mid Q_S$.
+
+\subsection{Exact local data and weights}
+
+% BEGIN DNE1
+\paragraph{DNE1: place weights and the unchanged zero-row rank.}
+\label{claim:DNE1}
+For a coefficient place $w$ above a rational prime $p$, the actual
+weight in $\eta\mathrm{Sum}$ is
+\[
+ a_w=\frac{\log \mathrm Nw}{[K:\mathbb Q]}e_w
+     =\frac{e_w f_w}{[K:\mathbb Q]}\log p.                 \tag{DNE.3}
+\]
+Thus $a_w\ge0$, and the sum over any subset of places above $p$
+is at most $\log p$.  Likewise, for the host places $\lambda\mid p$,
+put $n_\lambda=e_\lambda f_\lambda$.  Then
+\[
+ \sum_{\lambda\mid p}n_\lambda=2f,\qquad
+ \sum_{\lambda\mid p}(n_\lambda+1)\le4f.                 \tag{DNE.4}
+\]
+These are the number-field degree formula; every residue degree
+and ramification index is positive.  In the source's finite-set
+presentation one may use the corresponding inequalities, which
+are sufficient below.
+
+Fix a lift $j\in\{1,\ldots,m\}$ and write $d_j=L.dZ0(j)$.
+The original \texttt{adm1}, \texttt{adm2}, \texttt{adm3} say,
+away from $G$, that the local row loss is bounded by
+\[
+ \eta_{\mathrm{loc},i}\le
+    \sum_{\pi\in Z_i^{\mathrm{good}}}
+         m_{i,\pi}(v_{i,\pi}+v_p(J)),\qquad
+ \sum_{i\in\operatorname{locs}(j,w)}
+    \sum_{\pi\in Z_i^{\mathrm{good}}}m_{i,\pi}
+ \le \operatorname{rk}_0(j,w)=d_j,                       \tag{DNE.5}
+\]
+where $J=D.\mathrm{what}_2.\mathrm{restRowsFiniteGroupCard}>0$.
+The actual equality
+$\eta_J(j,w)=\sum_{i\in\operatorname{locs}(j,w)}\eta_{\mathrm{loc},i}$
+is part of the $D$ record.  Consequently, if every summand at $p$
+satisfies $v_{i,\pi}+v_p(J)\le U_p$, with $U_p\ge0$, then
+\[
+ \eta\mathrm{At}(L,j,p)\le d_j\log p\,U_p.              \tag{DNE.6}
+\]
+Indeed multiply (DNE.5) by the nonnegative $U_p$, use the exact rank
+identity, multiply by $a_w$, and sum using (DNE.3).  This also
+handles an empty place set or $d_j=0$; no division by $d_j$ occurs.
+% END DNE1
+
+% BEGIN DNE2
+\paragraph{DNE2: an elementary sufficient cyclotomic budget.}
+\label{claim:DNE2}
+For the actual cyclotomic character $\chi_p:G_E\to\mathbb Z_p^\times$
+and the odd positive integer $a=tr$, set
+\[
+ \nu_p=\min_{\sigma\in G_E}v_p(\chi_p(\sigma)^a-1).
+\]
+This minimum is the source's \texttt{nuOf}, hence its real image is
+\texttt{nuL}.  For every prime $p$,
+\[
+ \nu_p\le v_p(M)+v_p(a),\qquad
+ \sum_{p\in T}\nu_p\log p\le\log M+\log a              \tag{DNE.7}
+\]
+for every finite prime set $T$.
+
+\begin{proof}
+An automorphism of a cyclotomic extension whose exponent is $1$
+modulo $M$ fixes $E$, because $E$ is embedded in
+$\mathbb Q(\zeta_M)$.  For any prescribed finite $p$-power precision,
+the Chinese remainder theorem permits every $p$-adic unit congruent
+to $1$ modulo $p^{v_p(M)}$ as such an exponent.  Extend the resulting
+automorphism of the finite cyclotomic compositum to the algebraic
+closure over $E$.
+
+If $p$ is odd and $p\nmid M$, choose the unit $-1$; as $a$ is odd,
+$(-1)^a-1=-2$ is a unit.  If $p\mid M$, put $h=v_p(M)$ and choose
+$1+p^h$.  The binomial theorem gives
+\[
+ v_p((1+p^h)^a-1)=h+v_p(a)
+\]
+for odd $p$.  One direct proof first treats an exponent prime to
+$p$, for which the linear term has strictly smaller valuation than
+the others, and then repeatedly raises to the $p$th power; each
+step increases the valuation by one.  For $p=2$ we have $h\ge2$
+and $a$ odd, so the linear term again proves the same equality.
+Use precision strictly greater than this displayed valuation.
+Approximation of the unit by an actual cyclotomic character value
+preserves it.  This proves the first inequality and also proves
+that the minimum is finite.  The second follows from
+$\sum_pv_p(u)\log p=\log u$ for positive integers $u$.
+\end{proof}
+
+The source proves the sharper budget $\log Q_S+\log(tr)$ by removing
+$q,d$.  The sufficient budget (DNE.7) is used here only as an
+intermediate estimate: $\log M\le z/72$ follows from the original
+parameter inequality $M^{36}t^{150}\le b^{1/2}$.  The final
+\texttt{LinkN} bound below is exactly the original one.
+% END DNE2
+
+% BEGIN DNE3
+\paragraph{DNE3: patching the actual local bounds, including the prime three.}
+\label{claim:DNE3}
+Suppose the original \texttt{Concl}(L,P,X,C) is supplied, where
+$X$ is its actual \texttt{HubData}.  Its representations are denoted
+$\rho_i$; its finite good-point sets, exceptional prime set and band
+predicates are $Z_i^{\mathrm{good}}$, $\mathcal E$ and $B_{i,\lambda}$.
+Put
+\[
+ L^X_{i,\lambda}=\max_{\pi\in Z_i^{\mathrm{good}}}
+                       X.\mathrm{len0}_{i,\pi,\lambda},\qquad
+ B_i^X=\max_{\pi\in Z_i^{\mathrm{good}}}
+                       X.\mathrm{errorBoundHub}_{i,\pi},           \tag{DNE.8}
+\]
+with maximum zero for an empty set.  The same representation gives
+$s_{i,\pi}=\operatorname{sPi}(\rho_i,\pi)$.
+Take the one table $T_f$ provided by the \texttt{StarF} field, and set
+$b_i^f=\sum_{\lambda\mid p_i}(T_f.\mathrm{len})_{i,\lambda}
+             +T_f.\mathrm{BB}_i$.
+Define the ordinary range
+\[
+ \mathcal R=\{p:p\notin\mathrm{small},\ p\ne3,q,d,
+                         \ p\le p_*\ \hbox{or}\ p\in\mathcal E\}.
+\]
+The literal \texttt{tab} of the source is the following table,
+with the branches taken in the displayed order:
+\[
+ \ell_{i,\lambda}=
+ \begin{cases}
+  0,&p_i\in\mathrm{small},\\
+  b_i^f/\#\{\lambda\mid3\},&p_i=3\notin\mathrm{small},\\
+  L^X_{i,\lambda},&p_i\in\mathcal R,\\
+  0,&\text{otherwise},
+ \end{cases}\qquad
+ B_i=
+ \begin{cases}
+  b_i^f,&p_i\in\mathrm{small},\\
+  \operatorname{midG}(L,C,p_i),&p_i=q\text{ or }d,\\
+  B_i^X,&p_i\in\mathcal R,\\
+  0,&\text{otherwise}.
+ \end{cases}                                                   \tag{DNE.9}
+\]
+It retains $s$, $B_{i,\lambda}$ and $\mathcal E$, and sets
+$\mathrm{gcost}(j,p)=Cx^C\eta$, $\mathrm{gs}(j,p)=p^{-2}$.
+The division in (DNE.9) is legitimate: the number field $E$ has
+finitely many and at least one prime above $3$.  For example $3$
+is a nonunit in $\mathcal O_E$, since its norm is
+$3^{[E:\mathbb Q]}$, so a maximal ideal contains it.
+Thus summing its equal shares gives exactly $b_i^f$.
+
+For every twisted local row away from $G$, (DNE.9) satisfies
+\[
+ v_{i,\pi}\le s_{i,\pi}+\sum_{\lambda\mid p_i}\ell_{i,\lambda}
+       +V_{p_i}+v_{p_i}(h_E)+B_i+p_i^{-2}.               \tag{DNE.10}
+\]
+Here $V_p=D.\mathrm{what}_2.VV(p)$ and $h_E$ is the actual host
+class number.  At a small prime or at $3$, this is exactly
+\texttt{StarF}, by the equal-share identity.  At $q,d$, it is
+\texttt{StarG}.  In $\mathcal R$, dominate each local length and
+error by its maximum (DNE.8) and use \texttt{StarAD}.
+In the remaining case $p>p_*$ and $p\notin\mathcal E$, so
+\texttt{StarE} gives (DNE.10) with zero added length and error.
+These alternatives exhaust the original prime cases.
+% END DNE3
+
+\subsection{All admissibility fields on this same table}
+
+For precision, the numerical part of \texttt{AdmT} is recorded here.
+The table has error $B_i\le B_0=Cfnt^2n_Vz^2$ away from
+$\mathrm{small}\cup\{q,d\}\cup G$, and
+$s_{i,\pi}+p_i^{-2}\le\nu_{p_i}+2p_i^{-2}$.
+For the split and inert rows, put
+\[
+ F_{i,\lambda}(p)=\frac{w_P+\eta_3}{p}+S+z+
+                          \eta_3\mathbf1_{B_{i,\lambda}},
+ \quad R(p)=\frac H{(p-1)^{j_p+1}}+(G_P+1)(j_p+1)+z.     \tag{DNE.11}
+\]
+The four bounds, at the source's twisted rows away from $G$, are
+\[
+\begin{array}{ll}
+\text{split},\ p\ge5,\ p\le p_*\text{ or }p\in\mathcal E:
+ &2\sum_{\lambda\mid p}\ell_{i,\lambda}
+       \le\sum_{\lambda\mid p}(2n_\lambda m+1)e_p,\\[2pt]
+\text{inert},\ p<A,\ \operatorname{ord}_{\pm}(p)>4L_w:
+ &\ell_{i,\lambda}\le C(n_\lambda+1)rR(p),\\[2pt]
+\text{inert},\ p\ge A,\ p\le p_*\text{ or }p\in\mathcal E:
+ &\ell_{i,\lambda}\le C(n_\lambda+1)r(H/p^2+F_{i,\lambda}(p))
+                              +Cn_\lambda m e_p,\\[2pt]
+\text{inert},\ p<A,\ \operatorname{ord}_{\pm}(p)\le4L_w:
+ &\ell_{i,\lambda}\le C(n_\lambda+1)rH/p^2
+       +C(n_\lambda+1)rF_{i,\lambda}(p)+Cn_\lambda m e_p.
+\end{array}                                                     \tag{DNE.12}
+\]
+The order is in
+$(\mathbb Z/2^{e+2}\mathbb Z)^\times/\{\pm1\}$.
+The band implication is
+\[
+ B_{i,\lambda},\ \lambda\mid p\quad\Longrightarrow\quad
+ \exists s\in[w'',w_B]:\ |ps-b|
+   \le C\{p\eta_3+pS+b/p+s+pz\}.                       \tag{DNE.13}
+\]
+Above $p_*$ outside $G\cup\mathcal E$, both $\ell$ and $B_i$ vanish.
+The exception bounds are
+\[
+ |\mathcal E|\le(|TT|+2)(S+3\eta+t+8b/p_*+9),\qquad
+                    p\in\mathcal E\Longrightarrow p\le3b.       \tag{DNE.14}
+\]
+For $p\in\mathrm{small}\cup\{3\}$ the sum of the lengths and
+error is at most $Cfm b\log x+Cx^Cz^2$; for $p=q,d$ it is at most
+$\operatorname{midG}(L,C,p)\le2Cfm b$.
+For $p\in G$ the direct bound is
+\[
+ \eta\mathrm{At}(L,j,p)\le
+    d_j\log p\{Cx^C\eta+2p^{-2}+V_p+v_p(h_E)\}.        \tag{DNE.15}
+\]
+Finally \texttt{ParametersPolynomiallyBounded} means exactly
+\[
+ \begin{gathered}
+  P.CLw\le C,\quad P.CYL\le C,\quad k,n,t\le x^C,
+  \quad x^{-\epsilon}\le\delta,\\
+  \log h_E\le Cx^C,\qquad \log J\le Cx^Cz .
+ \end{gathered}                                                   \tag{DNE.16}
+\]
+In particular a supplied admissible table forces $C>0$, since
+$P.CLw>0$.
+
+% BEGIN DNE4
+\paragraph{DNE4: the full original table is admissible.}
+\label{claim:DNE4}
+The table (DNE.9) satisfies all seventeen fields of
+\texttt{AdmT}$(L,\mathrm{tab},C,P)$.
+
+\begin{proof}
+The first three fields are \texttt{Concl.pass},
+\texttt{Concl.mult} restricted to places outside $G$, and
+\texttt{Concl.rank}.  DNE3 proves the fourth field (DNE.10).
+For the fifth, at the ordinary range take the maximum in
+\texttt{BBLe}; outside it $B_i=0$, including $p=3$ when it is not
+small.  The required upper bound is nonnegative.  For the sixth,
+\texttt{KillAt} gives $s_{i,\pi}\le\nu_p+p^{-2}$, and
+$\mathrm{gs}+p^{-2}=2p^{-2}$.
+
+For the four rows (DNE.12), in $\mathcal R$ the new length is
+exactly the original maximum length supplied by \texttt{RowNum}.
+Outside $\mathcal R$ it is zero.  The split row excludes $3$
+by $p\ge5$; the inert rows exclude it by the original
+\texttt{Concl.small} clause that $3$ is not inert.  Every
+right-hand side in (DNE.12) is nonnegative, since $C\ge0$,
+$H\ge1$, all ranks are nonnegative, and $p\ge2$.
+Thus the zero alternative also satisfies all four bounds.
+The band predicate was not changed, so (DNE.13) is unchanged.
+
+The \texttt{Small} field puts $3,q,d$ and every small prime below
+$p_*$.  Hence a prime above $p_*$ outside $\mathcal E\cup G$ lies
+in the zero branch of (DNE.9).  This proves large-prime vanishing;
+the exceptional set itself is unchanged, giving (DNE.14).
+The small-prime bound is preserved by putting its whole cost in
+$B_i$, or, at $3$ outside the small set, distributing it equally
+over the primes above $3$.  At $q,d$, both primes are outside the
+small set and unequal to $3$, and the length is zero while the
+error is exactly $\operatorname{midG}$.  The retained
+\texttt{Small} bound gives its advertised upper bound.
+Finally (DNE.15) is \texttt{StarH} with the chosen
+$\mathrm{gcost},\mathrm{gs}$, and (DNE.16) is
+\texttt{Concl.par}.  This accounts for each field on the actual
+table and actual host.
+\end{proof}
+
+As a separate elementary constructor, the source's
+\texttt{BoundAtTwoThree} and \texttt{StarS} imply \texttt{StarF}:
+take all length entries zero and $\mathrm{BB}_i=Cfm b\log x+Cx^Cz^2$.
+At $2$ use the former hypothesis; at every other small prime use
+the latter; at $3$ outside the small set use the former again.
+This proves the source's full \texttt{starF\_of} implication
+without dropping the $2$ or $3$ case.
+% END DNE4
+
+% BEGIN DNE5
+\paragraph{DNE5: a scalar majorant and the original global row sum.}
+\label{claim:DNE5}
+For any admissible table define $I(p)\in\{0,1\}$ by the existence
+of the $s$ in (DNE.13), and put
+\[
+ F(p)=(w_P+\eta_3)/p+S+z+\eta_3I(p).
+\]
+Define
+\[
+ \mathcal L(p)=
+ \begin{cases}
+ (2fm+f)e_p,&p\text{ split},\\
+ 4fCrR(p),&p<A,\ \operatorname{ord}_{\pm}(p)>4L_w,\\
+ 4fCr(H/p^2+F(p))+2fCm e_p,&\text{otherwise},
+ \end{cases}                                                     \tag{DNE.17}
+\]
+and the ordered scalar table
+\[
+ \Lambda(p)=
+ \begin{cases}
+ Cx^C\eta,&p\in G,\\
+ Cfm b\log x+Cx^Cz^2,&p\in\mathrm{small}\text{ or }p=3,\\
+ 2Cfm b,&p=q\text{ or }d,\\
+ 0,&p>p_*,\ p\notin\mathcal E,\\
+ B_0+\mathcal L(p),&\text{otherwise}.
+ \end{cases}                                                     \tag{DNE.18}
+\]
+These are the literal source \texttt{lenB}, \texttt{lamG}; in
+particular the occurrence of $C$ inside $e_p$ is retained.
+
+For every lift $j$, assuming only summability of the original
+$\mathrm{vvTerm}(D,p)$, one has
+\[
+\begin{split}
+ \eta\mathrm{Sum}(L,j)\le d_j\biggl(&6+\log M+\log(tr)
+                      +\log h_E+\log J\\
+             &+\sum_{p\in T}\log p\,\Lambda(p)
+                         +\sum_p\mathrm{vvTerm}(D,p)\biggr),
+\end{split}                                                       \tag{DNE.19}
+\]
+where $T$ is exactly the image under residue characteristic of the
+twisted places in $L.\mathrm{supp}$.
+
+\begin{proof}
+Sum (DNE.12) over $\lambda$, using (DNE.4).
+In the split case, division by $2$ gives $(2fm+f)e_p$.
+In the other cases, the bounds $\sum(n_\lambda+1)\le4f$
+and $\sum n_\lambda\le2f$ give (DNE.17); the band implication
+ensures $F_{i,\lambda}(p)\le F(p)$.  Together with the remaining
+admissibility fields this proves
+$\sum_{\lambda\mid p}\ell_{i,\lambda}+B_i\le\Lambda(p)$
+outside $G$.
+
+Use (DNE.10), the sixth field of admissibility, and DNE1, with
+\[
+ U_p=\nu_p+2p^{-2}+\Lambda(p)+V_p+v_p(h_E)+v_p(J).
+\]
+Every term here is nonnegative.  At $G$, (DNE.15) gives the same
+bound directly, with harmless nonnegative extra terms.  Grouping
+the original finite place sum by residue characteristic is an exact
+finite-sum identity.  The cyclotomic sum is bounded by DNE2;
+$\sum_{p\in T}2\log p/p^2\le4<6$ follows by comparison with the
+integral of $\log u/u^2$ on $[2,\infty)$ and its first term.
+Unique factorization gives
+$\sum_{p\in T}v_p(h_E)\log p\le\log h_E$ and the same statement
+for $J$.  Finally
+\[
+ \log p\,V_p=
+  \log p\sum_{a=1}^{t-1}\mathrm{shaLen}_D(p,a)
+       =\mathrm{vvTerm}(D,p).
+\]
+These are nonnegative terms.  Summability therefore permits bounding
+their finite sum by the full series on this very host.  This proves
+(DNE.19), retaining the exact $d_j$, $\mathrm{shaLen}$ and $\mathrm{vvTerm}$.
+\end{proof}
+% END DNE5
+
+\subsection{Uniform estimates with a simpler eventual cutoff}
+
+% BEGIN DNE6
+\paragraph{DNE6: the uniform scale comparison.}
+\label{claim:DNE6}
+Fix $0<\epsilon<1/52$ and $C>0$.  All assertions below are uniform
+over every original $D,L,P$ satisfying (DNE.16) with these fixed
+$\epsilon,C$, once $x\ge x_0(\epsilon,C)$.
+The original parameters give
+\[
+\begin{gathered}
+ \eta\le e^{z^{1/4}},\quad S=4k\Delta\le4x^C e^{z^{1/4}/2},
+ \quad t\le\eta,\quad 0<\delta\le1,\\
+ b_a\le2b',\quad w_P+\eta_3\le9b',\quad G_P\le10b',\quad
+ \eta_3\le4\eta,\quad r\eta_3\le4m w'',\\
+ z\le A\le x^{C+2\epsilon},\quad
+ \frac rA\le\frac{2m}{z},\quad
+ p_*\le b/z,\quad \log p_*\le z,\quad A<p_*,\\
+ o\le x^{\epsilon/100},\quad 2\le L_w\le C\log x,
+ \quad n\le o2^e,\quad \frac km\le R_0^2,
+ \quad R_0\ge\sqrt{x^{1/2}\log x}.
+\end{gathered}                                                    \tag{DNE.20}
+\]
+Every finite polynomial with fixed coefficients in
+$k,n,m,r,t,N,n_V,z,S,\eta,|TT|,\mathcal D,b/p_*$ is bounded by
+\[
+             Kx^a\exp(Bz^{1/4})                                \tag{DNE.21}
+\]
+for $K,a,B$ depending only on $C$ and that polynomial.  Such a
+bound is $o(b)$, and its product with $b'$ is also $o(b)$.
+
+\begin{proof}
+The bounds on $\eta,\Delta$ are \texttt{logeta}, \texttt{logDel}.
+The polynomial rank bounds and $|TT|\le2n x^{-\epsilon/8}\le2n$
+give (DNE.21) by its displayed formula for $\mathcal D$ and
+$b/p_*=\mathcal D/m$.
+Since $z^{1/4}=x^{\epsilon/4}$ and
+$z^{1/3}=x^{\epsilon/3}$, taking logarithms proves, for every
+fixed $K,a,B$,
+\[
+ Kx^a e^{Bz^{1/4}-z}\longrightarrow0,
+ \qquad Kx^{a+1}e^{Bz^{1/4}-z^{1/3}}\longrightarrow0.     \tag{DNE.22}
+\]
+This also proves $A<p_*$ uniformly: $A\mathcal D/(mb)$ tends to zero.
+
+For the top weights, the \texttt{bT\_le} inequality and
+\texttt{rho\_le} show $b_a\le2b'$.  If $L.\mathrm{LaG}<0$,
+the correction is nonpositive; otherwise discard the nonnegative
+second term of \texttt{rhoP} and bound its first term by
+$x^{-2}\le1$.  The definitions then give $w_B\le3b'+\eta$.
+The inequalities \texttt{teta} and \texttt{kS\_le} give
+$\eta,S\le b'$, while $t\le\eta$ and $\eta\ge1$ give
+$\eta_3\le4\eta$.  Substitution proves the bounds on $w_P,G_P$.
+Moreover \texttt{Neta} gives
+$r\eta_3\le4N\eta\le4\delta m w''\le4m w''$.
+The formulas in (DNE.2), $r\le2k$ and
+$\delta\in[x^{-\epsilon},1]$ give the bounds on $A,r/A$.
+Since $\mathcal D\ge kn^2z\ge mz$, $p_*\le b/z$.
+The final line is \texttt{o\_tie}, \texttt{Lw\_le}, the original
+frame identity $n\le o2^e$, and \texttt{radius\_ge\_sqrt\_ratio}
+together with \texttt{k\_ge\_mx}.  This proves every assertion.
+\end{proof}
+
+Only finitely many comparisons of type (DNE.22) are used below.
+Their thresholds can therefore be maximized before any local index,
+coefficient place, prime set or member of the family is chosen.
+% END DNE6
+
+% BEGIN DNE7
+\paragraph{DNE7: the small-order inert primes.}
+\label{claim:DNE7}
+Uniformly as in DNE6, every finite set $T$ of odd integers $p\ge3$
+with $\operatorname{ord}_{\pm}(p)\le4L_w$ satisfies
+\[
+           r\sum_{p\in T}\frac{\log p}{p^2}\le4mz^2.     \tag{DNE.23}
+\]
+No distribution theorem for primes is needed.
+
+\begin{proof}
+The elementary dyadic calculation proved in LFS2 says that, with
+$v=\lfloor\log_2(4L_w)\rfloor$ and
+$M_0=2^{e+2-v}$, these integers are $\pm1\pmod{M_0}$.
+Eventually $2^e/L_w\ge2R_0\ge R_0+1$, since
+$n=R_0z\le o2^e$ and $2oL_w\le z$ by (DNE.20).
+Since $R_0\ge3$ eventually, $2^e\ge6L_w>4L_w$,
+so $v<e$.  Thus the residue calculation applies without truncation, and
+$M_0\ge2^e/L_w\ge R_0+1$.
+
+For $R\ge3$ and an integer $M_0\ge R+1$, a decreasing-function
+comparison along each of the progressions $aM_0\pm1$ gives
+\[
+ \sum_{p\equiv\pm1\ (M_0),\ p\ge2}\frac{\log p}{p^2}
+ \le\frac{2\log R}{R^2}
+             +\frac{2(\log R+2)}{RM_0}.                 \tag{DNE.24}
+\]
+For completeness, in each progression the first term is at most
+$\log R/R^2$, because its first admissible member is at least
+$M_0-1\ge R$.  The remaining terms, separated by $M_0$, are
+bounded by $M_0^{-1}\int_R^\infty\log u/u^2\,du$; the latter
+is $(\log R+1)/(RM_0)$, even stronger than the stated term.
+Apply (DNE.24) at $R=R_0$.  Since $r\le2mR_0^2$, its first
+contribution after multiplication by $r$ is at most $4m\log R_0$.
+Since $n=R_0z\le oM_0L_w$, the second is at most
+$4moL_w(\log R_0+2)/z$.
+Now $\log R_0\le C\log x$, $o\le z^{1/100}$ and
+$L_w\le C\log x$; thus
+$\log R_0+oL_w(\log R_0+2)/z\le z^2$ eventually.
+This proves (DNE.23) with one threshold for every finite $T$.
+\end{proof}
+% END DNE7
+
+% BEGIN DNE8
+\paragraph{DNE8: common error and split-place contributions below $p_*$.}
+\label{claim:DNE8}
+For every finite prime set $T\subset[5,p_*]$, uniformly eventually,
+\[
+ \sum_{p\in T}\log p\,B_0\le Cfm bz^2,
+ \qquad \sum_{p\in T}\log p\,e_p\le11Cbz^2.             \tag{DNE.25}
+\]
+
+\begin{proof}
+For any finite integer set below $Y\ge1$,
+$\sum\log u\le Y\log Y$, $\#T\le Y$, and
+$\sum\log u/u\le(1+\log Y)^2$; the last assertion follows from
+$\sum_{u\le Y}1/u\le1+\log Y$.
+The first bound in (DNE.25) follows from
+\[
+ B_0p_*z=Cfnt^2n_Vz^2\frac{mb}{\mathcal D}z
+      \le Cfm bz\le Cfm bz^2,
+\]
+using $n_V\le N+t$.  DNE6 gives $H\le2b$, $\log H\le2z$,
+$p_*\le b/z$, and $\log p_*\le z$, eventually with $z\ge1$.
+Consequently
+\[
+ \sum_{p\in T}\log p\,e_p
+ =C\left(\sum\log p+H\sum\frac{\log p}{p}
+                                     +\#T\log H\right)
+ \le C(b+8bz^2+2b)\le11Cbz^2.
+\]
+The total coefficient of $e_p$ from (DNE.17) is bounded by
+$(3+2C)fm$; this keeps both the split term and the $C$ already
+present in the inert term.
+\end{proof}
+% END DNE8
+
+% BEGIN DNE9
+\paragraph{DNE9: inert primes below $A$ with large dyadic order.}
+\label{claim:DNE9}
+For every finite set $T\subset[5,A)$,
+\[
+        \sum_{p\in T}4fCr\log p\,R(p)\le40Cfm bz^2       \tag{DNE.26}
+\]
+uniformly eventually.  It is permissible here to include all
+integers in the indicated interval, so this bounds the needed
+inert primes of large order.
+
+\begin{proof}
+By definition $(p-1)^{j_p}\ge A$, and
+$j_p+1\le3+\log A$ for $p\ge5$.  Therefore
+\[
+ R(p)\le\frac H{A(p-1)}+(G_P+1)(3+\log A)+z.
+\]
+The elementary bound
+$\sum_{p\le A}\log p/(p-1)\le2(1+\log A)^2$ and $r/A\le2m/z$
+show that the sum of the first term, multiplied by $r$, is at
+most $8mb(1+\log A)^2/z\le8mb$ eventually.
+For the other terms use $G_P\le10b'$, $\log A\le(C+2)\log x$,
+$A\le x^{C+2\epsilon}$ and $r\le2x^C$.
+Their sum times $r$ is bounded by a fixed polynomial in $x$
+times $b'$, plus a fixed polynomial in $x$.  DNE6 makes this
+at most $mb$ eventually, uniformly over $T$.
+Multiplication by $4fC$ gives $36Cfm b$, hence (DNE.26).
+\end{proof}
+% END DNE9
+
+% BEGIN DNE10
+\paragraph{DNE10: the remaining inert terms $H/p^2$.}
+\label{claim:DNE10}
+For the inert primes in the third and fourth rows of (DNE.12),
+their combined $H/p^2$ contribution satisfies
+\[
+ \sum 4fCrH\frac{\log p}{p^2}\le96Cfm bz^2              \tag{DNE.27}
+\]
+uniformly eventually.
+
+\begin{proof}
+For $p\ge A\ge2$, monotonicity and integration of $\log u/u^2$
+give the convenient bound
+$\sum_{p\ge A}\log p/p^2\le4(\log A+2)/A$.
+With $r/A\le2m/z$, $H\le2b$ and
+$\log A+2\le z$, this contributes at most $64Cfm b$.
+For $p<A$ and order at most $4L_w$, DNE7 and $H\le2b$ give
+$4fC(2b)(4mz^2)=32Cfm bz^2$.  Add these bounds and use $z\ge1$.
+\end{proof}
+% END DNE10
+
+% BEGIN DNE11
+\paragraph{DNE11: the band contribution and the full flat term.}
+\label{claim:DNE11}
+For every finite prime set $T\subset[5,p_*]$, uniformly eventually,
+\[
+ \sum_{p\in T}4fCr\log p\,F(p)
+ \le\{248C+16C(2C+1)^2\}fm bz^2.                      \tag{DNE.28}
+\]
+
+\begin{proof}
+The contribution of $(w_P+\eta_3)/p$ before multiplication by
+$4fC$ is at most
+$9rb'(1+\log p_*)^2\le36rb'z^2\le36mbz^2$.
+The last inequality follows uniformly from
+$r\le2x^C$ and $b'/b=xe^{-z^{1/3}}$.
+The contribution of $S+z$ is bounded by
+\[
+ r(S+z)p_*z
+   \le2kn^2(S+t+z)\frac{mb}{\mathcal D}z
+   \le2mbz\le2mbz^2.                                  \tag{DNE.29}
+\]
+
+For the band, DNE6 permits one threshold such that
+$C(\eta_3+S+z)\le w''/4$.  Suppose $I(p)=1$, witnessed by
+$s\ge w''$, and $p\ge2C$.  Then the right side of (DNE.13)
+is at most $ps/4+Cb/p+ps/2$.  Since $Cb/p\le b/2$,
+\[
+ ps-b\le3ps/4+b/2,\qquad ps\le6b,
+                         \qquad p\le6b/w''.             \tag{DNE.30}
+\]
+There are at most $6b/w''$ such integers.  Their logarithms are
+at most $z$ because $p\le p_*$.  Thus
+$r\eta_3\sum\log p\le(4mw'')(6b/w'')z=24mbz$.
+The primes $p<2C$ contribute at most
+$4mw''(2C+1)^2\le4(2C+1)^2mb$, using
+$\sum_{p<2C}\log p\le(2C+1)^2$.
+Together the three contributions before $4fC$ are bounded by
+$\{62+4(2C+1)^2\}mbz^2$, proving (DNE.28).
+\end{proof}
+
+This argument uses the actual band implication.  It does not
+replace the band set by arbitrary primes or discard its dependence
+on the local row and place.
+% END DNE11
+
+% BEGIN DNE12
+\paragraph{DNE12: large exceptional primes and the three special classes.}
+\label{claim:DNE12}
+Set $X_0=fm bz^2$.  Uniformly eventually, the part of
+$\sum\log p\,\Lambda(p)$ from the large exceptional primes is
+at most $X_0$, the generator-prime part at most $X_0$, the
+small-prime part at most $2X_0$, and the $q,d$ part at most
+$4CX_0$.  These bounds apply to arbitrary finite subsets of each class.
+
+\begin{proof}
+For the exceptions $p>p_*$, (DNE.14) and DNE6 bound
+$|\mathcal E|$ by an expression of form (DNE.21), while
+$p\le3b$ gives $\log p\le2z$.  Also $p>p_*>A$ and
+$\log p\ge z/2$ eventually.  Here $H/p$ is bounded by
+$2\mathcal D/m$, and $\log H/\log p\le4$.
+Thus $e_p$ and $B_0$ satisfy (DNE.21).  In the inert branch,
+$H/p^2$ does too, and
+\[
+ F(p)\le9b'/p_*+S+z+\eta_3
+       =9x\mathcal D/(mX')+S+z+\eta_3
+\]
+is again of that form, even with the crude bound $I(p)\le1$.
+The high-order branch below $A$ cannot occur.  Therefore the
+entire exceptional sum is of form (DNE.21), hence at most
+$b\le X_0$ eventually.
+
+There are at most two generator primes, and \texttt{g\_Y},
+$P.CYL\le C$ give $\log g_i\le Cz+\log2$.  Their cost is
+$Cx^C\eta$ each, so their total is again of form (DNE.21)
+and eventually at most $b$.
+The small primes divide $Q_S$, whence
+\[
+ \sum_{p\in\mathrm{small}\cup\{3\}}\log p
+      \le\log Q_S+\log3\le2C\log x+\log3.
+\]
+Multiplication by $Cfm b\log x$ is at most $X_0$ eventually,
+because $(\log x)^2=o(z^2)$.  Multiplication by $Cx^Cz^2$
+is at most another $b$, giving $2X_0$.
+Finally $\log q,\log d\le z$ follows from
+$M^{36}t^{150}\le b^{1/2}$.  At most two terms of size
+$2Cfm b\log p$ give $4Cfm bz\le4CX_0$.
+\end{proof}
+% END DNE12
+
+% BEGIN DNE13
+\paragraph{DNE13: the complete original denominator inequality.}
+\label{claim:DNE13}
+For fixed $\epsilon,C$ and every sufficiently large $x$ as above,
+any original admissible table gives, for every original lift $j$,
+\[
+ \eta\mathrm{Sum}(L,j)
+ \le d_j\left[2000(C+1)^3
+       \{fm bz^2+(\log x)^2L.Nc\}
+                       +\sum_p\mathrm{vvTerm}(D,p)\right]        \tag{DNE.31}
+\]
+whenever the last series is summable.  This is exactly
+\texttt{LinkN\_at}$(L,j,2000(C+1)^3)$.
+
+\begin{proof}
+Partition the ordered table (DNE.18) into its special classes,
+ordinary primes below $p_*$, and exceptional primes above $p_*$.
+One can also bound by the sum of the five overlapping nonnegative
+majorants, so overlaps at special primes present no issue.
+For ordinary primes use DNE8--DNE11.  The bound, in units of
+$X_0=fm bz^2$, is
+\[
+ C+11C(3+2C)+40C+96C+248C+16C(2C+1)^2
+                 =434C+86C^2+64C^3.                    \tag{DNE.32}
+\]
+DNE12 adds at most $4+4C$.
+The non-prime part of (DNE.19) is at most $b\le X_0$
+eventually: $\log M\le z/72$, $\log(tr)\le O_C(\log x)$,
+$\log h_E\le Cx^C$ and $\log J\le Cx^Cz$.
+Thus its inclusion changes the majorant to
+$5+438C+86C^2+64C^3$, which is at most $2000(C+1)^3$ for $C>0$.
+Substitute in (DNE.19).
+The source quantity $L.Nc$ is nonnegative, by its definition
+as a quotient of positive rank/scale factors and the nonnegative
+thick-place count.  Adding $2000(C+1)^3(\log x)^2L.Nc$ therefore
+gives exactly (DNE.31).  All multipliers use the same $d_j\ge0$.
+\end{proof}
+
+The small-prime Selmer finiteness guard is not removed: it enters
+when \texttt{admitted} supplies the table under
+\texttt{ShaFinOdd}.  The summability guard is used at precisely
+the nonnegative infinite-sum step in DNE5.
+% END DNE13
+
+% BEGIN DNE14
+\paragraph{DNE14: uniform export and the original common-family consumer.}
+\label{claim:DNE14}
+For every fixed $\epsilon$ and real $C_a$ one may choose
+\[
+                  C_{\mathrm{out}}=2000(|C_a|+1)^3             \tag{DNE.33}
+\]
+before the family $\mathcal F:\texttt{FamP}(\epsilon)$, so that
+\texttt{AdmFC}$(\mathcal F,C_a)$ implies
+\texttt{FamilyThinScalesBound}$(\mathcal F,C_{\mathrm{out}})$.
+Consequently
+\[
+ \texttt{ConclF}(\mathcal F)\ \Longrightarrow\ 
+ \texttt{AdmF}(\mathcal F)\ \Longrightarrow\ 
+ \texttt{LinkN}(\mathcal F).                              \tag{DNE.34}
+\]
+
+\begin{proof}
+If a family exists, its scale record at its supplied member at
+$x=0$ fixes $0<\epsilon<1/52$; the family parameter $x$ and
+the scale coordinate are identified at all sufficiently late
+indices by its original equality.  Take the cutoff in
+\texttt{AdmFC} and maximize it with $\mathcal F.x1+1$ and the
+uniform cutoff of DNE6--DNE13.
+At a later member satisfying \texttt{ShaFinOdd}, \texttt{admitted}
+supplies an actual table with all fields of \texttt{AdmT}.
+Its parameter bound forces $C_a\ge P.CLw>0$, so DNE13 applies
+with $C=C_a$ and (DNE.33).  It is universal over the lift $j$,
+and still has the original summability antecedent.
+If $C_a\le0$, no such admissible table exists, so the same guarded
+conclusion is vacuous; if there is no family the assertion is
+also vacuous.  No choice of table is needed before the
+\texttt{ShaFinOdd} premise.
+
+This proves the full original \texttt{UniformExportStatement}:
+$C_{\mathrm{out}}$ is independent of the family, and only the
+final family threshold uses its initial cutoff.
+The identity between the exported and original $\eta\mathrm{Sum}$
+is definitional: both use the same twisted support, weights and
+$\eta_J$.  This gives \texttt{LinkN} with precisely its original
+quantifier order.  Finally, \texttt{ConclF} supplies one $C_a$
+and one threshold, then an actual $X$ under \texttt{ShaFinOdd}
+for each later member.  Apply DNE3--DNE4 to those very data;
+this supplies \texttt{AdmFC} and proves (DNE.34).
+\end{proof}
+
+% END DNE14
+
+\subsection{What remains upstream}
+
+The construction of the actual common $X$ satisfying
+\texttt{Concl} has not been assumed away.  In particular the
+\texttt{NormChoiceFacts}, compatible Galois points and killing data,
+the numerical row bounds on their actual lattices, and the original
+two/three-prime and type-prime bounds must still be supplied on
+the selected family.  DNE3--DNE14 now discharge the entire
+table-patching, weighted aggregation and uniform export after those
+inputs, and do so with the unchanged coefficient field and host.
+They do not prove the closed selected-class supplier of these inputs,
+or nonemptiness of the common construction class.
+
+\paragraph{Source map.}
+The exact pinned source ranges, full original contracts and file hashes
+are recorded in \texttt{denominator\_\allowbreak export\_\allowbreak v50/\allowbreak provenance.\allowbreak json},
+\texttt{contracts.\allowbreak json} and \texttt{source\_\allowbreak manifest.\allowbreak json}.
+The main sources are \texttt{Bound\allowbreak At\allowbreak Two\allowbreak Three\allowbreak Family.\allowbreak lean},
+\texttt{Admitted\allowbreak Statements\allowbreak Of\allowbreak Local\allowbreak Bounds\allowbreak Conclusion.\allowbreak lean}, its seven
+table lemmas, \texttt{Twisted\allowbreak Places.\allowbreak lean},
+\texttt{Mem\allowbreak Primes\allowbreak Over\allowbreak Of\allowbreak Mem.\allowbreak lean}, \texttt{NEq\allowbreak RZero\allowbreak Mul\allowbreak XPow.\allowbreak lean},
+\texttt{Export\allowbreak Bound\allowbreak Of\allowbreak Admissible.\allowbreak lean},
+\texttt{Theta\allowbreak Scalar\allowbreak Family\allowbreak Of\allowbreak Eigenvalue.\allowbreak lean} and
+\texttt{Link\allowbreak NAlong\allowbreak Family\allowbreak Of\allowbreak Local\allowbreak Bounds.\allowbreak lean}.
+The sole inherited mathematical argument used as a theorem is the
+dyadic residue calculation LFS2; its range and hash are included.
+All analytic comparisons used in the simplification are proved in
+DNE6--DNE13.  No new external published theorem is invoked.

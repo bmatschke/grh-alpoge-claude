@@ -1,0 +1,518 @@
+OPERATOR-WORD TRANSPORT OF INCOMING MEMBERSHIP — v0.6
+
+Owner: lean_audit. Date: 2026-11-21.
+Repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+0. RESULT, SOURCE MAP, AND SCOPE
+
+This note proves the operator-word half of incoming MemAt. The actual
+endpoint is WordConditionAt, not the distinct outgoing assertion MembAt.
+For C>=16 and the source DataII, it proves
+
+  MemAtG(0,1/8;F) => MemAtG(1/8,3/8;opWord_l F)
+
+for every allowed list l: its positions are in TT, and at most c0 entries
+have any one position s. There is no assumption that the TOTAL word length
+is at most c0. The argument is uniform in all coordinate indices, residues,
+plane/normal degree blocks, and normal joint projections quantified in
+MemAtG. No integral-projector denominator is spent in this membership
+argument; its linear algebra is over the characteristic-zero fraction
+field, and the conclusions concern algebraic prefix orders.
+
+The substantive source route is:
+
+  TwistedSubstitution/MemRed.WordConditionAt
+    <- WordLossNonneg.restWordStep_of
+    <- PlaneCoefficients/RestOneOpOf.oneOpStep_of and WBound.wordBoundStep.
+
+The one-operator proof uses four ingredients, all expanded below:
+
+  DoubleMonomialApply: exact first-digit derivative/multiplication formulas;
+  TouchCOfMem + XXgZeroP: second digits and plane cutoff transport;
+  MonomialSupport/Lam1SPderivAndXMulLeAddIndicator: normal type transport;
+  PlaneCoeffMonomial + GeoTouch: threshold and physical-prefix comparison.
+
+The input from the initial-symbol companion IN9 is EXACTLY Lemma5aAt, whose
+output is MemAtG(0,1/8) for each symP(B_b). The actual initial source route
+uses rest5aMono_of_cut and retains its block-degree conditions internally.
+We do not replace it by the stronger Lemma5aGeneratorProductsAt, which is
+not the instantiated initial theorem on this call path.
+
+All local steps from that input are proved here. Initial-symbol membership
+is proved in the v0.6 companion IN9; together the two sections close the
+incoming membership premise. The existence of a frame satisfying FramesOK
+and the global parameter supply satisfying Hyps remain separate inputs. The
+finite-dimensional rational representation theory of split GL in
+characteristic zero (complete reducibility and highest-weight dominance)
+is background, as in IW/PG; no new integral semisimplicity assertion is
+introduced. No Lean source was changed and no compilation or kernel replay
+is claimed. Exact declaration ranges, hashes and URLs are in provenance.json.
+
+1. THE ACTUAL LETTERS, PREFIXES, AND UNIVERSAL MEMBERSHIP [WT1]
+
+Use n=n' for the physical period and k=r+K for the coordinate dimension,
+with r,K>=1. Work over a field F0 of characteristic zero; the actual F0 is
+KK O. A valid frame has positions f_(j,i), 0<=i<r, satisfying
+
+  f_(j,0)<...<f_(j,r-1)=z_j<f_(j+1,0),
+  f_(j+J,i)=f_(j,i)+n,               J>=1.
+
+Every frame position is even and has selected residue in TT. There are
+no selected positions strictly between consecutive entries of one frame.
+Define
+
+  W_j={x in [f_(j-1,0),z_j]: x mod n in TT},
+  L_j={x in (z_(j-1),f_(j,0)): x mod n in TT}.
+
+These are Frames.letters and Frames.LLset. The true letters in segment j
+are L_j and the current frame. Let x_(j,0)<...<x_(j,nL_j+r-1) list them.
+The source calls the internal letter with index l Sum.inl(l), and calls
+the frame entry f_(j,r-1-m) Sum.inr(m): frame indices are REVERSED, although
+the prefix position index u increases physically. Its NSet(j,u) consists
+of the first u true letters, so u ranges from 0 to nL_j+r inclusive.
+
+1.1. Why the true physical residue is unique.
+
+The selected positions in (z_(j-1),z_j] are precisely L_j and the current
+frame: the interval before f_(j,0) gives L_j, and the no-selected-gap
+condition eliminates every other point between frame entries. These
+half-open intervals partition (z_-1,z_(J-1)], an interval of length n by
+periodicity. Each residue modulo n has exactly one integer representative
+there. Restricting to selected residues proves that
+
+  true letters x -> posTL(x) mod n
+
+is a bijection onto TT. This proves the actual GeoTop property, including
+the uniqueness needed to change only one coordinate under digit extraction.
+It does not require assuming that a whole overlapping W_j is injective
+modulo n.
+
+1.2. Exactly which physical prefixes can be affected.
+
+For s in TT define
+
+  delta_(j,u)(s)=1 if some x in W_j has x mod n=s and x<=x_(j,u),
+                 0 otherwise.                              (1.1)
+
+This is cost1, while opCost is 2 delta. For an internal true letter x0,
+membership in NSet(j,u+1) means its position index is <=u, hence its
+physical lift is <=x_(j,u). The same statement for a current frame follows
+from its reversed m-index: nL_j+(r-1-m)<u+1 is exactly the corresponding
+position inequality. Every previous-frame entry is less than every
+x_(j,u) and belongs to W_j. At j=0 the source representative of j-1 may
+lie one period later; subtract n from its physical position. The residue
+is unchanged, and the preceding-frame inequality then applies. Thus
+
+  x0 in NSet(j,u+1), or x0 a previous-frame letter,
+       implies delta_(j,u)(posTL(x0) mod n)=1.                (1.2)
+
+These are the full GeoTouch cases. The chain set in the second-digit model
+contains the internal letters of index <i and all carries from the previous
+frame. Therefore an operation can affect that chain only in one of the
+cases (1.2), with u=i. The link TSet(j,m) consists of all internal letters
+and frame indices m'>m, hence of the true positions strictly before
+x_(j,nL_j+r-1-m). It too is covered by (1.2). The use of <= in (1.1) is
+deliberately generous: it covers the adjacent normal prefix as well.
+
+1.3. The threshold and the precise universal condition.
+
+Write s_(j,u)=slU(j,u), B_(j,u)=Bo(j,x_(j,u)), and let a_(j,u)=kappa_(j,u),1
+be the first coordinate of a normal highest-weight tuple. The source's
+thStar is the following function T_(j,u)(kappa): take the maximum of
+B_(j,u)/2 and the active expressions
+
+  a_(j,u+1)+mStar+s_(j,u), if x_(j,u) is even;
+  a_(j,u-1)+mStar+s_(j,u), if u>=1 and x_(j,u-1) is odd.       (1.3)
+
+An inactive expression is replaced by B/2. The threshold is independent
+of the particular plane and normal multidegrees being extracted.
+
+The first extraction levImg retains, in every selected physical coordinate,
+exponents rho_v+q_v b_v, where q_v=p^(z_j-posTL(v)), and replaces them by
+b_v. It then selects the prescribed total quotient degree dPl(x) in the
+first r coordinates of each true letter and dNo(x) in the last K. It
+views the result as a plane polynomial with normal polynomial coefficients.
+Variables at unselected physical positions are effectively sent to 1;
+all the operators here act at selected positions, so they commute with
+that harmless specialization. Thus the definition applies to arbitrary F,
+without an unstated support hypothesis.
+
+For every residue array, both quotient degree arrays, and every normal
+joint projector e_kappa for the NSet prefixes, extract each normal monomial
+coefficient of (1 tensor e_kappa)levImg(F). MemAtG(alpha,beta;F) requires
+these plane polynomials to have the prescribed plane multidegree, all
+second-digit chain orders >=T-alpha*s, and all links >=T-beta*s.
+The chain cuts are 0<=u<=nL_j; the imposed links correspond to
+nL_j<u<nL_j+r, equivalently m+2<=r. The link thresholds must be positive,
+as required by SignedChainData.
+
+It is useful to allow an extra arbitrary real loss L_(j,u), and arbitrary
+positive link thresholds BELOW those displayed bounds. Call that property
+M_(alpha,beta)(L;F). It is precisely MemAtLe, or equivalently MemLev after
+fixing the geometric datum. MemAtG implies M(0;F): given smaller thresholds,
+replace them by their exact upper bounds, apply MemAtG, and weaken back.
+The new link thresholds are positive because they dominate the given
+positive ones. Changing dPl and thresholds leaves the signs, digit maps,
+normal actions, and unit hypotheses unchanged. This proves restLeOfG and
+memAtLe_iff; these are harmless transports, not extra mathematical inputs.
+
+2. A DIRECT PROOF OF THE SIGNED TWIST BOUNDS [WT2]
+
+For a set S of signed letters, choose a generic invertible matrix g and
+put A(t)=g diag(1,...,t,...,1)g^(-1). Its entries have Laurent exponents
+in {0,1}, and those of its inverse have exponents in {0,-1}. For a vector
+letter the source substitution sends x_i to sum_b A_(b,i)x_b; for a
+covector it sends x_i to sum_b A^(-1)_(i,b)x_b. Letters outside S are fixed.
+Let v_S be the minimum Laurent exponent using the last diagonal coordinate,
+and M_S the maximum using the first. These are literally valS and lam1S.
+
+Multiplication transforms by the indicated matrix. The chain rule gives,
+for vector coordinates,
+
+  twist(partial_i H)=sum_b A^(-1)_(i,b) partial_b(twist H),
+
+and for covectors it gives the same expression with A_(b,i). Coefficients
+of A are independent of the polynomial variables. Differentiating a
+coefficient polynomial cannot introduce any new Laurent exponent. Hence,
+when the letter belongs to S, the possible minimum-order losses are
+
+                    multiply     differentiate     coordinate Euler
+  vector                0              1                  1
+  covector              1              0                  1,
+
+and the possible maximum-order increases are
+
+                    multiply     differentiate     coordinate Euler
+  vector                1              0                  1
+  covector              0              1                  1.             (2.1)
+
+For a letter outside S all costs are zero. Euler is multiplication after
+differentiation, and one of those operations has zero cost in each row;
+therefore its cost is ONE, not two. Scalar multiplication and finite sums
+preserve lower cutoffs and upper cutoffs, since they cannot add exponents
+outside the existing support. Zero polynomials cause no exception: their
+orders are +infinity and -infinity respectively.
+
+This proves the first-order instances of the source twisted-filtration
+lemmas directly, including both vector/covector signs and the unchanged
+prefix case. It is a simplification of the source's more general divided-
+Taylor proof, specialized to exactly the operators needed by WordConditionAt.
+
+3. THE TWO EXACT DIGIT TRANSPORTS [WT3]
+
+Fix one coordinate X and integer q>=1. Let L_rho send X^(rho+qb) to y^b
+and discard other residue classes, with 0<=rho<q. Other variables are
+carried along unchanged. Then
+
+  L_rho(partial_X H)
+    = ((rho+1)Id+q y partial_y)L_(rho+1)H,   rho<q-1;
+    = q partial_y L_0 H,                   rho=q-1;          (3.1)
+
+  L_rho(XH)
+    = L_(rho-1)H,                          rho>0;
+    = y L_(q-1)H,                          rho=0.            (3.2)
+
+Proof: for the first case the incoming exponent is rho+1+qb, whose
+derivative coefficient is rho+1+qb and whose quotient remains b. At the
+carry boundary the incoming exponent is q(b+1), so the coefficient is
+q(b+1) and its quotient drops from b+1 to b. Multiplication either raises
+the residue without a carry or changes residue q-1 to zero and quotient
+b to b+1. These are identities on every monomial, hence on every polynomial.
+They also cover q=1, when only the carry cases occur. Invalid residues
+give zero. There is no division by q and no analytic convergence argument.
+
+In the first extraction q=lowP(x0). The true-residue bijection in Section 1
+ensures that no other true letter changes. After selecting quotient
+degrees, the noncarry derivative terms use the same dPl,dNo; its carry
+term uses the input degree dPl(x0)+1, or dNo(x0)+1 for a normal coordinate.
+The multiplication carry term uses input degree dPl(x0)-1 or dNo(x0)-1.
+If the requested output degree is zero this term is zero, since a quotient
+exponent increased by one cannot have total degree zero. These are exactly
+TrDerPl, TrDerNo, TrMulPl and TrMulNo, with the source's three/two-term
+formulas obtained by setting unused scalar coefficients to zero.
+
+The second extraction Fdig leaves internal letters untouched. At a frame
+coordinate in segment j it uses q=P_j=p^(z_(j+1)-z_j), retains a residue,
+divides the exponent by P_j, and renames the quotient coordinate to the
+carry letter for segment j+1. Formulae (3.1)--(3.2) apply again. At an
+internal coordinate differentiation/multiplication simply commutes with
+Fdig and the injective renaming. The extra Euler term in (3.1) appears
+only at a frame letter, which is a VECTOR. This sign fact is essential
+to the sharper derivative argument below. The named source statements
+are Fdig_der_ex, Fdig_mul_ex and modelLet_vec.
+
+These exact identities explain how Frobenius powers and differentiation
+interact. Differentiation does not simply commute with digit extraction;
+the residue, carry and q factors have all been retained. Their scalar q
+factors do not change an algebraic Laurent-order cutoff.
+
+4. TRANSPORT OF THE PLANE COEFFICIENT CONDITIONS [WT4]
+
+Fix geometric SignedChainData and a true letter x0. For every chain and
+link impose a target threshold theta, and an input threshold theta'. Assume
+theta' >= theta always, and theta' >= theta+1 on each cutoff whose variable
+set can be affected by x0. This is the precise ThDrop condition.
+
+For links, the estimates are immediate from (2.1), using the real threshold
+inequality: order>=theta' and a loss of at most one imply order>=theta.
+For chains apply the second-digit identities of Section 3. Every resulting
+term is a scalar times another digit component, its derivative, or its
+coordinate Euler operator. The internal derivative has loss zero for a
+covector and at most one for a vector in the chain. A frame derivative
+has the scalar/Euler/derivative expansion, but its renamed carry is a
+vector, so both nonscalar terms cost at most one. A frame multiplication
+has either no operation or multiplication by a vector carry, both of
+which cost zero. An internal multiplication has loss only for a covector
+in the chain. All other chains are unchanged.
+
+The letter membership checks in Section 1 identify the affected chain:
+an internal letter belongs to its indicated initial subset, or a frame
+is carried to the next segment. These are exactly touchC. Multiplication
+and differentiation change one letter degree by +1 and -1; monomial sums
+show the stated homogeneous degree spaces map to the required ones.
+
+Consequently PlDer and PlMul hold. More precisely, derivative spends one
+only for a vector, and multiplication spends one only for a covector.
+For Euler, if the letter has degree zero the result is zero. Otherwise
+differentiate and multiply back. For a vector the derivative spends the
+one unit and multiplication spends zero; for a covector differentiation
+spends zero and multiplication spends one. This proves PlEul with the
+same one-unit ThDrop, not with a mistakenly doubled loss. It also proves
+the stronger sign-sensitive plDer'/plMul' used in the source.
+
+5. NORMAL JOINT TYPES AND WHY THE NORMAL STEP IS NOT ASSUMED [WT5]
+
+Normal polynomials carry the signed GL_K action on every prefix NSet(j,u).
+For any fixed finite collection of polynomial degrees this is a finite-
+dimensional rational representation of split GL_K in characteristic zero.
+It decomposes into its canonical isotypic components. An isotypic
+projection is equivariant for that prefix group and commutes with actions
+on disjoint letters. For S subset T it therefore commutes with the
+diagonal action on T, the product of the actions on S and T\S. It preserves
+the T-isotypic components and so commutes with the T-isotypic projections.
+Projections for disjoint prefixes also commute. The NSet prefixes are
+nested inside each segment and disjoint across segments. Thus their
+products e_kappa give a finite joint decomposition of every polynomial.
+An operator satisfying the source IsJProj for one specified joint type
+is unique, since its values on this decomposition are prescribed.
+
+The generic maximum M_S(H) equals the maximum first highest-weight
+coordinate among the types present in H. To see this, undo the outer g
+in the conjugated diagonal substitution. Its exponents are the coordinate
+weights of the generic translate g^(-1)H. Those translates span the cyclic
+GL-module generated by H. In an irreducible highest-weight module of type
+lambda, every coordinate weight is at most lambda_1 by dominance and
+permutation symmetry, and lambda_1 occurs in the highest vector. Complete
+reducibility gives the asserted maximum for the cyclic module. This also
+shows that an M_S cutoff kills every projected type with larger first
+coordinate. No lattice comparison is involved.
+
+Let D be a derivative, coordinate multiplication, or coordinate Euler
+on the normal letter x0. By (2.1), for every normal prefix,
+
+  M_(j,u)(DH) <= M_(j,u)(H) + 1_(x0 in NSet(j,u)).
+
+Since e_kappa H lies in type kappa at every prefix, it follows that
+
+  e_(kappa') D e_kappa = 0 unless
+  kappa'_(j,u),1 <= kappa_(j,u),1 + 1_(x0 in NSet(j,u))
+       for EVERY j,u.                                      (5.1)
+
+Indeed if one inequality fails, the corresponding individual output
+projection kills D e_kappa H. The joint projection contains that factor;
+all its factors commute, so the entire joint output is zero. Notice that
+D need not commute with any of these projections. Formula (5.1), rather
+than an incorrect commutation assertion, is the transport mechanism.
+
+Now let G be a plane polynomial with normal coefficients. Decompose the
+finitely many normal coefficient polynomials into joint types, using a
+finite union of their finite supports. In (1 tensor e_(kappa')D)G only
+the compatible types in (5.1) survive. For each compatible kappa, every
+new plane coefficient is a finite F0-linear combination of the plane
+coefficients of (1 tensor e_kappa)G. The plane space XXg with FIXED degree,
+chain thresholds and link thresholds is an F0-subspace: digit extraction
+is linear and Laurent-order lower bounds are closed under addition and
+scalar multiplication. Therefore the desired XXg property passes to
+the new coefficients. This is the full substantive NoOpStep proof.
+
+The source writes kappa(j,u) for all natural u, although actual joint
+indices have 0<=u<=nL_j+r. Extend an input kappa outside this finite set
+by the output kappa'. The comparisons outside the set then hold trivially
+because the indicator is nonnegative. This covers its exact universal
+quantifiers without adding an infinite decomposition.
+
+6. THRESHOLD COMPARISON AND THE ONE-OPERATOR THEOREM [WT6]
+
+Let x0 have selected physical residue s. Put delta=delta_(j,u)(s).
+If kappa,kappa' satisfy (5.1), then both active adjacent first weights
+in (1.3) increase by at most delta. Indeed NSet(j,u-1) is contained in
+NSet(j,u+1), and (1.2) applies whenever x0 lies in the latter. The baseline
+B/2 is unchanged and delta>=0. Taking the maximum yields
+
+  T_(j,u)(kappa') <= T_(j,u)(kappa)+delta_(j,u)(s).             (6.1)
+
+This proves thStar_le and its actual thLe_ka specialization. Its use of
+the neighboring cuts u+1 and u-1 is explicit. At a chain or link cut
+u<nL_j+r, the needed u+1 is still among the actual normal joint indices.
+
+Suppose M_(alpha,beta)(L;F). We prove it for partial_(s,b)F and X_(s,b)F
+with L increased to L+delta(s), considering arbitrary output residues,
+blocks, normal type and positive link thresholds below the new budget.
+
+If b is a plane coordinate, use (3.1) or (3.2). Normal projection and
+normal coefficient extraction commute with all plane operations, by
+linearity on monomials. For an identity term the original hypothesis
+applies at the same thresholds. For a derivative, multiplication or Euler
+term, raise the input chain and link thresholds by delta at their cuts.
+They remain within the old budget because
+
+  theta <= T-alpha*s-L-delta  =>  theta+delta <= T-alpha*s-L,
+
+and likewise for links. Raised link thresholds remain positive. Section 1
+shows that every affected cutoff receives a unit; Section 4 therefore
+maps back to the requested thresholds. All degree changes in (3.1)--(3.2)
+are allowed because the membership hypothesis quantifies universally over
+both degree arrays. The degree-zero multiplication case contributes zero.
+
+If b is a normal coordinate, apply (5.1) to each derivative/multiplication/
+Euler term. For every compatible input type kappa, (6.1) gives
+
+  theta <= T(kappa')-alpha*s-L-delta <= T(kappa)-alpha*s-L.
+
+The same statement holds for links. Thus the hypothesis supplies the
+required plane coefficients at the UNCHANGED thresholds for every
+compatible input type. Section 5 combines them, proving the normal case.
+
+Finite sums and scalar factors in the digit formulas preserve all these
+conclusions. We have proved one unit of touched-prefix cost for each
+physical derivative and each physical multiplication. Apply first the
+derivative and then multiplication, possibly in different plane/normal
+blocks but at the same selected physical position s. This gives
+
+  M_(0,1/8)(L;F) =>
+  M_(0,1/8)(L+2 delta(s); X_(s,a) partial_(s,b)F).             (6.2)
+
+This is the actual OneOpStep. Neither a,b nor the intermediate degree
+block was restricted. The complete operator preserves the physical total
+degree at s, as each monomial loses and gains one coordinate there.
+
+7. THE EXACT WORD-LOSS AND NUMERICAL ABSORPTION [WT7]
+
+For a list l put L_l(j,u)=2 sum_(s,a,b in l) delta_(j,u)(s). Let m_l(s)
+count entries of l at position s. If m_l(s)<=c0 for all s, then
+
+  0 <= L_l(j,u)
+     <= 2 sum_(s in image(W_j mod n)) m_l(s)
+     <= 2 #W_j c0 <= 2 N1 c0.                              (7.1)
+
+The image may have fewer elements than W_j; injectivity on an overlapping
+window is unnecessary. This is the exact wordLoss_le proof. An individual
+position contributes its count, regardless of the many different pairs
+of coordinate indices used there.
+
+We now derive the actual slack bound, not a renamed WordBoundStep input.
+By FramesOK, z_j-f_(j-1,0)<G'. Put Q=p^G'. For a nonprevious-frame position
+x=x_(j,u), the preceding frame supplies r even selected positions before x.
+The source oldest(j,x), the r-th most recent even selected position before
+x, therefore belongs to W_j. Its distance from z_j is at most G'. Selected
+flat degrees satisfy deg(s)>=a; hence
+
+  B_(j,u)=deg(oldest mod n)/p^(z_j-oldest) >= a/Q.             (7.2)
+
+For the actual degree, deg(s)=flatDeg(lambda0,s). WeightHyp gives
+lambda0_s,1=aT_s, |lambda0_s,2|<=cpp and a+cpp<=aT_s;
+therefore lambda0_s,1-lambda0_s,2>=a. Its nonnegative integer value is
+exactly flatDeg, proving the lower bound used in (7.2).
+
+Write N=#TT, k=m+1=r+K and
+
+  cP=cStar+r N c0+2 r n cpp.
+
+The actual Hyps include N1^2<=rN and
+
+  C k^3 r^2 N Q^5 cP Y <= a.                               (7.3)
+
+All quantities are nonnegative; k,r,N,Q>=1 and Y>0. Since N1 is a
+nonnegative integer, N1<=N1^2<=rN, so N1 c0<=cP. Also, for C>=16,
+
+  16 k^2 Q <= C k^3 r^2 N Q^5.
+
+Multiply these inequalities and then by Y. Equation (7.3) yields
+
+  16 N1 c0 Y k^2 Q <= a.
+
+Together with (7.2), this gives B_(j,u)/(Y k^2)>=16 N1 c0. The right side
+is an INTEGER, so taking the floor introduces no additional loss:
+
+  s_(j,u)=floor(B_(j,u)/(Y k^2)) >=16 N1 c0.                 (7.4)
+
+Thus L_l<=s/8 at every chain and link cut. This proves the actual
+WordBoundStep for C>=16. It is conditional on the original quantitative
+frame/weight data; it does not assert those data exist automatically.
+
+8. ITERATION, THE EXACT EXPORT, AND THE WORD SPAN [WT8]
+
+The source opWord uses a right fold: the head operator acts after the
+tail word. The empty word has loss zero; by (6.2), adjoining its head
+adds exactly 2 delta at every cut. Induction gives
+
+  MemAtG(0,1/8;F) => M_(0,1/8)(L_l;opWord_l F).              (8.1)
+
+By L_l<=s/8, a chain threshold T-s/8 lies within the budget T-L_l.
+A link threshold T-3s/8 lies within T-s/8-L_l, since s>=0. Therefore
+we can take precisely the target thresholds and obtain
+
+  MemAtG(1/8,3/8;opWord_l F).                              (8.2)
+
+In fact (8.1) gives link threshold T-s/4, a little stronger than the
+exported T-3s/8. We record that elementary consequence but keep the
+source's 3/8 in the assembled argument; no later constants are changed.
+
+For fixed extraction data, every condition involved is linear in F.
+Explicitly, levImg, the normal projector, coefficient extraction, and
+Fdig are linear; prescribed multidegree is a linear subspace; and
+Laurent-order lower bounds survive finite linear combinations. Thus if
+each initial symP(B_b) satisfies MemAtG(0,1/8), so does their F0-span.
+Apply (8.2) to each allowed word on each member of that span. The same
+linearity then gives MemAtG(1/8,3/8) on the literal OpCl span. The equality
+of its threshold formula with Tied proves that this is exactly incoming
+MemAt, by memAt_iff. This is the mathematical content of
+memAt_of_wordConditionAt, with both span extensions made explicit.
+
+9. EXACT APPLICATION INTERFACES AND WHAT HAS BEEN CLOSED [WT9]
+
+Closed here: actual first and second residue/carry formulas; signed-twist
+prefix estimates for all relevant first-order operations; plane chains
+and links; normal joint-type transition and coefficient recombination;
+adjacent-prefix threshold comparison; the selected-position geometry;
+the per-position word counting; and the numerical C>=16 absorption.
+Consequently RestLeOfG, OneOpStep and WordBoundStep are not retained
+black boxes, and their composition proves WordConditionAt.
+
+External inputs are precisely:
+
+  (i) Initial Lemma5aAt, with output MemAtG(0,1/8) for symP(B_b),
+      proved by companion IN9 through its actual block-aware source
+      route. This is an external theorem for WT, but it is no longer
+      an unresolved membership input in the combined v0.6 reconstruction.
+  (ii) FramesOK and Hyps for the actual application. We proved every
+      consequence of them used in this word branch, but not their
+      global existence or parameter construction.
+  (iii) Characteristic-zero rational GL highest-weight theory, the
+      same field-level background already used in IP/IW/PG.
+
+No additional operator-word, twisted-substitution, integral spectral,
+or normal-membership theorem is being left behind under a new name.
+Outgoing MembAt was treated in DT10 and is not re-proved or conflated
+with the incoming assertion here. Closing the operator branch alone
+does not establish the whole Type-II theorem or RH/GRH.
+
+10. REPRODUCTION
+
+Run python v0_6/word_transport/build_provenance.py from the project root.
+The builder checks the source HEAD and every read file against its pinned
+git blob, reads the exact declarations and records inclusive ranges,
+full-file and range SHA256, and pinned URLs.
+It does not run Lean or modify source files. The main fragment is
+word_transport_section.tex; report.txt supplies the complete arguments.

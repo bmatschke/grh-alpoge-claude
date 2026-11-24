@@ -1,0 +1,319 @@
+INTEGRAL WEYL COMPARISON, NORMALIZED FOCK DUALITY, AND ISOTYPIC PROJECTORS
+RH reconstruction v0.5; claims IW1--IW7
+Source pin: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+0. RESULT, SCOPE, AND BACKGROUND
+
+This note proves the logarithmic integral comparison used in CL5--CL6 and the integral-comparison portion of CL12. It also proves a universal quantitative isotypic-projector lemma (IW4) that the constrained signed-chain Gram argument can use on its weighted coefficient lattice. These are ordinary mathematical proofs reconstructed from, and checked against, the pinned definitions and arguments. No Lean compilation or independent verification of the whole release is asserted.
+
+The main exponent is
+
+  D_p(k,h) = binom(k,2) floor(log_p(h+k-1)).
+
+For k=1 the cost is zero. When the normalized shape has h=0 it is the trivial polynomial representation and its cost is also zero; the source explicitly uses this improvement. The formula with a logarithm is used only with positive argument. Its Lean counterpart uses Nat.log, whose value at zero is zero.
+
+The characteristic-zero background is the finite-dimensional rational representation theory of split GL_k: weight decomposition, complete reducibility, existence of highest vectors, and PBW generation/dominance of weights. These facts concern fields. Every assertion about O-lattices, denominators, integral duals and the actual Fock normalization is proved below. No integral standard-monomial theorem is required for the square polynomial model used in FormCoreSKX and the cloud comparison. Standard-monomial bases used elsewhere to count complementary families, prove their leading-term independence, or span Cartan products are separate claims.
+
+O denotes a DVR of mixed characteristic (0,p), K its fraction field, and v the valuation normalized by v(p)=1. Completeness, an algebraically closed residue field, unramifiedness, and a square root of p are unnecessary for IW1--IW5. The source cloud application has w^2=p; that assumption enters only the midpoint/edge description in IW6.
+
+1. THE FINITE OPERATOR AND ITS DENOMINATORS (IW1)
+
+Let E_ab act on a K-vector space and satisfy
+
+  [E_ab,E_cd] = delta_bc E_ad - delta_da E_cb.
+
+Let M be an O-submodule stable under E_ab^[j] = E_ab^j/j! for a != b. Neither the integral estimate nor its proof requires M to have a basis.
+
+For an index z outside a set S of size s define
+
+  Omega_0 = Id,
+  Omega_(q+1) = sum_(i in S) E_zi Omega_q E_iz,
+  c_(s,q) = (-1)^q s!/((q+s)! q!),
+  P_(S,z,h) = sum_(q=0)^h c_(s,q) Omega_q.
+
+For an ordered list of distinct indices L define I_h([])=Id and
+
+  I_h(z::L) = P_(set(L),z,h) I_h(L).
+
+These are precisely Om, Pstep and InvOp in TraceIsometryWeights/DivStable.lean.
+
+Put F_i=E_zi and A_i=E_iz. The left-right operators T -> F_i T A_i commute: the F_i commute among themselves and so do the A_i. Thus
+
+  Omega_q = sum_(|alpha|=q) (q!/prod alpha_i!) F^alpha A^alpha.
+
+Replacing each power by its divided power gives
+
+  c_(s,q) Omega_q
+    = (-1)^q sum_(|alpha|=q)
+        [s! prod alpha_i!/(q+s)!] F^[alpha] A^[alpha].
+
+For an enumeration alpha_1,...,alpha_s, the denominator of the coefficient is
+
+  (q+s)!/(s! prod alpha_i!)
+    = prod_(i=1)^s binom(s+alpha_1+...+alpha_i, alpha_i).
+
+Every upper entry is at most h+s. Legendre's formula gives, for 0<=t<=n,
+
+  v_p binom(n,t)
+    = sum_(j>=1) [floor(n/p^j)-floor(t/p^j)-floor((n-t)/p^j)]
+    <= floor(log_p n),
+
+because each summand is zero or one, and is zero for p^j>n. Hence
+
+  p^[s floor(log_p(h+s))] P_(S,z,h)(M) subset M.
+
+All integers prime to p are units in O, so this valuation assertion really is O-integrality, even when O is ramified. Applying the successive steps and using s<=k-1 proves
+
+  p^D_p(k,h) I_h(M) subset M.
+
+This is a direct multinomial compression of the induction in InvInt.Om_int. It preserves its exact cost. A sharper sum of s floor(log_p(h+s)) is possible, but the displayed bound is the one used downstream.
+
+2. WHY THIS OPERATOR PRODUCES INVARIANTS (IW2)
+
+Suppose the relevant stable finite-dimensional module has integer diagonal weights with each coordinate in [-h,h]. Start with a vector u of weight zero. We show inductively that P_(S,z,h) extends gl(S)-invariance to gl(S union {z}).
+
+Assume E_ab u=0 for a,b in S and E_zz u=0. The gl commutator relations imply that Omega_q commutes with gl(S), E_zz and every diagonal E_cc with c outside S union {z}. For j in S set
+
+  C_j = sum_(i in S) E_iz E_ji - E_jz E_zz + (s+1)E_jz.
+
+The same relations give
+
+  [C_j,E_iz] = 2 E_iz E_jz,
+  [E_jz,Omega_(q+1)] = (q+1) Omega_q (C_j+q E_jz).
+
+The second identity follows by induction from the recurrence for Omega; the first is the extra term when E_iz passes C_j. On u, C_j u=(s+1)E_jz u. Consequently
+
+  E_jz Omega_(q+1)u
+    = Omega_(q+1)E_jz u + (q+1)(q+s+1) Omega_q E_jz u.
+
+The coefficient identity
+
+  c_(s,q) + (q+1)(q+s+1)c_(s,q+1) = 0
+
+therefore telescopes to
+
+  E_jz P_(S,z,h)u = c_(s,h) Omega_h E_jz u = 0.
+
+The last zero deserves care. Omega_h E_jz u itself has z-weight -1, not -h-1. In each of its summands the RIGHT-HAND string applies h additional E_iz's to E_jz u before any E_zi's return the weight. That intermediate vector has z-weight -h-1 and therefore vanishes by the weight bound.
+
+Let y=P_(S,z,h)u. The previous commutation identities show E_ii y=E_zz y=0 and E_ij y=0 for i,j in S. To obtain the opposite root, write E=E_jz and F=E_zj. From the gl_2 relations,
+
+  E F^(m+1)y = -m(m+1) F^m y  (m>=0).
+
+The F-string is finite by the diagonal weight bound. If Fy were nonzero, choose maximal m>=1 with F^m y!=0 and apply this identity to F^(m+1)y=0. Characteristic zero gives a contradiction. Thus E_zj y=0 as well. Induction over the ordered indices proves that I_h takes weight zero to invariants.
+
+The q=0 term in each P is Id, and each q>0 term starts with an off-diagonal E_zi. Hence I_h u-u lies in the span of root-operator images. I_h fixes an invariant vector. Its formula also commutes with every intertwiner.
+
+For Hom(U,V) the action is
+
+  H_ab(T)=E_ab^V T - T E_ab^U.
+
+If U=V, every H_ab image has trace zero. Therefore I_h preserves trace on weight-zero endomorphisms. If U is a split irreducible highest-weight module of dimension d, its commuting endomorphisms are scalars: a commuting map acts by a scalar on the one-dimensional highest line, which generates U. We obtain
+
+  I_h(T) = (tr(T)/d) Id_U
+
+for weight-zero T. This is the Schur trace identity actually used in the two integral applications. There is no appeal to an unproved normal-order/extremal-projector formula.
+
+3. THE ACTUAL SQUARE POLYNOMIAL MODEL (IW3)
+
+Take variables X_ij, 1<=i,j<=k, and a partition nu_1>=...>=nu_k=0. Define V over K by the two conditions:
+
+  (a) F is homogeneous of degree nu_j in column j;
+  (b) F(XU)=F(X) for upper unitriangular U.
+
+The identity in (b) is a polynomial identity in the entries of U, equivalently invariance under each generic column addition. This is dualWeyl K k k nu. Let M=V intersect O[X], exactly the image of dualWeyl O k k nu in K[X]. The equality follows by injectivity of O->K in the defining coefficient equations. M is a full finite free O-lattice: all degrees are bounded, it is a submodule of a finite free coefficient module, and clearing scalar denominators proves that it spans V.
+
+Set nu_(k+1)=0 and
+
+  H(X)=prod_(j=1)^k det(X_[1..j,1..j])^(nu_j-nu_(j+1)).
+
+It lies in M and H(I)=1. Let Delta be the O-span of all off-diagonal divided-power words applied to H. In source weyl, the words are also allowed to have a=b. This does not enlarge Delta: every root-word applied to H has a definite nonnegative row multidegree, and a diagonal rowDiv acts on such a vector by an integer binomial coefficient.
+
+The source uses R(g)F(X)=F(gX), an anti-action under composition. The corresponding genuine GL representation is g -> R(g^t). Its infinitesimal E_ab is sum_j X_aj d/dX_bj, exactly the coefficient of t when row b is replaced by row b+t row a. These operators preserve M because row substitutions commute with right column operations and preserve column degree; their divided powers are the integral Hasse coefficients of that substitution. Row-weight projections preserve M for the same reason.
+
+Here is a short identification of the characteristic-zero highest line. A vector killed by E_ab for a<b is invariant under lower unitriangular left multiplication, because these locally nilpotent derivations exponentiate in characteristic zero. On the generic Gaussian cell X=LDU, its left and right invariances leave only F(D)=F(I)prod_j d_j^nu_j. Since det(X_[1..j,1..j])=d_1...d_j, this equals F(I)H(X). Density of the Gaussian cell proves F=F(I)H everywhere. Thus the highest line is KH. Complete reducibility now implies V is irreducible: two nonzero irreducible summands would supply two independent highest vectors. H generates V.
+
+Its row weights have each coordinate between 0 and h=nu_1. More generally for an unnormalized partition they lie between nu_k and nu_1. One can see this from PBW dominance and row-permutation symmetry: every weight and every permutation of it is dominated by nu; the first partial sum bounds any coordinate above, and the (k-1)st partial sum bounds it below. Thus each diagonal eigenvalue on End(V) is a difference of two same-coordinate weights and belongs to [-h,h].
+
+The highest-weight projection C:V->KH has C(M) subset O H subset Delta. The fact M intersect KH=O H follows from evaluation at I. Both M and Delta are divided-power stable; Delta is a full lattice since H generates V. The Hom lattice
+
+  T = {f:V->V linear : f(M) subset Delta}
+
+is stable under all divided H_ab because
+
+  H_ab^[j](f)=sum_(q_1+q_2=j)(-1)^q_2 (E_ab^V)^[q_1] f (E_ab^V)^[q_2].
+
+Each summand maps M to Delta.
+
+The map C is weight zero and trace one. IW2 therefore gives I_h(C)=d^(-1)Id, d=dim V. Apply IW1 to the Hom lattice and C, then multiply by the integer d:
+
+  p^D_p(k,h) M subset Delta subset M.
+
+Multiplication by d introduces no additional denominator. This is exactly why one should not replace the proof by the unsupported assertion that dim(V) alone clears Weyl-lattice denominators.
+
+4. A UNIVERSAL ISOTYPIC-PROJECTOR BOUND (IW4)
+
+Let V be a finite-dimensional split semisimple rational GL_k representation and M a full O-lattice, stable under all weight projections and root divided powers. Assume
+
+  |mu_a-eta_a| <= h
+
+for every TWO weights mu,eta of V and every single coordinate a. This is not a bound on differences of coordinates within one weight; it is exactly the absolute-coordinate bound for Hom(U,V) when U is a subrepresentation.
+
+Fix an irreducible summand U. Its lattice L=M intersect U is full, graded and divided-power stable. Choose an O-basis u_1,...,u_d of L, with K-dual basis u_i^*. Let
+
+  Pi_0(T)=sum_mu P_mu^V T P_mu^U,
+  A(T)=I_h(Pi_0(T)).
+
+The first map is integral on Hom_O(L,M), because both lattices are graded; the second has the IW1 denominator. Define
+
+  Q_U(y)=d sum_(i=1)^d A(u_i^* tensor y)(u_i).
+
+This is the canonical U-isotypic projector. Indeed, on an inequivalent irreducible summand W each A(u_i^* tensor y) is an intertwiner U->W and is zero. On an equivalent copy theta:U->W, naturality and trace preservation give
+
+  A(u_i^* tensor theta(z))
+    = theta [tr(u_i^* tensor z)/d Id_U]
+    = (u_i^*(z)/d) theta.
+
+The sum is theta(z). Thus Q_U acts as identity on all copies of U and as zero on the other types. For y in M, the input rank-one map is in Hom_O(L,M). IW1 and evaluation at u_i in L therefore give
+
+  p^D_p(k,h) e_U(M) subset M.
+
+The same denominator works for any sum of distinct isotypic projectors: after multiplying by p^D each summand preserves M, and O-lattices are closed under addition. There is no cost proportional to the number of types.
+
+This proof is the mathematical content of TraceIsometryWeights.TypeInt.QQ, QQ_id, QQ_zero and QQ_int. The actual signed-polynomial route in GrowthBounds has a parallel version via the linfty invariant-denominator theorem. The two routes share the binomial denominator mechanism; we do not claim one Lean file imports the other.
+
+For the signed-letter polynomial representation of fixed multidegree d on a letter set S, every weight coordinate has absolute value at most degIn(d,S). Hence h=2degIn(d,S) is a safe input, giving exactly
+
+  binom(k,2) floor(log_p(2degIn(d,S)+k-1)).
+
+The weighted coefficient lattice BB, self-adjointness for the Fock form, and compatibility/commutation for nested or disjoint letter sets are verified in the constrained-Gram companion. BB divided-power stability has the elementary one-letter valuation change
+
+  [v_p binom(alpha_b,q)+v_p binom(alpha_a+q,q)]/2 >= 0.
+
+Thus the integral projector result needs no additional integral standard-monomial theorem.
+
+5. EXACT NORMALIZED FOCK DUALITY, WITHOUT A STANDARD-MONOMIAL INPUT (IW5)
+
+On K[X] use the symmetric BILINEAR form
+
+  F(P,Q)=sum_alpha P_alpha Q_alpha alpha!,
+  alpha!=prod_(i,j) alpha_ij!,
+  N=F(H,H)=sum_alpha (H_alpha)^2 alpha! in Z_(>0),
+  B(P,Q)=F(P,Q)/N.
+
+This is the actual source normalization: highest_weight_norm provides this positive integer N, and formCoreGX_of divides by it. N is not an arbitrarily chosen p-power and is not asserted to be a unit. Positivity is an elementary integer statement since H has integer coefficients and is nonzero. B is symmetric, with B(H,H)=1.
+
+Direct calculation on monomials gives
+
+  F(E_ab^[j]P,Q)=F(P,E_ba^[j]Q),
+  F(R(g)P,Q)=F(P,R(g^t)Q).
+
+The coefficient of the highest row weight nu in Q in V is cH. Distinct row weights are orthogonal for F. At X=I only the diagonal monomial of column degrees nu can survive, and it has row weight nu; H(I)=1 therefore gives c=Q(I). Consequently
+
+  B(H,Q)=Q(I),
+  B(R(g^t)H,Q)=B(H,R(g)Q)=(R(g)Q)(I)=Q(g).            (R)
+
+This is valid also for a generic matrix g, as a polynomial identity over K. Transpose, rather than inverse transpose, occurs in this reproducing identity; inverse transpose will enter when moving whole lattices.
+
+It follows immediately that B(Delta,M) subset O: move every divided power across the form, then evaluate an integral polynomial at I.
+
+For the converse, suppose Q in V pairs integrally with every element of Delta. We prove Q in M. Take a generic lower unitriangular matrix L. Such matrices have polynomial coordinates given by a fixed ordered product of elementary lower unipotents; conversion between these coordinates and their matrix entries is triangular with integer polynomial inverse. Thus the coefficients of R(L^t)H are integral combinations of divided-power words on H. Applying (R) coefficient by coefficient shows that Q(L) has coefficients in O.
+
+For a generic square X, invert its leading principal minors Delta_1,...,Delta_k. Gaussian elimination over Z[X,1/(Delta_1...Delta_k)] gives X=LDU with L lower unitriangular, D diagonal and U upper unitriangular. All their entries belong to that localization. Column homogeneity and the defining right-U invariance give
+
+  Q(X)=Q(LD)=prod_j d_j^nu_j Q(L).
+
+The right-hand side lies in O[X,1/(Delta_1...Delta_k)], so some power G of the product of the principal minors satisfies GQ in O[X]. Each principal minor reduces to a nonzero determinant polynomial over the residue field; its diagonal monomial has coefficient 1. Their product G is therefore primitive.
+
+For a polynomial f in K[X], define its content valuation as the minimum of its finitely many coefficient valuations. The equality
+
+  contentval(fg)=contentval(f)+contentval(g)
+
+follows by rescaling f and g to have minimum valuation zero and reducing modulo the maximal ideal; a polynomial ring over the residue field is a domain. Since contentval(G)=0 and GQ is integral, contentval(Q)>=0. Thus every coefficient of Q is integral, as required.
+
+Identity (R) also proves nondegeneracy directly: if Q is orthogonal to V, it is orthogonal to every R(g^t)H, so Q(g)=0 for every g; K is infinite and Q=0. We have now proved
+
+  Delta^#=M,
+
+where # means dual with respect to B inside V. Delta is a full lattice, so the elementary dual-basis identity (L^#)^#=L over a DVR gives
+
+  M^#=Delta.
+
+Combining with IW3 yields p^D M subset M^# subset M. This establishes both directions of the actual normalized Fock lattice comparison. The source derives the converse by lower-triangular coefficient words and integral leading terms; Gaussian elimination plus the primitive-content argument is a shorter human substitute in the square case.
+
+Example checking the normalization. For k=2, nu=(2,0), write x=X_11,y=X_21. Then H=x^2, N=2,
+
+  M=O{x^2,xy,y^2},
+  Delta=O{x^2,2xy,y^2},
+  B has diagonal entries (1,1/2,1).
+
+Therefore M^#=Delta. For p=2 the integral difference is real and the logarithmic exponent D_2(2,2)=1 clears it. The dimension is 3, which alone does not clear the denominator at p=2. This small example distinguishes an integral theorem from a field-level equivalence.
+
+6. VERTICES, TENSORS, AND THE ACTUAL EDGE NORMALIZATION (IW6)
+
+For a dominant integer weight lambda set e=lambda_k, nu_i=lambda_i-e. A basis matrix A of the underlying rank-k lattice gives
+
+  L_lambda(A)=det(A)^(-e) R(A^(-1)) M_nu.
+
+This inverse convention is important: source nablaL is a COMAP under R(A), and nablaLTw then multiplies by det(A)^(-e). Equivalently F belongs to L_lambda(A) exactly when det(A)^e R(A)F belongs to M_nu. Naming the forward-image lattice by the same A would exchange the basis and its inverse and would not match the release.
+
+The integer exponent e may be negative. Transpose adjointness gives
+
+  B(det(A)^(-e) R(A^(-1))x, det(A)^e R(A^t)y)=B(x,y).
+
+Indeed det(A^(-t))=det(A)^(-1); the second argument has the required form for the basis A^(-t). The determinant scalars cancel, and R is the substitution anti-action, so R(A^(-t))R(A^t)=Id. Therefore
+
+  L_lambda(A)^#=det(A)^e R(A^t) M_nu^#.
+
+IW5 implies
+
+  p^D L_lambda(A^(-t)) subset L_lambda(A)^# subset L_lambda(A^(-t)).
+
+For finitely many twists s, use the tensor product form B_tot= tensor_s B_s and the tensor lattices. Dual bases give (tensor L_s)^#=tensor L_s^#. The exponent is the sum of the D_s, with zero-spread terms omitted. If beta:V->V^* is beta(y)(u)=B_tot(u,y) and Psi=beta^(-1), then
+
+  p^kappa L(A^(-t)) subset Psi(L(A)^*) subset L(A^(-t)),
+  kappa=sum_(s:h_s>0) binom(k,2) floor(log_p(h_s+k-1)).
+
+On the block-polynomial realization, factorials split over disjoint variable blocks, so B_tot is exactly (prod_s N_s)^(-1) times the full Fock form. This matches the scalar cs_s=N_s^(-1) and its product in ten_sideX and test_side_explicit_identification.
+
+For an edge e with basis g and rank r, source and target are g W^k and g diag(p^(-1)I_r,I)W^k. Let w^2=p. At twist s its midpoint lattice has basis
+
+  A_s = sigma^s(g) diag(w^(-1)I_r,I)
+
+(with the source embedding into the coefficient field understood). The reversed dual edge has basis g^(-t)diag(pI_r,I). Its midpoint matrix is
+
+  sigma^s(g)^(-t)diag(pI_r,I)diag(w^(-1)I_r,I)
+    = sigma^s(g)^(-t)diag(wI_r,I) = A_s^(-t).
+
+This proves the opposite-edge identification used in the integral sandwich. Set A_r(lambda)=sum_s sum_(i<=r)lambda_(s,i). The release defines
+
+  R_e = w^(-A_r) H_e,
+  R'_e = w^(-A_r) H_e^*,
+  beta_e(u,T)=T(p^A_r u).
+
+Both R_e on the opposite edge and R'_e acquire the SAME w^(-A_r) scalar; applying the linear map Psi preserves it. Hence the tensor comparison is exactly
+
+  p^kappa R_(e.dual) subset Psi(R'_e) subset R_(e.dual).
+
+Notice R'_e is not merely the unscaled ordinary dual of R_e: the pairing contains p^A_r. Keeping this scalar is essential for the later contraction identity. This note retains it.
+
+7. SIZE, WHAT IS CLOSED, AND WHAT IS SEPARATE (IW7)
+
+Suppose h_s+k<=a^2, a>=1. Each nonzero-spread term satisfies
+
+  D_p(k,h_s) <= binom(k,2) log_p(a^2)
+              = k(k-1)log_p a <= k^2 log_p a.
+
+For N selected twists in each of the full and flat families, this gives the elementary stronger bound
+
+  kappa_0+kappa_f <= 2N k(k-1)log_p a <= 2N k^2 log_p a.
+
+In particular the source's deliberately coarse 4N k^2 log_p a is valid. We keep that stated constant in the assembled cloud argument so no downstream parameter change is needed. Unselected zero-spread factors contribute zero. Nonselected factors that are contracted away in the cloud construction are treated by its separate height bookkeeping, not inserted into this kappa sum.
+
+Closed here: the logarithmic denominator estimate; the actual invariant operator identity; the universal integral isotypic projector bound; the square polynomial Weyl sandwich; the source-normalized Fock form and its integral dual; tensor/vertex/edge transport; the numerical exponent bound.
+
+Separate: Cartan multiplication onto its prescribed integral polynomial module; semistandard complementary-family counting/independence; the signed path-column basis; geometric realization of tests; arithmetic/cohomological window inputs. IW4 supplies the denominator part of the constrained projector argument, while its BB specialization, self-adjointness and commutation are in the companion constrained-Gram reconstruction.
+
+8. PROVENANCE AND REGENERATION
+
+Run `python v0_5/integral_weyl/build_ledger.py` from the shared project directory. It asserts the source commit, reads declaration boundaries, and regenerates provenance.json with source path, exact start/end line, full-file SHA-256, range SHA-256, and pinned GitHub URL. The ledger distinguishes a source definition/theorem that matches a claim from a human replacement proof (notably the Gaussian argument in IW5). It also records the shared projector route separately from the cloud route. No source or main document is modified.

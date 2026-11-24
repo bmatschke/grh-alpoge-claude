@@ -1,0 +1,596 @@
+COARSE GENERATORS LIFT TO ALLOWED INTEGRAL GENERATORS — v0.7
+
+Owner: /root/lean_audit. Date: 2026-11-21.
+Repository: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+0. RESULT AND EXACT SCOPE
+
+We prove the actual GeneratorModuloUniformiser assertion. For every
+coarse generator u in Dat.lamGen, there is an allowed integral generator
+g in Dat.gen such that
+
+                 reduction(Delta*u)=reduction(g).               (CG0.1)
+
+Here Delta is the source Dl, not the larger localizer SPR. The generator
+g belongs to the full allowed Gen set; choosing a primitive independent
+subfamily of that set is the separate, already proved SD1 selection.
+In particular (CG0.1) is an existence assertion about an individual
+allowed product, stronger than membership in its residue-field span.
+
+The hypotheses are the literal Dat.Hyp and UniformizedDVR data, with
+C0>=32 and CLa,Ck>=C0. The final application may retain C0=1088. Write
+k=r+K, with r>=2, K>=1, p prime, p>=13 and even n'>0. The coefficient
+ring O is a DVR with uniformizer w, residue field f of characteristic p,
+and the source UniformizedDVR structure. Its completeness is not used
+in this finite congruence proof.
+
+The valid periodic frame has r increasing even selected positions
+f_(j,0)<...<f_(j,r-1)=z_j, z_j<f_(j+1,0), and
+f_(j+J,i)=f_(j,i)+n', J>=1. Set
+
+  W_j = selected letters in [f_(j-1,0),z_j],
+  Wold_j = selected letters in [f_(j-1,0),z_(j-1)],
+  L_j = selected letters in (z_(j-1),f_(j,0)),
+  T_j^late = selected letters in (z_(j-1),z_j],
+  d_j(x)=z_j-x on W_j.
+
+No selected letters lie strictly between consecutive positions of one
+frame, so Wold_j consists of its r even frame letters. For a late x,
+y_j(x) is the r-th most recent even selected letter before x. Validity
+requires x-y_j(x)>L1. The other valid-frame conditions remain exactly
+as stated in SegRing.Valid; our arguments use their consequences below.
+
+The scalar data satisfy, for every selected physical residue t and j,
+
+  a<=deg_t<=2a,  E'_t<=E0,
+  #W_j<=Ns,  Ns<=N1,  Ns<=2|TT|,  Ns+r<=K,
+  p^(d_j(x))<=Q for x in W_j,  Y>=1,
+  Ck Ns^2 log(a)<=k,
+  128 k^2 Ns Y^2<=p^(L1-1),
+  32 p Y k^2 Ns Q^2 (E0+mStar+1)<=a.                 (CG0.2)
+
+All real powers/floors are literal source ones. In particular a>0,
+Ns>=1, k>=5 and Q>=1 follow from these hypotheses. Put
+
+  La=CLa Ns^2 log(a),
+  B_x=deg_(y_j(x) mod n')/p^(d_j(y_j(x))),
+  s_x=floor(B_x/(k^2Y)),  m_x=mStar+s_x,  theta_x=B_x/2,
+  o_x=La*a/(p*k*p^(d_j(x)))
+       +(10 if x even, 1 if x odd)*a/p^(L1+d_j(x)).   (CG0.3)
+
+Natural floors in the source agree with ordinary floors because B_x>=0.
+Write XX_j=XX'(O,r,K,F,j,m,theta,o). Its definition and the common
+integral basis needed to reduce it are proved in CG1, not assumed under
+the name NestedTypeBound.
+
+DEPENDENCIES ALREADY RECONSTRUCTED. IP3--IP4 give the universal integral
+signed-path basis and its simultaneous prefix minimum/maximum adaptation.
+SD3 gives Delta nonzero modulo w, hence Delta!=0 over O. Companion RS2/RS3
+give the determinant degree budget and scale estimates recorded in CG3.
+For clarity their short calculations are also supplied here, so that no
+numeric wrapper is left unexpanded. We do not redo the SD3 nonvanishing
+argument. The result does not count coarse generators or construct the
+global frame and parameter data, and does not by itself complete RH/GRH.
+
+
+1. THE ACTUAL PAIRED-PATH LATTICE AND ITS REDUCTION [CG1]
+
+Let R be any integral domain. List W_j increasingly as x_0,...,x_(N-1),
+with vector sign at even positions and covector sign at odd positions.
+For a plane polynomial A and normal polynomial G write v_<x(A),v_<=x(A)
+for the minimum generic rank-one torus orders, and M_<x(G),M_<=x(G)
+for the corresponding maximum orders. The definitions use a generic
+invertible matrix, not evaluations on the finite group GL(f).
+
+For integer margins m_x and real theta_x,o_x, XX'_R is the intersection
+of the following two R-submodules. First take the span of separated
+products A G, where A uses plane variables at W_j, G uses normal
+variables only at T_j^late, and there are integers M_x with, at every
+late x,
+
+  x even: M_<=x(G)<=M_x,  v_<x(A)>=M_x+m_x;
+  x odd:  M_<x(G)<=M_x,   v_<=x(A)>=M_x+m_x;
+  always: v_<x(A)>=theta_x.                           (CG1.1)
+
+Intersect that span with the monomial support condition
+
+  normal degree at x <= o_x,
+  where normal degree means degree in the last K coordinates for
+  even x and in the first r coordinates for odd x.   (CG1.2)
+
+This is exactly SegRing.XX'. It is important that (CG1.2) is imposed
+on the span, not prematurely imposed on each arbitrary separated
+product in a chosen expansion.
+
+Use the already proved IP basis independently in the r plane and K
+normal coordinates. Its elements have paths nu^0,...,nu^N and
+kappa^0,...,kappa^N, with respective letter degrees b'_i,b''_i, and
+standard terminal column indices I',I''. The paired products
+
+  B_(nu,kappa,I',I'')=Psi_(nu,I') * Psi_(kappa,I'')     (CG1.3)
+
+form an integral basis of the polynomial ring on these segment letters.
+Each path is indexed once; its degrees are determined by its successive
+weight differences. The two variable blocks are independent, so this
+assertion is the ordinary tensor-product basis assertion, followed by
+the injective renaming i->x_i. It is not an integral isotypic splitting.
+
+The allowed index subset is precisely:
+
+  b''_i=0 if x_i is in Wold_j;
+  if x_i is late and even:
+       kappa^(i+1)_1+m_(x_i)<=nu^i_r,
+       b''_i<=o_(x_i);
+  if x_i is late and odd:
+       kappa^i_1+m_(x_i)<=nu^(i+1)_r,
+       b'_i<=o_(x_i);
+  at every late x_i: theta_(x_i)<=nu^i_r.              (CG1.4)
+
+These are the literal inequalities in segPairs. We claim that XX'_R
+is exactly the span of the subset (CG1.3) satisfying (CG1.4).
+
+Proof of the inclusion from XX'_R. First ignore (CG1.2). Split each
+separated product A G into its plane and normal letter-multihomogeneous
+components. Every twist preserves these degrees, so the components
+retain (CG1.1). For each component, apply IP4 to A with the indicated
+lower bounds, and to G with the indicated upper bounds. Real lower
+bounds use their ceilings. At unused prefix cuts one can use the
+automatic bounds between plus and minus the total letter degree.
+Every plane basis element in the expansion has the required minima,
+and every normal basis element has the required maxima. Multiplying
+the expansions therefore gives the gap inequalities in (CG1.4), without
+their o-bounds. The zero normal degrees on Wold_j hold because the
+original G has no such variables; every basis vector has its fixed
+letter degrees.
+
+Now apply the monomial projector retaining (CG1.2) to this expansion.
+On a paired basis vector every support monomial has normal degree
+b''_i at an even x_i and b'_i at an odd x_i. Thus the projector either
+keeps that whole basis vector or kills it. On a polynomial in XX'_R it
+is the identity. This proves the inclusion with all of (CG1.4).
+
+For the reverse inclusion, take an allowed paired basis vector. IP4
+gives its plane/normal prefix bounds. Choose
+M_(x_i)=kappa^(i+1)_1 at an even letter and kappa^i_1 at an odd letter.
+Then (CG1.4) gives (CG1.1), while its exact multidegrees give (CG1.2).
+Its normal old-frame degrees vanish. Hence it belongs to XX'_R.
+
+Consequences over O and its residue field f:
+
+  (a) XX'_O is spanned by a subset of an ambient O-basis. Add the
+      excluded paired basis elements and monomials involving an
+      outside-segment variable to obtain a complement. In particular
+      XX'_O is saturated for multiplication by any nonzero a in O.
+  (b) Reduction sends every integral basis polynomial to the identical
+      path polynomial over f, because wedge/contraction and renaming
+      have integral coefficients. Thus
+
+             reduction(XX'_O)=XX'_f.                 (CG1.5)
+
+      A direct lift is obtained by expanding in the allowed f-basis
+      and lifting its finitely many scalar coefficients to O.
+  (c) Projection to any fixed total letter degree preserves XX'_O:
+      each paired basis polynomial has a fixed sum b'+b''.
+
+This proves exactly the first, third and sixth clauses of the actual
+NestedTypeBound package needed here and by RestLam. The residue-field
+sixth clause first puts the separated pair in XX'_f by (CG1.1)--(CG1.2),
+then uses (CG1.5). We are not claiming its separate characteristic-zero
+joint-isotypic description (the fourth clause) as a consequence of
+this argument. Under the source's valid-frame, N+r<=K and m>=0
+hypotheses all statements above apply. The direct basis proof itself
+does not need the last two inequalities.
+
+
+2. COARSE DATA, UNIQUE LATE LETTERS, AND THE LABEL DIGITS [CG2]
+
+For each late x let D_(j,x) be the determinant of the first-r-coordinate
+rows at the last r even selected predecessors of x. All these rows
+are distinct and belong to W_j. Set
+
+  D_j=product_(x in T_j^late) D_(j,x)^(s_x),
+  Delta=product_(0<=j<J) phi_j(D_j),
+  phi_j(X_(x,c))=Z_(x mod n',c)^(p^(d_j(x))).         (CG2.1)
+
+The plane embedding is implicit. Write E_t for the physical degree of
+Delta at row t; CG3 gives E_t<=d_t, where
+d_t=deg_t-E'_t on TT and d_t=0 outside TT. Thus
+
+                 a'_t=d_t-E_t.                     (CG2.2)
+
+For the coarse scale define
+
+  T_j=a/[8Yk^2 Ns p^(d_j(f_(j-1,0)))],
+  R_j=floor(log_p(floor(T_j))),  P_j=p^(R_j),
+  m0=k Ns+1,
+  Qc_j=p^max(z_(j+1)-z_j+R_(j+1)-R_j,0).            (CG2.3)
+
+The floor-log description is valid because CG3 proves T_j>=1; the
+source uses Nat.log and the natural floor exactly. This P_j is the
+coarse exponent scale; it is distinct from the global physical size Q
+and the carry ratio Qc_j.
+
+For y=y_j(x), define
+
+  Bw_j(y)=floor(a'_(y mod n')/p^(d_j(y)+R_j))-(k+r+1),
+  theta^c_(j,b)(x)=(2/3)*
+    {Bw_j(y)-m0, if y is in Wold_j;
+     b(y),       otherwise},
+  o^c_j(x)=La*a/[p*k*p^(d_j(x)+R_j)]
+       +1_(x even)*4a/p^(d_j(y)+R_j).                (CG2.4)
+
+The coarse segment module M_j(b) is XX' with margin m0, lower threshold
+theta^c and normal-degree bound o^c, intersected with total letter
+degree b and the restrictions that every plane exponent at a current
+frame letter is less than Qc_j. This is the literal Dat.Mj. The current
+frame exponent restriction is useful in counting/injectivity elsewhere;
+the congruence proof uses only the other two conditions.
+
+A coarse generator has the form
+
+  u=Z^ell product_(0<=j<J) phi_j(expand_(P_j)(y_j)),
+  y_j in M_j(b_j),  physical multidegree of u = a'.   (CG2.5)
+
+Here expand_P replaces each variable by its P-th power and FIXES
+coefficients. The coarse label satisfies
+ell_(x mod n',c)<p^(d_j(x)) P_j at every late x.
+
+The intervals (z_(j-1),z_j], 0<=j<J, partition (z_(-1),z_(-1)+n'].
+Every selected residue consequently has exactly one late representative
+x in this period. Periodic translation supplies the representatives for
+all integer j and preserves d_j and R_j. At the coordinate of that x,
+perform Euclidean division
+
+  ell_(t,c)=ell0_(t,c)+p^(d_j(x)) e_(j,x,c),
+  0<=ell0_(t,c)<p^(d_j(x)),  0<=e_(j,x,c)<P_j.       (CG2.6)
+
+Set e_j=0 off T_j^late, and keep ell0=ell outside TT. This proves both
+the fine-label condition and IsEll, with the exact monomial identity
+
+             Z^ell=Z^ell0 product_j phi_j(X^(e_j)). (CG2.7)
+
+No assumption of injectivity on the whole overlapping set W_j is used.
+Only late representatives are unique. This is CoarseLabelFactorisation.
+
+
+3. THE DETERMINANT BUDGET AND THE COARSE SCALE [CG3]
+
+These are the completed RS2/RS3 companion estimates; we record their
+proofs to make the constants used in CG6 explicit.
+
+Each W_j lies in the union of the two consecutive half-open cells
+(z_(j-2),z_(j-1)] and (z_(j-1),z_j]. Summing over one frame period,
+each physical residue occurs at most twice among all W_j, even if a
+single W_j contains repeated residues. The r predecessor rows of any
+one determinant are distinct as integers. If y=y_j(x) and a row v is
+one of those predecessors, then v>=y and therefore d_j(v)<=d_j(y).
+Consequently
+
+  s_x p^(d_j(v))
+    <= [deg_(y mod n')/(p^(d_j(y)) k^2Y)] p^(d_j(v))
+    <=2a/(k^2Y).                                    (CG3.1)
+
+For a fixed physical residue there are at most two row occurrences
+among the segment sets, and each occurrence can occur in at most Ns
+of the determinants of that segment. Summing (CG3.1) gives
+
+                      E_t<=4Ns*a/(k^2Y).             (CG3.2)
+
+The last inequality in (CG0.2) implies a>=32(E0+mStar+1)>=32, since
+p,Y,k,Ns,Q are at least one. Thus log(a)>=1. As Ck>=32,
+Ck Ns^2 log(a)<=k implies k>=32Ns. With k>=5 and Y>=1 this gives
+k^2Y>=160Ns. Hence E_t<=a/40 and E0<=a/32. On TT, deg_t>=a and
+E'_t<=E0 imply
+
+  E_t<=d_t,   a'_t=deg_t-E'_t-E_t >= (9/10)deg_t.     (CG3.3)
+
+Indeed the removed amount is at most a(1/32+1/40)<a/10.
+Outside TT every determinant row is absent, so E_t=0=d_t.
+This proves the full TopCountLowerBounds input, including natural
+subtraction agreeing with the displayed ordinary subtraction.
+
+The first position f_(j-1,0) belongs to W_j, so its power is at most
+Q<=Q^2. Divide the last inequality in (CG0.2) by the denominator in
+T_j to obtain
+
+  T_j>=4p(E0+mStar+1),
+  P_j<=T_j<pP_j,
+  P_j>4(E0+mStar+1)>mStar.                            (CG3.4)
+
+The middle pair is the defining property of the largest power of p
+not exceeding floor(T_j); integrality upgrades floor(T_j)<pP_j to
+T_j<pP_j. Every y in W_j is later than f_(j-1,0), so
+
+             8Yk^2 Ns p^(d_j(y)) P_j <= a.          (CG3.5)
+
+These prove PowerExceedsMaxMultiplicity and the exact scale inequalities
+used below. None requires a claim that Frobenius is a characteristic-zero
+intertwiner.
+
+
+4. THE ACTUAL COARSE GENERATOR SUPPLIES THE INTERNAL DEGREES [CG4]
+
+An intermediate letter z in L_j belongs to no other segment letter set
+modulo a period. To see this, place a representative between z_(j-1)
+and f_(j,0). Earlier segment sets end no later than z_(j-1); later ones
+begin no earlier than f_(j,0). Periodic translation gives the same
+conclusion for residues. This is the exact LL_unique assertion.
+
+Assume u in (CG2.5) is nonzero. At t=z mod n' only its y_j factor
+contributes a segment degree, namely p^(d_j(z))P_j b_j(z). Its label
+degree is sum_c ell_(t,c), strictly less than k p^(d_j(z))P_j. Since
+u has degree a'_t, equality of multihomogeneous degrees gives
+
+  a'_t=p^(d_j(z))P_j b_j(z)+sum_c ell_(t,c),
+  a'_t/[p^(d_j(z))P_j]-k < b_j(z).                   (CG4.1)
+
+Nonzeroness is used only to identify the common degree with a';
+cancellation in a sum of polynomial monomials does not invalidate a
+fixed row-degree calculation. Equation (CG4.1) is exactly Step2.
+
+For every late x the r preceding vectors exist because the previous
+frame already supplies r. The oldest of these, y_j(x), belongs to W_j.
+If it is not in the old frame, it lies in L_j. Indeed, if it lay in the
+current frame, its last r predecessors together with x would give
+r+1 distinct selected positions in the current-frame interval, which
+has exactly r. Thus (CG4.1) applies precisely in the non-old-frame
+branch of theta^c.
+
+
+5. THE TWO NUMERICAL TRANSFERS [CG5]
+
+Fix a late x, write y=y_j(x), P=P_j and K0=k Ns. Define
+
+  c=deg_(y mod n')/[p^(d_j(y))P],
+  q=a'_(y mod n')/[p^(d_j(y))P].
+
+By (CG3.3),(CG3.5),
+
+       q>=(9/10)c,   c>=8Yk^2Ns>=40K0.              (CG5.1)
+
+If y is intermediate, (CG4.1) gives b_j(y)>q-k. Then
+
+  theta^c(x)-K0=(2/3)b_j(y)-K0
+      >(3/5)c-(2/3)k-K0 >= c/2.                     (CG5.2)
+
+The last inequality follows from c/10>=4K0 and K0>=k.
+If y lies in the old frame, floor(q)>q-1 yields
+
+  theta^c(x)-K0
+   =(2/3)[floor(q)-(k+r+1)-(K0+1)]-K0
+   >(3/5)c-(2/3)(k+r+3)-(5/3)K0 >= c/2.            (CG5.3)
+
+For the last inequality, c/10>=4K0, r<=k<=K0 and k>=5 give
+4K0-(2/3)(k+r+3)-(5/3)K0 >= k-2>0.
+Since Pc/2=theta_x, both cases prove the source transfer
+
+                  P(theta^c(x)-k Ns)>=theta_x.      (CG5.4)
+
+For the normal-order transfer, validity gives
+d_j(y)>=d_j(x)+L1+1. Put H=a/p^(L1+d_j(x)). From P<=T_j and
+d_j(f_(j-1,0))>=d_j(y),
+
+  kP<=H,
+  4a/p^(d_j(y))<=H,                                (CG5.5)
+
+where the second inequality uses p>=13>=4. Multiplication of the
+definition of o^c by P cancels P from its denominators, so
+
+  P o^c(x)+kP <= La*a/[p*k*p^(d_j(x))]
+                    +(2 if x even, 1 if x odd)*H
+               <=o_x.                              (CG5.6)
+
+The source coefficient 10 at an even letter is retained. The displayed
+2 is merely unused spare room in this local calculation; no downstream
+normalization is changed. Equations (CG5.4),(CG5.6) prove the precise
+ThresholdPowerLowerBound and OrderNumericBound premises.
+
+
+6. ONE CANONICAL COLUMN PRODUCT AFTER REDUCTION [CG6]
+
+Take one allowed coarse paired basis product B=A0 G0 from CG1, with
+paths nu,kappa and per-letter degrees b',b''. Its coarse margin is
+m0=k Ns+1. Let e=e_j, supported on late letters with every exponent
+less than P=P_j, and split X^e=ellP*ellN into its plane and normal
+monomials. Over f define
+
+  A=A0^P ellP D_j,   G=G0^P ellN,                    (CG6.1)
+  dS=sum_(late odd x,c<r) e_(x,c),
+  dV=sum_(late even x,c>=r) e_(x,c).
+
+There are at most Ns late letters and k coordinates at each, so
+
+                  dS+dV <= k Ns P.                 (CG6.2)
+
+The exact reduction identity is
+
+  reduction[D_j expand_P(B) X^e]=A G.                (CG6.3)
+
+This is where characteristic p is used. The canonical path polynomials
+have integer coefficients, by their wedge/contraction definition.
+Their reductions have coefficients in the prime field, where c^P=c.
+The Frobenius identity therefore gives expand_P(B)=B^P. It is not
+being applied to arbitrary residue-field coefficients. For a general
+y=sum c_B B, expand_P(y)=sum c_B expand_P(B) is linear in the original
+coefficients; no surjectivity or inverse of coefficient Frobenius is
+needed. This distinction is essential when f is larger than F_p.
+
+Support is correct: A uses only W_j; G uses no old-frame variables,
+since G0 has degree zero there and ellN is late-supported. Every D_j
+uses only plane vector letters, so it contributes zero normal degree.
+
+We prove all the target prefix conditions. Fix a late x=x_i. In the
+even case let nu*=nu^i_r and kappa*=kappa^(i+1)_1; in the odd case
+let nu*=nu^(i+1)_r and kappa*=kappa^i_1. The relevant prefix is <x
+for A and <=x for G in the even case, with these exchanged in the odd
+case. IP4 and the generic Laurent support rules give
+
+  minimum(A0^P)>=P nu*,   maximum(G0^P)<=P kappa*;
+  minimum(ellP)>=-dS,     maximum(ellN)<=dV.          (CG6.4)
+
+The latter bounds count only covector plane exponents and vector normal
+exponents; all other factors have the favorable sign. Multiplication
+adds finite Laurent lower/upper bounds, and zero polynomials satisfy
+them automatically.
+
+Every determinant factor of D_j has nonnegative minimum order at any
+prefix, since all its variables are vectors. The specific D_(j,x)
+uses r distinct vector rows strictly before x. Twisting them all
+multiplies their determinant by the rank-one torus determinant t, so
+that factor has order 1; its s_x-th power contributes s_x. Hence
+
+  minimum(A)>=P nu*-dS+s_x,
+  maximum(G)<=P kappa*+dV.                           (CG6.5)
+
+Choose M_x=P kappa*+dV. The coarse path gap nu*>=kappa*+k Ns+1,
+(CG6.2), and P>mStar from (CG3.4) imply
+
+  P nu*-dS+s_x >= M_x+mStar+s_x = M_x+m_x.          (CG6.6)
+
+For the always clause use nu^i_r>=theta^c(x) and (CG5.4):
+
+  v_<x(A)>=P nu^i_r-dS+s_x
+           >=P(theta^c(x)-k Ns)>=theta_x.            (CG6.7)
+
+Finally every support monomial of AG has target normal degree
+
+  even x: P b''_i+sum_(c>=r)e_(x,c),
+  odd x:  P b'_i +sum_(c<r)e_(x,c).                  (CG6.8)
+
+There is no determinant term in the odd case because all determinant
+letters are even. Coarse path membership gives b''_i<=o^c(x) at an
+even x and b'_i<=o^c(x) at an odd x. Each label coordinate is <P, so
+(CG6.8) is bounded by P o^c(x)+kP<=o_x, by (CG5.6).
+
+Thus AG satisfies all actual support, prefix gap, lower threshold, and
+normal-order conditions over f. CG1 puts it in XX'_f for the fine
+parameters and supplies an integral lift in XX_j. This proves the
+substantive content of all four premises of column_word_reduction_of_four
+and the resulting ColumnWordReductionLifts assertion.
+
+
+7. GENERAL SEGMENTS AND PRESERVATION OF MULTIHOMOGENEITY [CG7]
+
+For y in M_j(b), define the actual polynomial
+
+                 z_j=D_j expand_(P_j)(y) X^(e_j).   (CG7.1)
+
+By CG1, y is an O-linear combination of allowed coarse paired basis
+products. The operation in (CG7.1) is O-linear in y. Apply CG6 to every
+basis product and take the same integral linear combination of their
+lifts. This gives h_j in XX_j with reduction(h_j)=reduction(z_j).
+
+The polynomial z_j is homogeneous in each whole letter. Its degree
+at letter v is explicitly
+
+  beta_j(v)=P_j b(v)+sum_c e_(j,v,c)
+       +sum_(x late) s_x #{i: predecessor_row(j,x,i)=v}.           (CG7.2)
+
+Every determinant term has one variable from each of its rows, so its
+letter degree is independent of the determinant permutation. The other
+two terms in (CG7.2) are respectively exponent expansion and the label.
+This directly proves SegmentImageMultihomogeneous.
+
+Project h_j onto its total letter-multidegree beta_j component. By CG1(c)
+this projection stays in XX_j. It commutes with residue reduction and
+fixes z_j. Therefore we may choose an integral x_j such that
+
+  x_j in XX_j,  deg_letter(x_j)=beta_j,
+                    reduction(x_j)=reduction(z_j). (CG7.3)
+
+The degree equality means membership in the indicated homogeneous
+submodule, so it includes x_j=0. This is exactly
+SegmentReductionLiftsMultihomogeneous; no unproved homogeneous-lift
+principle is being invoked.
+
+
+8. ASSEMBLY INTO ONE ACTUAL GENERATOR [CG8]
+
+Take a coarse u. If u=0, choose g=0: because J>=1, the product with
+one zero segment factor and label zero is an allowed Gen element.
+All label inequalities hold since the relevant powers of p are positive.
+
+Suppose u!=0. Split its label by CG2, obtain the needed internal
+degree lower bounds from CG4, and choose all x_j by CG7. The exact
+polynomial identity before reduction is
+
+  Delta*u=Z^ell0 product_(0<=j<J) phi_j(z_j).         (CG8.1)
+
+It follows by distributing products and by
+phi^c_j=phi_j composed with expand_(P_j). Define
+
+                    g=Z^ell0 product_j phi_j(x_j). (CG8.2)
+
+It has a fine permitted label and every segment factor belongs to XX_j.
+Its physical multidegree is the same as the nonzero polynomial Delta*u:
+for any letter-multihomogeneous factor of degree beta_j, substitution
+by phi_j gives physical degree at t equal to
+
+       sum_(v mod n'=t) p^(d_j(v)) beta_j(v).        (CG8.3)
+
+Thus replacing z_j by x_j preserves every row degree, irrespective of
+whether the replacement product vanishes. By SD3 and the domain property,
+Delta*u!=0. Its row degree is E+a'=d by CG3. Consequently g has the
+required degree d, and g belongs to the literal Dat.gen=Gen set.
+
+Residue reduction commutes with substitutions and products. Applying
+(CG7.3) in (CG8.1)--(CG8.2) now gives (CG0.1). This proves
+GeneratorModuloUniformiser(C0) under the actual hypotheses C0>=32.
+
+The two occurrences of nonzeroness in the source are accounted for:
+u!=0 identifies the Step2 internal degrees; Delta*u!=0 identifies the
+target total physical degree. Neither asserts a nonzero residue for u
+or for g. No choice of a new frame, no limit, and no kernel replay is
+hidden in this finite construction.
+
+
+9. STATUS, SOURCE ROUTE, AND REPRODUCTION [CG9]
+
+Closed here, with complete mathematical proofs:
+
+  CG1: actual XX' paired-path identification, saturation, and reduction;
+  CG2: exact coarse objects and label splitting using unique late positions;
+  CG3: the determinant degree and scale bounds, shared with RS2/RS3;
+  CG4: Step2 from the nonzero actual coarse generator's physical degree;
+  CG5: both numerical transfers, with all floor and old-frame cases;
+  CG6: prime-field Frobenius identity, support, prefix margins and orders;
+  CG7: arbitrary segment lift and its exact homogeneous component;
+  CG8: assembly into an individual allowed generator and the congruence.
+
+CG1 is derived directly from completed IP3--IP4. It supplies the shared
+NestedTypeBound first/third/sixth clauses used by the actual RestLam
+reconstruction as well as the present lift. We neither assume the whole
+NestedTypeBound conjunction nor claim that its unused fourth clause
+has been proved here. RS2/RS3 and CG3 have the same numerical content;
+they are one shared result, not two independent remaining assumptions.
+
+The exact source route is
+
+  DiscriminantNonzeroModUniformiser.generator_modulo_uniformiser_of_adm
+    -> DiscriminantNeZeroOfResidueNeZero.generator_of_segment_reductions
+    -> SegmentReductionOfColumnWords.segment_reduction_of_column_words
+    -> ColumnWordReductionOfFour.column_word_reduction_of_four,
+
+with local proof branches FrobeniusReductionProduct,
+AllowedLettersOfLateRows, ColumnConditionsOfNumericBounds,
+WordOrderBoundOfNumericBound, ThresholdPowerBoundOfCounts,
+TopCountLowerBoundsOfOccurrence, CoarseLabelFactorisation and
+TopDegreeComparison. The actual integral reduction clause is
+ValuationLowestDegreeMapFractionField.space_statement_sixth_clause.
+The source's larger AdmB and NestedTypeBound packages are not used
+as unexplained human hypotheses in this reconstruction.
+
+What remains separate: the quantitative dimension/count of the coarse
+family, the global supply of the valid frame/parameter data, and the
+other global arithmetic, cohomological and analytic inputs. This
+section removes the GeneratorModuloUniformiser item of the v0.6 SD8
+frontier. It does not remove those other items by renaming them.
+
+Run python v0_7/coarse_lift/build_provenance.py from the workspace root.
+It verifies the pinned HEAD and every cited file against its pinned
+git blob, then records exact declarations, inclusive line intervals,
+full-file and interval SHA256, and immutable source URLs. The main
+fragment is coarse_lift_section.tex. No Lean source edits, local Lean
+compilation, independent kernel replay, or formalization of replacement
+human arguments are claimed.

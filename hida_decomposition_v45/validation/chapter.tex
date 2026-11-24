@@ -1,0 +1,634 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,mathtools,microtype,mathrsfs}
+\usepackage[margin=25mm,top=23mm,bottom=25mm]{geometry}
+\usepackage{booktabs,array,longtable,enumitem,xcolor,fancyhdr}
+\usepackage[colorlinks=true,linkcolor=blue!45!black,urlcolor=blue!45!black,citecolor=blue!45!black]{hyperref}
+\hypersetup{pdftitle={Reading the Alpoge--Claude RH and Dirichlet-GRH proof: working version 0.44},pdfauthor={ChatGPT},pdfsubject={Partial human-readable reconstruction with explicit arithmetic inputs},pdfkeywords={Riemann hypothesis, Lean, theta lifts, prime sums, Arakelov slopes}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{5pt plus 1pt}
+\setlist{topsep=3pt,itemsep=3pt,leftmargin=*}
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small RH and Dirichlet GRH: a reconstruction}
+\fancyhead[R]{\small Working version 0.44}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\numberwithin{equation}{section}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{remark}\newtheorem{remark}[theorem]{Remark}
+\newcommand{\Rea}{\operatorname{Re}}
+\newcommand{\HS}{\mathrm{HS}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\codim}{\operatorname{codim}}
+\newcommand{\covol}{\operatorname{covol}}
+\newcommand{\OK}{\mathcal O_K}
+\newcommand{\src}[2]{\href{https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/#1}{\texttt{#2}}}
+\newcommand{\status}[1]{\textbf{Status:} #1}
+
+\begin{document}
+\section{Arithmetic points, cyclotomic strings, and the strict cofinite bound}
+\label{sec:hida-decomposition-v45}
+
+This chapter proves the original arithmetic-point extraction theorem and
+the complete \texttt{Arithmetic\allowbreak Point\allowbreak Decomposition} field, also called
+\texttt{end1}.  The same point and the same supplied representation are
+retained throughout.  The strict local estimate needed at the last step
+follows from the generic-unitary classification already matched in BCS8
+and the spherical calculation in GUA12.  It requires no additional
+Ramanujan statement or stronger uniform window theorem.
+
+We retain the original \texttt{HypothesesH'}, the coefficient DVR
+\(\mathcal O\), the fixed field isomorphism
+\(\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C\), the Hida setting
+\(s\), level \(V\), auxiliary datum \(Q\), residual representation,
+universal determinant ring \(B\), weight object \(\Lambda\), and
+\(R_H:\mathrm{UnitaryHeckeData}(Q,\iota,\Lambda)\).
+The original base-change and polarized cuspidal attachment foundations,
+and their local and period foundations, have exactly the scope stated
+in BCS and GUA.  We use CAP6 for the already matched degree-one
+Chebotarev statement.  In particular \(\iota\) is used algebraically;
+no continuity of \(\iota\) is assumed.
+
+For a number field \(E\), write \(G_E=\operatorname{Gal}(\Omega/E)\),
+\(q_w=\#(\mathcal O_E/w)\), and \(\varepsilon=\mathrm{cycBar}\).
+The source convention is
+\(\varepsilon(\operatorname{Frob}^{\mathrm{ar}}_w)=q_w\).
+The predicate \(\mathrm{FrobEig}(\iota,r,w,S)\) includes triviality
+on every inertia group above \(w\) and, for every place prolongation
+and every arithmetic Frobenius lift \(g\), the identity
+\[
+ \iota\det(X-r(g^{-1}))=\prod_{z\in S}(X-z).
+ \tag{HED.1}
+\]
+All products over multisets include multiplicities.
+
+\subsection{Extracting the actual representation at a point of the ideal}
+
+% BEGIN HED1
+\paragraph{HED1. Factoring a point through the actual Hecke quotient.}
+\label{claim:HED1}
+Let \(f:A\twoheadrightarrow T\) be a surjective \(\mathcal O\)-algebra
+map and let \(x:A\to k\) be another such map, where \(k\) is a field.
+If \(\ker f\subseteq\ker x\), there is a unique
+\(\mathcal O\)-algebra map \(y:T\to k\) with \(y f=x\).
+\begin{proof}
+For \(t=f(a)\), set \(y(t)=x(a)\).  If \(f(a)=f(a')\), then
+\(a-a'\in\ker f\subseteq\ker x\), proving well-definedness.
+Choose preimages of two elements to verify addition and multiplication;
+the identity and the \(\mathcal O\)-algebra relation follow from those
+for \(f,x\).  Surjectivity proves uniqueness.  Equivalently, this is
+the quotient lift \(A/\ker f\to k\) transported through the actual
+isomorphism \(A/\ker f\simeq T\).  No section of \(f\) as an algebra
+map is required.
+\end{proof}
+% END HED1
+
+% BEGIN HED2
+\paragraph{HED2. Naturality preserves the full determinant law.}
+\label{claim:HED2}
+Let \(D\) be the original homogeneous multiplicative determinant
+polynomial law over \(A\).  For the maps of HED1,
+\[
+                  (D\otimes_{A,f}T)\otimes_{T,y}k
+                              =D\otimes_{A,x}k.
+ \tag{HED.2}
+\]
+Moreover, for a group map \(p:\Gamma'\to\Gamma\), pullback of the
+determinant law of a representation \(r\) is the determinant law of
+\(r\circ p\).
+\begin{proof}
+Evaluate both sides on an arbitrary commutative \(k\)-algebra \(C\)
+and an arbitrary finite sum in its group algebra.  Both coefficient
+structures from \(A\) to \(C\) are identical, because \(yf=x\).
+The base-changed polynomial laws therefore have the same value by
+their defining naturality.  This proves equality over every scalar
+algebra, including those with nilpotents.  Pullback sends a finite sum
+\(\sum a_g g\) to \(\sum a_g p(g)\); its matrix under \(r\) is
+\(\sum a_g r(p(g))\), exactly the matrix for \(r\circ p\).
+Taking determinants proves the second assertion at the same full-law
+strength.
+\end{proof}
+% END HED2
+
+% BEGIN HED3
+\paragraph{HED3. Transferring the entire arithmetic-point output.}
+\label{claim:HED3}
+Suppose the original Hecke algebra \(T=H.TK(\theta,a,K)\) has its
+given \(H.\mathrm{Out}\) record for a determinant \(D_0\otimes f\)
+and property \(P(\lambda,r)\).  Let \(j:A\to B\) and
+\(f:B\twoheadrightarrow T\) satisfy
+\(f(j(b))=\operatorname{algebraMap}_{A,T}(b)\).
+If \(x:B\to\overline{\mathbb Q}_\ell\) kills \(\ker f\), and
+\(xj\) is arithmetic at an admitted \(\lambda\), then one obtains
+\(r:H.Gq\to\operatorname{GL}_n(\overline{\mathbb Q}_\ell)\) with
+\[
+ \mathrm{Continuous}(r),\quad \mathrm{IsSSRep}(r),\quad
+ P(\lambda,r),\quad D_0\otimes_x\overline{\mathbb Q}_\ell=\det r.
+ \tag{HED.3}
+\]
+\begin{proof}
+Factor \(x=yf\) by HED1.  For every \(b\in A\),
+\[
+ y(\operatorname{algebraMap}_{A,T}(b))=y(f(j(b)))=x(j(b)).
+\]
+Thus the weight character induced by \(y\) is exactly the given
+character induced by \(xj\).  Apply the literal \(\mathrm{Out.pt}\)
+field to this \(y,\lambda\).  It supplies one representation with
+continuity, semisimplicity, \(P\), and the evaluated determinant law.
+HED2 identifies that law with the last law in (HED.3).
+No good-point condition is needed for these four conclusions.
+\end{proof}
+% END HED3
+
+% BEGIN HED4
+\paragraph{HED4. The literal original \texttt{hecke\_ideal\_end}.}
+\label{claim:HED4}
+Retain all original data with \(n\geq1\), any allowed \(K\), and
+\(R_H.\mathrm{IsJ}(B,K,J)\).  For every \(x:B.\mathrm{Pt}\) and
+weight \(h\) satisfying \(J\subseteq\ker x\) and
+\(x.\mathrm{Arith}(h)\), there are an admitted \(\lambda\) and one
+frame representation \(r:G_0\to\operatorname{GL}_n
+(\overline{\mathbb Q}_\ell)\) such that
+\[
+ \mathrm{Continuous}(r),\quad \mathrm{IsSSRep}(r),\quad
+ \mathrm{UnitaryPointProperties}(\bar r,\iota,\lambda,r),\quad
+                     x.\mathrm{IsRep}(r\circ V.\mathrm{pr}).
+ \tag{HED.4}
+\]
+\begin{proof}
+In the top-ideal branch of \(\mathrm{IsJ}\), the premise sends
+\(1\in J\) to zero under \(x\), contradicting \(x(1)=1\) in the
+nonzero field.  Hence that branch has no such point.
+
+In the other branch, the actual \(\mathrm{IsJ}\) witness supplies
+the original Hecke algebra \(T\), its commutativity and coefficient
+conditions, a surjection \(f:B\twoheadrightarrow T\), and
+\(J=\ker f\).  It also supplies the original determinant and
+ordinary-character comparison and the weight-map relation
+\[
+ f(\Lambda.\mathrm{toPair}(B.u)(b))
+                         =\operatorname{algebraMap}_{\Lambda,T}(b).
+\]
+The increasing-weight part of \(x.\mathrm{Arith}(h)\), together
+with AFS8, gives \(\lambda\) and exactly the arithmetic Hecke
+weight required by HED3.  All dominant weights of this original
+\(hset\) are admitted.
+
+HEP12 supplies the complete \(\mathrm{Out}\) record on precisely
+these data; its automorphic premise is the actual one installed in
+UPA17.  Apply HED3 with \(j=\Lambda.\mathrm{toPair}(B.u)\).
+Its property \(P\) is the full \(\mathrm{UnitaryPointProperties}\),
+so the representation carries all four fields, including all
+Teichm\"uller families and the complete automorphic witness.
+Its full frame determinant equals \(x.D\).  Pulling this equality
+back along \(V.\mathrm{pr}\) by HED2 gives exactly the source
+predicate \(x.\mathrm{IsRep}(r\circ V.\mathrm{pr})\).
+The same \(r\) occurs in every field of (HED.4).
+\end{proof}
+% END HED4
+
+% BEGIN HED5
+\paragraph{HED5. Pullback to the original absolute Galois group.}
+\label{claim:HED5}
+The original map \(p=V.\mathrm{pr}:G_L\to G_0\) is surjective.
+Consequently a continuous semisimple frame representation \(r\)
+pulls back to a continuous semisimple representation \(r\circ p\).
+\begin{proof}
+Given \(g\in G_0\), lift its underlying element through the
+original quotient map \(\mathrm{toGS}\).  The condition defining
+\(G_0\) says that the lift has trivial \(\eta\)-character.
+The original \(V.h\eta\) identifies this kernel with the image of
+\(G_L\).  Choose the corresponding element of \(G_L\); its image
+under \(p\) is \(g\), since both have the chosen quotient image.
+This proves surjectivity on the actual source groups.
+
+The source map \(p\) is continuous, so the composition is continuous.
+A vector subspace is invariant under \(r\circ p\) if and only if
+it is invariant under \(r\), by surjectivity.  An invariant
+complement furnished by semisimplicity of \(r\) is therefore an
+invariant complement for the pullback.  No local semisimplification
+or new representation is involved.
+\end{proof}
+% END HED5
+
+\subsection{Frobenius comparison with all original normalizations}
+
+% BEGIN HED6
+\paragraph{HED6. Degree-one places split in the unramified CM extension.}
+\label{claim:HED6}
+Let \(E/E^+\) be the original CM quadratic extension, unramified at
+every finite place.  If a finite place \(w\) of \(E\) has absolute
+residue degree one, then \(w\) is split over \(E^+\).
+\begin{proof}
+Put \(v=w|_{E^+}\).  Multiplicativity of residue degrees gives
+\(f(w/v)f(v/p)=1\), hence \(f(w/v)=1\).  Unramifiedness gives
+\(e(w/v)=1\).  If there were only one prime above \(v\), the
+degree formula \(\sum_{w'\mid v}e(w'/v)f(w'/v)=2\) would give
+\(1=2\).  Thus there are two primes above \(v\), which is the
+literal splitting condition.  The argument applies to every such
+\(w\); its only ramification hypothesis is the original one.
+\end{proof}
+% END HED6
+
+% BEGIN HED7
+\paragraph{HED7. A cofinite degree-one Frobenius comparison is global.}
+\label{claim:HED7}
+Let \(R:G_E\to\operatorname{GL}_n(\overline{\mathbb Q}_\ell)\)
+and a finite family \(r_i:G_E\to\operatorname{GL}_{a_i}
+(\overline{\mathbb Q}_\ell)\) be continuous.  Suppose that outside
+one finite set, every degree-one place admits multisets \(B_{i,w}\)
+such that
+\[
+ \mathrm{FrobEig}(\iota,R,w,\coprod_i B_{i,w}),\qquad
+              \mathrm{FrobEig}(\iota,r_i,w,B_{i,w})\quad\text{for all }i.
+\]
+Then for every \(g\in G_E\),
+\[
+                  \det(X-R(g))=\prod_i\det(X-r_i(g)).
+ \tag{HED.5}
+\]
+\begin{proof}
+CAP6 puts an arithmetic Frobenius at a degree-one place outside
+the finite exceptional set into every prescribed open coset of
+\(G_E\).  These Frobenius elements are therefore dense.  At each
+one, (HED.1) and the multiset union give (HED.5) at its inverse,
+first after applying \(\iota\), then over
+\(\overline{\mathbb Q}_\ell\) by injectivity of \(\iota\).
+
+For each coefficient, the characteristic polynomial is a polynomial
+in the matrix entries and is continuous.  Coefficients of the finite
+product on the right are finite sums of products of those continuous
+functions.  Inversion on \(G_E\) is continuous.  Since the coefficient
+field is Hausdorff, equality extends from the dense set to every
+\(g^{-1}\), and hence to every \(g\).  All continuity is used over
+\(\overline{\mathbb Q}_\ell\), before applying the merely algebraic
+\(\iota\).  Semisimplicity is not needed for this comparison lemma.
+\end{proof}
+% END HED7
+
+% BEGIN HED8
+\paragraph{HED8. The exact spherical Frobenius law for any real shift.}
+\label{claim:HED8}
+Let \(w\nmid\ell\), let \(\pi_w\) be an actual smooth irreducible
+spherical representation with normalized Satake multiset \(S_w\),
+and let \(t\in\mathbb R\).  If the original
+\(\mathrm{ParAtT}(\iota,r,w,\mathrm{rc}(\pi_w)(t))\) holds,
+with its full quantification over \(\mathrm{IsRecT}\) maps, then
+\[
+ \mathrm{FrobEig}\left(\iota,r,w,
+              \{\alpha q_w^{-t}:\alpha\in S_w\}\right).
+ \tag{HED.6}
+\]
+This is the original \texttt{frobTwT} conclusion, for arbitrary real
+\(t\), not only an exponent arising from a particular Speh length.
+\begin{proof}
+Fix any prolongation \(A\) over \(w\).  The original existence
+theorem supplies a permissible local correspondence there.  GUA12
+computes its spherical parameter: inertia is trivial, monodromy
+is zero, and arithmetic Frobenius has eigenvalues \(\alpha^{-1}\).
+The real twist multiplies these by \(q_w^t\).  Its parameter is
+unramified and hence good by GUA1, so the conditional equality in
+\(\mathrm{ParAtT}\) applies to the actual Weil--Deligne parameter
+of \(r\).
+
+For clarity, this equality implies triviality of the original
+inertia action, as in GUA14.  Zero monodromy makes that action
+trivial on an open subgroup; its image is finite.  Every inertia
+matrix is thus semisimple in characteristic zero.  The original
+Frobenius-semisimplification witness commutes with it and differs
+by a nilpotent matrix.  Simultaneous diagonalization makes this
+difference zero, giving the trivial original inertia action.
+For general Weil elements the same commuting correction preserves
+the characteristic polynomial.  Inverting the arithmetic
+eigenvalues \(\alpha^{-1}q_w^t\) gives
+\(\alpha q_w^{-t}\).  Trivial inertia makes the identity hold for
+every lift, and \(A\) was arbitrary.  This proves the entire
+\(\mathrm{FrobEig}\) predicate.
+\end{proof}
+% END HED8
+
+% BEGIN HED9
+\paragraph{HED9. Cyclotomic strings have the source's sign and multiplicities.}
+\label{claim:HED9}
+At \(w\nmid\ell\), the character \(\varepsilon^{-j}\),
+\(j\geq0\), is unramified and has geometric Frobenius value
+\(q_w^j\).  Therefore
+\[
+ \mathrm{FrobEig}(\iota,r,w,B)
+ \ \Longrightarrow\
+ \mathrm{FrobEig}(\iota,r\otimes\varepsilon^{-j},w,
+                                     \{zq_w^j:z\in B\}).
+ \tag{HED.7}
+\]
+Every twist of a continuous representation occurring here is continuous.
+\begin{proof}
+Inertia away from \(\ell\) fixes every \(\ell\)-power root of
+unity; arithmetic Frobenius raises them to their \(q_w\)-th powers.
+Passing to the defining inverse limit gives
+\(\varepsilon(I_w)=1\) and
+\(\varepsilon(\operatorname{Frob}^{\mathrm{ar}}_w)=q_w\).
+Thus \(\varepsilon^{-j}(g^{-1})=q_w^j\) for an arithmetic
+Frobenius \(g\).
+
+For any matrix \(M\) and nonzero scalar \(u\),
+\(\det(X-uM)=u^{\dim M}\det((X/u)-M)\).  If the characteristic
+polynomial of \(M\) is \(\prod_{z\in B}(X-z)\), this identity
+is \(\det(X-uM)=\prod_{z\in B}(X-uz)\), with every multiplicity
+unchanged.  Apply it to the actual Frobenius matrix, and use the
+triviality of both inertia actions.  The original cyclotomic
+character is continuous by its inverse-limit construction; powers,
+inversion and scalar matrix multiplication preserve continuity.
+\end{proof}
+% END HED9
+
+\subsection{The complete decomposition of an arbitrary supplied representation}
+
+% BEGIN HED10
+\paragraph{HED10. One initial Galois representation for each cusp.}
+\label{claim:HED10}
+Let \(E/E^+\), \(\ell\ne2\), \(n\geq1\), and the actual
+automorphic unitary subspace \(\sigma\) be as in the original
+\texttt{endShape} theorem.  Choose its BCS18 witnesses: cusps
+\(P_i\), ranks \(a_i\geq1\), lengths \(d_i\geq1\), actual local
+components \(\pi_{i,w}\), and infinity multisets \(m_{i,\tau}\),
+with \(\sum_i a_i d_i=n\).
+For each \(i\) there is a continuous representation
+\(r_i:G_E\to\operatorname{GL}_{a_i}(\overline{\mathbb Q}_\ell)\)
+whose original compatibility record has local parameter
+\[
+                  \mathrm{rc}(\pi_{i,w})\bigl((d_i-n)/2\bigr).
+ \tag{HED.8}
+\]
+All local and period quantifiers belong to that one \(r_i\).
+\begin{proof}
+GUA9 supplies an infinity weight at every embedding and applies
+the Speh-string identity to the BCS infinity multisets.  In
+particular \(m_{i,\tau}\) has distinct entries, and
+\(z+(d_i-n)/2\in\mathbb Z\) for every entry \(z\).
+These are exactly the hypotheses of GUA8 with the single integer
+\(e_i=d_i-n=\mathrm{ex}(n,d_i,0)\).  Apply GUA8 to \(P_i\),
+its entire specified local-component family, and all its infinity
+multisets.  It supplies \(r_i\) and the full compatibility record
+with (HED.8), including continuity.
+
+Make this finite family choice once.  The remaining string members
+will be \(r_i\otimes\varepsilon^{-j}\); they are determined by
+this initial representation.  Their construction does not require
+identifying separately chosen Galois representations for different
+half shifts.
+\end{proof}
+% END HED10
+
+% BEGIN HED11
+\paragraph{HED11. Matching the given representation at degree-one places.}
+\label{claim:HED11}
+Let \(R:G_E\to\operatorname{GL}_n(\overline{\mathbb Q}_\ell)\)
+be any continuous representation satisfying the original
+\(\mathrm{LocGlobT}\) comparison with \(\sigma\) for every split
+place and every actual local component.  For the \(r_i\) of HED10,
+outside one finite set and at every degree-one place \(w\), there
+are multisets
+\[
+ B_{ij,w}=\{\alpha q_w^{(n-d_i)/2+j}:\alpha\in S_{i,w}\},
+                       \qquad 0\leq j<d_i,
+ \tag{HED.9}
+\]
+such that \(R\) has Frobenius multiset \(\coprod_{i,j}B_{ij,w}\)
+and \(r_i\otimes\varepsilon^{-j}\) has multiset \(B_{ij,w}\).
+\begin{proof}
+GUA13 makes all the finitely many \(\pi_{i,w}\) spherical away
+from one finite set.  Add the finitely many places above \(\ell\).
+At any remaining degree-one place, HED6 gives splitting over
+\(E^+\).  The BCS18 split-component assertion supplies the actual
+irreducible normalized product of the specified Speh components.
+Apply the assumed local comparison of \(R\) to that component.
+GUA6 identifies its local parameter, for every permissible
+correspondence, with
+\[
+ \bigoplus_i\bigoplus_{0\leq j<d_i}
+       \mathrm{rc}(\pi_{i,w})\bigl((d_i-2j-n)/2\bigr).
+\]
+GUA14, whose conclusion applies to any continuous representation
+with this parameter, gives the Frobenius multiset in (HED.9) for
+\(R\), including trivial original inertia and all Frobenius lifts.
+
+For each initial \(r_i\), HED8 applied to (HED.8) gives
+\(\{\alpha q_w^{(n-d_i)/2}:\alpha\in S_{i,w}\}\).
+HED9 multiplies this by \(q_w^j\), giving (HED.9) for the
+\(j\)-th cyclotomic twist.  The common exponent identity is
+\[
+ \frac{n-1}{2}+j-\frac{d_i-1}{2}
+                          =\frac{n-d_i}{2}+j.
+\]
+Thus the comparison uses the given \(R\), not a representation
+chosen to replace it, and includes every positive Speh length.
+\end{proof}
+% END HED11
+
+% BEGIN HED12
+\paragraph{HED12. The full cyclotomic-string characteristic polynomial.}
+\label{claim:HED12}
+Under HED10--HED11, for every \(g\in G_E\),
+\[
+ \det(X-R(g))=
+     \prod_i\prod_{j=0}^{d_i-1}
+             \det\bigl(X-(r_i\otimes\varepsilon^{-j})(g)\bigr).
+ \tag{HED.10}
+\]
+The ranks and lengths are positive, and every \(r_i\) is continuous.
+\begin{proof}
+Index the finite family in HED7 by the pairs \((i,j)\),
+\(0\leq j<d_i\).  HED9 supplies continuity of every twist;
+HED11 supplies exactly its cofinite degree-one Frobenius premise.
+Hence HED7 proves (HED.10) at every group element.  Positivity and
+the rank identity come from the same BCS witnesses, and continuity
+of the initial representations was proved in HED10.  Neither a
+semisimplification nor an isomorphism of the given \(R\) is needed
+to establish the stated characteristic-polynomial identity.
+\end{proof}
+% END HED12
+
+% BEGIN HED13
+\paragraph{HED13. The strict spherical bound from the existing local classification.}
+\label{claim:HED13}
+Let \(F\) be a nonarchimedean characteristic-zero local field with
+residue cardinality \(q>1\).  If \(\pi\) is smooth, irreducible,
+generic, unitarisable and spherical, then every element \(\alpha\)
+of its normalized Satake multiset satisfies
+\[
+                         q^{-1/2}<|\alpha|<q^{1/2}.
+ \tag{HED.11}
+\]
+In particular this applies to every spherical local component of
+the actual conjugate-self-dual cusps \(P_i\) above.
+\begin{proof}
+BCS8 gives the actual normalized induction
+\[
+          \pi\simeq\delta_1\nu^{t_1}\times\cdots\times
+                             \delta_b\nu^{t_b},\qquad |t_s|<1/2,
+\]
+with each \(\delta_s\) unitary and square-integrable.  Since the
+maximal-compact fixed space of \(\pi\) is nonzero, the tensor
+formula for that fixed space in BCS14 makes every
+\(\delta_s\nu^{t_s}\) spherical.  The real determinant twists
+are trivial on the maximal compact, so every \(\delta_s\) is
+spherical as well.
+
+Use the original square-integrable-segment theorem, retained in
+BCS9, to write each \(\delta_s\) as a segment representation.
+The spherical-classification argument in GUA12 proves that a
+spherical segment has length one and unramified rank-one cuspidal
+support: spherical supercuspidals are unramified characters, and
+a longer segment would have the same spherical Hecke character
+as a determinant character, contradicting uniqueness of its
+Langlands multisegment.  Thus \(\delta_s=\chi_s\) is a unitary
+unramified character, and \(|\chi_s(\varpi)|=1\).
+
+The normalized induction calculation in BCS15 identifies the
+Satake multiset, with multiplicities, as
+\(\{\chi_s(\varpi)q^{-t_s}\}_s\).  Its moduli are \(q^{-t_s}\).
+Since \(q>1\) and \(-1/2<t_s<1/2\), both inequalities in
+(HED.11) are strict.  BCS1 and BCS5 supply precisely unitarisability
+and genericity for the chosen cuspidal local components.
+This derives the source's needed local Satake window from its
+already matched generic-unitary input; it asserts no uniform
+distance of the exponents from the endpoints as the place varies.
+\end{proof}
+% END HED13
+
+% BEGIN HED14
+\paragraph{HED14. Singleton strings give the exact cofinite ratio at all places.}
+\label{claim:HED14}
+If every \(d_i=1\) in HED12, then for cofinally many finite places
+\(w\), every multiset \(b\) with
+\(\mathrm{FrobEig}(\iota,R,w,b)\) and every \(z,z'\in b\) satisfy
+\[
+                             |z|<q_w|z'|.
+ \tag{HED.12}
+\]
+There is no final splitting condition and no extra nonzero-root
+premise in this assertion.
+\begin{proof}
+Outside the finite set consisting of the places above \(\ell\)
+and the nonspherical places of the finitely many cusps, HED8 gives
+for each \(r_i\) the multiset
+\[
+                  C_{i,w}=\{\alpha q_w^{(n-1)/2}:
+                                              \alpha\in S_{i,w}\}.
+\]
+These comparisons hold at every such place, whether split or not.
+The identity (HED.10) is already global.  When \(d_i=1\), it says
+\(\det(X-R(g))=\prod_i\det(X-r_i(g))\) for every \(g\).
+
+Given any \(b\) in the statement, choose a prolongation and an
+arithmetic Frobenius at \(w\), whose existence is part of the
+original local-place formalism.  Evaluate that global identity at
+its inverse and compare the \(\mathrm{FrobEig}\) equations.  It gives
+\[
+                  \prod_{z\in b}(X-z)
+                         =\prod_i\prod_{u\in C_{i,w}}(X-u).
+\]
+For completeness, if \(z\in b\), evaluation at \(X=z\) makes the
+right side zero.  Since \(\mathbb C\) is a field and the product
+is finite, \(z\) equals an element of some \(C_{i,w}\).  Thus
+every such \(z\) is \(\alpha q_w^{(n-1)/2}\) for some \(i\).
+HED13 consequently gives
+\[
+                    q_w^{(n-2)/2}<|z|<q_w^{n/2}.
+ \tag{HED.13}
+\]
+The same lower bound holds for \(z'\).  As \(q_w>0\),
+\[
+             |z|<q_w^{n/2}
+                    =q_w q_w^{(n-2)/2}<q_w|z'|.
+\]
+The finite exceptional set was chosen before \(b,z,z'\), so all
+their quantifiers have the required order.  The positive lower
+bound also proves nonvanishing rather than requiring it as an
+additional hypothesis.
+\end{proof}
+% END HED14
+
+% BEGIN HED15
+\paragraph{HED15. The complete end-shape theorem and its original wrapper.}
+\label{claim:HED15}
+Under the original \(\mathrm{HypothesesH'}\), let \(E/E^+\) be CM
+and unramified at every finite place, \(\ell\ne2\), \(n\geq1\),
+and \(\sigma\) an actual \(\mathrm{IsAutRepU}\) subspace.
+For every continuous semisimple \(R:G_E\to\operatorname{GL}_n
+(\overline{\mathbb Q}_\ell)\) satisfying the original
+\(\mathrm{LocGlobT}\) comparison with every split local component
+of \(\sigma\), there are finitely many positive ranks \(a_i\),
+positive lengths \(d_i\), and continuous representations \(r_i\)
+with (HED.10).  If every \(d_i=1\), the exact cofinite conclusion
+(HED.12) holds for every \(\mathrm{FrobEig}\) witness of this \(R\).
+\begin{proof}
+BCS18 supplies one complete Speh family for the given \(\sigma\)
+under the original base-change foundation.  HED10 uses the original
+polarized attachment foundation through GUA8 to construct the
+initial representations.  HED11 and HED12 establish the global
+characteristic-polynomial identity for the supplied \(R\).
+HED13 and HED14 prove the singleton-string clause.  This gives
+every field of the displayed source theorem, including positivity,
+continuity, every group element, and its strict cofinite conclusion.
+Semisimplicity of \(R\) is retained exactly as in the target.
+The \texttt{GuWrap} specialization uses these same BCS18 and GUA8
+constructions, so it adds no new supplier.  All odd primes,
+including \(3\), and all positive ranks and lengths remain allowed.
+\end{proof}
+% END HED15
+
+% BEGIN HED16
+\paragraph{HED16. The full arithmetic-point decomposition on the same ideal.}
+\label{claim:HED16}
+Retain the original data of HED4, the condition \(V.S'=s.S\), and
+the same \(R_H.\mathrm{IsJ}(B,K,J)\).  Then the original field
+\[
+               \mathrm{ArithmeticPointDecomposition}(B,\iota,J)
+\]
+holds.
+Explicitly, every \(x,h\) with \(J\subseteq\ker x\) and
+\(x.\mathrm{Arith}(h)\) has a continuous semisimple
+\(\rho:G_L\to\operatorname{GL}_n(\overline{\mathbb Q}_\ell)\)
+with \(x.\mathrm{IsRep}(\rho)\), and positive ranks and lengths
+with the full identity (HED.10) and the implication (HED.12).
+\begin{proof}
+HED4 supplies \(\lambda,r\) and all four unitary point properties.
+Set \(\rho=r\circ V.\mathrm{pr}\).  HED5 proves its continuity
+and semisimplicity, and HED4 already gives the required full
+\(x.\mathrm{IsRep}\) equality.  The \(\mathrm{aut}\) field of
+those same point properties supplies one actual \(\sigma\), its
+\(\mathrm{IsAutRepU}\) property, and its \(\mathrm{LocGlobT}\)
+comparison with this very \(\rho\) at every split local component.
+
+The original Hida setting has odd \(\ell\), and UPA1 proves that
+\(L/L^+\) is unramified at every finite place.  Hence HED15 applies
+to \(\sigma,\rho\).  Use its ranks \(a_i\) as the source's
+\(d_i\), and its lengths \(d_i\) as the source's \(m_i\).
+The initial representations \(r_i\), their continuity and
+positivity, (HED.10), and (HED.12) are exactly the remaining
+fields of the original arithmetic-point decomposition.
+No good-point assumption or change of ideal is introduced.
+The source's original \(V.S'=s.S\) hypothesis is retained;
+the extraction and comparison lemmas themselves have the broader
+scopes explicitly stated above.
+\end{proof}
+% END HED16
+
+\subsection{Scope of this completion}
+
+HED4 is the original point-extraction supplier; HED16 completes the
+\texttt{end1} field on the chosen original ideal.  The stronger
+\texttt{AutOffN} window, the reverse low-rank point theorem, finite
+twisting and all-level modules have separate proofs and exact input
+contracts.  The local strict interval in HED13 supplies no place-uniform
+margin and is not substituted for that stronger window.  The present
+chapter changes neither the original coefficient ring nor the choice
+order needed when the Hida fields are installed on both rank-four Links.
+
+\end{document}

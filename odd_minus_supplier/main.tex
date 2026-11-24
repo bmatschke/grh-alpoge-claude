@@ -1,0 +1,1196 @@
+% Version 0.24. Complete finite supplier for the literal PsiBound interface.
+% Source: commit 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+\section{The finite arithmetic supplier for the odd-minus bound}
+\label{sec:odd-minus-supplier}
+
+\status{This section proves the literal \texttt{PsiBound} interface by a
+finite Jacobi-sum and Kolyvagin argument.  It includes the construction of
+the auxiliary classes, the selection of auxiliary primes, the finite
+length descent, the Bernoulli normalization, the residual exceptional
+case, and descent to the original character eigenspace.  The global
+reciprocity input is the finite duality statement reconstructed in
+LD2--LD4.  The remaining classical arithmetic inputs are stated explicitly
+below.  No Iwasawa main conjecture or unproved Euler-system existence
+statement is used in this supplier.}
+
+\subsection{Conventions and classical inputs}
+
+Fix an odd prime $p$, a finite extension of $\mathbb Q_p$ with ring of
+integers $O$, fraction field $K$, uniformizer $\varpi$, and residue field
+$k$.  The specified embedding $O\subset\overline{\mathbb Q}_p$ is kept
+throughout.  Write $A=K/O$ and normalize $v=v_O$ by $v(\varpi)=1$,
+with $v(0)=\infty$.  Thus $A[a]\simeq O/(a)$ and
+$\operatorname{length}_O A[a]=v(a)$ for $a\ne0$.
+For the source's finite DVR subalgebra $O$, this is literally its
+coefficient module \texttt{QO}: the localization
+$\mathbb Q_p\otimes_{\mathbb Z_p}O$ is the fraction field $K$,
+and the specified quotient is $K/O$.  Indeed $O$ is a finite
+torsion-free $\mathbb Z_p$-algebra and a domain, so this localization
+is a finite-dimensional domain over $\mathbb Q_p$, hence a field.
+Lengths of arbitrary modules initially belong to
+$\mathbb N\cup\{\infty\}$.  Let $G=\operatorname{Gal}(\Omega/\mathbb Q)$
+for the specified algebraic closure, and let $\chi_p:G\to O^\times$ be
+the cyclotomic character.  Decomposition and inertia groups at a chosen
+place above a rational prime $q$ are denoted by $D_q$ and $I_q$; whenever
+several choices matter, the assertion is required at every such place.
+
+For a continuous character $\alpha:G\to O^\times$, put
+\[
+ \mathscr S(\alpha)=\ker\!\left(
+ H^1(G,A(\alpha))\longrightarrow
+ H^1(D_p,A(\alpha))\times\prod_q H^1(I_q,A(\alpha))\right).
+ \tag{OS.1}
+\]
+Here $A(\alpha)$ has action $g x=\alpha(g)x$.  The product notation
+expresses simultaneous local triviality, and does not assert that only
+finitely many local groups are nonzero.  This is the source's
+$\operatorname{ShaU}$ over $\mathbb Q$.
+
+We use the following classical theorems in their ordinary finite forms.
+They are foundational inputs, rather than newly reconstructed claims.
+Cyclotomic theory identifies $\operatorname{Gal}(\mathbb Q(\zeta_n)/\mathbb Q)$
+with $(\mathbb Z/n)^\times$, identifies the integers with
+$\mathbb Z[\zeta_n]$, gives ramification only at primes dividing $n$,
+and identifies Frobenius at $q\nmid n$ with $\zeta_n\mapsto\zeta_n^q$.
+At a prime $q$, roots of unity of order prime to $q$ reduce injectively;
+adjoining an $M$th root of a local unit is unramified when $q\nmid M$.
+The latter follows also directly from Hensel's lemma over the maximal
+unramified extension, whose residue field is algebraically closed.
+Chebotarev supplies Frobenius elements in every nonempty open conjugacy
+class condition, outside a prescribed finite set.  Together with the
+Hilbert class field and its Artin isomorphism, it supplies a degree-one
+prime in every ideal class of a number field, outside a prescribed finite
+set.  Indeed degree $\ge2$ primes have Dirichlet density zero: their
+norm-reciprocal series converges at $s=1$, being bounded by a fixed
+multiple of $\sum_r r^{-2}$ over rational primes.  The desired Artin
+class has positive Dirichlet density.  Finally, Kummer theory gives
+$H^1(\mathbb Q,\mu_p)=\mathbb Q^\times/\mathbb Q^{\times p}$, with its
+usual compatible local identifications; this is the Kummer exact
+sequence and Hilbert's theorem 90.  The exact global/local finite
+duality input is isolated in OS5 and supplied by LD2--LD4.
+
+The source map at the end of this component records pinned declarations
+for each use.  In particular, these named classical inputs do not stand
+for the stronger assertion that the auxiliary classes constructed below
+already exist or satisfy the required recurrence.
+
+\subsection{Jacobi elements and their two distribution laws}
+
+Write $K_n=\mathbb Q(\zeta_n)\subset\Omega$ and
+$\sigma_t(\zeta_n)=\zeta_n^t$.  For $1\le b<n$ define
+\[
+ \theta_{n,b}(t)=
+ \left\lfloor\frac{b\langle t\rangle_n}{n}\right\rfloor-
+ \left\lfloor\frac{b\langle-t\rangle_n}{n}\right\rfloor,
+ \qquad t\in(\mathbb Z/n)^\times.
+ \tag{OS.2}
+\]
+Thus $\theta_{n,b}(-t)=-\theta_{n,b}(t)$.
+For an ideal $\mathfrak a\ne0$ of $K_n$, call $X$ an associated
+Jacobi element if
+\[
+ X\overline X=1,\qquad
+ (X)=\prod_{t\in(\mathbb Z/n)^\times}
+       \sigma_t^{-1}\mathfrak a^{\,\theta_{n,b}(t)}.
+ \tag{OS.3}
+\]
+The inverse in this formula fixes the convention used in all subsequent
+Frobenius and character formulas.
+
+% BEGIN OS1
+\begin{proposition}[OS1: existence, norm, and congruence of Jacobi elements]
+For every nonzero ideal $\mathfrak a$ an element satisfying (OS.3)
+exists, and any two differ by a root of unity whose order divides $2n$.
+Let $q\nmid n$ be prime, $b<q$, and let $X'$ and $X$ satisfy (OS.3)
+at levels $nq$ and $n$, for $\mathfrak a'$ and
+$N_{K_{nq}/K_n}\mathfrak a'$, respectively.  Then
+\[
+ N_{K_{nq}/K_n}X'
+   =\zeta\,X/\sigma_q^{-1}X,\qquad \zeta^{2n}=1.
+ \tag{OS.4}
+\]
+If $\mathfrak a'$ is prime to $q$, there is a single root of unity
+$\xi$, with $\xi^{2nq}=1$, such that, at every prime above $q$,
+\[
+                  X'\equiv\xi\,\sigma_q^{-1}X\pmod q.
+ \tag{OS.5}
+\]
+Congruences here mean equality in the local residue field; all the
+elements being compared are local units.
+\end{proposition}
+\begin{proof}
+First suppose $\mathfrak a=P$ has prime norm $r\nmid n$.
+Then $r\equiv1\pmod n$, and reduction at $P$ identifies
+$\mu_n$ with the subgroup of order $n$ in $\mathbb F_r^\times$.
+Let $d=(r-1)/n$ and let $\eta:\mathbb F_r^\times\to\mu_n$ be
+the character reducing to $x\mapsto x^d$, extended by zero at zero.
+Set
+\[
+ J=\prod_{j=1}^{b-1}J(\eta,\eta^j),\quad
+ J(\eta,\eta^j)=\sum_{x\in\mathbb F_r}\eta(x)\eta^j(1-x),
+ \qquad X=\overline J/J.
+ \tag{OS.6}
+\]
+The standard finite-sum change of variables gives
+$J(\eta,\eta^j)J(\eta^{-1},\eta^{-j})=r$ when
+$\eta,\eta^j,\eta^{j+1}$ are nontrivial.  One way to check the
+identity is to introduce a nontrivial additive character, expand the
+two Gauss sums, and substitute $x+y=u$; this gives
+$g(\eta)g(\eta^j)=J(\eta,\eta^j)g(\eta^{j+1})$ and
+$g(\lambda)g(\lambda^{-1})=\lambda(-1)r$.
+Consequently each Jacobi sum is nonzero and its integral ideal divides
+$(r)$.
+
+Put $u=\langle t\rangle_n$ and $v=\langle jt\rangle_n$.
+Reduction at $\sigma_t^{-1}P$ gives
+\[
+ J(\eta,\eta^j)\equiv
+       \sum_{x\in\mathbb F_r}x^{du}(1-x)^{dv}.
+\]
+For $0<i,j<r-1$, the sum $\sum_x x^i(1-x)^j$ vanishes exactly
+when $i+j<r-1$.  To see this, expand $(1-x)^j$; the only possible
+nonzero power sum has exponent $r-1$, and its coefficient is
+$-(-1)^{r-1-i}\binom{j}{r-1-i}$, which is nonzero modulo $r$ when
+$0\le r-1-i\le j<r$.  Thus the exponent of
+$\sigma_t^{-1}P$ in the Jacobi sum is
+$1-\operatorname{carry}(u,v)$, where the carry is $0$ or $1$
+according as $u+v<n$ or $u+v\ge n$.
+The prime $r$ splits without ramification, so the exponents really are
+zero or one.  Telescoping carries gives
+\[
+ \operatorname{ord}_{\sigma_t^{-1}P}J
+    =b-1-\left\lfloor\frac{b\langle t\rangle_n}{n}\right\rfloor.
+\]
+Subtracting this formula from its conjugate proves (OS.3) for
+$\overline J/J$.
+
+For a general $\mathfrak a$, choose a degree-one prime $P$, prime to
+$n$, whose ideal class is $[\mathfrak a]^{-1}$, and write
+$\mathfrak aP=(y)$.  The explicit element
+\[
+                 Y=\prod_t\sigma_t^{-1}(y)^{\theta_{n,b}(t)}
+ \tag{OS.7}
+\]
+satisfies (OS.3) for $(y)$: the ideal identity is immediate and the
+conjugate factors cancel in pairs.  Dividing $Y$ by the element (OS.6)
+for $P$ proves existence for $\mathfrak a$.
+The quotient of two choices is a unit all of whose complex conjugates
+have absolute value one.  It is a root of unity: the monic polynomials
+whose roots are the conjugates of its powers have integral, uniformly
+bounded coefficients, hence only finitely many possibilities; some two
+powers agree.  If a root of order $h$ lies in $K_n$, then
+$K_{\operatorname{lcm}(n,h)}=K_n$, so their Euler totients are equal.
+The formula for the totient permits no increase in a prime-power
+factor, except adjoining a factor $2$ when $n$ is odd.  Thus
+$h\mid2n$.  This proves
+the stated uniqueness.
+
+The norm identity rests on the following integer identity:
+\[
+ \sum_{\substack{t'\in(\mathbb Z/nq)^\times\\t'\equiv t\pmod n}}
+ \theta_{nq,b}(t')
+       =\theta_{n,b}(t)-\theta_{n,b}(q^{-1}t).
+ \tag{OS.8}
+\]
+To verify it, first sum over the $q$ representatives $u+in$ of $t$,
+$0\le i<q$.  Since $0\le b<q$, the usual floor-sum identity gives
+the floor at level $n$, plus the constant
+$\sum_{i=0}^{q-1}\lfloor ib/q\rfloor$.
+Remove the unique representative divisible by $q$; its contribution
+is the floor at $q^{-1}t$.  Subtract the identical computation for
+$-t$; the constants cancel.  Apply (OS.8) to ideals and use norm
+compatibility with conjugation.  The two sides of (OS.4), with the
+root of unity omitted, then have the same ideal and conjugate product
+one.  The uniqueness just proved supplies $\zeta$.
+
+For (OS.5), first take $\mathfrak a'$ of degree one and norm $r$.
+The characters $\eta'$ at level $nq$ and $\eta$ at level $n$ in
+(OS.6) satisfy $(\eta')^q=\eta$ after inclusion in the larger field:
+both sides have the same reduction at the prime above $r$, and
+reduction is injective on $\mu_{nq}$.  Also
+$(\sigma_q^{-1}\eta)^q=\eta$.  In characteristic $q$, the Frobenius
+map is injective, so $\eta'$ and $\sigma_q^{-1}\eta$ have the same
+reduction at every prime above $q$.  The Jacobi sums, their products,
+and their conjugates therefore have the same reductions.  Their
+denominators are units there, since they divide powers of $r\ne q$.
+This proves (OS.5) for the canonical choices, and uniqueness inserts
+one root of unity for any other choices.
+
+For a principal ideal $(y)$ prime to $q$, use (OS.7).
+Reduction of $\sigma_{t'}^{-1}y$ depends only on $t'\bmod n$,
+because $\zeta_q$ reduces to one.  Call this value $f(t)$.
+Frobenius gives $f(t)=f(qt)^q$.  Combining this with (OS.8), the
+reduction of the upper-level product is
+\[
+ \prod_t f(t)^{\theta(t)-\theta(q^{-1}t)}
+   =\prod_t f(qt)^{(q-1)\theta(t)}.
+\]
+Every one of the $q-1$ relative conjugates of $y$ has the same
+reduction.  The last expression is consequently the reduction of
+the lower-level product attached to $N(y)$, acted on by
+$\sigma_q^{-1}$.  This proves (OS.5) for principal ideals.
+Finally choose a degree-one prime $P'$ in $[\mathfrak a']^{-1}$,
+outside $nq$, and apply the principal calculation to
+$P'\mathfrak a'=(y)$.  Divide by the already proved calculation
+for $P'$.  All factors are units at $q$, and the root of unity from
+the degree-one calculation is global, so a single $\xi$ works at
+every prime above $q$.  This proves (OS.5) in full.
+\end{proof}
+% END OS1
+
+\subsection{Removing the roots of unity}
+
+For the ensuing finite construction let $M=p^m$, $m\ge1$, and
+$F=N_0M$ with $(N_0,p)=1$.  Suppose
+\[
+ \alpha|_{U}\equiv1\pmod M,\quad
+ \alpha(j)=-1,\quad
+ \alpha(g_0)-\chi_p(g_0)\in O^\times,
+ \qquad U=\operatorname{Gal}(\Omega/K_F),
+ \tag{OS.9}
+\]
+where $j$ is a complex conjugation.  Put
+$\beta=\chi_p\alpha^{-1}$.  Thus $\beta(j)=1$,
+$\beta|_U\equiv1\pmod M$, and some $\beta(g)-1$ is a unit.
+Choose an integer $a$ such that $g_0$ acts on $\mu_M$ by the
+$a$th power, and put
+\[
+                   P(y)=g_0(y)/y^a.
+ \tag{OS.10}
+\]
+Then $\alpha(g_0)-a$ is a unit, since $M$ is in the maximal ideal.
+
+Choose a prime $r\equiv1\pmod F$ and one place $A_0$ above $r$.
+Call a prime $q$ admissible if
+\[
+ q\equiv1\pmod F,\qquad q\ne r,\qquad
+              p\nmid\operatorname{ord}_{\mathbb F_q^\times}(r).
+ \tag{OS.11}
+\]
+An admissible list has distinct admissible entries, and $d$ denotes
+their product.  All cyclotomic fields below are the actual subfields
+of the chosen $\Omega$.
+
+% BEGIN OS2
+\begin{proposition}[OS2: a strict finite Euler system]
+For $1\le b<F$ there are nonzero elements $x_d\in K_{Fd}$,
+units outside $r$, and positive integers $s(d,q)$ prime to $p$,
+such that for every admissible extension $d\mapsto dq$,
+\begin{align*}
+ N_{K_{Fdq}/K_{Fd}}x_{dq}
+       &=(x_d/\sigma_q^{-1}x_d)^{s(d,q)},\\
+ x_{dq}&\equiv(\sigma_q^{-1}x_d)^{s(d,q)}\pmod q.
+\end{align*}
+The second equality holds at every place above $q$.
+The elements can be chosen in the form
+$x_d=P(X_d)^{2N_0d}$, where $X_1$ has
+\[
+ \operatorname{ord}_{A_0}(\sigma_tX_1)
+                 =\theta_{F,b}(t)\operatorname{ord}_{A_0}(r).
+ \tag{OS.12}
+\]
+\end{proposition}
+\begin{proof}
+At each level take the prime below the fixed place $A_0$, and use OS1
+to choose its Jacobi element $X_d$.  These elements are units outside
+$r$.  Relative norm of the upper prime is a power of the lower
+prime, with exponent $s_0(d,q)$ dividing the order of $r$ modulo $q$.
+Indeed residue degrees in cyclotomic fields are orders of $r$ modulo
+their levels, and their relative ratio divides that order.  The
+admissibility condition makes $s_0(d,q)$ prime to $p$.
+OS1 therefore gives the displayed norm and congruence for $X_d$
+with exponent $s_0(d,q)$ and possible root-of-unity factors of order
+dividing $2Fdq$.  At level $F$, $r$ splits completely, so the ideal
+identity (OS.3) gives precisely (OS.12).
+
+The operator $P$ commutes with cyclotomic conjugations and with their
+norms.  If $\zeta^{2Fdq}=1$, then
+$\zeta^{2N_0dq}\in\mu_M$, and consequently
+\[
+                     P(\zeta)^{2N_0dq}=1.
+\]
+Apply $P$ and then the power $2N_0dq$ to both lax identities.
+The root-of-unity factors disappear.  On the lower side this power
+is $q$ times the exponent used in $x_d$, so the new exponent is
+$s(d,q)=q s_0(d,q)$, still prime to $p$.
+Congruences remain valid after applying $g_0$, because the original
+congruence held at every prime above $q$, and after division and
+integer powers because all relevant elements are local units.
+This proves both strict identities simultaneously.
+\end{proof}
+% END OS2
+
+\subsection{Derivative classes with exact local recurrence}
+
+For every admissible $q$, choose $\tau_q$ acting trivially on all
+roots of unity of order prime to $q$, and generating the action on
+$\mu_q$.  Such an element exists in inertia at $q$.
+In multiplicative notation put
+\[
+ D_q y=\prod_{i=0}^{q-2}\tau_q^i(y)^i,
+ \qquad D_L=\prod_{q\in L}D_q,
+ \qquad y_L=D_Lx_d.
+ \tag{OS.13}
+\]
+The last product means composition of commuting group-ring operators
+on the indicated cyclotomic field.  Fix a primitive $M$th root
+$\zeta\in\Omega$, representatives $\sigma_t\in G$ of
+$t\in(\mathbb Z/F)^\times$, and $w\in A[M]$.
+
+% BEGIN OS3
+\begin{proposition}[OS3: construction of the auxiliary homomorphisms]
+There are continuous additive homomorphisms $\nu_L:U\to A[M]$
+such that
+\[
+ \nu_L(gug^{-1})=\beta(g)\nu_L(u),\qquad
+ \nu_L(I_q)=0\quad(q\nmid Frd).
+ \tag{OS.14}
+\]
+If $q$ is admissible and absent from $L$, then for every place above
+$q$ and every Frobenius $\phi_q$ there are
+$\tau\in I_q$ and $u_q\in O^\times$ with
+\[
+                  \nu_{qL}(\tau)=u_q\nu_L(\phi_q).
+ \tag{OS.15}
+\]
+At the fixed place above $r$ there are $\tau_0\in I_r$ and
+$u_0\in O^\times$ with
+\[
+ \nu_\varnothing(\tau_0)=u_0zw,\qquad
+ z=\sum_{t\in(\mathbb Z/F)^\times}
+          \theta_{F,b}(t)\alpha(\sigma_t)^{-1}.
+ \tag{OS.16}
+\]
+These are the full source conditions \texttt{NuSys}, for the same
+$M,F,r,\alpha,A_0,\sigma$ and $w$.
+\end{proposition}
+\begin{proof}
+The group-ring identity
+\[
+                 (\tau_q-1)D_q=(q-1)-N_q
+ \tag{OS.17}
+\]
+and the norm formula of OS2 imply, by induction on $L$, that
+$g y_L/y_L$ is an $M$th power in $K_{Fd}$ for every $g\in U$.
+Here are the induction details.  For a new $q$ write
+$w'=D_Lx_{dq}$ and $y=D_Lx_d$.  Then
+$N_qw'=(y/\phi_q^{-1}y)^s$, where $s=s(d,q)$.
+By induction choose $z'$ in $K_{Fd}$ with
+$(z')^M=\phi_q^{-1}y/y$.  Since $q-1=Mh$, (OS.17) gives
+\[
+ \frac{\tau_q(D_qw')}{D_qw'}
+          =\frac{(w')^{q-1}}{N_qw'}
+          =((w')^h(z')^s)^M.
+\]
+Repeat this calculation for each member of the enlarged list, using
+the derivative for the list with that member removed; the induction
+hypothesis applies to that shorter list.  For elements fixing
+$K_{Fdq}$ the quotient is one.
+These elements generate $\operatorname{Gal}(K_{Fdq}/K_F)$, by the
+Chinese remainder theorem.  The property is closed under products
+and inverses, proving the induction.
+
+Choose $Y_L^M=y_L$.  For $g\in U$ choose $z_g\in K_{Fd}$ with
+$z_g^M=g y_L/y_L$, and define $\kappa_L(g)\in\mathbb Z/M$ by
+\[
+ \zeta^{\kappa_L(g)}=
+       \frac{g(PY_L)}{PY_L}\,\frac1{Pz_g}.
+ \tag{OS.18}
+\]
+The $M$th power of the right side is one, because $g_0$ and $g$
+commute on $K_{Fd}$.  Changing $z_g$ multiplies it by an element of
+$\mu_M$, which $P$ kills; changing $Y_L$ has the same harmless
+effect.  For $g,h\in U$, one can take $z_{gh}=g(z_h)z_g$.
+Substitution in (OS.18), using the same commutation on $K_{Fd}$,
+proves additivity.  Its kernel contains the open subgroup fixing
+$K_{Fd}$ and $PY_L$, so $\kappa_L$ is continuous.
+At a prime outside $Frd$, the field $K_{Fd}$ is unramified and
+$y_L$ is a unit.  Its $M$th roots are unramified there, as are their
+$g_0$-conjugates.  Inertia therefore gives zero in (OS.18).
+
+Define
+\[
+ \nu_L(u)=\sum_t\kappa_L(\sigma_t^{-1}u\sigma_t)
+                              \beta(\sigma_t)w.
+ \tag{OS.19}
+\]
+Additivity, continuity, $M$-torsion and the stated unramifiedness are
+immediate.  To check equivariance, reindex the cosets by $g$.
+The extra factors are in $U$; an additive homomorphism on $U$ is
+unchanged by conjugation inside $U$, and $\beta|_U$ acts trivially
+on $A[M]$.  The remaining factor is $\beta(g)$, proving (OS.14).
+
+For completeness the local recurrence in (OS.15) is an exact residue
+calculation, not an additional Euler-system axiom.  Choose inertia
+$\tau$ with the same action on $\mu_q$ as $\tau_q$.
+Put $w'=D_Lx_{dq}$, $y=D_Lx_d$, $Y^M=D_qw'$ and $(Y')^M=y$.
+For $\phi=\phi_q$ choose $z'$ with $(z')^M=\phi^{-1}y/y$.
+The previous induction shows that $(w')^h(z')^s$ is an allowable
+root for $\tau$, where $Mh=q-1$.
+Substituting these roots in (OS.18) and cancelling factors gives
+\[
+ \frac{\zeta^{\kappa_{qL}(\tau)}}
+      {(\zeta^{\kappa_L(\phi^{-1})})^s}
+ =\frac{\tau(PY)}{PY}
+   \left(\frac{PY'}{\phi^{-1}(PY')^q}\right)^s
+   \left[P\!\left(\frac{w'}{(\phi^{-1}y)^s}\right)\right]^{-h}.
+ \tag{OS.20}
+\]
+The first factor reduces to one because $\tau$ is inertia; the
+second does so because $\phi$ is Frobenius; the third does so by
+the congruence in OS2 and its images under $D_L$ and $P$.
+All elements involved are units at $q$.
+Both sides on the left belong to $\mu_M$, whose reduction is
+injective since $q\ne p$.  Hence
+$\kappa_{qL}(\tau)=-s\kappa_L(\phi)$ in $\mathbb Z/M$.
+The same identity holds after conjugating the chosen place by each
+$\sigma_t$: cyclotomic automorphisms commute, so the action of
+the conjugated inertia element on $\mu_q$ is still the required
+generator.  Sum as in (OS.19).  This gives (OS.15) with
+$u_q=-s$, a unit.
+
+For initialization, if $y\in K_F$ and
+$\operatorname{ord}_{A_0}(\sigma_tPy)=k(t)
+\operatorname{ord}_{A_0}(r)$, choose $\rho^M=r$ and tame inertia
+$\tau_0$ with $\tau_0\rho=\zeta\rho$.
+The quotient $\sigma_t(PY)/\rho^{k(t)}$ is a local unit whose
+$M$th power is a unit, so it is fixed by inertia.  Formula (OS.18)
+therefore gives
+\[
+       t\,\kappa(\sigma_t^{-1}\tau_0\sigma_t)=k(t)
+                         \quad\hbox{in }\mathbb Z/M.
+\]
+Since $\chi_p(\sigma_t)\equiv t\pmod M$, its weighted sum is
+$\sum_t k(t)\alpha(\sigma_t)^{-1}w$.
+For $y=x_1=P(X_1)^{2N_0}$, write $d_0$ for the image of $g_0$
+in $(\mathbb Z/F)^\times$.  By (OS.12),
+\[
+ k(t)=2N_0\bigl(\theta(td_0^2)-2a\theta(td_0)+a^2\theta(t)\bigr).
+\]
+Reindexing the sum, and using $\alpha|_U\equiv1\pmod M$, gives
+\[
+ \sum_t k(t)\alpha(\sigma_t)^{-1}w
+       =2N_0(\alpha(g_0)-a)^2zw.
+\]
+The coefficient is a unit by (OS.9) and $p\ne2$.
+This proves (OS.16) and the entire assertion.
+\end{proof}
+% END OS3
+
+\subsection{Compatible auxiliary primes}
+
+% BEGIN OS4
+\begin{proposition}[OS4: one prime with all the required properties]
+Assume (OS.9).  Let $c:U\to A[M]$ be a nonzero continuous
+$\alpha$-equivariant homomorphism, and let
+$\nu:U\to A[M]$ be a continuous $\beta$-equivariant homomorphism.
+For every finite set of excluded primes, there are an admissible prime
+$q$ outside that set, a place above $q$, and its Frobenius $\phi$, such
+that
+\[
+       c(\phi)\ne0,\qquad
+       O\nu(\phi)=\sum_{u\in U}O\nu(u).
+ \tag{OS.21}
+\]
+The same prime can in addition be required to satisfy
+$q\not\equiv1\pmod{Fp}$.
+\end{proposition}
+\begin{proof}
+Choose $\rho^M=r$ and put $H=\operatorname{Gal}(\Omega/K_F(\rho))$.
+The extension $K_F(\rho)/K_F$ is cyclic of degree $M$:
+$X^M-r$ is Eisenstein at a prime above $r$, and $\mu_M\subset K_F$.
+It is Galois over $\mathbb Q$, because every conjugate of $\rho$
+is $\zeta^i\rho$.  On its relative cyclic group, conjugation by
+$g\in G$ acts by the scalar $\chi_p(g)$ modulo $M$.
+
+Let $B=\ker c$.  If $H\subset B$, then $c$ factors through this
+cyclic Kummer group.  Comparing its $\alpha$-equivariance with
+the preceding conjugation action gives
+$(\alpha(g)-\chi_p(g))c(u)=0$ for every $g,u$.
+At $g_0$ the coefficient is a unit, contrary to $c\ne0$.
+Thus $H\not\subset B$.
+
+The $O$-module $C=\sum O\nu(U)$ is finite cyclic: $\nu$ has finite
+image by compactness, and every finite submodule of $A$ is one of
+the modules $A[\varpi^a]$.
+If $C\ne0$, let $B'=\{u:\nu(u)\in\varpi C\}$.
+If $H\subset B'$, the nonzero homomorphism
+$U\to C/\varpi C$ would again factor through the Kummer group.
+Its two conjugation scalars would be $\beta(j)=1$ and
+$\chi_p(j)=-1$.  Their difference is a unit because $p$ is odd,
+a contradiction.  Thus $H\not\subset B'$.
+If $C=0$, simply set $B'=B$; the second condition of (OS.21) is
+then automatic.
+
+Put $B''=\operatorname{Gal}(\Omega/K_{Fp})$, a subgroup of $U$.
+We also have $H\not\subset B''$.
+Otherwise $K_{Fp}\subset K_F(\rho)$.  The relative extension
+$K_{Fp}/K_F$ has degree $p$ and is abelian over $\mathbb Q$.
+Complex conjugation would therefore act trivially on its relative
+Galois group.  But, as a quotient of the Kummer group, that action
+is inversion.  A nontrivial group of odd order $p$ cannot have
+both actions.  This proves the third noncontainment.
+
+Here is the small group-theoretic compatibility argument.
+A group cannot be the union of three proper subgroups $A_1,B_1,C_1$
+when $x^M\in B_1$ for every $x$ and $M$ is odd.
+Two proper subgroups cannot cover a group: the product of an element
+in each exclusive part lies outside both.
+If a three-subgroup cover existed, choose
+$x\notin B_1\cup C_1$ and $y\notin A_1\cup C_1$ using this
+two-subgroup fact.  Then $x\in A_1$, $y\in B_1$, and $xy\in C_1$.
+The element $x^2y$ is in neither $A_1$ nor $C_1$, so belongs to
+$B_1$.  Hence $x^2\in B_1$.  Combining this with $x^M\in B_1$
+and oddness of $M$ gives $x\in B_1$, a contradiction.
+Apply the argument inside $H$ to its intersections with $B',B,B''$.
+The required power condition follows because $c(x^M)=Mc(x)=0$.
+Hence there is an element
+\[
+                         h\in H\setminus(B\cup B'\cup B'').
+\]
+All three subgroups are open in $U$; thus this is a nonempty open
+condition in $G$.  Pass to a finite Galois quotient small enough
+to preserve it.  Chebotarev supplies a Frobenius conjugate in this
+open set outside the prescribed primes.  Changing the place above
+that rational prime selects the indicated conjugate itself.
+This explains compatibility of all conditions in the compositum;
+no independent, possibly conflicting congruence choices have been
+made.
+
+The selected Frobenius lies in $U\setminus B''$, so
+$q\equiv1\pmod F$ but $q\not\equiv1\pmod{Fp}$.
+Write $q-1=N_0M h_0$; then $p\nmid h_0$.
+It fixes $\rho$, so its residue satisfies $\rho^{q-1}=1$,
+and consequently $r^{N_0h_0}=1$ modulo $q$.
+Therefore $\operatorname{ord}_{\mathbb F_q^\times}(r)$ divides
+$N_0h_0$, which is prime to $p$.  Excluding $r$ makes $q$
+admissible.  Avoidance of $B$ gives the first assertion of (OS.21),
+and avoidance of $B'$ says that $\nu(\phi)$ is a generator of
+the cyclic module $C$.  This proves every required condition.
+\end{proof}
+% END OS4
+
+\subsection{The precise reciprocity consequence}
+
+% BEGIN OS5
+\begin{proposition}[OS5: finite reciprocity and the annihilator comparison]
+The duality results LD2--LD4 imply the source condition
+\texttt{Rec}.  In particular, let $a_0\mid a\mid a'$ with
+$a'\mid M$, and let $c:G\to A$ be an $\alpha$-cocycle killed by
+$a_0$.  Assume $c$ is zero on inertia away $F$, is a coboundary
+on decomposition groups above $F$ with witnesses killed by $a_0$,
+and is zero on the decomposition groups above the primes dividing
+$n$ outside $F$.
+Suppose $q\equiv1\pmod F$, $q\nmid Fn$, and
+$\nu:U\to A[M]$ is $\beta$-equivariant, unramified outside $Fnq$,
+with
+\[
+ \operatorname{Ann}_O\nu(U)=(a'),\qquad
+                  \operatorname{Ann}_O\nu(\tau)=(a)
+ \tag{OS.22}
+\]
+for some $\tau\in I_q$.
+Then $a'=a d$ for some $d\in O$ and
+\[
+                         d\,c(\phi_q)=0.
+ \tag{OS.23}
+\]
+\end{proposition}
+\begin{proof}
+We first spell out the finite coefficient reduction, so that the
+reference to LD4 preserves the literal \texttt{Rec} quantifiers.
+For any nonzero annihilator $a'$ choose $w_0\in A$ with
+$\operatorname{Ann}(w_0)=(a')$ and identify $A[a']$ with
+$B=O/(a')$ by $b\mapsto bw_0$.
+Choose $p^h$ divisible by $a'$ and let
+$\lambda:B\to\mathbb Z/p^h$ be any
+$\mathbb Z/p^h$-linear map.
+For an $\alpha$-cocycle $c$ and a
+$\beta=\chi_p\alpha^{-1}$-cocycle $n$, the function
+\[
+             (g,h)\longmapsto
+                 \lambda\bigl(n(g)\alpha(g)c(h)\bigr)
+ \tag{OS.24}
+\]
+is their cup-product cocycle in $(\mathbb Z/p^h)(1)$.
+Use the assumed continuity of the reduction of $\alpha$ modulo $a'$;
+this is exactly the open-kernel hypothesis in \texttt{Rec}.
+No continuity of an unreduced character is needed at this step.
+At primes outside the finite ramification
+set this cup class is unramified; at every specified prime where
+$c$ is a coboundary, it is a coboundary.  For example if
+$c(g)=(\alpha(g)-1)m$, a cobounding cochain is
+$-\lambda(n(g)\alpha(g)m)$.
+At the single remaining prime $q$, LD4 first makes the local cup
+class zero.  The following argument converts that fact into the
+elementwise assertion actually needed.  Let
+$x_0:D_q/I_q\to R=\mathbb Z/p^h$ send arithmetic Frobenius to $1$.
+Since $c$ is unramified and the characters are trivial on $B$,
+$c(g)=x_0(g)c(\phi_q)$ in $B$.
+The function $N(g)=\lambda(n(g)c(\phi_q))$ is a cocycle in $R(1)$:
+on these values the action of $\beta$ agrees with that of $\chi_p$,
+as both are trivial modulo $a'$ on $D_q$.
+Thus the local cup (OS.24) is $N\cup x_0$.
+Every unramified $R$-valued class is an $R$-multiple of $x_0$,
+so $N$ pairs trivially with every such class.
+LD2, applied to the trivial module $R$ and its dual $R(1)$, makes
+$N$ unramified.  Inertia acts trivially on $R(1)$ at $q\ne p$,
+so an unramified class has $N(\tau)=0$ as an actual cocycle value.
+Multiplying by $x_0(g)$ now gives
+\[
+                  \lambda\bigl(n(\tau)c(g)\bigr)=0
+                 \quad(\tau\in I_q,\ g\in D_q),
+ \tag{OS.25}
+\]
+under exactly the stated trivial-character and unramified conditions.
+This deduction uses the same finite modules and the same place choices
+throughout.
+All the maps $\lambda$ together separate points of $B$:
+decompose its finite additive $p$-group into cyclic factors and
+map a nonzero coordinate into $\mathbb Z/p^h$.
+Thus (OS.25) holds before applying $\lambda$ as well.
+Equivalently, $n(\tau)=yw_0$ implies $y c(g)=0$ in $A$.
+This is exactly \texttt{Rec}; no trace pairing of potentially
+nonunit discriminant has been substituted for these separating maps.
+
+To apply it to $\nu$, choose $g_1$ with $\beta(g_1)-1$ a unit.
+The quotient $G/U$ is abelian, so
+\[
+ n(g)=-(\beta(g_1)-1)^{-1}
+                \nu(gg_1g^{-1}g_1^{-1})
+ \tag{OS.26}
+\]
+is defined.  The commutator identity and $\beta$-equivariance give
+$n(gh)=n(g)+\beta(g)n(h)$, and for $u\in U$ give $n(u)=\nu(u)$.
+Its values are $O$-multiples of values of $\nu$, so $a'n=0$.
+It is continuous, and it has exactly the unramifiedness needed
+outside $Fnq$, since inertia there lies in $U$.
+At $q$, $D_q\subset U$ because $q$ splits in $K_F$; hence
+$\alpha,\beta\equiv1\pmod{a'}$.  The hypotheses on $c$
+provide the other local conditions in \texttt{Rec}.
+We obtain $y c(\phi_q)=0$ if $\nu(\tau)=yw_0$.
+
+The inclusion $\nu(\tau)\in\nu(U)$ shows $a\mid a'$.
+In a DVR,
+\[
+ v(a)=\max\{v(a')-v(y),0\},\qquad
+ v(d)=v(a')-v(a)=\min\{v(y),v(a')\}.
+\]
+If $v(y)\le v(a')$, then $d$ is a multiple of $y$ up to a unit,
+so it kills $c(\phi_q)$.  If $v(y)\ge v(a')$, then $a$ is a
+unit, and $a_0\mid a$ makes $c=0$.
+This proves (OS.23).
+\end{proof}
+% END OS5
+
+\subsection{The finite descent actually bounds length}
+
+For $\alpha(j)=-1$, let $\mathcal T(F,a_0)$ consist of continuous
+$\alpha$-cocycles $c:G\to A$ with $c(j)=0$, killed by $a_0$,
+zero on inertia away $F$, and locally coboundaries at primes
+dividing $F$ with witnesses killed by $a_0$.
+This is the exact normalized module \texttt{ShT}.
+Let $\mathcal T_n$ be its submodule whose cocycles vanish on every
+decomposition group above a prime dividing $n$.
+
+% BEGIN OS6
+\begin{proposition}[OS6: the complete finite length descent]
+Under (OS.9), and with $z$ as in (OS.16), if
+$a_0z\mid M$, then
+\[
+              \operatorname{length}_O\mathcal T(F,a_0)\le v(z).
+ \tag{OS.27}
+\]
+No finiteness assumption on the module on the left is required.
+\end{proposition}
+\begin{proof}
+The divisibility implies $z\ne0$; write $M=k_0z$, so $a_0\mid k_0$.
+Choose $w\in A$ with annihilator $(M)$, and construct $\nu_L$
+by OS3.  Let $(a_L)=\operatorname{Ann}\nu_L(U)$.
+Every $a_L$ divides $M$, and $a_L\ne0$.
+Initialization gives $\operatorname{Ann}\nu_\varnothing(\tau_0)=(k_0)$,
+so $a_\varnothing=k_0d_0$.
+
+We will repeatedly use the following length comparison, which is
+stronger than an elementwise annihilation statement.
+If $\nu$ has annihilator $(a')$ and $\nu(\tau)$ has annihilator
+$(a)$, with $a_0\mid a$ and $a'=ad$, OS5 shows that evaluation
+\[
+             \mathcal T_n\longrightarrow A,\qquad
+                       c\longmapsto c(\phi_q)
+\]
+has image in $A[d]$, of length at most $v(d)$.
+Its kernel is $\mathcal T_{nq}$.
+Indeed inertia at $q$ acts trivially on the values and $c$ vanishes
+there; the unramified quotient is procyclic, so a continuous
+homomorphism zero at Frobenius vanishes on $D_q$.
+The same conclusion holds at every conjugate place: the cocycle
+conjugation formula changes the value only by
+$(\alpha(g)-1)c(h)$ with $g\in D_q\subset U$, which is zero
+because $a_0\mid M$ and $\alpha|_U\equiv1\pmod M$.
+Thus additivity and monotonicity of extended module length give
+\[
+        \operatorname{length}\mathcal T_n
+       \le\operatorname{length}\mathcal T_{nq}+v(d).
+ \tag{OS.28}
+\]
+Apply this first with $n=1$, $q=r$, and the initialization data:
+\[
+ \operatorname{length}\mathcal T(F,a_0)
+       \le\operatorname{length}\mathcal T_r+v(d_0).
+ \tag{OS.29}
+\]
+
+For an admissible list $L$ with $a_0\mid a_L$, put
+$S_L=\mathcal T_{r\prod L}$ and $J=v(M)$.
+If $S_L\ne0$, choose a nonzero $c\in S_L$.
+Its restriction to $U$ is an $\alpha$-equivariant homomorphism:
+the action is trivial modulo $M$, and the cocycle conjugation
+formula gives equivariance.  This restriction is nonzero.
+For if it were zero, $c$ would factor through the abelian group
+$G/U$; the commutativity relation for $j$ and $g$, together with
+$c(j)=0$, would give $(\alpha(j)-1)c(g)=0$, hence $c=0$.
+
+Use OS4 with this $c$ and $\nu_L$, excluding primes dividing
+$Fr\prod L$.  The resulting $q$ has
+$c(\phi_q)\ne0$ and $\nu_L(\phi_q)$ generates $\nu_L(U)$.
+By OS3, $\nu_{qL}(\tau)$ therefore has annihilator $(a_L)$.
+Write $a_{qL}=a_Ld$ and apply (OS.28):
+\[
+ \operatorname{length}S_L+v(a_L)
+       \le\operatorname{length}S_{qL}+v(a_{qL}).
+ \tag{OS.30}
+\]
+Moreover $v(d)>0$, because (OS.23) kills the nonzero value
+$c(\phi_q)$; a unit cannot do so.  Thus $v(a_{qL})>v(a_L)$,
+while both are at most the finite integer $J$.
+
+Induction on $J-v(a_L)$ now proves
+\[
+                   \operatorname{length}S_L+v(a_L)\le J.
+ \tag{OS.31}
+\]
+If $S_L=0$ this is immediate.  Otherwise (OS.30) reduces it to
+a strictly smaller induction parameter.  This proof also establishes
+finiteness; it has not subtracted an infinite length or presumed
+that a nonzero element exhausts a module.
+At $L=\varnothing$, substitute
+$a_\varnothing=k_0d_0$ and $M=k_0z$ in (OS.31):
+\[
+                  \operatorname{length}\mathcal T_r+v(d_0)\le v(z).
+\]
+Only the finite integer $v(k_0)$ has been cancelled.
+Combine this with (OS.29) to obtain (OS.27).
+\end{proof}
+% END OS6
+
+\subsection{The Bernoulli value with the correct denominator and sign}
+
+For a primitive Dirichlet character $\eta$ of conductor $f$, set
+\[
+ B_{k,\eta}=f^{k-1}\sum_{t=1}^{f}\eta(t)B_k(t/f),
+ \qquad \operatorname{den}(N,k)=N\prod_{\substack{\ell\le k+1\\
+                                    \ell\ {m prime}}}\ell.
+ \tag{OS.32}
+\]
+The generalized Bernoulli number in the source's
+$\operatorname{Bprim}$ is always taken at the primitive conductor.
+Thus for an induced character at level $N$ the source value is
+$\operatorname{den}(N,k)B_{k,\eta}$; it has no additional Euler
+factors at primes dividing $N/f$.
+
+% BEGIN OS7
+\begin{proposition}[OS7: finite theta evaluation]
+Let $e\ge1$, $k=e+1$, and let $\eta$ be primitive of conductor
+$f$, with values in $O$, satisfying
+$\eta(-1)=(-1)^k$.  Put
+\[
+       \alpha=\chi_p^{-e}\eta^{-1},\qquad
+       Y=B_{k,\eta}/k.
+ \tag{OS.33}
+\]
+Suppose $Y\ne0$ and $\alpha(g_0)-\chi_p(g_0)$ is a unit for
+some $g_0$.  For every $a_0\in O\setminus\{0\}$, there are
+$m\ge1$, $F=f/p^{v_p(f)}\cdot p^m$, $1\le b<F$ and
+representatives $\sigma_t$ such that (OS.9) holds and the element
+$z$ in (OS.16) satisfies
+\[
+              v(z)=v(Y),\qquad a_0z\mid p^m.
+ \tag{OS.34}
+\]
+In particular, if $f\mid N$ and
+$a=\operatorname{den}(N,k)B_{k,\eta}\in O$, then $z\mid a$.
+The field, the coefficient ring and the character are unchanged.
+\end{proposition}
+\begin{proof}
+We use a simple denominator-clearing version of the source's
+Bernoulli congruence.  Choose a nonzero integer $D=D_k$ clearing
+the finitely many rational coefficients that occur below.
+It depends only on $k$, and not on $F,b,t$ or the character.
+Writing
+\[
+ b_{F,k}(t)=F^{k-1}B_k(t/F)
+          =\frac{t^k}{F}-\frac{k}{2}t^{k-1}
+             +\sum_{j=2}^k\binom{k}{j}B_jF^{j-1}t^{k-j},
+\]
+take $u=\langle t\rangle_F$, $y=\langle bt\rangle_F$,
+and $h=\lfloor bu/F\rfloor$, with $b$ a unit modulo $F$.
+Then $y=bu-Fh$ and
+$\theta_{F,b}(t)=2h-(b-1)$.
+Expand $y^k$ modulo $F^2$ and $y^{k-1}$ modulo $F$.
+After the leading terms cancel, this gives
+\[
+ D\left[b^{k-1}\theta_{F,b}(t)u^{k-1}
+       +2\left(\frac{b_{F,k}(y)}k
+                   -b^k\frac{b_{F,k}(u)}k\right)\right]\in F\mathbb Z.
+ \tag{OS.35}
+\]
+This calculation also explains why a denominator independent of
+the increasing level suffices: all terms after the two displayed
+leading Bernoulli terms contain a factor $F$.
+The source uses the explicit choice
+$D=2k\prod_{\ell\le k+1}\ell$; the argument here only needs a
+fixed common denominator and therefore does not invoke a theorem
+on Bernoulli denominators.
+
+Let $\eta_F$ be $\eta$ induced to $F$ and put
+\[
+ S=\sum_{t\in(\mathbb Z/F)^\times}
+          \theta_{F,b}(t)\langle t\rangle_F^{e}\eta_F(t).
+\]
+Multiply (OS.35) by $\eta_F(bt)$ and sum.
+Reindexing the terms containing $y=bt$ gives
+\[
+ D\left[b^e\eta_F(b)S
+       -2\bigl(\eta_F(b)b^k-1\bigr)B_{k,\eta_F}/k\right]
+                                               \in p^m O.
+ \tag{OS.36}
+\]
+The generalized Bernoulli numbers here are algebraic numbers in
+$K$.  Adding only powers of $p$ to the conductor gives
+\[
+ B_{k,\eta_F}=
+ \begin{cases}
+ B_{k,\eta},&p\mid f,\\
+ (1-\eta(p)p^{k-1})B_{k,\eta},&p\nmid f,
+ \end{cases}
+ \tag{OS.37}
+\]
+once $m\ge v_p(f)$ and $m\ge1$.
+For a direct verification, use
+$\sum_{i=0}^{q-1}B_k((x+i)/q)=q^{1-k}B_k(x)$,
+which follows by summing the generating function
+$te^{xt}/(e^t-1)$.  Summation over all lifts at level $qf$
+preserves the Bernoulli value; if $q\nmid f$, removing the terms
+divisible by $q$ subtracts $\eta(q)q^{k-1}B_{k,\eta}$.
+Once $q$ divides the level there is no further removal.
+This proves (OS.37).  Its displayed factor is a $p$-adic unit
+because $k\ge2$.
+
+Choose $m$ sufficiently large that $f\mid F$ and
+\[
+                  |p^m|_p<|a_0|_p\,|D|_p\,|Y|_p.
+ \tag{OS.38}
+\]
+Choose $b$ to be the least positive representative of the action of
+$g_0$ on $\mu_F$.  Then $b$ is a unit modulo $F$ and
+$\eta_F(b)b^k-1$ is a unit in $O$:
+modulo the maximal ideal it is associated to
+$\alpha(g_0)-\chi_p(g_0)$, after multiplication by the unit
+$-\chi_p(g_0)^e\eta(g_0)$.
+The factors $b^e\eta_F(b)$ and $2$ are also units.
+By (OS.36)--(OS.38) and the ultrametric inequality,
+\[
+                             |S|_p=|Y|_p.
+\]
+Indeed the error after division by $D$ is strictly smaller than
+the norm of the nonzero term
+$2(\eta_F(b)b^k-1)B_{k,\eta_F}/k$.
+
+For any lift $\sigma_t$ of $t$ we have
+$\alpha(\sigma_t)^{-1}=\chi_p(\sigma_t)^e\eta_F(t)$ and
+$\chi_p(\sigma_t)\equiv\langle t\rangle_F\pmod{p^m}$.
+Therefore $z-S\in p^mO$.
+By (OS.38) again, $|z|_p=|S|_p=|Y|_p$.
+In particular $Y$ has nonnegative valuation, as $z\in O$.
+The same inequality implies $v(p^m)\ge v(a_0)+v(z)$, proving
+the divisibility in (OS.34).
+Also
+\[
+        a=\bigl(k\operatorname{den}(N,k)\bigr)Y
+\]
+has valuation at least $v(Y)=v(z)$, so $z\mid a$.
+This last argument avoids assuming separately that the primitive
+Bernoulli normalization is integral in $O$.
+
+Finally $\alpha|_U\equiv1\pmod{p^m}$ since $f\mid F$,
+and parity gives
+$\alpha(j)=(-1)^{-e}(-1)^{-(e+1)}=-1$.
+The remaining condition in (OS.9) was the hypothesis on $g_0$.
+All constructions took place in the original $\Omega$ and $O$.
+\end{proof}
+% END OS7
+
+\subsection{Normalized Selmer classes and the residual exception}
+
+% BEGIN OS8
+\begin{proposition}[OS8: the full cohomology module is controlled]
+Let $\eta$ be a primitive Dirichlet character of conductor $f$,
+of order prime to $p$, and put $\alpha=\chi_p^{-e}\eta^{-1}$,
+with the parity and $e\ge1$ of OS7.
+Every class of $\mathscr S(\alpha)$ has a unique cocycle representative
+normalized by $c(j)=0$, and these representatives are the increasing
+union of $\mathcal T(fp,\varpi^h)$, $h\ge0$.
+Consequently a uniform bound $L$ for their lengths gives
+$\operatorname{length}_O\mathscr S(\alpha)\le L$.
+If
+\[
+                   \alpha(g)\equiv\chi_p(g)\pmod\varpi
+                      \quad\hbox{for every }g\in G,
+ \tag{OS.39}
+\]
+then $\mathscr S(\alpha)=0$.
+\end{proposition}
+\begin{proof}
+Since $\alpha(j)-1=-2$ is a unit, subtracting the coboundary of
+$(\alpha(j)-1)^{-1}c(j)$ gives a representative with $c(j)=0$.
+Two such representatives differ by a coboundary
+$(\alpha(g)-1)m$ vanishing at $j$; this forces $m=0$.
+Normalization is therefore unique and $O$-linear.
+
+We check carefully the local conditions in the asserted union.
+The character $\alpha$ is unramified outside $fp$.
+At each prime $q\mid f$, $q\ne p$, there is
+$\tau\in I_q$ with $\alpha(\tau)-1$ a unit.
+In fact primitivity means $\eta$ is nontrivial on the $q$-primary
+factor of $(\mathbb Z/f)^\times$; otherwise it would factor
+through a proper divisor of $f$.  Cyclotomic inertia surjects onto
+that factor.  A nontrivial root of unity of order prime to $p$
+cannot be congruent to one modulo $\varpi$: if $u^n=1$,
+$(n,p)=1$ and $u\ne1$, the identity
+$1+u+\cdots+u^{n-1}=0$ would reduce to $n=0$ in $k$.
+As $\chi_p$ is unramified at $q\ne p$, this proves the unit claim.
+
+Take a normalized cocycle representing a class in (OS.1).
+Its finite image is killed by some $\varpi^h$, since a continuous
+map from the compact group $G$ to the discrete torsion group $A$
+has finite image.  Choose also one local coboundary witness at
+$p$, and enlarge $h$ to kill it.
+Conjugating that witness to every other place above $p$ replaces
+it by $\alpha(g)m-c(g)$, so the same $\varpi^h$ kills all those
+witnesses.
+Away from $fp$ the inertia character is trivial; local cohomological
+triviality therefore says that the actual cocycle is zero on inertia.
+At $q\mid f$, $q\ne p$, let $m_q$ be an inertia coboundary
+witness.  The unit value $\alpha(\tau)-1$ just found shows that
+$\varpi^h m_q=0$.  It also promotes the witness from inertia to
+the decomposition group: for $d\in D_q$, compare the cocycle
+identities for $\tau$ and $d^{-1}\tau d$.
+They give
+\[
+  (\alpha(\tau)-1)
+       \bigl(c(d)-(\alpha(d)-1)m_q\bigr)=0,
+\]
+and the coefficient is a unit.  Thus the normalized cocycle belongs
+to $\mathcal T(fp,\varpi^h)$.
+Conversely the defining conditions of this module imply all the
+local triviality conditions in (OS.1), proving the union assertion.
+
+Module length respects this increasing union without a noetherian
+assumption.  For any finite strictly increasing chain of submodules
+of the union, choose one element witnessing each strict inclusion.
+All the finitely many elements occur in one stage; intersecting the
+chain with that stage leaves all its inclusions strict.
+A common finite length bound for the stages therefore bounds every
+such chain and hence the length of the union.
+
+It remains to treat (OS.39), which the finite derivative argument
+deliberately excluded.  At a prime $q\ne p$, cyclotomic inertia is
+trivial.  If $\eta$ were nontrivial on that inertia group, the
+root-of-unity unit argument above would contradict (OS.39).
+Thus $\alpha$ is unramified outside $p$.
+Moreover $A(\alpha)^G=0$, because $\alpha(j)-1=-2$ is a unit.
+Also $A(\alpha)^{D_p}=0$: inertia at $p$ surjects onto
+$\operatorname{Gal}(\mathbb Q(\zeta_p)/\mathbb Q)$, so it contains
+an element with $\chi_p\equiv-1\pmod\varpi$; by (OS.39) its
+$\alpha-1$ is a unit.
+
+Apply cohomology to
+$0\to A[\varpi](\alpha)\to A(\alpha)
+\xrightarrow{\varpi}A(\alpha)\to0$.
+The two vanishing invariant groups just established imply that a
+$\varpi$-torsion class in $\mathscr S(\alpha)$ lifts uniquely to
+$H^1(\mathbb Q,A[\varpi](\alpha))$ and is still locally zero at
+$p$.  At inertia away from $p$, the action on $A$ is trivial and
+multiplication by $\varpi$ on its invariants $A$ is surjective;
+the same exact sequence makes the lifted class unramified there.
+By (OS.39), $A[\varpi](\alpha)\simeq k(1)$.
+Choose an $\mathbb F_p$-basis of $k$ and apply the Kummer
+identification to each component.  Each component is represented
+by $t\in\mathbb Q^\times$.
+Unramifiedness at $q\ne p$ forces $v_q(t)\equiv0\pmod p$:
+a $p$th root of a unit is unramified there, while a valuation not
+divisible by $p$ forces ramification of order $p$.
+Local triviality at $p$ makes $t$ a $p$th power in $\mathbb Q_p$,
+so $v_p(t)$ is divisible by $p$ as well.
+All rational prime exponents in $t$ are thus divisible by $p$,
+and its sign is a $p$th power since $p$ is odd.
+Hence $t\in\mathbb Q^{\times p}$ and every lifted component is zero.
+We have proved $\mathscr S(\alpha)[\varpi]=0$.
+Every cohomology class here is killed by a power of $\varpi$,
+again because its cocycle has finite image.  Any nonzero such class
+would yield nonzero $\varpi$-torsion by multiplying by its largest
+nonvanishing power.  Therefore $\mathscr S(\alpha)=0$, as claimed.
+\end{proof}
+% END OS8
+
+\subsection{Closing the original-field and eigenspace interface}
+
+% BEGIN OS9
+\begin{theorem}[OS9: the literal \texttt{PsiBound} supplier]
+Let $E/\mathbb Q$ be the original abelian CM field, with the
+specified scalar towers into $\Omega$, and let
+$\rho:(\mathbb Z/N)^\times\to\operatorname{Gal}(E/\mathbb Q)$,
+$N>0$, have the specified cyclotomic compatibility
+\texttt{IsCycAct}.  Let $p$ be odd with $p\nmid[E:\mathbb Q]$,
+let $O\subset\overline{\mathbb Q}_p$ be the specified finite DVR,
+and let $e\ge1$ and
+$\psi:\operatorname{Gal}(E/\mathbb Q)\to O^\times$ satisfy
+\[
+                 (\psi\circ\rho)(-1)=(-1)^{e+1}.
+\]
+For every supplied $a\in O$ with
+\[
+           a=\operatorname{den}(N,e+1)
+                 B_{e+1,(\psi\circ\rho)_{\rm prim}},
+ \tag{OS.40}
+\]
+the original eigenspace length satisfies
+\[
+                         \operatorname{psiLen}(\Omega,e,\psi)
+                                  \le v_O(a).
+ \tag{OS.41}
+\]
+This is the universal source proposition \texttt{PsiBound}, with
+all of its original fields, coefficient rings and character readings.
+\end{theorem}
+\begin{proof}
+Let $\eta_N$ be the Dirichlet character obtained from
+$\psi\circ\rho$, and let $\eta$ be its primitive inducer of
+conductor $f\mid N$.  Its values lie in the same $O$:
+reduction of unit groups onto $(\mathbb Z/f)^\times$ is surjective,
+and the induced values are independent of a lift.
+Its order divides $|\operatorname{Gal}(E/\mathbb Q)|=[E:\mathbb Q]$,
+so is prime to $p$.  Parity is unchanged.
+The Galois character attached to $\eta_N$ is identical to that
+attached to $\eta$, since their cyclotomic reductions commute.
+Write this character as $\widetilde\eta$ and put
+$\alpha=\chi_p^{-e}\widetilde\eta^{-1}$.
+
+If $a=0$, (OS.41) is immediate because its right side is $\infty$.
+Otherwise the Bernoulli value $Y=B_{e+1,\eta}/(e+1)$ is nonzero.
+If (OS.39) holds, OS8 makes $\mathscr S(\alpha)=0$.
+If it does not hold, there is a $g_0$ with
+$\alpha(g_0)-\chi_p(g_0)$ a unit, since $O$ is local.
+For each $a_0\ne0$, apply OS7, then OS6, to obtain
+\[
+ \operatorname{length}\mathcal T(F,a_0)
+                    \le v(z)\le v(a).
+\]
+All these levels $F=f/p^{v_p(f)}\cdot p^m$ have exactly the
+same prime divisors as $fp$.  The definition of $\mathcal T$
+depends on this prime support, so
+$\mathcal T(F,a_0)=\mathcal T(fp,a_0)$.
+OS8 now gives, in both cases,
+\[
+                   \operatorname{length}_O\mathscr S(\alpha)
+                                      \le v_O(a).
+ \tag{OS.42}
+\]
+This also explains a useful simplification: Bernoulli nonvanishing
+need not be imported into this supplier.  Its zero case was already
+covered by the extended-valuation convention.  Separate nonvanishing
+is used later when a finite quantitative bound is wanted.
+
+We finally identify (OS.42) with the exact group in (OS.41).
+Cyclotomic compatibility of $\rho$ says, for every $g\in G$,
+\[
+                  \rho(g|_{\mu_N})=g|_E.
+ \tag{OS.43}
+\]
+Indeed both sides have the same action on every element of the
+given copy of $E$ in $\Omega$, by \texttt{IsCycAct} and the
+definition of restriction.  Hence
+$\widetilde\eta=\psi\circ\operatorname{res}_E$ as actual
+characters on $G$, not merely as isomorphic representations.
+Let $U_E=\operatorname{Gal}(\Omega/E)$ and
+$\Delta=G/U_E=\operatorname{Gal}(E/\mathbb Q)$.
+Its order is a unit in $O$.
+
+Restriction in cohomology therefore gives
+\[
+ H^1(G,A(\alpha))\simeq H^1(U_E,A(\chi_p^{-e}))^{\psi}.
+ \tag{OS.44}
+\]
+Here is the elementary descent argument including the twist sign.
+For a finite group of unit order, positive-degree cohomology
+vanishes by the averaging homotopy; inflation--restriction is
+therefore an isomorphism onto invariants.
+On $U_E$ the finite character is trivial, so the coefficient
+module really is the same $A(\chi_p^{-e})$.
+The ordinary action on a restricted cocycle is
+$z(u)\mapsto\chi_p(g)^{-e}z(g^{-1}ug)$.
+The invariant action for the twisted coefficient $\alpha$ instead
+uses $\alpha(g)=\chi_p(g)^{-e}\psi(g|_E)^{-1}$.
+Multiplying by $\psi(g|_E)$ turns this invariant condition into
+the $\psi$-eigencondition in (OS.44).
+
+The isomorphism preserves the exact local kernels.
+For each decomposition group and each inertia group of $G$,
+its intersection with $U_E$ has quotient a subgroup of $\Delta$,
+again of unit order.  The same inflation--restriction argument
+makes local restriction injective.  Thus a global class is locally
+trivial before restriction if and only if it is trivial on all the
+corresponding local groups after restriction.
+Primes above $p$ correspond to the specified decomposition groups;
+all finite inertias correspond to the other part of (OS.1).
+Conjugation simply permutes these actual places, so this argument
+works for every original choice of them.
+Consequently (OS.44) restricts to an $O$-linear isomorphism
+\[
+ \mathscr S(\alpha)\simeq
+ \operatorname{Sha}(E,A(-e))^{\psi},
+ \tag{OS.45}
+\]
+whose right side is precisely the module defining
+$\operatorname{psiLen}(\Omega,e,\psi)$.
+Length is invariant under this isomorphism.  Combining (OS.42)
+and (OS.45) proves (OS.41), with every required quantifier retained.
+\end{proof}
+% END OS9
+
+\paragraph{Closed dependency boundary.}
+OS1--OS9 supply \texttt{PsiBound}; they do not assume it at an
+intermediate stage.  Their only duality boundary is LD2--LD4,
+whose classical inputs are stated there.  Their remaining classical
+arithmetic inputs are the finite cyclotomic/local facts, Hilbert
+class field, Chebotarev and Kummer theorem stated at the start.
+The Jacobi identities, roots-of-unity removal, derivative construction,
+local transition, simultaneous prime selection, finite-length descent,
+exceptional residual case and tame eigenspace transport are proved
+here.  For the classical number-theoretic inputs see J.~S.~Milne,
+\href{https://www.jmilne.org/math/CourseNotes/ANT.pdf}{\emph{Algebraic
+Number Theory}, version 3.08}, Sections~6--7 and Theorem~8.31,
+and
+\href{https://www.jmilne.org/math/CourseNotes/CFT.pdf}{\emph{Class
+Field Theory}, version 4.03}, V, Theorem~3.6, Corollary~3.7 and
+Example~3.9, and II, Proposition~1.22 for Hilbert's theorem~90.
+These references specify general classical theorem leaves; the
+component provenance records the exact source declarations and pinned
+file hashes for the reconstructed special-value argument.
+
+The literal output (OS.41) is the input to the following odd-minus
+quantitative argument.  Thus the former bespoke \texttt{PsiBound}
+frontier can be removed once the stated classical inputs and LD are
+adopted; this does not remove the separate odd-plus and two-primary
+cohomological suppliers or the geometric common-family obligations.

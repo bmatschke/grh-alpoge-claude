@@ -1,0 +1,679 @@
+\section{Uniform character seeds and the common abelian CM field}
+\label{sec:common-arithmetic-frame-v50}
+
+This section constructs the character-and-field input to the ordinary
+automorphy argument.  Its principal endpoint is the full original
+\texttt{seed\_cl}: one modulus is chosen before the later abelian CM
+field and auxiliary prime, and every compatible later choice receives
+the entire original \texttt{SeedClause}.  We also construct the actual
+fixed field in \texttt{field\_ex}, the auxiliary prime in
+\texttt{auxw\_ex}, and install the seed on an already supplied common
+frame without changing its marked element.  The seed here is a triple
+of characters.  Constructing the rank-two and rank-three automorphic
+representations from that triple remains a separate task.
+
+\subsection{Objects, hypotheses, and the order of choices}
+
+Fix the supplied algebraic closure \(\Omega/\mathbb Q\), put
+\(G=\operatorname{Gal}(\Omega/\mathbb Q)\), and let \(\ell\) be an
+odd prime.  The coefficient ring \(O=c.O\subset\overline{\mathbb Q}_\ell\)
+is the original finite \(\mathbb Z_\ell\)-algebra which is a DVR.
+Write \(k=O/\mathfrak m_O\), \(q=|k|\), and
+\[
+ \epsilon:G\longrightarrow\mathbb Z_\ell^\times,\qquad
+ \omega:G\longrightarrow k^\times,
+ \qquad \alpha=\overline\Psi:G\longrightarrow k^\times .
+ \tag{CAF.1}
+\]
+Here \(\omega\) is the reduction of the actual cyclotomic character,
+and \(\Psi:G\to O^\times\) and
+\(\eta:G\to\{\pm1\}\) are the specified characters.  A complex
+conjugation \(\sigma\in G\) and a valuation \(B\) over \(\ell\)
+are fixed.  For a positive integer \(n\), the source's
+\(\operatorname{KillsMu}(n,\chi)\) means
+\[
+ s|_{\mu_n}=1\quad\Longrightarrow\quad \chi(s)=1.
+ \tag{CAF.2}
+\]
+It is a factorization through the actual cyclotomic extension inside
+\(\Omega\), rather than an assertion about an unrelated character of
+the same order.  Decomposition and inertia subgroups at a valuation
+\(A\) are denoted by \(D_A,I_A\).
+
+The full original \(\operatorname{Gen}(\ell,\eta,\Psi,\sigma,B,M,H_b)\)
+is an allowed starting input.  For the seed construction only the
+following clauses of that record are needed:
+\begin{enumerate}
+\item \(k\) is finite, \(M>0\), \(\ell\mid M\), \(\ell\ne2\),
+      \(\sigma\) is a complex conjugation, and \(B\) lies over \(\ell\).
+\item There are \(D>0\) and \(\delta\in\Omega\) such that
+      \(\delta^2=-D\) and \(s\delta=\eta(s)\delta\) for every \(s\in G\).
+\item For one integer \(a\ge0\), both \(\eta\) and \(\alpha\)
+      satisfy \(\operatorname{KillsMu}(M^a,-)\).
+\item \(\eta|_{I_A}=1\) for every \(A\) over \(\ell\),
+      \(\alpha(\sigma)=1\), and there is one \(j\ge0\) such that
+      \(\alpha|_{I_A}=\omega^j|_{I_A}\) for every such \(A\).
+\item \(\ker\omega\cap\ker\alpha\not\subseteq\ker\eta\).
+\end{enumerate}
+Call these explicit clauses \(\mathcal S\).  Every use of
+\(\mathcal S\) below is therefore available from the original
+\texttt{Gen} without an extra hypothesis.  Conversely, proving the
+seed from these fewer clauses does not assert the other
+\texttt{Gen} fields.  In particular, \(H_b\), the local degree bounds,
+and the strict cohomology classes are not constructed by the seed
+argument.  Claims CAF9 and CAF10 verify \(\mathcal S\) directly for
+the original \texttt{Dat} and \texttt{HostData} applications.
+
+For an abelian CM field \(L\subset\Omega\), let
+\(U_L=G_{L^+}\), the source's \texttt{upl}, and
+\(G_L=\operatorname{Gal}(\Omega/L)\).  Put
+\[
+ H_\ell(w)=\{s\in G:\ s|_{\mu_w}\text{ is an }\ell
+                  \text{-th power in }(\mathbb Z/w\mathbb Z)^\times\}.
+ \tag{CAF.3}
+\]
+This equals the literal \texttt{Hth}: the source additionally writes
+the same condition for \(s^{-1}\), which is automatic because the
+\(\ell\)-th powers form a subgroup.
+
+A \emph{witness prime} is exactly the original
+\texttt{FrobeniusWitnessPrime}: a prime \(w\nmid M\) with
+\(w\equiv1\pmod\ell\), such that for every \(A\) above \(w\),
+\[
+          D_A\subseteq\ker\eta\cap\ker\alpha\cap\ker\omega.
+ \tag{CAF.4}
+\]
+All assertions below use the same \(\Omega,O,\eta,\Psi,\sigma\).
+The embedding \(\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C\)
+needed for later automorphy is not used or changed here.
+
+\subsection{Local algebra and the two cyclotomic constructions}
+
+% BEGIN CAF1
+\paragraph{CAF1. Teichmuller lifts with the original norm congruence.}
+\label{claim:CAF1}
+There is an injective homomorphism
+\(T:k^\times\to\overline{\mathbb Q}_\ell^\times\), landing in
+\(O^\times\), such that for every \(u\in O^\times\), every
+\(j\ge0\), and every \(s\in G\),
+\[
+ \left|\epsilon(s)^j
+       T\bigl(\overline u\,\omega(s)^{-j}\bigr)-u\right|_\ell<1.
+ \tag{CAF.5}
+\]
+Moreover, \(|x|_\ell\le1\) for every \(x\in O\), and
+\(x\in\mathfrak m_O\) if and only if \(|x|_\ell<1\).
+These assertions need only that \(\ell\) is prime, including
+\(\ell=2\); the parity observation at the end of the proof uses
+oddness.
+
+\emph{Proof.}
+Integrality over \(\mathbb Z_\ell\) gives the first norm bound: in a
+monic integral equation, a root of norm greater than one would make
+the leading term strictly larger than every other term, contradicting
+the ultrametric inequality.  A unit and its inverse both have norm at
+most one, so both have norm one.  If \(\varpi\) is a uniformizer,
+write \(\ell=u\varpi^r\) in the DVR.  Since
+\(|\ell|_\ell=\ell^{-1}<1\) and \(|u|_\ell=1\),
+\(|\varpi|_\ell<1\).  The factorization of any nonzero element as a
+unit times a power of \(\varpi\) now proves the asserted equivalence,
+including zero separately.
+
+The ring \(O\) is complete: it is finite over the complete DVR
+\(\mathbb Z_\ell\), and its maximal-ideal topology is the same as
+its \(\ell\)-adic topology.  For \(b\in k^\times\), Hensel's lemma
+gives a unique root \(T(b)\in O\) of \(X^{q-1}-1\) reducing to
+\(b\), since the derivative is a unit modulo \(\mathfrak m_O\).
+Uniqueness shows \(T(bb')=T(b)T(b')\), and reduction proves
+injectivity.  The reduction of
+\(\epsilon(s)^jT(\overline u\,\omega(s)^{-j})\) is precisely
+\(\overline u\).  Its difference from \(u\) belongs to
+\(\mathfrak m_O\), proving (CAF.5).  Since \(\ell\) is odd,
+\(-1\ne1\) in \(k\), and uniqueness also gives \(T(-1)=-1\).
+This proves the complete original \texttt{sc\_norm} and
+\texttt{sc\_teich} conclusions.
+% END CAF1
+
+% BEGIN CAF2
+\paragraph{CAF2. Removing the cyclotomic conductor at \(\ell\).}
+\label{claim:CAF2}
+Let \(C\) be any group and \(\chi:G\to C\) a homomorphism.
+If \(N_0>0\), \(\ell\nmid N_0\),
+\(\operatorname{KillsMu}(\ell^rN_0,\chi)\), and
+\(\chi|_{I_B}=1\), then
+\(\operatorname{KillsMu}(N_0,\chi)\).
+If also \(w\equiv1\pmod {N_0}\), then the source's full
+\(\operatorname{SplitAt}(N_0,w,\chi)\) holds.
+
+\emph{Proof.}
+Inertia at \(\ell\) acts trivially on roots of unity of order prime
+to \(\ell\).  Indeed, those roots are the Hensel lifts of the roots
+in finite residue-field extensions, and hence lie in the maximal
+unramified extension.  In contrast,
+\(\mathbb Q_\ell(\mu_{\ell^r})/\mathbb Q_\ell\) is totally
+ramified: for \(r\ge1\),
+\(\Phi_{\ell^r}(1+X)\) is Eisenstein at \(\ell\), of degree
+\(\ell^{r-1}(\ell-1)\).  Inertia therefore surjects onto the full
+group of its cyclotomic automorphisms.  The case \(r=0\) is immediate.
+
+Suppose \(s\) fixes \(\mu_{N_0}\).  Choose \(t\in I_B\) with the
+same action as \(s\) on \(\mu_{\ell^r}\).  It fixes
+\(\mu_{N_0}\), so \(t^{-1}s\) fixes both sets of roots.  Since the
+orders are coprime, these roots generate \(\mu_{\ell^rN_0}\).
+Thus \(\chi(t^{-1}s)=1\), and \(\chi(t)=1\) gives \(\chi(s)=1\).
+No commutativity of \(C\) was used.  Finally, an element acting as
+\(\zeta\mapsto\zeta^w\) on \(\mu_{N_0}\) fixes it when
+\(w\equiv1\pmod {N_0}\), so \(\chi\) is one on every such
+element.  These are exactly the two \texttt{SplitAt} clauses.
+The proof preserves the one given valuation \(B\) and supplies the
+original \texttt{sc\_strip} for every target group.
+% END CAF2
+
+% BEGIN CAF3
+\paragraph{CAF3. The actual imaginary quadratic field and its discriminant.}
+\label{claim:CAF3}
+The quadratic clause of \(\mathcal S\) alone makes the subfield
+\(K_0=\mathbb Q(\delta)\) of \(\Omega\) imaginary quadratic with
+\(G_{K_0}=\ker\eta\).  With the inertia clause as well,
+\[
+                 G_{K_0}=\ker\eta,\qquad
+                 \ell\nmid\operatorname{disc}(K_0).
+ \tag{CAF.6}
+\]
+More generally, the discriminant conclusion holds for any supplied
+quadratic field \(K\) for which every inertia subgroup above
+\(\ell\) lies in \(G_K\).  No oddness assumption is needed for
+this assertion.
+
+\emph{Proof.}
+The polynomial \(X^2+D\) has no rational root because \(D>0\).
+It is therefore the minimal polynomial of \(\delta\), and all its
+complex roots are nonreal.  An element \(s\in G\) fixes \(K_0\)
+exactly when it fixes \(\delta\).  As \(\delta\ne0\) and
+\(s\delta=\eta(s)\delta\), this is equivalent to \(\eta(s)=1\).
+Every inertia subgroup above \(\ell\) lies in that kernel by
+\(\mathcal S\), so \(K_0\) is unramified above \(\ell\).
+
+For completeness, the discriminant consequence uses the ordinary
+integral trace pairing.  The completion of the ring of integers at
+\(\ell\) is a product of the integer rings of the local extensions.
+Trivial inertia makes each of these unramified; its residue extension
+is a finite separable field extension.  Reduction of its trace pairing
+is the nondegenerate field-trace pairing over the finite residue field.
+Its determinant is consequently a unit.  Taking the product over the
+places shows that the global discriminant is a unit at \(\ell\).
+This is the source's \texttt{sc\_quad} and \texttt{sc\_disc}, on the
+actual embedded quadratic field.
+% END CAF3
+
+% BEGIN CAF4
+\paragraph{CAF4. The prescribed order-\(\ell\) character at \(w\).}
+\label{claim:CAF4}
+For primes \(\ell,w\) with \(w\equiv1\pmod\ell\), there is a
+character \(\theta:G\to\overline{\mathbb Q}_\ell^\times\) such that
+\[
+ \ker\theta=H_\ell(w),\qquad \theta\ne1,
+ \qquad\theta^\ell=1,
+ \qquad\operatorname{KillsMu}(w,\theta).
+ \tag{CAF.7}
+\]
+The group \(H_\ell(w)\) is open, contains \([G,G]\), has index
+\(\ell\), contains all inertia away from \(w\), and does not
+contain inertia at any place over \(w\).  These assertions hold also
+for \(\ell=2\); only the further real-place observation below uses
+oddness.
+
+\emph{Proof.}
+The cyclotomic map \(G\twoheadrightarrow
+(\mathbb Z/w\mathbb Z)^\times\) is onto; the target is cyclic of
+order \(w-1\).  The subgroup of \(\ell\)-th powers has index
+\(\ell\).  Compose this map, its quotient by the power subgroup,
+and an isomorphism of that cyclic quotient with
+\(\mu_\ell(\overline{\mathbb Q}_\ell)\).  This gives \(\theta\)
+and all four identities in (CAF.7).  It also proves openness and
+the commutator assertion.  Roots of order \(w\) are unramified away
+from \(w\), while total ramification of
+\(\mathbb Q_w(\mu_w)\) makes inertia at \(w\) surject onto the
+entire cyclotomic group.  Its image in the order-\(\ell\) quotient
+is therefore nontrivial at every prolongation of the place.  For odd
+\(\ell\), complex conjugation belongs to \(H_\ell(w)\), because
+its cyclotomic image \(-1\) is \((-1)^\ell\).
+This proves \texttt{hth} and \texttt{sc\_theta}, including the
+literal kernel equality needed in the later field choice.
+% END CAF4
+
+% BEGIN CAF5
+\paragraph{CAF5. A witness prime satisfying every prescribed congruence.}
+\label{claim:CAF5}
+Given the original \texttt{Gen} and any \(Q>0\), there is a witness
+prime \(w\) satisfying \(w\equiv1\pmod Q\).  In fact, the
+weaker clauses \(\mathcal S\) suffice.
+
+\emph{Proof.}
+Choose \(a\) in \(\mathcal S\) and put \(R=M^{a+1}Q\).  There
+are arbitrarily large primes congruent to one modulo \(R\).
+Only this residue class is needed, so the elementary cyclotomic proof
+suffices: for \(R>1\), take a sufficiently large integer \(A\)
+divisible by \(R\)
+and by any proposed finite list of primes.  A prime divisor of
+\(\Phi_R(A)>1\) divides neither \(A\) nor \(R\), since
+\(\Phi_R(0)=1\).  The order of \(A\) modulo that prime is exactly
+\(R\): the cyclotomic factors of \(X^R-1\) have disjoint roots
+in characteristic prime to \(R\).  Hence the prime is one modulo
+\(R\) and is outside the proposed list.  The case \(R=1\) is
+Euclid's argument.  Select such a prime \(w>R\).
+
+Then \(w\nmid M\), \(w\equiv1\pmod\ell\), and
+\(w\equiv1\pmod Q\).  For \(A\) above \(w\), decomposition
+acts on \(\mu_n\), \(n\mid R\), through powers of the Frobenius
+\(\zeta\mapsto\zeta^w\).  These roots are unramified there, and
+\(w\equiv1\pmod n\), so the entire decomposition subgroup fixes
+them.  In particular it fixes \(\mu_{M^a}\) and \(\mu_\ell\).
+The two \texttt{KillsMu} conditions and the definition of \(\omega\)
+give (CAF.4).  This proves \texttt{auxw\_ex} without a stronger
+distribution theorem for primes or a field-dependent modulus.
+% END CAF5
+
+\subsection{One modulus before every later field and prime}
+
+% BEGIN CAF6
+\paragraph{CAF6. Fixed core characters and a prime-to-\(\ell\) modulus.}
+\label{claim:CAF6}
+Choose \(a,j,\delta\) from \(\mathcal S\), put
+\[
+ M^a\ell=\ell^rN_0,\quad \ell\nmid N_0,\quad N_0>0,
+ \qquad \phi=\alpha\omega^{-j},\quad
+ \chi'=T\phi,\quad \eta'=\eta\text{ viewed in }
+                  \overline{\mathbb Q}_\ell^\times.
+ \tag{CAF.8}
+\]
+All of \(K_0,N_0,j,\chi',\eta'\) are fixed before \(L,w\).
+They satisfy
+\[
+ \begin{gathered}
+ \operatorname{KillsMu}(N_0,\chi'),\qquad
+ \operatorname{KillsMu}(N_0,\eta'),\qquad
+ \ell\nmid\operatorname{ord}(\chi'),\qquad \chi'\ne\eta',\\
+ \ker\eta'=G_{K_0},\qquad \chi'(\sigma)=(-1)^j,\qquad
+ |(\epsilon^j\chi')(s)-\Psi(s)|_\ell<1\quad(s\in G).
+ \end{gathered}
+ \tag{CAF.9}
+\]
+
+\emph{Proof.}
+The characters \(\eta,\alpha\) factor through \(\mu_{M^a}\),
+and \(\omega\) factors through \(\mu_\ell\).  Thus \(\chi'\)
+and \(\eta'\) satisfy \(\operatorname{KillsMu}(M^a\ell,-)\).
+At every inertia group over \(\ell\),
+\(\phi=\alpha\omega^{-j}=1\), and \(\eta'=1\).
+CAF2 strips the factor \(\ell^r\) and proves the two factorizations
+through \(\mu_{N_0}\).
+
+The image of \(\chi'\) lies in the Teichmuller group of order
+\(q-1\).  Its order divides \(q-1\), which is prime to \(\ell\).
+The natural embedding of \(\{\pm1\}\) in the characteristic-zero
+field is injective, so \(\ker\eta'=\ker\eta=G_{K_0}\).
+At \(\sigma\), \(\alpha=1\) and \(\omega=-1\), giving
+\(\chi'(\sigma)=T((-1)^{-j})=(-1)^j\).  Equation (CAF.5), with
+\(u=\Psi(s)\), gives the last assertion of (CAF.9) for every
+\(s\), with the original integral embedding of \(O\).
+
+Finally, choose \(s\in\ker\omega\cap\ker\alpha\) outside
+\(\ker\eta\), using \(\mathcal S\).  At this element
+\(\chi'(s)=T(1)=1\) and \(\eta'(s)=-1\).  Hence
+\(\chi'\ne\eta'\).  No later field or representation has been
+chosen in this proof.
+% END CAF6
+
+% BEGIN CAF7
+\paragraph{CAF7. The complete original uniform \texttt{SeedClause}.}
+\label{claim:CAF7}
+Set \(Q=N_0\) from CAF6.  For every later abelian CM field
+\(L\subset\Omega\) and every later witness prime \(w\), assume
+\[
+ G_L=U_L\cap\ker\eta,\qquad w\equiv1\pmod Q,
+ \qquad U_L\subseteq H_\ell(w),\qquad
+ \exists s_0\in G_L:\alpha(s_0)^2\ne1.
+ \tag{CAF.10}
+\]
+Then the full original
+\(\operatorname{SeedClause}(c,\eta,\Psi,\sigma,L)\) holds.
+Consequently this proves \texttt{seed\_cl} for every original
+\texttt{Gen}, with its entire \(\forall L\,\forall w\) scope.
+
+\emph{Proof.}
+Use \(K_0,N_0,j,\chi',\eta'\) already fixed in CAF6, and choose
+\(\theta\) from CAF4 for this \(w\).  The numerical conditions in
+\texttt{SlopeTestRemainingChoices} are all satisfied: \(\ell\ne2\),
+\(N_0>0\), \(\ell\nmid N_0\), \(w\) is prime, and
+\(w\nmid N_0\).  For the last assertion, \(N_0\mid M^a\ell\),
+whereas \(w\nmid M\) and \(w\ne\ell\); the latter follows from
+\(w\equiv1\pmod\ell\).  The remaining three auxiliary conditions
+\(\theta\ne1\), \(\theta^\ell=1\), and
+\(\operatorname{KillsMu}(w,\theta)\) are exactly (CAF.7).
+
+We check every field condition.  The given \(\sigma\) is a complex
+conjugation.  CAF3 gives \([K_0:\mathbb Q]=2\) and imaginary
+quadratic \(K_0\).  Abelianity of \(L\) is supplied in (CAF.10).
+The equality there gives
+\(G_L\subseteq\ker\eta=G_{K_0}\), which is the original
+\texttt{KL} inclusion, and CAF6 gives
+\(\ker\eta'=G_{K_0}\).  Since \(w\equiv1\pmod {N_0}\),
+CAF2 and CAF6 give both
+\(\operatorname{SplitAt}(N_0,w,\eta')\) and
+\(\operatorname{SplitAt}(N_0,w,\chi')\).  Furthermore,
+\[
+        G_L\subseteq U_L\subseteq H_\ell(w)=\ker\theta,
+\]
+which is the original \texttt{thetaL} condition, and the parity
+condition is \(\chi'(\sigma)=(-1)^j\) from CAF6.
+
+For the remaining square condition, let
+\(z=(\epsilon^j\chi')(s_0)\) and \(u=\Psi(s_0)\).
+Equation (CAF.9) gives \(|z-u|_\ell<1\).  Since \(u\) is a
+unit, both \(|u|_\ell=1\) and \(|z|_\ell=1\).
+If \(|z^2-1|_\ell<1\), then
+\[
+ u^2-1=(u-z)(u+z)+(z^2-1)
+\]
+has norm less than one.  CAF1 would give
+\(\alpha(s_0)^2=1\), contrary to (CAF.10).  Therefore
+\(\neg\operatorname{Cong}(z^2,1)\), precisely the source's
+\texttt{sq} clause.  This proves every field of
+\texttt{FieldPair\allowbreak{}Character\allowbreak{}TripleConditions}.
+
+The four additional \texttt{SeedClause} requirements are
+\(\chi'\ne\eta'\), \(\ell\nmid\operatorname{ord}(\chi')\),
+the literal equality of values of \(\eta'\) with the integer-valued
+\(\eta\), and the all-\(s\) norm congruence.  They are (CAF.8)--(CAF.9).
+The final discriminant requirement \(\ell\nmid\operatorname{disc}K_0\)
+is CAF3.  Nothing in these choices depends on a later automorphic
+representation, coefficient extension, or universal-ring point.
+The proof of the square implication also proves the original
+\texttt{sc\_cong} on its full stated inputs.
+% END CAF7
+
+\subsection{The actual CM field, and the two arithmetic applications}
+
+% BEGIN CAF8
+\paragraph{CAF8. An explicit common abelian CM field from the prescribed subgroup.}
+\label{claim:CAF8}
+Let \(U\subseteq G\) be open, contain \([G,G]\), and contain
+every complex conjugation.  Under the quadratic clause of
+\(\mathcal S\), define the actual subfield
+\[
+                   L=\Omega^{U\cap\ker\eta}.
+ \tag{CAF.11}
+\]
+Then \(L/\mathbb Q\) is finite abelian and CM, and literally
+\[
+             G_L=U\cap\ker\eta,\qquad U_L=U.
+ \tag{CAF.12}
+\]
+Thus the original \texttt{field\_ex} is proved for every original
+\texttt{Gen}, every \(m\), and every supplied
+\(\operatorname{UFacts}(\ell,\eta,\Psi,M,m,U)\).
+
+\emph{Proof.}
+A subgroup containing the commutator is normal, and its quotient is
+abelian.  Both \(U\) and \(\ker\eta=G_{K_0}\) are open, so
+infinite Galois correspondence identifies their fixed fields with
+finite Galois extensions in the given \(\Omega\).  Put
+\(F=\Omega^U\).  Every complex embedding of \(F\) extends to an
+embedding of \(\Omega\) in \(\mathbb C\).  The corresponding
+complex conjugation lies in \(U\), so fixes \(F\).  Hence every
+such embedding has real image and \(F\) is totally real.
+
+The fixed field of an intersection of these closed subgroups is the
+compositum, so \(L=FK_0\) inside \(\Omega\).  Since the imaginary
+quadratic field \(K_0\) has no nontrivial real subfield,
+\(F\cap K_0=\mathbb Q\).  Thus \([L:F]=2\), and every complex
+embedding of \(L\) contains a nonreal root of \(X^2+D\).
+The extension \(L/F\) is totally imaginary quadratic, so it is CM
+with maximal real subfield exactly \(F\).  Consequently
+\(U_L=G_F=U\), and the first equality in (CAF.12) follows directly
+from the definition (CAF.11).  Both groups and their embeddings are
+the original subgroups of \(G\); there is no replacement by an
+abstract isomorphic CM field.  In \texttt{UFacts}, precisely
+\texttt{isOpen}, \texttt{ab}, and \texttt{real} provide the three
+subgroup hypotheses used here.  Its remaining local clauses are
+retained for subsequent frame construction.
+% END CAF8
+
+% BEGIN CAF9
+\paragraph{CAF9. The seed hypotheses for the original \texttt{Dat}.}
+\label{claim:CAF9}
+For the original \(D:\operatorname{Dat}(\Omega,K,c,e,\psi)\),
+use its characters \(\eta=D.\eta\), \(\Psi=\epsilon^e\psi\),
+its conjugation \(\sigma=D.\mathrm{cc}\), and any supplied \(B\)
+over \(\ell\).  Set
+\[
+ M=\ell N|\operatorname{disc}K|,
+ \qquad Q=|\operatorname{disc}K|\,N_{\ell'},
+ \tag{CAF.13}
+\]
+where \(N_{\ell'}\) is the prime-to-\(\ell\) part of \(N\).
+Then \(\mathcal S\) holds, and CAF7 supplies the original
+\texttt{SeedClause} for every later \(L,w\) satisfying (CAF.10)
+with this \(Q\).  The quadratic field in that clause may be the
+original embedded \(K\).
+
+\emph{Proof.}
+The original \(GD\) conditions give imaginary quadratic \(K\),
+\(\ell\ne2\), even positive \(N\),
+\(\ell\nmid\operatorname{disc}K\), prime-to-\(\ell\) order of
+\(\psi\), \((\operatorname{comp}_\ell\psi)^2=1\), and
+\(\psi(-1)=(-1)^e\).  The ring \(O\) is finite over
+\(\mathbb Z_\ell\), so its residue field is finite.
+Write \(\Delta=\operatorname{disc}K<0\).  The discriminant
+determinant of an integral basis is an element \(\delta\in K\)
+with \(\delta^2=\Delta=-|\Delta|\).  It generates the quadratic
+field, and its two conjugates are \(\delta,-\delta\).  Since
+\(\ker\eta=G_K\), \(s\delta=\eta(s)\delta\).
+
+The elementary quadratic conductor theorem places
+\(K\) in \(\mathbb Q(\mu_{|\Delta|})\), so
+\(\operatorname{KillsMu}(|\Delta|,\eta)\).  One usual explicit
+proof uses the primitive quadratic Kronecker character \(\chi_\Delta\):
+its Gauss sum \(g=\sum_{a\bmod |\Delta|}\chi_\Delta(a)\zeta^a\)
+satisfies \(s_b(g)=\chi_\Delta(b)g\) and \(g^2=\Delta\).
+The latter identity follows from finite additive-character
+orthogonality, giving \(|g|^2=|\Delta|\), and
+\(\overline g=\chi_\Delta(-1)g=-g\).
+Thus the same quadratic field generated by \(\delta\) is contained
+in that cyclotomic field.  This is the usual elementary quadratic
+conductor input; no general potential modularity is used.
+Also \(\psi\) factors through \(\mu_N\), and \(\omega\) through
+\(\mu_\ell\).  Hence \(\eta\) and
+\(\alpha=\omega^e\overline\psi\) both satisfy
+\(\operatorname{KillsMu}(M,-)\), so \(a=1\) is allowed.
+
+The character \(\eta\) is unramified at \(\ell\).
+At \(\ell\), the residual character of the finite local component
+of \(\psi\) factors through \(\mathbb F_\ell^\times\): the
+\(\ell\)-Sylow subgroup maps trivially into the prime-to-\(\ell\)
+group \(k^\times\).  Therefore it is \(\omega^b\) for one
+\(0\le b<\ell-1\).  The same exponent works at every prolongation
+of the place, by conjugacy and commutativity of the target.  Taking
+\(j=e+b\) proves the inertia clause, and the stated parity gives
+\(\alpha(\sigma)=1\).
+
+It remains to verify the kernel noncontainment.  The original
+\(GD.\eta\) gives an \(s\) with \(\omega(s)=1\),
+\(\chi_P(s)=1\), and \(\eta(s)=-1\), where, since \(\psi\)
+has order prime to \(\ell\),
+\(\chi_P=\psi(\operatorname{comp}_\ell\psi)^{-1}\).
+The local component has order prime to \(\ell\), and therefore
+factors through the mod-\(\ell\) cyclotomic character rather than
+its pro-\(\ell\) kernel.  It is one at this \(s\).
+Consequently \(\psi(s)=1\), and \(\alpha(s)=1\), as required.
+CAF6 with \(a=1\) yields
+\(Q=(M\ell)_{\ell'}=|\Delta|N_{\ell'}\), exactly (CAF.13).
+All constructions precede \(L,w\).  Taking the original \(K\)
+in CAF3 instead of the canonically isomorphic \(\mathbb Q(\delta)\)
+preserves its original embedding and all the field conditions.
+This claim verifies the seed-relevant part of \texttt{gen\_gd}; it
+does not claim the unused full \texttt{Gen} fields as new results.
+% END CAF9
+
+% BEGIN CAF10
+\paragraph{CAF10. The separate CountV host has its own seed modulus.}
+\label{claim:CAF10}
+For the original \(\operatorname{HostData}(\ell,e,\psi,o_1)\),
+take
+\[
+ \eta=\eta_4,\qquad \Psi=\epsilon^e\psi,
+ \qquad M=\ell N,
+ \qquad Q=N_{\ell'}^{\,2}.
+ \tag{CAF.14}
+\]
+For every complex conjugation \(\sigma\) and every \(B\) over
+\(\ell\), these data satisfy \(\mathcal S\).  Thus CAF7 supplies
+\texttt{SeedClause} for every compatible later \(L,w\), with its
+original host characters.  This assertion includes \(\ell=3\).
+
+\emph{Proof.}
+The source \texttt{HostData} has \(\ell\ne2\), \(e,o_1\ge1\),
+even \(N>0\), the parity \(\psi(-1)=(-1)^e\), and dyadic
+conductor exponent \(c_2(\psi)\ge4\).  Its additional order and
+size inequalities are retained but are unnecessary for this seed
+construction.  The character \(\eta_4\) is the character of the
+actual quadratic field \(\mathbb Q(i)\subset\Omega\); choose
+\(\delta=i\), so \(D=1\).  It is unramified at odd \(\ell\)
+and factors through \(\mu_4\).
+Both \(\eta_4\) and \(\alpha\) factor through
+\(\mu_{M^2}\), because \(4\mid M^2\), \(N\mid M^2\), and
+\(\ell\mid M^2\).  Take \(a=2\).
+The residue field is finite because \(O\) is finite over
+\(\mathbb Z_\ell\), and the stated parity gives
+\(\alpha(\sigma)=1\).  On inertia at \(\ell\), the residual
+character of \(\psi\) kills the \(\ell\)-Sylow subgroup of
+\((\mathbb Z/\ell^r\mathbb Z)^\times\), because \(k^\times\)
+has order prime to \(\ell\).  It is therefore a power
+\(\omega^b\), with one \(0\le b<\ell-1\), and the exponent
+\(j=e+b\) works at every prolongation by conjugacy.  Thus no
+prime-to-\(\ell\) order assumption on \(\psi\) is required.
+
+Here is the needed noncontainment without using the
+\(GD.\mathrm{gen}\) guard.  Write \(\psi_2\) for the dyadic
+CRT component.  Its restriction to the subgroup of units congruent
+to one modulo four is nontrivial; otherwise its conductor would
+divide four, contradicting \(c_2\ge4\).  The image of that subgroup
+has nontrivial power-of-two order.  Since the coefficient field has
+characteristic zero, its unique element of order two is \(-1\).
+Hence there is a dyadic unit \(v\equiv1\pmod4\) with
+\(\psi_2(v)=-1\).  If \(\psi_2(-1)=1\), take \(u=-1\);
+otherwise take \(u=-v\).  In both cases
+\[
+                  u\equiv-1\pmod4,\qquad \psi_2(u)=1.
+ \tag{CAF.15}
+\]
+Total ramification of the dyadic cyclotomic extension supplies an
+element \(s\) of inertia at two with this dyadic cyclotomic action.
+All prime-to-two roots of unity are unramified there.  Thus the other
+CRT components of \(\psi\) are one at \(s\), and the
+\(\ell\)-adic cyclotomic character is one because \(\ell\) is odd.
+Equation (CAF.15) gives
+\(\omega(s)=\alpha(s)=1\) and \(\eta_4(s)=-1\), proving
+\(\mathcal S\).  CAF6 gives
+\(Q=(M^2\ell)_{\ell'}=N_{\ell'}^2\).
+This verifies the seed-relevant part of \texttt{gen\_host} and
+preserves the complete host small-prime scope.  It does not replace
+the host by the \texttt{Dat} field or assume
+\(\ell-1\nmid2e\).
+% END CAF10
+
+% BEGIN CAF11
+\paragraph{CAF11. Installing the seed on the same marked frame.}
+\label{claim:CAF11}
+Choose \(Q\) by CAF6, CAF9, or CAF10 before selecting the frame.
+Suppose the original \texttt{HasFrameW} at that \(Q\) has been
+supplied.  Its very same
+\(L,g_1,\Phi,C_0,w\), with the same \texttt{GalLink}, then
+satisfies the full original \texttt{HasFrame}, including its
+\texttt{SeedClause}.  In particular, an eventual proof of
+\texttt{frame\_ex} can be consumed in both the \texttt{GdFrameEx}
+and \texttt{HostFrameEx} applications without a new seed choice or
+a new marked element.
+
+\emph{Proof.}
+Unpack the supplied \texttt{HasFrameW}.  It contains a
+\texttt{Linked} witness, hence a literal
+\(k:\operatorname{GalLink}(\eta,\Psi,\sigma,g_1,B,M,L,\Phi)\),
+the existing \(\Phi.\mathrm{Ok}(C_0)\) and
+\(\Phi.\mathrm{Big}(C_0)\), a witness prime \(w\),
+\(w\equiv1\pmod Q\), and \(U_L\subseteq H_\ell(w)\).
+The \texttt{ab} and \texttt{gal} fields of \(k\) give abelian
+\(L\) and \(G_L=U_L\cap\ker\eta\).
+
+The \texttt{g0} field gives \(g_1\in U_L\) with
+\(p(g_1)=\Phi.g_0\).  The \texttt{del} field and the fact
+\(\Phi.g_0\in\ker\Phi.\mathrm{del}\) imply
+\(\eta(g_1)=1\).  Hence \(g_1\in G_L\).
+The \texttt{psi} field identifies
+\(\alpha(g_1)=\Phi.\Psi(\Phi.g_0)\), whose square is not one
+by \(\Phi.\mathrm{Ok}.\mathrm{baseSubgroup\_spec}\).
+Thus the final witness in (CAF.10) is the already selected \(g_1\).
+CAF7 provides the full \texttt{SeedClause}.  Keep the same
+\(L,g_1,\Phi,C_0,k\), its \texttt{Ok} and \texttt{Big} proofs,
+and add that seed.  These are exactly all fields of
+\texttt{HasFrame}; none has been reselected.
+
+The source's \texttt{gd\_ex} and \texttt{host\_ex} use precisely
+this installation after \texttt{frame\_ex}.  CAF9 and CAF10 give
+their seed moduli directly, so their \texttt{Gen} constructions are
+not additional seed hypotheses.  The existence of the large
+\texttt{HasFrameW} is still required for either full frame-existence
+conclusion.
+% END CAF11
+
+\subsection{The exact remaining interface}
+
+The completed internal producers are \texttt{sc\_norm},
+\texttt{sc\_teich}, \texttt{sc\_strip}, \texttt{sc\_quad},
+\texttt{sc\_disc}, \texttt{hth}, \texttt{sc\_theta},
+\texttt{auxw\_ex}, \texttt{sc\_cong}, \texttt{seed\_cl}, and
+\texttt{field\_ex}, together with the two actual arithmetic
+specializations of the seed hypotheses and the same-frame
+installation.  The original \texttt{Gen} and \texttt{UFacts}
+antecedents of the first two major source endpoints have been
+preserved or weakened by proved implications; they have not been
+silently assumed to exist.
+
+For the remaining large frame, the source next chooses a real
+quadratic subgroup \(H_0\), sets
+\[
+ U_m=H_0\cap H_\ell(w)\cap H_b\cap
+          \ker\bigl(\epsilon\bmod\ell^{m+1}\bigr)^{\ell-1},
+ \tag{CAF.16}
+\]
+proves its full \texttt{UFacts}, obtains one uniform class-rank
+bound \(C_0\), and takes \(m=3C_0+7\).  Then
+\(\ell^m>3C_0+7\).  CAF8 identifies the actual field belonging
+to that very \(U_m\).  The still required pieces are the strict
+cocycle constructions, the actual quotient/local linking frame,
+and the cohomological \texttt{Ok} fields, with their exact
+\texttt{GC.Hypotheses\_2} input.  The elementary inequality alone
+does not prove those fields.
+
+The CountV lane must keep \(M=\ell N\), \(\eta=\eta_4\), and
+\(H_b=\ker(\kappa_B)\), where \(\kappa_B\) is the away-from-\(\ell\)
+part of the \(\ell\)-power-order character.  The \texttt{Dat}
+lane uses \(M=\ell N|\operatorname{disc}K|\) and \(H_b=G\).
+Moreover, its auxiliary \(\Phi\) is the cohomological frame over
+\(G_{L^+}\).  It is not the original CountV host frame over
+\(G_{\mathbb Q,S}\).  Transport between them must retain their
+actual projection maps, coefficient modules, local conditions, and
+normalized Selmer lengths.  No \texttt{HOST\_FRAME\_LENGTH},
+\texttt{HOST\_VAN\_E}, or \texttt{HOST\_XPP} closure is claimed here.
+
+Finally, \texttt{LinkedEndEAlt} consumes both rank-two and rank-three
+automorphic seeds, the general \texttt{ModUAlt} supplier, the same
+frame and its common coefficient extension.  CAF7 supplies the
+character triple those seeds require.  It does not assert that the
+automorphic representations have been constructed.  Returning from
+\texttt{GdEndAlt} to the full original \texttt{GdEnd} likewise
+retains its local and descent matching.  Thus the selected whole
+obligations \texttt{AUT\_UNRAM\_COEF}, \texttt{THM\_S6\_S}, and
+the CountV joins remain open, while their common character-seed
+producer is now completely written.

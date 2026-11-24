@@ -1,0 +1,424 @@
+ASSEMBLING THE ACTUAL SEGMENT SPACES
+Working reconstruction 0.7 — 21 November 2026
+Pinned source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+Purpose and exact status
+========================
+The remaining SD2 obligation was not the abstract assertion that an injective
+monomial substitution preserves tensor-product independence. It was proving
+that the ACTUAL segment lattices, frame geometry, digit constraints and row
+degrees satisfy its hypotheses, simultaneously for every label/path family.
+
+This note proves that assembly, with the exact source conclusion RestLam 1088.
+Two shared results in version 0.7 are used by name and at their precise scope:
+
+* CG1: the actual XX' module is the integral span of an explicit subset of the
+  universal paired path basis, hence saturated. The same assertion over the
+  residue field supplies the base-change/lifting route in the separate coarse
+  congruence note. Its proof is the actual-model application of IP, not a
+  characteristic-zero isotypic decomposition.
+* RS3: the numerical parameter estimate a'_t/P_j(y) >= (36/5)Y k^2 Ns for every
+  segment letter y. Its proof expands the determinant degree loss and the
+  original Dat.Hyp; it is not a new independent parameter assumption.
+
+Everything else used in RestLam is derived below. We also state a conditional
+version under the single narrow numerical bound that LA5 actually uses, so
+the logical role of RS3 is completely visible. No good-path abundance estimate,
+coarse-generator congruence, or global arithmetic window is inferred here.
+No Lean source was modified, and no Lean build or kernel replay is claimed.
+
+0. Exact source data and hypotheses
+==================================
+Write k=r+K. The source datum X contains a periodically framed selected set
+TT subset Z/n'Z; an integer degree deg_t at each residue position; positive
+integer dimension parameters r,K; L1,N1,Ns,E0,mStar; a row loss E'_t; and real
+parameters a,Y,Q,CLa,Ck. Its Hyp contains exactly:
+
+  p prime, p>=13, n'>0 even, r>=2;
+  F.Valid(L1,N1);
+  a <= deg_t <= 2a for t in TT;
+  #letters_j <= Ns <= N1, Ns <= 2#TT, Ns+r <= K;
+  p^dist(j,x) <= Q for every x in letters_j;
+  Y>=1, Ck Ns^2 log(a) <= k;
+  128 k^2 Ns Y^2 <= p^(L1-1);
+  E'_t <= E0 for t in TT;
+  32pY k^2 Ns Q^2(E0+mStar+1) <= a.
+
+The RestLam endpoint additionally assumes CLa,Ck>=1088 and the source
+UniformizedDVR(p,O) setting. In particular O is a DVR domain and its residue
+field is f. The geometry and digit injection below need only the frame
+properties explicitly used; their proof has no hidden use of 1088. The
+numerical bound in LA5 and the actual path-space hypotheses are the reasons
+for carrying the full source assumptions at the endpoint.
+
+The literal frame validity conditions are:
+  J>=1 and f_(j+J,i)=f_(j,i)+n';
+  f_(j,0)<...<f_(j,r-1)<f_(j+1,0);
+  frame letters are even and selected;
+  no selected letter lies strictly between adjacent entries of one frame;
+  the intermediate selected letters between consecutive frames number at
+  least r, with the designated first/last r even and satisfying the specified
+  L1 gaps; the first current-frame letter also has its L1 gap;
+  #letters_j<=N1;
+  every late letter x lies more than L1 beyond its r-th most recent selected
+  even predecessor (the source's oldest(j,x)).
+Only the first four lines are needed in LA1--LA2; the other conditions enter
+CG1/RS3 or the separate numerical/path count.
+
+Put z_j=f_(j,r-1), s_j=f_(j-1,0). The finite segment is
+  letters_j = TT_Z intersect [s_j,z_j],
+where TT_Z is the periodic lift of TT. Its old letters satisfy x<=z_(j-1),
+and its late letters are the remaining ones. The first r polynomial
+coordinates c=0,...,r-1 are the plane coordinates; the last K are normal.
+
+The original generator row degree is d_t=deg_t-E'_t on TT and zero off TT,
+using natural subtraction. The coarse degree is a'_t=d_t-Et_t, where Et_t
+is the exact row degree of the determinant multiplier Dl. The explicit
+formula, recalled to fix the object, is
+
+ Et_t = sum_(j=0)^(J-1) sum_(x in late_j) sg(j,x)
+             sum_(i=0)^(r-1) 1_(row(j,x,i) mod n'=t) p^dist(j,row(j,x,i)),
+ sg(j,x)=floor(Bo(j,x)/(k^2Y)),
+ Bo(j,x)=deg_(oldest(j,x) mod n')/p^dist(j,oldest(j,x)).
+
+Here row(j,x,i) lists the last r even selected predecessors of x, in
+increasing order. RS2 proves the smallness of this exact degree loss and
+the required absence of underflow in the natural subtractions. The present
+argument uses its consequence RS3, not an informal approximate degree.
+
+LA1. All four LamGeo properties from one-period geometry
+========================================================
+There are exactly r old letters in segment j, namely f_(j-1,i). Indeed, an
+old selected x lies in [f_(j-1,0),f_(j-1,r-1)]. The no-selected-letter gaps
+between adjacent frame entries force x to be one of those entries.
+Thus
+
+  W_j={f_(j-1,i):0<=i<r},
+  L_j=TT_Z intersect (z_(j-1),z_j].
+
+The z_j are strictly increasing. Periodicity gives z_(J-1)=z_(-1)+n'. The
+J adjacent late intervals for j=0,...,J-1 tile (z_(-1),z_(-1)+n']. This
+half-open interval contains exactly one integer of each residue class
+modulo n'. It follows that every t in TT has precisely one late occurrence,
+and two late occurrences with the same residue have the same j and x.
+These are LamGeo.EX and LamGeo.U1, with no probabilistic assertion.
+
+An old occurrence (j,x) is a current-frame entry of segment j-1, hence a
+late occurrence for j-1. Applying the same interval argument to the J
+segments -1,...,J-2 proves uniqueness among old occurrences. This is U2.
+
+If an old occurrence and a late occurrence have the same residue, the
+uniqueness just proved says that the late one is a periodic translate of
+that old frame entry. Thus it is a CURRENT-frame entry of its late segment.
+The next segment supplies its unique old copy. This proves the geometric
+part of LamGeo.LK. At the boundary, the late current-frame letter in segment
+J-1 is shared with its translate by -n' in segment 0. LA2 proves the exact
+factor relating the corresponding powers, including this wraparound.
+
+These arguments also show that intermediate selected letters never have
+an old-frame copy. A variable in an old occurrence can only have plane
+coordinate: the exact XX' definition permits normal factors only at late
+letters. This support assertion will be used during decoding, not inferred
+from a dimension count.
+
+LA2. A closed formula for every coarse exponent
+==============================================
+Set
+  B=a/(8Yk^2Ns), N=floor(B), H=integer_log_p(N), with integer_log_p(0)=0.
+The source defines
+  R_j=integer_log_p floor(B/p^(z_j-s_j)).
+For N>=0, p>=2 and d>=0,
+  integer_log_p(N div p^d)=max(integer_log_p N-d,0).
+If N<p^d both sides are zero; otherwise dividing p^h<=N<p^(h+1)
+proves the formula. Also floor(B/p^d)=floor(B) div p^d. Therefore
+
+  R_j=max(H-(z_j-s_j),0),
+  A_j=z_j+R_j=max(z_j,H+s_j).
+
+Both s_j and z_j strictly increase with j. Since all are integers,
+  A_(j+1)>=A_j+1.
+For x<=z_j the source distance is the actual nonnegative integer z_j-x,
+so its definitions Pz and Qc become exactly
+
+  P_j(x)=p^(A_j-x),       Q_j=p^(A_(j+1)-A_j).
+
+In particular Q_j is positive (indeed at least p), and the positive-part
+conversion in its source exponent discards nothing. It follows at once that
+
+  P_(j+1)(x)=P_j(x)Q_j for x<=z_j.                     (LA2a)
+
+Periodicity of s and z gives A_(j+J)=A_j+n'. Hence R_(j+J)=R_j,
+P_(j+J)(x+n')=P_j(x), Q_(j+J)=Q_j, and
+
+  product_(j=0)^(J-1) Q_j=p^(A_J-A_0)=p^n'.          (LA2b)
+
+For an old/late overlap in LA1, apply (LA2a) to the common current-frame
+letter and then translate by a period if needed. Its old power is precisely
+its late power multiplied by Q of the late segment. This proves the final
+LamGeo.LK clause. The max formula is a shorter human replacement for the
+source's truncated-log and exponent case analysis; it is an exact identity,
+not a large-parameter approximation.
+
+LA3. Actual segment saturation, finite rank and residue bases
+============================================================
+For completeness, the actual XX'_j(m,theta,o) is the O-span of separated
+products A(plane)G(normal), intersected with an order support condition.
+Here A uses all segment letters and G only late letters. For some integer
+function M(x), at each late x the pair obeys:
+
+  x even: lambda_max(G, prefix<=x)<=M(x),
+          valuation_min(A, prefix<x)>=M(x)+m(x);
+  x odd:  lambda_max(G, prefix<x)<=M(x),
+          valuation_min(A, prefix<=x)>=M(x)+m(x);
+  always: valuation_min(A, prefix<x)>=theta(x).
+
+The lambda/valuation quantities are the maximal/minimal exponents under
+the source's GENERIC signed diagonal twist, not bounds at finite-field
+points. The final order support condition bounds, at an even x, the total
+normal degree; at an odd x, the total plane degree, by o(x).
+
+Shared CG1 identifies this actual module with the span of the paired path
+polynomials PsiPl(nu,I)PsiTan(kappa,J) having these same bounds. More
+explicitly, if letter i is x, the allowed paired paths satisfy:
+
+  normal letter degree b''_i=0 when x is old;
+  for late even x: kappa_(i+1),1+m(x)<=nu_i,r and b''_i<=o(x);
+  for late odd x:  kappa_i,1+m(x)<=nu_(i+1),r and b'_i<=o(x);
+  for all late x: theta(x)<=nu_i,r.
+
+Each factor has its own signed-letter path of degrees b',b'', and I,J
+are standard column indices. The correspondence with prefixes is exact:
+prefix<x corresponds to i letters and prefix<=x to i+1 letters. The
+ordered enumeration of the finite segment is injective; renaming into
+integer-indexed letters embeds the polynomial ring as a coefficient
+direct summand. CG1 derives this identity over O and its residue field
+from IP's integral signed path basis and simultaneous prefix filtration.
+Consequently XX'_O is a span of a subset of an ambient integral basis,
+and is saturated in the whole segment polynomial ring. This is the
+specific third clause of NestedTypeBound used here. We do NOT use its
+separate characteristic-zero joint-isotypic clause.
+
+For the coarse family, put m0=k Ns+1 and use the actual source functions
+
+  Bw(j,y)=floor(a'_(y mod n')/P_j(y))-(k+r+1),
+  theta_b(j,x)=(2/3)*(Bw(j,oldest)-m0) if oldest is old,
+              =(2/3)*b(oldest) otherwise,
+  oc(j,x)=CLa Ns^2 log(a)*a/(p k P_j(x))
+                + 4a/P_j(oldest(j,x)) if x even,
+           =CLa Ns^2 log(a)*a/(p k P_j(x)) if x odd.
+
+The exact M_j(b) is
+
+  XX'_j(m0,theta_b,oc)
+  intersect {monomials m: sum_c m(x,c)=b(x) for every x}
+  intersect {monomials m: m(f_(j,i),c)<Q_j for all i<r,c<r}.
+
+CG1's required inequalities hold: m0>=0 and
+segN(F,j)+r=#letters_j+r<=Ns+r<=K. Its frame and DVR hypotheses are
+literally contained in Dat.Hyp and UniformizedDVR(p,O).
+
+Over a domain, every coefficient-support restriction is saturated: a
+nonzero scalar cannot erase a nonzero coefficient at a prohibited
+monomial. Intersections preserve saturation, so this proves saturation
+of the ACTUAL M_j(b). In particular it is not enough merely to name an
+abstract saturated lattice whose identification with M_j has been omitted.
+
+If b vanishes outside the finite segment, its multidegree condition has
+finite support: m(x,c)<=b(x), with finitely many x,c and a finite range at
+each coordinate. Thus M_j(b) is a submodule of a finite free coefficient
+module. A DVR is a noetherian PID, so M_j(b) is finite free. Write its rank
+as h. For an O-basis u_1,...,u_h, suppose sum bar(c_i)bar(u_i)=0. Lift the
+coefficients c_i to O. Every coefficient of sum c_i u_i is divisible by
+the uniformizer pi, so sum c_i u_i=pi P for a polynomial P. Saturation puts
+P in M_j(b), and expansion in its O-basis forces each c_i divisible by pi.
+The reduced basis is therefore independent over f. Equivalently
+  M_j(b) intersect pi O[X] = pi M_j(b).
+Rank zero causes no exception: the chosen family is empty.
+
+This gives exactly RestLamA and the finiteness assertion RestFin needed
+by this application. The digit support restriction need not select a
+subset of the path basis: saturation of its intersection is sufficient.
+
+LA4. Uniform monomial decoding across all label/path families
+============================================================
+We now define the precise finite family indices. A label ell in LA gives
+nonnegative integers ell_(t,c) satisfying
+  L_t=sum_c ell_(t,c)<=a'_t,
+and, for every late representative x in segment j of t,
+  ell_(t,c)<P_j(x),        L_t congruent a'_t modulo P_j(x).
+By LA1--LA2 the condition is identical for all periodic representatives.
+In particular labels are zero off TT, where a'_t=0. Define
+  n_j(x)=(a'_(x mod n')-L_(x mod n'))/P_j(x),
+with natural division. Label membership ensures the numerator is both
+nonnegative and divisible by P_j(x).
+
+For each j in {0,...,J-1} and i<r, choose e_(j,i) from EE(ell):
+  0<=e_(j,i)<rQ_j,
+  e_(j,i) congruent n_j(f_(j,i)) modulo Q_j.
+Extend e periodically in j, as the source eZ does.
+
+The exact family row degree b_(ell,e,j) is zero outside the segment and
+is given there by
+  intermediate x:                 n_j(x);
+  current-frame x=f_(j,i):         e_(j,i);
+  old-frame x=f_(j-1,i):           (n_(j-1)(x)-e_(j-1,i)) div Q_(j-1).
+The first two formulas follow immediately from bfam and the absence of
+selected letters between adjacent frame entries. The third is the exact
+source bfam_at_w_letter_eq; uniqueness of frame entries eliminates every
+other summand in its definition. Natural subtraction in the last formula
+will be justified in LA5 rather than ignored.
+
+Let S_(ell,e,j) consist of the monomials m in the segment variables with:
+  support only in letters_j and no normal variables at old letters;
+  row degree b_(ell,e,j);
+  m(f_(j,i),c)<Q_j whenever c<r.
+Every member of M_j(b_(ell,e,j)) is supported in this set. This follows
+directly from the separated-product definition for the first condition
+and from the two restrictions in M_j for the other conditions. Reduction
+of coefficients cannot create new support.
+
+The assembled exponent is the exact source lamL+sum imgMon:
+
+  N_(t,c)=ell_(t,c)+sum_j sum_(x in letters_j, x mod n'=t) P_j(x)m_j(x,c).
+
+Fix the unique late occurrence x in L_j of t. If it is a current-frame
+letter, the only other possible occurrence is its old copy in the next
+segment. Periodic shifts are understood at the last segment. For c<r:
+
+  N_(t,c)=ell_(t,c)+P_j(x)*(u+Q_j v),
+  u=m_j(x,c),  v=m_(j+1)(x,c),  0<=u<Q_j.           (LA4a)
+
+At j=J-1 the notation for v means m_0(x-n',c), exactly the old occurrence
+inside segment 0. This is only periodic notation for the chosen finite
+tuple; no additional periodicity hypothesis on its polynomials is needed.
+
+All quantities are nonnegative integers and 0<=ell_(t,c)<P_j(x). Thus
+N mod P recovers ell. After subtracting ell and dividing by P, reduction
+mod Q recovers u; division by Q then recovers v.
+
+For a nonframe late x there is no old copy, so N=ell+P u; here u needs
+no upper bound. At a normal coordinate c>=r the old exponent vanishes
+by the support condition, even when x is a frame letter, and the same
+one-division recovery applies. Off TT both label and segment exponents
+are zero. Hence N determines every label coordinate and every m_j.
+The current-frame row sum sum_c m_j(f_(j,i),c)=e_(j,i) then recovers e.
+
+This proves injectivity of
+  (ell,e,(m_j)_j) |-> N
+on the full disjoint union of all allowed support families. It is stronger
+than injectivity within a single fixed label. It is the exact RestLamInj,
+with the source RestLamTau (current-frame row sum=e) proved above. The
+argument is integral combinatorics and works in every coefficient
+characteristic; it uses no Frobenius map on coefficients.
+
+LA5. Exact multidegree and the missing nonnegative subtraction
+==============================================================
+Here is the narrow numerical input sufficient for the degree calculation:
+for every current-frame x=f_(j,i), t=x mod n',
+
+  a'_t/(P_j(x)Q_j) >= k+r+1.                         (LA5a)
+
+RS3 proves the stronger inequality. In fact x belongs to segment j+1,
+P_(j+1)(x)=P_j(x)Q_j by LA2, and
+  a'_t/P_(j+1)(x)>=(36/5)Y k^2 Ns>=k+r+1.
+The last comparison follows from Y,Ns>=1, r<=k and k>=5, which are
+already consequences of the source Hyp. Thus (LA5a) holds for every
+family simultaneously; it does not depend on ell or e.
+
+Put P=P_j(x), q=Q_j, L=L_t and n=n_j(x). The k label coordinates are all
+<P, so L<kP. Because P n=a'_t-L exactly,
+  n > a'_t/P-k >= q(k+r+1)-k >= rq.
+Since e_(j,i)<rq, this proves e_(j,i)<n, in particular e<=n. Therefore
+the natural subtraction n-e agrees with ordinary subtraction. The EE
+congruence says q divides n-e; hence
+
+  e+q*((n-e) div q)=n.                              (LA5b)
+
+This elementary direct argument replaces the source's detour through
+RestPad and positivity of Bw. It does not assert RestPad itself, whose
+other inequalities belong to RS.
+
+Now sum the exponent formula in LA4 over the k coordinates at a fixed t.
+At an intermediate position there is only one segment occurrence and
+the degree is L_t+P_j(x)n_j(x)=a'_t. At a current-frame position the late
+row has degree e and the old row degree (n-e)/q. By (LA5b) its assembled
+degree is also L_t+P_j(x)n_j(x)=a'_t. At t outside TT both sides are zero.
+This proves exact fixed multidegree for EVERY tuple of allowed support
+monomials, so cancellations between polynomial coefficients are irrelevant.
+
+The label inequalities already prove the source IsCLabel condition for
+every integer segment j. Thus the pair of assertions is exactly RestLamDeg
+1088. No row degree is merely bounded above; equality is essential to
+membership in the actual coarse generator set lamGen.
+
+LA6. From primitive segment bases to the complete RestLam inequality
+====================================================================
+For each finite family f=(ell,e) and each segment j choose the O-basis of
+M_j(b_(f,j)) from LA3. Its reductions u_(f,j,i) are linearly independent
+over f. All are supported in S_(f,j).
+
+For clarity, construct the ambient injection before taking these subspaces.
+The free monomial space on S_(f,j) has basis {X^m:m in S_(f,j)}. The tensor
+product over j has basis indexed by tuples (m_j), and the direct sum over
+f distinguishes different label/terminal-parameter families. Send its
+basis vector to the monomial with exponent
+  ell+sum_j imgMon(lamG_j,lamE_j,m_j).
+LA4 says those images are all distinct monomials. The map is therefore
+injective. Restricting it to the tensor products of the spans of the
+u_(f,j,i) stays injective, and their tensor-product bases give
+
+  sum_(ell in LA) sum_(e in EE(ell)) product_j rank_O M_j(b_(ell,e,j))
+
+linearly independent assembled products over the residue field. This
+proves exactly lam_li_all in the actual setting, and avoids a false
+general assertion that products of independent polynomial families
+are automatically independent.
+
+Each product is the reduction of the integral polynomial
+  X^ell product_(j=0)^(J-1) phc_j(y_(f,j,i_j)).
+The substitutions phc are polynomial algebra maps and commute with any
+coefficient ring homomorphism, so reduction is exact. For the source
+integer-indexed witness y_j, use these basis vectors for 0<=j<J and zero
+for other j. Zero belongs to every remaining M_j. Each chosen factor has
+the required actual membership, the label is IsCLabel, and LA5 gives
+the exact target row multidegree. Hence the polynomial belongs to lamGen.
+
+The target span LamBar is finite dimensional: it lies in the coefficient
+space of all monomials with fixed row degrees a'_t, a finite set. Thus the
+independent family just constructed proves
+
+  sum_(ell in LA) sum_(e in EE(ell)) product_(j=0)^(J-1)
+       rank_O M_j(b_(ell,e,j)) <= dim_f LamBar.        (LA6)
+
+This is the full source RestLam 1088. If any M_j has rank zero the product
+has no basis tuples and contributes zero, exactly as required. The frame
+period J is positive by validity; no empty-period convention is silently
+used. Empty label/terminal sets simply contribute zero.
+
+What this closes, and what remains separate
+===========================================
+LA1--LA2 prove all actual LamGeo conditions, including scale periodicity
+and wraparound. LA3 proves finite residue-independent bases for the actual
+restricted segment spaces using the explicitly shared CG1 identity.
+LA4 proves simultaneous injectivity across every family. LA5 proves exact
+multidegree and the required nonnegative subtraction from the narrow RS3
+bound. LA6 gives the whole RestLam conclusion.
+
+The dimension on the left is not estimated here. RestSeg must exhibit
+sufficiently many admissible paths and compare their dimensions; RestSum
+must sum the residue/label families quantitatively. The coarse-generator
+congruence is another shared version-0.7 proof, not a consequence of this
+injection. No spectral, arithmetic-window or prime-selection input follows
+from the algebraic assembly alone.
+
+Provenance and reproducibility
+==============================
+The accompanying provenance.json records each source declaration used to
+identify the exact objects and endpoints, its inclusive line range, exact
+byte range, full-file SHA-256, range SHA-256, and pinned GitHub URL. It also
+records which claims are human replacements, which previous/shared proved
+claims are used, and which unrelated obligations remain separate. Run
+build_provenance.py to regenerate the ledger at the same source commit.
+No generated source ranges are presented as an independently verified Lean
+dependency closure.

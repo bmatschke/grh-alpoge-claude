@@ -1,0 +1,959 @@
+[RFD_original_contract_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/RowsDef.lean:19-119
+Range SHA256 ffd9a50818bf63275774d9ffe45d7610e725e2d5f49c2678d593575ec9ae5909
+def HH (Re T : I.L2 μf fund →L[ℂ] I.L2 μf fund) : Submodule ℂ (I.L2 μf fund) :=
+  LinearMap.range ((Re.comp T : I.L2 μf fund →L[ℂ] I.L2 μf fund) : I.L2 μf fund →ₗ[ℂ] I.L2 μf fund)
+
+def evAt {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund))
+    (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund) (w₀ : Hs) :
+    I.eHom σs μf fund R Re →ₗ[ℂ] I.L2 μf fund :=
+  ((ContinuousLinearMap.apply ℂ (I.L2 μf fund) w₀ : (Hs →L[ℂ] I.L2 μf fund) →L[ℂ] I.L2 μf fund) :
+      (Hs →L[ℂ] I.L2 μf fund) →ₗ[ℂ] I.L2 μf fund).comp (I.eHom σs μf fund R Re).subtype
+
+end Defs
+
+def RowsProj : Prop :=
+  ∀ (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsHaarMeasure] (fund : Set I.GA),
+    I.IsFundDom (I.muA μf) fund →
+    ∀ R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund), I.IsRightReg μf fund R →
+    ∀ (e : I.Gf → ℂ) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund),
+      IsLocallyConstant e → I.convF μf e e = e → (∀ x, e x⁻¹ = star (e x)) →
+      I.IsRConvF μf fund R e Re →
+    ∀ (H : InfinitePlace I.F → Type) [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
+      (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v)) (dv : InfinitePlace I.F → ℝ) (w : ∀ v, H v),
+      (∀ v, IsURepOn (UJset (I.ε v)) (σ v)) → (∀ v, IsFdeg (Formalism.REAL.muG (I.ε v)) (σ v) (dv v)) →
+      (∀ v, ‖w v‖ = 1) → (∀ v, Integrable (phLoc (ε := I.ε v) (σ v) (w v) (dv v)) (Formalism.REAL.muG (I.ε v))) →
+      ∀ T : I.L2 μf fund →L[ℂ] I.L2 μf fund,
+        IsOpInt (muInf I) (fun g => R (g, 1)) (phInf I σ w dv) T →
+        Re.comp T = T.comp Re ∧
+        I.IsRConv μf fund R (fun g => phInf I σ w dv g.1 * e g.2) (Re.comp T) ∧
+        (∀ x y : I.L2 μf fund, ⟪(Re.comp T) x, y⟫_ℂ = ⟪x, (Re.comp T) y⟫_ℂ) ∧
+        (Re.comp T).comp (Re.comp T) = Re.comp T
+
+def RowsBij : Prop :=
+  ∀ (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsHaarMeasure] (fund : Set I.GA),
+    I.IsFundDom (I.muA μf) fund →
+    ∀ R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund), I.IsRightReg μf fund R →
+    ∀ (e : I.Gf → ℂ) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund), I.IsRConvF μf fund R e Re →
+    ∀ (H : InfinitePlace I.F → Type) [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
+      [∀ v, CompleteSpace (H v)]
+      (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v)) (dv : InfinitePlace I.F → ℝ) (w : ∀ v, H v),
+      (∀ v, IsURepOn (UJset (I.ε v)) (σ v)) → (∀ v, IsIrredOn (UJset (I.ε v)) (σ v)) →
+      (∀ v, IsFdeg (Formalism.REAL.muG (I.ε v)) (σ v) (dv v)) →
+      (∀ v, ‖w v‖ = 1) → (∀ v, Integrable (phLoc (ε := I.ε v) (σ v) (w v) (dv v)) (Formalism.REAL.muG (I.ε v))) →
+      ∀ T : I.L2 μf fund →L[ℂ] I.L2 μf fund,
+        IsOpInt (muInf I) (fun g => R (g, 1)) (phInf I σ w dv) T →
+      ∀ (Hs : Type) [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs] [CompleteSpace Hs]
+        (σs : I.Ginf → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs), I.IsHilbTensor σ σs tens →
+        Function.Injective (evAt I μf fund σs R Re (tens w)) ∧
+          LinearMap.range (evAt I μf fund σs R Re (tens w)) = HH I μf fund Re T
+
+def RowsFinDim : Prop :=
+  ∀ (I : AutInst) (μf : Measure I.Gf) [SigmaFinite μf] [μf.IsHaarMeasure] (fund : Set I.GA),
+    I.IsFundDom (I.muA μf) fund →
+    ∀ R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund), I.IsRightReg μf fund R →
+    ∀ (e : I.Gf → ℂ) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund),
+      IsLocallyConstant e → (∀ x, e x ≠ 0 → x ∈ I.Kset) → I.IsRConvF μf fund R e Re →
+    ∀ (H : InfinitePlace I.F → Type) [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
+      [∀ v, CompleteSpace (H v)]
+      (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v)) (dv : InfinitePlace I.F → ℝ) (w : ∀ v, H v),
+      (∀ v, IsURepOn (UJset (I.ε v)) (σ v)) → (∀ v, IsIrredOn (UJset (I.ε v)) (σ v)) →
+      (∀ v, IsFdeg (Formalism.REAL.muG (I.ε v)) (σ v) (dv v)) →
+      (∀ v, ‖w v‖ = 1) → (∀ v, Integrable (phLoc (ε := I.ε v) (σ v) (w v) (dv v)) (Formalism.REAL.muG (I.ε v))) →
+      ∀ T : I.L2 μf fund →L[ℂ] I.L2 μf fund,
+        IsOpInt (muInf I) (fun g => R (g, 1)) (phInf I σ w dv) T →
+        FiniteDimensional ℂ (HH I μf fund Re T)
+
+section Count
+
+variable {I : AutInst} {μf : Measure I.Gf} [SigmaFinite μf] {fund : Set I.GA}
+  {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+  {σs : I.Ginf → (Hs →L[ℂ] Hs)} {R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)}
+  {Re T : I.L2 μf fund →L[ℂ] I.L2 μf fund} {w₀ : Hs}
+
+def eHomEquivHH (hinj : Function.Injective (evAt I μf fund σs R Re w₀))
+    (hran : LinearMap.range (evAt I μf fund σs R Re w₀) = HH I μf fund Re T) :
+    I.eHom σs μf fund R Re ≃ₗ[ℂ] HH I μf fund Re T :=
+  (LinearEquiv.ofInjective _ hinj).trans (LinearEquiv.ofEq _ _ hran)
+
+theorem finrank_HH_eq_Dcount (hinj : Function.Injective (evAt I μf fund σs R Re w₀))
+    (hran : LinearMap.range (evAt I μf fund σs R Re w₀) = HH I μf fund Re T) :
+    Module.finrank ℂ (HH I μf fund Re T) = I.Dcount σs μf fund R Re :=
+  ((eHomEquivHH hinj hran).finrank_eq).symm
+
+theorem rank_HH_eq (hinj : Function.Injective (evAt I μf fund σs R Re w₀))
+    (hran : LinearMap.range (evAt I μf fund σs R Re w₀) = HH I μf fund Re T) :
+    Module.rank ℂ (HH I μf fund Re T) = Module.rank ℂ (I.eHom σs μf fund R Re) :=
+  ((eHomEquivHH hinj hran).rank_eq).symm
+
+theorem finiteDimensional_eHom (hinj : Function.Injective (evAt I μf fund σs R Re w₀))
+    (hran : LinearMap.range (evAt I μf fund σs R Re w₀) = HH I μf fund Re T)
+    [hfin : FiniteDimensional ℂ (HH I μf fund Re T)] :
+    FiniteDimensional ℂ (I.eHom σs μf fund R Re) :=
+  LinearEquiv.finiteDimensional (eHomEquivHH hinj hran).symm
+
+theorem Dcount_pos_iff (hinj : Function.Injective (evAt I μf fund σs R Re w₀))
+    (hran : LinearMap.range (evAt I μf fund σs R Re w₀) = HH I μf fund Re T)
+    [hfin : FiniteDimensional ℂ (HH I μf fund Re T)] :
+    0 < I.Dcount σs μf fund R Re ↔ HH I μf fund Re T ≠ ⊥ := by
+  rw [← finrank_HH_eq_Dcount hinj hran, Nat.pos_iff_ne_zero, Ne, Submodule.finrank_eq_zero]
+
+theorem finiteDimensional_HH_of_eHom (hinj : Function.Injective (evAt I μf fund σs R Re w₀))
+    (hran : LinearMap.range (evAt I μf fund σs R Re w₀) = HH I μf fund Re T)
+    [hfin : FiniteDimensional ℂ (I.eHom σs μf fund R Re)] :
+
+
+[RFD_original_finiteness_producer_01] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/RowsFinDimLink.lean:1-10
+Range SHA256 8493763f12f6c02f2fbe30c8409a4d2fe902a80da47af1fa1d3a4021b3d76548
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.RowsDef
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.AutomorphicFormsFiniteDimensional
+
+namespace GlobalTheory
+
+theorem rowsFinDim_link : Formalism.L2.SG.RowsDef.RowsFinDim :=
+  CompanionTheory.D.gk.RF.automorphic_forms_finite_dimensional
+
+end GlobalTheory
+
+
+[RFD_original_finiteness_producer_02] src/CompanionTheory/HarishChandraModules/KFiniteAnalyticVectors/FundamentalDomainCusps/AutomorphicFormsFiniteDimensional.lean:1-29
+Range SHA256 e9f44888bf4f455d01d59341a5889c5c5a9b2a26c8ae35f4ad85c4b8bd92d2fc
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.RowsFinDimOf
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.FiniteDimensionalFromLinearForms
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.ParabolicSubgroupDecomposition
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.PBAdel
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.CuspidalAtInfinityOf
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.SecondOrderExpAtInfinitePlace
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.LocalPointData
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.LogBallEstimates
+import CompanionTheory.HarishChandraModules.KFiniteAnalyticVectors.FundamentalDomainCusps.RealParabolicDecomposition
+
+namespace CompanionTheory.D.gk.RF
+
+theorem gamSub : GamSub := by
+  exact arithmetic_subgroup_of_transport transport_to_standard_form
+
+theorem geoInf : GeoInf := by
+  have hT : Transp := transport_to_standard_form
+  have hG : GamSub := arithmetic_subgroup_of_transport hT
+  exact reduction_geometry_at_infinity successive_minima_gap (short_isotropic_vector_of hT) covolume_span (covolume_orthogonal_complement hT)
+    (mahler_compactness_of hT hG) (nilpotent_cover_of hT hG nilpotent_lie_algebra nilpotent_subgroup_representation)
+
+theorem cuspInf : CuspInf :=
+  cuspidal_at_infinity_of selP (averaging_of_fundamental_domain fundamental_domain_inclusion) unipotent_radical_subgroup real_parabolic_decomposition parabolic_subgroup_decomposition transport_to_standard_form gamSub geoInf
+
+theorem automorphic_forms_finite_dimensional : Formalism.L2.SG.RowsDef.RowsFinDim := by
+  exact rowsFinDim_of discrete_series_bound_of_inputs finite_dimensional_from_linear_forms (adelic_cusp_of_infinite_cusp cuspInf congruence_subgroup_compact_open)
+    (fundamental_domain_discrete_of gamSub) level_structure_of convolution_operator_representation representation_of_convolution
+
+end CompanionTheory.D.gk.RF
+
+
+[RFD_original_finiteness_producer_03] src/CompanionTheory/HarishChandraModules/KFiniteAnalyticVectors/FundamentalDomainCusps/RowsFinDimOf.lean:28-88
+Range SHA256 5f3a408df8c9e0053463fff3d6dd64c1ab7c82c5feb1648a8ee3d7546f8fea5a
+  have : LocallyCompactSpace I.Gf := gf_locallyCompact I
+  have : T2Space I.Gf := finite_adeles_group_t2 I
+  have : SecondCountableTopology I.Gf := rr_secondCountable I μf
+  have hright : (I.muA μf).IsMulRightInvariant := Formalism.L2.S.S7.IwasawaBase.muA_right I μf
+  have : (I.muA μf).IsHaarMeasure := by
+    have h1 : (I.muA μf).IsOpenPosMeasure := by unfold AutInst.muA; infer_instance
+    have h2 : (I.muA μf).IsMulLeftInvariant := rr_muA_left I μf
+    have h3 : IsLocallyFiniteMeasure (I.muA μf) := by unfold AutInst.muA; infer_instance
+    exact {}
+  have hlf : IsLocallyFiniteMeasure μf := inferInstance
+  let X : Formalism.MainNotions.BridgeLemma.CData :=
+    { I := I, b := 0, lam := 0, g := 0, g₀ := 0, e := e, H := fun _ => ℂ, σ := fun _ _ => 0, w := 0,
+      Hs := ℂ, σs := fun _ => 0, tens := fun _ => 0, μf := μf, fund := fund, R := R, Re := Re, h := 0 }
+  have hd : RegData X := ⟨‹_›, hfund, hR⟩
+  have hu : UnimodA X := hright
+  obtain ⟨hmul, -, hiso, -⟩ := adelic_regular_rep_unitary_continuous X hd hu hlf
+  have hmeas := regular_rep_coeff_measurable X hd hu
+  set ph := phInf I σ w dv with hph
+  have hphI : Integrable ph (muInf I) := phInf_int I hL
+  have hconv := phInf_conv I hU hF hw
+  have hφ₀ : Integrable (fun p : I.GA => ph p.1 * e p.2) (I.muA μf) := hphI.mul_prod hRe.1
+  have hpr := prod_op_eq (muInf I) μf R hmul hiso (fun x y => (hmeas x y).aestronglyMeasurable) ph e hφ₀ T Re hT hRe.2
+  have hRT : I.IsRConv μf fund R (fun p => ph p.1 * e p.2) (Re.comp T) := ⟨hφ₀, fun x y => (hpr x y).2.symm⟩
+  obtain ⟨Kp, hKo, hKc, hKe⟩ := hLev I e hlc hsupp
+  have hK0 : μf Kp ≠ 0 := (hKo.measure_pos μf ⟨1, Kp.one_mem⟩).ne'
+  have hK1 : μf Kp ≠ ∞ := hKc.measure_lt_top.ne
+  have hind : Integrable ((Kp : Set I.Gf).indicator fun _ => (((μf Kp).toReal⁻¹ : ℝ) : ℂ)) μf :=
+    (integrable_indicator_iff hKo.measurableSet).2 (integrableOn_const hK1)
+  have hφ : Integrable (phK I μf ph Kp) (I.muA μf) := hphI.mul_prod hind
+  have hφφ₀ : ∀ z : I.GA, ∫ y, phK I μf ph Kp y * (ph (y⁻¹ * z).1 * e (y⁻¹ * z).2) ∂(I.muA μf) = ph z.1 * e z.2 := by
+    intro z
+    have e1 : (fun y : I.GA => phK I μf ph Kp y * (ph (y⁻¹ * z).1 * e (y⁻¹ * z).2)) = fun y =>
+        (ph y.1 * ph (y.1⁻¹ * z.1)) *
+          (Kp : Set I.Gf).indicator (fun _ => (((μf Kp).toReal⁻¹ : ℝ) : ℂ) * e z.2) y.2 := by
+      funext y
+      by_cases hy : y.2 ∈ Kp
+      · have hy' : y.2 ∈ (Kp : Set I.Gf) := hy
+        simp only [phK, Set.indicator_of_mem hy', Prod.fst_mul, Prod.snd_mul, Prod.fst_inv, Prod.snd_inv,
+          hKe _ (Kp.inv_mem hy)]
+        ring
+      · have hy' : y.2 ∉ (Kp : Set I.Gf) := hy
+        simp only [phK, Set.indicator_of_notMem hy', mul_zero, zero_mul]
+    rw [e1]
+    refine (integral_prod_mul (μ := muInf I) (ν := μf) (fun g => ph g * ph (g⁻¹ * z.1)) _).trans ?_
+    rw [hconv, integral_indicator_const _ hKo.measurableSet, Measure.real, Complex.real_smul, ← mul_assoc ((μf Kp).toReal : ℂ),
+      ← Complex.ofReal_mul, mul_inv_cancel₀ (ENNReal.toReal_pos hK0 hK1).ne', Complex.ofReal_one, one_mul]
+  have hFD := rr_isFD (rr_FD_of I μf fund hfund)
+  have hO : IsClopen {g : I.GA | g.2 ∈ Kp} :=
+    IsClopen.preimage (s := (Kp : Set I.Gf)) ⟨Kp.isClosed_of_isOpen hKo, hKo⟩ continuous_snd
+  have hdet := hCore I.GA (I.muA μf) (rr_GF I) fund hFD (fun C hC => hD I C hC) (phK I μf ph Kp) _ hφ hO
+    (fun y hy => by
+      have hy' : y.2 ∉ (Kp : Set I.Gf) := hy
+      simp only [phK, Set.indicator_of_notMem hy', mul_zero])
+    (hCA I μf (rr_GF I) rfl Kp hKo hKc ph hphI hconv)
+  refine hFin I.GA (I.muA μf) (rr_GF I) fund _ hφ hdet _ ?_
+  rintro _ ⟨F₀, rfl⟩
+  refine map_mem_closure (f := Re.comp T) (Re.comp T).continuous (dense_bdd _ F₀) fun F hFb => ?_
+  obtain ⟨s, hs, hsb, hsi, hae⟩ := hCR I μf fund hfund R hR _ _ hRT F hFb
+  exact ⟨_, hRC I.GA (I.muA μf) (rr_GF I) _ _ s hφ hφ₀ hφφ₀ hs hsb hsi, hae⟩
+
+end CompanionTheory.D.gk.RF
+
+
+[RFD_original_instance_01] src/Formalism/SharpRestriction/CuspSpanNormBounds/GlobAut.lean:1-205
+Range SHA256 1b40512dbfdc760965ed84f41f45dbaaa10796ba7fae1bdddcdcf68aca8591a6
+import Mathlib
+import Formalism.LocalRingCardinality.DataSpaces
+import Formalism.SatakeDualWeyl.Statement
+import Formalism.RealPlaceAnalysis.InstMeasurableSpaceUJ
+
+noncomputable section
+
+namespace Formalism.MainNotions.S
+
+abbrev uMat {n : ℕ} {ε : Fin n → Bool} (g : Formalism.REAL.UJ ε) : Matrix (Fin n) (Fin n) ℂ :=
+  ((g : (Matrix (Fin n) (Fin n) ℂ)ˣ) : Matrix (Fin n) (Fin n) ℂ)
+
+open MeasureTheory NumberField Matrix Finset IsDedekindDomain
+open scoped TensorProduct InnerProductSpace ComplexOrder
+
+abbrev Af (F : Type) [Field F] [NumberField F] : Type := FiniteAdeleRing (𝓞 F) F
+
+section Lat
+
+variable {F E : Type} [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] {n : ℕ}
+
+abbrev IntAf (F E : Type) [Field F] [NumberField F] [Field E] [NumberField E] [Algebra F E] :
+    Subring (E ⊗[F] Af F) :=
+  Formalism.UG.tensInt (F := F) (Af F) (Formalism.UG.intOE E) (Formalism.UG.intAd F)
+
+def lamAf (L : Submodule (𝓞 E) (Fin n → E)) : Submodule (IntAf F E) (Fin n → E ⊗[F] Af F) :=
+  Submodule.span (IntAf F E)
+    (Set.range fun x : L => fun i => Formalism.UG.inclE (F := F) (Af F) ((x : Fin n → E) i))
+
+end Lat
+
+structure AutInst : Type 1 where
+  F : Type
+  E : Type
+  [fF : Field F]
+  [nF : NumberField F]
+  [fE : Field E]
+  [nE : NumberField E]
+  [sE : StarRing E]
+  [aFE : Algebra F E]
+  cm : Formalism.BasicNotions.CMData F E
+  n : ℕ
+
+  J : Matrix (Fin n) (Fin n) E
+  J_herm : Formalism.UG.IsHerm (starRingEnd E) J
+  J_det : J.det ≠ 0
+
+  L : Submodule (𝓞 E) (Fin n → E)
+  L_span : Submodule.span E (L : Set (Fin n → E)) = ⊤
+  L_fg : L.FG
+  L_dual : ∀ x : Fin n → E, x ∈ L ↔
+    ∀ y ∈ L, Formalism.UG.hform (starRingEnd E) J y x ∈ (algebraMap (𝓞 E) E).range
+
+  ε : InfinitePlace F → Fin n → Bool
+  φ : InfinitePlace F → (E →+* ℂ)
+  φ_over : ∀ v (a : F), φ v (algebraMap F E a) = v.embedding a
+  P : InfinitePlace F → Matrix (Fin n) (Fin n) ℂ
+  P_unit : ∀ v, IsUnit (P v)
+  P_spec : ∀ v, (P v)ᴴ * J.map (φ v) * P v = Formalism.REAL.Jm (ε v)
+
+  [topf : TopologicalSpace (Formalism.UG.UPts cm.sig J (Af F))]
+  [topf_group : IsTopologicalGroup (Formalism.UG.UPts cm.sig J (Af F))]
+
+  topf_open : ∀ g : ℕ, 1 ≤ g → IsOpen {x : Formalism.UG.UPts cm.sig J (Af F) |
+    (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
+      ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
+        ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z}
+  topf_basis : ∀ U ∈ nhds (1 : Formalism.UG.UPts cm.sig J (Af F)), ∃ g : ℕ, 1 ≤ g ∧
+    {x : Formalism.UG.UPts cm.sig J (Af F) |
+      (x : GL (Fin n) (E ⊗[F] Af F)) ∈ Formalism.UG.stabGL (lamAf (F := F) L) ∧
+      ∀ y ∈ lamAf (F := F) L, ∃ z ∈ lamAf (F := F) L,
+        ((x : GL (Fin n) (E ⊗[F] Af F)) - 1 : Matrix (Fin n) (Fin n) (E ⊗[F] Af F)) *ᵥ y = (g : E ⊗[F] Af F) • z} ⊆ U
+
+attribute [instance] AutInst.fF AutInst.nF AutInst.fE AutInst.nE AutInst.sE AutInst.aFE AutInst.topf
+  AutInst.topf_group
+
+namespace AutInst
+
+variable (I : AutInst)
+
+abbrev Gf : Type := Formalism.UG.UPts I.cm.sig I.J (Af I.F)
+
+instance : MeasurableSpace I.Gf := borel _
+instance : BorelSpace I.Gf := ⟨rfl⟩
+
+abbrev Ginf : Type := ∀ v : InfinitePlace I.F, Formalism.REAL.UJ (I.ε v)
+
+abbrev GA : Type := I.Ginf × I.Gf
+
+abbrev fmat (x : I.Gf) : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F) :=
+  ((x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) : Matrix (Fin I.n) (Fin I.n) (I.E ⊗[I.F] Af I.F))
+
+abbrev Lf : Submodule (IntAf I.F I.E) (Fin I.n → I.E ⊗[I.F] Af I.F) := lamAf (F := I.F) I.L
+
+def Kset : Set I.Gf := {x | (x : GL (Fin I.n) (I.E ⊗[I.F] Af I.F)) ∈ Formalism.UG.stabGL I.Lf}
+
+def Kg (g : ℕ) : Set I.Gf :=
+  {x | x ∈ I.Kset ∧ ∀ y ∈ I.Lf, ∃ z ∈ I.Lf, (I.fmat x - 1) *ᵥ y = (g : I.E ⊗[I.F] Af I.F) • z}
+
+def UnipMod (l : ℕ) (x : I.Gf) : Prop :=
+  ∀ y ∈ I.Lf, ∃ z ∈ I.Lf, ((I.fmat x - 1) ^ I.n) *ᵥ y = (l : I.E ⊗[I.F] Af I.F) • z
+
+def GFset : Set I.GA :=
+  {x | ∃ γ : GL (Fin I.n) I.E, γ ∈ Formalism.UG.UJ (starRingEnd I.E) I.J ∧
+    (∀ v, uMat (x.1 v) = (I.P v)⁻¹ * (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (I.φ v) * I.P v) ∧
+    I.fmat x.2 = (γ : Matrix (Fin I.n) (Fin I.n) I.E).map (Formalism.UG.inclE (F := I.F) (Af I.F))}
+
+def muA (μf : Measure I.Gf) [SigmaFinite μf] : Measure I.GA :=
+  (Measure.pi fun v => Formalism.REAL.muG (I.ε v)).prod μf
+
+def IsFundDom (μ : Measure I.GA) (fund : Set I.GA) : Prop :=
+  MeasurableSet fund ∧ (∀ y : I.GA, ∃ γ ∈ I.GFset, γ * y ∈ fund) ∧
+    ∀ γ ∈ I.GFset, γ ≠ 1 → μ ((fun y => γ * y) '' fund ∩ fund) = 0
+
+def rep (fund : Set I.GA) (y : I.GA) : I.GA := by
+  classical
+  exact if h : ∃ γ ∈ I.GFset, γ * y ∈ fund then h.choose * y else y
+
+abbrev L2 (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA) : Type :=
+  Lp ℂ 2 ((I.muA μf).restrict fund)
+
+def ext {μf : Measure I.Gf} [SigmaFinite μf] {fund : Set I.GA} (Fv : I.L2 μf fund) : I.GA → ℂ :=
+  fun y => (Fv : I.GA → ℂ) (I.rep fund y)
+
+def IsRightReg (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) : Prop :=
+  ∀ g Fv, ((R g Fv : I.L2 μf fund) : I.GA → ℂ) =ᵐ[(I.muA μf).restrict fund] fun x => I.ext Fv (x * g)
+
+def IsRConv (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (φ : I.GA → ℂ)
+    (T : I.L2 μf fund →L[ℂ] I.L2 μf fund) : Prop :=
+  Integrable φ (I.muA μf) ∧ ∀ x y : I.L2 μf fund, ⟪x, T y⟫_ℂ = ∫ g, φ g * ⟪x, R g y⟫_ℂ ∂(I.muA μf)
+
+def IsRConvF (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (e : I.Gf → ℂ)
+    (T : I.L2 μf fund →L[ℂ] I.L2 μf fund) : Prop :=
+  Integrable e μf ∧ ∀ x y : I.L2 μf fund, ⟪x, T y⟫_ℂ = ∫ g, e g * ⟪x, R (1, g) y⟫_ℂ ∂μf
+
+def IsIsot (W : Submodule I.E (Fin I.n → I.E)) : Prop :=
+  W ≠ ⊥ ∧ ∀ x ∈ W, ∀ y ∈ W, Formalism.UG.hform (starRingEnd I.E) I.J x y = 0
+
+def InUnipRad {A : Type} [CommRing A] (s : A →+* A) (JA : Matrix (Fin I.n) (Fin I.n) A)
+    (WA : Submodule A (Fin I.n → A)) (g : Matrix (Fin I.n) (Fin I.n) A) : Prop :=
+  let perp : Set (Fin I.n → A) := {y | ∀ x ∈ WA, Formalism.UG.hform s JA x y = 0}
+  (∀ x ∈ WA, (g - 1) *ᵥ x = 0) ∧ (∀ y ∈ perp, (g - 1) *ᵥ y ∈ WA) ∧ ∀ y, (g - 1) *ᵥ y ∈ perp
+
+def NA (W : Submodule I.E (Fin I.n → I.E)) : Set I.GA :=
+  {x | (∀ v, I.InUnipRad (starRingEnd ℂ) (I.J.map (I.φ v))
+      (Submodule.span ℂ ((fun w : Fin I.n → I.E => fun i => I.φ v (w i)) '' (W : Set _)))
+      (I.P v * uMat (x.1 v) * (I.P v)⁻¹)) ∧
+    I.InUnipRad (Formalism.UG.sigR I.cm.sig (Af I.F)) (I.J.map (Formalism.UG.inclE (F := I.F) (Af I.F)))
+      (Submodule.span (I.E ⊗[I.F] Af I.F)
+        ((fun w : Fin I.n → I.E => fun i => Formalism.UG.inclE (F := I.F) (Af I.F) (w i)) '' (W : Set _)))
+      (I.fmat x.2)}
+
+def IsNQuotMeas (W : Submodule I.E (Fin I.n → I.E)) (ν : Measure I.GA) : Prop :=
+  IsFiniteMeasure ν ∧ ν ≠ 0 ∧ ν (I.NA W)ᶜ = 0 ∧
+    ∀ f : I.GA → ℂ, (∀ γ ∈ I.GFset ∩ I.NA W, ∀ y, f (γ * y) = f y) →
+      ∀ n₀ ∈ I.NA W, ∫ m, f (m * n₀) ∂ν = ∫ m, f m ∂ν
+
+def IsCuspFn (μ : Measure I.GA) (f : I.GA → ℂ) : Prop :=
+  ∀ W : Submodule I.E (Fin I.n → I.E), I.IsIsot W → ∀ ν : Measure I.GA, I.IsNQuotMeas W ν →
+    ∀ᵐ x ∂μ, ∫ m, f (m * x) ∂ν = 0
+
+variable {H : InfinitePlace I.F → Type} [∀ v, NormedAddCommGroup (H v)] [∀ v, InnerProductSpace ℂ (H v)]
+
+def IsHilbTensor (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v))
+    {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs) : Prop :=
+  (∀ x y, ⟪tens x, tens y⟫_ℂ = ∏ v, ⟪x v, y v⟫_ℂ) ∧
+    (∀ g x, σs g (tens x) = tens fun v => σ v (uMat (g v)) (x v)) ∧
+    Dense (Submodule.span ℂ (Set.range tens) : Set Hs)
+
+def HomS {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) : Submodule ℂ (Hs →L[ℂ] I.L2 μf fund) where
+  carrier := {T | ∀ g : I.Ginf, T.comp (σs g) = (R (g, 1)).comp T}
+  add_mem' := by
+    intro a b ha hb g
+    simp only [Set.mem_ofPred_eq] at *
+    rw [ContinuousLinearMap.add_comp, ContinuousLinearMap.comp_add, ha g, hb g]
+  zero_mem' := by
+    intro g
+    simp
+  smul_mem' := by
+    intro c a ha g
+    simp only [Set.mem_ofPred_eq] at *
+    rw [ContinuousLinearMap.smul_comp, ContinuousLinearMap.comp_smul, ha g]
+
+def eHom {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund) :
+    Submodule ℂ (Hs →L[ℂ] I.L2 μf fund) :=
+  (I.HomS σs μf fund R).map
+    ((ContinuousLinearMap.compL ℂ Hs (I.L2 μf fund) (I.L2 μf fund) Re) :
+      (Hs →L[ℂ] I.L2 μf fund) →ₗ[ℂ] (Hs →L[ℂ] I.L2 μf fund))
+
+def Dcount {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA)
+    (R : I.GA → (I.L2 μf fund →L[ℂ] I.L2 μf fund)) (Re : I.L2 μf fund →L[ℂ] I.L2 μf fund) : ℕ :=
+  Module.finrank ℂ (I.eHom σs μf fund R Re)
+
+def vol (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA) : ℝ := ((I.muA μf) fund).toReal
+
+def Dstar (d : ℝ) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA) (e : I.Gf → ℂ) : ℝ :=
+
+
+[RFD_schur_projector_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/RowsBij.lean:170-557
+Range SHA256 ac1f8293cd1f430a2cb63936f52a58792864a91cdc1346b043e40b61e9b25407
+theorem loc_schur {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)} {d : ℝ} {w : H} (x : H)
+    (hF : IsFdeg (Formalism.REAL.muG ε) σ d) (hw : ‖w‖ = 1) :
+    ∫ g, phLoc (ε := ε) σ w d g * ⟪x, σ (umat g) w⟫_ℂ ∂(Formalism.REAL.muG ε) = ⟪x, w⟫_ℂ := by
+  obtain ⟨hd, hF2⟩ := hF
+  have hd' : (d : ℂ) ≠ 0 := by exact_mod_cast hd.ne'
+  have hph : ∀ g, Formalism.L2.SG.ProjRows.phLoc (ε := ε) σ w d g * ⟪x, σ (umat g) w⟫_ℂ =
+      (d : ℂ) * (coefOn σ w x g * star (coefOn σ w w g)) := by
+    intro g
+    simp only [Formalism.L2.SG.ProjRows.phLoc, coefOn]
+    ring
+  simp_rw [hph]
+  have hww : ⟪w, w⟫_ℂ = 1 := by
+    rw [inner_self_eq_norm_sq_to_K, hw]
+    simp
+  rw [MeasureTheory.integral_const_mul, (hF2 w x w w).2, hww, one_mul]
+  field_simp
+
+section Glob
+
+variable (I : AutInst) {H : InfinitePlace I.F → Type} [∀ v, NormedAddCommGroup (H v)]
+  [∀ v, InnerProductSpace ℂ (H v)]
+  {Hs : Type} [NormedAddCommGroup Hs] [InnerProductSpace ℂ Hs]
+
+theorem orbit_eq (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v))
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs) (htens : I.IsHilbTensor σ σs tens)
+    (w : ∀ v, H v) (g : I.Ginf) :
+    σs g (tens w) = tens fun v => σ v (umat (g v)) (w v) := htens.2.1 g w
+
+theorem loc_cyc {n : ℕ} {ε : Fin n → Bool} {K : Type} [NormedAddCommGroup K] [InnerProductSpace ℂ K]
+    {σ : Matrix (Fin n) (Fin n) ℂ → (K →L[ℂ] K)} (hU : IsURepOn (UJset ε) σ) (hI : IsIrredOn (UJset ε) σ)
+    {w : K} (hw : ‖w‖ = 1) :
+    (Submodule.span ℂ (Set.range fun g : Formalism.REAL.UJ ε => σ (umat g) w)).topologicalClosure = ⊤ := by
+  classical
+  obtain ⟨⟨h1, hmul⟩, hiso, hcont⟩ := hU
+  obtain ⟨sp, hsp⟩ : ∃ sp : Submodule ℂ K,
+      sp = Submodule.span ℂ (Set.range fun g : Formalism.REAL.UJ ε => σ (umat g) w) := ⟨_, rfl⟩
+  rw [← hsp]
+  have hJJ : Formalism.REAL.Jm ε * Formalism.REAL.Jm ε = 1 := by
+    rw [Formalism.REAL.Jm, Matrix.diagonal_mul_diagonal, ← Matrix.diagonal_one]
+    congr 1
+    funext a
+    split_ifs <;> norm_num
+
+  have hunit : ∀ m ∈ UJset ε, ∃ g : Formalism.REAL.UJ ε, umat g = m := by
+    intro m hm
+    have hm' : (Matrix.conjTranspose m) * Formalism.REAL.Jm ε * m = Formalism.REAL.Jm ε := hm
+    have hl : Formalism.REAL.Jm ε * (Matrix.conjTranspose m) * Formalism.REAL.Jm ε * m = 1 := by
+      have e : Formalism.REAL.Jm ε * (Matrix.conjTranspose m) * Formalism.REAL.Jm ε * m = Formalism.REAL.Jm ε * ((Matrix.conjTranspose m) * Formalism.REAL.Jm ε * m) := by
+        simp only [Matrix.mul_assoc]
+      rw [e, hm', hJJ]
+    have hr : m * (Formalism.REAL.Jm ε * (Matrix.conjTranspose m) * Formalism.REAL.Jm ε) = 1 := mul_eq_one_comm.mp hl
+    exact ⟨⟨⟨m, Formalism.REAL.Jm ε * (Matrix.conjTranspose m) * Formalism.REAL.Jm ε, hr, hl⟩, hm⟩, rfl⟩
+  have hinv : ∀ m ∈ UJset ε, ∀ v ∈ sp.topologicalClosure, σ m v ∈ sp.topologicalClosure := by
+    intro m hm v hv
+    obtain ⟨g', rfl⟩ := hunit m hm
+    have hspan : sp ≤ sp.comap (σ (umat g') : K →ₗ[ℂ] K) := by
+      rw [hsp, Submodule.span_le]
+      rintro _ ⟨g, rfl⟩
+      rw [SetLike.mem_coe, Submodule.mem_comap]
+      change σ (umat g') (σ (umat g) w) ∈ Submodule.span ℂ (Set.range fun g : Formalism.REAL.UJ ε => σ (umat g) w)
+      rw [← ContinuousLinearMap.comp_apply,
+        ← hmul _ (Formalism.MainNotions.BridgeCSchur.umat_mem g') _ (Formalism.MainNotions.BridgeCSchur.umat_mem g)]
+      exact Submodule.subset_span ⟨g' * g, rfl⟩
+    have hcl : sp.topologicalClosure ≤ sp.topologicalClosure.comap (σ (umat g') : K →ₗ[ℂ] K) := by
+      apply Submodule.topologicalClosure_minimal
+      · exact hspan.trans (Submodule.comap_mono (Submodule.le_topologicalClosure _))
+      · exact (Submodule.isClosed_topologicalClosure _).preimage (σ (umat g')).continuous
+    exact hcl hv
+  rcases hI _ (Submodule.isClosed_topologicalClosure _) hinv with h | h
+  · exfalso
+    have hw0 : w ∈ sp.topologicalClosure := by
+      apply Submodule.le_topologicalClosure
+      rw [hsp]
+      exact Submodule.subset_span ⟨1, by simp [umat, h1]⟩
+    rw [h, Submodule.mem_bot] at hw0
+    rw [hw0, norm_zero] at hw
+    exact zero_ne_one hw
+  · exact h
+
+theorem glob_cyc [∀ v, CompleteSpace (H v)]
+    (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v)) (w : ∀ v, H v)
+    (hU : ∀ v, IsURepOn (UJset (I.ε v)) (σ v)) (hIrr : ∀ v, IsIrredOn (UJset (I.ε v)) (σ v))
+    (hw : ∀ v, ‖w v‖ = 1)
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs) (htens : I.IsHilbTensor σ σs tens) :
+    (Submodule.span ℂ (Set.range fun g : I.Ginf => σs g (tens w))).topologicalClosure = ⊤ := by
+  classical
+  have htin := htens.1
+  obtain ⟨M, hM⟩ : ∃ M : Submodule ℂ Hs,
+      M = (Submodule.span ℂ (Set.range fun g : I.Ginf => σs g (tens w))).topologicalClosure := ⟨_, rfl⟩
+  rw [← hM]
+  have hMc : IsClosed (M : Set Hs) := by
+    rw [hM]
+    exact Submodule.isClosed_topologicalClosure _
+  have hall : ∀ x, tens x ∈ M := by
+    refine tens_mem_of tens htin M hMc (fun v => Set.range fun g : Formalism.REAL.UJ (I.ε v) => σ v (umat g) (w v))
+      (fun v => loc_cyc (hU v) (hIrr v) (hw v)) ?_
+    intro x hx
+    choose g hg using hx
+    have hx' : tens x = σs g (tens w) := by
+      rw [htens.2.1 g w]
+      congr 1
+      funext v
+      exact (hg v).symm
+    rw [hx', hM]
+    exact Submodule.le_topologicalClosure _ (Submodule.subset_span ⟨g, rfl⟩)
+  rw [eq_top_iff]
+  intro z _
+  have hsub : (Submodule.span ℂ (Set.range tens) : Set Hs) ⊆ M :=
+    Submodule.span_le.mpr (by rintro _ ⟨x, rfl⟩; exact hall x)
+  exact hMc.closure_subset_iff.mpr hsub (htens.2.2 z)
+
+theorem glob_schur (σ : ∀ v, Matrix (Fin I.n) (Fin I.n) ℂ → (H v →L[ℂ] H v)) (dv : InfinitePlace I.F → ℝ)
+    (w : ∀ v, H v)
+    (hU : ∀ v, IsURepOn (UJset (I.ε v)) (σ v)) (hF : ∀ v, IsFdeg (Formalism.REAL.muG (I.ε v)) (σ v) (dv v))
+    (hw : ∀ v, ‖w v‖ = 1) (hL : ∀ v, Integrable (phLoc (ε := I.ε v) (σ v) (w v) (dv v)) (Formalism.REAL.muG (I.ε v)))
+    (σs : I.Ginf → (Hs →L[ℂ] Hs)) (tens : (∀ v, H v) → Hs) (htens : I.IsHilbTensor σ σs tens) (u : Hs) :
+    Integrable (fun g => phInf I σ w dv g * ⟪u, σs g (tens w)⟫_ℂ) (muInf I) ∧
+      ∫ g, phInf I σ w dv g * ⟪u, σs g (tens w)⟫_ℂ ∂(muInf I) = ⟪u, tens w⟫_ℂ := by
+  classical
+  have hρ : ∀ v, IsURep (fun g : Formalism.REAL.UJ (I.ε v) => σ v (umat g)) := fun v => isURep_of_on (hU v)
+  have hph : Integrable (phInf I σ w dv) (muInf I) := by
+    rw [phInf_eq]; exact Integrable.fintype_prod_dep hL
+
+  set F : I.Ginf → Hs := fun g => σs g (tens w) with hFdef
+  have hFc : Continuous F := by
+    have : F = tens ∘ fun g v => σ v (umat (g v)) (w v) := by
+      funext g; exact orbit_eq I σ σs tens htens w g
+    rw [this]
+    exact (tens_continuous tens htens.1).comp
+      (continuous_pi fun v => ((hρ v).2.2.2 (w v)).comp (continuous_apply v))
+  have hF1 : ∀ g, ‖F g‖ = 1 := by
+    intro g
+    have h1 : ⟪F g, F g⟫_ℂ = 1 := by
+      simp only [hFdef]
+      rw [orbit_eq I σ σs tens htens w g, htens.1]
+      refine Finset.prod_eq_one fun v _ => ?_
+      let L : H v →ₗᵢ[ℂ] H v := ⟨(σ v (umat (g v)) : H v →ₗ[ℂ] H v), fun z => (hρ v).2.2.1 (g v) z⟩
+      have := L.inner_map_map (w v) (w v)
+      simp only [L] at this
+      rw [show (σ v (umat (g v))) (w v) = L (w v) from rfl, this, inner_self_eq_norm_sq_to_K, hw v]
+      simp
+    rw [norm_eq_sqrt_re_inner (𝕜 := ℂ), h1]
+    simp
+  have hint : ∀ u : Hs, Integrable (fun g => phInf I σ w dv g * ⟪u, F g⟫_ℂ) (muInf I) := by
+    intro u
+    refine Integrable.mono' (hph.norm.mul_const ‖u‖) (hph.aestronglyMeasurable.mul
+      (continuous_const.inner hFc).aestronglyMeasurable) (Filter.Eventually.of_forall fun g => ?_)
+    rw [norm_mul]
+    refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
+    calc ‖⟪u, F g⟫_ℂ‖ ≤ ‖u‖ * ‖F g‖ := norm_inner_le_norm _ _
+      _ = ‖u‖ := by rw [hF1, mul_one]
+  refine ⟨hint u, ?_⟩
+
+  let Λ : Hs → ℂ := fun u => ∫ g, phInf I σ w dv g * ⟪u, F g⟫_ℂ ∂(muInf I)
+  have hadd : ∀ a b, Λ (a + b) = Λ a + Λ b := by
+    intro a b
+    simp only [Λ, inner_add_left, mul_add]
+    exact integral_add (hint a) (hint b)
+  have hsmul : ∀ (c : ℂ) a, Λ (c • a) = (starRingEnd ℂ) c * Λ a := by
+    intro c a
+    simp only [Λ, inner_smul_left]
+    rw [← integral_const_mul]
+    congr 1; funext g; ring
+  let ΛL : Hs →L⋆[ℂ] ℂ := LinearMap.mkContinuous
+    { toFun := Λ, map_add' := hadd, map_smul' := fun c a => by rw [hsmul]; rfl }
+    (∫ g, ‖phInf I σ w dv g‖ ∂(muInf I)) (fun a => by
+      show ‖Λ a‖ ≤ _
+      calc ‖Λ a‖ ≤ ∫ g, ‖phInf I σ w dv g‖ * ‖a‖ ∂(muInf I) := by
+            refine norm_integral_le_of_norm_le (hph.norm.mul_const ‖a‖) (Filter.Eventually.of_forall fun g => ?_)
+            rw [norm_mul]
+            refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
+            calc ‖⟪a, F g⟫_ℂ‖ ≤ ‖a‖ * ‖F g‖ := norm_inner_le_norm _ _
+              _ = ‖a‖ := by rw [hF1, mul_one]
+        _ = (∫ g, ‖phInf I σ w dv g‖ ∂(muInf I)) * ‖a‖ := integral_mul_const _ _)
+  have hΛL : ∀ a, ΛL a = Λ a := fun a => rfl
+
+  let Z : Submodule ℂ Hs :=
+    { carrier := {a | Λ a = ⟪a, tens w⟫_ℂ}
+      add_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_ofPred_eq] at *; rw [hadd, ha, hb, inner_add_left]
+      zero_mem' := by
+        simp only [Set.mem_ofPred_eq, Λ, inner_zero_left, mul_zero, integral_zero]
+      smul_mem' := fun c a ha => by
+        simp only [Set.mem_ofPred_eq] at *; rw [hsmul, ha, inner_smul_left] }
+  have hZc : IsClosed (Z : Set Hs) := by
+    have : (Z : Set Hs) = {a | ΛL a = ⟪a, tens w⟫_ℂ} := rfl
+    rw [this]
+    exact isClosed_eq ΛL.continuous (continuous_id.inner continuous_const)
+
+  have hpure : ∀ x, tens x ∈ Z := by
+    intro x
+    show Λ (tens x) = ⟪tens x, tens w⟫_ℂ
+    have e1 : ∀ g : I.Ginf, phInf I σ w dv g * ⟪tens x, F g⟫_ℂ =
+        ∏ v, (phLoc (ε := I.ε v) (σ v) (w v) (dv v) (g v) * ⟪x v, σ v (umat (g v)) (w v)⟫_ℂ) := by
+      intro g
+      simp only [hFdef]
+      rw [orbit_eq I σ σs tens htens w g, htens.1, phInf_eq, Finset.prod_mul_distrib]
+    simp only [Λ]
+    simp_rw [e1]
+    rw [integral_fintype_prod_eq_prod (fun v (g : Formalism.REAL.UJ (I.ε v)) =>
+      phLoc (ε := I.ε v) (σ v) (w v) (dv v) g * ⟪x v, σ v (umat g) (w v)⟫_ℂ), htens.1]
+    exact Finset.prod_congr rfl fun v _ => loc_schur (x v) (hF v) (hw v)
+  have hle : Submodule.span ℂ (Set.range tens) ≤ Z := Submodule.span_le.2 (by rintro _ ⟨x, rfl⟩; exact hpure x)
+  have : u ∈ closure (Submodule.span ℂ (Set.range tens) : Set Hs) := by rw [htens.2.2.closure_eq]; trivial
+  exact (closure_minimal hle hZc) this
+
+end Glob
+
+theorem rows_bijective (hP : ProjRowsR) (hUn : UnimodGf) : RowsBij := by
+  classical
+  intro I μf _ _ fund hfund R hR e Re hRe H _ _ _ σ dv w hU hIrr hF hw hL T hT Hs _ _ _ σs tens htens
+  obtain ⟨hmul, hone, hiso⟩ := reg_alg hUn I μf fund hfund R hR
+  have hRP : IsRowProj (fun g => R (g, 1)) (mInf I σ w) T := hP I μf fund hfund R hR H σ dv w hU hF hw hL T hT
+  have hρ : ∀ v, IsURep (fun g : Formalism.REAL.UJ (I.ε v) => σ v (umat g)) := fun v => isURep_of_on (hU v)
+  set tw := tens w with htw
+  set π : I.Ginf → (I.L2 μf fund →L[ℂ] I.L2 μf fund) := fun g => R (g, 1) with hπ
+  have hπmul : ∀ a b, π (a * b) = (π a).comp (π b) := by
+    intro a b; simp only [hπ]; rw [← hmul, Prod.mk_mul_mk, mul_one]
+  have hπiso : ∀ a F, ‖π a F‖ = ‖F‖ := fun a F => hiso _ F
+  have hπone : π 1 = 1 := hone
+
+  have hcomm : ∀ g : I.Ginf, Re.comp (π g) = (π g).comp Re := by
+    intro g
+    ext1 y
+    refine ext_inner_left ℂ fun x => ?_
+    simp only [ContinuousLinearMap.comp_apply, hπ]
+    rw [hRe.2, ← ContinuousLinearMap.adjoint_inner_left, hRe.2]
+    congr 1; funext h
+    rw [ContinuousLinearMap.adjoint_inner_left, ← ContinuousLinearMap.comp_apply (R (1, h)),
+      ← ContinuousLinearMap.comp_apply (R (g, 1)), ← hmul, ← hmul]
+    congr 3
+    ext <;> simp
+
+  have hσmul : ∀ a b : I.Ginf, σs a (σs b tw) = σs (a * b) tw := by
+    intro a b
+    rw [orbit_eq I σ σs tens htens w b, htens.2.1, orbit_eq I σ σs tens htens w (a * b)]
+    congr 1; funext v
+    have := (hρ v).2.1 (a v) (b v)
+    simp only at this
+    rw [show (a * b) v = a v * b v from rfl, this]; rfl
+  have hσ1 : σs 1 tw = tw := by
+    rw [orbit_eq I σ σs tens htens w 1]
+    congr 1; funext v
+    have := (hρ v).1
+    simp only at this
+    rw [show (1 : I.Ginf) v = 1 from rfl, this]; rfl
+  have hσinner : ∀ a b : I.Ginf, ⟪σs a tw, σs b tw⟫_ℂ = mInf I σ w (a⁻¹ * b) := by
+    intro a b
+    rw [orbit_eq I σ σs tens htens w a, orbit_eq I σ σs tens htens w b, htens.1]
+    refine Finset.prod_congr rfl fun v _ => ?_
+    exact inner_orbit (fun g : Formalism.REAL.UJ (I.ε v) => σ v (umat g)) (hρ v).2.1 (hρ v).2.2.1 (a v) (b v) (w v) (w v)
+  have hcyc := glob_cyc I σ w hU hIrr hw σs tens htens
+
+  have hTA : ∀ A : Hs →L[ℂ] I.L2 μf fund, (∀ g, A.comp (σs g) = (π g).comp A) → T (A tw) = A tw := by
+    intro A hA
+    refine ext_inner_left ℂ fun x => ?_
+    rw [hT x (A tw)]
+    have e1 : ∀ g : I.Ginf, phInf I σ w dv g * ⟪x, π g (A tw)⟫_ℂ =
+        phInf I σ w dv g * ⟪ContinuousLinearMap.adjoint A x, σs g tw⟫_ℂ := by
+      intro g
+      rw [ContinuousLinearMap.adjoint_inner_left, ← ContinuousLinearMap.comp_apply (π g) A, ← hA g,
+        ContinuousLinearMap.comp_apply]
+    simp_rw [e1]
+    rw [(glob_schur I σ dv w hU hF hw hL σs tens htens _).2, ContinuousLinearMap.adjoint_inner_left]
+
+  have hexists : ∀ z, T z = z → ∃ A : Hs →L[ℂ] I.L2 μf fund, (∀ g, A.comp (σs g) = (π g).comp A) ∧ A tw = z := by
+    intro z hz
+    have hpair : ∀ a b : I.Ginf, ⟪π a z, π b z⟫_ℂ = ⟪z, z⟫_ℂ * ⟪σs a tw, σs b tw⟫_ℂ := by
+      intro a b
+      rw [inner_orbit π hπmul hπiso, hσinner]
+      calc ⟪z, π (a⁻¹ * b) z⟫_ℂ = ⟪T z, π (a⁻¹ * b) (T z)⟫_ℂ := by rw [hz]
+        _ = ⟪z, T (π (a⁻¹ * b) (T z))⟫_ℂ := hRP.1 _ _
+        _ = ⟪z, (T.comp ((π (a⁻¹ * b)).comp T)) z⟫_ℂ := rfl
+        _ = mInf I σ w (a⁻¹ * b) * ⟪z, z⟫_ℂ := by
+          rw [hRP.2.2 (a⁻¹ * b)]
+          rw [ContinuousLinearMap.smul_apply, inner_smul_right, hz]
+        _ = ⟪z, z⟫_ℂ * mInf I σ w (a⁻¹ * b) := mul_comm _ _
+    let Φ₁ : (I.Ginf →₀ ℂ) →ₗ[ℂ] Hs := Finsupp.linearCombination ℂ fun g => σs g tw
+    let Φ₂ : (I.Ginf →₀ ℂ) →ₗ[ℂ] I.L2 μf fund := Finsupp.linearCombination ℂ fun g => π g z
+    have hkey : ∀ c c', ⟪Φ₂ c, Φ₂ c'⟫_ℂ = ⟪z, z⟫_ℂ * ⟪Φ₁ c, Φ₁ c'⟫_ℂ := by
+      intro c c'
+      simp only [Φ₁, Φ₂, Finsupp.linearCombination_apply, Finsupp.sum, sum_inner, inner_sum,
+        inner_smul_left, inner_smul_right, hpair, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun g _ => Finset.sum_congr rfl fun h _ => by ring
+    have hnorm : ∀ c, ‖Φ₂ c‖ = ‖z‖ * ‖Φ₁ c‖ := by
+      intro c
+      have h := hkey c c
+      rw [inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K, inner_self_eq_norm_sq_to_K] at h
+      have h' : ‖Φ₂ c‖ ^ 2 = (‖z‖ * ‖Φ₁ c‖) ^ 2 := by rw [mul_pow]; exact_mod_cast h
+      exact (pow_left_inj₀ (norm_nonneg _) (by positivity) two_ne_zero).1 h'
+    have hker : LinearMap.ker Φ₁ ≤ LinearMap.ker Φ₂ := by
+      intro c hc
+      rw [LinearMap.mem_ker] at hc ⊢
+      rw [← norm_eq_zero, hnorm, hc, norm_zero, mul_zero]
+    let B : LinearMap.range Φ₁ →ₗ[ℂ] I.L2 μf fund :=
+      ((LinearMap.ker Φ₁).liftQ Φ₂ hker).comp (Φ₁.quotKerEquivRange.symm : LinearMap.range Φ₁ →ₗ[ℂ] _)
+    have hB : ∀ c, B ⟨Φ₁ c, LinearMap.mem_range_self Φ₁ c⟩ = Φ₂ c := by
+      intro c
+      simp only [B, LinearMap.comp_apply, LinearEquiv.coe_coe, LinearMap.quotKerEquivRange_symm_apply_image,
+        Submodule.mkQ_apply, Submodule.liftQ_apply]
+    have hBn : ∀ y, ‖B y‖ ≤ ‖z‖ * ‖y‖ := by
+      rintro ⟨_, c, rfl⟩
+      rw [hB, hnorm]
+      rfl
+    let BL : LinearMap.range Φ₁ →L[ℂ] I.L2 μf fund := B.mkContinuous ‖z‖ hBn
+    let eL : LinearMap.range Φ₁ →L[ℂ] Hs := (LinearMap.range Φ₁).subtypeL
+    have hdense : DenseRange eL := by
+      have h1 : Set.range eL = (LinearMap.range Φ₁ : Set Hs) := by
+        ext x
+        constructor
+        · rintro ⟨y, rfl⟩; exact y.2
+        · intro hx; exact ⟨⟨x, hx⟩, rfl⟩
+      rw [DenseRange, h1, Finsupp.range_linearCombination, Submodule.dense_iff_topologicalClosure_eq_top]
+      exact hcyc
+    have hui : IsUniformInducing eL := isUniformEmbedding_subtype_val.isUniformInducing
+    let A := BL.extend eL
+    have hAk : ∀ k, A (σs k tw) = π k z := by
+      intro k
+      have h1 : σs k tw = eL ⟨Φ₁ (Finsupp.single k 1), LinearMap.mem_range_self Φ₁ _⟩ := by
+        simp [eL, Φ₁]
+      rw [h1, ContinuousLinearMap.extend_eq BL hdense hui]
+      show B _ = _
+      rw [hB]
+      simp [Φ₂]
+    refine ⟨A, fun h => ?_, ?_⟩
+    ·
+      have hker2 : (Submodule.span ℂ (Set.range fun g : I.Ginf => σs g tw)).topologicalClosure ≤
+          LinearMap.ker ((A.comp (σs h) - (π h).comp A : Hs →L[ℂ] I.L2 μf fund) : Hs →ₗ[ℂ] I.L2 μf fund) := by
+        refine Submodule.topologicalClosure_minimal _ (Submodule.span_le.2 ?_)
+          (ContinuousLinearMap.isClosed_ker _)
+        rintro _ ⟨k, rfl⟩
+        simp only [SetLike.mem_coe, LinearMap.mem_ker, ContinuousLinearMap.coe_coe,
+          ContinuousLinearMap.sub_apply, ContinuousLinearMap.comp_apply]
+        rw [hσmul, hAk, hAk, hπmul, ContinuousLinearMap.comp_apply, sub_self]
+      rw [hcyc] at hker2
+      ext1 u
+      have := hker2 (Submodule.mem_top (x := u))
+      rw [LinearMap.mem_ker, ContinuousLinearMap.coe_coe] at this
+      exact sub_eq_zero.1 this
+    · have := hAk 1
+      rwa [hσ1, hπone, ContinuousLinearMap.one_apply] at this
+
+  have hmemE : ∀ S, S ∈ I.eHom σs μf fund R Re ↔
+      ∃ A : Hs →L[ℂ] I.L2 μf fund, (∀ g, A.comp (σs g) = (π g).comp A) ∧ Re.comp A = S := by
+    intro S
+    simp only [AutInst.eHom, Submodule.mem_map]
+    rfl
+  constructor
+  ·
+    rw [injective_iff_map_eq_zero]
+    rintro ⟨S, hS⟩ h0
+    obtain ⟨A, hA, rfl⟩ := (hmemE S).1 hS
+    have h0' : (Re.comp A) tw = 0 := h0
+    apply Subtype.ext
+    show Re.comp A = 0
+    have hker2 : (Submodule.span ℂ (Set.range fun g : I.Ginf => σs g tw)).topologicalClosure ≤
+        LinearMap.ker ((Re.comp A : Hs →L[ℂ] I.L2 μf fund) : Hs →ₗ[ℂ] I.L2 μf fund) := by
+      refine Submodule.topologicalClosure_minimal _ (Submodule.span_le.2 ?_)
+        (ContinuousLinearMap.isClosed_ker _)
+      rintro _ ⟨k, rfl⟩
+      simp only [SetLike.mem_coe, LinearMap.mem_ker, ContinuousLinearMap.coe_coe]
+      rw [← ContinuousLinearMap.comp_apply (Re.comp A), ContinuousLinearMap.comp_assoc, hA k,
+        ← ContinuousLinearMap.comp_assoc, hcomm k, ContinuousLinearMap.comp_assoc,
+        ContinuousLinearMap.comp_apply, h0', map_zero]
+    rw [hcyc] at hker2
+    ext1 u
+    have := LinearMap.mem_ker.1 (hker2 (Submodule.mem_top (x := u)))
+    rw [ContinuousLinearMap.coe_coe] at this
+    rw [this, ContinuousLinearMap.zero_apply]
+  ·
+    ext v
+    constructor
+    · rintro ⟨⟨S, hS⟩, rfl⟩
+      obtain ⟨A, hA, rfl⟩ := (hmemE S).1 hS
+      refine ⟨A tw, ?_⟩
+      show Re (T (A tw)) = Re (A tw)
+      rw [hTA A hA]
+    · rintro ⟨y, rfl⟩
+      have hz : T (T y) = T y := by
+        have := hRP.2.1
+        rw [← ContinuousLinearMap.comp_apply, this]
+      obtain ⟨A, hA, hAw⟩ := hexists (T y) hz
+      refine ⟨⟨Re.comp A, (hmemE _).2 ⟨A, hA, rfl⟩⟩, ?_⟩
+      show Re (A tw) = Re (T y)
+      rw [hAw]
+
+end Formalism.L2.SG.Pf
+
+
+[RFD_actual_row_consumer_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/RootLatticeThresholds/AllRowsAddFin.lean:1-29
+Range SHA256 e9d892a9fbb2ad7aca03828fd26315a8892eabadee5e87a3104a56d81d9d6e91
+import Formalism.LocalToGlobal.SiegelLatticeTheory.WeightedGaugeFactors.FactsDS
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.AllRowsAdd
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.EvalTOnto
+import Formalism.LocalToGlobal.SiegelLatticeTheory.FlagStabilizerTensors.RootLatticeThresholds.RowDictPf
+
+noncomputable section
+
+namespace Formalism.L2.SG.Pf.AllRowsAddFin
+
+open Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.AllRowsOf
+
+variable {D : D7} (X : HidaSetting D)
+
+theorem eHom_fin (hHC : Formalism.L2.SG.RowsDef.RowsFinDim) (hG : Formalism.L2.SG.ConcreteSettingExists.GapHyp D) :
+    FiniteDimensional ℂ (X.B.I.eHom X.B.σs X.B.μf X.B.fund X.B.R X.B.Re) := by
+  have hint := Formalism.L2.SG.Pf.RowDictPf.hint_of_gap X hG
+  have hB := Formalism.L2.SG.Closed.RowsBij_holds X.B.I X.B.μf X.B.fund X.B.fund_spec X.B.R X.B.R_spec X.B.e X.B.Re
+    X.B.Re_spec X.B.H X.B.σ X.dv X.B.w (fun v => (X.ds v).2.2.1) (fun v => (X.ds v).2.2.2.1)
+    (Formalism.L2.SG.EvalTRph.isFdeg_dv X) (fun v => (X.low v).1) hint X.Rph X.Rph_spec X.B.Hs X.B.σs X.B.tens
+    X.B.tens_spec
+  have : FiniteDimensional ℂ (Formalism.L2.SG.PoincareInHH.PoincareSetting.HHX X) :=
+    Formalism.L2.SG.Pf.RowDictPf.finiteDimensional_HHX_of_gap X hHC hG
+  exact Formalism.L2.SG.RowsDef.finiteDimensional_eHom hB.1 hB.2
+
+theorem rowsAdd_holds (hHC : Formalism.L2.SG.RowsDef.RowsFinDim) (hG : Formalism.L2.SG.ConcreteSettingExists.GapHyp D) : RowsAdd X :=
+  Formalism.L2.SG.Pf.AllRowsAdd.rowsAdd_of X (eHom_fin X hHC hG)
+
+end Formalism.L2.SG.Pf.AllRowsAddFin
+
+
+[RFD_actual_row_consumer_02] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/AllRowsAtRecord.lean:23-97
+Range SHA256 2b83277d2c73245ad6df3b92bc899a22e50a1a2b7d2d9f00d786f3aecc69d565
+
+def stdChar (D : D7) (k : Fin 2) : AddChar (ZMod (D.host.g k)) ℂ :=
+  haveI : NeZero (D.host.g k) := ⟨(D.host.g_prime k).ne_zero⟩
+  ZMod.stdAddChar
+
+theorem stdChar_ne (D : D7) (k : Fin 2) : stdChar D k ≠ 1 := by
+  intro hk
+  haveI : NeZero (D.host.g k) := ⟨(D.host.g_prime k).ne_zero⟩
+  haveI : Fact (1 < D.host.g k) := ⟨(D.host.g_prime k).one_lt⟩
+  change (ZMod.stdAddChar : AddChar (ZMod (D.host.g k)) ℂ) = 1 at hk
+  have h1 : (ZMod.stdAddChar : AddChar (ZMod (D.host.g k)) ℂ) 1 = (ZMod.stdAddChar : AddChar (ZMod (D.host.g k)) ℂ) 0 := by
+    rw [hk, AddChar.one_apply, AddChar.map_zero_eq_one]
+  exact one_ne_zero (ZMod.injective_stdAddChar h1)
+
+theorem countAllRows_of {D : D7} (A : AllRows D) {c c₃ : ℝ} (hc : 0 < c) (hcc : c ≤ c₃) (hN : 2 ≤ D.R.r)
+    (hf : 1 ≤ D.R.f) (hC : Formalism.MainNotions.N.CylinderCountFamily.CountCylAt D A.toAt c₃) (hpos : 0 < DstarE A A.B.e) :
+    CountAllRows A (epsC c D.R.r D.R.f) := by
+  have hL : 0 < Real.log (D.R.r : ℝ) := Real.log_pos (by exact_mod_cast hN)
+  have hN0 : (0 : ℝ) < D.R.r := by exact_mod_cast (lt_of_lt_of_le (by norm_num) hN)
+  have hf0 : (0 : ℝ) < D.R.f := by exact_mod_cast (lt_of_lt_of_le (by norm_num) hf)
+  have hP : 0 < (D.R.r : ℝ) * D.R.f * Real.log D.R.r := by positivity
+  refine ⟨(Real.exp_pos _).le, ?_, hpos, fun k S => ?_⟩
+  · unfold epsC
+    have h0 : 0 < c * (D.R.r : ℝ) * D.R.f * Real.log D.R.r := by
+      have := mul_pos hc hP
+      linarith [this, show c * ((D.R.r : ℝ) * D.R.f * Real.log D.R.r) = c * (D.R.r : ℝ) * D.R.f * Real.log D.R.r by ring]
+    have h1 := Real.exp_lt_exp.mpr (show -(c * (D.R.r : ℝ) * D.R.f * Real.log D.R.r) < 0 by linarith)
+    rwa [Real.exp_zero] at h1
+  · have h := hC k S
+    change |((A.dimT (cyl D k S) : ℕ) : ℝ) - DstarE A (A.eT (cyl D k S))| ≤
+      Real.exp (-c₃ * (A.B.I.n : ℝ) * (A.B.I.f : ℝ) * Real.log (A.B.I.n : ℝ)) * DstarE A (A.eT (cyl D k S)) at h
+    rw [A.n_eq, A.f_eq] at h
+    have hDs : 0 ≤ DstarE A (A.eT (cyl D k S)) :=
+      (mul_nonneg_iff_of_pos_left (Real.exp_pos _)).mp (le_trans (abs_nonneg _) h)
+    have hexp : Real.exp (-c₃ * (D.R.r : ℝ) * (D.R.f : ℝ) * Real.log (D.R.r : ℝ)) ≤ epsC c D.R.r D.R.f := by
+      unfold epsC
+      apply Real.exp_le_exp.mpr
+      have e1 : -c₃ * (D.R.r : ℝ) * (D.R.f : ℝ) * Real.log (D.R.r : ℝ) = -(c₃ * ((D.R.r : ℝ) * D.R.f * Real.log D.R.r)) := by ring
+      have e2 : -(c * (D.R.r : ℝ) * (D.R.f : ℝ) * Real.log (D.R.r : ℝ)) = -(c * ((D.R.r : ℝ) * D.R.f * Real.log D.R.r)) := by ring
+      rw [e1, e2]
+      have := mul_le_mul_of_nonneg_right hcc hP.le
+      linarith
+    exact le_trans h (mul_le_mul_of_nonneg_right hexp hDs)
+
+theorem allRows_at_record : Formalism.L2.SG.RowsDef.RowsFinDim → ∀ (D : D7) (large₂ : SizeData₂ D) (X : HidaSetting D) (G : GoodOp X)
+    (ι : D.s.HH ≃ₗᵢ[ℂ] HHX X) (n₀ : ℕ) (Alev C₃ c₃ cb c : ℝ), 0 < c → c ≤ c₃ → Formalism.L2.SG.ConcreteSettingExists.GapHyp D →
+    AutTie D X.B X.pl → RowDictTie X G ι → GlobalTheory.LabPin.LabTie X ι → (∀ P, CountE.CountIdempotentsClass P D n₀ Alev C₃ c₃ cb) →
+    AdmissibleBoundsFromSource.CountTheoremHypotheses D large₂ n₀ Alev C₃ cb → 4 * D.R.r < D.host.g 1 →
+    ∃ A : AllRows D, LabelCountGoodInjective A ∧ AllJoinA A ∧ CountAllRows A (epsC c D.R.r D.R.f) := by
+  intro hRF D large₂ X G ι n₀ Alev C₃ c₃ cb c hc hcc hG hAut hT hLab hCnt hp hg1
+  have hL : RowsLab X := Formalism.L2.SG.Pf.AllRowsLab.rowsLab_holds X hRF hG G ι hT hLab hAut
+  have hψ : ∀ k, stdChar D k ≠ 1 := stdChar_ne D
+  have hB : CountBase X n₀ Alev C₃ cb := Formalism.L2.SG.Pf.AllRowsCountBase.countBase_of X hAut hp hg1
+  refine ⟨Formalism.L2.SG.Pf.AllRowsClosed.allRowsOfL X (stdChar D) hψ hL, ?_, ⟨?_, ?_⟩, ?_⟩
+  · exact thirdTie_allRows (hI := etInt_holds X)
+  · refine ⟨⟨X.pl, hAut⟩, fun v => Formalism.L2.SG.Pf.AllRowsCountBase.hc_X X hAut v, fun _ => ?_⟩
+    change Formalism.MainNotions.S.SplitsCompl X.B.I.E X.B.g₀
+    rw [X.g0_eq]
+    exact Formalism.L2.SG.Pf.AllRowsCountBase.splits_X X 0
+  · exact ⟨stdChar D, hψ, fun _ _ => rfl⟩
+  · have hN : 2 ≤ D.R.r := le_trans (by norm_num) hG.1
+    have hf : 1 ≤ D.R.f := by exact_mod_cast Formalism.MainNotions.S.one_le_f (D := D)
+    have hTC := tieCountAt_allRowsOf (X := X) (ψ₀ := stdChar D) (hJ := ejIdem_holds D (stdChar D))
+      (hU := etUniv_of X (redKer_of X (redKerOne_of X (Formalism.L2.SG.Pf.AllRowsRedKer.redKerP_holds X 0)
+        (Formalism.L2.SG.Pf.AllRowsRedKer.redKerP_holds X 1))))
+      (hO := Formalism.L2.SG.Pf.AllRowsClosed.etOne_holds X (stdChar D) hψ) (hI := etInt_holds X) (hL := hL) hB
+      (fun _ _ => Formalism.L2.SG.Pf.AllRowsClosed.etAlg_holds X _)
+      (fun k S => Formalism.L2.SG.Pf.AllRowsClosed.etUnip_holds X k S)
+    have hC : Formalism.MainNotions.N.CylinderCountFamily.CountCylAt D (Formalism.L2.SG.Pf.AllRowsClosed.allRowsOfL X (stdChar D) hψ hL).toAt c₃ :=
+      Formalism.MainNotions.N.CylinderCountFamily.countCylAt_of D _ (hCnt Formalism.MainNotions.S.CountE.PCount) hTC
+        (Formalism.L2.SG.Pf.AllRowsPCount.pCountTie_holds X (stdChar D) hψ hL)
+    obtain ⟨-, -, -, -, -, -, -, hpos⟩ := hB
+    exact countAllRows_of _ hc hcc hN hf hC hpos
+
+end GlobalTheory.AllRowsAtRecord
+
+
+[RFD_actual_row_consumer_03] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/IrreducibilityRowOfConcreteAutomorphicData.lean:18-43
+Range SHA256 3849abe20330805991913c78ad951128d2b0938e1650b3b5c789563821930ef6
+theorem irr_row_closed : HeckeCharacterZeroLocus.SiegelWeilU.SiegelWeilUnitaryConvergent → Formalism.L2.SG.RowsDef.RowsFinDim → ∃ cIc : ℝ, 0 < cIc ∧ ∀ 𝒞 : FamClass, (∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → TuSize Fm) → (Closed 𝒞 fun Fm _ => 𝒞 Fm → ∃ x0 : ℝ, ∀ x, Fm.x1 < x → x0 ≤ x → ∀ i : Fm.Ix x, ∃ (X : HidaSetting (Fm.D x i)) (G : GoodOp X) (ι : (Fm.D x i).s.HH ≃ₗᵢ[ℂ] HHX X), AutTie (Fm.D x i) X.B X.pl ∧ RowDictTie X G ι ∧ GlobalTheory.LabPin.LabTie X ι) → Closed 𝒞 fun Fm _ => ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i), LabelCountGoodInjective A ∧ AllJoinA A ∧ CountAllRows A (epsC cIc (Fm.D x i).R.r (Fm.D x i).R.f) := by
+  intro hSW hRF
+  obtain ⟨c30, cIc, hc30, hcI, hcle, hP⟩ := GlobalTheory.CountConstants.count_constants_of_siegelWeil hSW
+  refine ⟨cIc, hcI, fun 𝒞 hT hX => ?_⟩
+  have hcb : ∀ {eps : ℝ} (Fm : FamP eps), 0 < (c30 Fm.cOut).cb := fun Fm =>
+    (hP (fun _ _ _ _ => True) Fm).2.1
+  have hEv := GlobalTheory.IrrCountEv.countClauses_closed 𝒞 c30 hc30 hcb hT
+  have hGap := Formalism.L2.SG.GapClosed.gapEv_closed_of 𝒞 hT
+  obtain ⟨a1, ha1, H1⟩ := (hX.and hEv).and hGap
+  refine ⟨a1, ha1, fun e he hle => ?_⟩
+  obtain ⟨K, hK⟩ := H1 e he hle
+  refine ⟨K, fun Fm CH hc hL => ?_⟩
+  obtain ⟨⟨hx, hev⟩, hg⟩ := hK Fm CH hc hL
+  obtain ⟨x1, hx1⟩ := hx hc
+  obtain ⟨x2, hx2⟩ := hev
+  obtain ⟨y, hy⟩ := hg hc
+  refine ⟨max (max x1 x2) (max y (Fm.x1 + 1)), fun x hxge i => ?_⟩
+  have hb : max (max x1 x2) (max y (Fm.x1 + 1)) ≤ x := hxge
+  simp only [max_le_iff] at hb
+  obtain ⟨⟨b1, b2⟩, b3, b4⟩ := hb
+  obtain ⟨X, G, ι, hA, hR, hLab⟩ := hx1 x (by linarith) b1 i
+  obtain ⟨hpar, h4⟩ := hx2 x b2 i
+  exact GlobalTheory.AllRowsAtRecord.allRows_at_record hRF (Fm.D x i) (Fm.L x i) X G ι (c30 Fm.cOut).n0 (c30 Fm.cOut).A (c30 Fm.cOut).C
+    (c30 Fm.cOut).c (c30 Fm.cOut).cb cIc hcI (hcle Fm) (hy x b3 i) hA hR hLab (fun P => (hP P Fm).2.2 x i) hpar h4
+
+end GlobalTheory.IrrRowConcrete
+

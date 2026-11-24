@@ -1,0 +1,2566 @@
+[KTR_SRC_KATO_ORIGINAL] Full Used, KatoTwo and literal RigII original contracts
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/KatoQuadraticCharacters/KatoTwoOfUseN.lean#L11-L53
+structure Used (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
+    [Algebra K Ω] (e N : ℕ) (θ ψ : G ℚ Ω →* (Qbar l)ˣ) (W : G ℚ Ω →* GL (Fin 2) (Qbar l)) : Prop where
+  l_odd : l ≠ 2
+  e_pos : 1 ≤ e
+  gen : ¬ l - 1 ∣ 2 * e
+  quad : Module.finrank ℚ K = 2
+  imag : IsTotallyComplex K
+  l_cop : ¬ l ∣ (discr K).natAbs * classNumber K
+  N_pos : 1 ≤ N
+  N_even : Even N
+  cop : (discr K).natAbs.Coprime N
+  θ_ker : θ.ker = galOf ℚ K Ω
+  θ_sq : ∀ g, θ g ^ 2 = 1
+  ψ_mu : Af.KillsMu N ψ
+  ψ_ord : ∃ m : ℕ, ¬ l ∣ m ∧ ∀ g, ψ g ^ m = 1
+  ψ_ine : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∀ s ∈ Ine (F := ℚ) A, ψ s ^ 2 = 1
+  even : ∃ cc : G ℚ Ω, (∃ φ : Ω →+* ℂ, ∀ x, φ (cc x) = starRingEnd ℂ (φ x)) ∧ cycBar ℚ Ω l cc ^ (e : ℤ) * ψ cc = 1
+  level : Af.Level l (N * (discr K).natAbs) ![(e : ℤ), -(e : ℤ)] W
+  ord : Lit.OrdPoly (e : ℤ) (-(e : ℤ)) W
+  det : ∀ g, (W g : Matrix (Fin 2) (Fin 2) (Qbar l)).det = θ g
+  tr_ine : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∀ s ∈ Ine (F := ℚ) A,
+    (W s : Matrix (Fin 2) (Fin 2) (Qbar l)).trace =
+      ((cycBar ℚ Ω l s ^ (e : ℤ) * ψ s : (Qbar l)ˣ) : Qbar l) + (((cycBar ℚ Ω l s ^ (e : ℤ) * ψ s)⁻¹ : (Qbar l)ˣ) : Qbar l)
+  red : ∀ g, ‖(W g : Matrix (Fin 2) (Fin 2) (Qbar l)).trace -
+    ((θ g : Qbar l) * ((cycBar ℚ Ω l g ^ (e : ℤ) * ψ g : (Qbar l)ˣ) : Qbar l) +
+      (((cycBar ℚ Ω l g ^ (e : ℤ) * ψ g)⁻¹ : (Qbar l)ˣ) : Qbar l))‖ < 1
+  flag : ∃ (A : ValuationSubring Ω) (χ : G ℚ Ω →* (Qbar l)ˣ) (κ : Fin 2 → ↥(Dec (F := ℚ) A) →* (Qbar l)ˣ),
+    (∃ v : HeightOneSpectrum (𝓞 ℚ), IsPlaceOver A v ∧ ((l : ℕ) : 𝓞 ℚ) ∈ v.asIdeal) ∧ Af.KillsMu l χ ∧
+    Af.IsFlagOn W (Dec (F := ℚ) A) κ ∧ Ine (F := ℚ) A ≤ θ.ker ∧ ∀ s : ↥(Dec (F := ℚ) A), (s : G ℚ Ω) ∈ Ine (F := ℚ) A →
+      κ 0 s = cycBar ℚ Ω l s ^ (e : ℤ) * χ s ∧ κ 1 s = cycBar ℚ Ω l s ^ (-(e : ℤ)) * χ s
+  irr : Af.IsIrr ((W.comp (galEmb ℚ K Ω)).comp (cycBar K Ω l).ker.subtype)
+
+def KatoTwo : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω]
+    (e N : ℕ) (θ ψ : G ℚ Ω →* (Qbar l)ˣ) (W : G ℚ Ω →* GL (Fin 2) (Qbar l)), Used l Ω K e N θ ψ W →
+    ∀ (ι : Qbar l ≃+* ℂ) (f : Af.Newform (2 * e + 1)), f.Att ι (Af.tw W (cycBar ℚ Ω l ^ (-(e : ℤ)))) →
+      Af.BlochKatoSelmerVanishes l (Loc.colRep (Af.tw W 1)) ∧ Af.BlochKatoSelmerVanishes l (Loc.colRep (Af.tw W θ))
+
+def RigII : Prop :=
+  ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+    {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : D.ULoc}
+    {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ {r : G ℚ Ω →* GG 3 (PadicAlgCl l)} (_ : D.IsPt U g₁ r), ∀ (ι : Qbar l ≃+* ℂ),
+    TypeII D.η r → (∀ W : G ℚ Ω →* GL (Fin 2) (PadicAlgCl l), D.IsExt r W → D.IsModular ι W) → Af.BlochKatoSelmerVanishes l (adRep r)
+
+
+[KTR_SRC_INPZ] Separate InpZ record; not assembled in this packet
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/KatoQuadraticCharacters/KatoTwoOfUseN.lean#L55-L61
+structure InpZ : Prop extends U3.CohInp where
+  lemM : LemmaM
+  lemM' : LemmaM'
+  lemP : LemmaP
+  rigII : RigII
+  adK : Af.AdVanishK
+  number : Af.CongruenceNumberRankThree
+
+
+[KTR_SRC_KATO_USE] Original full finite-cyclotomic-character KatoUse
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L13-L18
+def KatoUse : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime], l ≠ 2 → ∀ (Ω : Type) [Field Ω] [Algebra ℚ Ω] [IsAlgClosure ℚ Ω] (ι : Qbar l ≃+* ℂ) (e : ℕ), 1 ≤ e →
+    ∀ (f : Af.Newform (2 * e + 1)) (W : G ℚ Ω →* GL (Fin 2) (Qbar l)), Continuous W →
+      f.Att ι (Af.tw W (cycBar ℚ Ω l ^ (-(e : ℤ)))) → ∀ (M : ℕ) (φ : G ℚ Ω →* (Qbar l)ˣ), 1 ≤ M → Af.KillsMu M φ →
+      Af.BlochKatoSelmerVanishes l (Loc.colRep (Af.tw W φ))
+
+
+
+[KTR_SRC_COHINP] Original cohomological and literature input scope
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L20-L34
+  loc : Loc.LocalPublishedTheorems
+  pt : GlobalTheory.Published.PoitouTateNormalised
+  gf : GlobalFiniteness
+  ge : GlobalEulerChar
+  lemK : ∃ CK : ℝ, LemmaK CK
+
+structure Inp : Prop extends CohInp where
+  lemM : LemmaM
+  lemM' : LemmaM'
+  lemP : LemmaP
+  kato : KatoUse
+  adK : Af.AdVanishK
+  adQ : Af.AdVanishQ
+  newAut : Af.NewformAut
+  number : Af.CongruenceNumberRankThree
+
+
+[KTR_SRC_ONECHAR] Separate original OneChar endpoint remains outside this closure
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L54-L64
+def OneChar : Prop :=
+  ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [IsCMField K] [Algebra K Ω]
+    [IsAlgClosure K Ω] (l : ℕ) [Fact l.Prime] (c : Coef l) (N : ℕ) [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N),
+    GD Ω K l e ψ → ∀ (ι : Qbar l ≃+* ℂ) (σ : G K Ω) (t : Qbar l),
+    t = algebraMap c.O (PadicAlgCl l) ((Chr.Psi l e (Chr.dirG ℚ Ω ψ) (galEmb ℚ K Ω σ) : c.O) + 1 +
+      (((Chr.Psi l e (Chr.dirG ℚ Ω ψ) (galEmb ℚ K Ω σ))⁻¹ : c.Oˣ) : c.O)) →
+    (∀ ρ : G K Ω →* GL (Fin 3) (Qbar l), Af.Adm3 ι e N ρ ∨ Af.Adm2 ι e (N * (discr K).natAbs) ρ →
+      (ρ σ : Matrix (Fin 3) (Fin 3) (Qbar l)).trace ≠ t) →
+    Vlen Ω c e ψ ≠ ⊤ ∧ ∃ X : Finset (G K Ω →* GL (Fin 3) (Qbar l)),
+      (∀ ρ ∈ X, Af.Adm3 ι e N ρ ∨ Af.Adm2 ι e (N * (discr K).natAbs) ρ) ∧ (∀ ρ ∈ X, ∀ ρ' ∈ X, Af.RepIso ρ ρ' → ρ = ρ') ∧
+      Vn Ω c e ψ ≤ 2 * ∑ ρ ∈ X, vl l ((ρ σ : Matrix (Fin 3) (Fin 3) (Qbar l)).trace - t)
+
+
+[KTR_SRC_NEWFORM] Exact normalized newform, polynomial and semisimple all-prolongations attachment
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/Newform.lean#L12-L48
+def coef (f : ℍ → ℂ) (n : ℕ) : ℂ := (qExpansion 1 f).coeff n
+
+def HasChar (k : ℕ) {M : ℕ} (χ : DirichletCharacter ℂ M) (f : ℍ → ℂ) : Prop :=
+  ∀ γ : SL(2, ℤ), γ ∈ Gamma0 M → f ∣[(k : ℤ)] γ = χ ((γ 1 1 : ℤ) : ZMod M) • f
+
+def IsEigAt (k : ℕ) {M : ℕ} (χ : DirichletCharacter ℂ M) (f : ℍ → ℂ) (p : ℕ) (lam : ℂ) : Prop :=
+  ∀ n : ℕ, 1 ≤ n →
+    coef f (p * n) + χ (p : ZMod M) * (p : ℂ) ^ (k - 1) * (if p ∣ n then coef f (n / p) else 0) = lam * coef f n
+
+structure Newform (k : ℕ) where
+
+  M : ℕ
+  pos : 0 < M
+
+  f : CuspForm (Gamma1 M) (k : ℤ)
+
+  χ : DirichletCharacter ℂ M
+  char : HasChar k χ f
+  one : coef f 1 = 1
+  eig : ∀ p : ℕ, p.Prime → ¬ p ∣ M → IsEigAt k χ f p (coef f p)
+  new : ∀ M' : ℕ, M' ∣ M → M' ≠ M → ∀ (g : CuspForm (Gamma1 M') (k : ℤ)) (χ' : DirichletCharacter ℂ M'),
+    HasChar k χ' g → (∀ᶠ p : ℕ in Filter.cofinite, p.Prime → IsEigAt k χ' g p (coef f p)) → g = 0
+
+namespace Newform
+
+variable {k : ℕ} (g : Newform k)
+
+def a (n : ℕ) : ℂ := coef g.f n
+
+def heckePoly (p : ℕ) : ℂ[X] := X ^ 2 - C (g.a p) * X + C (g.χ (p : ZMod g.M) * (p : ℂ) ^ (k - 1))
+
+def Att {Ω : Type} [Field Ω] [Algebra ℚ Ω] {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ)
+    (V : G ℚ Ω →* GL (Fin 2) (Qbar l)) : Prop :=
+  IsSSRep V ∧ ∀ᶠ w : HeightOneSpectrum (𝓞 ℚ) in Filter.cofinite, ∀ A : ValuationSubring Ω, IsPlaceOver A w →
+    (∀ s ∈ Ine (F := ℚ) A, V s = 1) ∧ ∀ σ : G ℚ Ω, IsFrob A (normV w) σ →
+      (V σ⁻¹ : Matrix (Fin 2) (Fin 2) (Qbar l)).charpoly.map ι.toRingHom = g.heckePoly (normV w)
+
+
+
+[KTR_SRC_LEVEL] Source KillsMu, geometric algebraic Satake and continuous Level
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/BlochKatoSelmerVanishes.lean#L65-L116
+
+def KillsMu (M : ℕ) {C : Type} [Monoid C] (χ : G F Ω →* C) : Prop :=
+  ∀ s : G F Ω, (∀ ζ : Ω, ζ ^ M = 1 → s ζ = ζ) → χ s = 1
+
+def FrobEig (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l)) (w : HeightOneSpectrum (𝓞 F)) (B : Multiset ℂ) : Prop :=
+  ∀ A : ValuationSubring Ω, IsPlaceOver A w → (∀ s ∈ Ine (F := F) A, r s = 1) ∧
+    ∀ σ : G F Ω, IsFrob A (normV w) σ →
+      (r σ⁻¹ : Matrix (Fin n) (Fin n) (Qbar l)).charpoly.map ι.toRingHom = (B.map fun b => X - C b).prod
+
+def algSat (n q : ℕ) (B : Multiset ℂˣ) : Multiset ℂ :=
+  B.map fun α => (((q : ℝ) ^ (((n : ℝ) - 1) / 2) : ℝ) : ℂ) * (α : ℂ)
+
+def AttachedSys (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l))
+    (sat : HeightOneSpectrum (𝓞 F) → Multiset ℂˣ → Prop) : Prop :=
+  IsSSRep r ∧ ∀ᶠ w : HeightOneSpectrum (𝓞 F) in Filter.cofinite, ∃ B, sat w B ∧ FrobEig ι r w (algSat n (normV w) B)
+
+def AttC [IsTotallyComplex F] (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l)) (π : CuspSub F n) : Prop :=
+  AttachedSys ι r (CG.mk π).HasSat
+
+def IsAutCsd [IsCMField F] (ι : Qbar l ≃+* ℂ) (r : G F Ω →* GL (Fin n) (Qbar l)) : Prop :=
+  ∃ π : CuspSub F n, (CG.mk π).IsRegAlg ∧ GlobalTheory.ContraPair.DualIsConj π ∧ AttC ι r π
+
+variable (l) in
+
+def LevelAway (M : ℕ) (r : G F Ω →* GL (Fin n) (Qbar l)) : Prop :=
+  ∀ w : HeightOneSpectrum (𝓞 F), ((l : ℕ) : 𝓞 F) ∉ w.asIdeal → ∃ A : ValuationSubring Ω, IsPlaceOver A w ∧
+    ∃ χ : Fin n → G F Ω →* (Qbar l)ˣ, (∀ i, KillsMu M (χ i)) ∧ IsDiagOn r (Ine (F := F) A) χ
+
+omit [NumberField F] in
+
+def PotCrysAt (r : G F Ω →* GL (Fin n) (Qbar l)) (A : ValuationSubring Ω) : Prop :=
+  ∃ (O : Type) (_ : CommRing O) (_ : Algebra ℤ_[l] O) (_ : TopologicalSpace O)
+    (Bw : LocBridge l F Ω (Dec (F := F) A) O), GlobalTheory.Pst.Induces Bw ∧
+      GlobalTheory.Pst.IsPotCrysAt (Loc.PP l) Bw (r.comp (Dec (F := F) A).subtype)
+
+variable (l) in
+
+def LevelAt (M : ℕ) (m : Fin n → ℤ) (r : G F Ω →* GL (Fin n) (Qbar l)) : Prop :=
+  ∀ w : HeightOneSpectrum (𝓞 F), ((l : ℕ) : 𝓞 F) ∈ w.asIdeal → ∃ A : ValuationSubring Ω, IsPlaceOver A w ∧
+    ∃ (χ : Fin n → G F Ω →* (Qbar l)ˣ) (κ : Fin n → ↥(Dec (F := F) A) →* (Qbar l)ˣ),
+      (∀ i, KillsMu M (χ i)) ∧ IsFlagOn r (Dec (F := F) A) κ ∧
+      (∀ i (s : ↥(Dec (F := F) A)), (s : G F Ω) ∈ Ine (F := F) A → κ i s = cycBar F Ω l s ^ m i * χ i s) ∧
+      ((∀ i j, κ i ≠ κ j * (cycBar F Ω l).comp (Dec (F := F) A).subtype) ∨ PotCrysAt r A)
+
+variable (l) in
+
+structure Level (M : ℕ) (m : Fin n → ℤ) (r : G F Ω →* GL (Fin n) (Qbar l)) : Prop where
+  cont : Continuous r
+  away : LevelAway l M r
+  above : LevelAt l M m r
+
+omit [NumberField F] in
+
+
+[KTR_SRC_SELMER] Graph decomposition group and full actual cocycle/primitive Selmer definition
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/BlochKatoSelmerVanishes.lean#L117-L144
+variable (F) in
+
+def decJ (j : Ω →+* Om l) : Subgroup (G F Ω × GQ l) where
+  carrier := {x | ∀ y : Ω, x.2 (j y) = j (x.1 y)}
+  one_mem' _ := rfl
+  mul_mem' {x x'} hx hx' y := by
+    change x.2 (x'.2 (j y)) = j (x.1 (x'.1 y))
+    rw [hx' y, hx]
+  inv_mem' {x} hx y := by
+    change x.2.symm (j y) = j (x.1.symm y)
+    rw [AlgEquiv.symm_apply_eq, hx]
+    simp
+
+variable {C V : Type} [CommRing C] [Algebra ℚ_[l] C] [AddCommGroup V] [Module C V] [Module ℚ_[l] V]
+  [IsScalarTower ℚ_[l] C V] [TopologicalSpace V] [IsTopologicalAddGroup V] [ContinuousConstSMul C V]
+
+variable (l) in
+
+structure IsBK (ρ : Representation C (G F Ω) V) (c : G F Ω → V) : Prop where
+  away : ∀ w : HeightOneSpectrum (𝓞 F), ((l : ℕ) : 𝓞 F) ∉ w.asIdeal → ∃ A : ValuationSubring Ω, IsPlaceOver A w ∧
+    ∃ x : V, ∀ s ∈ Ine (F := F) A, c s = ρ s x - x
+  above : ∀ τ : F →+* Om l, ∃ j : Ω →+* Om l, j.comp (algebraMap F Ω) = τ ∧
+    (fun x : ↥(decJ F j) => c x.1.1) ∈ Loc.finiteCocycles ((MonoidHom.snd _ _).comp (decJ F j).subtype)
+      (ρ.comp ((MonoidHom.fst _ _).comp (decJ F j).subtype))
+
+variable (l) in
+
+def BlochKatoSelmerVanishes (ρ : Representation C (G F Ω) V) : Prop := ∀ c ∈ Z1 ρ, IsBK l ρ c → c ∈ ReciprocityTheory.Gal.B1 ρ
+
+
+[KTR_SRC_GD] Original arithmetic GD fields and exact small-prime guards
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/Counts.lean#L9-L26
+structure GD (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω]
+    (l : ℕ) [Fact l.Prime] (e : ℕ) {O : Type} [CommRing O] {N : ℕ} [NeZero N] (ψ : DirichletCharacter O N) : Prop where
+  l_odd : l ≠ 2
+  e_pos : 1 ≤ e
+  N_even : Even N
+  ord : ¬ l ∣ orderOf ψ
+  ine : comp l ψ ^ 2 = 1
+  par : PsiEven e ψ
+  quad : Module.finrank ℚ K = 2
+  imag : IsTotallyComplex K
+  l_cop : ¬ l ∣ (discr K).natAbs * classNumber K
+  cop : (discr K).natAbs.Coprime N
+  eta : ¬ (cycMod ℚ Ω l 1).ker ⊓ (Chr.dirG ℚ Ω (chiP l ψ)).ker ≤ galOf ℚ K Ω
+  gen : ¬ l - 1 ∣ 2 * e
+
+def CorG : Prop :=
+  ∃ c5 : ℝ, ∀ (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω]
+    (e N : ℕ) [NeZero N] (H : Subgroup (ZMod N)ˣ) (p p' : ℕ), p.Prime → p'.Prime → p ≠ p' →
+
+
+[KTR_SRC_DATUM] Original Dat and local Dat3 coefficients/characters/embedding
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/RhoKApply.lean#L16-L59
+structure Dat (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K] [Algebra K Ω]
+    {l : ℕ} [Fact l.Prime] (c : Coef l) {N : ℕ} [NeZero N] (e : ℕ) (ψ : DirichletCharacter c.O N) where
+  gd : GD Ω K l e ψ
+  η : G ℚ Ω →* ℤˣ
+  η_ker : η.ker = galOf ℚ K Ω
+  cc : G ℚ Ω
+  conj : ∃ φ : Ω →+* ℂ, ∀ x, φ (cc x) = starRingEnd ℂ (φ x)
+  j : Ω →+* Om l
+  ι : GQ l →* G ℚ Ω
+  ι_cont : Continuous ι
+  ι_spec : ∀ σ x, σ (j x) = j (ι σ x)
+  Kv : FinExt l
+  Kv_spec : ∀ g, η (ι g) = 1 ↔ g ∈ GK Kv
+  η_unr : ∀ g ∈ Loc.Iq l, η (ι g) = 1
+  τ_open : IsOpen (((Chr.dirG ℚ Ω (comp l ψ)).comp ι).ker : Set (GQ l))
+  Ψ_cont : CharCont (Chr.Psi l e (Chr.dirG ℚ Ω ψ))
+  Ψ_I : ∀ g ∈ Loc.Iq l, Chr.Psi l e (Chr.dirG ℚ Ω ψ) (ι g) =
+    Loc.cycA l l c.O g ^ e * Chr.dirG ℚ Ω (comp l ψ) (ι g)
+
+namespace Dat
+
+variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+  {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ)
+
+abbrev Ψ (_ : Dat Ω K c e ψ) : G ℚ Ω →* c.Oˣ := Chr.Psi l e (Chr.dirG ℚ Ω ψ)
+
+def ΨQ : G ℚ Ω →* (PadicAlgCl l)ˣ := (Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom).comp D.Ψ
+
+abbrev loc : Loc.Dat3 l c.O where
+  η := D.η.comp D.ι
+  Ψ := D.Ψ.comp D.ι
+  τ := (Chr.dirG ℚ Ω (comp l ψ)).comp D.ι
+  e := e
+  Kv := D.Kv
+  odd := D.gd.l_odd
+  e_pos := D.gd.e_pos
+  η_ker := D.Kv_spec
+  η_unr := D.η_unr
+  τ_open := D.τ_open
+  Ψ_cont n := by
+    have h := (D.Ψ_cont 1 n).comp_continuous D.ι_cont
+    simp only [zpow_one] at h
+    exact h
+  Ψ_I := D.Ψ_I
+
+
+[KTR_SRC_POINT] Kill, actual local point, IsExt and IsModular
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/RhoKApply.lean#L61-L92
+def Kill : Set (G ℚ Ω) :=
+  {g | ∃ A : ValuationSubring Ω, ¬ A.valuation (l : Ω) < 1 ∧ g ∈ Ine (F := ℚ) A ∧ rbar c.O D.η D.Ψ g = 1}
+
+abbrev ULoc : Type 1 := Univ (GCond.noCondition c.O (D.η.comp D.ι) (D.Ψ.comp D.ι))
+
+abbrev Ring (U : D.ULoc) (g₁ : G ℚ Ω) : Type 1 := SRing D.Kill D.ι_cont U (D.loc.It U) D.cc g₁
+
+abbrev Marked (g₁ : G ℚ Ω) : Prop := Marks D.η D.Ψ D.cc g₁
+
+def rhoK {κ : Type} [CommRing κ] (r : G ℚ Ω →* GG 3 κ) (hr : HasMult D.η r) : G K Ω →* GL (Fin 3) κ :=
+  (glPart D.η r hr).comp ((galEmb ℚ K Ω).codRestrict D.η.ker fun s => D.η_ker ▸ galEmb_mem ℚ K Ω s)
+
+theorem rhoK_apply {κ : Type} [CommRing κ] (r : G ℚ Ω →* GG 3 κ) (hr : HasMult D.η r) (s : G K Ω) :
+    D.rhoK r hr s = (r (galEmb ℚ K Ω s)).left := rfl
+
+structure IsPt (U : D.ULoc) (g₁ : G ℚ Ω) (r : G ℚ Ω →* GG 3 (PadicAlgCl l)) : Prop where
+  mult : HasMult D.η r
+  cont : Continuous (mats r)
+  int : ∀ g a b, ‖(r g).mat a b‖ ≤ 1
+  red : ∀ g a b, ‖(r g).mat a b - (r0 D.η D.ΨQ g).mat a b‖ < 1
+  norm : Normalised D.cc g₁ r
+  kill : ∀ g ∈ D.Kill, r g = 1
+  loc : ∃ f : U.R →ₐ[c.O] PadicAlgCl l, IsLocPt f ∧ D.loc.It U ≤ RingHom.ker f ∧ push f U.r.hom = r.comp D.ι
+
+def IsExt {κ : Type} [CommRing κ] (r : G ℚ Ω →* GG 3 κ) (W : G ℚ Ω →* GL (Fin 2) κ) : Prop :=
+  (∀ g ∈ D.η.ker, (W g : Matrix (Fin 2) (Fin 2) κ) = corner (r g).mat) ∧ (W D.cc : Matrix (Fin 2) (Fin 2) κ).trace = 0
+
+def IsAutI [IsCMField K] (ι : Qbar l ≃+* ℂ) (r : G ℚ Ω →* GG 3 (PadicAlgCl l)) (hr : HasMult D.η r) : Prop :=
+  Af.IsAutCsd ι (Af.tw (D.rhoK r hr) (cycBar K Ω l)⁻¹)
+
+def IsModular (_ : Dat Ω K c e ψ) (ι : Qbar l ≃+* ℂ) (W : G ℚ Ω →* GL (Fin 2) (PadicAlgCl l)) : Prop :=
+  ∃ f : Af.Newform (2 * e + 1), f.Att ι (Af.tw W (cycBar ℚ Ω l ^ (-(e : ℤ))))
+
+
+[KTR_SRC_SHAPE] TypeII, corner representation and original Wfun
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/BaseRepGL3NormalisedOfPsiEqOne.lean#L11-L34
+def HasMult {m : ℕ} (η : G →* ℤˣ) (r : G →* GG m R) : Prop := ∀ g, (r g).right = η g
+
+def zeta (c g₁ : G) (r : G →* GG 3 R) : R := zmat c g₁ r 0 0
+
+def MatIrr {m : ℕ} (H : Subgroup G) (a : G → Matrix (Fin m) (Fin m) R) : Prop :=
+  ∀ W : Submodule R (Fin m → R), (∀ g ∈ H, ∀ v ∈ W, a g *ᵥ v ∈ W) → W = ⊥ ∨ W = ⊤
+
+def mats {m : ℕ} (r : G →* GG m R) (g : G) : Matrix (Fin m) (Fin m) R := (r g).mat
+
+def TypeI (η : G →* ℤˣ) (r : G →* GG 3 R) : Prop := MatIrr η.ker (mats r)
+
+def Upper (η : G →* ℤˣ) (r : G →* GG 3 R) : Prop := ∀ g ∈ η.ker, ∀ a b, wt a b < 0 → (r g).mat a b = 0
+
+def Lower (η : G →* ℤˣ) (r : G →* GG 3 R) : Prop := ∀ g ∈ η.ker, ∀ a b, 0 < wt a b → (r g).mat a b = 0
+
+def Block (η : G →* ℤˣ) (r : G →* GG 3 R) : Prop := ∀ g ∈ η.ker, ∀ a b, Odd (wt a b) → (r g).mat a b = 0
+
+def corner (X : Matrix (Fin 3) (Fin 3) R) : Matrix (Fin 2) (Fin 2) R := X.submatrix ![0, 2] ![0, 2]
+
+def TypeII (η : G →* ℤˣ) (r : G →* GG 3 R) : Prop :=
+  Block η r ∧ MatIrr η.ker fun g => corner (r g).mat
+
+def Wfun (r : G →* GG 3 R) (g : G) : Matrix (Fin 2) (Fin 2) R :=
+  if (r g).right = 1 then corner (r g).mat else corner (r g).mat * Matrix.diagonal ![-1, 1]
+
+
+[KTR_SRC_MARKS] Original marked complex conjugation and residual generic element
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/BaseRepGL3NormalisedOfPsiEqOne.lean#L68-L73
+structure Marks {G : Type*} [Group G] {k : Type*} [CommRing k] (η : G →* ℤˣ) (Ψ : G →* kˣ) (c g₁ : G) : Prop where
+  csq : c * c = 1
+  ηc : η c = -1
+  Ψc : Ψ c = 1
+  ηg : η g₁ = 1
+  Ψg : IsUnit (((Ψ g₁ : kˣ) : k) ^ 2 - 1)
+
+
+[KTR_SRC_AD_ACTION] Disconnected GG action and full adRep with inverse transpose
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L1-L227
+import Mathlib
+
+namespace UpperTheory.V.U3
+
+open Matrix
+
+section Group
+
+variable {n : Type} [Fintype n] [DecidableEq n] {R S : Type*} [CommRing R] [CommRing S]
+
+def trInv (g : GL n R) : GL n R where
+  val := ((g⁻¹ : GL n R) : Matrix n n R)ᵀ
+  inv := (g : Matrix n n R)ᵀ
+  val_inv := by rw [← Matrix.transpose_mul]; simp
+  inv_val := by rw [← Matrix.transpose_mul]; simp
+
+@[simp] theorem trInv_val (g : GL n R) :
+    (trInv g : Matrix n n R) = ((g⁻¹ : GL n R) : Matrix n n R)ᵀ := rfl
+
+@[simp] theorem trInv_inv_val (g : GL n R) :
+    (((trInv g)⁻¹ : GL n R) : Matrix n n R) = (g : Matrix n n R)ᵀ := rfl
+
+theorem trInv_trInv (g : GL n R) : trInv (trInv g) = g := by
+  apply Units.ext
+  rw [trInv_val, trInv_inv_val, Matrix.transpose_transpose]
+
+theorem trInv_mul (g h : GL n R) : trInv (g * h) = trInv g * trInv h := by
+  apply Units.ext
+  simp only [trInv_val, Units.val_mul, _root_.mul_inv_rev, Matrix.transpose_mul]
+
+theorem map_trInv (f : R →+* S) (g : GL n R) :
+    GeneralLinearGroup.map f (trInv g) = trInv (GeneralLinearGroup.map f g) := by
+  apply Units.ext
+  simp [GeneralLinearGroup.map, Matrix.transpose_map]
+
+end Group
+
+section Twisted
+
+variable {m : ℕ} {R S : Type*} [CommRing R] [CommRing S]
+
+variable (R) in
+
+def Jmat (m : ℕ) : Matrix (Fin m) (Fin m) R := fun i j => if j = i.rev then 1 else 0
+
+theorem Jmat_mul_Jmat (m : ℕ) : Jmat R m * Jmat R m = 1 := by
+  ext i j
+  simp only [Jmat, Matrix.mul_apply, Matrix.one_apply, mul_ite, mul_one, mul_zero]
+  rw [Finset.sum_eq_single i.rev]
+  · simp [eq_comm, Fin.rev_eq_iff]
+  · intro k _ hk
+    simp [hk]
+  · simp
+
+theorem Jmat_transpose (m : ℕ) : (Jmat R m)ᵀ = Jmat R m := by
+  ext i j
+  simp only [Jmat, Matrix.transpose_apply]
+  congr 1
+  exact propext ⟨fun h => by simp [h], fun h => by simp [h]⟩
+
+theorem Jmat_map (f : R →+* S) (m : ℕ) : (Jmat R m).map f = Jmat S m := by
+  ext i j
+  simp only [Jmat, Matrix.map_apply]
+  split_ifs <;> simp
+
+variable (R) in
+
+def Jgl (m : ℕ) : GL (Fin m) R := ⟨Jmat R m, Jmat R m, Jmat_mul_Jmat m, Jmat_mul_Jmat m⟩
+
+theorem Jgl_mul_Jgl : Jgl R m * Jgl R m = 1 := Units.ext (Jmat_mul_Jmat m)
+
+theorem trInv_Jgl : trInv (Jgl R m) = Jgl R m := Units.ext (Jmat_transpose m)
+
+def theta (g : GL (Fin m) R) : GL (Fin m) R := Jgl R m * trInv g * Jgl R m
+
+theorem theta_val (g : GL (Fin m) R) : (theta g : Matrix (Fin m) (Fin m) R) =
+    Jmat R m * ((g⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)ᵀ * Jmat R m := rfl
+
+theorem theta_inv_val (g : GL (Fin m) R) :
+    (((theta g)⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R) =
+      Jmat R m * (g : Matrix (Fin m) (Fin m) R)ᵀ * Jmat R m := by
+  rw [Matrix.mul_assoc]; rfl
+
+theorem theta_theta (g : GL (Fin m) R) : theta (theta g) = g := by
+  have hJ : ∀ x : GL (Fin m) R, Jgl R m * (Jgl R m * x) = x := fun x => by
+    rw [← mul_assoc, Jgl_mul_Jgl, one_mul]
+  simp only [theta, trInv_mul, trInv_Jgl, trInv_trInv, mul_assoc, Jgl_mul_Jgl, mul_one, hJ]
+
+theorem theta_mul (g h : GL (Fin m) R) : theta (g * h) = theta g * theta h := by
+  have hJ : ∀ x : GL (Fin m) R, Jgl R m * (Jgl R m * x) = x := fun x => by
+    rw [← mul_assoc, Jgl_mul_Jgl, one_mul]
+  simp only [theta, trInv_mul, mul_assoc, hJ]
+
+variable (m R) in
+
+def thetaAut : MulAut (GL (Fin m) R) where
+  toFun := theta
+  invFun := theta
+  left_inv := theta_theta
+  right_inv := theta_theta
+  map_mul' := theta_mul
+
+variable (m R) in
+
+def sgnAct : ℤˣ →* MulAut (GL (Fin m) R) where
+  toFun s := if s = 1 then 1 else thetaAut m R
+  map_one' := if_pos rfl
+  map_mul' s t := by
+    rcases Int.units_eq_one_or s with rfl | rfl <;> rcases Int.units_eq_one_or t with rfl | rfl
+    · simp
+    · simp
+    · simp
+    · have h : ((-1 : ℤˣ) = 1) = False := by decide
+      simp only [neg_mul_neg, mul_one, if_true, h, if_false]
+      ext1 g
+      exact (theta_theta g).symm
+
+@[simp] theorem sgnAct_one (g : GL (Fin m) R) : sgnAct m R 1 g = g := by simp
+
+@[simp] theorem sgnAct_neg_one (g : GL (Fin m) R) : sgnAct m R (-1) g = theta g := by
+  have h : ((-1 : ℤˣ) = 1) = False := by decide
+  show (if (-1 : ℤˣ) = 1 then 1 else thetaAut m R) g = theta g
+  simp only [h, if_false]
+  rfl
+
+variable (m R) in
+
+abbrev GG : Type _ := GL (Fin m) R ⋊[sgnAct m R] ℤˣ
+
+def GG.mat (x : GG m R) : Matrix (Fin m) (Fin m) R := (x.left : Matrix (Fin m) (Fin m) R)
+
+abbrev GG.ofGL : GL (Fin m) R →* GG m R := SemidirectProduct.inl
+
+abbrev GG.nu : GG m R →* ℤˣ := SemidirectProduct.rightHom
+
+theorem map_Jgl (f : R →+* S) : GeneralLinearGroup.map f (Jgl R m) = Jgl S m :=
+  Units.ext (Jmat_map f m)
+
+theorem map_theta (f : R →+* S) (g : GL (Fin m) R) :
+    GeneralLinearGroup.map f (theta g) = theta (GeneralLinearGroup.map f g) := by
+  simp only [theta, map_mul, map_trInv, map_Jgl]
+
+def GG.map (f : R →+* S) : GG m R →* GG m S :=
+  SemidirectProduct.map (GeneralLinearGroup.map f) (MonoidHom.id ℤˣ) (by
+    intro s
+    refine MonoidHom.ext fun g => ?_
+    rcases Int.units_eq_one_or s with rfl | rfl
+    · simp
+    · simpa using map_theta f g)
+
+@[simp] theorem GG.map_mat (f : R →+* S) (x : GG m R) : (GG.map f x).mat = x.mat.map f := rfl
+
+@[simp] theorem GG.map_right (f : R →+* S) (x : GG m R) : (GG.map f x).right = x.right := rfl
+
+def thetaLie (X : Matrix (Fin m) (Fin m) R) : Matrix (Fin m) (Fin m) R :=
+  -(Jmat R m * Xᵀ * Jmat R m)
+
+def GG.adFun (x : GG m R) (X : Matrix (Fin m) (Fin m) R) : Matrix (Fin m) (Fin m) R :=
+  x.mat * (if x.right = 1 then X else thetaLie X) *
+    ((x.left⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)
+
+private theorem jmat_mul_jmat_mul (Y : Matrix (Fin m) (Fin m) R) :
+    Jmat R m * (Jmat R m * Y) = Y := by
+  rw [← Matrix.mul_assoc, Jmat_mul_Jmat, Matrix.one_mul]
+
+private theorem thetaLie_thetaLie (X : Matrix (Fin m) (Fin m) R) :
+    thetaLie (thetaLie X) = X := by
+  simp only [thetaLie, Matrix.transpose_neg, Matrix.transpose_mul, Jmat_transpose,
+    Matrix.transpose_transpose, Matrix.mul_neg, Matrix.neg_mul, neg_neg, Matrix.mul_assoc,
+    jmat_mul_jmat_mul, Jmat_mul_Jmat, Matrix.mul_one]
+
+private theorem theta_conj_thetaLie_eq_thetaLie_conj (b : GL (Fin m) R) (X : Matrix (Fin m) (Fin m) R) :
+    (theta b : Matrix (Fin m) (Fin m) R) * (thetaLie X *
+        (((theta b)⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R)) =
+      thetaLie ((b : Matrix (Fin m) (Fin m) R) * (X * ((b⁻¹ : GL (Fin m) R) : Matrix (Fin m) (Fin m) R))) := by
+  simp only [theta_val, theta_inv_val, thetaLie, Matrix.transpose_mul, Jmat_transpose,
+    Matrix.mul_neg, Matrix.neg_mul, Matrix.mul_assoc, jmat_mul_jmat_mul]
+
+theorem GG.adFun_mul (x y : GG m R) (X : Matrix (Fin m) (Fin m) R) :
+    (x * y).adFun X = x.adFun (y.adFun X) := by
+  obtain ⟨a, s⟩ := x
+  obtain ⟨b, t⟩ := y
+  have hn : ((-1 : ℤˣ) = 1) = False := by decide
+  rcases Int.units_eq_one_or s with rfl | rfl <;> rcases Int.units_eq_one_or t with rfl | rfl <;>
+    simp only [GG.adFun, GG.mat, SemidirectProduct.mul_left, SemidirectProduct.mul_right,
+      sgnAct_one, sgnAct_neg_one, hn, if_true, if_false, mul_one, one_mul, neg_mul_neg,
+      Units.val_mul, _root_.mul_inv_rev, Matrix.mul_assoc]
+  · rw [← theta_conj_thetaLie_eq_thetaLie_conj]
+    simp only [Matrix.mul_assoc]
+  · rw [← theta_conj_thetaLie_eq_thetaLie_conj, thetaLie_thetaLie]
+    simp only [Matrix.mul_assoc]
+
+variable (m R) in
+
+def GG.ad : Representation R (GG m R) (Matrix (Fin m) (Fin m) R) where
+  toFun x :=
+    { toFun := x.adFun
+      map_add' := fun X Y => by
+        unfold GG.adFun thetaLie
+        split_ifs <;> simp [Matrix.mul_add, Matrix.add_mul, add_comm]
+      map_smul' := fun a X => by
+        unfold GG.adFun thetaLie
+        split_ifs <;> simp }
+  map_one' := by
+    ext1 X
+    simp [GG.adFun, GG.mat]
+  map_mul' x y := by
+    ext1 X
+    exact GG.adFun_mul x y X
+
+@[simp] theorem GG.ad_apply (x : GG m R) (X : Matrix (Fin m) (Fin m) R) :
+    GG.ad m R x X = x.adFun X := rfl
+
+variable {G : Type*} [Group G]
+
+def conjBy (h : GL (Fin m) R) (r : G →* GG m R) : G →* GG m R :=
+  (MulAut.conj (GG.ofGL h)).toMonoidHom.comp r
+
+def glPart (η : G →* ℤˣ) (r : G →* GG m R) (hr : ∀ g, (r g).right = η g) :
+    η.ker →* GL (Fin m) R where
+  toFun g := (r g).left
+  map_one' := by simp
+  map_mul' g h := by
+    have hg : (r g).right = 1 := (hr g).trans g.2
+    simp [hg]
+
+def adRep (r : G →* GG m R) : Representation R G (Matrix (Fin m) (Fin m) R) := (GG.ad m R).comp r
+
+
+[KTR_SRC_NORMALISED] Actual Normalised predicate, including matrix at complex conjugation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L272-L292
+  smul_mem' := fun c X hX a b h => by simp [hX a b h]
+
+variable (R) in
+
+def unitaryThreeTorusLieAlgebra : Submodule R (Matrix (Fin 3) (Fin 3) R) :=
+  Submodule.span R {Matrix.diagonal fun i => ((wt1 i : ℤ) : R)}
+
+variable {G : Type*} [Group G]
+
+def gstar (c g : G) : G := c * g⁻¹ * c
+
+def zmat (c g₁ : G) (r : G →* GG 3 R) : Matrix (Fin 3) (Fin 3) R :=
+  (r g₁).mat - (r (gstar c g₁)).mat
+
+structure Normalised (c g₁ : G) (r : G →* GG 3 R) : Prop where
+  atc : (r c).mat = 1
+  z12 : zmat c g₁ r 0 1 = 0
+  z21 : zmat c g₁ r 1 0 = 0
+
+def r0 (η : G →* ℤˣ) (Ψ : G →* Rˣ) : G →* GG 3 R where
+  toFun g := ⟨tor R (Ψ g), η g⟩
+
+
+[KTR_SRC_LOCAL_IDEALS] Ordered ordinary ideal, saturation, radical and It intersection
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/IsInertiaInfiniteCyclotomic.lean#L87-L138
+
+variable {C : Type} [CommRing C] [Algebra O C] (r : GQ l →* GG 3 C)
+
+def sh (a : Fin 3) (s : GQ l) : Matrix (Fin 3) (Fin 3) C :=
+  (r s).mat - Matrix.scalar _ (algebraMap O C (UpperTheory.V.UnitaryThreeInertia.psi D.Ψ a s))
+
+def ordIdeal : Ideal C :=
+  Ideal.span ({x | ∃ s ∈ D.HL ⊓ Iq l, ∃ i : ℕ, x = ((r s).mat.charpoly -
+      ∏ a, (X - Polynomial.C (algebraMap O C (UpperTheory.V.UnitaryThreeInertia.psi D.Ψ a s)))).coeff i} ∪
+    {x | ∃ s : Fin 3 → GQ l, (∀ a, s a ∈ D.HL ⊓ Iq l) ∧ ∃ i j,
+      x = (sh D r 0 (s 0) * sh D r 1 (s 1) * sh D r 2 (s 2)) i j})
+
+def tr (a : Fin 3) : C := (sh D r (a + 1) (s0 D) * sh D r (a + 2) (s0 D) * (r (fr D)).mat).trace
+
+def dd (a : Fin 3) : C :=
+  algebraMap O C (cc D (a + 1)) * tr D r a - algebraMap O C ((cycA l l O (fr D) : Oˣ) * cc D a) * tr D r (a + 1)
+
+def del : C := (l : C) * dd D r 0 * dd D r 1
+
+end Eq
+
+end Ord
+
+variable (U : D.Univ)
+
+def IY : Ideal U.R where
+  carrier := {a | ∃ n : ℕ, del D U.r.hom ^ n * a ∈ ordIdeal D U.r.hom}
+  zero_mem' := ⟨0, by simp⟩
+  add_mem' := by
+    rintro a b ⟨m, hm⟩ ⟨n, hn⟩
+    refine ⟨m + n, ?_⟩
+    have e : del D U.r.hom ^ (m + n) * (a + b) = del D U.r.hom ^ n * (del D U.r.hom ^ m * a) +
+        del D U.r.hom ^ m * (del D U.r.hom ^ n * b) := by ring
+    rw [e]
+    exact Ideal.add_mem _ (Ideal.mul_mem_left _ _ hm) (Ideal.mul_mem_left _ _ hn)
+  smul_mem' := by
+    rintro c a ⟨n, hn⟩
+    refine ⟨n, ?_⟩
+    rw [smul_eq_mul, mul_left_comm]
+    exact Ideal.mul_mem_left _ _ hn
+
+def Icr : Ideal U.R := (IY D U).radical
+
+def primesAt0 : Set (Ideal U.R) :=
+  {P | P ∈ (D.Icr U).minimalPrimes ∧ ∀ x : U.R →ₐ[O] O, push x U.r.hom = r0 D.η D.Ψ → P ≤ RingHom.ker x}
+
+def It : Ideal U.R := sInf (D.primesAt0 U)
+
+abbrev Rt : Type := U.R ⧸ D.It U
+
+def On {C : Type} [CommRing C] [Algebra O C] (r : GQ l →* GG 3 C) : Prop :=
+  ∃ f : U.R →ₐ[O] C, push f U.r.hom = r ∧ D.It U ≤ RingHom.ker f
+
+
+[KTR_SRC_LOCAL_DATA] Dat3 and local HL kernel guards
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/IsInertiaInfiniteCyclotomic.lean#L1-L85
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.LocalPublishedTheorems
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeDeformations.AdjointDiagonalRepPreservesWeightPiece
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.ConjStable
+
+noncomputable section
+
+namespace UpperTheory.V.Loc
+
+open Formalism.BasicNotions Formalism.BasicNotions.Loc UpperTheory.V.U3 UpperTheory.V.Alg IsLocalRing
+
+structure Dat3 (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] where
+  η : GQ l →* ℤˣ
+  Ψ : GQ l →* Oˣ
+  τ : GQ l →* Oˣ
+  e : ℕ
+  Kv : FinExt l
+  odd : l ≠ 2
+  e_pos : 1 ≤ e
+  η_ker : ∀ g, η g = 1 ↔ g ∈ GK Kv
+  η_unr : ∀ g ∈ Iq l, η g = 1
+  τ_open : IsOpen (τ.ker : Set (GQ l))
+  Ψ_cont : AdicCont (maximalIdeal O) fun g => (Ψ g : O)
+  Ψ_I : ∀ g ∈ Iq l, Ψ g = cycA l l O g ^ e * τ g
+
+def hodge0 (e : ℕ) (i : ℤ) : ℕ := if i = -(e : ℤ) ∨ i = 0 ∨ i = e then 1 else 0
+
+namespace Dat3
+
+variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [Algebra ℤ_[l] O] (D : Dat3 l O)
+
+def HL : Subgroup (GQ l) := D.η.ker ⊓ D.τ.ker
+
+def rz (A : Type) [CommRing A] [Algebra O A] : GQ l →* GG 3 A := (GG.map (algebraMap O A)).comp (r0 D.η D.Ψ)
+
+section Types
+
+variable {B : Type} [CommRing B] [Algebra O B] [Algebra ℚ_[l] B]
+
+def IsType (r : GQ l →* GG 3 B) : Prop :=
+  ∃ ρ : ↥(GK D.Kv) →* GL (Fin 3) B, (∀ g, ρ g = (r g).left) ∧
+    PotCrysType D.Kv (colRep ρ) 3 (hodge0 D.e)
+      fun γ => algebraMap O B ((D.τ γ : O) + 1 + (((D.τ γ)⁻¹ : Oˣ) : O))
+
+def IsLCr (r : GQ l →* GG 3 B) : Prop :=
+  ∃ ρ : ↥D.HL →* GL (Fin 3) B, (∀ g, ρ g = (r g).left) ∧ IsCr D.HL.subtype (colRep ρ)
+
+variable {E : Type} [CommRing E] [Algebra O E] (π : B →+* E)
+
+structure InDcrAt (r₁ : GQ l →* GG 3 E) (r : GQ l →* GG 3 B) : Prop where
+  mult : HasMult D.η r
+  red : (GG.map π).comp r = r₁
+  cont : ∀ a b, QCont l fun g => (r g).mat a b
+  cr : D.IsLCr r
+
+abbrev InDcr (r : GQ l →* GG 3 B) : Prop := D.InDcrAt π (D.rz E) r
+
+structure InDtri (r : GQ l →* GG 3 B) : Prop extends D.InDcrAt π (D.rz E) r where
+  tri : ∀ g a b, wt a b < 0 → (r g).mat a b = 0
+
+def InDord (r : GQ l →* GG 3 B) : Prop :=
+  ∃ (u : GQ l →* GG 3 B) (n : GL (Fin 3) B), D.InDtri π u ∧ CongOne (RingHom.ker π) n ∧
+    (∀ a b, 0 ≤ wt a b → ((n : Matrix (Fin 3) (Fin 3) B) - 1) a b = 0) ∧ r = conjBy n u
+
+end Types
+
+abbrev Univ : Type 1 := U3.Univ (GCond.noCondition O D.η D.Ψ)
+
+section Ord
+
+open Polynomial
+
+def IsInertiaInfiniteCyclotomic (s : GQ l) : Prop := s ∈ D.HL ∧ s ∈ Iq l ∧ ¬ IsOfFinOrder (cyc l l s)
+
+def IsFr (σ : GQ l) : Prop :=
+  (∃ h : σ ∈ D.HL, ((Iq l).comap D.HL.subtype ⊔ Subgroup.zpowers (⟨σ, h⟩ : ↥D.HL)).topologicalClosure = ⊤) ∧
+    ∃ (σ₀ : GQ l) (m : ℕ), IsFrob σ₀ ∧ 1 ≤ m ∧ (σ₀ ^ m)⁻¹ * σ ∈ Iq l
+
+def s0 : GQ l := Classical.epsilon (IsInertiaInfiniteCyclotomic D)
+
+def fr : GQ l := Classical.epsilon (IsFr D)
+
+def cc (a : Fin 3) : O :=
+  (UpperTheory.V.UnitaryThreeInertia.psi D.Ψ a (s0 D) - UpperTheory.V.UnitaryThreeInertia.psi D.Ψ (a + 1) (s0 D)) *
+    (UpperTheory.V.UnitaryThreeInertia.psi D.Ψ a (s0 D) - UpperTheory.V.UnitaryThreeInertia.psi D.Ψ (a + 2) (s0 D))
+
+
+
+[KTR_SRC_MATRIX_FLAG] Explicit distinct-diagonal and ordered-three-product linear algebra
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PadicHodgeTheory/CommutingUpperTriangularDistinct.lean#L15-L83
+  have a10 := hA 1 0 (by decide)
+  have a20 := hA 2 0 (by decide)
+  have a21 := hA 2 1 (by decide)
+  have b10 := hB 1 0 (by decide)
+  have b20 := hB 2 0 (by decide)
+  have b21 := hB 2 1 (by decide)
+  have d01 : d 0 - d 1 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have d02 : d 0 - d 2 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have d12 : d 1 - d 2 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have e20 := congrFun (congrFun h 2) 0
+  have e21 := congrFun (congrFun h 2) 1
+  have e10 := congrFun (congrFun h 1) 0
+  simp only [Matrix.mul_apply, Fin.sum_univ_three, a10, a20, a21, b10, b20, b21, hA', hB'] at e20 e21 e10
+  have k20 : k 2 0 = 0 := (mul_eq_zero.1 (show (d 0 - d 2) * k 2 0 = 0 by linear_combination -e20)).resolve_left d02
+  rw [k20] at e21 e10
+  have k21 : k 2 1 = 0 := (mul_eq_zero.1 (show (d 1 - d 2) * k 2 1 = 0 by linear_combination -e21)).resolve_left d12
+  have k10 : k 1 0 = 0 := (mul_eq_zero.1 (show (d 0 - d 1) * k 1 0 = 0 by linear_combination -e10)).resolve_left d01
+  intro a b hab
+  fin_cases a <;> fin_cases b <;> first | exact absurd hab (by decide) | assumption
+
+private theorem diagonalize_three_by_three_split {K : Type} [Field K] (d : Fin 3 → K) (hd : Function.Injective d)
+    (M : Matrix (Fin 3) (Fin 3) K) (hM : M.charpoly = ∏ a, (X - C (d a))) :
+    ∃ h : GL (Fin 3) K, ((h⁻¹ : GL (Fin 3) K) : Matrix (Fin 3) (Fin 3) K) * M * h = Matrix.diagonal d :=
+  _root_.UpperTheory.Reformulated.B.DiagonalizeThreeByThree.diagonalize_three_by_three_split d hd M hM
+
+private theorem three_eigenvalue_product_zero {K : Type} [Field K] (d p : Fin 3 → K) (hd : Function.Injective d)
+    (N : Matrix (Fin 3) (Fin 3) K)
+    (h0 : (N - Matrix.scalar _ (p 0)) * (Matrix.diagonal d - Matrix.scalar _ (d 1)) *
+      (Matrix.diagonal d - Matrix.scalar _ (d 2)) = 0)
+    (h1 : (Matrix.diagonal d - Matrix.scalar _ (d 0)) * (N - Matrix.scalar _ (p 1)) *
+      (Matrix.diagonal d - Matrix.scalar _ (d 2)) = 0)
+    (h2 : (Matrix.diagonal d - Matrix.scalar _ (d 0)) * (Matrix.diagonal d - Matrix.scalar _ (d 1)) *
+      (N - Matrix.scalar _ (p 2)) = 0) :
+    (∀ a b, wt a b < 0 → N a b = 0) ∧ ∀ a, N a a = p a := by
+  have d01 : d 0 - d 1 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have d02 : d 0 - d 2 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have d12 : d 1 - d 2 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have d10 : d 1 - d 0 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have d20 : d 2 - d 0 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have d21 : d 2 - d 1 ≠ 0 := sub_ne_zero.2 (hd.ne (by decide))
+  have hs : ∀ c : K, Matrix.diagonal d - Matrix.scalar (Fin 3) c = Matrix.diagonal fun i => d i - c := fun c => by
+    rw [Matrix.scalar_apply, Matrix.diagonal_sub]
+  simp only [hs, Matrix.diagonal_mul_diagonal] at h0 h1 h2
+  have e00 := congrFun (congrFun h0 0) 0
+  have e10 := congrFun (congrFun h0 1) 0
+  have e20 := congrFun (congrFun h0 2) 0
+  have e11 := congrFun (congrFun h1 1) 1
+  have e21 := congrFun (congrFun h2 2) 1
+  have e22 := congrFun (congrFun h2 2) 2
+  simp [Matrix.mul_diagonal, Matrix.diagonal_mul, d01, d02, d12, d10, d20, d21, sub_eq_zero] at e00 e10 e20 e11 e21 e22
+  constructor
+  · intro a b hab
+    fin_cases a <;> fin_cases b <;> first | exact absurd hab (by decide) | assumption
+  · intro a
+    fin_cases a <;> assumption
+
+private theorem conjugate_representation_mat {R D : Type} [CommRing R] [Group D] (r : D →* GG 3 R) (h : GL (Fin 3) R) (g : D)
+    (hg : (r g).right = 1) : (conjBy h⁻¹ r g).mat =
+      ((h⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) * (r g).mat * h := by
+  simp [conjBy, GG.mat, hg]
+
+private theorem padic_int_ringHom_injective {l : ℕ} [Fact l.Prime] {K : Type} [Field K] [CharZero K] (φ : ℤ_[l] →+* K) :
+    Function.Injective φ := by
+  rw [injective_iff_map_eq_zero]
+  intro x hx
+  by_contra h0
+  rw [PadicInt.unitCoeff_spec h0, map_mul, map_pow, map_natCast] at hx
+  exact mul_ne_zero ((Units.isUnit _).map φ).ne_zero
+    (pow_ne_zero _ (Nat.cast_ne_zero.2 (Fact.out : l.Prime).ne_zero)) hx
+
+
+[KTR_SRC_COMPLETION] Actual embedding gives local decomposition/inertia and cyclotomic compatibility
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/DatLoc.lean#L1-L45
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.KatoUse
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IotaFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PrimitiveFrobeniusFixed.PlaceBasic
+
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
+
+theorem UpperTheory.V.U3.dat_loc :
+    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ),
+      ∃ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 ∧ D.ι.range = Dec (F := ℚ) A ∧ (Loc.Iq l).map D.ι = Ine (F := ℚ) A ∧
+        Function.Injective D.ι ∧ (∀ x : Ω, x ∈ A ↔ ‖D.j x‖ ≤ 1) ∧ (∀ σ, cycZ ℚ Ω l (D.ι σ) = Loc.cyc l l σ) ∧
+        ∀ A' : ValuationSubring Ω, A'.valuation (l : Ω) < 1 → ∃ g : G ℚ Ω,
+          (∀ s, s ∈ Dec (F := ℚ) A' ↔ g⁻¹ * s * g ∈ Dec (F := ℚ) A) ∧ ∀ s, s ∈ Ine (F := ℚ) A' ↔ g⁻¹ * s * g ∈ Ine (F := ℚ) A := by
+  intro Ω _ _ _ K _ _ _ l _ c N _ e ψ D
+  have hι : D.ι = Loc.iota D.j := by
+    ext σ x
+    apply D.j.injective
+    rw [Loc.iota_spec, ← D.ι_spec]
+  obtain ⟨hemb, hrange, -, hmap, hcyc, -, -⟩ := Loc.iotaFacts D.j
+  have hmem : ∀ x : Ω, x ∈ Loc.placeJ D.j ↔ Valued.v (D.j x) ≤ 1 := fun x => Iff.rfl
+  have hA : (Loc.placeJ D.j).valuation (l : Ω) < 1 := by
+    have hnot : (l : Ω)⁻¹ ∉ Loc.placeJ D.j := by
+      rw [hmem, map_inv₀, map_natCast, map_inv₀, PadicAlgCl.valuation_p, not_le]
+      have hl : (1 : NNReal) < l := by exact_mod_cast (Fact.out : l.Prime).one_lt
+      simpa using hl
+    by_contra h
+    push_neg at h
+    apply hnot
+    have hle : (Loc.placeJ D.j).valuation (l : Ω) ≤ 1 :=
+      ((Loc.placeJ D.j).valuation_le_one_iff _).2 (natCast_mem _ l)
+    rw [← ValuationSubring.valuation_le_one_iff, map_inv₀, le_antisymm hle h, inv_one]
+  refine ⟨Loc.placeJ D.j, hA, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · rw [hι]; exact hrange
+  · rw [hι]; exact hmap
+  · rw [hι]; exact hemb.injective
+  · intro x
+    rw [hmem, ← NNReal.coe_le_coe, PadicAlgCl.valuation_coe, NNReal.coe_one]
+  · intro σ
+    rw [hι]
+    exact DFunLike.congr_fun (hcyc l) σ
+  · intro A' hA'
+    obtain ⟨-, -, -, -, -, -, -, hconj, -, hact⟩ := ML.placeBasic Ω
+    obtain ⟨g, rfl⟩ := hconj (Loc.placeJ D.j) A' l Fact.out hA hA'
+    exact ⟨g, (hact _ g).1, (hact _ g).2.1⟩
+
+
+[KTR_SRC_POINT_FACTS] Residual point, local and character facts behind exact original producer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/DatFacts.lean#L1-L133
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.KatoUse
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.PsiBar
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.GdIffIndex
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.EqOfIndexTwo
+import Development.AutomorphicArithmetic.AutomorphicVarieties.HeightAndVanishing.CongrFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLevelBounds.ClsFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.SelmerTransport.DvrFacts
+import Development.AutomorphicArithmetic.IntegralCasts.CapelliIdentities.LocallyConstantOfKernel
+
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
+
+private theorem locConst {Γ A : Type} [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ] [Group A] (ψ : Γ →* A)
+    (h : IsOpen (ψ.ker : Set Γ)) : IsLocallyConstant ψ :=
+  _root_.UpperTheory.Reformulated.B.LocallyConstantOfKernel.lc_of_ker ψ h
+
+private theorem open_galOf (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (K : Type) [Field K] [NumberField K]
+    [Algebra K Ω] : IsOpen (galOf ℚ K Ω : Set (G ℚ Ω)) := by
+  let b := Module.finBasis ℚ K
+  have e : (galOf ℚ K Ω : Set (G ℚ Ω)) = ⋂ i, {σ : G ℚ Ω | σ (algebraMap K Ω (b i)) = algebraMap K Ω (b i)} := by
+    ext σ
+    simp only [Set.mem_iInter, Set.mem_setOf_eq, SetLike.mem_coe, mem_galOf]
+    refine ⟨fun h i => h _, fun h x => ?_⟩
+    have := b.ext (f₁ := σ.toLinearMap ∘ₗ (IsScalarTower.toAlgHom ℚ K Ω).toLinearMap)
+      (f₂ := (IsScalarTower.toAlgHom ℚ K Ω).toLinearMap) h
+    exact LinearMap.congr_fun this x
+  rw [e]
+  exact isOpen_iInter_of_finite fun i => isOpen_setOf_apply (F := ℚ) _ (fun t => t = algebraMap K Ω (b i))
+
+private theorem cyc_ine (Ω : Type) [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (l : ℕ) [Fact l.Prime]
+    (A : ValuationSubring Ω) (hA : ¬ A.valuation (l : Ω) < 1) {σ : G ℚ Ω} (hσ : σ ∈ Ine (F := ℚ) A) :
+    cycZ ℚ Ω l σ = 1 := by
+  have : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
+  have : NeZero ((l : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr (Fact.out : l.Prime).ne_zero⟩
+  show cyclotomicCharacter Ω l σ.toRingEquiv = 1
+  refine Units.ext (PadicInt.ext_of_toZModPow.mp fun n => ?_)
+  obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω (l ^ n)
+  have hN0 : l ^ n ≠ 0 := pow_ne_zero _ (Fact.out : l.Prime).ne_zero
+  have : NeZero (l ^ n) := ⟨hN0⟩
+  have hspec := cyclotomicCharacter.spec (L := Ω) l σ.toRingEquiv ζ hζ.pow_eq_one
+  have hv : ¬ A.valuation ((l ^ n : ℕ) : Ω) < 1 := by
+    rw [Nat.cast_pow, map_pow, not_lt]
+    exact one_le_pow₀ (not_lt.1 hA)
+  have h1 : Chr.cls ℚ Ω (l ^ n) σ = 1 := (Chr.clsFacts ℚ Ω (l ^ n)).2.2.2.2 A hv hσ
+  have h2 := Chr.cls_spec (l ^ n) σ ζ hζ.pow_eq_one
+  rw [h1] at h2
+  have h3 := hζ.pow_inj (ZMod.val_lt _) (ZMod.val_lt _) (hspec.symm.trans h2)
+  rw [ZMod.val_injective _ h3]
+  simp
+
+private theorem tor_eq_one {R : Type} [CommRing R] {t : Rˣ} (h : tor R t = 1) : t = 1 := by
+  have h1 := congrArg (fun x : GL (Fin 3) R => (x : Matrix (Fin 3) (Fin 3) R) 0 0) h
+  apply Units.ext
+  simpa [tor_val, wt1] using h1
+
+private theorem diagonal_rep_eq_one_iff {Γ R : Type} [Group Γ] [CommRing R] (η : Γ →* ℤˣ) (Ψ : Γ →* Rˣ) (g : Γ) :
+    r0 η Ψ g = 1 ↔ η g = 1 ∧ Ψ g = 1 := by
+  refine ⟨fun h => ⟨congrArg SemidirectProduct.right h, tor_eq_one (congrArg SemidirectProduct.left h)⟩, fun h => ?_⟩
+  refine SemidirectProduct.ext ?_ h.1
+  rw [unitaryThreeReflection_left, h.2, map_one]
+  rfl
+
+private theorem bar_lc {O Γ : Type} [CommRing O] [IsLocalRing O] [Group Γ] [TopologicalSpace Γ] (Ψ : Γ →* Oˣ)
+    (hΨ : CharCont Ψ) : IsLocallyConstant (barChar O Ψ) := by
+  refine IsLocallyConstant.desc _ Units.val ?_ Units.val_injective
+  have h := (hΨ 1 1).comp (Ideal.Quotient.factor (pow_one (maximalIdeal O)).le)
+  simp only [zpow_one] at h
+  exact h
+
+theorem UpperTheory.V.U3.dat_facts :
+    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ),
+      D.cc * D.cc = 1 ∧ D.η D.cc = -1 ∧ D.Ψ D.cc = 1 ∧ IsLocallyConstant D.η ∧ IsLocallyConstant (barChar c.O D.Ψ) ∧
+      (∀ g ∈ D.Kill, r0 D.η D.Ψ g = 1) ∧ IsUnit (2 : c.O) ∧ IsCMField K ∧ Continuous D.ΨQ ∧
+      (∀ g, g ∈ D.Kill ↔ ∃ A : ValuationSubring Ω, ¬ A.valuation (l : Ω) < 1 ∧ g ∈ Ine (F := ℚ) A ∧ D.η g = 1 ∧ Chr.dirG ℚ Ω ψ g = 1) ∧
+      (∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → Ine (F := ℚ) A ≤ D.η.ker ∧
+        ∃ s ∈ Ine (F := ℚ) A, IsUnit ((D.Ψ s : c.O) ^ 2 - 1)) := by
+  intro Ω _ _ _ K _ _ _ l hl c N _ e ψ D
+  obtain ⟨w, η', a, hlit⟩ := (gdIff Ω K l c e N ψ).1.1 D.gd
+  have himag := D.gd.imag
+  have hΨ : ∀ A : ValuationSubring Ω, ¬ A.valuation (l : Ω) < 1 → ∀ g ∈ Ine (F := ℚ) A,
+      D.Ψ g = Chr.dirG ℚ Ω ψ g := fun A hA g hg => by
+    show (chiO ℚ Ω l c.O g) ^ (e : ℤ) * Chr.dirG ℚ Ω ψ g = _
+    have : chiO ℚ Ω l c.O g = 1 := by
+      unfold chiO
+      rw [MonoidHom.comp_apply, cyc_ine Ω l A hA hg, map_one]
+    rw [this, _root_.one_zpow, one_mul]
+  have hkill : ∀ g, g ∈ D.Kill ↔ ∃ A : ValuationSubring Ω, ¬ A.valuation (l : Ω) < 1 ∧ g ∈ Ine (F := ℚ) A ∧
+      D.η g = 1 ∧ Chr.dirG ℚ Ω ψ g = 1 := fun g => by
+    refine exists_congr fun A => and_congr_right fun hA => and_congr_right fun hg => ?_
+    unfold rbar
+    rw [diagonal_rep_eq_one_iff]
+    refine and_congr_right fun _ => ?_
+    unfold barChar
+    rw [MonoidHom.comp_apply, hΨ A hA g hg]
+    refine ⟨fun h => ?_, fun h => by rw [h, map_one]⟩
+    refine (congrFacts Ω l c).2.2.2.1 _ 1 _ hlit.ord ?_ (one_pow _) ?_
+    · rw [← MonoidHom.pow_apply, pow_orderOf_eq_one, MonoidHom.one_apply]
+    · rw [← residue_eq_zero_iff, map_sub, sub_eq_zero, Units.val_one, map_one]
+      exact congrArg Units.val h
+  obtain ⟨φ, hφ⟩ := D.conj
+  refine ⟨?_, ?_, hlit.par D.cc ⟨φ, hφ⟩, ?_, ?_, fun g hg => ?_, ?_, ?_, ?_, hkill, fun A hA => ?_⟩
+  · refine AlgEquiv.ext fun x => φ.injective ?_
+    rw [AlgEquiv.mul_apply, hφ, hφ]
+    simp
+  · refine (Int.units_eq_one_or _).resolve_left fun h => ?_
+    have h1 : D.cc ∈ galOf ℚ K Ω := D.η_ker ▸ h
+    refine IsTotallyComplex.complexEmbedding_not_isReal (φ.comp (algebraMap K Ω)) ?_
+    rw [ComplexEmbedding.isReal_iff]
+    ext x
+    rw [ComplexEmbedding.conjugate_coe_eq, RingHom.comp_apply, ← hφ, h1 x]
+  · exact locConst _ (D.η_ker ▸ open_galOf Ω K)
+  · exact bar_lc _ D.Ψ_cont
+  · obtain ⟨A, hA, hg, h1, h2⟩ := (hkill g).1 hg
+    exact (diagonal_rep_eq_one_iff _ _ _).2 ⟨h1, (hΨ A hA g hg).trans h2⟩
+  · have := (dvrFacts l c.O).2.2.2.2.2.2.2.2 2 fun h => D.gd.l_odd ((Nat.prime_dvd_prime_iff_eq hl.out Nat.prime_two).1 h)
+    simpa using this
+  · have : Algebra.IsQuadraticExtension ℚ K := ⟨D.gd.quad⟩
+    exact IsCMField.ofCMExtension ℚ K
+  · have hf : Continuous (algebraMap ℤ_[l] (PadicAlgCl l)).toMonoidHom := by
+      refine ((continuous_algebraMap ℚ_[l] (PadicAlgCl l)).comp continuous_subtype_val).congr fun x => ?_
+      exact (IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] (PadicAlgCl l) x).symm
+    have h1 := ((hf.units_map _).comp (continuous_cycZ ℚ Ω l)).zpow (e : ℤ)
+    have h2 := (((locConst _ (Chr.clsFacts ℚ Ω N).1).comp ψ.toUnitHom).comp
+      (Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom)).continuous
+    refine (h1.mul h2).congr fun g => ?_
+    show _ = Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom (chiO ℚ Ω l c.O g ^ (e : ℤ) * Chr.dirG ℚ Ω ψ g)
+    rw [map_mul, map_zpow]
+    rfl
+  · obtain ⟨h1, s, hs, h2⟩ := (gdLoc Ω K l c e N ψ w η' a hlit).1 A hA
+    refine ⟨D.η_ker ▸ h1, s, hs, ?_⟩
+    rw [Units.val_pow_eq_pow_val] at h2
+    exact not_not.1 h2
+
+
+[KTR_SRC_MIDDLE] Original middle/determinant class-group triviality target
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/ClsEqOne.lean#L1-L216
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.KatoUse
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.CoboundaryLemmaNoColumn
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.PtInertiaAway
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.PtIneL
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.DatFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.MemGalOfQuadraticOfFixesDiscrRootsOfUnity
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.ExistsIsDiagOnOfIsDiagOnInfKerSign
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.DiagonalOnSubgroupOfConjugate
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.ExistsIsFlagOnOfEigenvectorNormalSubgroup
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.SelmerTransport.Places
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLevelBounds.DecCyc
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicCharInertiaSurjective
+
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
+
+private theorem cls_eq_one {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] (N : ℕ) [NeZero N] (g : G ℚ Ω)
+    (hg : ∀ ζ : Ω, ζ ^ N = 1 → g ζ = ζ) : Chr.cls ℚ Ω N g = 1 := by
+  haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
+  haveI : NeZero ((N : ℕ) : Ω) := ⟨Nat.cast_ne_zero.mpr (NeZero.ne N)⟩
+  obtain ⟨ζ, hζ⟩ := HasEnoughRootsOfUnity.exists_primitiveRoot Ω N
+  have h1 := Chr.cls_spec N g ζ hζ.pow_eq_one
+  rw [hg ζ hζ.pow_eq_one] at h1
+  have h2 : ζ ^ (1 : ZMod N).val = ζ := by
+    rw [ZMod.val_one_eq_one_mod, hζ.eq_orderOf, pow_mod_orderOf, pow_one]
+  apply Units.ext
+  apply ZMod.val_injective
+  exact hζ.pow_inj (ZMod.val_lt _) (ZMod.val_lt _) (h1.symm.trans h2.symm)
+
+private theorem block_form {k : Type} [Field k] (X : Matrix (Fin 3) (Fin 3) k) (Y : Matrix (Fin 2) (Fin 2) k)
+    (hb : ∀ a b, Odd (wt a b) → X a b = 0) (h1 : X 1 1 = 1) (hY : Y = corner X) :
+    X = !![Y 0 0, 0, Y 0 1; 0, 1, 0; Y 1 0, 0, Y 1 1] := by
+  subst hY
+  have e01 := hb 0 1 (by decide)
+  have e10 := hb 1 0 (by decide)
+  have e12 := hb 1 2 (by decide)
+  have e21 := hb 2 1 (by decide)
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [corner, e01, e10, e12, e21, h1]
+
+private theorem conj_mat {Γ k : Type} [Group Γ] [Field k] (M : GL (Fin 3) k) (r : Γ →* GG 3 k) (g : Γ)
+    (hg : (r g).right = 1) : (conjBy M r g).mat = (M : Matrix (Fin 3) (Fin 3) k) * (r g).mat * ((M⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k) := by
+  simp [conjBy, GG.mat, hg]
+
+private theorem eigvec {k : Type} [Field k] (M : GL (Fin 3) k) (X : Matrix (Fin 3) (Fin 3) k) (a : k)
+    (h0 : ((M : Matrix (Fin 3) (Fin 3) k) * X * ((M⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k)) 0 0 = a)
+    (h : ∀ i j, wt i j < 0 → ((M : Matrix (Fin 3) (Fin 3) k) * X * ((M⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k)) i j = 0) :
+    X *ᵥ (((M⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k) *ᵥ Pi.single 0 1) =
+      a • (((M⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k) *ᵥ Pi.single 0 1) := by
+  have e : ((M : Matrix (Fin 3) (Fin 3) k) * X * ((M⁻¹ : GL (Fin 3) k) : Matrix (Fin 3) (Fin 3) k)) *ᵥ Pi.single 0 1 =
+      a • Pi.single 0 1 := by
+    rw [Matrix.mulVec_single_one]
+    funext i
+    fin_cases i
+    · simpa using h0
+    · simpa using h 1 0 (by decide)
+    · simpa using h 2 0 (by decide)
+  rw [← Matrix.mulVec_smul, ← e, Matrix.mulVec_mulVec, Matrix.mulVec_mulVec, ← Matrix.mul_assoc, ← Matrix.mul_assoc,
+    Units.inv_mul, Matrix.one_mul]
+
+private theorem exists_two {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [hl : Fact l.Prime] (h2 : l ≠ 2)
+    (A : ValuationSubring Ω) (hA : A.valuation (l : Ω) < 1) :
+    ∃ s ∈ Ine (F := ℚ) A, ∀ n : ℤ, cycBar ℚ Ω l s ^ n = 1 → n = 0 := by
+  have hu : IsUnit ((2 : ℕ) : ℤ_[l]) := by
+    rw [PadicInt.isUnit_iff, PadicInt.norm_natCast_eq_one_iff]
+    exact (Nat.coprime_primes hl.out Nat.prime_two).2 h2
+  obtain ⟨u, hu⟩ := hu
+  obtain ⟨s, hs, e⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hA u
+  refine ⟨s, hs, fun n hn => ?_⟩
+  have e2 : ((cycBar ℚ Ω l s : (Qbar l)ˣ) : Qbar l) = ((2 : ℚ) : Qbar l) := by
+    show ((algebraMap ℚ_[l] (Qbar l)).comp PadicInt.Coe.ringHom) (cycZ ℚ Ω l s : ℤ_[l]) = _
+    rw [e, hu, map_natCast]
+    simp
+  have e3 := congrArg Units.val hn
+  rw [Units.val_zpow_eq_zpow_val, e2, Units.val_one, ← Rat.cast_zpow] at e3
+  have e4 : (2 : ℚ) ^ n = 1 := by exact_mod_cast e3
+  exact (zpow_eq_one_iff_right₀ (by norm_num) (by norm_num)).1 e4
+
+theorem UpperTheory.V.U3.typeII_ord :
+    CohInp → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : D.ULoc} {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ {r : G ℚ Ω →* GG 3 (PadicAlgCl l)} (_ : D.IsPt U g₁ r),
+      TypeII D.η r → ∀ W : G ℚ Ω →* GL (Fin 2) (PadicAlgCl l), D.IsExt r W → Continuous W →
+      (∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).det = ((D.η g : ℤˣ) : ℤ)) →
+      Af.Level l (N * (discr K).natAbs) ![(e : ℤ), -(e : ℤ)] W ∧
+      ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∀ s ∈ Ine (F := ℚ) A, (∀ ζ : Ω, ζ ^ N = 1 → s ζ = ζ) →
+        (W s : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).charpoly =
+          (Polynomial.X - Polynomial.C ((cycBar ℚ Ω l s ^ (e : ℤ) : (Qbar l)ˣ) : Qbar l)) *
+            (Polynomial.X - Polynomial.C ((cycBar ℚ Ω l s ^ (-(e : ℤ)) : (Qbar l)ˣ) : Qbar l)) := by
+  intro hC Ω _ _ _ K _ _ _ l hl c N _ e ψ D U g₁ hM r h hII W hext hcont hdet
+  obtain ⟨h11, -, -⟩ := typeII_facts hC D hM h hII
+  obtain ⟨-, -, -, -, -, -, -, -, -, -, hl1⟩ := dat_facts D
+  let ψQ : G ℚ Ω →* (Qbar l)ˣ := (Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom).comp (Chr.dirG ℚ Ω ψ)
+  have hΨ : ∀ g, D.ΨQ g = cycBar ℚ Ω l g ^ (e : ℤ) * ψQ g := fun g => by
+    show Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom (chiO ℚ Ω l c.O g ^ (e : ℤ) * Chr.dirG ℚ Ω ψ g) = _
+    rw [map_mul, map_zpow]
+    rfl
+  have hfin : ∀ g, ψQ g ^ Nat.card (ZMod N)ˣ = 1 := fun g => by
+    show Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom (ψ.toUnitHom (Chr.cls ℚ Ω N g)) ^ _ = 1
+    rw [← map_pow, ← map_pow, pow_card_eq_one', map_one, map_one]
+  have hodd : Odd (discr K).natAbs := Nat.coprime_two_right.1 (D.gd.cop.coprime_dvd_right D.gd.N_even.two_dvd)
+  have hkill : ∀ g : G ℚ Ω, (∀ ζ : Ω, ζ ^ (N * (discr K).natAbs) = 1 → g ζ = ζ) → ψQ g = 1 ∧ D.η g = 1 := fun g hg => by
+    constructor
+    · show Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom (ψ.toUnitHom (Chr.cls ℚ Ω N g)) = 1
+      rw [cls_eq_one N g fun ζ hζ => hg ζ (by rw [pow_mul, hζ, one_pow]), map_one, map_one]
+    · rw [← MonoidHom.mem_ker, D.η_ker]
+      exact UpperTheory.mem_galOf_quadratic_of_fixes_discr_roots_of_unity Ω K D.gd.quad hodd g fun ζ hζ => hg ζ (by rw [pow_mul', hζ, one_pow])
+  have hblk : ∀ g ∈ D.η.ker, (r g).mat = !![W g 0 0, 0, W g 0 1; 0, 1, 0; W g 1 0, 0, W g 1 1] := fun g hg =>
+    block_form _ _ (hII.1 g hg) (h11 g hg) (hext.1 g hg)
+  refine ⟨⟨hcont, fun w hw => ?_, fun w hw => ?_⟩, fun A hAl s hs hfix => ?_⟩
+  · obtain ⟨A, hA⟩ := exists_isPlaceOver Ω w
+    have hAl : ¬ A.valuation (l : Ω) < 1 := fun h' => hw (((places ℚ Ω l A).2.2.1 w hA).1 h')
+    obtain ⟨M, hMM⟩ := pt_inertia_away D hM h A hAl
+    have h1 := UpperTheory.diagonal_on_subgroup_of_conjugate (Ine (F := ℚ) A ⊓ D.η.ker) W ψQ M fun g hg => by
+      have hc : cycZ ℚ Ω l g = 1 := (places ℚ Ω l A).2.2.2 hAl hg.1
+      have hc' : cycBar ℚ Ω l g = 1 := by
+        rw [cycBar, MonoidHom.comp_apply, hc, map_one]
+      rw [← hblk g hg.2, hMM g hg.1 hg.2, GG.mat, unitaryThreeReflection_left, tor_val, hΨ, hc', _root_.one_zpow, one_mul]
+      congr 2
+      funext i
+      fin_cases i <;> simp [wt1]
+    obtain ⟨χ, hχ, hd⟩ := UpperTheory.exists_isDiagOn_of_isDiagOn_inf_ker_sign _ _ W ψQ h1
+    exact ⟨A, hA, χ, fun i s hs => hχ i s (hkill s hs).1 (hkill s hs).2, hd⟩
+  · obtain ⟨A, hA⟩ := exists_isPlaceOver Ω w
+    have hAl : A.valuation (l : Ω) < 1 := ((places ℚ Ω l A).2.2.1 w hA).2 hw
+    obtain ⟨-, M, hup, hdiag⟩ := pt_inertia_above hC D hM h A hAl
+    obtain ⟨hIk, s₀, hs₀, hu⟩ := hl1 A hAl
+    obtain ⟨hnorm, hID, -⟩ := Chr.decCyc Ω l A hl.out hAl
+    have hs₀' : (D.ΨQ s₀ : Qbar l) ^ 2 ≠ 1 := by
+      have := (hu.map (algebraMap c.O (PadicAlgCl l))).ne_zero
+      rw [map_sub, map_pow, map_one, sub_ne_zero] at this
+      exact this
+    set v : Fin 3 → Qbar l := ((M⁻¹ : GL (Fin 3) (Qbar l)) : Matrix (Fin 3) (Fin 3) (Qbar l)) *ᵥ Pi.single 0 1 with hv
+    have hv0 : v ≠ 0 := fun h0 => by
+      have := congrArg (fun x => ((M : Matrix (Fin 3) (Fin 3) (Qbar l)) *ᵥ x) 0) (hv.symm.trans h0)
+      simp only [Matrix.mulVec_mulVec, Units.mul_inv, Matrix.one_mulVec, Matrix.mulVec_zero] at this
+      simp at this
+    have hev : ∀ s ∈ Ine (F := ℚ) A,
+        !![W s 0 0, 0, W s 0 1; 0, 1, 0; W s 1 0, 0, W s 1 1] *ᵥ v = (D.ΨQ s : Qbar l) • v := fun s hs => by
+      have hr : (r s).right = 1 := (h.mult s).trans (hIk hs)
+      rw [← hblk s (hIk hs)]
+      refine eigvec M _ _ ?_ fun i j hij => ?_
+      · rw [← conj_mat M r s hr, hdiag s hs 0]
+        simp [GG.mat, tor_val, wt1]
+      · rw [← conj_mat M r s hr]
+        exact hup s (hID hs) (hIk hs) i j hij
+    have hv1 : v 1 = 0 := by
+      have := congrFun (hev s₀ hs₀) 1
+      simp [Matrix.mulVec, dotProduct, Fin.sum_univ_three] at this
+      by_contra hne
+      have h3 : (D.ΨQ s₀ : Qbar l) = 1 := (mul_right_cancel₀ hne ((one_mul _).trans this)).symm
+      exact hs₀' (by rw [h3, one_pow])
+    obtain ⟨κ, hflag, hκ⟩ := UpperTheory.exists_isFlagOn_of_eigenvector_normal_subgroup (Dec (F := ℚ) A) (Ine (F := ℚ) A) W D.ΨQ ![v 0, v 2]
+      (fun d hd s hs => hnorm.conj_mem' ⟨s, hID hs⟩ hs ⟨d, hd⟩)
+      (fun h0 => hv0 (by
+        funext i
+        fin_cases i
+        · exact congrFun h0 0
+        · exact hv1
+        · exact congrFun h0 1))
+      (fun s hs => by
+        have a0 := congrFun (hev s hs) 0
+        have a2 := congrFun (hev s hs) 2
+        funext i
+        fin_cases i
+        · simpa [Matrix.mulVec, dotProduct, Fin.sum_univ_three, Fin.sum_univ_two] using a0
+        · simpa [Matrix.mulVec, dotProduct, Fin.sum_univ_three, Fin.sum_univ_two] using a2)
+      (fun s hs => by rw [hdet, show D.η s = 1 from hIk hs]; simp)
+      ⟨s₀, hs₀, hs₀'⟩
+    have hκ' : ∀ i (s : ↥(Dec (F := ℚ) A)), (s : G ℚ Ω) ∈ Ine (F := ℚ) A →
+        κ i s = cycBar ℚ Ω l s ^ (![(e : ℤ), -(e : ℤ)] i) * (![ψQ, ψQ⁻¹] i) s := fun i s hs => by
+      fin_cases i
+      · exact (hκ s hs).1.trans (hΨ s)
+      · refine (hκ s hs).2.trans ?_
+        rw [hΨ, mul_inv, ← _root_.zpow_neg]
+        rfl
+    refine ⟨A, hA, ![ψQ, ψQ⁻¹], κ, fun i s hs => ?_, hflag, hκ', Or.inl fun i j hij => ?_⟩
+    · fin_cases i <;> simp [(hkill s hs).1]
+    · obtain ⟨s, hs, hn⟩ := exists_two D.gd.l_odd A hAl
+      have h1 := DFunLike.congr_fun hij ⟨s, hID hs⟩
+      rw [MonoidHom.mul_apply, hκ' i _ hs, hκ' j _ hs] at h1
+      have hf : ∀ i, ((![ψQ, ψQ⁻¹] i) s) ^ Nat.card (ZMod N)ˣ = 1 := fun i => by
+        fin_cases i
+        · exact hfin s
+        · show (ψQ s)⁻¹ ^ _ = 1
+          rw [inv_pow, hfin, inv_one]
+      have h2 := congrArg (· ^ Nat.card (ZMod N)ˣ) h1
+      simp only [mul_pow, hf, mul_one] at h2
+      change (cycBar ℚ Ω l s ^ _) ^ _ = (cycBar ℚ Ω l s ^ _) ^ _ * cycBar ℚ Ω l s ^ _ at h2
+      rw [← mul_pow, ← _root_.zpow_add_one, ← mul_inv_eq_one, ← inv_pow, ← mul_pow, ← _root_.zpow_sub, ← _root_.zpow_natCast,
+        ← _root_.zpow_mul] at h2
+      have h3 := (mul_eq_zero.1 (hn _ h2)).resolve_right (by exact_mod_cast Nat.card_pos.ne')
+      fin_cases i <;> fin_cases j <;> simp at h3 <;> omega
+  · obtain ⟨hch, -⟩ := pt_inertia_above hC D hM h A hAl
+    have hk : s ∈ D.η.ker := (hl1 A hAl).1 hs
+    have hψ : ψQ s = 1 := by
+      show Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom (ψ.toUnitHom (Chr.cls ℚ Ω N s)) = 1
+      rw [cls_eq_one N s hfix, map_one, map_one]
+    have htr : (r s).mat.trace = (r0 D.η D.ΨQ s).mat.trace := by
+      rw [Matrix.trace_eq_neg_charpoly_coeff, Matrix.trace_eq_neg_charpoly_coeff, hch s hs]
+    have hd : (W s : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).det = 1 := by
+      rw [hdet, show D.η s = 1 from hk]; simp
+    have hu : ((cycBar ℚ Ω l s ^ (e : ℤ) : (Qbar l)ˣ) : Qbar l) * ((cycBar ℚ Ω l s ^ (-(e : ℤ)) : (Qbar l)ˣ) : Qbar l) = 1 := by
+      rw [← Units.val_mul, ← _root_.zpow_add, add_neg_cancel, _root_.zpow_zero, Units.val_one]
+    have ht : (W s : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)).trace =
+        ((cycBar ℚ Ω l s ^ (e : ℤ) : (Qbar l)ˣ) : Qbar l) + ((cycBar ℚ Ω l s ^ (-(e : ℤ)) : (Qbar l)ˣ) : Qbar l) := by
+      rw [hblk s hk, GG.mat, unitaryThreeReflection_left, tor_val, hΨ, hψ, mul_one, Matrix.trace_diagonal, Matrix.trace_fin_three,
+        Fin.sum_univ_three] at htr
+      rw [Matrix.trace_fin_two, _root_.zpow_neg]
+      have w0 : wt1 0 = 1 := by decide
+      have w1 : wt1 1 = 0 := by decide
+      have w2 : wt1 2 = -1 := by decide
+      simp only [w0, w1, w2, Matrix.of_apply, Matrix.cons_val', Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.cons_val,
+        Matrix.cons_val_fin_one, _root_.zpow_one, _root_.zpow_zero, _root_.zpow_neg, Units.val_one] at htr
+      linear_combination htr
+    rw [Matrix.charpoly_fin_two, ht, hd, ← hu, map_add, map_mul]
+    ring
+
+
+[KTR_SRC_CYCLOTOMIC] Original infinite-cyclotomic irreducibility target
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/TypeIIrrCyc.lean#L1-L103
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.KatoUse
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.Clifford
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.PtIneL
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.DatFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLevelBounds.PlacesQ
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.CyclotomicCharInertiaSurjective
+
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
+
+private theorem twist_triv {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K]
+    [Algebra K Ω] {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N}
+    (D : Dat Ω K c e ψ) (A : ValuationSubring Ω) (hA : A.valuation (l : Ω) < 1) {C : Type} [Group C]
+    (φ : G K Ω →* C) (hφ : (cycBar K Ω l).ker ≤ φ.ker) (m : ℕ) (hm : m ≠ 0)
+    (h : ∀ s : G K Ω, galEmb ℚ K Ω s ∈ Ine (F := ℚ) A → φ s ≠ 1 → D.ΨQ (galEmb ℚ K Ω s) ^ m = 1) (g : G K Ω) :
+    φ g = 1 := by
+  have hl : l.Prime := Fact.out
+  have hI : Ine (F := ℚ) A ≤ (galEmb ℚ K Ω).range := by
+    rw [range_galEmb, ← D.η_ker]
+    exact ((dat_facts D).2.2.2.2.2.2.2.2.2.2 A hA).1
+  have hsur : ∀ u : ℤ_[l]ˣ, ∃ s : G K Ω, galEmb ℚ K Ω s ∈ Ine (F := ℚ) A ∧ cycZ K Ω l s = u := fun u => by
+    obtain ⟨σ, hσ, hu⟩ := GlobalTheory.CycInertia.cycZ_Ine_surjective Ω l A hA u
+    obtain ⟨s, rfl⟩ := hI hσ
+    exact ⟨s, hσ, hu⟩
+  by_contra hg
+  obtain ⟨s, hs, hsg⟩ := hsur (cycZ K Ω l g)
+  have hs1 : φ s ≠ 1 := by
+    intro h1
+    have : φ (g * s⁻¹) = 1 := hφ (by
+      rw [MonoidHom.mem_ker, cycBar, MonoidHom.comp_apply, map_mul, map_inv, hsg, mul_inv_cancel, map_one])
+    rw [map_mul, map_inv, h1, inv_one, mul_one] at this
+    exact hg this
+  have hu : IsUnit ((1 + l : ℕ) : ℤ_[l]) := by
+    rw [PadicInt.isUnit_iff, PadicInt.norm_natCast_eq_one_iff]
+    simp
+  obtain ⟨t, ht, htu⟩ := hsur hu.unit
+  have ht1 : D.ΨQ (galEmb ℚ K Ω t) ^ m = 1 := by
+    by_cases h1 : φ t = 1
+    · have h2 := h (s * t) (by rw [map_mul]; exact mul_mem hs ht) (by rwa [map_mul, h1, mul_one])
+      rwa [map_mul, map_mul, mul_pow, h s hs hs1, one_mul] at h2
+    · exact h t ht h1
+  have hn : Chr.dirG ℚ Ω ψ (galEmb ℚ K Ω t) ^ Nat.card (ZMod N)ˣ = 1 := by
+    rw [Chr.dirG, MonoidHom.comp_apply, ← map_pow, pow_card_eq_one', map_one]
+  have hc : (chiO ℚ Ω l c.O (galEmb ℚ K Ω t) : c.O) = ((1 + l : ℕ) : c.O) := by
+    have : cycZ ℚ Ω l (galEmb ℚ K Ω t) = hu.unit := htu
+    rw [chiO, MonoidHom.comp_apply, this]
+    simp
+  have h3 : ((D.Ψ (galEmb ℚ K Ω t) ^ Nat.card (ZMod N)ˣ : c.Oˣ) : c.O) = ((1 + l : ℕ) : c.O) ^ (e * Nat.card (ZMod N)ˣ) := by
+    rw [Dat.Ψ, Chr.Psi, MonoidHom.mul_apply, mul_pow, hn, mul_one, zpow_natCast, MonoidHom.pow_apply, ← pow_mul,
+      Units.val_pow_eq_pow_val, hc]
+  have h4 : ((D.ΨQ (galEmb ℚ K Ω t) ^ Nat.card (ZMod N)ˣ : (PadicAlgCl l)ˣ) : PadicAlgCl l) =
+      ((1 + l : ℕ) : PadicAlgCl l) ^ (e * Nat.card (ZMod N)ˣ) := by
+    have := congrArg (algebraMap c.O (PadicAlgCl l)) h3
+    rw [map_pow, map_natCast] at this
+    rw [← this, Dat.ΨQ, MonoidHom.comp_apply, ← map_pow]
+    rfl
+  have h5 : ((1 + l : ℕ) : PadicAlgCl l) ^ (e * Nat.card (ZMod N)ˣ * m) = 1 := by
+    rw [pow_mul, ← h4, ← Units.val_pow_eq_pow_val, ← pow_mul, mul_comm, pow_mul, ht1, one_pow, Units.val_one]
+  have h6 : (1 + l) ^ (e * Nat.card (ZMod N)ˣ * m) = 1 := by exact_mod_cast h5
+  have he := D.gd.e_pos
+  have hN : 0 < Nat.card (ZMod N)ˣ := Nat.card_pos
+  rcases Nat.pow_eq_one.1 h6 with h7 | h7
+  · exact hl.ne_zero (by omega)
+  · exact (mul_ne_zero (mul_ne_zero (by omega) hN.ne') hm) h7
+
+theorem UpperTheory.V.U3.typeI_irr_cyc :
+    CohInp → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : D.ULoc} {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ {r : G ℚ Ω →* GG 3 (PadicAlgCl l)} (h : D.IsPt U g₁ r),
+      TypeI D.η r → Af.IsIrr ((D.rhoK r h.mult).comp (cycBar K Ω l).ker.subtype) := by
+  intro hC Ω _ _ _ K _ _ _ l _ c N _ e ψ D U g₁ hg r h hI
+  have hirr : MatIrr ⊤ fun g => (D.rhoK r h.mult g : Matrix (Fin 3) (Fin 3) (PadicAlgCl l)) := by
+    intro W hW
+    refine hI W fun g hg v hv => ?_
+    rw [D.η_ker, ← range_galEmb] at hg
+    obtain ⟨s, rfl⟩ := hg
+    exact hW s trivial v hv
+  have key : MatIrr (cycBar K Ω l).ker fun g => (D.rhoK r h.mult g : Matrix (Fin 3) (Fin 3) (PadicAlgCl l)) := by
+    by_contra hred
+    obtain ⟨φ, hφ1, hker, -, M, hM⟩ := exists_selfTwist (D.rhoK r h.mult) (cycBar K Ω l).ker
+      (fun a b => by simp [MonoidHom.mem_ker, mul_comm (cycBar K Ω l a)]) hirr hred
+    obtain ⟨A, hA⟩ := (Chr.placesQ Ω).1 l Fact.out
+    refine hφ1 (MonoidHom.ext (twist_triv D A hA φ hker 3 (by norm_num) fun s hs h1 => ?_))
+    have hch := (pt_inertia_above hC D hg h A hA).1 _ hs
+    have htr : (D.rhoK r h.mult s : Matrix (Fin 3) (Fin 3) (PadicAlgCl l)).trace =
+        (r0 D.η D.ΨQ (galEmb ℚ K Ω s)).mat.trace := by
+      rw [Matrix.trace_eq_neg_charpoly_coeff, Matrix.trace_eq_neg_charpoly_coeff, ← hch]
+      rfl
+    have h2 := congrArg (fun X => (X * ((M⁻¹ : GL (Fin 3) (PadicAlgCl l)) : Matrix (Fin 3) (Fin 3) (PadicAlgCl l))).trace)
+      (hM s trivial)
+    simp only [Matrix.mul_smul, Matrix.smul_mul, Matrix.trace_smul] at h2
+    rw [Matrix.trace_mul_cycle, Units.inv_mul, Matrix.one_mul, Matrix.mul_assoc, Units.mul_inv, Matrix.mul_one, htr,
+      smul_eq_mul] at h2
+    have h3 : (r0 D.η D.ΨQ (galEmb ℚ K Ω s)).mat.trace = 0 := by
+      by_contra h0
+      exact h1 (Units.ext (mul_right_cancel₀ h0 (h2.trans (one_mul _).symm)))
+    rw [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.trace_diagonal, Fin.sum_univ_three] at h3
+    generalize D.ΨQ (galEmb ℚ K Ω s) = a at h3 ⊢
+    have h4 : (a : PadicAlgCl l) + 1 + (a : PadicAlgCl l)⁻¹ = 0 := by simpa [wt1] using h3
+    have ha : (a : PadicAlgCl l) * (a : PadicAlgCl l)⁻¹ = 1 := mul_inv_cancel₀ a.ne_zero
+    apply Units.ext
+    rw [Units.val_pow_eq_pow_val, Units.val_one]
+    linear_combination (a : PadicAlgCl l) * (a - 1) * h4 - ((a : PadicAlgCl l) - 1) * ha
+  refine ⟨top_ne_bot, fun _ _ _ => trivial, fun W _ hW => key W fun g hg v hv => hW ⟨g, hg⟩ v hv⟩
+
+
+[KTR_SRC_EXTENSION] Original actual TypeII rank-two extension consumer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/ReducibleThreeDim.lean#L1-L379
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.KatoUse
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.CoboundaryLemmaNoColumn
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.ExistsUnitPowNe
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.BlochKatoNonpositiveWeight
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.DatFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.AdRepBaseLiftApply
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.ClassFieldRamification.KwAbs
+
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
+
+namespace UpperTheory.V.U3.ReducibleThreeDim
+
+open TensorProduct in
+private theorem bk_map {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {l : ℕ} [Fact l.Prime]
+    {C : Type} [CommRing C] [Algebra ℚ_[l] C]
+    {V : Type} [AddCommGroup V] [Module C V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] C V] [TopologicalSpace V]
+    [IsTopologicalAddGroup V] [ContinuousConstSMul C V]
+    {V' : Type} [AddCommGroup V'] [Module C V'] [Module ℚ_[l] V'] [IsScalarTower ℚ_[l] C V'] [TopologicalSpace V']
+    [IsTopologicalAddGroup V'] [ContinuousConstSMul C V']
+    (ρ : Representation C (G F Ω) V) (ρ' : Representation C (G F Ω) V') (f : V →ₗ[C] V') (hfc : Continuous f)
+    (hf : ∀ g x, f (ρ g x) = ρ' g (f x)) {γ : G F Ω → V} (h1 : γ ∈ Z1 ρ) (h2 : Af.IsBK l ρ γ) :
+    (fun g => f (γ g)) ∈ Z1 ρ' ∧ Af.IsBK l ρ' (fun g => f (γ g)) := by
+  refine ⟨⟨hfc.comp h1.1, fun g h => by simp only [h1.2 g h, map_add, hf]⟩, fun w hw => ?_, fun τ => ?_⟩
+  · obtain ⟨A, hA, x, hx⟩ := h2.away w hw
+    exact ⟨A, hA, f x, fun s hs => by simp only [hx s hs, map_sub, hf]⟩
+  · obtain ⟨j, hj, ⟨hc, hcc⟩, x, hx⟩ := h2.above τ
+    refine ⟨j, hj, ⟨hfc.comp hc, fun g h => ?_⟩, LinearMap.rTensor (Loc.Bcr l) (f.restrictScalars ℚ_[l]) x, fun g => ?_⟩
+    · have := congrArg f (hcc g h)
+      rw [map_add] at this
+      exact this.trans (congrArg _ (hf _ _))
+    · have key : ∀ y : V ⊗[ℚ_[l]] Loc.Bcr l, LinearMap.rTensor (Loc.Bcr l) (f.restrictScalars ℚ_[l])
+          (Loc.actC ((MonoidHom.snd _ _).comp (Af.decJ F j).subtype)
+            (ρ.comp ((MonoidHom.fst _ _).comp (Af.decJ F j).subtype)) g y) =
+          Loc.actC ((MonoidHom.snd _ _).comp (Af.decJ F j).subtype)
+            (ρ'.comp ((MonoidHom.fst _ _).comp (Af.decJ F j).subtype)) g
+            (LinearMap.rTensor (Loc.Bcr l) (f.restrictScalars ℚ_[l]) y) := by
+        intro y
+        induction y using TensorProduct.induction_on with
+        | zero => simp
+        | tmul a b => simp [Loc.actC, hf]
+        | add a b ha hb => simp only [map_add, ha, hb]
+      rw [← key, ← map_sub, ← hx g, LinearMap.rTensor_tmul]
+      rfl
+
+section Alg
+
+variable {R : Type} [CommRing R]
+
+private def IsBlockSL2Embedding (x : GG 3 R) : Prop :=
+  ∃ a b c d : R, a * d - b * c = 1 ∧ x.mat = !![a, 0, b; 0, 1, 0; c, 0, d]
+
+private theorem theta_eq (X : Matrix (Fin 3) (Fin 3) R) :
+    thetaLie X = !![-X 2 2, -X 1 2, -X 0 2; -X 2 1, -X 1 1, -X 0 1; -X 2 0, -X 1 0, -X 0 0] := by
+  ext a b
+  fin_cases a <;> fin_cases b <;>
+    simp [thetaLie, Matrix.mul_apply, Fin.sum_univ_three, Jmat, Fin.rev]
+
+private theorem conj_eq (a b c d : R) (Y : Matrix (Fin 3) (Fin 3) R) :
+    !![a, 0, b; 0, 1, 0; c, 0, d] * Y * !![d, 0, -b; 0, 1, 0; -c, 0, a] =
+    !![(a * Y 0 0 + b * Y 2 0) * d - (a * Y 0 2 + b * Y 2 2) * c, a * Y 0 1 + b * Y 2 1,
+        -(a * Y 0 0 + b * Y 2 0) * b + (a * Y 0 2 + b * Y 2 2) * a;
+      Y 1 0 * d - Y 1 2 * c, Y 1 1, -Y 1 0 * b + Y 1 2 * a;
+      (c * Y 0 0 + d * Y 2 0) * d - (c * Y 0 2 + d * Y 2 2) * c, c * Y 0 1 + d * Y 2 1,
+        -(c * Y 0 0 + d * Y 2 0) * b + (c * Y 0 2 + d * Y 2 2) * a] := by
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_three]
+  fin_cases i <;> fin_cases j <;> simp <;> ring
+
+private theorem ad_eq {x : GG 3 R} {a b c d : R} (h : a * d - b * c = 1)
+    (hx : x.mat = !![a, 0, b; 0, 1, 0; c, 0, d]) (X : Matrix (Fin 3) (Fin 3) R) :
+    x.adFun X = !![a, 0, b; 0, 1, 0; c, 0, d] * (if x.right = 1 then X else thetaLie X) *
+      !![d, 0, -b; 0, 1, 0; -c, 0, a] := by
+  have : ((x.left⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) = !![d, 0, -b; 0, 1, 0; -c, 0, a] := by
+    apply Units.inv_eq_of_mul_eq_one_right
+    change x.mat * _ = 1
+    rw [hx]
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three] <;>
+      first | ring1 | linear_combination h
+  rw [GG.adFun, this, hx]
+
+private def pA : Matrix (Fin 3) (Fin 3) R →ₗ[R] Matrix (Fin 2) (Fin 2) R where
+  toFun X := !![X 0 0, X 0 2; X 2 0, X 2 2]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp
+
+private def sA : Matrix (Fin 2) (Fin 2) R →ₗ[R] Matrix (Fin 3) (Fin 3) R where
+  toFun Y := !![Y 0 0, 0, Y 0 1; 0, 0, 0; Y 1 0, 0, Y 1 1]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp
+
+private def pB (t : R) : Matrix (Fin 3) (Fin 3) R →ₗ[R] (Fin 2 → R) where
+  toFun X := ![X 0 1 + t * X 1 2, X 2 1 - t * X 1 0]
+  map_add' X Y := by ext i; fin_cases i <;> simp <;> ring
+  map_smul' a X := by ext i; fin_cases i <;> simp <;> ring
+
+private def sB (t : R) : (Fin 2 → R) →ₗ[R] Matrix (Fin 3) (Fin 3) R where
+  toFun v := !![0, v 0, 0; -(t * v 1), 0, t * v 0; 0, v 1, 0]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp <;> ring
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp <;> ring
+
+private def pC : Matrix (Fin 3) (Fin 3) R →ₗ[R] Matrix (Fin 3) (Fin 3) R where
+  toFun X := !![0, 0, 0; 0, X 1 1, 0; 0, 0, 0]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp
+
+private theorem decomp (u : R) (hu : 2 * u = 1) (X : Matrix (Fin 3) (Fin 3) R) :
+    X = sA (pA X) + u • sB 1 (pB 1 X) + u • sB (-1) (pB (-1) X) + pC (pC X) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [sA, pA, sB, pB, pC]
+  · linear_combination (-X 0 1) * hu
+  · linear_combination (-X 1 0) * hu
+  · linear_combination (-X 1 2) * hu
+  · linear_combination (-X 2 1) * hu
+
+private theorem pA_sA (Y : Matrix (Fin 2) (Fin 2) R) : pA (sA Y) = Y := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [sA, pA]
+
+private theorem ad_sA {x : GG 3 R} (hx : IsBlockSL2Embedding x) (Y : Matrix (Fin 2) (Fin 2) R) :
+    sA (pA (x.adFun (sA Y))) = x.adFun (sA Y) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [sA, pA]
+
+private theorem pA_ad {x : GG 3 R} (hx : IsBlockSL2Embedding x) (X : Matrix (Fin 3) (Fin 3) R) :
+    pA (x.adFun X) = pA (x.adFun (sA (pA X))) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, ad_eq h hx, theta_eq, theta_eq, conj_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [sA, pA]
+
+private def wOf (x : GG 3 R) : Matrix (Fin 2) (Fin 2) R :=
+  if x.right = 1 then corner x.mat else corner x.mat * Matrix.diagonal ![-1, 1]
+
+private theorem wOf_eq {x : GG 3 R} {a b c d : R} (hx : x.mat = !![a, 0, b; 0, 1, 0; c, 0, d]) :
+    wOf x = if x.right = 1 then !![a, b; c, d] else !![-a, b; -c, d] := by
+  have : corner x.mat = !![a, b; c, d] := by
+    rw [hx]
+    ext i j
+    fin_cases i <;> fin_cases j <;> rfl
+  rw [wOf, this]
+  split_ifs
+  · rfl
+  · ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal]
+
+private theorem pB_ad {x : GG 3 R} (hx : IsBlockSL2Embedding x) (t : R) (ht : t * t = 1) (X : Matrix (Fin 3) (Fin 3) R) :
+    pB t (x.adFun X) = ((if x.right = 1 then 1 else t) • wOf x) *ᵥ pB t X := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq, wOf_eq hx]
+  ext i
+  split_ifs <;> fin_cases i <;>
+    simp [pB, Matrix.mulVec, dotProduct, Fin.sum_univ_two] <;>
+    first | ring1 | linear_combination (a * X 1 2 + b * X 1 0) * ht | linear_combination (c * X 1 2 + d * X 1 0) * ht
+
+private theorem ad_sB {x : GG 3 R} (hx : IsBlockSL2Embedding x) (t : R) (ht : t * t = 1) (v : Fin 2 → R) :
+    sB t (((if x.right = 1 then 1 else t) • wOf x) *ᵥ v) = x.adFun (sB t v) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq, wOf_eq hx]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;>
+    simp [sB, Matrix.mulVec, dotProduct, Fin.sum_univ_two] <;>
+    first | ring1 | linear_combination (c * v 0 - d * v 1) * ht | linear_combination (-a * v 0 + b * v 1) * ht
+
+private theorem pC_ad {x : GG 3 R} (hx : IsBlockSL2Embedding x) (X : Matrix (Fin 3) (Fin 3) R) :
+    pC (x.adFun X) = (if x.right = 1 then 1 else -1 : R) • pC X := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [pC]
+
+private theorem ad_pC {x : GG 3 R} (hx : IsBlockSL2Embedding x) (X : Matrix (Fin 3) (Fin 3) R) :
+    x.adFun (pC X) = (if x.right = 1 then 1 else -1 : R) • pC X := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [pC]
+
+private theorem pA_ad_one {x : GG 3 R} (hx : IsBlockSL2Embedding x) (h1 : x.right = 1) (w : GL (Fin 2) R)
+    (hw : (w : Matrix (Fin 2) (Fin 2) R) = wOf x) (Y : Matrix (Fin 2) (Fin 2) R) :
+    pA (x.adFun (sA Y)) = (w : Matrix (Fin 2) (Fin 2) R) * Y * (w⁻¹ : GL (Fin 2) R) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [wOf_eq hx, if_pos h1] at hw
+  have : ((w⁻¹ : GL (Fin 2) R) : Matrix (Fin 2) (Fin 2) R) = !![d, -b; -c, a] := by
+    apply Units.inv_eq_of_mul_eq_one_right
+    rw [hw]
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two] <;>
+      first | ring1 | linear_combination h
+  rw [ad_eq h hx, if_pos h1, this, hw, conj_eq]
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_two]
+  fin_cases i <;> fin_cases j <;> simp [sA, pA] <;> ring
+
+private theorem pA_ad_c {x : GG 3 R} (hx : x.mat = 1) (h1 : x.right = -1) (Y : Matrix (Fin 2) (Fin 2) R) :
+    pA (x.adFun (sA Y)) = -(Jmat R 2 * Yᵀ * Jmat R 2) := by
+  have hx' : x.mat = !![1, 0, 0; 0, 1, 0; 0, 0, 1] := by
+    rw [hx]; ext i j; fin_cases i <;> fin_cases j <;> simp
+  rw [ad_eq (by ring) hx', if_neg (by rw [h1]; decide), theta_eq]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [sA, pA, Jmat, Fin.rev, Matrix.mul_apply, Fin.sum_univ_three, Fin.sum_univ_two]
+
+private def repA {Γ : Type} [Group Γ] (r : Γ →* GG 3 R) (hr : ∀ g, IsBlockSL2Embedding (r g)) :
+    Representation R Γ (Matrix (Fin 2) (Fin 2) R) where
+  toFun g := pA ∘ₗ adRep r g ∘ₗ sA
+  map_one' := by
+    refine LinearMap.ext fun Y => ?_
+    simp [pA_sA]
+  map_mul' g h := by
+    refine LinearMap.ext fun Y => ?_
+    change pA ((r (g * h)).adFun (sA Y)) = pA ((r g).adFun (sA (pA ((r h).adFun (sA Y)))))
+    rw [ad_sA (hr h), map_mul, GG.adFun_mul]
+
+private theorem symp_eq (w : Matrix (Fin 2) (Fin 2) R) :
+    wᵀ * !![0, 1; -1, 0] * w = w.det • !![0, 1; -1, 0] := by
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two]
+  fin_cases i <;> fin_cases j <;> simp <;> ring
+
+private theorem pair_eq (w : Matrix (Fin 2) (Fin 2) R) :
+    wᵀ * Jmat R 2 * (!![-1, 0; 0, 1] * w * !![-1, 0; 0, 1]) = w.det • Jmat R 2 := by
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two]
+  fin_cases i <;> fin_cases j <;> simp [Jmat, Fin.rev] <;> ring
+
+private theorem isBlock_reducible_three_dim {Γ : Type} [Group Γ] (η : Γ →* ℤˣ) (Ψ : Γ →* Rˣ) (g : Γ) : IsBlockSL2Embedding (r0 η Ψ g) := by
+  refine ⟨(Ψ g : R), 0, 0, ((Ψ g)⁻¹ : Rˣ), by simp, ?_⟩
+  rw [GG.mat, unitaryThreeReflection_left, tor_val]
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [wt1]
+
+private theorem pC_mem (X : Matrix (Fin 3) (Fin 3) R) : pC X ∈ gw R 0 := by
+  intro a b hab
+  fin_cases a <;> fin_cases b <;> first | rfl | exact absurd (by decide) hab
+
+variable [TopologicalSpace R] [IsTopologicalRing R]
+
+omit [IsTopologicalRing R] in
+private theorem cont_pA : Continuous (pA : Matrix (Fin 3) (Fin 3) R → _) := by
+  refine continuous_matrix fun i j => ?_
+  fin_cases i <;> fin_cases j <;> exact continuous_id.matrix_elem _ _
+
+private theorem cont_pB (t : R) : Continuous (pB t) := by
+  refine continuous_pi fun i => ?_
+  fin_cases i
+  · exact (continuous_id.matrix_elem 0 1).add (continuous_const.mul (continuous_id.matrix_elem 1 2))
+  · exact (continuous_id.matrix_elem 2 1).sub (continuous_const.mul (continuous_id.matrix_elem 1 0))
+
+omit [IsTopologicalRing R] in
+private theorem cont_pC : Continuous (pC : Matrix (Fin 3) (Fin 3) R → _) := by
+  refine continuous_matrix fun i j => ?_
+  fin_cases i <;> fin_cases j <;> first | exact continuous_const | exact continuous_id.matrix_elem 1 1
+
+end Alg
+
+end UpperTheory.V.U3.ReducibleThreeDim
+
+open UpperTheory.V.U3.ReducibleThreeDim in
+theorem UpperTheory.V.U3.blochKatoSelmer_adRep_vanishes_of_typeII_modular :
+    Inp → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) {U : D.ULoc} {g₁ : G ℚ Ω}, D.Marked g₁ → ∀ {r : G ℚ Ω →* GG 3 (PadicAlgCl l)} (h : D.IsPt U g₁ r), ∀ (ι : Qbar l ≃+* ℂ),
+      TypeII D.η r → (∀ W : G ℚ Ω →* GL (Fin 2) (PadicAlgCl l), D.IsExt r W → D.IsModular ι W) → Af.BlochKatoSelmerVanishes l (adRep r) := by
+  intro inp Ω _ _ _ K _ _ _ l _ c N _ e ψ D U g₁ hm r h ι hII hmod
+  obtain ⟨hcc, hηc, -, hlc, -, -, -, hCM, -⟩ := dat_facts D
+  obtain ⟨h11, hdet, W, hext, hWc, -, hW, hWd⟩ := typeII_facts inp.toCohInp D hm h hII
+  have hirr := typeII_irr_cyc inp.toCohInp D hm h hII W hext
+  obtain ⟨f, hf⟩ := hmod W hext
+  have hW' : ∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) = wOf (r g) := hW
+  have hblk0 : ∀ g ∈ D.η.ker, IsBlockSL2Embedding (r g) := by
+    intro g hg
+    refine ⟨(r g).mat 0 0, (r g).mat 0 2, (r g).mat 2 0, (r g).mat 2 2, ?_, ?_⟩
+    · have := hdet g hg
+      rw [Matrix.det_fin_two] at this
+      exact this
+    · ext i j
+      fin_cases i <;> fin_cases j <;> first
+        | rfl
+        | exact h11 g hg
+        | exact hII.1 g hg _ _ (by decide)
+  have hblk : ∀ g, IsBlockSL2Embedding (r g) := by
+    intro g
+    rcases Int.units_eq_one_or (D.η g) with hg | hg
+    · exact hblk0 g hg
+    · have hk : D.η (g * D.cc⁻¹) = 1 := by rw [map_mul, map_inv, hg, hηc, mul_inv_cancel]
+      have e1 : r g = r (g * D.cc⁻¹) * r D.cc := by rw [← map_mul, inv_mul_cancel_right]
+      have hr : (r (g * D.cc⁻¹)).right = 1 := (h.mult _).trans hk
+      have e2 : (r g).mat = (r (g * D.cc⁻¹)).mat := by
+        have hrc := h.norm.atc
+        rw [e1]
+        simp only [GG.mat] at hrc ⊢
+        rw [SemidirectProduct.mul_left, hr, sgnAct_one, Units.val_mul, hrc, Matrix.mul_one]
+      obtain ⟨a, b, c, d, h1, h2⟩ := hblk0 _ hk
+      exact ⟨a, b, c, d, h1, e2.trans h2⟩
+  let θ : G ℚ Ω →* (PadicAlgCl l)ˣ := (Units.map (Int.castRingHom (PadicAlgCl l)).toMonoidHom).comp D.η
+  have hθ0 : ∀ g, (θ g : PadicAlgCl l) = ((D.η g : ℤˣ) : ℤ) := fun g => rfl
+  have hθ : ∀ g, (θ g : PadicAlgCl l) = if (r g).right = 1 then 1 else -1 := by
+    intro g
+    rw [hθ0, h.mult g]
+    rcases Int.units_eq_one_or (D.η g) with hg | hg <;> simp [hg]
+  obtain ⟨M, hM, hMk⟩ := CF.kwAbs Ω D.η.ker (hlc.isOpen_fiber 1) (Abelianization.commutator_subset_ker D.η)
+  have hθM : Af.KillsMu M θ := by
+    intro s hs
+    have : D.η s = 1 := hMk s hs
+    simp only [θ, MonoidHom.comp_apply, this, map_one]
+  have hB1 := inp.kato l D.gd.l_odd Ω ι e D.gd.e_pos f W hWc hf 1 1 le_rfl (fun _ _ => rfl)
+  have hB2 := inp.kato l D.gd.l_odd Ω ι e D.gd.e_pos f W hWc hf M θ hM hθM
+  haveI : IsAlgClosure K Ω := by
+    haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
+    haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
+    exact ⟨inferInstance, Algebra.IsAlgebraic.tower_top (K := ℚ) K⟩
+  have hker : ∀ s : G K Ω, D.η (s.restrictScalars ℚ) = 1 := fun s => by
+    have : galEmb ℚ K Ω s ∈ D.η.ker := D.η_ker ▸ galEmb_mem ℚ K Ω s
+    exact this
+  have hrc : (r D.cc).right = -1 := (h.mult _).trans hηc
+  have hWcc : (W D.cc : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) = !![-1, 0; 0, 1] := by
+    have hx' : (r D.cc).mat = !![1, 0, 0; 0, 1, 0; 0, 0, 1] := by
+      rw [h.norm.atc]; ext i j; fin_cases i <;> fin_cases j <;> simp
+    rw [hW', wOf_eq hx', if_neg (by rw [hrc]; decide), neg_zero]
+  have hA : Af.BlochKatoSelmerVanishes l (repA r hblk) := by
+    have he := D.gd.e_pos
+    refine inp.adQ K D.gd.quad 2 le_rfl l Ω ι W 0 θ hWc (inp.newAut _ (by omega) f l Ω ι W _ hf)
+      ⟨M, θ, hM, hθM, by simp⟩ ?_ hirr _ ⟨D.cc, Jgl _ 2, D.conj, fun s s' hs => ?_, fun s X => ?_, fun X => ?_⟩
+    · refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero !![0, 1; -1, 0] (by simp), fun s => ?_⟩
+      rw [hθ0, ← hWd s]
+      exact symp_eq _
+    · have e1 : W (s'.restrictScalars ℚ) = W D.cc * W (s.restrictScalars ℚ) * W D.cc := by
+        rw [hs, inv_eq_of_mul_eq_one_right hcc, map_mul, map_mul]
+      have e2 := hWd (s.restrictScalars ℚ)
+      change (W (s.restrictScalars ℚ) : Matrix (Fin 2) (Fin 2) (PadicAlgCl l))ᵀ * Jmat _ 2 *
+        (W (s'.restrictScalars ℚ) : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) =
+          (θ (s.restrictScalars ℚ) : PadicAlgCl l) • Jmat _ 2
+      rw [e1, hθ0, ← e2, Units.val_mul, Units.val_mul, hWcc]
+      exact pair_eq _
+    · exact pA_ad_one (hblk _) ((h.mult _).trans (hker s)) _ (hW' _) X
+    · exact pA_ad_c h.norm.atc hrc X
+  intro γ hγ hbk
+
+  have eA : ∀ g X, pA (adRep r g X) = repA r hblk g (pA X) := fun g X => pA_ad (hblk g) X
+  have eA' : ∀ g Y, sA (repA r hblk g Y) = adRep r g (sA Y) := fun g Y => ad_sA (hblk g) Y
+  have t1 : ∀ g v, Loc.colRep (Af.tw W 1) g v =
+      ((if (r g).right = 1 then 1 else 1 : PadicAlgCl l) • wOf (r g)) *ᵥ v := fun g v => by
+    rw [← hW', ite_self]
+    exact congrArg (· *ᵥ v) (Af.tw_val W 1 g)
+  have t2 : ∀ g v, Loc.colRep (Af.tw W θ) g v =
+      ((if (r g).right = 1 then 1 else -1 : PadicAlgCl l) • wOf (r g)) *ᵥ v := fun g v => by
+    rw [← hW', ← hθ]
+    exact congrArg (· *ᵥ v) (Af.tw_val W θ g)
+  have eB1 : ∀ g X, pB 1 (adRep r g X) = Loc.colRep (Af.tw W 1) g (pB 1 X) := fun g X => by
+    rw [t1]; exact pB_ad (hblk g) 1 (by ring) X
+  have eB1' : ∀ g v, sB 1 (Loc.colRep (Af.tw W 1) g v) = adRep r g (sB 1 v) := fun g v => by
+    rw [t1]; exact ad_sB (hblk g) 1 (by ring) v
+  have eB2 : ∀ g X, pB (-1) (adRep r g X) = Loc.colRep (Af.tw W θ) g (pB (-1) X) := fun g X => by
+    rw [t2]; exact pB_ad (hblk g) (-1) (by ring) X
+  have eB2' : ∀ g v, sB (-1) (Loc.colRep (Af.tw W θ) g v) = adRep r g (sB (-1) v) := fun g v => by
+    rw [t2]; exact ad_sB (hblk g) (-1) (by ring) v
+  have hblkz : ∀ g, IsBlockSL2Embedding (r0 D.η D.ΨQ g) := fun g => isBlock_reducible_three_dim _ _ g
+  have eC : ∀ g X, pC (adRep r g X) = adRep (r0 D.η D.ΨQ) g (pC X) := fun g X => by
+    refine (pC_ad (hblk g) X).trans (Eq.trans ?_ (ad_pC (hblkz g) X).symm)
+    rw [h.mult g, unitaryThreeReflection_right]
+  have eC' : ∀ g X, pC (adRep (r0 D.η D.ΨQ) g X) = adRep r g (pC X) := fun g X => by
+    refine (pC_ad (hblkz g) X).trans (Eq.trans ?_ (ad_pC (hblk g) X).symm)
+    rw [h.mult g, unitaryThreeReflection_right]
+  obtain ⟨zA, bA⟩ := bk_map (adRep r) (repA r hblk) pA cont_pA eA hγ hbk
+  obtain ⟨z1, b1⟩ := bk_map (adRep r) _ (pB 1) (cont_pB 1) eB1 hγ hbk
+  obtain ⟨z2, b2⟩ := bk_map (adRep r) _ (pB (-1)) (cont_pB (-1)) eB2 hγ hbk
+  obtain ⟨zC, bC⟩ := bk_map (adRep r) _ pC cont_pC eC hγ hbk
+  obtain ⟨xA, hxA⟩ := (mem_coboundaries1 _ _).1 (hA _ zA bA)
+  obtain ⟨x1, hx1⟩ := (mem_coboundaries1 _ _).1 (hB1 _ z1 b1)
+  obtain ⟨x2, hx2⟩ := (mem_coboundaries1 _ _).1 (hB2 _ z2 b2)
+  obtain ⟨xC, hxC⟩ := (mem_coboundaries1 _ _).1
+    (bloch_kato_nonpositive_weight inp.toCohInp D 0 le_rfl _ zC (fun g => pC_mem (γ g)) bC)
+  refine (mem_coboundaries1 _ _).2 ⟨sA xA + (2⁻¹ : PadicAlgCl l) • sB 1 x1 + (2⁻¹ : PadicAlgCl l) • sB (-1) x2 + pC xC, fun g => ?_⟩
+  rw [decomp (2⁻¹ : PadicAlgCl l) (by norm_num) (γ g), hxA g, hx1 g, hx2 g, hxC g]
+  simp only [map_sub, map_add, map_smul, eA', eB1', eB2', eC', smul_sub]
+  abel
+
+
+[KTR_SRC_PRIMITIVE_MAPS] Continuous equivariant maps preserve every IsBK witness
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/KatoQuadraticCharacters/ReducibleThreeDim.lean#L17-L55
+private theorem bk_map {F Ω : Type} [Field F] [NumberField F] [Field Ω] [Algebra F Ω] {l : ℕ} [Fact l.Prime]
+    {C : Type} [CommRing C] [Algebra ℚ_[l] C]
+    {V : Type} [AddCommGroup V] [Module C V] [Module ℚ_[l] V] [IsScalarTower ℚ_[l] C V] [TopologicalSpace V]
+    [IsTopologicalAddGroup V] [ContinuousConstSMul C V]
+    {V' : Type} [AddCommGroup V'] [Module C V'] [Module ℚ_[l] V'] [IsScalarTower ℚ_[l] C V'] [TopologicalSpace V']
+    [IsTopologicalAddGroup V'] [ContinuousConstSMul C V']
+    (ρ : Representation C (G F Ω) V) (ρ' : Representation C (G F Ω) V') (f : V →ₗ[C] V') (hfc : Continuous f)
+    (hf : ∀ g x, f (ρ g x) = ρ' g (f x)) {γ : G F Ω → V} (h1 : γ ∈ Z1 ρ) (h2 : Af.IsBK l ρ γ) :
+    (fun g => f (γ g)) ∈ Z1 ρ' ∧ Af.IsBK l ρ' (fun g => f (γ g)) := by
+  refine ⟨⟨hfc.comp h1.1, fun g h => by simp only [h1.2 g h, map_add, hf]⟩, fun w hw => ?_, fun τ => ?_⟩
+  · obtain ⟨A, hA, x, hx⟩ := h2.away w hw
+    exact ⟨A, hA, f x, fun s hs => by simp only [hx s hs, map_sub, hf]⟩
+  · obtain ⟨j, hj, ⟨hc, hcc⟩, x, hx⟩ := h2.above τ
+    refine ⟨j, hj, ⟨hfc.comp hc, fun g h => ?_⟩, LinearMap.rTensor (Loc.Bcr l) (f.restrictScalars ℚ_[l]) x, fun g => ?_⟩
+    · have := congrArg f (hcc g h)
+      rw [map_add] at this
+      exact this.trans (congrArg _ (hf _ _))
+    · have key : ∀ y : V ⊗[ℚ_[l]] Loc.Bcr l, LinearMap.rTensor (Loc.Bcr l) (f.restrictScalars ℚ_[l])
+          (Loc.actC ((MonoidHom.snd _ _).comp (Af.decJ F j).subtype)
+            (ρ.comp ((MonoidHom.fst _ _).comp (Af.decJ F j).subtype)) g y) =
+          Loc.actC ((MonoidHom.snd _ _).comp (Af.decJ F j).subtype)
+            (ρ'.comp ((MonoidHom.fst _ _).comp (Af.decJ F j).subtype)) g
+            (LinearMap.rTensor (Loc.Bcr l) (f.restrictScalars ℚ_[l]) y) := by
+        intro y
+        induction y using TensorProduct.induction_on with
+        | zero => simp
+        | tmul a b => simp [Loc.actC, hf]
+        | add a b ha hb => simp only [map_add, ha, hb]
+      rw [← key, ← map_sub, ← hx g, LinearMap.rTensor_tmul]
+      rfl
+
+section Alg
+
+variable {R : Type} [CommRing R]
+
+private def IsBlockSL2Embedding (x : GG 3 R) : Prop :=
+  ∃ a b c d : R, a * d - b * c = 1 ∧ x.mat = !![a, 0, b; 0, 1, 0; c, 0, d]
+
+private theorem theta_eq (X : Matrix (Fin 3) (Fin 3) R) :
+
+
+[KTR_SRC_DECOMPOSITION] Exact original pA,sA,pB,sB,pC and nine-coordinate action
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/KatoQuadraticCharacters/ReducibleThreeDim.lean#L57-L264
+  ext a b
+  fin_cases a <;> fin_cases b <;>
+    simp [thetaLie, Matrix.mul_apply, Fin.sum_univ_three, Jmat, Fin.rev]
+
+private theorem conj_eq (a b c d : R) (Y : Matrix (Fin 3) (Fin 3) R) :
+    !![a, 0, b; 0, 1, 0; c, 0, d] * Y * !![d, 0, -b; 0, 1, 0; -c, 0, a] =
+    !![(a * Y 0 0 + b * Y 2 0) * d - (a * Y 0 2 + b * Y 2 2) * c, a * Y 0 1 + b * Y 2 1,
+        -(a * Y 0 0 + b * Y 2 0) * b + (a * Y 0 2 + b * Y 2 2) * a;
+      Y 1 0 * d - Y 1 2 * c, Y 1 1, -Y 1 0 * b + Y 1 2 * a;
+      (c * Y 0 0 + d * Y 2 0) * d - (c * Y 0 2 + d * Y 2 2) * c, c * Y 0 1 + d * Y 2 1,
+        -(c * Y 0 0 + d * Y 2 0) * b + (c * Y 0 2 + d * Y 2 2) * a] := by
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_three]
+  fin_cases i <;> fin_cases j <;> simp <;> ring
+
+private theorem ad_eq {x : GG 3 R} {a b c d : R} (h : a * d - b * c = 1)
+    (hx : x.mat = !![a, 0, b; 0, 1, 0; c, 0, d]) (X : Matrix (Fin 3) (Fin 3) R) :
+    x.adFun X = !![a, 0, b; 0, 1, 0; c, 0, d] * (if x.right = 1 then X else thetaLie X) *
+      !![d, 0, -b; 0, 1, 0; -c, 0, a] := by
+  have : ((x.left⁻¹ : GL (Fin 3) R) : Matrix (Fin 3) (Fin 3) R) = !![d, 0, -b; 0, 1, 0; -c, 0, a] := by
+    apply Units.inv_eq_of_mul_eq_one_right
+    change x.mat * _ = 1
+    rw [hx]
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_three] <;>
+      first | ring1 | linear_combination h
+  rw [GG.adFun, this, hx]
+
+private def pA : Matrix (Fin 3) (Fin 3) R →ₗ[R] Matrix (Fin 2) (Fin 2) R where
+  toFun X := !![X 0 0, X 0 2; X 2 0, X 2 2]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp
+
+private def sA : Matrix (Fin 2) (Fin 2) R →ₗ[R] Matrix (Fin 3) (Fin 3) R where
+  toFun Y := !![Y 0 0, 0, Y 0 1; 0, 0, 0; Y 1 0, 0, Y 1 1]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp
+
+private def pB (t : R) : Matrix (Fin 3) (Fin 3) R →ₗ[R] (Fin 2 → R) where
+  toFun X := ![X 0 1 + t * X 1 2, X 2 1 - t * X 1 0]
+  map_add' X Y := by ext i; fin_cases i <;> simp <;> ring
+  map_smul' a X := by ext i; fin_cases i <;> simp <;> ring
+
+private def sB (t : R) : (Fin 2 → R) →ₗ[R] Matrix (Fin 3) (Fin 3) R where
+  toFun v := !![0, v 0, 0; -(t * v 1), 0, t * v 0; 0, v 1, 0]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp <;> ring
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp <;> ring
+
+private def pC : Matrix (Fin 3) (Fin 3) R →ₗ[R] Matrix (Fin 3) (Fin 3) R where
+  toFun X := !![0, 0, 0; 0, X 1 1, 0; 0, 0, 0]
+  map_add' X Y := by ext i j; fin_cases i <;> fin_cases j <;> simp
+  map_smul' a X := by ext i j; fin_cases i <;> fin_cases j <;> simp
+
+private theorem decomp (u : R) (hu : 2 * u = 1) (X : Matrix (Fin 3) (Fin 3) R) :
+    X = sA (pA X) + u • sB 1 (pB 1 X) + u • sB (-1) (pB (-1) X) + pC (pC X) := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [sA, pA, sB, pB, pC]
+  · linear_combination (-X 0 1) * hu
+  · linear_combination (-X 1 0) * hu
+  · linear_combination (-X 1 2) * hu
+  · linear_combination (-X 2 1) * hu
+
+private theorem pA_sA (Y : Matrix (Fin 2) (Fin 2) R) : pA (sA Y) = Y := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [sA, pA]
+
+private theorem ad_sA {x : GG 3 R} (hx : IsBlockSL2Embedding x) (Y : Matrix (Fin 2) (Fin 2) R) :
+    sA (pA (x.adFun (sA Y))) = x.adFun (sA Y) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [sA, pA]
+
+private theorem pA_ad {x : GG 3 R} (hx : IsBlockSL2Embedding x) (X : Matrix (Fin 3) (Fin 3) R) :
+    pA (x.adFun X) = pA (x.adFun (sA (pA X))) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, ad_eq h hx, theta_eq, theta_eq, conj_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [sA, pA]
+
+private def wOf (x : GG 3 R) : Matrix (Fin 2) (Fin 2) R :=
+  if x.right = 1 then corner x.mat else corner x.mat * Matrix.diagonal ![-1, 1]
+
+private theorem wOf_eq {x : GG 3 R} {a b c d : R} (hx : x.mat = !![a, 0, b; 0, 1, 0; c, 0, d]) :
+    wOf x = if x.right = 1 then !![a, b; c, d] else !![-a, b; -c, d] := by
+  have : corner x.mat = !![a, b; c, d] := by
+    rw [hx]
+    ext i j
+    fin_cases i <;> fin_cases j <;> rfl
+  rw [wOf, this]
+  split_ifs
+  · rfl
+  · ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two, Matrix.diagonal]
+
+private theorem pB_ad {x : GG 3 R} (hx : IsBlockSL2Embedding x) (t : R) (ht : t * t = 1) (X : Matrix (Fin 3) (Fin 3) R) :
+    pB t (x.adFun X) = ((if x.right = 1 then 1 else t) • wOf x) *ᵥ pB t X := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq, wOf_eq hx]
+  ext i
+  split_ifs <;> fin_cases i <;>
+    simp [pB, Matrix.mulVec, dotProduct, Fin.sum_univ_two] <;>
+    first | ring1 | linear_combination (a * X 1 2 + b * X 1 0) * ht | linear_combination (c * X 1 2 + d * X 1 0) * ht
+
+private theorem ad_sB {x : GG 3 R} (hx : IsBlockSL2Embedding x) (t : R) (ht : t * t = 1) (v : Fin 2 → R) :
+    sB t (((if x.right = 1 then 1 else t) • wOf x) *ᵥ v) = x.adFun (sB t v) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq, wOf_eq hx]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;>
+    simp [sB, Matrix.mulVec, dotProduct, Fin.sum_univ_two] <;>
+    first | ring1 | linear_combination (c * v 0 - d * v 1) * ht | linear_combination (-a * v 0 + b * v 1) * ht
+
+private theorem pC_ad {x : GG 3 R} (hx : IsBlockSL2Embedding x) (X : Matrix (Fin 3) (Fin 3) R) :
+    pC (x.adFun X) = (if x.right = 1 then 1 else -1 : R) • pC X := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [pC]
+
+private theorem ad_pC {x : GG 3 R} (hx : IsBlockSL2Embedding x) (X : Matrix (Fin 3) (Fin 3) R) :
+    x.adFun (pC X) = (if x.right = 1 then 1 else -1 : R) • pC X := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [ad_eq h hx, theta_eq, conj_eq]
+  ext i j
+  split_ifs <;> fin_cases i <;> fin_cases j <;> simp [pC]
+
+private theorem pA_ad_one {x : GG 3 R} (hx : IsBlockSL2Embedding x) (h1 : x.right = 1) (w : GL (Fin 2) R)
+    (hw : (w : Matrix (Fin 2) (Fin 2) R) = wOf x) (Y : Matrix (Fin 2) (Fin 2) R) :
+    pA (x.adFun (sA Y)) = (w : Matrix (Fin 2) (Fin 2) R) * Y * (w⁻¹ : GL (Fin 2) R) := by
+  obtain ⟨a, b, c, d, h, hx⟩ := hx
+  rw [wOf_eq hx, if_pos h1] at hw
+  have : ((w⁻¹ : GL (Fin 2) R) : Matrix (Fin 2) (Fin 2) R) = !![d, -b; -c, a] := by
+    apply Units.inv_eq_of_mul_eq_one_right
+    rw [hw]
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp [Matrix.mul_apply, Fin.sum_univ_two] <;>
+      first | ring1 | linear_combination h
+  rw [ad_eq h hx, if_pos h1, this, hw, conj_eq]
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_two]
+  fin_cases i <;> fin_cases j <;> simp [sA, pA] <;> ring
+
+private theorem pA_ad_c {x : GG 3 R} (hx : x.mat = 1) (h1 : x.right = -1) (Y : Matrix (Fin 2) (Fin 2) R) :
+    pA (x.adFun (sA Y)) = -(Jmat R 2 * Yᵀ * Jmat R 2) := by
+  have hx' : x.mat = !![1, 0, 0; 0, 1, 0; 0, 0, 1] := by
+    rw [hx]; ext i j; fin_cases i <;> fin_cases j <;> simp
+  rw [ad_eq (by ring) hx', if_neg (by rw [h1]; decide), theta_eq]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [sA, pA, Jmat, Fin.rev, Matrix.mul_apply, Fin.sum_univ_three, Fin.sum_univ_two]
+
+private def repA {Γ : Type} [Group Γ] (r : Γ →* GG 3 R) (hr : ∀ g, IsBlockSL2Embedding (r g)) :
+    Representation R Γ (Matrix (Fin 2) (Fin 2) R) where
+  toFun g := pA ∘ₗ adRep r g ∘ₗ sA
+  map_one' := by
+    refine LinearMap.ext fun Y => ?_
+    simp [pA_sA]
+  map_mul' g h := by
+    refine LinearMap.ext fun Y => ?_
+    change pA ((r (g * h)).adFun (sA Y)) = pA ((r g).adFun (sA (pA ((r h).adFun (sA Y)))))
+    rw [ad_sA (hr h), map_mul, GG.adFun_mul]
+
+private theorem symp_eq (w : Matrix (Fin 2) (Fin 2) R) :
+    wᵀ * !![0, 1; -1, 0] * w = w.det • !![0, 1; -1, 0] := by
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two]
+  fin_cases i <;> fin_cases j <;> simp <;> ring
+
+private theorem pair_eq (w : Matrix (Fin 2) (Fin 2) R) :
+    wᵀ * Jmat R 2 * (!![-1, 0; 0, 1] * w * !![-1, 0; 0, 1]) = w.det • Jmat R 2 := by
+  ext i j
+  simp only [Matrix.mul_apply, Fin.sum_univ_two, Matrix.det_fin_two]
+  fin_cases i <;> fin_cases j <;> simp [Jmat, Fin.rev] <;> ring
+
+private theorem isBlock_reducible_three_dim {Γ : Type} [Group Γ] (η : Γ →* ℤˣ) (Ψ : Γ →* Rˣ) (g : Γ) : IsBlockSL2Embedding (r0 η Ψ g) := by
+  refine ⟨(Ψ g : R), 0, 0, ((Ψ g)⁻¹ : Rˣ), by simp, ?_⟩
+  rw [GG.mat, unitaryThreeReflection_left, tor_val]
+  ext i j
+  fin_cases i <;> fin_cases j <;> simp [wt1]
+
+private theorem pC_mem (X : Matrix (Fin 3) (Fin 3) R) : pC X ∈ gw R 0 := by
+  intro a b hab
+  fin_cases a <;> fin_cases b <;> first | rfl | exact absurd (by decide) hab
+
+variable [TopologicalSpace R] [IsTopologicalRing R]
+
+omit [IsTopologicalRing R] in
+private theorem cont_pA : Continuous (pA : Matrix (Fin 3) (Fin 3) R → _) := by
+  refine continuous_matrix fun i j => ?_
+  fin_cases i <;> fin_cases j <;> exact continuous_id.matrix_elem _ _
+
+private theorem cont_pB (t : R) : Continuous (pB t) := by
+  refine continuous_pi fun i => ?_
+  fin_cases i
+  · exact (continuous_id.matrix_elem 0 1).add (continuous_const.mul (continuous_id.matrix_elem 1 2))
+  · exact (continuous_id.matrix_elem 2 1).sub (continuous_const.mul (continuous_id.matrix_elem 1 0))
+
+omit [IsTopologicalRing R] in
+private theorem cont_pC : Continuous (pC : Matrix (Fin 3) (Fin 3) R → _) := by
+  refine continuous_matrix fun i j => ?_
+  fin_cases i <;> fin_cases j <;> first | exact continuous_const | exact continuous_id.matrix_elem 1 1
+
+end Alg
+
+end UpperTheory.V.Z.Kato.ReducibleThreeDim
+
+open UpperTheory.V.Z.Kato.ReducibleThreeDim in
+
+
+[KTR_SRC_RIGIDITY_PRODUCER] Original rigII_of producer and its four vanishing inputs
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/KatoQuadraticCharacters/ReducibleThreeDim.lean#L265-L378
+theorem UpperTheory.V.Z.Kato.rigII_of :
+    CohInp → Af.AdVanishQ → Af.NewformAut → UpperTheory.V.Z.Kato.KatoTwo → UpperTheory.V.Z.Kato.RigII := by
+  intro hC adQ newAut hK Ω _ _ _ K _ _ _ l _ c N _ e ψ D U g₁ hm r h ι hII hmod
+  obtain ⟨hcc, hηc, -, hlc, -, -, -, hCM, -⟩ := dat_facts D
+  obtain ⟨h11, hdet, W, hext, hWc, -, hW, hWd⟩ := typeII_facts hC D hm h hII
+  have hirr := typeII_irr_cyc hC D hm h hII W hext
+  obtain ⟨f, hf⟩ := hmod W hext
+  have hW' : ∀ g, (W g : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) = wOf (r g) := hW
+  have hblk0 : ∀ g ∈ D.η.ker, IsBlockSL2Embedding (r g) := by
+    intro g hg
+    refine ⟨(r g).mat 0 0, (r g).mat 0 2, (r g).mat 2 0, (r g).mat 2 2, ?_, ?_⟩
+    · have := hdet g hg
+      rw [Matrix.det_fin_two] at this
+      exact this
+    · ext i j
+      fin_cases i <;> fin_cases j <;> first
+        | rfl
+        | exact h11 g hg
+        | exact hII.1 g hg _ _ (by decide)
+  have hblk : ∀ g, IsBlockSL2Embedding (r g) := by
+    intro g
+    rcases Int.units_eq_one_or (D.η g) with hg | hg
+    · exact hblk0 g hg
+    · have hk : D.η (g * D.cc⁻¹) = 1 := by rw [map_mul, map_inv, hg, hηc, mul_inv_cancel]
+      have e1 : r g = r (g * D.cc⁻¹) * r D.cc := by rw [← map_mul, inv_mul_cancel_right]
+      have hr : (r (g * D.cc⁻¹)).right = 1 := (h.mult _).trans hk
+      have e2 : (r g).mat = (r (g * D.cc⁻¹)).mat := by
+        have hrc := h.norm.atc
+        rw [e1]
+        simp only [GG.mat] at hrc ⊢
+        rw [SemidirectProduct.mul_left, hr, sgnAct_one, Units.val_mul, hrc, Matrix.mul_one]
+      obtain ⟨a, b, c, d, h1, h2⟩ := hblk0 _ hk
+      exact ⟨a, b, c, d, h1, e2.trans h2⟩
+  let θ : G ℚ Ω →* (PadicAlgCl l)ˣ := (Units.map (Int.castRingHom (PadicAlgCl l)).toMonoidHom).comp D.η
+  have hθ0 : ∀ g, (θ g : PadicAlgCl l) = ((D.η g : ℤˣ) : ℤ) := fun g => rfl
+  have hθ : ∀ g, (θ g : PadicAlgCl l) = if (r g).right = 1 then 1 else -1 := by
+    intro g
+    rw [hθ0, h.mult g]
+    rcases Int.units_eq_one_or (D.η g) with hg | hg <;> simp [hg]
+  obtain ⟨M, hM, hMk⟩ := CF.kwAbs Ω D.η.ker (hlc.isOpen_fiber 1) (Abelianization.commutator_subset_ker D.η)
+  have hθM : Af.KillsMu M θ := by
+    intro s hs
+    have : D.η s = 1 := hMk s hs
+    simp only [θ, MonoidHom.comp_apply, this, map_one]
+  obtain ⟨hB1, hB2⟩ := hK l Ω K e N θ _ W (UpperTheory.V.Z.Kato.used_of hC D hm h hII W hext hWc hW hWd ι ⟨f, hf⟩) ι f hf
+  haveI : IsAlgClosure K Ω := by
+    haveI : IsAlgClosed Ω := IsAlgClosure.isAlgClosed ℚ
+    haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
+    exact ⟨inferInstance, Algebra.IsAlgebraic.tower_top (K := ℚ) K⟩
+  have hker : ∀ s : G K Ω, D.η (s.restrictScalars ℚ) = 1 := fun s => by
+    have : galEmb ℚ K Ω s ∈ D.η.ker := D.η_ker ▸ galEmb_mem ℚ K Ω s
+    exact this
+  have hrc : (r D.cc).right = -1 := (h.mult _).trans hηc
+  have hWcc : (W D.cc : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) = !![-1, 0; 0, 1] := by
+    have hx' : (r D.cc).mat = !![1, 0, 0; 0, 1, 0; 0, 0, 1] := by
+      rw [h.norm.atc]; ext i j; fin_cases i <;> fin_cases j <;> simp
+    rw [hW', wOf_eq hx', if_neg (by rw [hrc]; decide), neg_zero]
+  have hA : Af.BlochKatoSelmerVanishes l (repA r hblk) := by
+    have he := D.gd.e_pos
+    refine adQ K D.gd.quad 2 le_rfl l Ω ι W 0 θ hWc (newAut _ (by omega) f l Ω ι W _ hf)
+      ⟨M, θ, hM, hθM, by simp⟩ ?_ hirr _ ⟨D.cc, Jgl _ 2, D.conj, fun s s' hs => ?_, fun s X => ?_, fun X => ?_⟩
+    · refine ⟨Matrix.GeneralLinearGroup.mkOfDetNeZero !![0, 1; -1, 0] (by simp), fun s => ?_⟩
+      rw [hθ0, ← hWd s]
+      exact symp_eq _
+    · have e1 : W (s'.restrictScalars ℚ) = W D.cc * W (s.restrictScalars ℚ) * W D.cc := by
+        rw [hs, inv_eq_of_mul_eq_one_right hcc, map_mul, map_mul]
+      have e2 := hWd (s.restrictScalars ℚ)
+      change (W (s.restrictScalars ℚ) : Matrix (Fin 2) (Fin 2) (PadicAlgCl l))ᵀ * Jmat _ 2 *
+        (W (s'.restrictScalars ℚ) : Matrix (Fin 2) (Fin 2) (PadicAlgCl l)) =
+          (θ (s.restrictScalars ℚ) : PadicAlgCl l) • Jmat _ 2
+      rw [e1, hθ0, ← e2, Units.val_mul, Units.val_mul, hWcc]
+      exact pair_eq _
+    · exact pA_ad_one (hblk _) ((h.mult _).trans (hker s)) _ (hW' _) X
+    · exact pA_ad_c h.norm.atc hrc X
+  intro γ hγ hbk
+
+  have eA : ∀ g X, pA (adRep r g X) = repA r hblk g (pA X) := fun g X => pA_ad (hblk g) X
+  have eA' : ∀ g Y, sA (repA r hblk g Y) = adRep r g (sA Y) := fun g Y => ad_sA (hblk g) Y
+  have t1 : ∀ g v, Loc.colRep (Af.tw W 1) g v =
+      ((if (r g).right = 1 then 1 else 1 : PadicAlgCl l) • wOf (r g)) *ᵥ v := fun g v => by
+    rw [← hW', ite_self]
+    exact congrArg (· *ᵥ v) (Af.tw_val W 1 g)
+  have t2 : ∀ g v, Loc.colRep (Af.tw W θ) g v =
+      ((if (r g).right = 1 then 1 else -1 : PadicAlgCl l) • wOf (r g)) *ᵥ v := fun g v => by
+    rw [← hW', ← hθ]
+    exact congrArg (· *ᵥ v) (Af.tw_val W θ g)
+  have eB1 : ∀ g X, pB 1 (adRep r g X) = Loc.colRep (Af.tw W 1) g (pB 1 X) := fun g X => by
+    rw [t1]; exact pB_ad (hblk g) 1 (by ring) X
+  have eB1' : ∀ g v, sB 1 (Loc.colRep (Af.tw W 1) g v) = adRep r g (sB 1 v) := fun g v => by
+    rw [t1]; exact ad_sB (hblk g) 1 (by ring) v
+  have eB2 : ∀ g X, pB (-1) (adRep r g X) = Loc.colRep (Af.tw W θ) g (pB (-1) X) := fun g X => by
+    rw [t2]; exact pB_ad (hblk g) (-1) (by ring) X
+  have eB2' : ∀ g v, sB (-1) (Loc.colRep (Af.tw W θ) g v) = adRep r g (sB (-1) v) := fun g v => by
+    rw [t2]; exact ad_sB (hblk g) (-1) (by ring) v
+  have hblkz : ∀ g, IsBlockSL2Embedding (r0 D.η D.ΨQ g) := fun g => isBlock_reducible_three_dim _ _ g
+  have eC : ∀ g X, pC (adRep r g X) = adRep (r0 D.η D.ΨQ) g (pC X) := fun g X => by
+    refine (pC_ad (hblk g) X).trans (Eq.trans ?_ (ad_pC (hblkz g) X).symm)
+    rw [h.mult g, unitaryThreeReflection_right]
+  have eC' : ∀ g X, pC (adRep (r0 D.η D.ΨQ) g X) = adRep r g (pC X) := fun g X => by
+    refine (pC_ad (hblkz g) X).trans (Eq.trans ?_ (ad_pC (hblk g) X).symm)
+    rw [h.mult g, unitaryThreeReflection_right]
+  obtain ⟨zA, bA⟩ := bk_map (adRep r) (repA r hblk) pA cont_pA eA hγ hbk
+  obtain ⟨z1, b1⟩ := bk_map (adRep r) _ (pB 1) (cont_pB 1) eB1 hγ hbk
+  obtain ⟨z2, b2⟩ := bk_map (adRep r) _ (pB (-1)) (cont_pB (-1)) eB2 hγ hbk
+  obtain ⟨zC, bC⟩ := bk_map (adRep r) _ pC cont_pC eC hγ hbk
+  obtain ⟨xA, hxA⟩ := (mem_coboundaries1 _ _).1 (hA _ zA bA)
+  obtain ⟨x1, hx1⟩ := (mem_coboundaries1 _ _).1 (hB1 _ z1 b1)
+  obtain ⟨x2, hx2⟩ := (mem_coboundaries1 _ _).1 (hB2 _ z2 b2)
+  obtain ⟨xC, hxC⟩ := (mem_coboundaries1 _ _).1
+    (bloch_kato_nonpositive_weight hC D 0 le_rfl _ zC (fun g => pC_mem (γ g)) bC)
+  refine (mem_coboundaries1 _ _).2 ⟨sA xA + (2⁻¹ : PadicAlgCl l) • sB 1 x1 + (2⁻¹ : PadicAlgCl l) • sB (-1) x2 + pC xC, fun g => ?_⟩
+  rw [decomp (2⁻¹ : PadicAlgCl l) (by norm_num) (γ g), hxA g, hx1 g, hx2 g, hxC g]
+  simp only [map_sub, map_add, map_smul, eA', eB1', eB2', eC', smul_sub]
+  abel
+
+
+[KTR_SRC_SCALAR] Original scalar finite-character nonpositive-weight vanishing route
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/BlochKatoNonpositiveWeight.lean#L1-L414
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.KatoUse
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.AdRepBaseLiftApply
+import Development.AutomorphicArithmetic.AutomorphicVarieties.UnitaryThreeGroups.DatFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.LevelCohomology.FdAdjoinRange
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ExistsNeOne
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.ExistsIntBasis
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.Z1fCoef
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PadicHodgeTheory.IotaFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.ArtKer
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.KummerTheory.ToGalDict
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.SelmerTransport.Places
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.SelmerTransport.GalEmbTop
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CharacterLevelBounds.ClsFacts
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PartsConj
+import Development.AbelianVarietyTheory.Proofs.InertiaEigenvalues.PoitouTateDualityOfNormalised
+
+open NumberField IsDedekindDomain Formalism.ConjugateSelfDual ReciprocityTheory.Gal Formalism.MainNotions.N Formalism.BasicNotions Formalism.BasicNotions.Loc GlobalTheory.GalOfCusp Matrix IsLocalRing
+open UpperTheory.V UpperTheory.V.Base UpperTheory.V.HV UpperTheory.V.Alg UpperTheory.V.U3
+
+private theorem fd_adjoin_range (l : ℕ) [Fact l.Prime] {ι : Type} [Finite ι] (f : ι → PadicAlgCl l) :
+    FiniteDimensional ℚ_[l] (IntermediateField.adjoin ℚ_[l] (Set.range f)) := by
+  haveI : Finite (Set.range f) := (Set.finite_range _).to_subtype
+  exact IntermediateField.finiteDimensional_adjoin fun z _ =>
+      (Algebra.IsAlgebraic.isAlgebraic z).isIntegral
+
+private theorem char_finext (l : ℕ) [Fact l.Prime] (Γ : Type) [Group Γ] [TopologicalSpace Γ] [IsTopologicalGroup Γ]
+    [CompactSpace Γ] (ψ : Γ →* (PadicAlgCl l)ˣ) (hψ : IsOpen (ψ.ker : Set Γ)) :
+    ∃ K : IntermediateField ℚ_[l] (PadicAlgCl l), FiniteDimensional ℚ_[l] K ∧ ∀ g, (ψ g : PadicAlgCl l) ∈ K := by
+  haveI : Finite (Γ ⧸ ψ.ker) := Subgroup.quotient_finite_of_isOpen _ hψ
+  refine ⟨_, fd_adjoin_range l (fun q : Γ ⧸ ψ.ker => (ψ q.out : PadicAlgCl l)), fun g => ?_⟩
+  obtain ⟨h, hh⟩ := QuotientGroup.mk_out_eq_mul ψ.ker g
+  refine IntermediateField.subset_adjoin _ _ ⟨(g : Γ ⧸ ψ.ker), ?_⟩
+  have h1 : ψ (h : Γ) = 1 := h.2
+  simp only [hh, map_mul, h1, mul_one]
+
+open TensorProduct in
+
+private theorem desc {l : ℕ} [Fact l.Prime] {H : Type} [Group H] [TopologicalSpace H] (φ : H →* GQ l)
+    (κ : H →* (PadicAlgCl l)ˣ) (E₀ : IntermediateField ℚ_[l] (PadicAlgCl l)) [FiniteDimensional ℚ_[l] E₀]
+    (hκ : ∀ g, (κ g : PadicAlgCl l) ∈ E₀) (c : H → PadicAlgCl l) (hc : c ∈ Loc.finiteCocycles φ (Loc.chRep κ)) :
+    ∃ (E : IntermediateField ℚ_[l] (PadicAlgCl l)) (_ : FiniteDimensional ℚ_[l] E) (κ' : H →* Eˣ) (c' : H → E),
+      (∀ g, ((κ' g : E) : PadicAlgCl l) = κ g) ∧ (∀ g, (c' g : PadicAlgCl l) = c g) ∧ c' ∈ Loc.finiteCocycles φ (Loc.chRep κ') := by
+  obtain ⟨⟨hcc, hcoc⟩, x, hx⟩ := hc
+  obtain ⟨S, rfl⟩ := TensorProduct.exists_finset x
+  obtain ⟨T⟩ := Loc.tiedP l
+  haveI : IsDomain (Loc.Bcr l) := GlobalTheory.RegularRing.isDomain_of_tied T (Loc.botExt l)
+  haveI := fd_adjoin_range l (fun p : S => p.1.1)
+  let E : IntermediateField ℚ_[l] (PadicAlgCl l) := E₀ ⊔ IntermediateField.adjoin ℚ_[l] (Set.range fun p : S => p.1.1)
+  have hκE : ∀ g, (κ g : PadicAlgCl l) ∈ E := fun g => (le_sup_left : E₀ ≤ E) (hκ g)
+  have hS : ∀ p ∈ S, p.1 ∈ E := fun p hp =>
+    (le_sup_right : _ ≤ E) (IntermediateField.subset_adjoin _ _ ⟨⟨p, hp⟩, rfl⟩)
+  obtain ⟨π, hπ⟩ := LinearMap.exists_leftInverse_of_injective (Algebra.linearMap E (PadicAlgCl l))
+    (LinearMap.ker_eq_bot.2 (algebraMap E (PadicAlgCl l)).injective)
+  have hπ1 : ∀ y : E, π (y : PadicAlgCl l) = y := fun y => LinearMap.congr_fun hπ y
+  let κ' : H →* Eˣ := MonoidHom.toHomUnits
+    { toFun := fun g => ⟨κ g, hκE g⟩
+      map_one' := Subtype.ext (by simp)
+      map_mul' := fun g h => Subtype.ext (by simp) }
+  have hκ' : ∀ g, ((κ' g : E) : PadicAlgCl l) = κ g := fun g => rfl
+  have hπ2 : ∀ g y, π (κ g * y) = κ' g * π y := fun g y => map_smul π (κ' g : E) y
+  let f : PadicAlgCl l →ₗ[ℚ_[l]] E := π.restrictScalars ℚ_[l]
+  let i : E →ₗ[ℚ_[l]] PadicAlgCl l := E.val.toLinearMap
+  have key : ∀ g (y : PadicAlgCl l ⊗[ℚ_[l]] Loc.Bcr l), LinearMap.rTensor (Loc.Bcr l) f (Loc.actC φ (Loc.chRep κ) g y) =
+      Loc.actC φ (Loc.chRep κ') g (LinearMap.rTensor (Loc.Bcr l) f y) := by
+    intro g y
+    induction y using TensorProduct.induction_on with
+    | zero => simp
+    | tmul a b => simp [Loc.actC, Loc.chRep, f, hπ2]
+    | add a b ha hb => simp only [map_add, ha, hb]
+  have key' : ∀ g (y : E ⊗[ℚ_[l]] Loc.Bcr l), LinearMap.rTensor (Loc.Bcr l) i (Loc.actC φ (Loc.chRep κ') g y) =
+      Loc.actC φ (Loc.chRep κ) g (LinearMap.rTensor (Loc.Bcr l) i y) := by
+    intro g y
+    induction y using TensorProduct.induction_on with
+    | zero => simp
+    | tmul a b => simp [Loc.actC, Loc.chRep, i, hκ']
+    | add a b ha hb => simp only [map_add, ha, hb]
+  set x := ∑ p ∈ S, p.1 ⊗ₜ[ℚ_[l]] p.2 with hxd
+  have hix : LinearMap.rTensor (Loc.Bcr l) i (LinearMap.rTensor (Loc.Bcr l) f x) = x := by
+    rw [hxd, map_sum, map_sum]
+    refine Finset.sum_congr rfl fun p hp => ?_
+    rw [LinearMap.rTensor_tmul, LinearMap.rTensor_tmul]
+    congr 1
+    exact congrArg Subtype.val (hπ1 ⟨p.1, hS p hp⟩)
+  have hx' : ∀ g, f (c g) ⊗ₜ[ℚ_[l]] (1 : Loc.Bcr l) =
+      Loc.actC φ (Loc.chRep κ') g (LinearMap.rTensor (Loc.Bcr l) f x) - LinearMap.rTensor (Loc.Bcr l) f x := fun g => by
+    rw [← key, ← map_sub, ← hx g, LinearMap.rTensor_tmul]
+  have hcE : ∀ g, ((f (c g) : E) : PadicAlgCl l) = c g := fun g => by
+    have h1 := congrArg (LinearMap.rTensor (Loc.Bcr l) i) (hx' g)
+    rw [map_sub, key', hix, ← hx g, LinearMap.rTensor_tmul] at h1
+    exact Algebra.TensorProduct.includeLeft_injective (R := ℚ_[l]) (S := ℚ_[l]) (B := Loc.Bcr l)
+      (algebraMap ℚ_[l] (Loc.Bcr l)).injective h1
+  refine ⟨E, inferInstance, κ', fun g => f (c g), hκ', hcE, ⟨?_, fun g h => ?_⟩, _, hx'⟩
+  · exact continuous_induced_rng.2 (hcc.congr fun g => (hcE g).symm)
+  · have := hcoc g h
+    simp only [Loc.chRep] at this ⊢
+    simp [this, f, hπ2]
+
+private theorem cob_conj {Γ k : Type} [Group Γ] [Field k] (θ : Γ →* kˣ) (c : Γ → k)
+    (hc : ∀ g h, c (g * h) = c g + θ g * c h) (S S' : Subgroup Γ) (g : Γ) (hS : ∀ s ∈ S', g⁻¹ * s * g ∈ S)
+    (h : ∃ m, ∀ s ∈ S, c s = θ s * m - m) : ∃ m, ∀ s ∈ S', c s = θ s * m - m := by
+  obtain ⟨m, hm⟩ := h
+  refine ⟨θ g * m - c g, fun s hs => ?_⟩
+  have h1 := hm _ (hS s hs)
+  have h2 := hc g (g⁻¹ * s * g)
+  have h3 := hc s g
+  have h4 : θ (g⁻¹ * s * g) = θ s := by rw [map_mul, map_mul, map_inv, mul_comm _ (θ s), inv_mul_cancel_right]
+  rw [show g * (g⁻¹ * s * g) = s * g by group, h3, h1, h4] at h2
+  linear_combination h2
+
+open scoped Pointwise in
+private theorem conj_place {k Ω : Type} [Field k] [NumberField k] [Field Ω] [Algebra k Ω] [IsAlgClosure k Ω]
+    {A B : ValuationSubring Ω} {v : HeightOneSpectrum (𝓞 k)} (hA : IsPlaceOver A v) (hB : IsPlaceOver B v) :
+    ∃ g : G k Ω, (∀ τ ∈ Ine (F := k) B, g⁻¹ * τ * g ∈ Ine (F := k) A) ∧ ∀ τ ∈ Dec (F := k) B, g⁻¹ * τ * g ∈ Dec (F := k) A := by
+  obtain ⟨g, hg⟩ := exists_smul_eq_of_isPlaceOver (F := k) hA hB
+  have h : IsLift (RingEquiv.refl k) g.toRingEquiv := fun x => g.commutes x
+  have hm : ∀ x, g.toRingEquiv x ∈ B ↔ x ∈ A := fun x => by
+    show g • x ∈ B ↔ _
+    rw [← hg]
+    exact ValuationSubring.smul_mem_pointwise_smul_iff
+  exact ⟨g, fun τ hτ => conjGal_mem_Ine h hm hτ, fun τ hτ => conjGal_mem_Dec h hm hτ⟩
+
+private theorem unr_zero (K Ω : Type) [Field K] [NumberField K] [Field Ω] [Algebra K Ω] [IsAlgClosure K Ω]
+    (l : ℕ) [Fact l.Prime] (f : G K Ω → PadicAlgCl l) (hf : Continuous f) (hm : ∀ g h, f (g * h) = f g + f h)
+    (hI : ∀ A : ValuationSubring Ω, ∀ g ∈ Ine (F := K) A, f g = 0) (g : G K Ω) : f g = 0 := by
+  let F : G K Ω →* Multiplicative (PadicAlgCl l) := MonoidHom.mk' (fun g => Multiplicative.ofAdd (f g)) hm
+  have hpow : ∀ g (n : ℕ), n ≠ 0 → f (g ^ n) = 0 → f g = 0 := fun g n hn h => by
+    have h1 : f (g ^ n) = n • f g := congrArg Multiplicative.toAdd (map_pow F g n)
+    rw [h, nsmul_eq_mul] at h1
+    exact (mul_eq_zero.1 h1.symm).resolve_left (Nat.cast_ne_zero.2 hn)
+  have h1 : f 1 = 0 := congrArg Multiplicative.toAdd (map_one F)
+  have key : ∀ g ∈ (Kum.artCl K Ω).ker, f g = 0 := fun g hg => by
+    by_contra h0
+    have hr : 0 < ‖f g‖ := norm_pos_iff.2 h0
+    let B : OpenAddSubgroup (PadicAlgCl l) := IsUltrametricDist.ball_openAddSubgroup (PadicAlgCl l) hr
+    let χ : G K Ω →* Multiplicative (PadicAlgCl l ⧸ B.toAddSubgroup) :=
+      (AddMonoidHom.toMultiplicative (QuotientAddGroup.mk' B.toAddSubgroup)).comp F
+    have hχ : ∀ s, χ s = 1 ↔ f s ∈ B := fun s => QuotientAddGroup.eq_zero_iff (f s)
+    have := Kum.artKer K Ω _ χ (by
+        have : (χ.ker : Set (G K Ω)) = f ⁻¹' B := Set.ext hχ
+        rw [this]
+        exact B.isOpen.preimage hf)
+      (fun A s hs => (hχ s).2 (by rw [hI A s hs]; exact zero_mem _))
+      (fun c hc => (hχ c).2 (by
+        obtain ⟨j, hj⟩ := hc
+        have h2 : c ^ 2 = 1 := AlgEquiv.ext fun x => j.injective (by
+          rw [pow_two, AlgEquiv.mul_apply]
+          exact (hj _).trans ((congrArg _ (hj x)).trans (Complex.conj_conj _)))
+        rw [hpow c 2 two_ne_zero (by rw [h2, h1])]
+        exact zero_mem _)) hg
+    have h3 : f g ∈ Metric.ball (0 : PadicAlgCl l) ‖f g‖ := (hχ g).1 this
+    simp at h3
+  refine hpow g (Nat.card (ClassGroup (𝓞 K))) Nat.card_pos.ne' (key _ ?_)
+  rw [MonoidHom.mem_ker, map_pow, pow_card_eq_one']
+
+section Char
+
+variable {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime]
+
+private theorem bk_loc (θ : G ℚ Ω →* (PadicAlgCl l)ˣ) (c : G ℚ Ω → PadicAlgCl l) (hc : c ∈ Z1 (Loc.chRep θ))
+    (hb : Af.IsBK l (Loc.chRep θ) c) :
+    (∀ A : ValuationSubring Ω, ¬ A.valuation (l : Ω) < 1 → ∃ m, ∀ g ∈ Ine (F := ℚ) A, c g = θ g * m - m) ∧
+    ∃ j : Ω →+* Om l, (fun σ => c (Loc.iota j σ)) ∈ Loc.finiteCocycles (MonoidHom.id (GQ l)) (Loc.chRep (θ.comp (Loc.iota j))) ∧
+      (Loc.placeJ j).valuation (l : Ω) < 1 ∧ ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∃ g : G ℚ Ω,
+        (∀ τ ∈ Ine (F := ℚ) A, g⁻¹ * τ * g ∈ Ine (F := ℚ) (Loc.placeJ j)) ∧
+        ∀ τ ∈ Dec (F := ℚ) A, g⁻¹ * τ * g ∈ Dec (F := ℚ) (Loc.placeJ j) := by
+  have hcoc : ∀ g h, c (g * h) = c g + θ g * c h := hc.2
+  refine ⟨fun A hA => ?_, ?_⟩
+  · obtain ⟨p1, p2, p3, -⟩ := places ℚ Ω l A
+    by_cases hT : A = ⊤
+    · refine ⟨0, fun g hg => ?_⟩
+      rw [(p2 hT).1, Subgroup.mem_bot] at hg
+      have := hcoc 1 1
+      simp only [mul_one, map_one, Units.val_one, one_mul] at this
+      rw [hg, left_eq_add.1 this]
+      simp
+    obtain ⟨v, hv⟩ := p1 hT
+    obtain ⟨B, hB, hx⟩ := hb.away v fun h => hA ((p3 v hv).2 h)
+    obtain ⟨g, hg, -⟩ := conj_place hB hv
+    exact cob_conj θ c hcoc _ _ g hg hx
+  · obtain ⟨j, -, -, x, hx⟩ := hb.above (algebraMap ℚ (Om l))
+    obtain ⟨i1, -, -, -, -, i6, -⟩ := Loc.iotaFacts j
+    refine ⟨j, ⟨⟨hc.1.comp i1.continuous, fun g h => ?_⟩, x, fun σ => ?_⟩, ?_, fun A hA => ?_⟩
+    · exact (congrArg c (map_mul _ g h)).trans (hc.2 _ _)
+    · exact hx ⟨(Loc.iota j σ, σ), fun y => (Loc.iota_spec j σ y).symm⟩
+    · rw [← ValuationSubring.mem_nonunits_iff, ValuationSubring.mem_nonunits_iff_or]
+      refine Or.inr fun h => ?_
+      have h1 : (Valued.v : Valuation (Om l) NNReal) (j (l : Ω)⁻¹) ≤ 1 := h
+      rw [map_inv₀, map_natCast, map_inv₀, PadicAlgCl.valuation_p, one_div, inv_inv] at h1
+      exact absurd (Nat.cast_le_one.1 h1) (Fact.out : l.Prime).one_lt.not_ge
+    · obtain ⟨p1, p2, p3, -⟩ := places ℚ Ω l A
+      obtain ⟨v, hv⟩ := p1 fun h => (p2 h).2 hA
+      exact conj_place ((i6 v).2 ((p3 v hv).1 hA)) hv
+
+private theorem neg_case (hP : CohInp) (θ χ : G ℚ Ω →* (PadicAlgCl l)ˣ) (hχ : IsOpen (χ.ker : Set (G ℚ Ω))) (e : ℕ)
+    (he : 1 ≤ e) (hθc : Continuous fun g => (θ g : PadicAlgCl l))
+    (hθ : ∀ g, (θ g : PadicAlgCl l) * χ g * algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ e = 1)
+    (c : G ℚ Ω → PadicAlgCl l) (hc : c ∈ Z1 (Loc.chRep θ)) (hb : Af.IsBK l (Loc.chRep θ) c) :
+    ∃ m, ∀ g, c g = θ g * m - m := by
+  have hcoc : ∀ g h, c (g * h) = c g + θ g * c h := hc.2
+  obtain ⟨CK, hK⟩ := hP.lemK
+  obtain ⟨h1, j, hj, -, h2⟩ := bk_loc θ c hc hb
+  obtain ⟨i1, i2, -, -, i5, -, -⟩ := Loc.iotaFacts j
+  obtain ⟨K₀, hK₀, hψK⟩ := char_finext l (G ℚ Ω) χ hχ
+  have hθK : ∀ g, (θ g : PadicAlgCl l) ∈ K₀ := fun g => by
+    have h := hθ g
+    rw [mul_assoc] at h
+    rw [eq_inv_of_mul_eq_one_left h]
+    refine inv_mem (mul_mem (hψK g) (pow_mem ?_ _))
+    rw [IsScalarTower.algebraMap_apply ℤ_[l] ℚ_[l] (PadicAlgCl l)]
+    exact K₀.algebraMap_mem _
+  obtain ⟨E, _, κ, c', hκ, hc', hf⟩ := desc _ (θ.comp (Loc.iota j)) K₀ (fun g => hθK _) _ hj
+  haveI : IsModuleTopology ℚ_[l] E := isModuleTopologyOfFiniteDimensional
+  have hw : Loc.HasWeight (MonoidHom.id (GQ l)) κ (-(e : ℤ)) := by
+    refine ⟨χ.ker.comap (Loc.iota j), hχ.preimage i1.continuous, fun g hg _ => ?_⟩
+    rw [_root_.zpow_neg, zpow_natCast]
+    refine eq_inv_of_mul_eq_one_left (Units.ext (Subtype.ext ?_))
+    have h3 := hθ (Loc.iota j g)
+    have h4 : χ (Loc.iota j g) = 1 := hg
+    have h5 : cycZ ℚ Ω l (Loc.iota j g) = Loc.cyc l l g := DFunLike.congr_fun (i5 l) g
+    rw [h4, h5, Units.val_one, mul_one] at h3
+    rw [Units.val_mul, MulMemClass.coe_mul, hκ, Units.val_pow_eq_pow_val, SubmonoidClass.coe_pow]
+    exact h3
+  have hz := (Loc.z1fChar hP.loc (MonoidHom.id (GQ l)) Topology.IsOpenEmbedding.id κ
+    (continuous_induced_rng.2 ((hθc.comp i1.continuous).congr fun g => (hκ g).symm)) _ hw).1 (by omega)
+  rw [hz.1, mem_coboundaries1] at hf
+  obtain ⟨m, hm⟩ := hf
+  have h3 : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → ∃ m, ∀ g ∈ Dec (F := ℚ) A, c g = θ g * m - m := by
+    intro A hA
+    obtain ⟨g, -, hg⟩ := h2 A hA
+    refine cob_conj θ c hcoc _ _ g hg ⟨m, fun s hs => ?_⟩
+    rw [← i2] at hs
+    obtain ⟨σ, rfl⟩ := hs
+    have h4 : c' σ = κ σ * m - m := hm σ
+    have h5 := hc' σ
+    rw [← h5, h4, AddSubgroupClass.coe_sub, MulMemClass.coe_mul, hκ]
+    rfl
+  refine X.soBar CK hK (GlobalTheory.PoitouTateConj.poitouTateDuality_of_normalised hP.pt) hP.loc.lfK hP.loc.ltK ℚ Ω l χ hχ e he
+    (fun g => θ g) hθ c hc.1 hcoc (fun A => ?_) h3
+  by_cases hA : A.valuation (l : Ω) < 1
+  · obtain ⟨m, hm⟩ := h3 A hA
+    exact ⟨m, fun g hg => hm g hg.1⟩
+  · exact h1 A hA
+
+private theorem zero_case (hP : CohInp) (K : Type) [Field K] [NumberField K] [Algebra K Ω]
+    (θ : G ℚ Ω →* (PadicAlgCl l)ˣ) (hθ : galOf ℚ K Ω ≤ θ.ker)
+    (hI : ∀ A : ValuationSubring Ω, A.valuation (l : Ω) < 1 → Ine (F := ℚ) A ≤ galOf ℚ K Ω)
+    (c : G ℚ Ω → PadicAlgCl l) (hc : c ∈ Z1 (Loc.chRep θ)) (hb : Af.IsBK l (Loc.chRep θ) c) :
+    ∀ g ∈ galOf ℚ K Ω, c g = 0 := by
+  have hcoc : ∀ g h, c (g * h) = c g + θ g * c h := hc.2
+  haveI : IsAlgClosure K Ω := ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) K⟩
+  obtain ⟨g1, g2, -⟩ := galEmbTop ℚ K Ω
+  obtain ⟨-, hIne, -, -⟩ := Kum.toGalDict ℚ Ω K _ le_rfl
+  have hχ : IsOpen (θ.ker : Set (G ℚ Ω)) := Subgroup.isOpen_mono hθ g2
+  have hθc : Continuous θ := continuous_of_continuousAt_one θ (by
+    refine (continuousAt_const (y := (1 : (PadicAlgCl l)ˣ))).congr ?_
+    filter_upwards [hχ.mem_nhds θ.ker.one_mem] with g hg using hg.symm)
+  obtain ⟨h1, j, hj, hjl, h2⟩ := bk_loc θ c hc hb
+  obtain ⟨i1, -, -, i4, -, -, -⟩ := Loc.iotaFacts j
+  obtain ⟨K₀, hK₀, hψK⟩ := char_finext l (G ℚ Ω) θ hχ
+  obtain ⟨E, _, κ, c', hκ, hc', hf⟩ := desc _ (θ.comp (Loc.iota j)) K₀ (fun g => hψK _) _ hj
+  haveI : IsModuleTopology ℚ_[l] E := isModuleTopologyOfFiniteDimensional
+  have hκc : Continuous fun g => (κ g : E) :=
+    continuous_induced_rng.2 (((Units.continuous_val.comp hθc).comp i1.continuous).congr fun g => (hκ g).symm)
+  have hz := (Loc.z1fUnr hP.loc (MonoidHom.id (GQ l)) Topology.IsOpenEmbedding.id (Loc.chRep κ)
+    ((hκc.comp continuous_fst).mul continuous_snd) (fun g hg => by
+      have h3 : θ (Loc.iota j g) = 1 := hθ (hI _ hjl (i4 ▸ ⟨g, hg, rfl⟩))
+      have h4 : (κ g : E) = 1 := Subtype.ext ((hκ g).trans (congrArg Units.val h3))
+      refine LinearMap.ext fun y => ?_
+      change (κ g : E) * y = y
+      rw [h4, one_mul]) c' hf.1).1 hf
+  have h3 : ∀ A : ValuationSubring Ω, ∃ m, ∀ g ∈ Ine (F := ℚ) A, c g = θ g * m - m := by
+    intro A
+    by_cases hA : A.valuation (l : Ω) < 1
+    · obtain ⟨g, hg, -⟩ := h2 A hA
+      refine cob_conj θ c hcoc _ _ g hg ⟨0, fun s hs => ?_⟩
+      rw [← i4] at hs
+      obtain ⟨σ, hσ, rfl⟩ := hs
+      have h5 := hc' σ
+      rw [← h5, hz σ hσ]
+      simp
+    · exact h1 A hA
+  have h4 : ∀ s : G K Ω, θ (galEmb ℚ K Ω s) = 1 := fun s => hθ (galEmb_mem ℚ K Ω s)
+  intro g hg
+  rw [← range_galEmb] at hg
+  obtain ⟨s, rfl⟩ := hg
+  refine unr_zero K Ω l (fun s => c (galEmb ℚ K Ω s)) (hc.1.comp g1.continuous) (fun s t => ?_) (fun A s hs => ?_) s
+  · rw [map_mul, hcoc, h4, Units.val_one, one_mul]
+  · obtain ⟨m, hm⟩ := h3 A
+    rw [hm _ ((hIne A ⟨_, galEmb_mem ℚ K Ω s⟩).1 hs), h4, Units.val_one, one_mul, sub_self]
+
+end Char
+
+private theorem wt_rev (a b : Fin 3) : wt b.rev a.rev = wt a b := by
+  revert a b
+  decide
+
+theorem UpperTheory.V.U3.bloch_kato_nonpositive_weight :
+    CohInp → ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {K : Type} [Field K] [NumberField K] [Algebra K Ω]
+      {l : ℕ} [Fact l.Prime] {c : Coef l} {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N} (D : Dat Ω K c e ψ) (j : ℤ), j ≤ 0 → ∀ γ ∈ Z1 (adRep (r0 D.η D.ΨQ)), (∀ g, γ g ∈ gw (PadicAlgCl l) j) →
+      Af.IsBK l (adRep (r0 D.η D.ΨQ)) γ → γ ∈ ReciprocityTheory.Gal.B1 (adRep (r0 D.η D.ΨQ)) := by
+  intro hP Ω _ _ _ K _ _ _ l _ c N _ e ψ D j hj γ hγ hw hb
+  obtain ⟨d1, d2, d3, d4, -, -, -, -, d5, -, d6⟩ := dat_facts D
+  let η : G ℚ Ω →* (PadicAlgCl l)ˣ := (Units.map (Int.castRingHom (PadicAlgCl l)).toMonoidHom).comp D.η
+  have hη1 : ∀ g, D.η g = 1 → η g = 1 := fun g h => by simp [η, h]
+  have hη2 : ∀ g, D.η g ≠ 1 → η g = -1 := fun g h => by
+    apply Units.ext
+    simp [η, (Int.units_eq_one_or _).resolve_left h]
+  have hηo : IsOpen (D.η.ker : Set (G ℚ Ω)) := d4.isOpen_fiber 1
+
+  have hch : ∀ (θ : G ℚ Ω →* (PadicAlgCl l)ˣ), θ = 1 ∨ θ = η → ∀ f ∈ Z1 (Loc.chRep (D.ΨQ ^ j * θ)),
+      Af.IsBK l (Loc.chRep (D.ΨQ ^ j * θ)) f → ∃ m, ∀ g, f g = (D.ΨQ g ^ j * θ g : (PadicAlgCl l)ˣ) * m - m := by
+    intro θ hθ f hf hfb
+    have hk : D.η.ker ≤ θ.ker := fun g hg => by
+      rcases hθ with rfl | rfl
+      · rfl
+      · exact hη1 g hg
+    rcases hj.eq_or_lt with rfl | hj
+    · simp only [zpow_zero, one_mul] at hf hfb ⊢
+      have hcoc : ∀ g h, f (g * h) = f g + θ g * f h := hf.2
+      have h0 := zero_case hP K θ (D.η_ker ▸ hk) (fun A hA => D.η_ker ▸ (d6 A hA).1) f hf hfb
+      rw [← D.η_ker] at h0
+      have h1 : ∀ g, D.η g ≠ 1 → f g = f D.cc := fun g hg => by
+        have h2 : g * D.cc ∈ D.η.ker := by
+          rw [MonoidHom.mem_ker, map_mul, d2, (Int.units_eq_one_or _).resolve_left hg]
+          simp
+        have h3 := hcoc (g * D.cc) D.cc
+        rwa [mul_assoc, d1, mul_one, h0 _ h2, show θ (g * D.cc) = 1 from hk h2, Units.val_one, one_mul, zero_add] at h3
+      refine ⟨-f D.cc / 2, fun g => ?_⟩
+      by_cases hg : D.η g = 1
+      · rw [h0 g hg, show θ g = 1 from hk hg]
+        simp
+      · rw [h1 g hg]
+        rcases hθ with rfl | rfl
+        · have h3 := hcoc D.cc D.cc
+          rw [d1, h0 1 (one_mem _)] at h3
+          simp only [MonoidHom.one_apply, Units.val_one] at h3 ⊢
+          linear_combination (-1 / 2 : PadicAlgCl l) * h3
+        · rw [hη2 g hg]
+          simp only [Units.val_neg, Units.val_one]
+          ring
+    · obtain ⟨n, rfl⟩ : ∃ n : ℕ, j = -(n : ℤ) := ⟨(-j).toNat, by omega⟩
+      let ψQ : G ℚ Ω →* (PadicAlgCl l)ˣ :=
+        (Units.map (algebraMap c.O (PadicAlgCl l)).toMonoidHom).comp (Chr.dirG ℚ Ω ψ)
+      have hθc : Continuous θ := continuous_of_continuousAt_one θ (by
+        refine (continuousAt_const (y := (1 : (PadicAlgCl l)ˣ))).congr ?_
+        filter_upwards [hηo.mem_nhds D.η.ker.one_mem] with g hg using (hk hg).symm)
+      refine neg_case hP _ (ψQ ^ n * θ⁻¹) ?_ (e * n) (Nat.mul_pos D.gd.e_pos (by omega))
+        (Units.continuous_val.comp ((d5.zpow _).mul hθc)) (fun g => ?_) f hf hfb
+      · refine Subgroup.isOpen_mono (H₁ := (Chr.cls ℚ Ω N).ker ⊓ D.η.ker) (fun g hg => ?_)
+          ((Chr.clsFacts ℚ Ω N).1.inter hηo)
+        have h1 : Chr.cls ℚ Ω N g = 1 := hg.1
+        have h2 : θ g = 1 := hk hg.2
+        simp [ψQ, Chr.dirG, h1, h2]
+      · have h1 : (D.ΨQ g : PadicAlgCl l) = algebraMap ℤ_[l] (PadicAlgCl l) (cycZ ℚ Ω l g : ℤ_[l]) ^ e * ψQ g := by
+          simp [Dat.ΨQ, Dat.Ψ, Chr.Psi, chiO, ψQ]
+        simp only [MonoidHom.mul_apply, MonoidHom.zpow_apply, MonoidHom.pow_apply, MonoidHom.inv_apply, Units.val_mul,
+          _root_.zpow_neg, zpow_natCast, Units.val_inv_eq_inv_val, Units.val_pow_eq_pow_val, pow_mul]
+        have h2 := (D.ΨQ g).ne_zero
+        have h3 := (θ g).ne_zero
+        field_simp
+        rw [h1, mul_pow, mul_comm]
+
+  have hpr : ∀ (s : PadicAlgCl l) (θ : G ℚ Ω →* (PadicAlgCl l)ˣ), (s = -1 ∧ θ = 1) ∨ (s = 1 ∧ θ = η) → ∀ a b : Fin 3,
+      ∃ m, ∀ g, γ g a b + s * γ g b.rev a.rev = (D.ΨQ g ^ wt a b * θ g : (PadicAlgCl l)ˣ) * m - m := by
+    intro s θ hs a b
+    by_cases hab : wt a b = j
+    swap
+    · exact ⟨0, fun g => by rw [hw g a b hab, hw g _ _ (by rwa [wt_rev])]; simp⟩
+    let f : Matrix (Fin 3) (Fin 3) (PadicAlgCl l) →ₗ[ℚ_[l]] PadicAlgCl l :=
+      { toFun := fun X => X a b + s * X b.rev a.rev
+        map_add' := fun X Y => by simp only [Matrix.add_apply]; ring
+        map_smul' := fun r X => by simp only [Matrix.smul_apply, RingHom.id_apply, smul_add, mul_smul_comm] }
+    have hfc : Continuous f := by
+      change Continuous fun X : Matrix (Fin 3) (Fin 3) (PadicAlgCl l) => X a b + s * X b.rev a.rev
+      fun_prop
+    have hfe : ∀ g X, f (adRep (r0 D.η D.ΨQ) g X) = Loc.chRep (D.ΨQ ^ j * θ) g (f X) := fun g X => by
+      change adRep (r0 D.η D.ΨQ) g X a b + s * adRep (r0 D.η D.ΨQ) g X b.rev a.rev =
+        (D.ΨQ g ^ j * θ g : (PadicAlgCl l)ˣ) * (X a b + s * X b.rev a.rev)
+      rw [adRep_baseLift_apply, adRep_baseLift_apply, wt_rev, hab, Fin.rev_rev, Fin.rev_rev, Units.val_mul]
+      by_cases hg : D.η g = 1
+      · rcases hs with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · simp [hg, mul_add]
+        · simp [hg, hη1 g hg, mul_add]
+      · rcases hs with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
+        · simp only [hg, if_false, MonoidHom.one_apply, Units.val_one]
+          ring
+        · simp only [hg, if_false, hη2 g hg, Units.val_neg, Units.val_one]
+          ring
+    rw [hab]
+    refine hch θ (hs.imp And.right And.right) (fun g => f (γ g)) ⟨hfc.comp hγ.1, fun g h => ?_⟩
+      ⟨fun w hw => ?_, fun τ => ?_⟩
+    · exact (congrArg f (hγ.2 g h)).trans (by rw [map_add, hfe])
+    · obtain ⟨A, hA, x, hx⟩ := hb.away w hw
+      exact ⟨A, hA, f x, fun s hs => by rw [hx s hs, map_sub, hfe]⟩
+    · obtain ⟨i, hi, hx⟩ := hb.above τ
+      refine ⟨i, hi, Loc.z1fCoef _ _ _ f hfc ?_ _ hx⟩
+      exact fun g x => hfe g.1.1 x
+  choose p hp using hpr 1 η (Or.inr ⟨rfl, rfl⟩)
+  choose q hq using hpr (-1) 1 (Or.inl ⟨rfl, rfl⟩)
+  refine (mem_coboundaries1 _ _).2 ⟨Matrix.of fun a b => (p a b + p b.rev a.rev + q a b - q b.rev a.rev) / 4, fun g => ?_⟩
+  ext a b
+  have h1 := hp a b g
+  have h2 := hp b.rev a.rev g
+  have h3 := hq a b g
+  have h4 := hq b.rev a.rev g
+  rw [Matrix.sub_apply, adRep_baseLift_apply]
+  simp only [wt_rev, Fin.rev_rev, Units.val_mul, MonoidHom.one_apply, Units.val_one, Matrix.of_apply] at h1 h2 h3 h4 ⊢
+  by_cases hg : D.η g = 1
+  · rw [hη1 g hg, Units.val_one] at h1 h2
+    rw [if_pos hg]
+    linear_combination (h1 + h2 + h3 - h4) / 4
+  · rw [hη2 g hg, Units.val_neg, Units.val_one] at h1 h2
+    rw [if_neg hg]
+    linear_combination (h1 + h2 + h3 - h4) / 4
+
+
+[KTR_SRC_AUTQ] Original named classical/period literature foundation boundary
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/AutomorphicForms/Hypotheses2.lean#L1-L28
+import Mathlib
+import Development.AbelianVarietyTheory.Definitions.AutomorphicMembership.Brauer
+import Development.AutomorphicArithmetic.AutomorphicVarieties.PublishedTheorems.GelfandKazhdanReal
+import Development.AutomorphicArithmetic.AutomorphicVarieties.AutomorphicForms.IsoOfFrob
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.SemisimpleLevels.CsdSsOfFull
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.SemisimpleLevels.SsMonoOdd
+import Development.AutomorphicArithmetic.AutomorphicVarieties.GaloisLibrary.CrystallineBaseChange.QuadBC0OfQuadBaseChange
+import Development.AutomorphicArithmetic.AutomorphicVarieties.ModularityArgument.BaseChangeUnits.GaloisRepRankTwoRealOf
+
+namespace UpperTheory.V.Af
+
+open UpperTheory.V.Published
+
+structure Hypotheses₂ : Prop where
+  litN : GlobalTheory.Mem.LiteralAutomorphy.LitN
+  cohC : ClozelCohC
+  conjC : ClozelConjC
+  borelC : BorelInjC
+  galR : Z.Bc.GaloisRepRankTwoReal
+  smoR : StrongMultOneReal
+  gkR : GelfandKazhdanReal
+  admR : AdmissibleReal
+  bc : Br.QuadBC0
+  newform : NewformRep
+  ss : Lev.CsdSs := Lev.csdSs_of_full litN.aut.car
+  mono : Lev.CsdMonoOdd := Lev.csdMonoOdd_of_full litN.aut.car
+
+end UpperTheory.V.Af

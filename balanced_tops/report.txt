@@ -1,0 +1,327 @@
+BALANCED BIASED TOP SELECTION — EXPANDED HUMAN PROOF
+Version 0.12, 21 November 2026
+Claims BS1–BS7
+Pinned source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+STATUS AND SCOPE
+
+The finite probability, coset normalization, numerical threshold, exact
+topsGroup assembly, and prime-weighted consequence are proved below.
+The assembly uses the complete nonconstant-probability good-orbit estimate
+BO5. It does not use a full arithmetic host existence theorem. The input
+finite group, subgroup, Frobenius steps and selectors must still be supplied
+by that construction. BS7 is a derived Fourier explanation of the source's
+weights, with its exact scope stated below.
+
+All random choices take place in finite spaces. There are no limit
+interchanges, infinite products of measures, or prime-independence
+assumptions. Constants are fixed before the group, selector, prime list and
+weights. Empty prime lists and zero total weighted badness are included.
+No Lean source was edited and no kernel replay is claimed.
+
+PRIMARY SOURCE ROUTE
+
+Development/AutomorphicArithmetic/ThickFrames/select.lean:
+  sel_moment, sel_moment', sel_exists, sel_ncard, select.
+Development/AutomorphicArithmetic/ThickFrames/SharesOfCounts.lean:
+  shares_of_counts.
+Development/AutomorphicArithmetic/ThickFrames/topsGroup.lean:
+  tg_num, tg_class_sum, topsGroup.
+Development/AutomorphicArithmetic/ThickFrames/orbitTerms.lean:
+  orbit_terms (expanded by BO).
+Development/AutomorphicArithmetic/ThickFrames/orbitSum.lean:
+  orbit_sum (expanded by BO).
+Formalism/SharpRestriction/RamificationFrobenius/TotientGaloisClasses/
+ExplicitFormulaErrorOfHostConditions.lean:
+  Frame.lam, Frame.Shares, Level.wt, Level.Gm, Level.ofSub, Level.cyc.
+
+The ledger gives complete qualified names, exact inclusive line ranges,
+full-file and range hashes, and pinned URLs. The present file keeps the
+mathematical explanation separate from source-navigation metadata.
+
+BS1. FINITE BERNOULLI LAWS AND ONE VARIANCE BUDGET
+
+Let A be any finite set. For each a in A fix p_a in [0,1], and give a subset
+T of A probability
+
+  w(T) = product_(a in T) p_a * product_(a not in T) (1-p_a).
+
+These weights are nonnegative and sum to product_a(p_a+(1-p_a))=1.
+For X_a(T)=1_(a in T), direct summation over every coordinate except a
+gives E X_a=p_a; summation except a,b gives E X_a X_b=p_a p_b for a≠b.
+Also X_a²=X_a. Consequently, for arbitrary real numbers b,g_a,
+
+  E(b+Σ_a g_a X_a)²
+    = b²+2bΣ_a g_a p_a+Σ_a g_a²p_a
+         +2Σ_(a<b)g_a g_b p_a p_b
+    = (b+Σ_a g_a p_a)²+Σ_a g_a²p_a(1-p_a).
+
+The displayed pair sum may be written using any ordering of the finite
+set; the identity is order independent. This is exactly sel_moment and
+sel_moment', expressed using finite probability.
+
+Let c:A→C classify A into finitely many possibly empty classes. Put
+S_j=|T∩c^(-1)(j)| and μ_j=Σ_(c(a)=j)p_a. Applying the identity to the
+indicator of that class gives E(S_j−μ_j)²=Σ_(c(a)=j)p_a(1-p_a).
+Each a appears in precisely one class. Hence, if p_a≤δ,
+
+  E Σ_j(S_j−μ_j)² = Σ_a p_a(1-p_a) ≤ δ|A|.
+
+This is the important normalization. Estimating each class separately
+and then applying the same worst-case variance to all of them would
+introduce an unnecessary factor |C|. Empty classes contribute zero.
+
+BS2. SIMULTANEOUS FINITE SELECTION
+
+Fix a finite index set I, nonnegative weights ω_i, and arbitrary predicates
+Bad(i,a,T). They can depend on the whole selected subset and on a, and
+can be highly correlated for different i.
+
+Suppose, for every i in I and a in A,
+
+  P(a in T and Bad(i,a,T)) ≤ βδ,
+
+where β≥0. Define
+
+  B(T)=Σ_(i in I)ω_i |{a in T:Bad(i,a,T)}|,
+  M=βδ|A|Σ_(i in I)ω_i.
+
+Since all sums are finite, exchanging them gives E B≤M. The set-cardinality
+identity used here is |{a:P(a)}|=Σ_a1_P(a), the source's sel_ncard.
+
+Let D>0 and D²≥2δ|A|. If M>0, form
+
+  F(T)=D^(-2)Σ_j(S_j−μ_j)²+B(T)/(4M).
+
+BS1 and E B≤M imply E F≤1/2+1/4=3/4. A positive-probability subset T
+with F(T)≤E F exists: otherwise every positive-weight value would
+strictly exceed the average, contradicting its defining weighted sum.
+This is the elementary sel_exists principle. Nonnegativity of both
+summands gives |S_j−μ_j|≤D for every j and B(T)≤4M. In fact this choice
+has the stronger bounds Σ_j(S_j−μ_j)²≤3D²/4 and B(T)≤3M, but only the
+source-compatible weaker conclusions are used downstream.
+
+If M=0, the finite nonnegative sum E B≤0 forces B(T)=0 at every
+positive-weight T. Choose a positive-weight T at which the squared-error
+sum is at most its average, hence at most D²/2. This gives the same
+conclusion without dividing by zero. It covers δ=0, β=0, an empty prime
+list, or zero total weight. If some p_a is 0 or 1, probability-zero
+subsets are simply absent from the support; the proof is unchanged.
+
+Thus there is one T for which
+
+  every class-count error is at most D,
+  B(T)≤4βδ|A|Σ_iω_i.
+
+The literal source select theorem assumes 0≤p_a≤δ≤1, D>0 and the
+same selected-and-bad joint bound. The argument above proves that
+theorem, with a slightly stronger positive-M intermediate estimate.
+
+BS3. COSET COUNTS NORMALIZE TO THE REQUIRED SHARES
+
+Let A now be a finite abelian group and A0 a subgroup of index o.
+Write n0=|A0| and N=|A|=on0. Translation is a bijection from A0
+onto any of its cosets, so every coset has n0 elements.
+
+Use p_a=δ on A0 and p_a=3δ/4 outside A0, with δ>0. The zero
+coset has expected count δn0; every other coset has expected count
+3δn0/4. This is tg_class_sum. Let C_j denote the actual coset counts
+of a selected set T, and suppose every count differs from its mean
+μ_j by at most D.
+
+Writing S=|T| and M0=(3o+1)δn0/4, sum once over the o distinct cosets:
+
+  |S−M0|≤oD.
+
+The source sums over A and divides by n0, which is the same argument.
+Let 0≤η≤1 and suppose 4oD≤ηδn0. Then oD≤δn0/4, and therefore
+
+  S≥3oδn0/4=3δN/4,
+  S≤(3o+2)δn0/4≤5δN/4.
+
+These improve the literal source's δN/2≤S≤2δN, and in particular S>0.
+The hypothesis η≥0 is implicit in the literal shares_of_counts statement:
+δn0>0, D≥0 and 4oD≤ηδn0 already force η≥0.
+
+Define λ_j=4/(3o+1) on the zero coset and 3/(3o+1) on the others.
+Then μ_j=λ_j M0. It follows that
+
+  |C_j−λ_j S| ≤ |C_j−μ_j|+λ_j|S−M0|
+               ≤ D+λ_j oD
+               ≤ D+4oD/(3o+1)
+               ≤3D.
+
+The scale condition gives
+
+  3D≤3ηδn0/(4o)≤3ηoδn0/4≤ηS,
+
+using o≥1. Thus |C_j−λ_j S|≤ηS for all cosets. Replacing a class
+j by any representative γ is exactly the source's expression
+|{t in T:t−γ in A0}|. This proves shares_of_counts with the same
+relative error and the same T as BS2.
+
+BS4. THE UNIFORM NUMERICAL THRESHOLD
+
+Fix ε>0 and real bounds Co,Lb. The group data satisfy
+
+  h=2+8ε, δ=x^(−ε/8), x≥1,
+  x^h/2≤N≤Co x^h, o≤Co.
+
+The existence of such group data already implies Co≥1. If Co<1,
+the conditional theorem is vacuous; no invalid division by Co is used.
+
+Set D=sqrt(2δN), η=x^(-1), and require x^ε≥64Co^4. Since ε>0,
+this is imposed by a threshold independent of the eventual group.
+We have
+
+  δN≥x^(2+63ε/8)/2≥x² x^ε/2≥32Co^4x²≥32o^4x².
+
+Because all quantities being squared are positive, this last inequality
+is equivalent to
+
+  sqrt(2δN)≤δN/(4o²x).
+
+Multiplying by 4o and using N=on0 gives
+
+  4oD≤δn0/x.
+
+Therefore BS3 applies with η=x^(-1). Since x≥1 and ε>0,
+x^(-1)≤x^(-1+ε), so it gives the literal, slightly weaker Shares
+tolerance used in topsGroup. This is an explicit proof of tg_num.
+
+BS5. ASSEMBLY OF THE COMPLETE BIASED TOPS THEOREM
+
+Quantifier order:
+
+  Fix ε>0, Co,Lb.
+  Choose Cb>0 and the BO5 uniform lower threshold x_BO.
+  Choose x0=max(x_BO,1,(64Co^4)^(1/ε)).
+  Only then choose x≥x0, the finite abelian group A and subgroup A0,
+  L2, the selector b, the finite list P, the steps h_p and weights ω_p.
+
+The group bounds are those of BS4; L2≤Lb. For every p in P assume
+ord(h_p)≥x^(ε/4). The upper order bound follows from Lagrange:
+ord(h_p)≤|A|≤Co x^h. Fix a selector b:A×A→A satisfying, for every
+h,t, b(h,t)+i h=t for some natural i. This selector is part of the input
+and is fixed before the random subset is sampled.
+
+For p,t, put n_p=ord(h_p) and pull the subset T back to the cyclic
+orbit using
+
+  i↦b(h_p,t)+i h_p,  i in Z/n_p Z.
+
+The event Bad(p,t,T) is exactly failure of IsGoodOrbit with that
+pullback, the supplied L2 and BO's K,r,δ,h,x parameters. Crucially, the
+base can depend on t. The even-index condition is not invariant under
+an arbitrary cyclic translation. Nothing in this proof identifies badness
+for two distinct t, even if they lie on the same unbased orbit.
+
+Under the biased point probabilities, BO5 gives
+
+  P(t selected and Bad(p,t,T))≤δCb x^-2.
+
+Apply BS2 with the classes A/A0, β=Cb x^-2 and D=sqrt(2δN).
+Every coset count is within D of its biased expectation, and
+
+  Σ_(p in P)ω_p |{t in T:Bad(p,t,T)}|
+      ≤4Cb x^-2 δN Σ_(p in P)ω_p.
+
+BS3 and BS4 give, for this same T,
+
+  δN/2≤|T|≤2δN,
+  | |{t in T:t−γ in A0}|−λ_γ|T| |≤x^(-1+ε)|T| for all γ.
+
+This is exactly topsGroup. Our proof additionally retains 3δN/4≤|T|≤
+5δN/4 and the relative share error x^-1. Those stronger inequalities
+are optional consequences; the downstream construction can use the
+source's original constants without alteration.
+
+There is no requirement that P consist of all primes below a bound.
+At this stage it is any finite list with the required order property,
+and nonnegative weights are arbitrary. The exact Lean statement uses
+a finite subset of natural numbers; primality is not used in BS5.
+
+BS6. PRIME-WEIGHTED BADNESS WITH THE SAME SELECTED SET
+
+For z≥2 set n=floor(z). Unique factorization of n! gives
+
+  log(n!)=Σ_(p≤n) v_p(n!)log p
+         ≥Σ_(p≤n)floor(n/p)log p.
+
+For 1≤y, floor(y)≥y/2. Since p≤n, it follows that
+
+  (n/2)Σ_(p≤n)(log p)/p≤log(n!)≤n log n,
+
+and hence Σ_(p<z)(log p)/p≤2log z. For 1<z<2 there are no
+such primes. This is an elementary factorial estimate; it does not
+invoke the prime number theorem or a sharp Mertens theorem.
+
+Let the finite candidate primes P lie below X'=exp(x^(ε/3)).
+Substitute ω_p=(log p)/p in BS5. Its bad mass is bounded by
+
+  4Cb x^-2 δN * 2x^(ε/3)
+    ≤16Cb|T|x^(-2+ε/3)
+
+because δN≤2|T|. Requiring x^(2ε/3)≥16Cb gives the source-style
+allowance |T|x^(-2+ε). This may be enforced by increasing x0 to at
+least (16Cb)^(3/(2ε)), before choosing the group or prime list.
+All previous properties of this same T are retained. For an empty
+candidate list the assertion is immediate.
+
+BS7. FOURIER EXPLANATION AND ORDINARY-RH SPECIALIZATION
+
+The probability mass on the finite quotient Q=A/A0 prescribed by
+the shares condition is
+
+  μ(q)=4/(3o+1) if q=0, 3/(3o+1) otherwise,
+
+where |Q|=o. Equivalently,
+
+  μ=(3o/(3o+1))u_Q+(1/(3o+1))δ_0.
+
+Let χ:Q→C^× be a group character. Every value is a root of unity
+since Q is finite, so |χ(q)|=1. If χ is nontrivial, choose q0 with
+χ(q0)≠1. Translation permutes Q and gives
+
+  Σ_qχ(q)=Σ_qχ(q+q0)=χ(q0)Σ_qχ(q),
+
+forcing its sum to zero. Thus the μ-average of χ equals 1 for
+the trivial character and 1/(3o+1) for every nontrivial character.
+
+If T has shares with error η and S=|T|>0, its empirical quotient
+mass ν(q)=|T∩q|/S satisfies |ν(q)−μ(q)|≤η. Therefore
+
+  | S^(-1)Σ_(a in T)χ(a mod A0) − Σ_qμ(q)χ(q) |
+     ≤Σ_q|ν(q)−μ(q)|≤oη.
+
+For the actual BS5 subset one can use η=x^-1, or retain the source's
+x^(-1+ε). The finite Fourier statement is a derived simplification
+of the bias, not a new source axiom or an independent explicit formula.
+
+The source's cyclic level is Level.cyc(ψ)=Level.ofSub(<ψ>). Its
+Level.ofSub record has psK=none and o equal to the finite character
+subgroup size, so Level.wt is 1/(3o+1) at each nontrivial retained
+primitive character; the trivial term occurs separately with coefficient
+one in Level.Gm. When the quotient and character subgroup are the actual
+paired objects of the host, the Fourier values above match these weights.
+This algebra explains why the selected bias is appropriate. It does not
+by itself construct that host identification, control Euler factors, or
+prove the centered-prime-sum explicit formula.
+
+If o=1, the finite subgroup index identity implies A0=A. The
+probabilities are then δ at every point, λ is identically one, and
+the shares error is exactly zero for every T. The size and badness
+selection still has to be performed. Thus the ordinary-RH specialization
+removes the extra coset balance while retaining the common orbit and
+arithmetic construction duties.
+
+CONTINUATION BOUNDARY
+
+BS and BO supply one subset satisfying all finite selection properties,
+with constants in the required order. HC must transport those properties
+into the existing frame/host and preserve every other HostAx field.
+The underlying global host existence, point construction for arbitrary
+admissible degrees, local comparison lattice, theta/spectral arguments,
+metrics, cohomological windows, and simultaneous arithmetic prime choices
+are not inferred from this finite selection theorem.

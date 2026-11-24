@@ -1,0 +1,770 @@
+\section{Host rigidity from the literal adjoint and local deformation conditions}
+\label{sec:host-rigidity-v42}
+
+The remaining question called \texttt{HOST\_RIGID\_S} is a
+reconstruction matching question: do the particular deformations in
+the source give Bloch--Kato classes for the particular polarized
+adjoint to which ADK6 applies?  This section answers that question.
+The pairing is the source's antidiagonal matrix, the scalar twist is
+exactly $\epsilon^{-1}$, and the local argument includes arbitrary
+dual-number changes of basis and unramified diagonal variations.
+The conclusion does not construct the automorphic points or prove
+the separate quantitative host-number bound.
+
+\subsection{The original hypotheses, in ordinary notation}
+
+Fix an algebraic closure $\Omega$ of $\mathbb Q$, an odd prime
+$\ell$, and a finite $\mathbb Z_\ell$-subalgebra
+$O\subset\overline{\mathbb Q}_\ell$ which is a discrete valuation
+ring.  Let $N\ne0$ be even, let
+$\psi:(\mathbb Z/N\mathbb Z)^\times\to O^\times$ be a Dirichlet
+character, and let $e,o\ge1$.  For a prime $p$, write $\psi_p$ for
+the CRT component of $\psi$ supported at the $p$-part of the modulus.
+This is the source's \texttt{comp p}; it is different from the
+decomposition according to the order of the character.  Write
+$\psi=\theta\kappa$, where $\theta$ has order prime to $\ell$
+and $\kappa$ has $\ell$-power order.  These are
+\texttt{th0} and \texttt{kap}.  Put
+\[
+ c_2=v_2(\operatorname{cond}\psi_2),\qquad
+ S_b=\{p\mid N:p\ne\ell,\ \kappa_p\ne1\},\qquad
+ T_b=\{\ell\}\cup S_b.
+ \tag{HSR.1}
+\]
+The complete \texttt{HostData} assumptions are
+\[
+ \psi(-1)=(-1)^e,\quad c_2\ge4,\quad
+ \theta_p^{\,2o}=1\ (p\ne2),\quad
+ 8op^2<2^{c_2}\ (p\in T_b).
+ \tag{HSR.2}
+\]
+The prime-to-$\ell$ and $\ell$-power order parts exist because
+$\psi$ is a character of a finite group.  The explicit exponent
+in the source's definition of \texttt{lPart} is the CRT projector
+on the $\ell$-primary subgroup of the finite cyclic group generated
+by $\psi$.
+
+Let $S$ be exactly the finite primes dividing $\ell N$, let
+$\Gamma=G_{\mathbb Q,S}$, and let
+$\pi:G_{\mathbb Q}\twoheadrightarrow\Gamma$ be the specified
+quotient.  For each $p\in S$ use the stored valuation above $p$,
+with decomposition and inertia groups $D_p,I_p\subset G_{\mathbb Q}$.
+The character $\eta:\Gamma\to\{\pm1\}$ and the character
+$\Psi:\Gamma\to O^\times$ satisfy
+\[
+ \eta\pi=\eta_4,\qquad
+ \Psi\pi=\epsilon^e\psi_{\mathrm{Gal}}.
+ \tag{HSR.3}
+\]
+Here $\eta_4$ is the quadratic character of $\mathbb Q(i)$,
+and $\epsilon$ is the actual $\ell$-adic cyclotomic character.
+A stored element $c\in\Gamma$ is the image of an actual complex
+conjugation $c_\infty\in G_{\mathbb Q}$.  This is precisely the
+content of \texttt{IsHostFrame}, including its choices of valuations,
+quotient map, distinguished $\ell$-place, and subset $S_b$.
+An actual complex conjugation sends $i$ to $-i$, so
+$\eta(c)=\eta_4(c_\infty)=-1$.
+
+Let
+\[
+ J=\begin{pmatrix}0&0&1\\0&1&0\\1&0&0\end{pmatrix},\qquad
+ \vartheta(a)=Ja^{-t}J,
+ \qquad \mathcal G_3=\operatorname{GL}_3\rtimes\{\pm1\},
+ \tag{HSR.4}
+\]
+where $-1$ acts by $\vartheta$.  The source's group
+\texttt{GG 3} is exactly $\mathcal G_3$.  If
+$R(g)=(a(g),\eta(g))$, its adjoint action on the full space
+$V=M_3(\overline{\mathbb Q}_\ell)$ is
+\[
+ \operatorname{Ad}_R(g)X=
+ \begin{cases}
+ a(g)Xa(g)^{-1},&\eta(g)=1,\\
+ -a(g)JX^tJa(g)^{-1},&\eta(g)=-1.
+ \end{cases}
+ \tag{HSR.5}
+\]
+
+Fix the marked element $g_1$ required by the source and a point
+$r:\Gamma\to\mathcal G_3(\overline{\mathbb Q}_\ell)$ satisfying
+\texttt{IsCharZeroPt}.  Thus there are a finite $O$-subalgebra
+$A\subset\overline{\mathbb Q}_\ell$ which is a DVR, a unit
+$t\in\overline{\mathbb Q}_\ell^\times$, and an integral point
+$r_A:\Gamma\to\mathcal G_3(A)$ such that
+\[
+ r_A=\operatorname{conj}_{T_t}r,
+ \qquad T_t=\operatorname{diag}(t,1,t^{-1}).
+ \tag{HSR.6}
+\]
+Scalar inclusions in (HSR.6) are understood.  The integral point has
+multiplier $\eta$, has continuous matrix entries modulo every power
+of $\mathfrak m_A$, has $r_A(c)^{\rm mat}=1$, and satisfies
+\[
+ r_A(g)^{\rm mat}\equiv
+ \operatorname{diag}(\Psi(g),1,\Psi(g)^{-1})\pmod{\mathfrak m_A}
+ \qquad(g\in\Gamma).
+ \tag{HSR.7}
+\]
+The remaining normalization and local conditions on this integral
+point are retained from the source, although the proof below does
+not need to use each of them separately.
+
+For clarity, here is the full conclusion \texttt{Rigid r} to be
+proved.  Let $z:\Gamma\to V$ be any continuous cocycle for (HSR.5),
+and let $r_\delta$ be any deformation over
+$\overline{\mathbb Q}_\ell[\delta]/(\delta^2)$ with the same
+multiplier and
+\[
+ r_\delta(g)^{\rm mat}=(1+\delta z(g))r(g)^{\rm mat}.
+ \tag{HSR.8}
+\]
+For $p\notin T_b$ assume that $z$ vanishes on
+\[
+ N_p=I_p\cap\ker\eta_4\cap\ker\overline{\Psi\pi}.
+ \tag{HSR.9}
+\]
+At $\ell$, assume that some dual-number basis $h$ makes $r_\delta$
+upper triangular on $D_\ell\cap\ker\eta_4$, with inertia diagonal
+\[
+                  (\Psi,1,\Psi^{-1}).
+ \tag{HSR.10}
+\]
+The right side of (HSR.10) has no $\delta$ term.  At every
+$p\in S_b$, assume that such a basis makes the restriction diagonal
+on $D_p\cap\ker\eta_4$, again with (HSR.10) on inertia.  These
+are literally \texttt{TriIn} and \texttt{DiagIn}; their bases are
+not required to be constant or close to the identity.  We must find
+one $X\in V$ with
+\[
+                  z(g)=X-\operatorname{Ad}_r(g)X
+                  \qquad(g\in\Gamma).
+ \tag{HSR.11}
+\]
+The sign in (HSR.11) is the source's \texttt{cob} convention.
+
+\subsection{Integral points and the local separating element}
+
+% BEGIN HSR1
+\begin{lemma}[HSR1: continuity, normalization, and finite coefficients]
+\label{claim:HSR1}
+The point $r$ has continuous matrix entries, has multiplier $\eta$,
+and satisfies $r(c)=(1,-1)$.  Its adjoint action is continuous.
+For every cocycle and deformation in (HSR.8), all matrix coefficients
+of $r,z,r_\delta$, together with any fixed finite set of dual-number
+bases, lie in one finite extension of $\mathbb Q_\ell$.
+\end{lemma}
+\begin{proof}
+Every element of $A$ is integral over $\mathbb Z_\ell$, hence has
+absolute value at most one: otherwise the leading term of a monic
+integral equation would have strictly larger absolute value than
+all its other terms.  Every unit of $A$ has absolute value one,
+by applying the same assertion to it and its inverse.  If $\varpi$
+is a uniformizer, write $\ell=u\varpi^b$.  Here $b\ge1$, since
+$\ell$ has absolute value less than one and cannot be a unit of
+$A$.  Thus $q=|\varpi|=\ell^{-1/b}<1$, and an element of
+$\mathfrak m_A^n$ has absolute value at most $q^n$.  Local constancy
+modulo $\mathfrak m_A^n$ for every $n$ now proves norm continuity
+of every entry of $r_A$, hence of $r$ under (HSR.6).
+
+Conjugation does not change the multiplier.  Also
+$\vartheta(T_t)=T_t$.  Since $\eta(c)=-1$, the matrix part of
+$T_t r(c)T_t^{-1}$ is consequently
+$T_t r(c)^{\rm mat}T_t^{-1}$.  Its equality to $1$ proves
+$r(c)^{\rm mat}=1$.  The character $\eta$ is locally constant:
+its composition with the quotient map is the continuous finite
+character $\eta_4$, and the quotient topology gives continuity of
+$\eta$.  Formula (HSR.5), on its two open cosets, proves continuity
+of the adjoint action.
+
+The fraction field of $A$ is finite over $\mathbb Q_\ell$ because
+$A$ is finite over $O$ and $O$ is finite over $\mathbb Z_\ell$.
+Adjoining $t$ gives a finite field containing every entry of $r$ and
+its adjoint action.  ADK1's cocycle argument then puts all values of
+the chosen $z$ in a finite extension.  Formula (HSR.8) includes the
+deformation, and adjoining the finitely many entries of the chosen
+bases includes those bases and their inverses.
+
+For the more general \texttt{RigDesc} interface one can start
+directly with a continuous dual-number representation on any compact
+group.  Take an increasing countable cofinal family $E_i$ of finite
+local coefficient fields, as in NR19 and ADK1.  The sets where all
+constant and $\delta$ matrix coefficients belong to $E_i$ are
+closed subgroups and cover the group.  They are subgroups because
+the semidirect-product operations are defined over $E_i[\delta]$;
+a matrix over this ring which is invertible over the larger ring
+is already invertible over it, since its constant determinant is
+nonzero.  Baire's theorem makes one subgroup open.  Adjoining the
+coefficients at its finitely many coset representatives and of the
+specified basis gives the asserted finite field.  The topology on
+each finite field is its subspace topology, so all descended matrix
+maps remain continuous.  This proves exactly the coefficient
+descent used in \texttt{RigDesc}, rather than assuming that arbitrary
+compact subsets of the algebraic closure have finite coefficients.
+\end{proof}
+% END HSR1
+
+% BEGIN HSR2
+\begin{lemma}[HSR2: the dyadic conductor forces separation after reduction]
+\label{claim:HSR2}
+Suppose $u\in(\mathbb Z/N\mathbb Z)^\times$ has $2$-primary
+coordinate equal to $\ell$.  Under (HSR.2),
+\[
+                         \overline{\psi(u)}^{\,4}\ne1.
+ \tag{HSR.12}
+\]
+\end{lemma}
+\begin{proof}
+Put $s=v_2(\ell^2-1)\ge3$, write $o=2^jm$ with $m$ odd, and
+put $a=v_2(N)$ and $d=s+j+1$.  Squaring $1+2^sb$ with $b$ odd
+raises the exact $2$-adic valuation of its difference from $1$ by
+one when $s\ge2$; raising to an odd power does not change it.
+Induction gives
+\[
+ v_2(\ell^{4o}-1)=d,\qquad
+ 2^d\le2o(\ell^2-1)<8o\ell^2<2^{c_2}.
+ \tag{HSR.13}
+\]
+Thus $d<c_2\le a$.
+
+For completeness, an element $v=1+2^d b$ with $b$ odd and $d\ge2$
+generates the group $1+2^d\mathbb Z/2^a\mathbb Z$.
+The same squaring calculation shows
+$v_2(v^{2^k}-1)=d+k$, so its order modulo $2^a$ is exactly
+$2^{a-d}$, the size of that group.  If
+$\psi_2(u)^{4o}=1$, then the character on
+$(\mathbb Z/2^a\mathbb Z)^\times$ kills the generator
+$\ell^{4o}$ of this group.  It therefore factors through
+$(\mathbb Z/2^d\mathbb Z)^\times$.  Its conductor divides $2^d$,
+contradicting the definition of $c_2$.  We have proved
+$\psi_2(u)^{4o}\ne1$.
+
+Reduction to the residue field kills all $\ell$-power order roots
+of unity.  It is injective on prime-to-$\ell$ roots: if $\zeta^b=1$
+with $\ell\nmid b$ and $\bar\zeta=1$, then
+$1+\zeta+\cdots+\zeta^{b-1}$ is a unit, and
+$(\zeta-1)(1+\cdots+\zeta^{b-1})=0$ implies $\zeta=1$.
+Since the $2$-primary unit group has $2$-power order and $\ell$ is
+odd, $\kappa_2=1$ and $\theta_2=\psi_2$.  The CRT product
+decomposition and (HSR.2) give
+\[
+                   \theta(u)^{4o}=\psi_2(u)^{4o}\ne1.
+ \tag{HSR.14}
+\]
+If $\overline{\psi(u)}^4=1$, reduction of $\kappa(u)$ gives
+$\overline{\theta(u)^4}=1$, and injectivity on prime-to-$\ell$
+roots gives $\theta(u)^4=1$.  This contradicts (HSR.14).
+Notice also that $\kappa_2=1$ proves $2\notin S_b$.
+\end{proof}
+% END HSR2
+
+% BEGIN HSR3
+\begin{lemma}[HSR3: the exact local subgroup, with cyclotomic value one]
+\label{claim:HSR3}
+For the stored decomposition group at $\ell$, there is an open
+normal subgroup
+\[
+ H=D_\ell\cap\ker\eta_4\cap\ker(\psi_\ell)_{\mathrm{Gal}}
+ \tag{HSR.15}
+\]
+and an element $g\in H$ with
+\[
+ \Psi\pi(s)=\epsilon(s)^e\quad(s\in H\cap I_\ell),\qquad
+ \epsilon(g)=1,\qquad (\Psi\pi(g))^2-1\in O^\times.
+ \tag{HSR.16}
+\]
+In particular this proves the full \texttt{rig\_sub} output, with
+its final inequality $|\epsilon(g)-1|<1$ strengthened to equality
+$\epsilon(g)=1$.
+\end{lemma}
+\begin{proof}
+Choose an embedding $j:\Omega\hookrightarrow
+\overline{\mathbb Q}_\ell$ inducing the stored valuation.  One
+construction embeds the completions of finite subextensions at
+that valuation into the local algebraic closure and takes a
+compatible system of these finite embeddings.  Each finite
+compatibility problem has a solution by extension of embeddings;
+compactness of the product of the finite nonempty sets gives the
+system.  Restriction identifies $G_{\mathbb Q_\ell}$
+topologically with $D_\ell$ and identifies their inertia groups.
+Here are the details relevant to the chosen model.  The image
+$j\Omega$ is the field of elements algebraic over $\mathbb Q$
+in the local closure and is dense there, by the rational-polynomial
+approximation and conjugate-separation argument used in NR19.
+An element of $D_\ell$ preserves the normalized absolute value,
+so extends isometrically to the completion.  It fixes the closure
+$\mathbb Q_\ell$ of $\mathbb Q$, and consequently preserves
+the elements algebraic over $\mathbb Q_\ell$.  This gives the
+inverse to restriction.  Restriction is continuous: fixing a finite
+set $T\subset\Omega$ pulls back to the open subgroup fixing
+$\mathbb Q_\ell(j(T))$.  The continuous bijection from the compact
+local Galois group to the Hausdorff group $D_\ell$ is a
+homeomorphism.  Its valuation-preserving construction identifies
+inertia and preserves the action on every root of unity.
+
+The image of local inertia under $\epsilon$ is all of
+$\mathbb Z_\ell^\times$.  Indeed
+$\Phi_{\ell^m}(1+T)$ is Eisenstein at $\ell$: its constant term
+is $\ell$, its reduction modulo $\ell$ is
+$T^{\ell^{m-1}(\ell-1)}$, and it is monic.  Thus
+$\mathbb Q_\ell(\mu_{\ell^m})/\mathbb Q_\ell$ is totally
+ramified of degree $\ell^{m-1}(\ell-1)$, and inertia maps onto
+$(\mathbb Z/\ell^m\mathbb Z)^\times$.  Compactness gives the
+surjection on the inverse limit as well.
+
+Take any lift $\sigma_0$ of arithmetic Frobenius in the local
+unramified quotient.  Choose $\tau\in I_\ell$ with
+$\epsilon(\tau)=\epsilon(\sigma_0)^{-1}$ and set
+$\sigma=\sigma_0\tau$.  Then $\epsilon(\sigma)=1$.
+Roots of unity of order prime to $\ell$ lie in the maximal
+unramified extension: they are the unique Hensel lifts of roots
+of the same order in finite residue fields.  Hence $\sigma$
+still acts on them by raising to the $\ell$th power.  Its action
+on $\mu_N$ therefore has $2$-primary coordinate $\ell$.
+HSR2 gives $\overline{\psi_{\mathrm{Gal}}(\sigma)}^4\ne1$.
+
+Since $\epsilon(\sigma)=1$, the element $\sigma$ fixes all
+$\ell$-power roots of unity and kills $(\psi_\ell)_{\mathrm{Gal}}$.
+Set $g=\sigma^2$.  This kills $\eta_4$, so $g\in H$, and
+\[
+ \overline{\Psi\pi(g)}^2
+   =\overline{\psi_{\mathrm{Gal}}(\sigma)}^4\ne1.
+\]
+An element of the local ring $O$ is a unit exactly when its residue
+is nonzero, proving the last assertion in (HSR.16).
+Both characters cutting out $H$ have finite image and open kernel,
+so $H$ is open and normal in $D_\ell$.  Finally inertia at $\ell$
+fixes all prime-to-$\ell$ roots of unity, so on it
+$\psi_{\mathrm{Gal}}=(\psi_\ell)_{\mathrm{Gal}}$.
+Equations (HSR.3) and (HSR.15) give the first assertion of
+(HSR.16).
+\end{proof}
+% END HSR3
+
+% BEGIN HSR4
+\begin{lemma}[HSR4: separation in every triangular basis]
+\label{claim:HSR4}
+Suppose $g\in\Gamma$ has $\eta(g)=1$ and
+$\Psi(g)^2-1\in O^\times$.  In any basis in which $r(g)^{\rm mat}$
+is upper triangular, its diagonal entries $\lambda_1,\lambda_2,
+\lambda_3$ satisfy
+\[
+ |\lambda_i|=1,\qquad |\lambda_i-\lambda_j|=1\ (i\ne j),
+ \qquad \lambda_i\ne u\lambda_j\quad(|u-1|<1, i\ne j).
+ \tag{HSR.17}
+\]
+This is the exact \texttt{rig\_eig} conclusion.
+\end{lemma}
+\begin{proof}
+The three entries $d=(\Psi(g),1,\Psi(g)^{-1})$ are units with
+pairwise distinct residues.  Indeed $\Psi(g)^2-1$ being a unit
+makes both $\Psi(g)-1$ and $\Psi(g)+1$ units, and the other
+differences follow after multiplication by $\Psi(g)^{-1}$.
+By HSR1 and (HSR.7), the integral model $M=r_A(g)^{\rm mat}$
+has entries of absolute value at most one and reduces to
+$\operatorname{diag}(\bar d_1,\bar d_2,\bar d_3)$.
+Its characteristic polynomial is monic integral.  Every root has
+absolute value at most one, by the same leading-term argument as
+in HSR1.  Reducing its factorization into linear factors gives
+\[
+ \prod_i(T-\bar\lambda_i)=\prod_i(T-\bar d_i).
+\]
+The roots on the right are distinct and nonzero.  Unique
+factorization over the residue algebraic closure makes the
+$\bar\lambda_i$ a permutation of them.  This proves the first
+two assertions of (HSR.17).  The triangular diagonals are these
+roots because $\eta(g)=1$ makes (HSR.6) ordinary matrix
+conjugation.  Finally $|\lambda_j(u-1)|<1$ and
+$|\lambda_i-\lambda_j|=1$ imply
+$|\lambda_i-u\lambda_j|=1$ by the ultrametric inequality.
+\end{proof}
+% END HSR4
+
+\subsection{The local deformation is a finite adjoint class}
+
+% BEGIN HSR5
+\begin{proposition}[HSR5: the precise RigFin and RigLoc implication]
+\label{claim:HSR5}
+Let $D$ be an open subgroup of a local absolute Galois group at
+$\ell$, let $r:D\to\mathcal G_3(\overline{\mathbb Q}_\ell)$
+have locally constant multiplier and continuous matrix entries,
+let $z$ be a continuous adjoint cocycle, and let $r_\delta$ be a
+deformation with the same multiplier satisfying (HSR.8).
+Equivalently, $D$ may be an abstract topological group equipped
+with the specified open embedding into $G_{\mathbb Q_\ell}$;
+transport along that embedding gives the present formulation.
+Suppose an open normal
+$H\subset D\cap\ker\eta$ and a dual-number basis give an upper
+triangular representation on $H$ whose diagonal characters
+$\kappa_1,\kappa_2,\kappa_3$ satisfy
+\[
+ \kappa_i|_{H\cap I}=\epsilon^{w_i},\qquad
+ w_1>w_2>w_3,
+ \qquad \bar\kappa_i\ne\bar\kappa_j\epsilon\quad(i<j).
+ \tag{HSR.18}
+\]
+The bar here means reduction modulo $\delta$, not modulo $\ell$.
+Then the original adjoint cocycle has a primitive in
+$M_3(\overline{\mathbb Q}_\ell)\otimes_{\mathbb Q_\ell}
+B_{\mathrm{cris}}$ on all of $D$.  This conclusion is exactly
+the source's \texttt{finiteCocycles}, including its tensor order
+and its diagonal Galois action.
+\end{proposition}
+\begin{proof}
+The coefficient descent in HSR1 gives a finite field $E$ containing
+the representation, cocycle, and basis.  It applies here because
+open local Galois subgroups are compact.  All polynomial equations,
+the upper-triangular conditions, and the non-equalities in
+(HSR.18) descend along the injective inclusion
+$E[\delta]\hookrightarrow\overline{\mathbb Q}_\ell[\delta]$.
+On $H$, both $r$ and $r_\delta$ are ordinary linear
+representations, because their multiplier is one.  Under the
+identification $H=G_L$ for a finite extension of the local base,
+$H\cap I$ is precisely $I_L$.
+
+We recall the actual calculation from RX2 to record why all these
+hypotheses, including the dual-number ones, suffice.  For
+$A=E$ or $E[\delta]$, an upper triangular representation with
+(HSR.18) is crystalline as an underlying $E$-representation.
+Each $\kappa_i\epsilon^{-w_i}$ is unramified.  Even when it
+contains a nontrivial unramified $\delta$-variation, its underlying
+$E$-representation is unramified and hence crystalline; twisting
+by $\epsilon^{w_i}$ preserves this property.  For the induction
+step, let $V_0$ be the first two (or first $n-1$) coordinates and
+put $W=V_0\otimes_A A(\kappa_n^{-1})$.  By induction and tensor
+and quotient stability, $W$ is crystalline.  Its $E$-character
+constituents are $\bar\kappa_i/\bar\kappa_n$, with repetitions
+when $A$ has dual numbers.  All inertia exponents are positive,
+so $\operatorname{Fil}^0D_{\mathrm{dR}}(W)=0$ in the convention
+where $\epsilon$ has Hodge--Tate weight $-1$.
+The constituents of $W^\vee(1)$ are nontrivial by (HSR.18),
+whence $H^0(L,W^\vee(1))=0$.
+
+The local Euler characteristic and Tate duality give
+\[
+ H^2(L,W)=0,\qquad
+ \dim_E H^1(L,W)=\dim_E H^0(L,W)+[L:\mathbb Q_\ell]\dim_EW.
+\]
+The Bloch--Kato finite dimension formula gives the same expression
+for $\dim_EH^1_f(L,W)$, since $\operatorname{Fil}^0=0$.
+Thus $H^1=H^1_f$ for this $W$.  RX2 supplies the lattice limit
+argument deriving these rational statements from the already
+installed finite local duality and Euler identities, and BX1--BX4
+supply the finite dimension formula for the actual period model.
+The last column of the upper triangular representation, divided
+by its last diagonal character, is a cocycle in $W$.  Its
+$B_{\mathrm{cris}}$ primitive splits the corresponding underlying
+$E$-extension after tensoring.  The crystalline comparison
+isomorphisms for its submodule and quotient therefore give one
+for the extension.  This proves the induction, with all
+unramified dual-number diagonal variations included.
+
+Consequently the underlying $E$-self-extension of $r|_H$ defined
+by $r_\delta|_H$ is crystalline.  Exactness of $D_{\mathrm{cris}}$
+and the comparison isomorphism give an equivariant splitting after
+tensoring with $B_{\mathrm{cris}}$.  Choose it compatibly with $E$
+by splitting first over the semisimple algebra
+$L_0\otimes_{\mathbb Q_\ell}E$.  In the vector-space splitting
+already used in (HSR.8), this is precisely an element $b$ with
+\[
+ z(h)\otimes1=\operatorname{Ad}_{r,\mathrm{cris}}(h)b-b
+                  \qquad(h\in H).
+ \tag{HSR.19}
+\]
+
+Here is the descent to $D$, also valid if $\ell$ divides $[D:H]$.
+Subtract the coboundary in (HSR.19) from $z\otimes1$, obtaining
+a cocycle $f$ which vanishes on $H$.  Normality and the cocycle
+identity show that it factors through $Q=D/H$ with values in
+the $H$-invariants.  For $S_f=\sum_{q\in Q}f(q)$, permutation
+of the finite sum gives
+\[
+                  gS_f-S_f=-|Q|f(g).
+\]
+Thus $b-|Q|^{-1}S_f$ is a primitive on $D$.  The action here is
+the full disconnected adjoint on the first tensor factor and
+the actual Galois action on $B_{\mathrm{cris}}$ on the second;
+no connectedness assumption on $D$ was made.  Extending
+coefficients to the algebraic closure carries this primitive to
+the required one.  BX1--BX2 identify the period ring and this
+literal tensor-primitive condition with \texttt{finiteCocycles}.
+Equivariance of scalar extension is immediate on pure tensors
+$X\otimes b$ and hence on their sums.  This proves both the
+finite-coefficient \texttt{RigFin} and the algebraic-closure
+\texttt{RigLoc} interfaces.
+\end{proof}
+% END HSR5
+
+% BEGIN HSR6
+\begin{lemma}[HSR6: the exact inertia primitives away from ell]
+\label{claim:HSR6}
+Every deformation satisfying (HSR.8)--(HSR.10) has an adjoint
+coboundary on inertia at each finite $p\ne\ell$.
+\end{lemma}
+\begin{proof}
+If $p\notin S$, the quotient $\pi$ kills inertia, and
+$z(1)=0$, so the assertion holds with primitive zero.
+Suppose $p\in S_b$.  By HSR2, $p\ne2$; hence $\eta_4$ is
+trivial on $I_p$, since the fourth roots of unity are unramified
+at odd primes.  Write the supplied diagonalizing basis as
+$h=h_0+\delta h_1$, with $h_0$ invertible, and write
+$C=h^{-1}r_\delta(s)h$ for $s\in I_p$.  Its matrix is diagonal
+with the fixed inertia entries (HSR.10), so has no $\delta$
+coefficient.  Put $R=r(s)^{\rm mat}$.  The constant and
+$\delta$ terms of $hC=(1+\delta z(s))Rh$ give
+\[
+ h_0C_0=Rh_0,\qquad
+ h_1C_0=Rh_1+z(s)Rh_0.
+\]
+With $U=h_1h_0^{-1}$, this says
+\[
+ z(s)=U-RUR^{-1}
+     =\operatorname{Ad}_r(s)(-U)-(-U).
+ \tag{HSR.20}
+\]
+The single matrix $-U$ works for all inertia elements.  This is
+the source's \texttt{rig\_diag}, with its sign explicitly fixed.
+
+If $p\in S\setminus T_b$, the cocycle vanishes on $N_p$ from
+(HSR.9).  This is a normal subgroup of finite index in $I_p$:
+it is the intersection of the kernels of two finite characters,
+$\eta_4$ and $\bar\Psi$, with inertia.  The same finite quotient
+sum as in HSR5, now without a period-ring tensor, proves that
+$z|_{I_p}$ is a coboundary.  In detail $z$ factors through
+$I_p/N_p$ with values invariant under $N_p$, and
+$-\sum_{q\in I_p/N_p}z(q)/[I_p:N_p]$ is a primitive.  This
+also handles $p=2$, without asserting that $\eta_4$ is
+unramified there.  These cases exhaust all $p\ne\ell$.
+\end{proof}
+% END HSR6
+
+% BEGIN HSR7
+\begin{proposition}[HSR7: all source tangent classes satisfy literal IsBK]
+\label{claim:HSR7}
+Let $R=r\pi$ and $Z=z\pi$.  For every allowed tangent in the
+source's \texttt{Rigid} definition,
+\[
+       Z\in Z^1(G_{\mathbb Q},\operatorname{Ad}_R),
+       \qquad \texttt{IsBK}_{\ell}(\operatorname{Ad}_R,Z).
+ \tag{HSR.21}
+\]
+\end{proposition}
+\begin{proof}
+Continuity follows from HSR1 and continuity of the quotient map;
+the cocycle law follows by composition.  The away condition is
+HSR6, using the stored valuation when $p\in S$ and any valuation
+when $p\notin S$.
+
+At $\ell$, use the subgroup $H$ and element $g$ of HSR3 and the
+dual-number upper-triangular basis supplied in (HSR.10).  On $H$
+the diagonal characters have inertia exponents
+\[
+                         (w_1,w_2,w_3)=(e,0,-e),
+ \tag{HSR.22}
+\]
+which are strictly decreasing because $e\ge1$.  Reduction of
+the basis modulo $\delta$ is an ordinary invertible matrix and
+triangularizes $r(g)^{\rm mat}$.  HSR4 gives pairwise distinct
+diagonal entries at $g$.  Since $\epsilon(g)=1$, this proves
+$\bar\kappa_i(g)\ne\bar\kappa_j(g)\epsilon(g)$ for every
+$i<j$, hence the character non-equalities in (HSR.18).
+HSR5 gives the required tensor primitive on the entire stored
+$D_\ell$.
+
+To check the exact \texttt{IsBK.above} interface, take the embedding
+$j$ of HSR3.  A field homomorphism
+$\tau:\mathbb Q\to\overline{\mathbb Q}_\ell$ is the unique
+rational inclusion, so $j|_{\mathbb Q}=\tau$ as required.
+The source's \texttt{decJ} consists of pairs $(s,u)$ such that
+$u j=j s$.  It is the graph of restriction from
+$G_{\mathbb Q_\ell}$; its first projection has image exactly
+the stored $D_\ell$ and its second projection is a topological
+isomorphism.  HSR3 supplies the identification with that stored
+group, and ADK5 gives the graph topology directly by open
+stabilizers of finite global sets.  Transport (HSR.19) along these
+maps.  On a pure tensor the transported action is
+\[
+            X\otimes b\longmapsto
+            \operatorname{Ad}_R(s)X\otimes u(b),
+\]
+which is exactly the source's \texttt{actC}.  Thus the transported
+primitive proves its \texttt{finiteCocycles} assertion, not just
+a condition on an unspecified local representation.  This
+verifies both clauses of the literal \texttt{IsBK}.
+\end{proof}
+% END HSR7
+
+\subsection{The exact global polarization and the endpoint}
+
+% BEGIN HSR8
+\begin{proposition}[HSR8: the automorphic twist and full disconnected adjoint]
+\label{claim:HSR8}
+Suppose the original \texttt{BPrime\_s} holds for
+$a(s)=R(s)^{\rm mat}$ and the specified $K$ with
+\texttt{IsQi K}.  Then ADK6 applies to
+$\operatorname{Ad}_R$ on the full $M_3$, with its original
+coefficient and local-condition scope.
+\end{proposition}
+\begin{proof}
+By definition \texttt{IsQi K} says $[K:\mathbb Q]=2$ and
+$K$ contains a square root of $-1$.  The algebra structure
+$K\hookrightarrow\Omega$ provided by
+\texttt{BPrime\_s.aut} therefore has image $\mathbb Q(i)$.
+The image of restriction $G_K\to G_{\mathbb Q}$ is exactly
+$\ker\eta_4$.  For example, the action on $i$ is its action on
+$\mu_4$, and the nontrivial element of
+$\operatorname{Gal}(\mathbb Q(i)/\mathbb Q)$ has character
+value $-1$.
+
+Unfolding \texttt{Af.AutOnAlt K iota (-1) a} gives a
+representation $r_0:G_K\to\operatorname{GL}_3
+(\overline{\mathbb Q}_\ell)$ whose matrix is literally
+$a(s)$ on $G_K$, and says that
+\[
+                         r_K=\epsilon^{-1}r_0
+ \tag{HSR.23}
+\]
+satisfies \texttt{IsAutCsdA}.  Its first conjunct is
+\texttt{AutCsd0}.  Inspecting that definition gives the very same
+existential cuspidal representation, regular algebraicity,
+conjugate self-duality, and \texttt{AttC} condition as
+\texttt{IsAutCsd}.  The normalized Satake and infinite-place
+dictionary, including the geometric Frobenius convention, is
+already checked in ADK3.  Thus (HSR.23) satisfies the literal
+automorphy hypothesis of ADK6.  HSR1 gives continuity of $r_0$
+and hence of $r_K$; the entries of the inverse are continuous as
+well, so this is continuity into $\operatorname{GL}_3$.
+
+The field $\Omega$ is an algebraic closure of this specified
+copy of $K$: it is algebraically closed and algebraic over
+$\mathbb Q\subset K$.  Under the above restriction map,
+$\ker\epsilon|_{G_K}$ identifies with
+$\ker\eta_4\cap\ker\epsilon$ in $G_{\mathbb Q}$.
+The source uses $\texttt{cycZ}$ for the latter character and
+$\texttt{cycBar}$ for its inclusion in
+$\overline{\mathbb Q}_\ell^\times$; the inclusion is injective,
+so their kernels coincide.  The \texttt{BPrime\_s.cyc}
+assertion says that $r_0$ is irreducible on this exact subgroup.
+The twist in (HSR.23) is one there.  Therefore $r_K$ is
+irreducible on its full infinite cyclotomic kernel, exactly the
+hypothesis of ADK6.  No residual or finite-level version is being
+substituted.  The additional \texttt{BPrime\_s.opens} hypothesis
+is retained but is unnecessary for this implication.
+
+It remains to check the pairing and the disconnected action.
+HSR1 and \texttt{IsHostFrame.cc} give
+$R(c_\infty)=(1,-1)$, with $c_\infty$ induced by an actual
+complex embedding.  The semidirect-product law implies, for
+$s\in G_K$,
+\[
+ r_0(c_\infty s c_\infty^{-1})
+      =Jr_0(s)^{-t}J,\qquad
+ r_0(s)^tJr_0(c_\infty s c_\infty^{-1})=J.
+\]
+The cyclotomic character is invariant under conjugation, so
+(HSR.23) gives
+\[
+ r_K(s)^tJr_K(c_\infty s c_\infty^{-1})
+                       =\epsilon(s)^{-2}J
+                       =\epsilon(s)^{1-3}J.
+ \tag{HSR.24}
+\]
+Also $J^t=J=J^{-1}$ and, for every $X\in M_3$,
+\[
+ \operatorname{Ad}_R(s)X=r_K(s)Xr_K(s)^{-1},\qquad
+ \operatorname{Ad}_R(c_\infty)X=-J^{-1}X^tJ.
+ \tag{HSR.25}
+\]
+Equations (HSR.24)--(HSR.25), together with the actual complex
+embedding, are every clause of \texttt{IsAdOf}, with $P=J$.
+In particular the scalar line is present and complex conjugation
+acts on it by $-1$.  There is no passage to trace zero and no
+undetermined scalar in the pairing.  ADK6 now proves
+\[
+ H^1_f(\mathbb Q,\operatorname{Ad}_R)=0
+\]
+in the literal source sense \texttt{BlochKatoSelmerVanishes}.
+\end{proof}
+% END HSR8
+
+% BEGIN HSR9
+\begin{theorem}[HSR9: the original HostRigid\_s statement]
+\label{claim:HSR9}
+For every choice of data quantified in the source's
+\texttt{HostRigid\_s}, an \texttt{IsCharZeroPt} satisfying
+\texttt{BPrime\_s} is rigid in the exact sense (HSR.11).
+Consequently \texttt{HOST\_RIGID\_S} is supplied by the
+human proofs ADK1--ADK6, HSR1--HSR8, and the previously installed
+local inputs BX1--BX4, DX1, NR19, and RX2.
+\end{theorem}
+\begin{proof}
+Take an arbitrary continuous cocycle and arbitrary allowed
+deformation from the definition of rigidity.  HSR7 makes
+$Z=z\pi$ a literal Bloch--Kato cocycle for
+$\operatorname{Ad}_{r\pi}$.  HSR8 and ADK6 give a single
+$v\in M_3(\overline{\mathbb Q}_\ell)$ such that
+\[
+ z(\pi(s))=\operatorname{Ad}_r(\pi(s))v-v
+                       \qquad(s\in G_{\mathbb Q}).
+\]
+The map $\pi$ is onto.  Set $X=-v$ and choose a preimage of
+each $g\in\Gamma$ to obtain (HSR.11).  This proves every
+quantifier of the original rigidity conclusion.  In particular
+the primitive is one global matrix, not a family of unrelated
+local primitives.
+\end{proof}
+% END HSR9
+
+\subsection{Scope and source comparisons}
+
+The proof has supplied the entire original
+\texttt{HostRigid\_s} implication.  It retains the original
+marked-element, parity, coefficient, valuation, and
+\texttt{BPrime\_s} hypotheses, and it works at every odd
+$\ell$ permitted by \texttt{HostData}.  It uses only the
+$p=\ell$ instance of the numerical inequality in (HSR.2), and
+only the \texttt{cyc} and \texttt{aut} parts of
+\texttt{BPrime\_s}.  These observations simplify this proof;
+they do not manufacture those hypotheses for a host or remove
+them from any downstream source statement.
+
+The local calculation is an explicit application of the already
+proved RX2, with its finite local duality and exact crystalline
+period model.  The global calculation is an explicit application
+of the published theorem matched in ADK1--ADK6.  There is no new
+automorphy theorem or new vanishing conjecture hidden in this
+step.  Conversely this section does not supply
+\texttt{HostNumber\_s}, the existence or automorphy of its points,
+the quantitative congruence estimates, or the other remaining
+arithmetic producers.  It closes a proof-reconstruction leaf;
+it does not by itself complete the reconstruction of RH or GRH.
+
+\begin{center}
+\begin{tabular}{p{0.31\textwidth}p{0.61\textwidth}}
+Original interface & Human proof and exact comparison \\
+\hline
+\texttt{IsCharZeroPt}, \texttt{RigDesc}
+ & HSR1: norm continuity from the actual finite DVR and Baire descent.\\
+\texttt{DyadicCharacterPowerNeOne}, \texttt{rig\_sub}
+ & HSR2--HSR3: dyadic conductor, finite characters, stored local group,
+   and the stronger witness $\epsilon(g)=1$.\\
+\texttt{RigSep}, \texttt{rig\_eig}
+ & HSR4: reduction of the actual characteristic polynomial in every
+   triangular basis.\\
+\texttt{rig\_fin}, \texttt{rig\_loc}
+ & HSR5 and RX2: finite coefficients, dual-number ordinary
+   crystalline calculation, and descent with the diagonal period action.\\
+\texttt{rig\_diag}, \texttt{rig\_away}, \texttt{rig\_above}
+ & HSR6--HSR7: explicit inertia primitives and the literal
+   \texttt{decJ}/\texttt{finiteCocycles} match.\\
+\texttt{BPrime\_s}, \texttt{AutOnAlt}, \texttt{IsAdOf}
+ & HSR8: exact twist $\epsilon^{-1}$, full infinite cyclotomic
+   kernel, and actual matrix $P=J$.\\
+\texttt{HostRigid\_s}
+ & HSR9: ADK6 applied to the literal global cocycle, quotient
+   surjectivity, and the required sign of \texttt{cob}.\\
+\end{tabular}
+\end{center}
+
+The accompanying \texttt{provenance.json} gives pinned source
+paths, declaration ranges, range hashes, inherited human-proof
+locations, and claim dependencies for this table.

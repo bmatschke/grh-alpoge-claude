@@ -1,0 +1,1640 @@
+[WRS_division_and_actual_objects_01] setDiv: arbitrary Nu.L and h replacement, with the exact derived HH maximum
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/SetUnipotentTranslate.lean#L25-L31
+Range SHA256: ffca4f03bbc117d2b6eb3ced2db075290739fd186b12a4fba82620d9558a32e3
+@[reducible] def setDiv (D : D7) (N : ∀ u, Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V) (h : D.what₂.Word → ℝ) : D7 :=
+  { D with
+    div := { D.div with
+      Nu := fun u => { D.div.Nu u with L := N u }
+      h := h
+      HH := max 1 (sFrame (fun u => { D.div.Nu u with L := N u }) h + D.div.RR.muMax)
+      HH_ge := le_max_right _ _ } }
+
+
+[WRS_division_and_actual_objects_02] All Lay fields, including given comparison, lattice, twisted forms and local kernel
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/SetUnipotentTranslate.lean#L83-L119
+Range SHA256: 1019f6f4d3dab4d7dfd97a6fb9c14b26096762de53c893b6cba2473c37b758da
+structure Lay (D : D7) : Type 1 where
+  gatT : GatTies D
+  ties : Formalism.BasicNotions.Ties D
+  X : DivX D
+  rrDef : DV.RRDef D
+  lev : LevelData D
+  th : ThetaX D
+  th_io : th.TieIo
+  cmp : LatCmp D
+  tw : TwForms D
+  Gy : G.LatInst D
+  vram : cmp.VramDef Gy
+  fills_all : FillsAll gatT Gy
+  ker : ∀ u w (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)),
+    haveI : Fact (D.what₂.places.resChar w).Prime := ⟨D.what₂.places.resChar_prime w⟩
+    LocalToGlobal₂ D gatT cmp tw u w h (Gy.Ch u w h)
+  idx : IdxDefs D X
+  kap_def : DV.KapDef D
+  lam_def : DV.LamDef D
+  kapR_def : DV.KapRBase X
+  errX : ErrX D
+  piG_lev : PiGLevel D lev errX
+  piT_lev : PiTLevel D lev errX
+  seen : SeenDef D errX
+  tauOf : TauOfDef D errX
+  dgam : DGamDef D
+  nch : NChoice D
+  nch_tie : NChTie D nch
+  xd : ThData D
+  p0 : BaseLevelRowSide D
+  rationalRoots_def : p0.s.RRDef
+  amb : AmbForm D (RowSide.sharp D)
+  amb0 : AmbForm D p0.s
+  duStar_def : ∀ u, ((D.mem u).A.duStar : ℝ) = StandardLattice.duStarU D u
+  Dstar_def : D.what₂.Dstar = StandardLattice.DstarD D
+  gauge : letI := D.host.cmStar; GlobalTheoryTheory.GenusMassVolumes.GaugeFam D.host.F D.host.E D.sp.cm.sig
+  gauge_def : letI := D.host.cmStar; gauge.IsGauge
+
+
+[WRS_division_and_actual_objects_03] LedPart with its Gy equality and full original Obj record
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/SetUnipotentTranslate.lean#L148-L171
+Range SHA256: be318bc93c1a0e9afa152b4c4f962ec7a511d7fa883edfd4d948d63df48ed435
+structure LedPart (C : FC) {D : D7} (Y : Lay D) where
+  L : SizeData₂ D
+  ta : TiesAt C L Y.gatT
+  Gy_eq : ta.Gy = Y.Gy
+  nuDef : DV.NuDef D L
+  lat : LatDefs D L ta.Gx Y.Gy C.GK Y.cmp
+  ep_def : G.EpDef ta.Gx C.cX.Ce
+  ep_tie : EpTie ta.Gx
+  kapI_def : G.KapIDef ta.Gx C.GK
+  nu_unserved : NuUnserved ta.Gx C.GK
+  err : ErrDefs D L Y.errX Y.lev C.GK C.cX.err
+  fdef : L.FDef
+
+structure Obj (D : D7) : Type 1 where
+  L : SizeData₂ D
+  gatT : GatTies D
+  Gx : G.Inst D L
+  Gy : G.LatInst D
+  K : G.Consts
+  X : DivX D
+  cX : ExtraC
+  ex : Extra D L gatT Gx Gy K X cX
+
+namespace Obj
+
+
+[WRS_division_and_actual_objects_04] Actual size, group, comparison, twisted-form, divisor and row-side transports
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/SetUnipotentTranslate.lean#L193-L221
+Range SHA256: 680874e07b991f284d5e14bb17aab99476fc420af368f216a8ce6cf39b91563d
+section Transport
+
+variable {D : D7} (N : ∀ u, Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V) (h : D.what₂.Word → ℝ)
+
+@[reducible] def ledTr (L : SizeData₂ D) : SizeData₂ (setDiv D N h) := { L with }
+
+@[reducible] def instTr {L : SizeData₂ D} (X : G.Inst D L) : G.Inst (setDiv D N h) (ledTr N h L) := { X with }
+
+@[reducible] def gatTr (x : GatTies D) : GatTies (setDiv D N h) := { x with }
+
+@[reducible] def latTr (x : G.LatInst D) : G.LatInst (setDiv D N h) := { x with }
+
+@[reducible] def cmpTr (x : LatCmp D) : LatCmp (setDiv D N h) := { x with }
+
+@[reducible] def twTr (x : TwForms D) : TwForms (setDiv D N h) := { x with }
+
+@[reducible] def thTr (x : ThetaX D) : ThetaX (setDiv D N h) := { x with }
+
+@[reducible] def errTr (x : ErrX D) : ErrX (setDiv D N h) := { x with }
+
+@[reducible] def nchTr (x : NChoice D) : NChoice (setDiv D N h) := { x with }
+
+@[reducible] def xdTr (x : ThData D) : ThData (setDiv D N h) := { x with }
+open DivX (md) in
+
+@[reducible] def divTr (X : DivX D) : DivX (setDiv D N h) := { X with md := fun S κ p _ la z => { md X S κ p la z with } }
+
+@[reducible] def sideTr {EE : Type} [NormedAddCommGroup EE] [InnerProductSpace ℂ EE] [FiniteDimensional ℂ EE] (S : RowSide D EE) :
+    RowSide (setDiv D N h) EE := { S with }
+
+
+[WRS_division_and_actual_objects_05] Complete extraTr and Obj.tr/Obj.ofPt; kernel uses the given record
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/SetUnipotentTranslate.lean#L313-L353
+Range SHA256: 04180f2353f19073f40acfea5c7ecac2257a01840e1aa02a762dc688a86b1ebc
+def extraTr {L : SizeData₂ D} {gatT : GatTies D} {Gx : G.Inst D L} {Gy : G.LatInst D} {K : G.Consts} {X : DivX D} {cX : ExtraC}
+    (ex : Extra D L gatT Gx Gy K X cX) :
+    Extra (setDiv D N h) (ledTr N h L) (gatTr N h gatT) (instTr N h Gx) (latTr N h Gy) K (divTr N h X) cX where
+  lev := ex.lev
+  th := thTr N h ex.th
+  th_io := ex.th_io
+  cmp := cmpTr N h ex.cmp
+  lat := ⟨ex.lat.vram, fun u w hg hv x => by
+    rw [NP_tr]; exact ex.lat.served u w hg (by rw [← VV_tr N h]; exact hv) x, ex.lat.atT⟩
+  tw := twTr N h ex.tw
+  ker := fun u w g => { ex.ker u w g with }
+  ep_def := ex.ep_def
+  ep_tie := ex.ep_tie
+  kapI_def := ex.kapI_def
+  fills_all := ex.fills_all
+  nu_unserved := fun u w h1 h2 => ex.nu_unserved u w h1 (by rw [← VV_tr N h]; exact h2)
+  idx := { ex.idx with }
+  kap_def := ex.kap_def
+  lam_def := ex.lam_def
+  kapR_def := ex.kapR_def.trans (kapSharp_tr N h).symm
+  errX := errTr N h ex.errX
+  err := { ex.err with }
+  nch := nchTr N h ex.nch
+  nch_tie := { ex.nch_tie with }
+  xd := xdTr N h ex.xd
+  p0 := ⟨sideTr N h ex.p0.s⟩
+  rationalRoots_def := rrDef_tr N h _ ex.rationalRoots_def
+  amb := { ex.amb with }
+  amb0 := { ex.amb0 with }
+  fdef := ex.fdef
+  duStar_def := ex.duStar_def
+  Dstar_def := ex.Dstar_def
+  gauge := ex.gauge
+  gauge_def := ex.gauge_def
+
+end Transport
+
+def Obj.tr {D : D7} (O : Obj D) (N : ∀ u, Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V) (h : D.what₂.Word → ℝ) : Obj (setDiv D N h) :=
+  ⟨ledTr N h O.L, gatTr N h O.gatT, instTr N h O.Gx, latTr N h O.Gy, O.K, divTr N h O.X, O.cX, extraTr N h O.ex⟩
+
+def Obj.ofPt {C : FC} (p : Pt C) : Obj p.D := ⟨p.L, p.gatT, p.ta.Gx, p.ta.Gy, C.GK, p.xa.X, C.cX, p.xa.ex⟩
+
+
+[WRS_division_and_actual_objects_06] Exact nPrime, hExpl6, LedPart.pt, same Gy, and full ofPt_pt equality
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/SetUnipotentTranslate.lean#L365-L413
+Range SHA256: 4ea782f63e2f32864fad4f32a0a441729d0b26a70ed2ded36cf270970d0966b8
+def LedPart.extra {C : FC} {D : D7} {Y : Lay D} (p : LedPart C Y) : Extra D p.L Y.gatT p.ta.Gx Y.Gy C.GK Y.X C.cX :=
+  { Y with
+    lat := p.lat, ep_def := p.ep_def, ep_tie := p.ep_tie, kapI_def := p.kapI_def, nu_unserved := p.nu_unserved, err := p.err,
+    fdef := p.fdef }
+
+def Lay.obj {C : FC} {D : D7} (Y : Lay D) (p : LedPart C Y) : Obj D := ⟨p.L, Y.gatT, p.ta.Gx, Y.Gy, C.GK, Y.X, C.cX, p.extra⟩
+
+def nPrime {D : D7} (L : SizeData₂ D) (u : D.what₂.Word) : Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V :=
+  Submodule.span (𝓞 D.what₂.LL) {x | ∃ a ∈ DV.Iu D L u, ∃ y ∈ L.NuLat u, x = (a : D.what₂.LL) • y}
+
+namespace LedPart
+
+variable {C : FC} {D : D7} {Y : Lay D} (p : LedPart C Y)
+
+def ht : D.what₂.Word → ℝ := DV.hExpl6 D p.L Y.X C.Csz
+
+def pt : Pt C where
+  D := setDiv D (nPrime p.L) p.ht
+  L := ledTr (nPrime p.L) p.ht p.L
+  gatT := gatTr (nPrime p.L) p.ht Y.gatT
+  ta :=
+    { Gx := instTr (nPrime p.L) p.ht p.ta.Gx
+      Gy := latTr (nPrime p.L) p.ht Y.Gy
+      supp_sat := p.ta.supp_sat
+      tw_supp := p.ta.tw_supp
+      fills := fun w => fills_tr (D := D) (nPrime p.L) p.ht p.ta.Gx C.GK w (p.ta.fills w)
+      lats0 := fun w u h1 h2 => p.ta.lats0 w u (by rw [← VV_tr (nPrime p.L) p.ht]; exact h1) h2
+      latTied := (p.Gy_eq ▸ p.ta.latTied : G.LatTied Y.gatT p.ta.Gx Y.Gy)
+      drop_iff := p.ta.drop_iff }
+  xa :=
+    { ties := { Y.ties with }
+      X := divTr (nPrime p.L) p.ht Y.X
+      nuDef := p.nuDef
+      nprimeDef := fun _ => rfl
+      rrDef := Y.rrDef
+      h_eq := fun _ => rfl
+      ex := extraTr (nPrime p.L) p.ht p.extra }
+
+theorem pt_D : p.pt.D = setDiv D (nPrime p.L) p.ht := rfl
+
+theorem pt_sc : p.pt.L.sc = p.L.sc := rfl
+
+theorem ofPt_pt : Obj.ofPt p.pt = (Y.obj p).tr (nPrime p.L) p.ht := rfl
+
+theorem pt_wtEq {φ : Formalism.HC.Frame} {a b : φ.A → ℤ} (H : WtEq p.L a b) : WtEq p.pt.L a b := H
+
+theorem pt_val {cD ch : ℝ} (H : Val C cD ch p.L) : Val C cD ch p.pt.L := { H with }
+
+theorem pt_canon (H : CanonInst p.ta.Gx) : CanonInst p.pt.ta.Gx := H
+
+
+[WRS_division_and_actual_objects_07] Full Obj2 retains actual comparison/kernel; complete Obj2.tr
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/PointPropertyEqSizeFree.lean#L10-L64
+Range SHA256: 04a7198ed9f94a92f711758c27acb087c7aeea3585c8170576417326942d3004
+structure Obj2 (D : D7) : Type 1 where
+
+  gatT : GatTies D
+
+  th : ThetaX D
+
+  cmp : LatCmp D
+
+  tw : TwForms D
+
+  Gy : G.LatInst D
+
+  errX : ErrX D
+
+  nch : NChoice D
+
+  xd : ThData D
+
+  lev : LevelData D
+
+  X : DivX D
+
+  p0 : BaseLevelRowSide D
+
+  ker : ∀ u w (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)),
+    haveI : Fact (D.what₂.places.resChar w).Prime := ⟨D.what₂.places.resChar_prime w⟩
+    LocalToGlobal₂ D gatT cmp tw u w h (Gy.Ch u w h)
+
+  amb : AmbForm D (RowSide.sharp D)
+
+  amb0 : AmbForm D p0.s
+
+  gauge : letI := D.host.cmStar; GlobalTheoryTheory.GenusMassVolumes.GaugeFam D.host.F D.host.E D.sp.cm.sig
+
+def layObj {D : D7} (Y : Lay D) : Obj2 D := { Y with }
+
+def divXtr {D : D7} (X : DivX D) (N : ∀ u, Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V) (h : D.what₂.Word → ℝ) : DivX (setDiv D N h) :=
+  divTr N h X
+
+def Obj2.tr {D : D7} (O : Obj2 D) (N : ∀ u, Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V) (h : D.what₂.Word → ℝ) : Obj2 (setDiv D N h) where
+  gatT := gatTr N h O.gatT
+  th := thTr N h O.th
+  cmp := cmpTr N h O.cmp
+  tw := twTr N h O.tw
+  Gy := latTr N h O.Gy
+  errX := errTr N h O.errX
+  nch := nchTr N h O.nch
+  xd := xdTr N h O.xd
+  lev := O.lev
+  X := divTr N h O.X
+  p0 := ⟨sideTr N h O.p0.s⟩
+  ker := fun u w g => { O.ker u w g with }
+  amb := { O.amb with }
+  amb0 := { O.amb0 with }
+  gauge := O.gauge
+
+
+[WRS_division_and_actual_objects_08] ofObj, pointObj, ofObj_tr and exact pointObj_pt at nPrime and hExpl6
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/PointPropertyEqSizeFree.lean#L70-L106
+Range SHA256: 8fe7ff6644d634b87cc1dcce3f20cf5f8b10513038203ed139db168f45a7ae56
+def allDiv (QO : ∀ D : D7, Obj2 D → Prop) (D : D7) (Y : Lay D) : Prop := ∀ N h, QO (setDiv D N h) ((layObj Y).tr N h)
+
+def extraObj {D : D7} {L : SizeData₂ D} {gatT : GatTies D} {Gx : G.Inst D L} {Gy : G.LatInst D} {K : G.Consts} {X : DivX D}
+    {cX : ExtraC} (ex : Extra D L gatT Gx Gy K X cX) : Obj2 D :=
+  { gatT := gatT, th := ex.th, cmp := ex.cmp, tw := ex.tw, Gy := Gy, errX := ex.errX, nch := ex.nch, xd := ex.xd,
+    lev := ex.lev, X := X, p0 := ex.p0, ker := ex.ker, amb := ex.amb, amb0 := ex.amb0, gauge := ex.gauge }
+
+def ofObj {D : D7} (O : Obj D) : Obj2 D := extraObj O.ex
+
+def pointObj {C : FC} (p : Pt C) : Obj2 p.D := extraObj p.xa.ex
+
+theorem has_pointProperty_iff {C : FC} (p : Pt C) (QO : ∀ D : D7, Obj2 D → Prop) : p.Has (pointPropertyOfObjects QO) ↔ QO p.D (pointObj p) := Iff.rfl
+
+theorem pointPropertyOfObjects_eq_ptO (QO : ∀ D : D7, Obj2 D → Prop) : pointPropertyOfObjects QO = ptO (fun D O => QO D (ofObj O)) := rfl
+
+theorem ofObj_ofPt {C : FC} (p : Pt C) : ofObj (Obj.ofPt p) = pointObj p := rfl
+
+theorem ofObj_obj {C : FC} {D : D7} (Y : Lay D) (p : LedPart C Y) : ofObj (Y.obj p) = layObj Y := rfl
+
+theorem ofObj_tr {D : D7} (O : Obj D) (N : ∀ u, Submodule (𝓞 D.what₂.LL) (D.div.Nu u).V) (h : D.what₂.Word → ℝ) :
+    ofObj (O.tr N h) = (ofObj O).tr N h := rfl
+
+theorem layObj_ofPt {C : FC} (p : Pt C) : layObj (Lay.ofPt p) = pointObj p := rfl
+
+theorem layObj_injective {D : D7} : Function.Injective (layObj (D := D)) := by
+  intro Y Y' H
+  cases Y; cases Y'
+  cases H
+  rfl
+
+theorem pointObj_pt {C : FC} {D : D7} {Y : Lay D} (p : LedPart C Y) : pointObj p.pt = (layObj Y).tr (nPrime p.L) p.ht := rfl
+
+theorem allDiv.has_pt {QO : ∀ D : D7, Obj2 D → Prop} {C : FC} {D : D7} {Y : Lay D} (H : allDiv QO D Y) (p : LedPart C Y) :
+    p.pt.Has (pointPropertyOfObjects QO) := H _ _
+
+theorem allDiv.ofPt_pt {QO : ∀ D : D7, Obj2 D → Prop} {C : FC} {D : D7} {Y : Lay D} (H : allDiv QO D Y) (p : LedPart C Y) :
+    QO p.pt.D (ofObj (Obj.ofPt p.pt)) := H _ _
+
+
+[WRS_local_kernel_transport_01] All seventeen LocalToGlobal2 fields, including actual comparison, integral span and chain equation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/DataKerP.lean#L26-L67
+Range SHA256: efcf0c65451231f140f97a5aeb043cedc77694ff016016646ae8aa141f169de3
+structure LocalToGlobal₂ (D : D7) (Gt : GatTies D) (c : LatCmp D) (Tw : TwForms D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
+    [Fact (D.what₂.places.resChar w).Prime]
+    (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) {Fl : Fills (D.gat u w h)} {Lv : Levels Fl}
+    (Ch : Chain Lv) where
+
+  fl_t : Fl.t = D.R.t
+  fl_m : Fl.mm = D.R.m
+
+  lam : (algebraicClosure ℚ ℂ) →+* ℂ_[D.what₂.places.resChar w]
+
+  iK : (D.gat u w h).Kf →+* ℂ_[D.what₂.places.resChar w]
+  iLL_lam : ∀ (x : D.what₂.LL) (hx : D.what₂.embLL x ∈ algebraicClosure ℚ ℂ),
+    iK (c.embW u w h x) = lam ⟨D.what₂.embLL x, hx⟩
+
+  iw : ∀ j (v : Fin (Fl.Pj j).nV), D.host.E →+* (Fl.Pj j).Qq v
+
+  glob : ∀ j, Lv.comp j → (Fl.Pj j).Tup → Submodule (𝓞 D.host.E) (Fin ((Fl.Pj j).m + 1) → D.host.E)
+
+  glob_loc : ∀ j, j ≤ D.R.m → ∀ (a : Lv.comp j) (L : (Fl.Pj j).Tup), (Fl.Pj j).IsLatTup L → ∀ v,
+    L v = Submodule.span ((Fl.Pj j).W v) {y | ∃ x ∈ glob j a L, y = fun i => iw j v (x i)}
+
+  cls : ∀ j, Lv.comp j → (Fl.Pj j).Tup → (D.chTw u (D.what₂.muAt w)).cls j
+
+  cls_iff : ∀ j, j ≤ D.R.m → ∀ (a a' : Lv.comp j) (L L' : (Fl.Pj j).Tup), (Fl.Pj j).IsLatTup L →
+    (Fl.Pj j).IsLatTup L' →
+    (cls j a L = cls j a' L' ↔ a = a' ∧ ∃ γ : (Lv.lev j a).Γ, L' = (Lv.lev j a).smul γ L)
+  cls_surj : ∀ j, j ≤ D.R.m → ∀ x : (D.chTw u (D.what₂.muAt w)).cls j, ∃ a L, (Fl.Pj j).IsLatTup L ∧ cls j a L = x
+
+  Th : ∀ j, Lv.comp j × (Fl.Pj j).Tup → Lv.comp (j + 1) × (Fl.Pj (j + 1)).Tup →
+    MvPowerSeries (D.what₂.Tau × Fin ((Fl.Pj (j + 1)).m + 1) × Fin ((Fl.Pj j).m + 1)) ℂ_[D.what₂.places.resChar w]
+
+  cmp : ∀ j, ((Tw.fm u (D.what₂.muAt w)).lat j).V →ₛₗ[c.embW u w h] Lv.Fm j
+  cmp_inj : ∀ j, j ≤ D.R.m → Function.Injective (cmp j)
+
+  cmp_zero : ∀ x : ((D.fm u).lat 0).V, cmp 0 (Tw.e0 u (D.what₂.muAt w) x) = c.cmp u w h x
+
+  cmp_int : Submodule.span (D.gat u w h).O
+    (cmp 0 '' (((Tw.fm u (D.what₂.muAt w)).lat 0).L : Set ((Tw.fm u (D.what₂.muAt w)).lat 0).V)) = Lv.Int 0
+
+  cmp_K : ∀ j, j < D.R.m → ∀ (x : ((Tw.fm u (D.what₂.muAt w)).lat j).V) (y : ((Tw.fm u (D.what₂.muAt w)).lat (j + 1)).V),
+    (Tw.fm u (D.what₂.muAt w)).emb (j + 1) y = (D.chTw u (D.what₂.muAt w)).K j ((Tw.fm u (D.what₂.muAt w)).emb j x) →
+    cmp (j + 1) y = Ch.Kz j (cmp j x)
+
+
+[WRS_local_kernel_transport_02] Exact kernel transport and full ColumnDataSplitPrimes division transport
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ColumnLocalDataTransportDivision.lean#L29-L41
+Range SHA256: 51e0867f558de9124276a8169a3a41c3edb9d62f053885e56b068e52600785d9
+def kerTr {Gt : GatTies (w.D Z)} {cmp : LatCmp (w.D Z)} {Gy : G.LatInst (w.D Z)} (k : KerFam (w.D Z) Gt cmp (w.tw Z) Gy) :
+    KerFam (w.D (setDivZ Z N h)) (gatTr (D := w.D Z) N h Gt) (cmpTr (D := w.D Z) N h cmp) (w.tw (setDivZ Z N h))
+      (latTr (D := w.D Z) N h Gy) :=
+  fun u v g => { k u v g with }
+
+set_option maxHeartbeats 8000000 in
+
+def columnLocalDataTransportDivision (c : ColumnDataSplitPrimes K w Z)
+    (hR : IsRecG K.s (w.D (setDivZ Z N h)) (gatTr (D := w.D Z) N h c.Gt) (cmpTr (D := w.D Z) N h c.cmp)
+      (DivTr.herm0S (D := w.D Z) N h c.g.herm) (fun u => DivTr.forms0S (D := w.D Z) N h (c.g.forms u))) :
+    ColumnDataSplitPrimes K w (setDivZ Z N h) :=
+  { DivTr.colTTr w Z N h c.toColT with isRec := hR, om := c.om }
+
+
+
+[WRS_local_kernel_transport_03] Actual kerTr and complete ktTr with all KerT fields
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/InstBack.lean#L25-L38
+Range SHA256: b5deb40419da1f48deeae9799c0d64953a798cd939849827b58501b07d81036c
+def kerTr {t : ColT w Z} {Gy : G.LatInst (w.D Z)} (ker : KerFam (w.D Z) t.Gt t.cmp (w.tw Z) Gy) :
+    KerFam (w.D (setDivZ Z N h)) (colTTr w Z N h t).Gt (colTTr w Z N h t).cmp (w.tw (setDivZ Z N h)) (latTr (D := w.D Z) N h Gy) :=
+  fun u v g => { ker u v g with }
+
+set_option maxHeartbeats 4000000 in
+
+def ktTr {t : ColT w Z} {X : DivX (w.D Z)} {Gy : G.LatInst (w.D Z)} {ker : KerFam (w.D Z) t.Gt t.cmp (w.tw Z) Gy}
+    (kt : KerT t X Gy ker) :
+    KerT (colTTr w Z N h t) (divTr (D := w.D Z) N h X) (latTr (D := w.D Z) N h Gy) (kerTr w Z N h ker) :=
+  { kt with
+    O := fun u a => { kt.O u a with }
+    E := { kt.E with }
+    std := { kt.std with }
+    ok := ⟨⟨fun u μ v hv => { (kt.ok.1.choose u μ v hv) with }, fun u μ v hv => kt.ok.1.choose_spec u μ v hv⟩, kt.ok.2⟩ }
+
+
+[WRS_taylor_kernel_transport_01] KerFam and all nine KerT fields on the actual coefficient data
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/TiedColumnData.lean#L106-L125
+Range SHA256: 02e2efe436c7f24c8a1b668b078289bb72ad834114c64197334007cc11409de5
+abbrev KerFam (D : D7) (Gt : GatTies D) (cmp : LatCmp D) (tw : TwForms D) (Gy : G.LatInst D) : Type _ :=
+  ∀ u v (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar v)),
+    haveI : Fact (D.what₂.places.resChar v).Prime := ⟨D.what₂.places.resChar_prime v⟩
+    LocalToGlobal₂ D Gt cmp tw u v h (Gy.Ch u v h)
+
+structure KerT {w : ColW B f T} {Z : w.Lt} (t : ColT w Z) (Y : DivX (w.D Z)) (Gy : G.LatInst (w.D Z))
+    (ker : KerFam (w.D Z) t.Gt t.cmp (w.tw Z) Gy) : Type 1 where
+  O : ∀ u a, GL3Theta.LiftObj (w.D Z) ((w.D Z).chTw u a)
+  std : TC.StdO w.I w.l Z Y.Qp O
+  unf : ∀ u a i, i < B.R.m → Formalism.L2.Ker.UnfIsAll (O u a) i
+  E : KerEnt (w.D Z) Y (w.tw Z)
+  ok : TC.EntOk E O
+  lam : ∀ u v h, haveI : Fact ((w.D Z).what₂.places.resChar v).Prime := ⟨(w.D Z).what₂.places.resChar_prime v⟩
+    (ker u v h).lam = E.lam v
+  served : ∀ u v h, haveI : Fact ((w.D Z).what₂.places.resChar v).Prime := ⟨(w.D Z).what₂.places.resChar_prime v⟩
+    ThAtServed (ker u v h) E
+  iw : ∀ u v h, haveI : Fact ((w.D Z).what₂.places.resChar v).Prime := ⟨(w.D Z).what₂.places.resChar_prime v⟩
+    Formalism.L2.Herm.SymmetricKernelCompatibleAtPlace t.full.1.base.toHermColsCh t.full.1.g u v h (ker u v h)
+  iw_pos : ∀ u v h, haveI : Fact ((w.D Z).what₂.places.resChar v).Prime := ⟨(w.D Z).what₂.places.resChar_prime v⟩
+    Formalism.L2.Herm.GIwPos u v h (ker u v h)
+
+
+[WRS_taylor_kernel_transport_02] Literal EntC and BuiltE definitions
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/ThetaChr.lean#L80-L87
+Range SHA256: 78ae4f58e23e4cd835599a1428e47f30774e9c06e95aa75f5fa1b8f67c99b4e4
+def EntC {w : ColW B f T} {Z : w.Lt} {t : ColT w Z} {Y : DivX (w.D Z)} {Gy : G.LatInst (w.D Z)}
+    {ker : KerFam (w.D Z) t.Gt t.cmp (w.tw Z) Gy} (k : KerT t Y Gy ker) : Prop :=
+  ∃ (Pl : Examples₂.EntPl (w.D Z)) (Bs : Formalism.L2.Ker.PlaceMatrixFamily (w.D Z)) (h : Formalism.L2.Ker.KerEntHyp Pl k.O Bs Y (w.tw Z)),
+    k.E = Formalism.L2.Ker.kerEntC Pl k.O Bs h
+
+def BuiltE (𝒮 : Slots) : CP := fun K _ _ _ w Z c => ∃ b : Built 𝒮 K w Z c, EntC b.ker
+
+def GoodE (𝒮 : Slots) : CP := fun K B f T w Z c => BuiltE 𝒮 K B f T w Z c ∧ GoodO (w.D Z) c.O.nch c.O.xd
+
+
+[WRS_taylor_kernel_transport_03] All seven standard lifting-object readings, with unchanged Qp
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/StdLvPr.lean#L140-L147
+Range SHA256: 3f9b8e8b2e6e939b094528e434796c5dc5b8658aa459bbbde98837d5fc322782
+structure StdO (Qp : I.ι → Finset ℕ) (O : ∀ u a, GL3Theta.LiftObj (I.rec7 l Z) ((I.rec7 l Z).chTw u a)) : Prop where
+  mt : ∀ u a, (O u a).mt = fun j => if 1 ≤ j ∧ j ≤ B.R.m then
+    (I.rec7 l Z).muTil j * (show (I.rec7 l Z).Dt →* ℂˣ from tildeQ B.host I.SQ (I.xi a)) else (I.rec7 l Z).muTil j
+  lat : ∀ u a i c, ((O u a).lat i c).1 = ((I.stp u a i).rep c).1.1.deco.1.N
+  dt : ∀ u a i c, (O u a).dt i c = detPt B.host I.SQ ((I.stp u a i).rep c).1.1
+  frm : ∀ u a i y, (O u a).frm i y = y.1
+  dgen : ∀ u a, (O u a).dgen = I.J.cD
+  S : ∀ u a, (O u a).S = insert (B.T u) ({B.host.g 0, B.host.g 1} ∪ Qp a)
+
+
+[WRS_taylor_kernel_transport_04] EntOk: same KFTie witnesses/UnIs and AdaptedTh
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/FixedVectorEqOfStandardData.lean#L114-L115
+Range SHA256: ce20599f94874e319d8a40c5423877ad72ee638968f9564812c4f1ebfcca8424
+def EntOk {D : D7} {Y : DivX D} {Tw : TwForms D} (E : KerEnt D Y Tw) (O : ∀ u μ, GL3Theta.LiftObj D (D.chTw u μ)) : Prop :=
+  (∃ kf : ∀ u μ w, LevFree Y u μ w → GL3Columns.KFTie E (O u μ) w, ∀ u μ w (h : LevFree Y u μ w), (kf u μ w h).UnIs) ∧ AdaptedTh E O
+
+
+[WRS_taylor_kernel_transport_05] Given place matrices, thAtW, polynomial evaluation quotient and fixed section
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/KernelLattices/ColumnData/KerEntHyp.lean#L18-L78
+Range SHA256: 4b1a1b0c48e8eb61badb0a6615026979ce8a8523cb9dbd9b7d75ad4d00dfd063
+abbrev PlaceMatrixFamily (D : D7) : Type :=
+  ∀ u μ (w : D.what₂.places.Pl) (i : ℕ), (D.chTw u μ).cls i → D.what₂.Tau → Matrix (Fin (D.R.N i)) (Fin (D.R.N i)) (Cw D w)
+
+section Obj
+
+variable {D : D7} (P : Examples₂.EntPl D) (O : ∀ u μ, GL3Theta.LiftObj D (D.chTw u μ)) (B : PlaceMatrixFamily D)
+
+def IsBasC (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c : (D.chTw u μ).cls i) (τ : D.what₂.Tau)
+    (M : Matrix (Fin (D.R.N i)) (Fin (D.R.N i)) (Cw D w)) : Prop :=
+  GL3Columns.BasR D (P.lam w) τ ((O u μ).lat i c).1 M ∧ ∀ a b, ∃ x : D.what₂.LL, M a b = P.iL w x
+
+def basC : PlaceMatrixFamily D := fun u μ w i c τ => Classical.epsilon (IsBasC P O u μ w i c τ)
+
+def BasEx : Prop :=
+  ∀ u μ (w : D.what₂.places.Pl) i, i ≤ D.R.m → ∀ (c : (D.chTw u μ).cls i) τ, ∃ M, IsBasC P O u μ w i c τ M
+
+def BasOk : Prop :=
+  ∀ u μ (w : D.what₂.places.Pl) i, i ≤ D.R.m → ∀ (c : (D.chTw u μ).cls i) τ, GL3Columns.BasR D (P.lam w) τ ((O u μ).lat i c).1 (B u μ w i c τ)
+
+def thAtW (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c : (D.chTw u μ).cls i) (c' : (D.chTw u μ).cls (i + 1)) :
+    MvPowerSeries ((Bool × HH D) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) (Cw D w) :=
+  atLin (fun (k : D.what₂.Tau × Fin (D.R.N (i + 1)) × Fin (D.R.N i)) (j : (Bool × HH D) × Fin (D.R.N i) × Fin (D.R.N (i + 1))) =>
+      if tauPl D j.1 = k.1 then
+        1 * lamC (P.lam w) ((O u μ).dgen k.1) * B u μ w (i + 1) c' k.1 k.2.1 j.2.2 * (B u μ w i c k.1)⁻¹ j.2.1 k.2.2
+      else 0)
+    (fun j => MvPowerSeries.X j) (pSer D (P.lam w) ((O u μ).Th i c c'))
+
+def twB (D : D7) (u : D.what₂.Word) (μ : D.what₂.Tup) : ℕ → D.what₂.Tau → ℤ
+  | 0 => (D.chTw u μ).sSharp 0
+  | j + 1 => (D.chTw u μ).sDiv j
+
+def polV (D : D7) (u : D.what₂.Word) : (i : ℕ) → Submodule D.what₂.LL (MvPolynomial (GL3Theta.FrV D (D.R.N i)) D.what₂.LL)
+  | 0 => WtPol D.what₂.LL (nuT D u 0)
+  | j + 1 => WtPol D.what₂.LL (extNu (D.R.N (j + 1)) (nuT D u j))
+
+def evP (u : D.what₂.Word) (μ : D.what₂.Tup) (i : ℕ) : polV D u i →ₛₗ[D.what₂.embLL] ((D.chTw u μ).Y i → ℂ) where
+  toFun v := fun y => (∏ τ, ((D.chTw u μ).de i y τ) ^ (-(twB D u μ i τ))) *
+    GL3Theta.evFr D (MvPolynomial.map D.what₂.embLL (v : MvPolynomial (GL3Theta.FrV D (D.R.N i)) D.what₂.LL)) ((O u μ).frm i y)
+  map_add' a b := by
+    funext y
+    simp [GL3Theta.evFr, mul_add]
+  map_smul' a b := by
+    funext y
+    simp [GL3Theta.evFr, MvPolynomial.smul_eq_C_mul]
+    ring
+
+abbrev ValQ (u : D.what₂.Word) (μ : D.what₂.Tup) (i : ℕ) : Type := (polV D u i) ⧸ LinearMap.ker (evP O u μ i)
+
+def evC (u : D.what₂.Word) (μ : D.what₂.Tup) (i : ℕ) : ValQ O u μ i →ₛₗ[D.what₂.embLL] ((D.chTw u μ).Y i → ℂ) :=
+  (LinearMap.ker (evP O u μ i)).liftQ (evP O u μ i) le_rfl
+
+def secC (u : D.what₂.Word) (μ : D.what₂.Tup) (i : ℕ) : ValQ O u μ i →ₗ[D.what₂.LL] polV D u i :=
+  Classical.choose ((LinearMap.ker (evP O u μ i)).mkQ.exists_rightInverse_of_surjective (Submodule.range_mkQ _))
+
+def canM (D : D7) (w : D.what₂.places.Pl) (N : ℕ) (nu : Bool × HH D → YoungDiagram) :
+    Module.Dual (Cw D w) (MvPolynomial ((Bool × HH D) × ℕ × Fin N) (Cw D w)) →ₗ[Cw D w] (FrP D w N → Cw D w) where
+  toFun ph := fun y => ph (GL3Columns.DeX N nu fun s => GL3Columns.colsOf (y (tauPl D s)))
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
+
+def canInv (D : D7) (w : D.what₂.places.Pl) (N : ℕ) (nu : Bool × HH D → YoungDiagram) :
+
+
+[WRS_taylor_kernel_transport_06] Actual minor maps, source/target functionals, determinant normalization and unC convention
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/KernelLattices/ColumnData/KerEntHyp.lean#L80-L136
+Range SHA256: 2b1c640725e7b50b021b84ef3198e8158c4922ffaf48cf48f0b2e1f65c48b14a
+  Classical.epsilon fun g => ∀ F ∈ LinearMap.range (canM D w N nu), canM D w N nu (g F) = F
+
+def onMin (D : D7) (w : D.what₂.places.Pl) (N : ℕ) (nu : Bool × HH D → YoungDiagram) :
+    Module.Dual (Cw D w) (MvPolynomial ((Bool × HH D) × ℕ × Fin N) (Cw D w)) →ₗ[Cw D w] (KM.ColChoice N nu → Cw D w) :=
+  LinearMap.pi fun I => LinearMap.applyₗ (MvPolynomial.map (Int.castRingHom (Cw D w)) (KM.nablaX N nu I))
+
+def srcPol (u : D.what₂.Word) (μ : D.what₂.Tup) (i : ℕ) (v : MvPolynomial (GL3Theta.FrV D (D.R.N i)) D.what₂.LL) : MvPolynomial (GL3Theta.FrV D (D.R.N i)) D.what₂.LL :=
+  v * ∏ τ, frDet D.what₂.LL (D.R.N i) τ ^ ((D.chTw u μ).sSharp i τ - twB D u μ i τ).toNat
+
+def atBas (w : D.what₂.places.Pl) {N : ℕ} (M : D.what₂.Tau → Matrix (Fin N) (Fin N) (Cw D w)) :
+    MvPolynomial (GL3Theta.FrV D N) D.what₂.LL →ₛₗ[P.iL w] (FrP D w N → Cw D w) where
+  toFun Q := fun y => MvPolynomial.eval (fun k : GL3Theta.FrV D N => (M k.1 * y k.1) k.2.1 k.2.2) (MvPolynomial.map (P.iL w) Q)
+  map_add' a b := by
+    funext y
+    simp
+  map_smul' a b := by
+    funext y
+    simp [MvPolynomial.smul_eq_C_mul]
+
+def srcFun (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c : (D.chTw u μ).cls i) :
+    polV D u i →ₛₗ[P.iL w] (FrP D w (D.R.N i) → Cw D w) :=
+  ((∏ τ, (B u μ w i c τ).det ^ (-(D.chTw u μ).sSharp i τ)) • (LinearMap.id : (FrP D w (D.R.N i) → Cw D w) →ₗ[Cw D w] _)).comp
+    ((atBas P w (B u μ w i c)).comp
+      ((LinearMap.mulRight D.what₂.LL (∏ τ, frDet D.what₂.LL (D.R.N i) τ ^ ((D.chTw u μ).sSharp i τ - twB D u μ i τ).toNat)).comp (polV D u i).subtype))
+
+def prSC (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c : (D.chTw u μ).cls i) :
+    ValQ O u μ i →ₛₗ[P.iL w] Module.Dual (Cw D w) (MvPolynomial ((Bool × HH D) × ℕ × Fin (D.R.N i)) (Cw D w)) :=
+  (canInv D w (D.R.N i) (nuD D u i)).comp ((srcFun P B u μ w i c).comp (secC O u μ i))
+
+def tgtFun (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c' : (D.chTw u μ).cls (i + 1)) :
+    polV D u (i + 1) →ₛₗ[P.iL w] (FrP D w (D.R.N (i + 1)) → Cw D w) :=
+  ((∏ τ, (B u μ w (i + 1) c' τ).det ^ (-(D.chTw u μ).sDiv i τ)) • (LinearMap.id : (FrP D w (D.R.N (i + 1)) → Cw D w) →ₗ[Cw D w] _)).comp
+    ((atBas P w (B u μ w (i + 1) c')).comp (polV D u (i + 1)).subtype)
+
+def tgtPh (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c' : (D.chTw u μ).cls (i + 1)) :
+    ValQ O u μ (i + 1) →ₛₗ[P.iL w] Module.Dual (Cw D w) (MvPolynomial ((Bool × HH D) × ℕ × Fin (D.R.N (i + 1))) (Cw D w)) :=
+  (canInv D w (D.R.N (i + 1)) (nuD D u i)).comp ((tgtFun P B u μ w i c').comp (secC O u μ (i + 1)))
+
+def prTC (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c' : (D.chTw u μ).cls (i + 1)) :
+    ValQ O u μ (i + 1) →ₛₗ[P.iL w] (KM.ColChoice (D.R.N (i + 1)) (nuD D u i) → Cw D w) :=
+  (onMin D w (D.R.N (i + 1)) (nuD D u i)).comp (tgtPh P O B u μ w i c')
+
+def unF (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c : (D.chTw u μ).cls i) (c' : (D.chTw u μ).cls (i + 1)) : Cw D w :=
+  (lamC (P.lam w) ((GL3Theta.rhoOf D (O u μ).mt i ((O u μ).dt i c) : ℂˣ) : ℂ) * ∏ τ, (B u μ w i c τ).det ^ ((D.chTw u μ).sSharp i τ)) *
+    (lamC (P.lam w) ((GL3Theta.rhoOf' D (O u μ).mt i ((O u μ).dt (i + 1) c') : ℂˣ) : ℂ) *
+      ∏ τ, (B u μ w (i + 1) c' τ).det ^ (-(D.chTw u μ).sDiv i τ))
+
+def unC (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c : (D.chTw u μ).cls i) (c' : (D.chTw u μ).cls (i + 1)) : Cw D w :=
+  if unF P O B u μ w i c c' = 0 then 1 else unF P O B u μ w i c c'
+
+def CanS : Prop :=
+  ∀ u μ (w : D.what₂.places.Pl) i, i < D.R.m → ∀ (c : (D.chTw u μ).cls i) (v : polV D u i),
+    srcFun P B u μ w i c v ∈ LinearMap.range (canM D w (D.R.N i) (nuD D u i))
+
+def CanT : Prop :=
+  ∀ u μ (w : D.what₂.places.Pl) i, i < D.R.m → ∀ (c' : (D.chTw u μ).cls (i + 1)) (v : polV D u (i + 1)),
+    tgtFun P B u μ w i c' v ∈ LinearMap.range (canM D w (D.R.N (i + 1)) (nuD D u i))
+
+
+[WRS_taylor_kernel_transport_07] All four KerEntHyp clauses and entire kerEntC presentation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/KernelLattices/ColumnData/KerEntHyp.lean#L149-L199
+Range SHA256: f4c5d43ead65d0aff81d170790a509940c2068e0fb4808a15f31a9efb258777e
+structure KerEntHyp : Prop where
+  val : ∀ u μ w, LevFree Dx u μ w → ∀ i, i < D.R.m → ∀ c' (v' : ValQ O u μ (i + 1)) I,
+    ∃ b : D.what₂.LL, ‖prTC P O B u μ w i c' v' I‖ = ‖P.iL w b‖
+  latS : ∀ u μ w, LevFree Dx u μ w → ∀ i, i < D.R.m → ∀ φ : (D.chTw u μ).cls i → (D.chTw u μ).Y i → ℂ,
+    (∃ x ∈ locW D.what₂.places w ((Tw.fm u μ).lat i).L, (Tw.fm u μ).emb i x = φ) ↔
+      (φ ∈ (Tw.fm u μ).Fi i ∧ ∀ c, ∃ v : ValQ O u μ i, evC O u μ i v = φ c ∧
+        ∀ J : KM.ColChoice (D.R.N i) (nuD D u i),
+          ‖prSC P O B u μ w i c v (MvPolynomial.map (Int.castRingHom _) (KM.nablaX (D.R.N i) (nuD D u i) J))‖ ≤ 1)
+  latT : ∀ u μ w, LevFree Dx u μ w → ∀ i, i < D.R.m →
+    ∀ φ : (D.chTw u μ).cls (i + 1) → (D.chTw u μ).Y (i + 1) → ℂ,
+    (∃ y ∈ locW D.what₂.places w ((Tw.fm u μ).lat (i + 1)).L, (Tw.fm u μ).emb (i + 1) y = φ) ↔
+      (φ ∈ (Tw.fm u μ).Fi (i + 1) ∧ ∀ c', ∃ v' : ValQ O u μ (i + 1), evC O u μ (i + 1) v' = φ c' ∧
+        ∀ I, ‖prTC P O B u μ w i c' v' I‖ ≤ 1)
+  kform : ∀ u μ w, LevFree Dx u μ w → ∀ i, i < D.R.m → ∀ (c : (D.chTw u μ).cls i) (c' : (D.chTw u μ).cls (i + 1))
+    (v : ValQ O u μ i) (v' : ValQ O u μ (i + 1)),
+    evC O u μ (i + 1) v' = (D.chTw u μ).Kmap i c c' (evC O u μ i v) →
+    ∀ I, prTC P O B u μ w i c' v' I =
+      unC P O B u μ w i c c' *
+        prSC P O B u μ w i c v (KM.applyAt0 (D.R.N i) (D.R.N (i + 1)) (D.what₂.places.resChar w) (thAtW P O B u μ w i c c')
+          (KM.Gxz (D.R.N i) (D.R.N (i + 1)) (nuD D u i) I))
+
+theorem evC_inj (u : D.what₂.Word) (μ : D.what₂.Tup) (i : ℕ) : Function.Injective (evC O u μ i) := by
+  rw [← LinearMap.ker_eq_bot]
+  exact Submodule.ker_liftQ_eq_bot _ _ _ le_rfl
+
+theorem unC_ne (u : D.what₂.Word) (μ : D.what₂.Tup) (w : D.what₂.places.Pl) (i : ℕ) (c : (D.chTw u μ).cls i) (c' : (D.chTw u μ).cls (i + 1)) :
+    unC P O B u μ w i c c' ≠ 0 := by
+  unfold unC
+  split_ifs with h
+  · exact one_ne_zero
+  · exact h
+
+variable {Dx Tw}
+
+def kerEntC (h : KerEntHyp P O B Dx Tw) : KerEnt D Dx Tw where
+  lam := P.lam
+  iL := P.iL
+  iL_lam := P.iL_lam
+  iL_int := P.iL_int
+  Th := thAtW P O B
+  VQ := fun u μ i _ => ValQ O u μ i
+  ev := fun u μ i _ => evC O u μ i
+  ev_inj := fun u μ i _ => evC_inj O u μ i
+  prS := prSC P O B
+  prT := prTC P O B
+  prT_val := h.val
+  lat_S := h.latS
+  levelFree_lattice_condition := h.latT
+  un := unC P O B
+  un_ne := unC_ne P O B
+  kform := h.kform
+
+
+[WRS_taylor_kernel_transport_08] Full entC_tr on the same place data, matrices, KerEntHyp and actual equality
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/InstBack.lean#L41-L52
+Range SHA256: cfce05298aea8559d4a58c8565ba0d3ccef9149213fc21917b88f33e7e654628
+
+theorem entC_tr {t : ColT w Z} {X : DivX (w.D Z)} {Gy : G.LatInst (w.D Z)} {ker : KerFam (w.D Z) t.Gt t.cmp (w.tw Z) Gy}
+    (kt : KerT t X Gy ker)
+    (H : ∃ (Pl : Examples₂.EntPl (w.D Z)) (Bs : Formalism.L2.Ker.PlaceMatrixFamily (w.D Z)) (hh : Formalism.L2.Ker.KerEntHyp Pl kt.O Bs X (w.tw Z)),
+      kt.E = Formalism.L2.Ker.kerEntC Pl kt.O Bs hh) :
+    ∃ (Pl : Examples₂.EntPl (w.D (setDivZ Z N h))) (Bs : Formalism.L2.Ker.PlaceMatrixFamily (w.D (setDivZ Z N h)))
+      (hh : Formalism.L2.Ker.KerEntHyp Pl (ktTr w Z N h kt).O Bs (divTr (D := w.D Z) N h X) (w.tw (setDivZ Z N h))),
+      (ktTr w Z N h kt).E = Formalism.L2.Ker.kerEntC Pl (ktTr w Z N h kt).O Bs hh := by
+  obtain ⟨Pl, Bs, hh, e⟩ := H
+  exact ⟨{ Pl with }, Bs, { hh with },
+    congrArg (fun E => ({ E with } : Formalism.BasicNotions.KerEnt (w.D (setDivZ Z N h)) (divTr (D := w.D Z) N h X) (w.tw (setDivZ Z N h)))) e⟩
+
+
+
+[WRS_taylor_kernel_transport_09] Full original kerT_entC_setDiv at its actual input record
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/KernelTaylorSeriesPreservedDivisionLatticeChange.lean#L10-L12
+Range SHA256: 4172c24e113ce0fe2469cc6c74e540d4115026b1e5eabe1b0cf7aa770311f532
+theorem kerT_entC_setDiv : ∀ {B : Base} {f : Fr B.toPre} {T : TwDat B} (w : ColW B f T) (Z : w.Lt) (t : ColT w Z) (Y : DivX (w.D Z)) (Gy : G.LatInst (w.D Z)) (ker : KerFam (w.D Z) t.Gt t.cmp (w.tw Z) Gy) (k : KerT t Y Gy ker) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V) (h : B.Word → ℝ), EntC k → ∃ k' : KerT (DivTr.colTTr w Z N h t) (divTr (D := w.D Z) N h Y) (latTr (D := w.D Z) N h Gy) (kerTr w Z N h ker), EntC k' := by
+  intro B f T w Z t Y Gy ker k N h hE
+  exact ⟨DivTr.ktTr w Z N h k, DivTr.entC_tr w Z N h k hE⟩
+
+
+[WRS_taylor_kernel_transport_10] Original kernelTaylorSeries_preserved_divisionLatticeChange endpoint
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/KernelTaylorSeriesPreservedDivisionLatticeChangeStatement.lean#L7-L8
+Range SHA256: b09b7747a092e943c34567ee142ccae498026968c5a19892366e16051249600c
+theorem _root_.GlobalTheory.T.kernelTaylorSeries_preserved_divisionLatticeChange : ∀ {B : Base} {f : Fr B.toPre} {T : TwDat B} (w : ColW B f T) (Z : w.Lt) (t : ColT w Z) (Y : DivX (w.D Z)) (Gy : G.LatInst (w.D Z)) (ker : KerFam (w.D Z) t.Gt t.cmp (w.tw Z) Gy) (k : KerT t Y Gy ker) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V) (h : B.Word → ℝ), EntC k → ∃ k' : KerT (DivTr.colTTr w Z N h t) (divTr (D := w.D Z) N h Y) (latTr (D := w.D Z) N h Gy) (kerTr w Z N h ker), EntC k' := by
+  first | exact @GlobalTheory.Mem.Top.Bl.WitTr.kerT_entC_setDiv | exact GlobalTheory.Mem.Top.Bl.WitTr.kerT_entC_setDiv | (intros; apply GlobalTheory.Mem.Top.Bl.WitTr.kerT_entC_setDiv <;> assumption)
+
+
+[WRS_joint_column_kernel_identity_01] All ColT fields, including actual Gt/cmp/g and Hermitian/form equalities
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/PositionOfIntro.lean#L73-L84
+Range SHA256: 77efaeb411fed9258e67d9d126609ffe658c56cb4a1799db5c3b162f73dbdf68
+structure ColT {B : Base} {f : Fr B.toPre} {T : TwDat B} (w : ColW B f T) (Z : w.Lt) : Type 1 where
+  C : Formalism.L2.Forms.ColsTiedSym (w.D Z)
+  std : TC.StdC w.I w.l Z C
+  stdLv : ∀ u, TC.StdLvC w.I w.l Z u (C.forms u)
+  full : Formalism.L2.Forms.ColsFullS C
+  stdDt : TC.StdDt w.I w.l Z full.1.base.dt
+  Gt : GatTies (w.D Z)
+  cmp : LatCmp (w.D Z)
+  g : Formalism.L2.G.GroupCompatibilityAll (w.D Z) Gt cmp
+  herm_eq : g.herm = full.1.to0
+  forms_eq : g.forms = fun u => (C.forms u).to0
+  gpl : Formalism.L2.Herm.SymmetricGroupCompatibleAtPlaces (w.D Z) full.1.base.toHermColsCh full.1.g Gt
+
+
+[WRS_joint_column_kernel_identity_02] Full ColumnDataSplitPrimes and original GIs2 quantifier order
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/TiedColumnData.lean#L91-L96
+Range SHA256: a710dfb45484f7e1f385969bc759ef7c348ef52c15e896424b3a18e22b3d8003
+structure ColumnDataSplitPrimes (K : Ctx) (w : ColW B f T) (Z : w.Lt) : Type 1 extends ColT w Z where
+  isRec : IsRecG K.s (w.D Z) Gt cmp g.herm g.forms
+  om : Formalism.L2.GlobalTheoryTheory.OmegaCompatible (w.D Z) w.I.J.δ
+
+def GIs2 (K : Ctx) (w : ColW B f T) (G : GJStage B w.C) : Prop :=
+  ∀ W V S N, Formalism.L2.Theta.VolTieG (w.D ⟨W, V, S, N, G⟩) ∧ GatNum K.s (w.D ⟨W, V, S, N, G⟩) ∧ Nonempty (ColumnDataSplitPrimes K w ⟨W, V, S, N, G⟩)
+
+
+[WRS_joint_column_kernel_identity_03] Full Built record, exact dependent (Gt,cmp,tw,ker) equality and IsBuilt
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/NonzeroPlacesOverPrimes.lean#L147-L171
+Range SHA256: af272ad5ada72a269eb159337aa08bb5b1625ce438b59b80a9b6f59681597583
+structure Built (𝒮 : Slots) (K : Ctx) (w : ColW B f T) (Z : w.Lt) (c : V4.Core K (w.st Z) f T) : Type 1 where
+  pin : ColPin w
+  coh : Coh B T
+  g : GIs2 K w Z.G
+  col : ColumnDataSplitPrimes K w Z
+  what₂ : RowsT K w Z c.Wt c.O.p0
+  rx : 𝒮.Rx K B f T w Z c.Wt c.O.p0 what₂
+  xi : c.xi = w.I.xi
+  lev : c.O.lev = col.full.1.base.lev0
+  errX : c.O.errX = Formalism.L2.Herm.toErrXS col.full.1
+  n : NchT w Z c.Wt c.O.nch
+  nx : 𝒮.Nx K B f T w Z c.Wt c.O.p0 what₂ c.O.nch n c.O.xd
+  sx : 𝒮.Sx K B f T w Z c.Wt c.O.p0 what₂ col.toColT
+  ker0 : KerFam (w.D Z) col.Gt col.cmp (w.tw Z) c.O.Gy
+  ker_eq : (⟨c.O.gatT, c.O.cmp, c.O.tw, c.O.ker⟩ : Σ (Gt : GatTies (w.D Z)) (cmp : LatCmp (w.D Z)) (tw : TwForms (w.D Z)),
+    KerFam (w.D Z) Gt cmp tw c.O.Gy) = ⟨col.Gt, col.cmp, w.tw Z, ker0⟩
+  ker : KerT col.toColT c.O.X c.O.Gy ker0
+  div : DivT n c.O.X
+  th : ThT n c.O.th
+  obj : ObjT c.O what₂
+  ox : 𝒮.Ox K B f T w Z c.Wt c.O what₂
+
+def BuiltC (𝒮 : Slots) : CP := fun K _ _ _ w Z c => Nonempty (Built 𝒮 K w Z c)
+
+def IsBuilt (𝒮 : Slots) : V4.Slot := positionOf (BuiltC 𝒮)
+
+
+[WRS_joint_column_kernel_identity_04] Exact prime and kernel embeddings, JoinTiedS and all SymmetricExtraCompatibility fields
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/HermitianColumns/FullSym.lean#L101-L129
+Range SHA256: 53bc23868c9d0fc39db55bddcf65b8aea3855e2aeb9702dc65974981a0354101
+def SymmetricGroupCompatibleAtPlaces (D : D7) (H : HermColsCh D) (G : SymmetricGroupCompatibility D H) (Gt : GatTies D) : Prop :=
+  ∀ u w hg (v : Fin (D.gat u w hg).P.nV) (s : Fin ((D.gat u w hg).P.n' v)) (x : 𝓞 D.host.F),
+    x ∈ ((G u w hg).pl v).1.asIdeal ↔
+      (0 : WithTop ℤ) < D.what₂.places.val w
+        (tauLL D (Gt.gat_pos u w hg ⟨v, s⟩) (algebraMap D.host.F D.host.E (x : D.host.F)))
+
+def SymmetricKernelCompatibleAtPlace {D : D7} (H : HermColsCh D) (G : SymmetricGroupCompatibility D H) {Gt : GatTies D} {c : LatCmp D} {Tw : TwForms D}
+    (u : D.what₂.Word) (w : D.what₂.places.Pl) [Fact (D.what₂.places.resChar w).Prime]
+    (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) {Fl : Formalism.MainNotions.G.Fills (D.gat u w hg)}
+    {Lv : Formalism.MainNotions.G.Levels Fl} {Ch : Formalism.MainNotions.G.Chain Lv} (Kp : LocalToGlobal₂ D Gt c Tw u w hg Ch) : Prop :=
+  ∀ (v : Fin (D.gat u w hg).P.nV) (x : D.host.E),
+    (G u w hg).eQ v _ rfl (Kp.iw 0 v x) =
+      ((G u w hg).spl _ ((G u w hg).pl v).2
+        (inclE (F := D.host.F) (((G u w hg).pl v).1.adicCompletion D.host.F) x)).1
+
+structure JoinTiedS {D : D7} (X : FullTiedS D) (lev : LevelData D) (eX : ErrX D) (Gt : GatTies D) : Prop where
+  lev_eq : lev = X.base.lev0
+  errX_eq : eX = toErrXS X
+  gpl : SymmetricGroupCompatibleAtPlaces D X.base.toHermColsCh X.g Gt
+
+structure SymmetricExtraCompatibility {D : D7} (X : FullTiedS D) {L : SizeData₂ D} {hT : GatTies D} {Gi : Formalism.MainNotions.G.Inst D L}
+    {Gl : Formalism.MainNotions.G.LatInst D} {K : Formalism.MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
+    (ex : Extra D L hT Gi Gl K Y cX) : Prop where
+  join : JoinTiedS X ex.lev ex.errX hT
+  iw : ∀ u w (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)),
+    haveI : Fact (D.what₂.places.resChar w).Prime := ⟨D.what₂.places.resChar_prime w⟩
+    SymmetricKernelCompatibleAtPlace X.base.toHermColsCh X.g u w h (ex.ker u w h)
+  iw_pos : ∀ u w (h : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)),
+    haveI : Fact (D.what₂.places.resChar w).Prime := ⟨D.what₂.places.resChar_prime w⟩
+
+
+[WRS_joint_column_kernel_identity_05] Literal ColsFullS and ColsExtraTiedS
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/HermitianForms/ExtraSym.lean#L10-L16
+Range SHA256: 269ead5e06ca74ea0475d453d3d18ba82af1e47ab6263bb7fe4d794be4585224
+def ColsFullS {D : D7} (C : ColsTiedSym D) :=
+  { full : Formalism.L2.Herm.FullTiedS D // full.cols = C.herm }
+
+def ColsExtraTiedS {D : D7} {C : ColsTiedSym D} (Fu : ColsFullS C) {L : SizeData₂ D} {hT : GatTies D}
+    {Gi : Formalism.MainNotions.G.Inst D L} {Gl : Formalism.MainNotions.G.LatInst D} {K : Formalism.MainNotions.G.Consts} {Y : DivX D} {cX : ExtraC}
+    (ex : Extra D L hT Gi Gl K Y cX) : Prop :=
+  Formalism.L2.Herm.SymmetricExtraCompatibility Fu.1 ex
+
+
+[WRS_joint_column_kernel_identity_06] Original same-Extra column/kernel extraction for WPt, whose finite argument is extended to Built
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExtraTiedCol.lean#L10-L21
+Range SHA256: 31b7dfdfd2a9faae919b9129f62dc94ef0d1e2274a3772fcdc51e027dc42a2c1
+theorem GlobalTheory.Mem.Top.Bl.WPt.extraTied_col : ∀ (𝒮 : Slots) (K : Ctx) (q : WPt 𝒮 K), Formalism.L2.Forms.ColsExtraTiedS q.x.col.full q.O.ex ∧ ∃ g : Formalism.L2.G.GroupCompatibilityAll (q.w.D q.Z) q.O.gatT q.O.ex.cmp, HEq g q.x.col.g ∧ g.herm = q.x.col.full.1.to0 ∧ g.forms = fun u => (q.x.col.C.forms u).to0 := by
+  intro 𝒮 K q
+  obtain ⟨B, f, T, w, Z, O, x⟩ := q
+  obtain ⟨L, gatT, Gx, Gy, K', X, cX, ex⟩ := O
+  obtain ⟨lev, th, th_io, cmp, lat, tw, ker, ep_def, ep_tie, kapI_def, fills_all, nu_unserved, idx, kap_def, lam_def, kapR_def,
+    errX, err, nch, nch_tie, xd, p0, rationalRoots_def, amb, amb0, fdef, duStar_def, Dstar_def, gauge, gauge_def⟩ := ex
+  obtain ⟨isOver, forced, Wt, pin, coh, vol, col, what₂, rx, hlev, herrX, n, nx, sx, ker0, ker_eq, kt, div, thT, obj, ox, real,
+    dsig_eq, hgauge, good⟩ := x
+  obtain ⟨⟨C, std, stdLv, full, stdDt, Gt, cmp', g, herm_eq, forms_eq, gpl⟩, isRec, om⟩ := col
+  dsimp only at hlev herrX ker_eq ⊢
+  cases ker_eq
+  exact ⟨⟨⟨hlev, herrX, gpl⟩, kt.iw, kt.iw_pos⟩, g, HEq.rfl, herm_eq, forms_eq⟩
+
+
+[WRS_joint_column_kernel_identity_07] All given column, group, Hermitian and form transports used from GCF16
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ColsReTo0S.lean#L21-L92
+Range SHA256: fa568eeeac7beca2230dc7490db5c9bb0ed3384a4328cd0252f1c8c28fcfb6b7
+def atTTS {u : D.what₂.Word} (A : AtTTied (D := D) u) : AtTTied (D := setDiv D N h) u := { A with }
+
+set_option maxHeartbeats 4000000 in
+
+def forms0S {u : D.what₂.Word} (F : Forms0 D u) : Forms0 (setDiv D N h) u :=
+  { F with
+    atT := atTTS N h F.atT
+    cls0 := { F.cls0 with }
+    val0 := { F.val0 with }
+    lv0 := { F.lv0 with } }
+
+set_option maxHeartbeats 4000000 in
+
+def herm0S (H : Formalism.L2.Herm.Herm0 D) : Formalism.L2.Herm.Herm0 (setDiv D N h) := { H with }
+
+set_option maxHeartbeats 4000000 in
+
+def fullS (X : Formalism.L2.Herm.FullTiedS D) : Formalism.L2.Herm.FullTiedS (setDiv D N h) :=
+  { X with
+    base := { X.base with }
+    atT := fun u => { X.atT u with }
+    ad := { X.ad with } }
+
+set_option maxHeartbeats 4000000 in
+theorem fullS_to0 (X : Formalism.L2.Herm.FullTiedS D) : (fullS N h X).to0 = herm0S N h X.to0 := rfl
+
+set_option maxHeartbeats 4000000 in
+
+def gS {Gt : GatTies D} {c : LatCmp D} (g : Formalism.L2.G.GroupCompatibilityAll D Gt c) :
+    Formalism.L2.G.GroupCompatibilityAll (setDiv D N h) (gatTr N h Gt) (cmpTr N h c) where
+  herm := herm0S N h g.herm
+  forms := fun u => forms0S N h (g.forms u)
+  cmp := { g.cmp with }
+  ring := g.ring
+  gat := g.gat
+
+end Gen
+
+variable {B : Base} {f : Fr B.toPre} {T : TwDat B}
+variable (w : ColW B f T) (Z : w.Lt) (N : ∀ u, Submodule (𝓞 B.LL) (Z.V.div.Nu u).V) (h : B.Word → ℝ)
+
+set_option maxHeartbeats 4000000 in
+theorem fullS_cols (X : Formalism.L2.Herm.FullTiedS (w.D Z)) :
+    (fullS (D := w.D Z) N h X).cols = hermRe (setDivZ Z N h) X.cols := rfl
+
+set_option maxHeartbeats 4000000 in
+theorem colsRe_to0S (C : ColsTiedSym (w.D Z)) (u : B.Word) :
+    ((colsRe (setDivZ Z N h) C).forms u).to0 = forms0S (D := w.D Z) N h (C.forms u).to0 := rfl
+
+set_option maxHeartbeats 8000000 in
+
+theorem stdC_tr (C : ColsTiedSym (w.D Z)) (hC : TC.StdC w.I w.l Z C) :
+    TC.StdC w.I w.l (setDivZ Z N h) (colsRe (setDivZ Z N h) C) := fun u =>
+  { hC u with gl := { (hC u).gl with } }
+
+set_option maxHeartbeats 8000000 in
+
+def colTTr (t : ColT w Z) : ColT w (setDivZ Z N h) where
+  C := colsRe (setDivZ Z N h) t.C
+  std := stdC_tr w Z N h t.C t.std
+  stdLv := fun u => t.stdLv u
+  full := ⟨fullS (D := w.D Z) N h t.full.1, (fullS_cols w Z N h t.full.1).trans (congrArg (hermRe (setDivZ Z N h)) t.full.2)⟩
+  stdDt := t.stdDt
+  Gt := gatTr (D := w.D Z) N h t.Gt
+  cmp := cmpTr (D := w.D Z) N h t.cmp
+  g := gS (D := w.D Z) N h t.g
+  herm_eq := (congrArg (herm0S (D := w.D Z) N h) t.herm_eq).trans (fullS_to0 (D := w.D Z) N h t.full.1).symm
+  forms_eq := (congrArg (fun F u => forms0S (D := w.D Z) N h (F u)) t.forms_eq).trans
+    (funext fun u => (colsRe_to0S w Z N h t.C u).symm)
+  gpl := t.gpl
+
+end GlobalTheory.Mem.Db.DivTr
+
+
+[WRS_built_point_and_selected_class_01] Original positionOf existential and one joint columns/stages/core equality
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/PositionOfIntro.lean#L56-L64
+Range SHA256: e1b11e24c1f06402bddbd669268e831564c26807089641e8354a97c04b9c110d
+abbrev ZP : Type 1 := ∀ (_ : Ctx) (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T), w.Lt → Prop
+
+abbrev CP : Type 1 :=
+  ∀ (K : Ctx) (B : Base) (f : Fr B.toPre) (T : TwDat B) (w : ColW B f T) (Z : w.Lt), V4.Core K (w.st Z) f T → Prop
+
+def positionOf (P : CP) : V4.Slot := fun K X f T c =>
+  ∃ (w : ColW X.B f T) (Z : w.Lt) (c' : V4.Core K (w.st Z) f T), P K X.B f T w Z c' ∧
+    (⟨X.C, ⟨X.W, X.V, X.S, X.N, X.G⟩, c⟩ : Σ (C : Cols X.B) (Y : TC.Later X.B C), V4.Core K ⟨X.B, C, Y.W, Y.V, Y.S, Y.N, Y.G⟩ f T) =
+      ⟨w.C, Z, c'⟩
+
+
+[WRS_built_point_and_selected_class_02] BPt, actual layout and LedPart, original given D/O and family objAt
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/ValidForConstructedPointClassesEventuallyWorking.lean#L67-L109
+Range SHA256: 1b7e34985bec6823706158c6dc70e978451a54d6d41067ddc7491d71c82a5b03
+structure BPt (K : Ctx) : Type 1 where
+  X : Stages
+  f : Fr X.B.toPre
+  T : TwDat X.B
+  c : V4.Core K X f T
+  Y : Lay X.toD7
+  hY : layObj Y = c.O
+  p : LedPart K.C Y
+  sc : p.L.sc = K.s
+  wt : WtEq p.L K.a K.b
+  val : Val K.C K.cD K.ch p.L
+  canon : CanonInst p.ta.Gx
+  good : ∃ C5 c6 Cb : ℝ, ChGood K.s K.C C5 c6 Cb K.cD K.ch K.P K.a K.b K.c
+  recOK : RecOK K.s K.C K.cD X.toD7
+  ledOK : LedOK K.s K.C K.cD K.ch Y K.a K.b
+  used : DQ.TupUsedAt X.toD7
+  twAll : DQ.TwAllAt X.toD7 Y.nch Y.xd
+
+abbrev BPt.D {K : Ctx} (β : BPt K) : D7 := β.p.pt.D
+
+abbrev BPt.O {K : Ctx} (β : BPt K) : Obj β.D := Obj.ofPt β.p.pt
+
+abbrev BPt.Is {K : Ctx} (β : BPt K) (Q : V4.Slot) : Prop := Q K β.X β.f β.T β.c
+
+def RecAtK (QL : Ctx → ∀ D : D7, Lay D → Prop) : Prop :=
+  Ev fun K => ∃ (D : D7) (Y : Lay D), Over D K.P K.Lv ∧ RecOK K.s K.C K.cD D ∧ LedOK K.s K.C K.cD K.ch Y K.a K.b ∧
+    LocalQuadraticParts.TWAt D Y.nch Y.xd ∧ QL K D Y
+
+def FromCoreK (Q : V4.Slot) (K : Ctx) (D : D7) (Y : Lay D) : Prop :=
+  ∃ (X : Stages) (f : Fr X.B.toPre) (T : TwDat X.B) (c : V4.Core K X f T), Q K X f T c ∧
+    (⟨D, layObj Y⟩ : Σ D : D7, Obj2 D) = ⟨X.toD7, c.O⟩
+
+abbrev objAt {eps : ℝ} (Fm : FamP eps) (x : ℝ) (hx : Fm.x1 < x) (i : Fm.Ix x) : Obj (Fm.D x i) :=
+  ⟨Fm.L x i, Fm.gatT x i, Fm.Gx x i, Fm.Gy x i, Fm.GK, Fm.X x i, Fm.cX, Fm.ex x hx i⟩
+
+abbrev BdT : Type 2 := ∀ D : D7, Obj D → ℝ → Type 1
+
+abbrev BdP (Bd : BdT) : Type 1 := ∀ (D : D7) (O : Obj D) (c : ℝ), Bd D O c → Prop
+
+abbrev LkT (Bd : BdT) : Type 1 := ∀ (K : Ctx) (β : BPt K) (c : ℝ), Bd β.D β.O c → Prop
+
+abbrev RawSel (Bd : BdT) (𝒜 : FamClass) : Type 1 :=
+  ∀ {eps : ℝ} (Fm : FamP eps) (_ : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (i : Fm.Ix x), Bd (Fm.D x i) (objAt Fm x hx i) Fm.Csz
+
+
+[WRS_built_point_and_selected_class_03] Link positivity, clsP, Built joint (D,O,b), QOf and unchanged cls
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/ValidForConstructedPointClassesEventuallyWorking.lean#L222-L257
+Range SHA256: 89243d53891abb414c662017a05f4bb57fc267af1250ffa72394554e67f4d8ee
+structure Link (κ : Par) {eps : ℝ} (Fm : FamP eps) : Prop where
+  eps_eq : κ.eps = eps
+  pos : κ.Pos
+  std : Std κ.C
+  pre : Fm.cPre = κ.C.cPre
+  out : (DC.setTu Fm κ.C.CTu).cOut = κ.C.cOut
+  mid : Fm.cMid = κ.C.cMid
+  last : Fm.cLast = κ.C.cLast
+
+theorem Link.csz {κ : Par} {eps : ℝ} {Fm : FamP eps} (h : Link κ Fm) : Fm.Csz = κ.C.Csz := by
+  have := congrArg (fun f : ℝ → List ℝ => (f 0).getD 2 0) h.mid
+  simpa [FamP.cMid, FC.cMid] using this
+
+theorem Link.host {κ : Par} {eps : ℝ} {Fm : FamP eps} (h : Link κ Fm) : max Fm.Co Fm.J = κ.C.P.Cpde :=
+  congrArg (fun l : List ℝ => l.getD 15 0) h.out
+
+def clsP (QO : Par → ∀ D : D7, Obj D → Prop) : FamClass := fun Fm => ∃ κ : Par, Link κ Fm ∧ DQ.cls7 (QO κ) Fm
+
+theorem familyClassWithFurtherProperties_mono {QO QO' : ∀ D : D7, Obj D → Prop} (h : ∀ D O, QO D O → QO' D O) {eps : ℝ} (Fm : FamP eps)
+    (hc : DQ.cls7 QO Fm) : DQ.cls7 QO' Fm :=
+  ⟨fun x hx i => let t := hc.1 x hx i
+    ⟨⟨⟨⟨⟨h _ _ t.1.1.1.1.1, t.1.1.1.1.2⟩, t.1.1.1.2⟩, t.1.1.2⟩, t.1.2⟩, t.2⟩, hc.2⟩
+
+theorem sevenDuties_of_class {QO : Par → ∀ D : D7, Obj D → Prop} {eps : ℝ} {Fm : FamP eps} (h : clsP QO Fm) :
+    DQ.Duty7 Fm ∧ DQ.MtStableF Fm := let ⟨_, _, h⟩ := h; DQ.familyClass_sevenDuties_and_stableLattices _ Fm h
+
+variable {Bd : BdT} (Q : V4.Slot) (Lk : LkT Bd)
+
+def Built (κ : Par) : BdP Bd := fun D O c b =>
+  ∃ (K : Ctx) (β : BPt K) (b' : Bd β.D β.O c), κ.Of K ∧ β.Is Q ∧ Lk K β c b' ∧
+    (⟨D, O, b⟩ : Σ (D : D7) (O : Obj D), Bd D O c) = ⟨β.D, β.O, b'⟩
+
+def QOf (E : Par → BdP Bd) (κ : Par) : ∀ D : D7, Obj D → Prop := fun D O =>
+  κ.Pos → ∀ c : ℝ, ∃ b : Bd D O c, Built Q Lk κ D O c b ∧ E κ D O c b
+
+def cls (E : Par → BdP Bd) : FamClass := clsP (QOf Q Lk E)
+
+
+[WRS_built_point_and_selected_class_04] IsSel and cls_at on every actual x,hx,i; one jointly identified source object
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/ValidForConstructedPointClassesEventuallyWorking.lean#L264-L286
+Range SHA256: 07e1dc6a69a492805684b96686f7f8f09110d0c4e346d486cf0b929babe7cb08
+def IsSel (E : Par → BdP Bd) (𝒜 : FamClass) (σ : RawSel Bd 𝒜) : Prop :=
+  ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm), ∃ κ : Par, Link κ Fm ∧ DQ.cls7 (fun _ _ => True) Fm ∧
+    ∀ (x : ℝ) (hx : Fm.x1 < x) (i : Fm.Ix x), Built Q Lk κ _ _ _ (σ Fm hc x hx i) ∧ E κ _ _ _ (σ Fm hc x hx i)
+
+def Row (H : ∀ 𝒜 : FamClass, RawSel Bd 𝒜 → Prop) : Prop :=
+  ∃ E : Par → BdP Bd, RowE Q Lk E ∧ ∀ (𝒜 : FamClass) (σ : RawSel Bd 𝒜), IsSel Q Lk E 𝒜 σ → H 𝒜 σ
+
+def AtAll (R : BdP Bd) : ∀ 𝒜 : FamClass, RawSel Bd 𝒜 → Prop := fun 𝒜 σ =>
+  ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (i : Fm.Ix x), R _ _ _ (σ Fm hc x hx i)
+
+theorem cls_at {E : Par → BdP Bd} {eps : ℝ} (Fm : FamP eps) (hc : cls Q Lk E Fm) (x : ℝ) (hx : Fm.x1 < x) (i : Fm.Ix x) :
+    ∃ b : Bd (Fm.D x i) (objAt Fm x hx i) Fm.Csz, Built Q Lk (Classical.choose hc) _ _ _ b ∧ E (Classical.choose hc) _ _ _ b :=
+  DQ.familyClass_points_satisfy_objectProperty _ Fm (Classical.choose_spec hc).2 x hx i (Classical.choose_spec hc).1.pos Fm.Csz
+
+def pick (E : Par → BdP Bd) : RawSel Bd (cls Q Lk E) := fun Fm hc x hx i => Classical.choose (cls_at Q Lk Fm hc x hx i)
+
+theorem pick_isSel (E : Par → BdP Bd) : IsSel Q Lk E (cls Q Lk E) (pick Q Lk E) := fun Fm hc =>
+  ⟨Classical.choose hc, (Classical.choose_spec hc).1, familyClassWithFurtherProperties_mono (fun _ _ _ => trivial) Fm (Classical.choose_spec hc).2,
+    fun x hx i => Classical.choose_spec (cls_at Q Lk Fm hc x hx i)⟩
+
+variable {Q Lk}
+
+theorem Built.ind {κ : Par} {R : BdP Bd}
+
+
+[WRS_built_point_and_selected_class_05] Actual W1/W3, EvC and class-level coefficient/threshold order
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/ValidForConstructedPointClassesEventuallyWorking.lean#L368-L394
+Range SHA256: 251b098c9bdd71258228d5457934ade006ded30794cb10ae267bb31a7b7b8e96
+abbrev W1 (𝒜 : FamClass) : FamClass := fun Fm =>
+  ((𝒜 Fm ∧ DC.DGamDvdF Fm ∧ DC.TameDistinctF Fm ∧ BoxesF Fm ∧ QDRowsF Fm ∧ Fm.CYL ≤ 9) ∧ Formalism.MainNotions.Pk.DGamSmooth Fm) ∧ TwGood Fm
+
+abbrev W3 (𝒜 : FamClass) : FamClass := fun Fm =>
+  W1 𝒜 Fm ∧ (∃ CH : ℝ, ChosenE Fm 3 CH) ∧ TuSize Fm ∧ DGamSize Fm
+
+theorem w3_a {𝒜 : FamClass} {eps : ℝ} {Fm : FamP eps} (h : W3 𝒜 Fm) : 𝒜 Fm := h.1.1.1.1
+
+def EvC (R : ∀ D : D7, Obj D → Prop) (𝒜 : FamClass) : Prop :=
+  Closed (W3 𝒜) fun Fm _ => ∃ x0 : ℝ, ∀ x, x0 ≤ x → ∀ (hx : Fm.x1 < x) (i : Fm.Ix x), R (Fm.D x i) (objAt Fm x hx i)
+
+def EvCC {α : Type} (R : α → ∀ D : D7, Obj D → Prop) (𝒜 : FamClass) : Prop :=
+  Closed (W3 𝒜) fun Fm _ => ∃ (a : α) (x0 : ℝ), ∀ x, x0 ≤ x → ∀ (hx : Fm.x1 < x) (i : Fm.Ix x), R a (Fm.D x i) (objAt Fm x hx i)
+
+theorem evaluation_constantFamily {α : Type} {R : α → ∀ D : D7, Obj D → Prop} (a : Par → α)
+    (h : EvP fun κ K => ∀ β : BPt K, β.Is Q → R (a κ) β.D β.O) : Row0 Q (EvCC R) :=
+  ⟨fun κ D O _ _ => R (a κ) D O, EvP.mono (fun _ _ _ H β hq _ _ _ => H β hq) h, fun _ _ s =>
+    ⟨1, one_pos, fun _ _ _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm _ hc _ =>
+      let ⟨κ, _, _, t⟩ := s Fm (w3_a hc); ⟨a κ, 0, fun x _ hx i => (t x hx i).2⟩⟩⟩⟩
+
+theorem validForConstructedPointClasses_eventuallyWorkingClass {R : ∀ D : D7, Obj D → Prop} (h : EvP fun _ K => ∀ β : BPt K, β.Is Q → R β.D β.O) : Row0 Q (EvC R) :=
+  ⟨fun _ D O _ _ => R D O, EvP.mono (fun _ _ _ H β hq _ _ _ => H β hq) h, fun _ _ s =>
+    ⟨1, one_pos, fun _ _ _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm _ hc _ =>
+      let ⟨_, _, _, t⟩ := s Fm (w3_a hc); ⟨0, fun x _ hx i => (t x hx i).2⟩⟩⟩⟩
+
+example : ExB (Bd := Bd0) Q fun _ _ _ _ => True := EvP.of_all fun _ _ _ _ _ _ => ⟨PUnit.unit, trivial⟩
+
+
+
+[WRS_built_point_and_selected_class_06] Original cls7 and actual object-property projection
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/FamilyClassSevenDutiesAndStableLattices.lean#L51-L67
+Range SHA256: 54a8320e6dc3f16f16d22fa28cc6fecc917b3542cb9add36b83721c1e132160d
+  DC.PageFix Fm ∧ DC.PageWin Fm ∧ DC.globalTwisting_fact Fm ∧ DC.TameDistinctF Fm ∧ DC.WallAll Fm ∧ TupUsedF Fm ∧ TwAllF Fm
+
+def cls7 (QO : ∀ D : D7, Obj D → Prop) : FamClass := DC.cls (ptO (withQD QO))
+
+theorem familyClass_sevenDuties_and_stableLattices (QO : ∀ D : D7, Obj D → Prop) {eps : ℝ} (Fm : FamP eps) (h : cls7 QO Fm) : Duty7 Fm ∧ MtStableF Fm := by
+  obtain ⟨a, b, c, d, e⟩ := DC.duty_of_cls _ Fm h
+  have hq := DC.classOf_of_cls _ Fm h
+  exact ⟨⟨a, b, c, d, e, ⟨Fm.x1, fun x hx _ i => (hq x hx i).2.1⟩, ⟨Fm.x1, fun x _ hx i => (hq x hx i).2.2.1⟩⟩,
+    ⟨Fm.x1 + 1, fun x hx i => (hq x (by linarith) i).2.2.2⟩⟩
+
+theorem familyClass_points_satisfy_objectProperty (QO : ∀ D : D7, Obj D → Prop) {eps : ℝ} (Fm : FamP eps) (h : cls7 QO Fm) : classOf (ptO QO) Fm :=
+  fun x hx i => (DC.classOf_of_cls _ Fm h x hx i).1
+
+theorem TwAllAt.twAt {D : D7} {C : NChoice D} {T : ThData D} (h : TwAllAt D C T) : LocalQuadraticParts.TWAt D C T := by
+  obtain ⟨hc, N0, S, hS⟩ := h
+  refine ⟨hc, N0, S, fun w hw => ⟨(hS w hw).1, ?_⟩⟩
+  have := (hS w hw).2 1 (by simp)
+
+
+[WRS_built_point_and_selected_class_07] IsGoodE and IsBuiltE really refine the unchanged IsBuilt predicate
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/ThetaChr.lean#L85-L105
+Range SHA256: d371d1d9484035641a06989bcd9390992803d9222a4658c6ecd180dffdec0fec
+def BuiltE (𝒮 : Slots) : CP := fun K _ _ _ w Z c => ∃ b : Built 𝒮 K w Z c, EntC b.ker
+
+def GoodE (𝒮 : Slots) : CP := fun K B f T w Z c => BuiltE 𝒮 K B f T w Z c ∧ GoodO (w.D Z) c.O.nch c.O.xd
+
+def IsBuiltE (𝒮 : Slots) : V4.Slot := positionOf (BuiltE 𝒮)
+
+def IsGoodE (𝒮 : Slots) : V4.Slot := positionOf (GoodE 𝒮)
+
+theorem IsBuiltE.isBuilt {𝒮 : Slots} (K X f T c) (h : IsBuiltE 𝒮 K X f T c) : IsBuilt 𝒮 K X f T c :=
+  positionOf_mono (fun _ _ _ _ _ _ _ ⟨b, _⟩ => ⟨b⟩) K X f T c h
+
+theorem IsGoodE.isGood {𝒮 : Slots} (K X f T c) (h : IsGoodE 𝒮 K X f T c) : IsGood 𝒮 K X f T c :=
+  positionOf_mono (fun _ _ _ _ _ _ _ ⟨⟨b, _⟩, g⟩ => ⟨⟨b⟩, g⟩) K X f T c h
+
+theorem IsGoodE.isBuiltE {𝒮 : Slots} (K X f T c) (h : IsGoodE 𝒮 K X f T c) : IsBuiltE 𝒮 K X f T c :=
+  positionOf_mono (fun _ _ _ _ _ _ _ h => h.1) K X f T c h
+
+def MemberE (𝒮 : Slots) : Prop :=
+  BaseCond KPx ∧ FirstG KPx (IsBuiltE 𝒮) ∧ ExportF KPx (IsBuiltE 𝒮) ∧ SecondG KPx (IsBuiltE 𝒮) (IsGoodE 𝒮)
+
+def WitExE (𝒮 : Slots) : Prop :=
+
+
+[WRS_built_point_and_selected_class_08] Original RL.At uses IsBuiltE/IsGoodE and further refinements, with same IsLinked
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/GoodReductionCondition.lean#L45-L50
+Range SHA256: 851a21075ab16a1d526954125ad86443cce804ab0fc85a698e507b4108a0377a
+def At (p : Prm hL) (r : V4.Slot → LkT Bundle → Prop) : Prop :=
+  Lg1 KPx (IsBuiltE p.s) (IsGoodE p.s) fun S => r S (IsLinked p)
+
+theorem At.of_row {p : Prm hL} {H : ∀ 𝒜 : FamClass, RawSel Bundle 𝒜 → Prop} (h : Row (IsGoodE p.s) (IsLinked p) H) :
+    At p fun S L => Row S L H :=
+  ⟨fun _ _ _ _ _ => True, largeBaseProperty_true, h.strengthen fun _ _ _ _ _ t => t.1⟩
+
+
+[WRS_family_and_closed_contracts_01] Every coefficient ring map, all five GroupCompatibilityAll fields, and exact GroupCompatibilityFamily
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/GroupLattices/StdSubAtOfRing.lean#L36-L89
+Range SHA256: 84f4fe8b6f25da18c8e9e38698bd1698d08b9d15d9cc875597db90f515c8de02
+def RingCompatibleAt (D : D7) (u : D.what₂.Word) (w : D.what₂.places.Pl)
+    (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) (v : Fin (D.gat u w hg).P.nV) : Prop :=
+  ∃ (eW : WQ (D.what₂.places.resChar w) ((D.gat u w hg).P.n' v) ≃+* (D.gat u w hg).P.W v)
+    (eQ : QQ (D.what₂.places.resChar w) ((D.gat u w hg).P.n' v) ≃+* (D.gat u w hg).P.Qq v)
+    (eO : ORec D w ((D.gat u w hg).P.n' v) ≃+* (D.gat u w hg).O)
+    (eK : KfRec D w ((D.gat u w hg).P.n' v) ≃+* (D.gat u w hg).Kf),
+    (∀ x, eQ (algebraMap _ _ x) = algebraMap ((D.gat u w hg).P.W v) ((D.gat u w hg).P.Qq v) (eW x)) ∧
+    (∀ x, eK (algebraMap _ _ x) = algebraMap (D.gat u w hg).O (D.gat u w hg).Kf (eO x)) ∧
+    (∀ y, (D.gat u w hg).P.ι v (eQ y) =
+      eK ((extRec D w ((D.gat u w hg).P.n' v)).φK (iota (D.what₂.places.resChar w) ((D.gat u w hg).P.n' v) y))) ∧
+    (∀ x, (D.gat u w hg).P.j v (eW x) =
+      eO ((extRec D w ((D.gat u w hg).P.n' v)).φ (jO (D.what₂.places.resChar w) ((D.gat u w hg).P.n' v) x))) ∧
+    eO ((extRec D w ((D.gat u w hg).P.n' v)).φ (wU (D.what₂.places.resChar w) ((D.gat u w hg).P.n' v))) = (D.gat u w hg).P.w
+
+theorem stdSubAt_of_ring (D : D7) (h : ∀ u w hg v, RingCompatibleAt D u w hg v) : Joints.StdSubAt D := by
+  intro u w hg v
+  obtain ⟨eW, eQ, eO, eK, hWQ, hOK, hι, hj, hw⟩ := h u w hg v
+  have hD := (D.gat u w hg).P.setting v
+  exact stdSub_of_iso hD eW eQ hWQ
+    ((extRec D w ((D.gat u w hg).P.n' v)).map eO eK hOK hD.frac_O hD.complete_O) hι hj hw
+
+def GatIs (D : D7) (H : LevelData D) (u : D.what₂.Word) (w : D.what₂.places.Pl)
+    (hg : GIdx D.host (D.mem u).A.T (D.what₂.places.resChar w)) : Prop :=
+  ∃ (W Qq O Kf : Type) (_ : CommRing W) (_ : IsDomain W) (_ : IsDiscreteValuationRing W) (_ : Field Qq) (_ : Algebra W Qq)
+    (_ : CommRing O) (_ : IsDomain O) (_ : IsDiscreteValuationRing O) (_ : Field Kf) (_ : Algebra O Kf)
+    (n' : ℕ) (ι : Qq →+* Kf) (σ : Qq ≃+* Qq) (j : W →+* O) (w0 : O)
+    (hS : Formalism.MainNotions.G.HidaSetting (D.what₂.places.resChar w) n' W Qq O Kf ι σ j w0) (nV r m : ℕ)
+    (lam0 : Fin nV → Fin n' → Fin (m + 1) → ℤ) (dom : ∀ v, IsDominant (lam0 v)) (hk : m + 1 = D.R.k)
+    (I : LocId (H u) (D.what₂.places.resChar w) nV W Qq) (ψ : Formalism.L2.Herm.awayFrom₂ (H u) (D.what₂.places.resChar w) →* Oˣ)
+    (e : ℕ), Cmp.HypAtP I ∧ D.gat u w hg = gatOfLevelP (H u) hS nV r lam0 dom hk I ψ e
+
+theorem gatE_of_gatIs (D : D7) (H : LevelData D) (hT : ∀ u, Cmp.TrivStabU (H u))
+    (h : ∀ u w hg, GatIs D H u w hg) : TrivialStabiliserFiniteClasses D := by
+  intro u w hg
+  obtain ⟨W, Qq, O, Kf, _, _, _, _, _, _, _, _, _, _, n', ι, σ, j, w0, hS, nV, r, m, lam0, dom, hk, I, ψ, e, hH, heq⟩ :=
+    h u w hg
+  rw [heq]
+  exact ⟨Cmp.trivStab hS r lam0 dom hk I ψ e (isUnit_det_gram0 D.sp) hH (hT u),
+    Cmp.finClasses hS r lam0 dom hk I ψ e (isUnit_det_gram0 D.sp) hH⟩
+
+structure GroupCompatibilityAll (D : D7) (Gt : GatTies D) (c : LatCmp D) where
+
+  herm : Formalism.L2.Herm.Herm0 D
+
+  forms : ∀ u : D.what₂.Word, Forms0 D u
+
+  cmp : Cmp.CmpTied D herm forms Gt c
+
+  ring : ∀ u w hg v, RingCompatibleAt D u w hg v
+
+  gat : ∀ u w hg, GatIs D herm.lev0 u w hg
+
+def GroupCompatibilityFamily {eps : ℝ} (Fm : FamP eps) : Prop :=
+  Ev Fm fun x i => ∀ hx : Fm.x1 < x, Nonempty (GroupCompatibilityAll (Fm.D x i) (Fm.gatT x i) (Fm.ex x hx i).cmp)
+
+
+[WRS_family_and_closed_contracts_02] Original Ev definition and threshold quantifiers
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/GrowthBounds/PlaneCountTheoremWithConstants.lean#L823-L823
+Range SHA256: d89e8e4fd2c80946ec7366acfb3ccd87eafaf895c5a9ed4c1b612462b140a910
+def Ev {eps : ℝ} (Fm : FamP eps) (P : ∀ x, Fm.Ix x → Prop) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i, P x i
+
+
+[WRS_family_and_closed_contracts_03] TransportedAlt, Large, pointwise sup and literal Closed choice order
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/ParamsHeightRankConstant.lean#L112-L181
+Range SHA256: 3103ee05b59ba121dabe26b8a949b92c35ffdb9abbf744fe18f84bf2153e83c0
+  Fm.GK.La, Fm.CF]
+
+def cLast : List ℝ := [Fm.CkLow, Fm.Ck6, Fm.CfL, Fm.cLL⁻¹, Fm.Crho, Fm.Crho, Fm.CDelG, Fm.Cw, Fm.CDel,
+  Fm.CCount, Fm.Ch0r, Fm.Ch0k, Fm.Ch0N, Fm.Cgap, Fm.CY, Fm.Cb, Fm.ChT, Fm.CbN,
+  Fm.GK.rho, Fm.GK.kII, Fm.GK.tII, Fm.GK.DII, Fm.GK.szII, Fm.GK.kII', Fm.GK.DI, Fm.GK.kappaThresholdOne,
+  Fm.GK.kappaThresholdTwo, Fm.GK.kI, Fm.GK.CN, Fm.GK.CN, Fm.GK.CN, Fm.GK.CN]
+
+example := @cPre.eq_1
+example := @cOut.eq_1
+example := @cMid.eq_1
+example := @cLast.eq_1
+
+end FamP
+
+structure TransportedAlt where
+  pre : ℝ
+  t : List ℝ → ℝ
+  mid : List ℝ → ℝ
+  last : List ℝ → ℝ
+
+def TransportedAlt.le (K K' : TransportedAlt) : Prop :=
+  K.pre ≤ K'.pre ∧ (∀ l, K.t l ≤ K'.t l) ∧ (∀ l, K.mid l ≤ K'.mid l) ∧ ∀ l, K.last l ≤ K'.last l
+
+def TransportedAlt.sup (K K' : TransportedAlt) : TransportedAlt :=
+  ⟨max K.pre K'.pre, fun l => max (K.t l) (K'.t l), fun l => max (K.mid l) (K'.mid l), fun l => max (K.last l) (K'.last l)⟩
+
+def FamP.Large {eps : ℝ} (Fm : FamP eps) (K : TransportedAlt) (CH : ℝ) : Prop :=
+  (∀ c ∈ Fm.cPre, K.pre ≤ c) ∧ True ∧ (∀ c ∈ Fm.cMid CH, K.mid Fm.cOut ≤ c) ∧
+    ∀ c ∈ Fm.cLast, K.last (Fm.cOut ++ Fm.cMid CH) ≤ c
+
+theorem FamP.Large.mono {eps : ℝ} {Fm : FamP eps} {K K' : TransportedAlt} {CH : ℝ} (h : Fm.Large K' CH) (hK : K.le K') :
+    Fm.Large K CH :=
+  ⟨fun c hc => hK.1.trans (h.1 c hc), trivial, fun c hc => (hK.2.2.1 _).trans (h.2.2.1 c hc),
+    fun c hc => (hK.2.2.2 _).trans (h.2.2.2 c hc)⟩
+
+theorem FamP.large_sup {eps : ℝ} (Fm : FamP eps) (K K' : TransportedAlt) (CH : ℝ) :
+    Fm.Large (K.sup K') CH ↔ Fm.Large K CH ∧ Fm.Large K' CH := by
+  constructor
+  · intro h
+    exact ⟨h.mono ⟨le_max_left _ _, fun _ => le_max_left _ _, fun _ => le_max_left _ _, fun _ => le_max_left _ _⟩,
+      h.mono ⟨le_max_right _ _, fun _ => le_max_right _ _, fun _ => le_max_right _ _, fun _ => le_max_right _ _⟩⟩
+  · rintro ⟨h, h'⟩
+    exact ⟨fun c hc => max_le (h.1 c hc) (h'.1 c hc), trivial,
+      fun c hc => max_le (h.2.2.1 c hc) (h'.2.2.1 c hc), fun c hc => max_le (h.2.2.2 c hc) (h'.2.2.2 c hc)⟩
+
+abbrev FamClass : Type 1 := ∀ {eps : ℝ}, FamP eps → Prop
+
+def Closed (𝒞 : FamClass) (P : ∀ {eps : ℝ}, FamP eps → ℝ → Prop) : Prop :=
+  ∃ ε1 : ℝ, 0 < ε1 ∧ ∀ eps : ℝ, 0 < eps → eps ≤ ε1 → ∃ K : TransportedAlt, ∀ (Fm : FamP eps) (CH : ℝ),
+    𝒞 Fm → Fm.Large K CH → P Fm CH
+
+theorem Closed.and {𝒞 : FamClass} {P Q : ∀ {eps : ℝ}, FamP eps → ℝ → Prop} (hP : Closed 𝒞 P) (hQ : Closed 𝒞 Q) :
+    Closed 𝒞 (fun Fm CH => P Fm CH ∧ Q Fm CH) := by
+  obtain ⟨a, ha, hP⟩ := hP
+  obtain ⟨b, hb, hQ⟩ := hQ
+  refine ⟨min a b, lt_min ha hb, fun e he hle => ?_⟩
+  obtain ⟨K, hK⟩ := hP e he (hle.trans (min_le_left _ _))
+  obtain ⟨K', hK'⟩ := hQ e he (hle.trans (min_le_right _ _))
+  exact ⟨K.sup K', fun Fm CH hc h =>
+    ⟨hK Fm CH hc ((Fm.large_sup K K' CH).1 h).1, hK' Fm CH hc ((Fm.large_sup K K' CH).1 h).2⟩⟩
+
+theorem Closed.imp {𝒞 : FamClass} {P Q : ∀ {eps : ℝ}, FamP eps → ℝ → Prop} (hP : Closed 𝒞 P)
+    (h : ∀ {eps : ℝ} (Fm : FamP eps) (CH : ℝ), 0 < eps → P Fm CH → Q Fm CH) : Closed 𝒞 Q := by
+  obtain ⟨a, ha, hP⟩ := hP
+  refine ⟨a, ha, fun e he hle => ?_⟩
+  obtain ⟨K, hK⟩ := hP e he hle
+  exact ⟨K, fun Fm CH hc hL => h Fm CH he (hK Fm CH hc hL)⟩
+
+def TuSize {eps : ℝ} (Fm : FamP eps) : Prop :=
+  ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, (Fm.L x i).TuGe ∧
+
+
+[WRS_family_and_closed_contracts_04] Separate DesignExists existential; not concluded by memberwise compatibility
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/ParamsHeightRankConstant.lean#L187-L190
+Range SHA256: ddbd18ba40386c121c02b5442b8ef4286ea8db0146592e368e1a798cdf9d1648
+def DesignExists (𝒞 : FamClass) (C0 : ℝ) : Prop :=
+  ∃ ε0 : ℝ, 0 < ε0 ∧ ∀ eps : ℝ, 0 < eps → eps ≤ ε0 → ∀ K : TransportedAlt, ∃ (Fm : FamP eps) (CH : ℝ),
+    𝒞 Fm ∧ 0 ≤ CH ∧ Fm.Large K CH ∧ ChosenE Fm C0 CH ∧ TuSize Fm ∧
+      DGamSize Fm
+
+
+[WRS_family_and_closed_contracts_05] Closed restriction and zero-bound classwise construction
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/SmoothDesignExistence/DGamSmooth.lean#L27-L36
+Range SHA256: b4b5610167fd7d7d2474919b8db208f56d6a91da77477adf91fcc6724ee63b3e
+theorem Closed.sub {𝒞 𝒞' : FamClass} {P : ∀ {eps : ℝ}, FamP eps → ℝ → Prop} (h : Closed 𝒞 P)
+    (hs : ∀ {eps : ℝ} (Fm : FamP eps), 𝒞' Fm → 𝒞 Fm) : Closed 𝒞' P := by
+  obtain ⟨e1, he1, h1⟩ := h
+  refine ⟨e1, he1, fun eps h0 hle => ?_⟩
+  obtain ⟨K, hK⟩ := h1 eps h0 hle
+  exact ⟨K, fun Fm CH hc hL => hK Fm CH (hs Fm hc) hL⟩
+
+theorem Closed.of_class {𝒞 : FamClass} {P : ∀ {eps : ℝ}, FamP eps → ℝ → Prop}
+    (hs : ∀ {eps : ℝ} (Fm : FamP eps) (CH : ℝ), 𝒞 Fm → P Fm CH) : Closed 𝒞 P :=
+  ⟨1, one_pos, fun _ _ _ => ⟨⟨0, fun _ => 0, fun _ => 0, fun _ => 0⟩, fun Fm CH hc _ => hs Fm CH hc⟩⟩
+
+
+[WRS_selected_tops_01] Actual WithChN and D3 classes, preserving the original base member
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/CountsIrreducibilityConstants.lean#L32-L38
+Range SHA256: 8106f980921afa6dce4c18bb7d0f05e9b032217ad532ff0858eb6aac30be39d5
+abbrev WithChN (𝒞 : FamClass) : FamClass :=
+  fun Fm => 𝒞 Fm ∧ DGamDvdF Fm ∧ TameDistinctF Fm ∧ BoxesF Fm ∧ QDRowsF Fm ∧ Fm.CYL ≤ 9
+
+abbrev D3 (C0 : ℝ) (𝒜 : FamClass) : FamClass := Des (WithChN 𝒜) C0
+
+theorem d3_a {C0 : ℝ} {𝒜 : FamClass} {eps : ℝ} {Fm : FamP eps} (h : D3 C0 𝒜 Fm) : 𝒜 Fm := h.1.1.1.1
+
+
+
+[WRS_selected_tops_02] Full original selected Des membership and its actual ChosenE
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/SmoothDesignExistence/DesignExistsDes.lean#L10-L15
+Range SHA256: 0f2f3004c0fb64979be8ba7442bf8e1c73b234789c3658d1b5cc01bd84548617
+abbrev Des (𝒞 : FamClass) (C0 : ℝ) : FamClass :=
+  fun Fm => ((𝒞 Fm ∧ DGamSmooth Fm) ∧ TwGood Fm) ∧ (∃ CH : ℝ, ChosenE Fm C0 CH) ∧ TuSize Fm ∧ DGamSize Fm
+
+abbrev WithSm (𝒞 : FamClass) : FamClass := fun Fm => 𝒞 Fm ∧ DGamSmooth Fm
+
+end Formalism.MainNotions
+
+
+[WRS_selected_tops_03] Exact ChosenTT, ChosenBad and ChosenE witnesses on the same selected subset
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/GlobalSchurBounds/Chosen.lean#L18-L90
+Range SHA256: 5615599d2642f48516efda11bdac1badf3b3d0e641d0cbee99d1b455f2828c0c
+def ChTT_at : Prop :=
+  L.sc.delta1 * D.R.n / 2 ≤ (D.host.TT.card : ℝ) ∧ (D.host.TT.card : ℝ) ≤ 2 * L.sc.delta1 * D.R.n
+
+open Classical in
+
+def largeOrderResiduePrimes : Finset ℕ :=
+  (Finset.range ⌈L.sc.X'⌉₊).filter (fun p =>
+    p.Prime ∧ G.IsResidueClassZero D p ∧ L.sc.x ^ (L.sc.eps / 4) ≤ (addOrderOf (G.hP D p) : ℝ))
+
+variable {L}
+
+open Classical in
+
+def badTops (X : G.Inst D L) (p : ℕ) : Finset (G.HH D) :=
+  D.host.TT.filter (fun t => ¬ G.Good X p (X.bs (G.stepP D p) t))
+
+def ChBad_at (X : G.Inst D L) (Cb : ℝ) : Prop :=
+  ∑ p ∈ largeOrderResiduePrimes L, Real.log p / p * ((badTops X p).card : ℝ) ≤
+    4 * (Cb * L.sc.x ^ (-2 : ℝ)) * L.sc.delta1 * D.R.n * ∑ p ∈ largeOrderResiduePrimes L, Real.log p / p
+
+def BoundsAtX (x eps C : ℝ) (f : ℕ → ℂ) (M : ℕ) : Prop :=
+  ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), GlobalTheoryTheory.Induces χ f M →
+    ‖GlobalTheoryTheory.gChi χ x‖ ≤ x ^ ((1 : ℝ) / 2 + eps) ∧ ‖GlobalTheoryTheory.logDerivativeAtOne χ‖ ≤ C * Real.log x
+
+def ChQD_at (D : D7) (x eps C : ℝ) : Prop :=
+  BoundsAtX x eps C (GlobalTheoryTheory.psDir D.host.q) (8 * D.host.q * D.host.d) ∧
+  BoundsAtX x eps C (GlobalTheoryTheory.chDir D.host.d) (8 * D.host.q * D.host.d) ∧
+  BoundsAtX x eps C (fun a => GlobalTheoryTheory.chDir D.host.d a * GlobalTheoryTheory.psDir D.host.q a) (8 * D.host.q * D.host.d)
+
+def ChThin_at (D : D7) (x eps c : ℝ) : Prop :=
+  ∀ (N : ℕ) [NeZero N] (χ : DirichletCharacter ℂ N), GlobalTheoryTheory.IsCharED D χ →
+    ∀ y : ℝ, Real.exp (x ^ (eps / 3)) / 3 ≤ y → ‖GlobalTheoryTheory.gChi χ y‖ ≤ y * Real.exp (-(c * x ^ (eps / 8)))
+
+variable (L)
+
+def ChProviso_at (C0 : ℝ) : Prop :=
+  ∀ u, C0⁻¹ ≤ (D.duS u : ℝ) * GamL L ^ 2 / D.what₂.Dstar ∧ (D.duS u : ℝ) * GamL L ^ 2 / D.what₂.Dstar ≤ C0
+
+def ChCode_at (C0 CH : ℝ) : Prop :=
+  C0 * GamL L ^ 2 * L.sc.x ^ CH ≤ (Fintype.card D.what₂.Word : ℝ)
+
+end AtRecord
+
+section Family
+
+variable {eps : ℝ} (Fm : FamP eps)
+
+def ThickSetEventually : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ThickSetLowerBound (Fm.L x i)
+
+def ChosenTT : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChTT_at (Fm.L x i)
+
+def ChosenBad (Cb : ℝ) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChBad_at (Fm.Gx x i) Cb
+
+def ChosenQD (C5 : ℝ) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChQD_at (Fm.D x i) x eps C5
+
+def ChosenThin (c6 : ℝ) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChThin_at (Fm.D x i) x eps c6
+
+def ChosenProviso (C0 : ℝ) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChProviso_at (Fm.L x i) C0
+
+def ChosenCode (C0 CH : ℝ) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ChCode_at (Fm.L x i) C0 CH
+
+def Chosen (CH C0 C5 c6 Cb : ℝ) : Prop :=
+  ThickSetEventually Fm ∧ ChosenTT Fm ∧ ChosenBad Fm Cb ∧ ChosenQD Fm C5 ∧ ChosenThin Fm c6 ∧
+    ChosenProviso Fm C0 ∧ ChosenCode Fm C0 CH
+
+def ChosenE (C0 CH : ℝ) : Prop :=
+  ∃ C5 c6 Cb : ℝ, 0 < C5 ∧ 0 < c6 ∧ 0 < Cb ∧ Chosen Fm CH C0 C5 c6 Cb
+
+def ChosenEx (CH : ℝ) : Prop := ∃ C0 : ℝ, 1 ≤ C0 ∧ ChosenE Fm C0 CH
+
+end Family
+
+end Formalism.MainNotions
+
+
+[WRS_selected_tops_04] TopsF and projection from original ChosenE
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/SmoothDesignExistence/AdmissibleTopsMertens.lean#L15-L19
+Range SHA256: 0d47ede280913c86990ab5ca79ec448ee4d3c2213d4eafd76960576f611de2ca
+def TopsF {eps : ℝ} (Fm : FamP eps) : Prop := ChosenTT Fm ∧ ∃ Cb : ℝ, 0 < Cb ∧ ChosenBad Fm Cb
+
+theorem topsF_of_chosenE {eps : ℝ} (Fm : FamP eps) {C0 CH : ℝ} (h : ChosenE Fm C0 CH) : TopsF Fm := by
+  obtain ⟨C5, c6, Cb, -, -, hCb, -, hTT, hBad, -⟩ := h
+  exact ⟨hTT, Cb, hCb, hBad⟩
+
+
+[WRS_selected_tops_05] Original Adm2F and the unchanged harmonic threshold inherited through GLG16
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/SmoothDesignExistence/AdmissibleTopsMertens.lean#L73-L144
+Range SHA256: f33eca91d6d26483b1b22ae2171876ba3e795db23e580e7a15bf917e7b0cde63
+theorem admissible_tops_mertens {eps : ℝ} (Fm : FamP eps) (h : TopsF Fm) : G.Adm2F Fm := by
+  obtain ⟨⟨xa, hTT⟩, Cb, hCb, xb, hBad⟩ := h
+  unfold G.Adm2F G.Ev
+  refine ⟨max (max xa xb) (max (Fm.x1 + 1) ((16 * Cb + 2) ^ (3 / eps))), fun x hx i => ?_⟩
+  have hxa : xa ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hx
+  have hxb : xb ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx
+  have hx1' : Fm.x1 + 1 ≤ x := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hx
+  have hx1 : Fm.x1 < x := by linarith
+  have hxc : (16 * Cb + 2) ^ (3 / eps) ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx
+  obtain ⟨hT1, hT2⟩ := hTT x hxa i
+  have hB := hBad x hxb i
+  unfold ChBad_at at hB
+  have hLx : (Fm.L x i).sc.x = x := Fm.L_x x i hx1
+  have hLe : (Fm.L x i).sc.eps = eps := Fm.L_eps x i
+  have he' : 0 < (Fm.L x i).sc.eps := (Fm.L x i).sc.eps_pos
+  have he : 0 < eps := by rw [← hLe]; exact he'
+  have hy1 : 1 < (Fm.L x i).sc.x := (Fm.L x i).sc.one_lt_alt
+  have hy0 : 0 < (Fm.L x i).sc.x := by linarith
+  have hT0 : 0 ≤ (Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3) := by positivity
+  have hTbig : 16 * Cb + 2 ≤ (Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3) := by
+    rw [hLx, hLe]
+    have hc : (0 : ℝ) ≤ 16 * Cb + 2 := by linarith
+    have hne : eps ≠ 0 := he.ne'
+    have hm : 3 / eps * (eps / 3) = 1 := by
+      first
+      | (field_simp; ring)
+      | field_simp
+    calc 16 * Cb + 2 = ((16 * Cb + 2) ^ (3 / eps)) ^ (eps / 3) := by
+          rw [← Real.rpow_mul hc, hm, Real.rpow_one]
+      _ ≤ x ^ (eps / 3) := Real.rpow_le_rpow (by positivity) hxc (by positivity)
+  have hS := sum_log_div_le_two_mul_mul_add_two (largeOrderResiduePrimes (Fm.L x i)) ((Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3)) hT0
+    (fun p hp => by
+      simp only [largeOrderResiduePrimes, Finset.mem_filter, Finset.mem_range] at hp
+      exact ⟨hp.2.1.one_lt.le, hp.1⟩)
+  have hBTT : AuxBlock8.BTT (Fm.D x i) (Fm.L x i) (Fm.Gx x i) ≤
+      ∑ p ∈ largeOrderResiduePrimes (Fm.L x i), Real.log p / p * ((badTops (Fm.Gx x i) p).card : ℝ) := by
+    unfold AuxBlock8.BTT
+    apply Finset.sum_le_sum_of_subset_of_nonneg
+    · intro p hp
+      simp only [AuxBlock8.primesResidueBelow, largeOrderResiduePrimes, Finset.mem_filter, Finset.mem_range] at hp ⊢
+      exact ⟨hp.1.1, hp.1.2.1, hp.1.2.2.2, hp.2⟩
+    · intro p _ _
+      have hl : 0 ≤ Real.log (p : ℝ) := by
+        rcases Nat.eq_zero_or_pos p with h0 | h0
+        · simp [h0]
+        · exact Real.log_nonneg (by exact_mod_cast h0)
+      exact mul_nonneg (div_nonneg hl (Nat.cast_nonneg p)) (Nat.cast_nonneg _)
+  have hdn : 0 ≤ (Fm.L x i).sc.delta1 * (Fm.D x i).R.n := by
+    have hc0 : (0 : ℝ) ≤ ((Fm.D x i).host.TT.card : ℝ) := Nat.cast_nonneg _
+    linarith
+  have hA : 0 < (Fm.L x i).sc.x ^ (-2 : ℝ) := by positivity
+  have hpow : (Fm.L x i).sc.x ^ (-2 + (Fm.L x i).sc.eps) =
+      (Fm.L x i).sc.x ^ (-2 : ℝ) * ((Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3)) ^ 3 := by
+    have h3 : (Fm.L x i).sc.eps = (Fm.L x i).sc.eps / 3 * ((3 : ℕ) : ℝ) := by push_cast; ring
+    rw [Real.rpow_add hy0, ← Real.rpow_natCast, ← Real.rpow_mul hy0.le, ← h3]
+  unfold AuxBlock8.adm2
+  refine ⟨⟨by linarith, by linarith⟩, ?_⟩
+  rw [hpow]
+  obtain ⟨T, hTe⟩ : ∃ T, T = (Fm.L x i).sc.x ^ ((Fm.L x i).sc.eps / 3) := ⟨_, rfl⟩
+  obtain ⟨A, hAe⟩ : ∃ A, A = (Fm.L x i).sc.x ^ (-2 : ℝ) := ⟨_, rfl⟩
+  rw [← hTe] at hS hTbig hT0 ⊢
+  rw [← hAe] at hA hB ⊢
+  have k1 : 16 * Cb * (T + 2) ≤ T ^ 2 := by
+    nlinarith [mul_le_mul_of_nonneg_right hTbig hT0]
+  have k2 := mul_le_mul_of_nonneg_left k1
+    (div_nonneg (mul_nonneg (mul_nonneg hdn hA.le) hT0) (by norm_num : (0 : ℝ) ≤ 2))
+  have k3 := mul_le_mul_of_nonneg_left hS
+    (mul_nonneg (by positivity : (0 : ℝ) ≤ 4 * (Cb * A)) hdn)
+  have k4 := mul_le_mul_of_nonneg_right hT1 (by positivity : (0 : ℝ) ≤ A * T ^ 3)
+  linarith [hBTT, hB, k2, k3, k4]
+
+end Formalism.MainNotions.Pk
+
+
+[WRS_literal_local_gain_01] Literal linkG_concrete5 with two Closed inputs on one unchanged class
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/GroupLattices/LinkGConcreteNoKer.lean#L44-L56
+Range SHA256: 8802734748cf603d494ad00ee7a71527dba0dc5b04ef67374726d3d1ece3b354
+      stdSub := stdSubF_of_tied Fm hh.1.1
+      localSystemLowTerm := hh.1.2
+      localSystemSizeLowTerm := hh.2 }
+
+theorem linkG_concrete_noKer (𝒞 : FamClass) (h : Loc)
+    (hT : Closed 𝒞 fun Fm _ => GroupCompatibilityFamily Fm) (h2 : Closed 𝒞 fun Fm _ => Adm2F Fm) :
+    Closed 𝒞 fun Fm _ => LinkG Fm :=
+  link_of_local_closed 𝒞 h (hT.imp fun Fm _ _ ht => gatEF_of_tied Fm ht) (hT.imp fun Fm _ _ ht => stdSubF_of_tied Fm ht)
+    h2 (hT.imp fun Fm _ _ ht => npDescF_of_tied Fm ht)
+
+theorem linkG_concrete5 (𝒞 : FamClass) (hT : Closed 𝒞 fun Fm _ => GroupCompatibilityFamily Fm) (h2 : Closed 𝒞 fun Fm _ => Adm2F Fm) :
+    Closed 𝒞 fun Fm _ => LinkG Fm :=
+  linkG_concrete_noKer 𝒞 loc_proved hT h2
+
+
+[WRS_literal_local_gain_02] Original loG/flG, all five LinkG_at conjuncts, all-place guard and LinkG tending-to-zero error
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/GlobalTheoremInputs.lean#L97-L141
+Range SHA256: e900593eb316c51b53451af67e4e79f931486fe183ce68ef4e013a98562976f4
+def InertK (D : D7) (p : ℕ) : Prop :=
+  D.host.cls p = PrimeClass.signal ∨ D.host.cls p = PrimeClass.inertClass
+
+def flG {D : D7} (L : SizeData₂ D) (C : ℝ) (p : ℕ) : ℝ :=
+  C * (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) ^ 2 * Real.logb p L.sc.a +
+    C * (D.R.f : ℝ) * (Real.logb p L.sc.a) ^ 2
+
+def rG (eps : ℝ) : ℕ := ⌈8 * ((2 + 8 * eps) + 2) / eps⌉₊ + 1
+
+def leastPowerExponent {D : D7} (L : SizeData₂ D) (p : ℕ) : ℕ :=
+  ⌈Real.logb p ((D.R.k : ℝ) ^ 2 * L.sc.x ^ (3 * Scale.A))⌉₊ + 1
+
+def loG {D : D7} (L : SizeData₂ D) (C bo : ℝ) (p : ℕ) : ℝ :=
+  let s := L.sc
+  let pr : ℝ := if D.host.cls p = PrimeClass.inertClass then
+      (if (p : ℝ) < s.p0 D.R.k then C * (rG s.eps : ℝ) * s.b' * Real.log s.x
+       else if (p : ℝ) < s.X' then
+         C * (s.b' / s.x + L.etaSz + L.Sc + (s.w'' D.R.n + D.R.t) * Real.log s.x / s.delta1) + bo
+       else 0) else 0
+  let orr : ℝ := if D.host.cls p = PrimeClass.inertClass ∧ (p : ℝ) < s.X' then
+      C * Real.log s.x * (L.LaG * s.a / ((p : ℝ) * D.R.k) +
+        (if (p : ℝ) < s.p0 D.R.k then s.a * (p : ℝ) ^ (-(leastPowerExponent L p : ℝ)) else s.a / (p : ℝ) ^ 2))
+      else 0
+  C * (L.Sc + D.R.k + L.etaSz) * Real.logb p (2 * s.a) + pr + orr
+
+def LinkG_at {D : D7} {L : SizeData₂ D} (X : G.Inst D L) (K : G.Consts) (C bo : ℝ) : Prop :=
+  (∀ u w, D.what₂.places.resChar w ≠ (D.mem u).A.T →
+    DV.LocLe (D.plEq w) ⌊DV.ur D w (L.tau w)⌋₊ (L.NuLat u) (DV.MramL D u) ∧
+    (L.lenMN u w : ℝ) ≤ (D.duS u : ℝ) * (L.tau w + L.io w) ∧
+    (G.VV X K (G.aL L) (G.bL L) (D.what₂.places.resChar w) = ∅ → L.tau w = 0 ∧ L.io w = 0 ∧ L.lenMN u w = 0)) ∧
+  (∀ p, ∀ t0 ∈ G.VV X K (G.aL L) (G.bL L) p,
+    G.Sv X K (G.aL L) (G.bL L) p t0 ≤ 2 * (D.R.m : ℝ) * (G.Nv X p t0 : ℝ) * L.sc.a / p) ∧
+  (∀ w, InertK D (D.what₂.places.resChar w) → (D.what₂.places.resChar w : ℝ) ≤ L.sc.X'' D.R.n →
+    (∀ j ∈ SizeData₂.lifts D, 0 ≤ L.gain j w ∧
+      L.gain j w ≤ 4 * (D.host.TT.card : ℝ) * L.sc.a / (D.what₂.places.resChar w : ℝ)) ∧
+    (∑ j ∈ SizeData₂.lifts D, ∑ t ∈ L.TTw w,
+        (L.vonMangoldtClassSum j t (D.what₂.places.resChar w) - loG L C bo (D.what₂.places.resChar w))) -
+      (D.R.m : ℝ) * flG L C (D.what₂.places.resChar w) ≤
+      ((∑ j ∈ SizeData₂.lifts D, L.gain j w) - L.tau w)) ∧
+  G.ServedOrbitsContained X K (G.aL L) (G.bL L) ∧ G.MeanKappaBound X K
+
+def LinkG {eps : ℝ} (Fm : FamP eps) : Prop :=
+  ∃ (C x0 : ℝ) (δ : ℝ → ℝ), Filter.Tendsto δ Filter.atTop (nhds 0) ∧
+    ∀ x ≥ x0, ∀ i : Fm.Ix x, LinkG_at (Fm.Gx x i) Fm.GK C ((Fm.L x i).sc.b ^ δ x)
+
+
+
+[WRS_literal_local_gain_03] Full universal GlobalTheory.Top.link_g with original TSel and Duty premises
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkG.lean#L14-L27
+Range SHA256: 95dacee1304998e9a1e18e921522d4dd27ee31a043e99f34e701637bae6d863b
+theorem GlobalTheory.Top.link_g : ∀ (𝒜 : FamClass)
+    (sel : Formalism.L2.TSel 𝒜)
+    (hduty : ∀ {eps : ℝ} (Fm : FamP eps), 𝒜 Fm → Duty Fm), Closed (D3 3 𝒜) fun Fm _ => LinkG Fm := by
+  intro 𝒜 sel hduty
+  have hRec : ∀ {eps : ℝ} (Fm : FamP eps), 𝒜 Fm → Formalism.L2.LayerTwoFamilyClass Fm := fun Fm hc =>
+    class_of_record_of_choice (sel Fm hc) (class_duties_of_choice (sel Fm hc) (hduty Fm hc))
+  have hG2 : Closed (D3 3 𝒜) fun Fm _ => Formalism.MainNotions.G.Adm2F Fm :=
+    Closed.of_class fun Fm _ hc => admissible_tops_mertens Fm (topsF_of_chosenE Fm hc.2.1.choose_spec)
+  have hGt : Closed (D3 3 𝒜) fun Fm _ => Formalism.L2.G.GroupCompatibilityFamily Fm :=
+    Closed.of_class fun Fm _ hc => Formalism.L2.gTiedF_of_C2Rec Fm (hRec Fm (d3_a hc))
+  have lG := Formalism.L2.G.linkG_concrete5 (D3 3 𝒜) hGt hG2
+  exact lG
+
+end
+
+
+[WRS_literal_local_gain_04] Original TSel comparison, selected tops, linkG_closed and repeated frame guards
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/DivisibilityRemainder/AdmissibleClasses/LinkGCl.lean#L11-L32
+Range SHA256: 07ee92ac4049199978cfb0c034001d3a5efa868f0892a1273ef2c21d7de54a22
+theorem gTiedF_of_sel (Fm : FamP eps) (s : Formalism.L2.TSelF Fm) : Formalism.L2.G.GroupCompatibilityFamily Fm :=
+  Formalism.L2.gTiedF_of_C2S Fm (tied_families_of_choice s)
+
+theorem admissible_tops_of_class {𝒜 : FamClass} {C0 : ℝ} (Fm : FamP eps) (hc : D3 C0 𝒜 Fm) : Formalism.MainNotions.G.Adm2F Fm :=
+  admissible_tops_mertens Fm (topsF_of_chosenE Fm hc.2.1.choose_spec)
+
+theorem linkG_closed (𝒜 : FamClass) (sel : Formalism.L2.TSel 𝒜) : Closed (D3 3 𝒜) fun Fm _ => LinkG Fm :=
+  Formalism.L2.G.linkG_concrete5 (D3 3 𝒜)
+    (Closed.of_class fun Fm _ hc => gTiedF_of_sel Fm (sel Fm (d3_a hc)))
+    (Closed.of_class fun Fm _ hc => admissible_tops_of_class Fm hc)
+
+theorem linkG_frame (𝒜 : FamClass) (sel : Formalism.L2.TSel 𝒜) :
+    Closed (D3 3 𝒜) fun Fm _ => ∀ _ : D3 3 𝒜 Fm, Formalism.MainNotions.TuSize Fm → Formalism.MainNotions.DGamSize Fm → LinkG Fm := by
+  obtain ⟨ε1, hε, H⟩ := linkG_closed 𝒜 sel
+  refine ⟨ε1, hε, fun eps he hle => ?_⟩
+  obtain ⟨K, hK⟩ := H eps he hle
+  refine ⟨K, fun Fm CH hc => ?_⟩
+  have h1 := hK Fm CH hc
+  intro hl
+  beta_reduce
+  intro _ _ _
+  exact h1 hl
+
+
+[WRS_stronger_selector_boundary_01] TSelF and TSel thresholds on the actual given Extra
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ThresholdSelection.lean#L9-L16
+Range SHA256: cff3ec22259b12750ecc2aa67fed4979b5090bb8528aa7f17b5e4d3918cd7636
+def TSelF {eps : ℝ} (Fm : FamP eps) : Type _ :=
+  Σ' x0 : ℝ, ∀ x (hx : Fm.x1 < x), x0 ≤ x → ∀ i : Fm.Ix x, RecT (Fm.ex x hx i)
+
+def TSel (𝒞 : FamClass) : Type _ := ∀ {eps : ℝ} (Fm : FamP eps), 𝒞 Fm → TSelF Fm
+
+theorem TSelF.tiedRec {eps : ℝ} {Fm : FamP eps} (s : TSelF Fm) :
+    ∃ x0 : ℝ, ∀ x (hx : Fm.x1 < x), x0 ≤ x → ∀ i : Fm.Ix x, TiedRec (Fm.ex x hx i) :=
+  ⟨s.1, fun x hx h i => ⟨s.2 x hx h i⟩⟩
+
+
+[WRS_stronger_selector_boundary_02] Full RecT: TiedDataSK, minimal row pin, joints, host and Weil equivariance
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ClassRec.lean#L21-L31
+Range SHA256: ff02082477b2f792d54d6af5f5bb9e2a913b80eec70f6f5215db76a53b5d03d2
+structure RecT (ex : Extra D L hT Gi Gl K Y cX) where
+
+  T : TiedDataSK ex
+
+  pin : Rows.RowPinMin T
+
+  joints : JointsS T.toTiedDataS
+
+  host : HostDatumS T.toTiedDataS
+
+  weq : Theta.WeilCompatibleEquivariance T.toTiedDataS.theta.W
+
+
+[WRS_stronger_selector_boundary_03] TiedDataS including the actual g comparison field
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ClassS.lean#L26-L59
+Range SHA256: bc2fe63f038a78b6ad441e3a03a0559ee7a14ec9ff2bd5e3c228f178638df3d5
+structure LinkedFamilyData (ex : Extra D L hT Gi Gl K Y cX) where
+  host : Host.HostTied D
+  level : Host.LevelTied D
+
+  cols : Forms.ColsTiedSym D
+
+  full : Forms.ColsFullS cols
+
+  extra : Forms.ColsExtraTiedS full ex
+  provA : TH.ProvA
+  theta : Theta.AllTied D ex.th provA
+  twIn : TwIn D
+  n : NormalizedTwistCompatibility D ex.nch twIn
+  frameN : Host.SameFrameN host n.gal.fr.jE
+  thetaChr : Host.ThetaChrTied D n.cf ex.nch n.tp ex.th
+  chrVal : Host.ValLL0 D n.cf
+  chrDt : Host.DtTied D n.cf
+  chrN : Host.NCharTied D n.cf ex.nch n.tp
+  chrGal : Host.NGalChrTied D n.cf ex.nch n.tp
+  chrPsi : Host.PsiChoiceCompatible D n.cf ex.nch n.tp
+  sameChr : JoinChr.SameChr theta.T thetaChr
+  what₂ : Rows.RowsCompatible D host n.cf n.tp
+
+  inK : Y.Lev → ℕ → Prop
+
+  geo : Geo.GeoTiedP Y inK
+
+  tw : Forms.SymmetricTwistedColumnsAtPrimes n.tp cols ex.tw
+
+  emt : Rows.EMtTied D cols tw
+
+  g : G.GroupCompatibilityAll D hT ex.cmp
+  herm_eq : g.herm = full.1.to0
+  forms_eq : g.forms = fun u => (cols.forms u).to0
+
+
+[WRS_stronger_selector_boundary_04] Exact same-comparison family extraction from linked-level records
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ClassSLinks.lean#L9-L13
+Range SHA256: dbcd7a2aee6ebe3cfb93f257ff214a9b79b03de3d1f3eba4f63df28351946915
+theorem gTiedF_of_C2S {eps : ℝ} (Fm : FamP eps) (h : LinkedFamiliesLevelClass Fm) : G.GroupCompatibilityFamily Fm := by
+  obtain ⟨x0, hx0⟩ := h
+  refine ⟨max x0 (Fm.x1 + 1), fun x hx i hx1 => ?_⟩
+  obtain ⟨T⟩ := hx0 x hx1 ((le_max_left _ _).trans hx) i
+  exact ⟨T.g⟩
+

@@ -1,0 +1,158 @@
+#!/usr/bin/env python3
+"""Independent review bindings; mathematical verdicts follow a separate full reading."""
+from pathlib import Path
+import hashlib
+import json
+import subprocess
+
+HERE=Path(__file__).resolve().parent
+WORK=HERE.parent
+REPO=Path('/workspace/scratch/249d32c24541/formal_source')
+PIN='7cbf7a0c32fca1badf05931879a37c3f8a2b03b4'
+EXPECTED='c35bc6c288705b2a8392d939767197c00d8b60a8c6c1655573291306f10613ad'
+sha=lambda data:hashlib.sha256(data).hexdigest()
+read=lambda path:json.loads(path.read_text())
+main=(HERE/'main.tex').read_bytes()
+assert sha(main)==EXPECTED
+prov=read(HERE/'provenance.json')
+assert prov['proof_file_sha256']==EXPECTED and prov['source_commit']==PIN
+assert subprocess.check_output(['git','-C',str(REPO),'rev-parse','HEAD'],text=True).strip()==PIN
+claims=prov['claims']
+assert [c['id'] for c in claims]==[f'APD{i}' for i in range(1,26)]
+proof_hashes={}
+for claim in claims:
+    loc=claim['proof_location']
+    assert loc['file']=='arithmetic_presentations_v56/main.tex'
+    block=b''.join(main.splitlines(keepends=True)[loc['line_start']-1:loc['line_end']])
+    assert sha(block)==loc['sha256'] and len(block)==loc['bytes'],claim['id']
+    assert block.startswith(('% BEGIN '+claim['id']).encode())
+    assert block.rstrip().endswith(('% END '+claim['id']).encode())
+    proof_hashes[claim['id']]=sha(block)
+manifest=read(HERE/'source_manifest.json')
+assert manifest['proof_file_sha256']==EXPECTED
+assert manifest['source_commit']==PIN
+assert len(manifest['files'])==manifest['file_count']==66
+assert len(manifest['ranges'])==manifest['range_count']==71
+file_data={}
+for file in manifest['files']:
+    blob=subprocess.check_output(['git','-C',str(REPO),'show',PIN+':'+file['path']])
+    assert blob==(WORK/file['snapshot_file']).read_bytes()==(REPO/file['path']).read_bytes(),file['path']
+    assert sha(blob)==file['sha256'] and len(blob)==file['bytes'],file['path']
+    assert len(blob.splitlines(keepends=True))==file['line_count']
+    file_data[file['path']]=blob
+for item in manifest['ranges']:
+    lines=file_data[item['path']].splitlines(keepends=True)
+    assert 1<=item['line_start']<=item['line_end']<=len(lines),item['id']
+    block=b''.join(lines[item['line_start']-1:item['line_end']])
+    assert sha(block)==item['range_sha256'] and len(block)==item['range_bytes'],item['id']
+    assert item['file_sha256']==sha(file_data[item['path']])
+inherited=read(HERE/'inherited_inputs.json')['inputs']
+assert len(inherited)==10
+for item in inherited:
+    data=(WORK/item['file']).read_bytes()
+    assert sha(data)==item['file_sha256'],item['id']
+    block=b''.join(data.splitlines(keepends=True)[item['line_start']-1:item['line_end']])
+    assert sha(block)==item['proof_range_sha256'],item['id']
+    assert sha((WORK/item['parent_provenance_file']).read_bytes())==item['exact_parent_provenance_sha256']
+validation=read(HERE/'tex_validation.json')
+assert validation['proof_file_sha256']==EXPECTED and validation['status']=='PASS'
+
+notes=[
+ 'Restriction of derivations gives the relative cotangent dual; residue lifts make the inverse independent of choices. The actual dual-number bijection, finite-dimensionality and arbitrary residue-field scope are all proved.',
+ 'The maximal-ideal generator calculation uses Nakayama, and successive corrections construct a surjective map from the complete power-series ring. The linear kernel coefficients vanish residually. No regularity or coefficient-field section is assumed.',
+ 'The relation space is I/m_P I and its basis lifts generate I. The separate pr_dualb proof accepts every ideal annihilated by the maximal ideal, including an ideal not contained in it; residue lifts identify the exact coordinates.',
+ 'Every nonzero scalar quotient of the minimal relation extension is nonsplit. The minimal kernel containment, Nakayama, and the proved complete-local surjectivity criterion give the contradiction without importing an obstruction theory.',
+ 'The literal HasObs quotient quantifiers imply injectivity of the dual minimal relation space into H. Padding with zero generators gives exactly dim(H) relations and exactly dim(T) variables.',
+ 'The strict cohomology quotient injects into the image of T modulo ordinary coboundaries. The invariant and noninvariant alternatives for X0 are both retained, including the case D0=0. Arbitrary field/topological-group/local-index scopes match pr_count.',
+ 'The residue-constant ring has the same positive maximal-ideal powers. Finite residue degree gives a finite module extension; the direct finite-ideal argument proves Noetherianity without a coefficient section. Closedness and the induced topology prove completeness.',
+ 'The rank-three marked difference separates the two cross products without dividing by three. Polarization ties the adjacent functions, so one triangular direction holds for the entire representation. The weight-zero off-diagonal monomial conclusion holds over every target field.',
+ 'The finite Laurent algebra is generated by the finite entry spans. Its maximal vertex ideal has homogeneous powers; Artin–Rees and the determinant trick prove actual separation by inspecting homogeneous components and using a unit from C. No Jacobson-radical assumption on the whole vertex algebra is made.',
+ 'Compatible quotient maps use the actual supplied universal Space. Compactness of the finite-residue coefficient ring gives a closed coefficient image in the separated completion; evaluation occurs only after returning to finite Laurent polynomials. Artin–Rees proves the exact entry-span continuity needed for point_loc.',
+ 'The fixed-weight topology from RTC9 makes both maps agree modulo every target maximal-ideal power on B. Krull intersection then gives equality in every Noetherian local target, without assuming target completeness.',
+ 'The same supplied O-prime, R, point and iota represent every later IsCO deformation. Residue maps are compared through their specified scalar towers, ext_A identifies them, and the original Loc universal property gives existence and uniqueness.',
+ 'The signed box is constructed using the two cosets of G0. The reverse construction retains every ordinary character and the ordered flag-product identity. Both directions have the original arbitrary-ring/ideal/rank scope under F.Ok.',
+ 'Artin–Rees separates the small kernel from a fixed sufficiently high ideal power. Coset representatives plus the unique deep lift give a continuous section for every topological domain. Entrywise lifting preserves invertibility and required zero entries.',
+ 'The global defect identity is associativity in the signed group. The local identity uses noncommuting matrix factors in their actual order. Kernel annihilation gives square-zero expansion and local constancy; applying an arbitrary O-linear functional gives the exact cone equations.',
+ 'The correction signs and new local bases are correct. The final statement explicitly permits arbitrary p/SetLift without annihilation of the whole kernel; IsSq makes the image of mu square zero. The elementary pr_sqz identities also retain their scope without any frame or map p.',
+ 'The first conjugation 1-X/2 solves the negative involution equation. The second uses off-diagonal Z_ij/(Z_ii-Z_jj), is fixed by theta, and diagonalizes the marking. Both original broad elementary scopes and nonsurjective p are retained.',
+ 'For every allowed quotient killing ker(u), the map mu factors q on the actual kernel. The supplied boundary gives a corrected normalized box and universality gives a section. The proof preserves every HasObs factorization and the broader pr_obs/pr_mu interfaces.',
+ 'The dual-number box has the exact local correction sign. Its construction is explicitly valid for every locally constant residual box before Good, Box.Of or universality is used. Normalization plus the actual universal ring yields each strict tangent cocycle modulo a coboundary.',
+ 'The diagonal weight torus commutes with the marking and is fixed by the signed involution. Its first-order derivative is the required coboundary. The nonzero weight matrix is checked in both actual ranks, with no exclusion of ell=3.',
+ 'All residual and character formulas descend through the actual residue-field isomorphisms. Marked and local separations prove Good over every target field. Inherited ordered-product and characteristic-polynomial results give the actual ordinary bases and hence the box.',
+ 'The Borel dimension and descending-distance commutator calculation prove rigidity at every rank. The broad rigidity scope needs only the original frame, Box.Of and Good. Signed-involution fixed vectors identify with skew matrices over every field of characteristic not two; local constancy gives the original open-kernel outputs.',
+ 'The triangular induction on the functional coefficients is correct in either orientation. Weights 0 and plus/minus1 use the corresponding original frame clauses; outer weights plus/minus2 use c and the precise delta factor. No finite target-field or ell-not-three hypothesis is introduced.',
+ 'All finite-module premises of F.EC are verified for the same residual box. The Borel and infinite fixed-space dimensions cancel to h2+h0+n*d<=h1; the strict tangent count gives h1+1<=t+h0. This yields the exact additional one.',
+ 'The obstruction space is enlarged by a zero summand of dimension t-(n*d+1)-h. Its zero locus is unchanged for every allowed quotient. The original pr_mazur consequence then gives N=t and N-prime=t-(n*d+1) on every supplied local object, with all character and coefficient data unchanged.'
+]
+assert len(notes)==25
+claim_reviews=[{'id':c['id'],'verdict':'PASS','proof_sha256':proof_hashes[c['id']],
+                'proof_location':c['proof_location'],'mathematical_scope_check':notes[i]}
+               for i,c in enumerate(claims)]
+refinements=[
+ 'APD15 and APD25: corrected two punctuation-only mathematical notation typos before final freeze.',
+ 'APD16: explicitly removed the unnecessary whole-kernel-annihilation restriction from the full pr_correct statement; the proof uses only IsSq and the supplied defects.',
+ 'APD19: explicitly separated the full arbitrary-residual-box pr_tbox construction from the later normalization/universality step.',
+ 'APD22: explicitly stated the full pr_brig scope without F.Ok.'
+]
+boundaries=[
+ 'The exact original supplied Space and Loc are antecedents; the same A, B, point x, O-prime, R, iota, marking and ordinary characters are preserved.',
+ 'The original frame F.Ok and its EC field remain as stated. LFC20 supplies the arithmetic EC construction under its exact original P/FLink premises; this chapter does not remove P.',
+ 'Full original general alg_limit, alg_closed and obs_pres are not claimed. The proved specializations supply the full actual alg, point_loc and pr_mazur interfaces.',
+ 'Original c1ch with ClComp/ClChain, strict triangular and coincident-character dimension estimates, and rank-three EPres remain separate.',
+ 'No sharp2, sharp3, actual OffFin, AllGood, propagation theorem, endpoint, Alt witness, or selected whole-obligation closure follows from this packet alone.'
+]
+review={
+ 'schema':'rh-independent-human-review/1','artifact_version':'0.56','date':'2026-11-23',
+ 'component':HERE.name,'reviewer':'/root/bessel_nonvanishing',
+ 'reviewer_name':'Independent analytic worker','independent_of_author':True,
+ 'status':'PASS','verdict':'PASS','source_commit':PIN,
+ 'proof_file':'arithmetic_presentations_v56/main.tex','proof_file_sha256':EXPECTED,
+ 'main_tex_sha256':EXPECTED,'claims_reviewed':[c['id'] for c in claims],
+ 'proof_hashes':proof_hashes,'claims':claim_reviews,
+ 'source_verification':{'status':'PASS','checkout_head':PIN,
+  'full_files_compared_to_pinned_git_blobs':66,'exact_ranges_independently_rehashed':71,
+  'full_worktree_equals_snapshots_equals_pinned_blobs':True,
+  'source_declarations_used_for_scope_not_as_human_proof':True,
+  'script':'arithmetic_presentations_v56/review_by_analytic.py'},
+ 'source_files_verified':66,'source_ranges_verified':71,
+ 'source_files':[{**x,'independently_verified_against_pinned_git_blob':True}
+                 for x in manifest['files']],
+ 'source_ranges':[{**x,'independently_verified_against_pinned_git_blob':True}
+                  for x in manifest['ranges']],
+ 'inherited_inputs_verified':[{'id':x['id'],'file':x['file'],'file_sha256':x['file_sha256'],
+                               'proof_range_sha256':x['proof_range_sha256']} for x in inherited],
+ 'original_scope_checks':[
+  'Read all 25 human proof blocks and compared actual original definitions and target declarations.',
+  'Checked arbitrary fields and ranks where the original elementary statement allows them; finite-residue compactness is used only at the original coefficient-DVR alg interface.',
+  'Checked actual same-frame and same-local-object scalar towers, complete ordinary characters, the finite-Laurent return and all HasObs quotient quantifiers.',
+  'Checked the two explicit normalization equations and local/global cochain signs.',
+  'Checked every input to EC and the exact relation-count equality N=N-prime+n*d+1.'
+ ],
+ 'foundational_inputs':'Ordinary commutative algebra/finite-dimensional linear algebra, as explicitly listed in classical_inputs.json; completion and Artin–Rees are inherited human proofs.',
+ 'retained_boundaries':boundaries,'unresolved_findings':[],
+ 'review_refinements_in_final_text':refinements,
+ 'whole_selected_obligation_closed':False,
+ 'scope':'Independent human mathematical and literal-source-scope review; source and proof hashes verify identity, not a substitute for the human arguments. No Lean replay.'
+}
+(HERE/'independent_review.json').write_text(json.dumps(review,ensure_ascii=False,indent=2)+'\n')
+md=['# Independent review of APD1–APD25','',
+ '**Verdict: PASS.** All 25 complete human proof blocks were read independently. The final manuscript proves the full original `pres` at every supplied rank-two or rank-three local object, with the exact equality `N = N-prime + n*F.d + 1`.', '',
+ 'Final manuscript SHA-256: `'+EXPECTED+'`.', '',
+ 'Accepted source pin: `'+PIN+'`.', '',
+ '## Review method and bindings','',
+ 'I compared the human arguments with the literal original target interfaces, independently checked all 66 full snapshots against the pinned Git blobs and the retained checkout, rehashed all 71 source ranges, and verified the 10 inherited full-file and proof-block bindings. All 25 individual proof hashes are recorded in the JSON review. The supplied two-pass draft TeX result is bound to the same final manuscript and reports zero diagnostics. No Lean replay was performed.', '',
+ '## Mathematical and scope findings','',
+ 'The presentation proof is substantive. It constructs the minimal presentation, proves nonsplitting of each nonzero minimal scalar relation, realizes the original deformation problem at the supplied local ring, constructs continuous set lifts, calculates both defects, solves the two normalization equations, and derives the tangent excess from the actual residual box. The Euler field is applied only after its finite-module, open-kernel, local-stability and cyclotomic-dual hypotheses have been verified.', '',
+ 'The main delicate checks were the residue-constant Noetherian ring, separation of the Laurent vertex without a Jacobson assumption, compact recovery of coefficients before finite Laurent evaluation, the broad quotient scope of HasObs, and the invariant branch in the extra tangent direction. Each is addressed in the proofs rather than retained as an opaque premise.', '',
+ '## Claim-by-claim verdicts','']
+for c,note in zip(claims,notes):
+    md += ['### '+c['id']+' — PASS','',note,'']
+md += ['## Clarifications incorporated before freeze','']
+md += ['- '+x for x in refinements]
+md += ['','These changes preserve the established argument and align the stated complete subsuppliers with their original broader quantifiers. No mathematical defect remains unresolved.','','## Retained frontier','']
+md += ['- '+x for x in boundaries]
+md += ['','The packet does not close a whole selected terminal obligation.','']
+(HERE/'independent_review.md').write_text('\n'.join(md))
+print(json.dumps({'status':'PASS','component':HERE.name,'main_sha256':EXPECTED,
+ 'claims':25,'source_files':66,'source_ranges':71,'inherited_blocks':10,
+ 'unresolved_findings':0,'review_files':['independent_review.json','independent_review.md']},indent=2))

@@ -1,0 +1,183 @@
+GLOBAL COMPARISON LATTICE: EXPANDED RECONSTRUCTION
+Component CS1--CS9, continuation of v0.12, 21 November 2026
+
+Scope
+-----
+This component reconstructs the exact integral comparison theorem for a supplied compatible global forms system. It proves the integral coefficient descent, the actual parity-sensitive lattice identifications, ValIntRec, rational surjectivity, and the integral span equality. It does not construct the entire Forms0/true-column system or its polynomial-value existence condition ValEx. It does not identify any metric, Hermitian norm, determinant norm, or covolume.
+
+The source is pinned at 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4 in CocoSgt/riemann-hypothesis-lean. Each source range in provenance.json is checked byte-for-byte against the pinned Git blob. The mathematical proofs below are human arguments; this work did not compile Lean or replay a kernel.
+
+1. Exact mathematical statement and supplied data
+------------------------------------------------
+Let E/F be the supplied CM field and let L be the coefficient number field. At the prescribed coefficient place w, let e:L -> K be the embedding used by the actual recC construction, O the DVR of K, and R=O cap e(L), identified with the local ring O_{L,w}. Fix the local models at the rational prime p, all places v of F above p, their LI completion identifications, and the exact source position map (v,s) -> tau. The same global matrix B from SF is used at every place. Its defining identities are B* J B=I and that i_v(B) is the local frame of the supplied level lattice. Here * is conjugate transpose over E.
+
+Let V be the L-space attached to the source's global level-zero forms, and let script L be its specified full O_L-lattice. In source notation these are ((D.fm u).lat 0).V and ((D.fm u).lat 0).L. Let M=(D.gat u w hg).M. M consists of polynomial-valued functions on component/lattice tuples, with values in HtupW and the source's exact character-twisted equivariance. HtupW is built from the divided-power-generated integral Weyl lattice Delta. It is not Htup, the naive lattice built from Nabla. Their rational dimensions can agree while their integral lattices differ.
+
+The comparison C is cmpRec/its semilinear cmpLin version. Its definition uses ValEx: for every supplied global form and every valid local tuple, a polynomial Q with coefficients in L realizes the actual complex value after the specified frame and point transformation. The zero value is used on invalid tuples. Polynomial uniqueness follows from values on all invertible frames.
+
+The exact conditional conclusion is
+
+       O-span C(script L) = M.                         (A)
+
+At the source level, comparison_lattice_span_eq assumes CmpCore T Gt I, GatIs, and ValIntRec. Our CS1--CS4 discharge ValIntRec from the same data plus the supplied Forms0, Joint0, and LevelZeroCharacterRational. GatIs supplies the actual local model, not an arbitrary module with the same rank. CR6 proves the actual local rank equality. SF and LI supply the common frame and place alignments under their stated global-data hypotheses.
+
+CmpCore has four fields: same, ex, pos, chi. The ex field is ValEx and remains a substantive supplied input in this component. The pos and chi fields are the LI alignment and inverse-character identities. The same field is SameUloc. Under supplied Joint0 it is exactly Joint0.Uloc_eq; it is not an additional independent unknown theorem. The remaining work is to construct the compatible forms/Joint0/ValEx data together, following formsTiedSym_std and the block-rational value supplier.
+
+2. CS1: contraction of integral spans
+------------------------------------
+Let L subset K, let O be a valuation ring of K, and put R=O cap L. For any family S in L[X],
+
+      O-span(S) cap L[X] = R-span(S).                  (B)
+
+To prove this, take one expression Q=sum c_i q_i, c_i in O. If q_i are L-independent, choose a full-rank coefficient minor. Solving its finite linear system shows every c_i belongs to L. Thus c_i belongs to R.
+
+If q_i are dependent, choose an L-relation sum a_i q_i=0. Among its nonzero coefficients choose one, a_j, with smallest valuation. Existence does not require a discrete valuation: principal ideals of a valuation ring are totally ordered, so any finite nonempty list has a minimal valuation. Consequently a_i/a_j belongs to R for every i. Replace each c_i by c_i-c_j(a_i/a_j). These coefficients remain integral, the jth becomes zero, and the represented polynomial is unchanged. Induction on the number of terms proves (B).
+
+This is the substance of CoreDesc.desc_main/descVal. No finite extension, trace map, integral basis for O over R, or averaging denominator occurs.
+
+3. CS2: exact integer Weyl generators and the odd duality
+--------------------------------------------------------
+For dominant integral lambda=(lambda_1,...,lambda_n), set nu_i=lambda_i-lambda_n and lambda*=(-lambda_n,...,-lambda_1). Let H_nu be the product of initial square minors with exponents nu_j-nu_{j+1}. Let Delta_nu(Z) be the Z-span of all row divided-power words applied to H_nu. Every word has integer coefficients: the divided power is defined as the coefficient of t^a after an elementary row substitution, not by dividing an integral derivative after the fact. Formation of these coefficients commutes with arbitrary scalar maps. Therefore
+
+      Delta_nu(O) = O-span image(Delta_nu(Z)).          (C)
+
+The polynomial degrees remain bounded by |nu|. Thus Delta_nu(Z) is a finitely generated torsion-free subgroup of a finite-rank free abelian group. In the characteristic-zero application it is free, and its scalar extension gives the intended integral Weyl lattice. This is not an assertion that Delta equals the larger coefficient lattice Nabla.
+
+Let R_n reverse columns and epsilon=det R_n. For f of weight nu(lambda*), set
+
+ D_lambda f(X) = epsilon^(-lambda_1) det(X)^(lambda_1-lambda_n)
+                              f(X^(-t) R_n).          (D)
+
+Initially (D) is a regular function on GL_n. Jacobi's identity
+
+ det((X^(-t))_{I,J}) = sign(I,J) det(X_{I^c,J^c})/det X
+
+shows that its value on H_nu(lambda*) is a signed row reversal of H_nu(lambda). Indeed, an initial r-minor after reversing columns has columns the last r indices; its complement is a first-(n-r)-column minor on the complementary rows. The product of determinant denominators has exponent sum_j(nu*_j-nu*_{j+1})=nu*_1=lambda_1-lambda_n, exactly the power in (D).
+
+For a non-diagonal elementary matrix g=I+tE_ab, (gX)^(-t)=g^(-t)X^(-t) and g^(-t)=I-tE_ba. Its determinant is one. Thus D intertwines the two elementary substitutions with t -> -t. Coefficients of each power of t are integral divided-power operators. The highest image belongs to Delta_nu(Z): signed row permutations are products of elementary integer matrices, and diagonal sign changes act by signs on weight vectors. Divided powers along diagonal generators are integer binomial coefficients on each weight vector, so allowing them does not enlarge the integral word span. It follows that D sends every integer word generator to Delta_nu(Z).
+
+Let T(X)=X^(-t)R_n. Then T(T(X))=X and det T(X)=epsilon det(X)^(-1). Consequently
+
+ D_{lambda*} D_lambda = identity,
+
+since the total sign is epsilon^(-lambda_1+lambda_n+lambda_1-lambda_n)=1. This proves integral surjectivity as well as integrality. Equivalently,
+
+ det Z^(lambda_n) (D_lambda f)(Z)
+       = det(T(Z))^(-lambda_1) f(T(Z)).                (E)
+
+This is the literal source OddId; it retains the reversal sign even for odd n(n-1)/2 and permits negative determinant twists.
+
+For a local lattice A O^n, the relevant integral polynomial lattice is
+
+ D_lambda(AO^n) = det(A)^(-lambda_n) R(A^(-1)) Delta_nu(O),
+                         R(g)f(X)=f(gX).             (F)
+
+The intersection-over-all-bases definition gives (F): changing A by A U with U in GL_n(O) preserves the divided-power lattice and contributes only a unit determinant twist. The source calls this dw_eq/descentLattice_eq_span_weyl. The basis-free definition is not replaced by an unrelated model lattice.
+
+Here is the complete parity dictionary. Write x=(v,s) and tau=pos(x), and set lambda_tau=lambda^0_{v,s}. At even s, the local weight is lambda_tau and nAt=N_tau. At odd s, the local weight is lambda_tau* and nAt=N_tau^(-t). Put e_x=(local weight)_n. For f_x in the corresponding integer Delta, the actual coefficient-field generator is
+
+ q_x(X)=det(nAt_x)^(-e_x) f_x(nAt_x^(-1)X),
+ q_f=product_x q_x(X_x).                              (G)
+
+All products use disjoint variable blocks and the exact source reindexing. Their O-span after e is HtupW whenever its underlying extended local lattices have those column matrices. Statement (B) shows that e(Q) lies in this span exactly when Q is an R-linear combination of q_f.
+
+Under complex evaluation, an even block has argument M_tau z_tau. Its normalized argument becomes N_tau^(-1)M_tau z_tau. In an odd block the source argument is (M_tau z_tau)^(-t)R_n, and multiplication by nAt_x^(-1)=N_tau^t gives
+
+       (N_tau^(-1)M_tau z_tau)^(-t)R_n.
+
+Identity (E) turns it into the global weight lambda_tau with the same determinant normalization. Pure tensors give all generators; addition and R-scalar multiplication give the two directions of CoreAt. Conversely, equality of the resulting functions on all invertible complex blocks determines Q: the substitutions are invertible on GL_n, and a polynomial vanishing there vanishes on all matrices, by replacing each matrix with X+tI and then setting t=0 in the resulting polynomial identity. This proves WeylLatticeDescent in the actual characteristic-zero application.
+
+4. CS3: why the same odd-position lattice is obtained
+----------------------------------------------------
+Let L_b be the supplied base lattice. Its level conditions imply L_b subset L_b# and T L_b# subset L_b. At every v|p with p not dividing T, T is a unit, so L_b is self-dual locally. The adelic representative y_c is unitary and carries L_b locally to the actual class lattice L_c. Thus L_c is locally self-dual too.
+
+Choose a basis B' of L_c# at all primes above p. Such a basis exists because O_E tensored with Z_(p) is semilocal Dedekind, hence principal: every ideal has finite valuation data at these primes, represented by one element chosen using CRT modulo one extra prime power. A finite torsion-free module over it is free. The resulting basis can be viewed as an E-basis; its precise condition is IsLocBasis p, which uses a common integer denominator prime to p.
+
+Since L_c=L_c# at the relevant local places, B' is a basis of the same local lattice. Let G'=B'* J B'. Both G' and its inverse are locally integral. Entries of G' are pairings of lattice basis vectors. Columns of the inverse describe their dual basis; self-duality says those columns also have integral basis coordinates.
+
+The comparison point equation uses gamma y_c kappa, with gamma unitary and kappa in the level subgroup. The source Joint0 identifies the base lattice on the forms side with the one used in the common local frame from SF. Therefore the local tuple lattice has basis i_v(N), N=B^(-1)gamma B'. To check equality rather than only rational span, compare the two coordinate matrices. The point equation and kappa's preservation of the base lattice show the transition and its inverse map the integral standard module into itself. Thus the transition is in GL_n(W_v), proving identical column spans.
+
+From B* J B=I and gamma* J gamma=J one has
+
+       N* N=G',        (N^(-1))*=N G'^(-1).           (H)
+
+Let rho_{v,s}=iota_v Frobenius^s. At even s, LI gives e(t_tau(N))=rho(i_v(N)). At odd s,
+
+ e(t_tau(N)^(-t)) = rho(i_v((N^(-1))*))
+                 = rho(i_v(N)) rho(i_v(G'^(-1))).    (I)
+
+The c^s term in LI is exactly what changes inverse transpose to conjugate inverse transpose in (I). The right factor and its inverse are integral, because Frobenius preserves the integer ring. Therefore multiplication by it has no effect on O-column spans. This proves RestLatO with the actual embeddings, positions, and common B. Joint0 is used here for the base-lattice equality, not for the rank theorem CR6.
+
+5. CS4: polynomial values and integral characters
+-------------------------------------------------
+At a represented local tuple, ValEx supplies Q over L realizing the complex value of a global form x in a transformed frame, multiplied by the supplied level character chi(kappa). By the preceding section, all its local block lattices have exactly the nAt matrices required for (G). Section 3 therefore identifies e(Q) in HtupW with an R-linear combination of integer global Weyl tensors in the local basis B'.
+
+The scalar chi(kappa) is a unit at w under the supplied LevelZeroCharacterRational. At level zero it is a product of additive residue-field characters. A character value r satisfies r^a=1 for a positive a, so v_w(r)=0 and r,r^(-1) belong to R. Multiplying the R-span by either scalar preserves it. Frame translation by gamma and gamma^(-1) proves both implications. If local membership holds, the argument works for every B'. Conversely, the quantified global integrality condition may be applied to any one B' whose existence was just established.
+
+This is precisely ValIntAt and, after the Forms0 frame equivalence eY, ValIntRec. The proof retains the source's all-B' quantifier; it does not silently choose a preferred global integral basis for every class.
+
+6. CS5: recovering the global localized lattice by CRT
+------------------------------------------------------
+Let x be a global L-rational form satisfying its prescribed integrality at w. Since script L is full and finite, choose a nonzero integer d in O_L with dx in script L. Its bad denominators involve finitely many prime ideals. Pick s in O_L which is 1 modulo w and divisible by each w' != w to at least the order occurring in d. These prime-power conditions are pairwise coprime, so CRT applies.
+
+At w, sx is integral since x is. At w' != w, s/d is locally integral, so sx=(s/d)(dx) is integral. The defining all-place criterion for the supplied global lattice yields sx in script L. As s is a local unit at w, x=s^(-1)(sx) lies in R script L. The other direction follows by R-linearity of every local integral polynomial condition.
+
+The comparison value criterion plus PtEx and PtAll gives
+
+       C(x) in M  iff  x in R script L.               (J)
+
+PtEx says each local lattice tuple has a represented global class. PtAll says each global class occurs. Their proofs use the actual adelic class bijections in the supplied Forms0/LocId package; SameUloc from Joint0 aligns the local level subgroups. The level-character equivariance follows from the inverse away-character relation of LI8. Thus (J) includes membership in the actual function module, not just pointwise polynomial integrality.
+
+7. CS6: simultaneous approximation produces exact lattices
+----------------------------------------------------------
+For each v|p let g_v be a matrix basis of an arbitrary local lattice. Choose N with p^N g_v^(-1) integral at every v. Simultaneously approximate all its entries by a matrix A over F to precision p^(N+1). This is an elementary number-field weak approximation statement: approximate separately using completion density, clear denominators, and use CRT at the distinct prime ideals to find one global entry with all required congruences.
+
+Then g_v^(-1)A=I+pD_v with D_v integral. The determinant reduces to 1, so this matrix and its inverse are integral. Thus A and g_v generate exactly the same local lattice. At any one place its determinant is nonzero, hence det(A) is nonzero in F. If there are no places, choose A=I.
+
+This proves WeakApprox in the source's coefficient normalization and RatTup. The target may be an arbitrary tuple of full local lattices. No relation among those lattices is assumed. The position and Frobenius identities convert their single global basis matrix into coefficient-field matrices in the local polynomial formulas.
+
+8. CS7: rational elements span integrally, including invariants
+---------------------------------------------------------------
+By RatTup and the integral words in Delta, each local HtupW is the O-span of finitely many rational polynomial generators q_j. Let D_R be the R-span of these q_j in their L-span U_L. It is finite torsion-free, hence free over the DVR R. Its basis remains independent after extending from L to K, because it consists of coefficient vectors over L. Consequently O D_R is the actual local lattice.
+
+At an orbit representative, equivariance forces the value to satisfy all stabilizer equations chi(gamma)R_gamma(v)=v. Both the matrices and chi(gamma) have coefficients in L by the common-global-matrix construction, LI positions, and coefficient-field character rationality. Let U_0 be the common L-kernel of these equations. It is enough to use finitely many coefficient rows: the space spanned by all rows is finite-dimensional.
+
+D_R cap U_0 is saturated in D_R. Indeed, if 0 != a in R and a x belongs to U_0, then x belongs to the L-subspace U_0. The quotient is finite torsion-free, hence free; the exact sequence splits over R. Moreover clearing a common denominator shows L(D_R cap U_0)=U_0 cap L D_R. A basis of the intersection extended to an R-basis of D_R therefore proves
+
+       (O D_R) cap K U_0 = O(D_R cap U_0).            (K)
+
+This establishes rational integral generation of invariant values without dividing by the finite stabilizer size. It remains valid when the stabilizer is nontrivial, although the actual free-orbit case from CR simplifies it further.
+
+There are finitely many component/lattice orbits, by the supplied actual GatIs identification. Given an invariant value at an orbit representative, extend it by the character-twisted action and set it to zero on other orbits. Stabilizer invariance makes this independent of the representative. The action is rational, so rational values extend to rational functions. Evaluation at representatives decomposes every F in M into a finite sum of such extensions. Equation (K) thus yields
+
+       M = O-span {F in M : all coefficients in e(L)}. (L)
+
+This is MRatSpan. It is an integral claim; equality of rational dimensions alone does not give it.
+
+9. CS8: rational surjectivity with the precise rank bridge
+----------------------------------------------------------
+C is injective: if all local polynomial values vanish, PtAll realizes every global class, and the value identity makes the form vanish at every complex frame. The supplied global realization is injective. Polynomial coefficients of C(x) lie in e(L), directly from ValEx.
+
+For an L-independent family b_i in V, any finite K-relation among C(b_i) can be expanded in an L-basis of the finite coefficient span. Applying each L-coordinate functional to every polynomial coefficient gives an L-relation among the b_i, so every coefficient is zero. Therefore the comparison images of an L-basis remain K-independent.
+
+The dimension match has two separate steps. First, the supplied rational-forms record gives that the complex images of its global basis form a basis of Fi(0); its Fi_zero field identifies Fi(0) with the actual complex space Mu0. Hence dim_L V = dim_C Mu0. Second, CR6 gives rank_O M = dim_C Mu0. Together they give exactly the card_eq_d identity used by TieSurj. Neither step may be omitted.
+
+By (J), images of script L lie in M; since script L spans V, all basis images lie in K M. M is finite over O (from finite classes and the finite tensor polynomial lattices). Thus rank counting shows the independent images form a K-basis of K M.
+
+For rational F in M write F=sum a_i C(b_i). An L-linear functional pi:K -> L with pi(1)=1 exists by extending {1} to a vector-space basis. Apply pi to every polynomial coefficient. All coefficients of C(b_i) and F already lie in L, so
+
+       F = C(sum pi(a_i)b_i).
+
+This proves SurjRat. The functional is used only for field-valued rational descent. It is not asserted to send O into R; integral membership is obtained separately using (J).
+
+10. CS9: exact integral span
+----------------------------
+The inclusion O-span C(script L) subset M follows from (J). For the reverse, (L) reduces to a rational F in M. SurjRat writes F=C(x). Then (J) puts x in R script L. Since e(R) is a subring of O, semilinearity puts F in O-span C(script L). This proves (A).
+
+In particular no residual finite index has been discarded. No saturation of NuLat, comparison of metrics, or cancellation of the stabilizer sandwich scalar is used in this proof. Those statements belong to their separate components.
+
+Continuation boundary
+---------------------
+The next exact source points are ex_C_blk (the actual value supplier from block rationality and a supplied forms system), valEx_of_rep' (the generic representative/value gluing proof), and formsTiedSym_std (the simultaneous actual forms and level/character construction). Their exact ranges and hashes are in next_targets.json. SameUloc itself is not a missing input once Joint0 is supplied: sameUloc_of_joint is simply Joint0.Uloc_eq.
+
+The simplifications in this component are proof simplifications only. They do not change the finite-field periods, the rank scale, the local constants, the exponent in any arithmetic window, or the scope of the eventual RH/Dirichlet-GRH theorem.

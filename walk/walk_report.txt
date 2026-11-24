@@ -1,0 +1,98 @@
+THREE-SLOT LATTICE WALK — v0.3
+
+The complete readable proof is in walk_section.tex. This note records the exact
+dictionary to the source and the few conventions suppressed in the main text.
+
+LW1. Statements and inputs.
+  Source WalkSharp is over an arbitrary commutative ring and module. The main
+  note specializes to the actual DVR setup. Its six local conditions are:
+    dual <= base <= ball;
+    pi^a ball <= base; pi^b base <= dual; pi^c ball <= dual;
+    y_v ball <= dual.
+  Each condition holds with all other slot labels held fixed. The joint input
+  is pi^c0 L_B <= sum_{v in B} y_v L_(B;v=ball) + span G_B.
+  The operators commute; they preserve the all-base lattice as a consequence.
+  The source uses indices Fin V (0 through V-1). The text uses 1 through V.
+
+LW2. General state proof, retaining every cost.
+  Fix q=beta+1. For an active q-element set B, put
+    D(B) = {u < max B : u not in B}.
+  Members of D(B) have completed m applications; all u>max B are waiting.
+  A state has counters 0 <= i_v < m at active indices, zero off B. Its operator
+  exponents are m on D(B), i_v on B, and zero on waiting indices. Define
+    K_v = a_v+b_v+(m-1)c_v+m c0;
+    A = sum_(u in D(B)) K_u + sum_(v in B)(b_v+i_v(c_v+c0));
+    E = sum K_v + beta S.
+  Let C be the union over all q-element B and all its m^q states of Y_(B,i)G_B.
+  The invariant is pi^(E-A) Y_(B,i) L_B <= N+span C.
+
+  To prove it, apply the joint decomposition and reserve c0. Each y_v term
+  increments its operator exponent exactly once. If i_v+1<m, multiply the
+  vector by pi^c_v to move ball to dual. The new budget is A+c0+c_v.
+  If i_v+1=m and w=max B+1 exists, multiply the vector by pi^(a_v+b_w),
+  move v from ball to base, move w from base to dual, and replace v by w in B.
+  The new budget is A+c0+a_v+b_w. The exponents of all operators other than
+  v are unchanged, including the new active w, whose exponent is zero.
+  If there is no waiting index, multiplication by pi^a_v puts the vector in
+  the lattice with dual slots B\{v}, hence in M. All indices outside that
+  beta-element set have exponent m. Multiplying by pi^sum_(u in B\{v}) S_u
+  therefore places the term in N. The remaining active powers preserve M.
+
+  Nonnegative budgets: for active v, i_v<=m-1. Thus
+    b_v+i_v(c_v+c0)+c0 <= K_v;
+  if i_v=m-1, adding a_v+c0 instead gives equality with K_v.
+  The terminal scalar cost is at most beta S. These inequalities justify
+  every exponent subtraction in the invariant, including m=1, S=0.
+  The sum of all operator exponents strictly increases at each transition
+  and is at most mV; hence backwards induction terminates. Start with the
+  first q indices and all counters zero. Entering their dual slots costs
+  sum b_v=A, so the invariant gives pi^E M <= N+span C.
+  If beta>=V, scalar generators alone give the result with C empty.
+
+LW3. Actual specialization and elementary symmetric count.
+  pi=w, w^2=p; a_v=b_v=t_v; c_v=2t_v; c0=2(D0+1);
+  S_general=2S, (S_v)_general=2S_v.
+  K_v = 2m(t_v+D0+1) and E=2(tau+beta S), where
+    tau=sum_v m(t_v+D0+1).
+  The source RestWalk supplies |G_B| <= d product_(v in B) kappa_v.
+  There are m^(beta+1) active counter patterns for each B. Consequently
+    |C| <= d m^(beta+1) e_(beta+1)(kappa).
+  Since the left side is integral, the nonnegative floor can be inserted.
+  This floor is a cardinality conversion, unrelated to the ramification-
+  scaled ideal floor in LC4. It must not be confused with that rounding loss.
+  All-scalar monomial gives p^sum S_v M <= N. The whole N lies in M because
+  all y_v preserve M. This matches GrowthBounds.walk_clause on M=G.Mna.
+  Applying LC1 and LC2 now proves the tail-to-index conclusion, conditional
+  only on the slot and joint-rank inputs just listed. Transfer to G.M and the
+  retained saturated lattice is handled separately by SR1 and its sequel.
+
+LW4. What is elementary about the slot construction, and what remains.
+  For a full lattice H in a finite-dimensional vector space over a DVR,
+  let H^vee be its integral dual. If H <= R_e for all outgoing edges and
+  H^vee <= R'_e for all incoming edges, define
+    B = w^(-t)H intersect intersection_e R_e,
+    T = w^(-t)H^vee intersect intersection_e R'_e,
+    D = {x : phi(x) in O for all phi in T}.
+  Then H <= B <= w^(-t)H. Also H^vee <= T <= w^(-t)H^vee;
+  integral polarity and H=(H^vee)^vee give w^t H <= D <= H.
+  These are exactly base<=ball, dual<=base, w^t ball<=base,
+  and w^t base<=dual. The bound w^(2t) ball<=dual follows by composition.
+  Tensor products carry each factor inclusion to a global inclusion;
+  requiring equivariant integral values at lattice configurations also
+  preserves inclusion. This is the human argument behind ch_locChain,
+  ch_tenV_smul, ch_step, ch_chain, and restWalk_of_concrete.
+
+  NOT reconstructed here: the detailed highest-weight representation
+  argument showing H<=R_e and H^vee<=R'_e for every actual edge; the
+  corresponding lattice embeddings and naturality giving y_v ball<=dual.
+  Those inputs are explicit RestLocD and RestNat. Their source proofs are
+  present (restLocD and restNat_proved), so this is a boundary of our human
+  exposition, not an asserted gap in the released formal proof. JR proves
+  the joint-rank assembly but retains its single-place polynomial inputs.
+
+SOURCE RELATION
+  This is a specialized translation and compression of WalkSharpP.main,
+  not a new theorem claimed independently of the source. The transparent
+  active-index description suppresses formal enumeration and reindexing.
+  Its generic invariant retains the exact original budget. No Lean source
+  was changed or newly checked by a full kernel replay in this project.

@@ -1,0 +1,846 @@
+\section{Actual symplectic rigidity from adjoint Selmer vanishing}
+\label{sec:actual-symplectic-rigidity}
+
+This chapter completes the irreducible-point rigidity argument on the
+original arithmetic datum.  The source passes through a substantial
+ordinary automorphy-lifting construction.  A more direct route is available:
+Thorne's adjoint Selmer theorem requires irreducibility over the cyclotomic
+tower, and the ordinary characters of these particular points prove that
+condition.  We give the restriction argument, the local crystalline
+calculation, and the polarization comparison explicitly.  The resulting
+statement supplies the literal \texttt{RigiditySymplecticFour} interface.
+It retains the automorphy premise in that interface; automorphy is not
+inferred from the existence of a deformation ring.
+
+\subsection{The unchanged datum and the classical inputs}
+
+Fix the original algebraic closure $\Omega/\mathbb Q$, coefficient ring
+$O\subset\overline{\mathbb Q}_\ell$, and a datum
+$D:\texttt{Raw}(\Omega,O)$ with $D.\texttt{Good}$.  Thus $\ell$ is odd and
+$e\ge2$.  Write $G=\operatorname{Gal}(\Omega/\mathbb Q)$,
+$\chi:G\to\mathbb Z_\ell^\times$ for the cyclotomic character, and
+$c=D.\mathrm{cc}$ for the chosen complex conjugation.  All decomposition
+and inertia groups below are the original ones in $G$.  The characters are
+\[
+ \alpha=\chi\omega^{-1}\xi,\qquad
+ \Psi=\chi^e\psi,\qquad \vartheta=\alpha\Psi,
+ \qquad (p_0,p_1,p_2,p_3)=(\vartheta,\Psi,\alpha,1).
+ \tag{RX.1}
+\]
+AX6 supplies their exact continuity, finite-order, inertia and separation
+properties.  In particular $\vartheta(c)=-1$, and the four inertia weights
+on the subgroup where $\psi$ and $\omega$ vanish are
+\[
+                    (w_0,w_1,w_2,w_3)=(e+1,e,1,0).
+ \tag{RX.2}
+\]
+The fixed alternating matrix and its adjoint operation are
+\[
+ J=\begin{pmatrix}0&0&0&1\\0&0&1&0\\0&-1&0&0\\-1&0&0&0\end{pmatrix},
+ \quad X^\dagger=J^{-1}X^tJ,\quad
+ \mathfrak{sp}_4=\{X:X^\dagger=-X\},\quad
+ P(X)=\tfrac12(X-X^\dagger).
+ \tag{RX.3}
+\]
+
+An actual point $r$ is an $O$-algebra specialization of an actual
+$\texttt{IsPt}$ lift over a complete Noetherian local $O$-algebra $R$ with
+the same residue field.  This is precisely $D.\texttt{PtIn}(A,r)$ for
+$A=\overline{\mathbb Q}_\ell$ or
+$\overline{\mathbb Q}_\ell[\epsilon]/(\epsilon^2)$.
+The local condition is the original \texttt{OnComp} condition, including
+its domain and diagonal base point.  In particular AX8 applies to every
+such characteristic-zero point.  The source's $\texttt{Irr}(r)$ says that
+the matrices $r(g)$ span $M_4(\overline{\mathbb Q}_\ell)$; it implies
+absolute irreducibility because every invariant subspace is then invariant
+under every matrix.
+
+We use the following named classical inputs, with the specific
+normalizations required here.
+
+\begin{itemize}
+\item Fontaine's category of crystalline representations is stable under
+subquotients, tensor products and duals; its period functors are exact on
+admissible objects.  An unramified representation is crystalline, and a
+cyclotomic power $\chi^a$ has its de Rham filtration in degree $-a$.
+These are the consequences of Proposition~1.5.2 and
+\S\S5.1.3--5.1.7 of \cite{RX-Fontaine}.  BX1--BX2 identify these rings,
+actions, filtrations and finite cocycles with the literal source models;
+BX4 supplies the Bloch--Kato dimension formula.  DX1 supplies finite local
+Tate duality and the finite Euler formula; RX2 below spells out the
+rational passage for the possibly higher-dimensional representation.
+\item Finite abelian class-field theory over $\mathbb Q$, including the
+cyclotomic description used in AX3, attaches algebraic Hecke characters
+to finite-order characters times integral cyclotomic powers.  We use
+geometric Frobenius throughout.  The quadratic character of an imaginary
+quadratic extension is trivial after composition with its idele norm.
+\item Strong multiplicity one identifies two cuspidal
+$\mathrm{GL}_n$ representations whose unramified local parameters agree
+outside a finite set; see \cite[\S4]{RX-JS}.
+The normalized Galois representation of a regular algebraic polarized
+cuspidal representation is the one in
+\cite[Theorem~2.1.1]{RX-BLGGT}.  Its geometric Frobenius eigenvalues are
+$q^{(n-1)/2}$ times the unitary Satake parameters.  We use Chebotarev
+density and the characteristic-zero character criterion for semisimple
+representations to identify two such attached systems.
+\item The substantive global vanishing input is
+\cite[Theorem~6.1]{RX-Thorne}: if $F$ is CM, $n\ge2$, and
+$(\pi,\lambda)$ is regular algebraic, cuspidal and polarized, then
+irreducibility of $r_{\pi,\iota}$ on
+$G_{F(\mu_{\ell^\infty})}$ implies
+$H^1_f(F^+,\operatorname{ad}r_{\pi,\iota})=0$.
+Here the adjoint is the polarized, or unitary, extension to $G_{F^+}$.
+It will be identified by an explicit formula below.  The theorem has no
+residual irreducibility or residual image-size premise.
+\end{itemize}
+
+The standard results are leaves of this reconstruction.  The class-field
+and cyclotomic facts in the second item are the already matched AX3
+inputs.  The enlarged
+source packages \texttt{UnramifiedInputs} and
+\texttt{AdjointLiftingTheorem} are not assumed in the argument below and
+are not claimed as consequences of it.
+
+\subsection{Actual coefficients and ordinary finite cocycles}
+
+% BEGIN RX1
+\begin{proposition}[RX1: finite coefficients and the actual tangent cocycle]
+\label{prop:rx-coefficients}
+Every actual $\overline{\mathbb Q}_\ell$ point is continuous and defined
+over one finite extension of $\mathbb Q_\ell$.  The same holds for both
+coordinates of every actual dual-number point.  If $r'$ is such a point
+and its first coordinate is $r$, write
+\[
+ r'(g)=r(g)+\epsilon\dot r(g),\qquad
+ z(g)=\dot r(g)r(g)^{-1}.
+ \tag{RX.4}
+\]
+Then $z$ is a continuous adjoint cocycle, and every $z(g)$ belongs to the
+actual $\mathfrak{sp}_4$ in (RX.3).  Moreover $r$ is unramified away from
+a finite set of rational primes.
+\end{proposition}
+
+\begin{proof}
+We first prove the coefficient assertion for the algebra map defining the
+point.  Let $f:R\to\overline{\mathbb Q}_\ell$ be an $O$-algebra map.
+For $a\in\mathfrak m_R$ one has $|f(a)|<1$.  Otherwise the inverse of
+the nonzero algebraic number $f(a)$ is integral over $\mathbb Z_\ell$.
+Its monic polynomial, multiplied by a suitable power of $f(a)$, gives
+\[
+              1+b_1f(a)+\cdots+b_df(a)^d=0,
+                   \qquad b_i\in\mathbb Z_\ell.
+ \tag{RX.5}
+\]
+The corresponding element of $R$ lies in $1+\mathfrak m_R$ and is a
+unit, which cannot map to zero.  Every element of $R$ differs from an
+element of $O$ by an element of $\mathfrak m_R$, so $|f(R)|\le1$.
+Choose finitely many generators of $\mathfrak m_R$ and a real number
+$0<a<1$ bounding their image norms.  The ultrametric inequality gives
+\[
+                 |f(x)|\le a^m\quad(x\in\mathfrak m_R^m).
+ \tag{RX.6}
+\]
+Thus $f$ is continuous.  Lifting generators of
+$\mathfrak m_R/(\mathfrak m_R^2+\mathfrak m_O R)$ and successive
+adic approximation gives a surjection $O[[t_1,\ldots,t_d]]\to R$.
+Choose a finite extension $E/\mathbb Q_\ell$ containing
+$\operatorname{Frac}(O)$ and the finitely many $f(t_i)$.
+Polynomial approximations converge after applying $f$ by (RX.6).
+Since $E$ is complete and is closed in $\overline{\mathbb Q}_\ell$,
+they show $f(R)\subset O_E$.
+
+Now let $F=f+\epsilon\delta:R\to
+\overline{\mathbb Q}_\ell[\epsilon]/(\epsilon^2)$ be an $O$-algebra
+map.  The function $\delta$ is an $O$-linear $f$-derivation.
+The ideal $I=\ker f$ has finitely many generators $a_j$.
+The $O$-submodule $f(R)\subset O_E$ is finite; choose generators
+$f(b_i)$.  Every $r\in R$ can therefore be written
+\[
+             r=\sum_i o_i b_i+\sum_j u_j a_j,
+                      \qquad o_i\in O,\quad u_j\in R.
+\]
+Consequently
+\[
+             \delta(r)=\sum_i o_i\delta(b_i)
+                         +\sum_j f(u_j)\delta(a_j).
+ \tag{RX.7}
+\]
+Adjoining the finitely many displayed derivative values to $E$ gives one
+finite coefficient field $E'$ containing all of $F(R)$, and (RX.7)
+gives a uniform bound $|\delta(R)|\le C$.
+Leibniz's rule and (RX.6) then give
+$|\delta(x)|\le Ca^m$ on $\mathfrak m_R^{m+1}$.
+The coefficients multiplying products of generators cause no problem:
+their derivative term has one additional factor bounded by $a$.
+Thus $\delta$ is also adically continuous.  This proves finite
+coefficient capture and continuity for the original maps themselves;
+it does not use any assertion that a compact subset of
+$\overline{\mathbb Q}_\ell$ lies in a finite extension.
+
+The actual lift has continuous entries modulo every power of
+$\mathfrak m_R$.  Applying the preceding estimates proves continuity
+of $r$ and $\dot r$ in their finite coefficient fields.  Multiplication
+of the dual-number matrices gives
+\[
+ z(gh)=z(g)+r(g)z(h)r(g)^{-1}.
+ \tag{RX.8}
+\]
+The multiplier is fixed by the $O$-algebra map, so the coefficient of
+$\epsilon$ in
+$r'(g)^tJr'(g)=\vartheta(g)J$ is
+$z(g)^tJ+Jz(g)=0$.  This is exactly $z(g)^\dagger=-z(g)$.
+
+Finally the residual representation has open kernel and finite image
+by AX6.  Its finite fixed field is ramified at finitely many primes.
+Outside these primes and $D.T$, its entire inertia group lies in
+$\ker\bar r$, and the original \texttt{UnrT} equation says that the
+actual lift, hence $r$, is trivial on that inertia group.
+\end{proof}
+% END RX1
+
+% BEGIN RX2
+\begin{proposition}[RX2: the ordinary crystalline calculation and descent]
+\label{prop:rx-ordinary-crystalline}
+Let $L/\mathbb Q_\ell$ and $E/\mathbb Q_\ell$ be finite, and let
+$A=E$ or $E[\epsilon]/(\epsilon^2)$.  Suppose a continuous upper
+triangular $A$-representation of $G_L$ has diagonal characters
+$\kappa_1,\ldots,\kappa_n$ such that
+\[
+ \kappa_i|_{I_L}=\chi^{w_i},\qquad
+ w_1>\cdots>w_n,\qquad
+ \bar\kappa_i\ne\bar\kappa_j\chi\quad(i<j).
+ \tag{RX.9}
+\]
+Here the bar means reduction modulo $\epsilon$ when $A$ has dual
+numbers, and is the identity otherwise.  Its underlying
+$\mathbb Q_\ell$ representation is crystalline.
+In particular a dual-number self-extension of a representation that
+satisfies (RX.9) has finite adjoint cocycle.  If such a cocycle becomes
+finite on an open subgroup, it is finite on the original local group.
+\end{proposition}
+
+\begin{proof}
+Each rank-one $A$-character $\kappa_i\chi^{-w_i}$ is unramified.
+As an $E$-representation it may be a nontrivial unramified extension
+of a character by itself, but is still crystalline: its restriction
+to inertia is trivial, and Fontaine's unramified descent
+\cite[\S5.1.5]{RX-Fontaine} gives crystalline admissibility.
+Twisting by $\chi^{w_i}$ preserves it.
+
+Induct on $n$.  The first $n-1$ coordinates give a crystalline
+$A$-module $V$ by induction.  Twisting by $\kappa_n^{-1}$ gives a
+crystalline underlying $E$-representation
+$W=V\otimes_A A(\kappa_n^{-1})$.
+Indeed this tensor product is a quotient of
+$V\otimes_E A(\kappa_n^{-1})$, so the assertion follows from
+tensor stability and subquotient stability of crystalline representations.
+It has an $E$-character filtration with factors
+$\bar\kappa_i/\bar\kappa_n$ for $i<n$, each occurring twice when
+$A=E[\epsilon]$ and once when $A=E$.
+Their inertia exponents are positive.  Exactness and strictness of
+$D_{\mathrm{dR}}$ therefore give
+\[
+ \operatorname{Fil}^0D_{\mathrm{dR}}(W)=0,
+ \qquad \dim_E t_W=[L:\mathbb Q_\ell]\dim_E W.
+ \tag{RX.10}
+\]
+The constituents of $W^\vee(1)$ are all nontrivial by (RX.9).
+Successive left exactness of invariants gives $H^0(L,W^\vee(1))=0$.
+We record the needed higher-dimensional rational Euler passage.
+Choose a stable $\mathbb Z_\ell$-lattice $T\subset W$; it exists
+because the continuous image of the compact group is bounded, so
+the sum of the translates of a lattice is contained in a fixed
+larger lattice.  The finite-cochain limit and finite-generation
+argument of BX3 applies in every degree at issue.  It gives
+$H^i(L,T)\otimes\mathbb Q_\ell=H^i(L,W)$ and finite generation
+of $H^i(L,T)$ for $i=0,1,2$, with $H^3(L,T)=0$.
+The multiplication-by-$\ell^m$ exact sequence gives
+\[
+ 0\longrightarrow H^i(L,T)/\ell^m
+ \longrightarrow H^i(L,T/\ell^mT)
+ \longrightarrow H^{i+1}(L,T)[\ell^m]\longrightarrow0.
+\]
+Its outside torsion groups have bounded size independently of $m$.
+Thus the base-$\ell$ logarithm of the middle cardinality is
+$m\operatorname{rank}_{\mathbb Z_\ell}H^i(L,T)+O(1)$.
+Divide the finite Euler identity of DX1 by $m$ and let $m$ increase.
+This proves the rational Euler identity with factor
+$[L:\mathbb Q_\ell]\dim_{\mathbb Q_\ell}W$.
+The degree-$(2,0)$ finite Tate pairings similarly identify
+$H^2(L,T)$ with the compact dual of $H^0(L,W^\vee(1)/T^\vee(1))$.
+If $H^0(L,W^\vee(1))=0$, the latter invariant group embeds into
+the finite torsion of $H^1(L,T^\vee(1))$, by the lattice sequence.
+Hence $H^2(L,W)=0$.
+After dividing all dimensions by $[E:\mathbb Q_\ell]$, these
+facts and BX4 yield
+\[
+ \begin{split}
+ H^2(L,W)&=0,\\
+ \dim_E H^1(L,W)&=\dim_E H^0(L,W)
+                              +[L:\mathbb Q_\ell]\dim_E W\\
+                    &=\dim_E H^1_f(L,W).
+ \end{split}\tag{RX.11}
+\]
+These are finite-dimensional spaces; hence $H^1_f(L,W)=H^1(L,W)$.
+The upper-right column of the representation, divided by
+$\kappa_n$, is a cocycle in $W$.  Its image in
+$\operatorname{Hom}_E(A(\kappa_n),V)$ is the class of the
+underlying $E$-extension.  A $B_{\mathrm{cris}}$ primitive in $W$
+maps to a primitive in this Hom space.  After tensoring with
+$B_{\mathrm{cris}}$ the extension therefore splits.  Since its
+subrepresentation and quotient are crystalline, their comparison
+isomorphisms give one for the whole extension.  This completes the
+induction.  In particular it includes all dual-number unramified
+diagonal variations, rather than assuming that those variations vanish.
+
+For a crystalline self-extension
+$0\to V\to V'\to V\to0$, exactness of $D_{\mathrm{cris}}$
+and the comparison isomorphisms give a $G_L$-equivariant splitting
+after tensoring with $B_{\mathrm{cris}}$.
+One can choose the splitting over the semisimple coefficient algebra
+$L_0\otimes_{\mathbb Q_\ell}E$ before extending scalars.
+Writing it in a chosen vector-space splitting says precisely that
+the adjoint cocycle has a $B_{\mathrm{cris}}$ primitive.  BX1--BX2
+identify this with the source's \texttt{finiteCocycles}, including
+its specified tensor order and diagonal action.
+
+Here is the descent argument at the cochain level.  Shrinking an open
+subgroup to its normal core, suppose $H\lhd G_L$ is open and
+$z(h)=hx-x$ for $h\in H$, with
+$x\in V\otimes_{\mathbb Q_\ell}B_{\mathrm{cris}}$.
+The cocycle $F(g)=z(g)-(gx-x)$ vanishes on $H$.  The cocycle identity
+shows that it factors through $Q=G_L/H$ and takes values in the
+$H$-invariants.  Put $S=\sum_{q\in Q}F(q)$.  Then
+\[
+     gS-S=-|Q|F(g),\qquad
+     z(g)=g\bigl(x-|Q|^{-1}S\bigr)
+                         -\bigl(x-|Q|^{-1}S\bigr).
+ \tag{RX.12}
+\]
+The division is valid in characteristic zero, including when
+$\ell\mid|Q|$.  This proves descent without an unramified-extension
+restriction.  Equivariant coefficient maps and projections carry
+the displayed primitive to the corresponding primitive, so the same
+argument also proves the coefficient transports used below.
+\end{proof}
+% END RX2
+
+% BEGIN RX3
+\begin{proposition}[RX3: the full actual \texttt{tanBK} conclusion]
+\label{prop:rx-tanbk}
+Let $D$ be good, let $r$ be an actual point, and let $r'$ be any
+actual dual-number point reducing to $r$.  The cocycle in (RX.4)
+satisfies, on the original $G$,
+\[
+ z\in Z^1(G,\operatorname{Ad}r),\qquad
+ \texttt{Af.IsBK}(\operatorname{Ad}r,z),\qquad
+                   z(g)\in\mathfrak{sp}_4\quad(g\in G).
+ \tag{RX.13}
+\]
+Thus the source's \texttt{tanBK} output is supplied with every
+original local condition, coefficient map and placement retained.
+\end{proposition}
+
+\begin{proof}
+RX1 gives the first and third assertions.  Enlarge its single finite
+coefficient field if needed for the finitely many changes of basis
+below; the original embeddings into $\overline{\mathbb Q}_\ell$ remain
+fixed.
+
+At $\ell$, the actual \texttt{OnComp} condition implies the
+unnormalized ordinary polynomial equations.  The four prescribed
+eigenvalues $p_i(s_0)$ are distinct by AX6, so their differences are
+units after passage to $E[\epsilon]$.
+The spectral projectors
+\[
+        \prod_{j\ne i}
+           \frac{r'(s_0)-p_j(s_0)}{p_i(s_0)-p_j(s_0)}
+ \tag{RX.14}
+\]
+decompose the free module into rank-one summands.  Their partial sums
+are stable by the ordinary equations.  A basis of these summands
+therefore makes all $r'(g)$ upper triangular, with continuous
+diagonal characters $\kappa_i$ and
+$\kappa_i|_{I_\ell}=p_i|_{I_\ell}$ exactly.
+Reduction gives an ordinary flag for $r$.  Its ordered characters
+are those of AX8: Jordan--H\"older uniqueness identifies the sets of
+characters, and evaluation at the distinct prescribed eigenvalues
+of $s_0$ identifies the indices.  No permutation of the ordinary
+weights has been introduced.
+
+Put $\sigma=D.\mathrm{sg}(\ell)$.
+The finite character $\tau=(\psi,\omega)$ of the original local
+group has an unramified companion $\tau_{\mathrm{ur}}$ taking
+$\sigma$ to $\tau(\sigma)$.  Indeed
+$G_\ell/I_\ell=\widehat{\mathbb Z}$ and a chosen Frobenius is its
+topological generator, so a homomorphism to the finite abelian image
+is determined by this value.  Therefore
+\[
+ U=\ker(\tau\tau_{\mathrm{ur}}^{-1})
+ \tag{RX.15}
+\]
+is open and normal, contains $\sigma$, and kills both $\psi$ and
+$\omega$ on $U\cap I_\ell$.
+The inertia characters of $r'|_U$ are consequently the exact powers
+$\chi^{e+1},\chi^e,\chi,1$.
+For every $i<j$, AX8, applied to this very subgroup $U$, says that
+$\bar\kappa_i|_U\ne\bar\kappa_j|_U\chi$.
+The presence of $\sigma$ in $U$ is essential in this use of AX8;
+distinct integer weights alone would not exclude the two adjacent
+weight differences equal to one.
+
+The actual decomposition group, its henselization and completion
+identify $U$ with the absolute Galois group of a finite local
+extension.  The inertia and cyclotomic identifications are those
+already established in DX1 and transported to the literal periods
+in BX1--BX2.  RX2 makes the underlying $r'$ and $r$ crystalline on
+$U$, so $z|_U$ is finite.  Formula (RX.12) then returns the finite
+cocycle to the entire original decomposition group.  The period
+primitive is transported through the original graph subgroup
+$\texttt{decJ}$, giving the exact \texttt{IsBK.above} clause.
+
+For a prime $q\ne\ell$ in $D.S_b$, the original condition kills
+$I_q\cap\ker\psi$.  Away from $D.T$, it kills
+$I_q\cap\ker\bar r$.  Both are finite-index normal subgroups of
+inertia, and $r'$ is the identity on the relevant subgroup.
+Thus $z$ vanishes there and factors, on inertia, through a finite
+quotient.  Averaging this finite quotient as in (RX.12), now with
+coefficients in $M_4(E)$, shows that $z|_{I_q}$ is a coboundary.
+For every rational finite place one may choose the original selected
+valuation if $q\in D.S_b$, and any original valuation above it
+otherwise.  Conjugating a placement transports a cocycle and its
+primitive by the cocycle identity.  This is precisely the
+existential original-valuation clause \texttt{IsBK.away}, at every
+place, and proves (RX.13).
+\end{proof}
+% END RX3
+
+\subsection{Cyclotomic irreducibility and an admissible CM field}
+
+% BEGIN RX4
+\begin{proposition}[RX4: irreducibility over the required infinite tower]
+\label{prop:rx-cyclotomic-irreducibility}
+If $D$ is good and $r$ is an irreducible actual point, then
+$r|_{\ker\chi}$ is irreducible.  There is an imaginary quadratic
+field $K\subset\Omega$ such that
+\[
+       r|_{G_{K(\mu_{\ell^\infty})}}\text{ is irreducible}.
+ \tag{RX.16}
+\]
+In particular $r|_{G_K}$ is irreducible.  The field $K$ is chosen
+inside the original $\Omega$; it does not replace the original
+arithmetic datum or its coefficient field.
+\end{proposition}
+
+\begin{proof}
+We need the following elementary profinite Clifford argument.
+Let $\Gamma$ act continuously and irreducibly on a finite-dimensional
+space over $\overline{\mathbb Q}_\ell$, let $H\lhd\Gamma$ be closed,
+and suppose $\Gamma/H$ is procyclic.  If the restriction to $H$ is
+reducible, there is a nontrivial finite-order continuous character
+$\eta$ of $\Gamma/H$ such that
+\[
+                          r\otimes\eta\simeq r.
+ \tag{RX.17}
+\]
+Here is a proof that also covers an infinite subgroup $H$.
+Choose an $H$-invariant nonzero subspace of minimal dimension.  It
+is simple.  Its $\Gamma$-translates are simple $H$-submodules, and
+their sum is a nonzero $\Gamma$-invariant subspace, hence the whole
+space.  A sum of simple modules is semisimple: successively add a
+simple summand only when it is not already contained in the sum;
+its intersection with that sum is then zero.  Finite dimension
+ends the procedure.  Thus the restriction has finitely many
+isotypic components, permuted transitively by $\Gamma$.
+
+Each isotypic component is a closed vector subspace.  Its stabilizer
+in $\Gamma$ is closed, since the condition that a continuous matrix
+map preserve a given finite-dimensional subspace is closed.  Its
+index is finite, so its complement is a finite union of closed
+cosets and the stabilizer is open.  The action on the components
+is consequently a continuous finite quotient of the procyclic
+group.  If the number of components is $d>1$, a generator cycles
+them.  Multiplication by $1,\zeta_d,\ldots,\zeta_d^{d-1}$ on
+successive components gives an intertwiner for a nontrivial
+character of this cyclic quotient, proving (RX.17).
+
+It remains to exclude multiplicity without a component permutation.
+In that case the restriction is $W\otimes M$, with $W$ simple for
+$H$ and $H$ acting trivially on the multiplicity space $M$.
+Choose $t\in\Gamma$ whose image topologically generates
+$\Gamma/H$.  The conjugate of $W$ by $t$ is isomorphic to $W$;
+choose an invertible intertwiner $A$ for this conjugation.
+Schur's lemma gives $\operatorname{End}_H(W)=
+\overline{\mathbb Q}_\ell$, so the action of $t$ is $A\otimes B$
+for some invertible $B$ on $M$.
+An eigenline of $B$ makes $W\otimes L$ invariant under $H$ and $t$.
+The stabilizer of this subspace is closed and contains $H$ and a
+dense generator modulo $H$, hence is all of $\Gamma$.
+Irreducibility forces $\dim M=1$.  This proves the assertion, with
+no finite-group Clifford theorem silently applied to an infinite
+group.
+
+Apply it to $\Gamma=G$ and $H=\ker\chi$.
+For odd $\ell$,
+$\mathbb Z_\ell^\times\simeq C_{\ell-1}\times\mathbb Z_\ell$
+is procyclic, and the global cyclotomic character is surjective.
+Suppose that (RX.17) holds.  At the original group $G_\ell$,
+AX8 gives the ordinary characters $\kappa_0,\ldots,\kappa_3$.
+The two isomorphic representations have the same semisimplification,
+so their constituents satisfy
+\[
+               \{\kappa_i\eta:0\le i<4\}
+                       =\{\kappa_i:0\le i<4\}.
+ \tag{RX.18}
+\]
+Restrict further to an open subgroup of inertia killing $\eta$,
+$\psi$ and $\omega$.  The four characters there are the distinct
+powers (RX.2); the image of $\chi$ is infinite on every open
+inertia subgroup.  Equality of two powers therefore forces equality
+of their integer exponents.  Thus the permutation in (RX.18)
+fixes every index, and $\eta|_{G_\ell}=1$.
+
+The image of $I_\ell$ under $\chi$ is all of
+$\mathbb Z_\ell^\times$.  One elementary verification is that
+$\Phi_{\ell^m}(1+T)$ is Eisenstein at $\ell$; hence the local
+cyclotomic extension is totally ramified of degree
+$\varphi(\ell^m)$.  The original global inertia therefore surjects
+onto every finite cyclotomic Galois group.  Compactness and the
+inverse-limit description give the claimed full image.
+A character of $G/H$ trivial on $I_\ell$ is consequently trivial.
+This contradicts (RX.17), proving irreducibility on $H$.
+
+By RX1 choose an odd prime $q\ne\ell$ at which $r$ is unramified,
+and take $K=\mathbb Q(\sqrt{-q})$ inside $\Omega$.
+Its quadratic character $\eta_K$ is nontrivial on $I_q$, since
+$q$ has odd valuation in $-q$ and ramifies in $K$.
+The cyclotomic character is unramified at $q$, so $I_q\subset H$.
+Hence $H\cap G_K$ has index two in $H$.
+If the restriction of the irreducible $r|_H$ to this subgroup were
+reducible, the same Clifford argument for this cyclic quotient of
+order two would give
+$r|_H\simeq r|_H\otimes\eta_K|_H$.
+On $I_q$ the first representation is the identity, while the second
+contains the nontrivial scalar $-1$.  This is impossible.
+Finally $H\cap G_K=G_{K(\mu_{\ell^\infty})}$, which proves
+(RX.16).
+\end{proof}
+% END RX4
+
+\subsection{The exact automorphic and adjoint comparison}
+
+% BEGIN RX5
+\begin{proposition}[RX5: the polarized adjoint of the actual automorphic point]
+\label{prop:rx-adjoint-vanishing}
+Suppose $D$ is good, $r$ is an irreducible actual point, and
+$\texttt{IsAut4Alt}(\iota,r)$ holds with its literal source meaning
+$\texttt{IsAutQA}$.  Let $K$ be as in RX4, and let $\eta_K$ be
+its quadratic character.  On $M_4(\overline{\mathbb Q}_\ell)$ define
+\[
+ \mathcal R(g)X
+   =r(g)P(X)r(g)^{-1}
+       +\eta_K(g)r(g)(X-P(X))r(g)^{-1}.
+ \tag{RX.19}
+\]
+This is the polarized adjoint representation of the automorphic
+representation supplied by \texttt{IsAut4Alt}, with the same
+original $G$ and $r|_{G_K}$.  Its actual Bloch--Kato Selmer group
+over $\mathbb Q$ vanishes.
+\end{proposition}
+
+\begin{proof}
+RX1 supplies continuity, and RX4 supplies irreducibility of
+$r|_{G_K}$, so the universal imaginary-quadratic clause of
+$\texttt{IsAutQA}$ applies to this $K\subset\Omega$.
+It gives a regular algebraic cuspidal representation $\pi/K$
+whose \texttt{AttC} system is $r|_{G_K}$.
+The additional \texttt{WitA} assertion in the literal definition
+is not needed in this argument.
+
+We must first verify polarization with the normalization of that
+system.  Since $r(g)^tJr(g)=\vartheta(g)J$, the representation
+is self-dual up to $\vartheta$; conjugation by $c$ also gives an
+isomorphism from $r|_{G_K}$ to its conjugate.
+At an unramified place $v$ of norm $Q_v$, write the unitary
+Satake parameters of $\pi_v$ as $a_{v,i}$.
+The definition of \texttt{AttC} uses geometric Frobenius $F_v$
+and gives the eigenvalues $Q_v^{3/2}a_{v,i}$.
+Because $\chi(F_v)=Q_v^{-1}$, the preceding self-duality and
+conjugation identities yield the exact multiset relation
+\[
+ \{a_{v^c,i}\}_i
+       =\{\iota(\vartheta(F_v))Q_v^{-3}a_{v,i}^{-1}\}_i.
+ \tag{RX.20}
+\]
+The character $\vartheta\chi^{-(e+1)}$ has finite order and open
+kernel.  Class-field theory therefore supplies an algebraic
+Hecke character $\lambda_0$ of $\mathbb Q$ whose pullback to $K$
+has $\ell$-adic character
+\[
+                    (\vartheta\chi^3)|_{G_K}.
+ \tag{RX.21}
+\]
+Concretely this is the finite Dirichlet character supplied by the
+cyclotomic description of the finite-order part, multiplied by
+the integral norm power fixed by its geometric Frobenius values.
+Thus its local factor in (RX.20) is exactly
+$\iota(\vartheta(F_v))Q_v^{-3}$.
+Strong multiplicity one, in the form of
+\cite[Theorem~4.2]{RX-JS}, gives
+\[
+       \pi^c\simeq\pi^\vee\otimes
+                    (\lambda_0\circ N_{K/\mathbb Q}\circ\det).
+ \tag{RX.22}
+\]
+If needed, multiply $\lambda_0$ by the quadratic Hecke character
+of $K/\mathbb Q$ so that its value at $-1$ at the real place is
+$(-1)^4=1$.  That character has value $-1$ there and is trivial
+after the idele norm from $K$.  Hence neither (RX.21) nor (RX.22)
+changes.  This is the exact sign correction in the source's
+\texttt{heckeChar\_sign\_fixed}; no equality between a Hecke
+infinity sign and an uncorrected cyclotomic exponent is assumed.
+The resulting pair $(\pi,\lambda)$ is polarized in the precise
+sense of \cite[\S2.1]{RX-BLGGT}.
+
+The normalized Galois representation of this pair has the same
+geometric Frobenius characteristic polynomials as $r|_{G_K}$
+outside a finite set, by (RX.20)--(RX.21) and
+\cite[Theorem~2.1.1]{RX-BLGGT}.
+Both representations are continuous and semisimple, so Chebotarev
+\cite[Theorem~8.31]{RX-Milne}
+and the character criterion identify them.  To see that the use
+of $\overline{\mathbb Q}_\ell$ hides no change of topology,
+choose finite coefficient fields for both representations, take
+their compositum, and compare their continuous traces there.
+The finite-dimensional character criterion can be seen by taking the
+algebra generated by the two actions in
+$\operatorname{End}(V\oplus V')$.  Semisimplicity and faithfulness
+make this a semisimple algebra.  After scalar extension its simple
+matrix factors have linearly independent trace characters, detected
+by their central idempotents.  Equality of traces therefore forces
+equality of the multiplicities of every simple module, and hence
+an isomorphism.  In particular RX4 proves exactly the
+cyclotomic irreducibility hypothesis in Thorne's theorem for this
+attached representation.
+
+It remains to identify its extension of the adjoint to $G$.
+Put
+\[
+                            B=Jr(c)^{-1}.
+ \tag{RX.23}
+\]
+Since $c^2=1$ and $\vartheta(c)=-1$, the matrix $B$ is symmetric.
+For $s\in G_K$, direct multiplication gives
+\[
+         r(s)^t B r(csc^{-1})=\vartheta(s)B.
+ \tag{RX.24}
+\]
+Thus the polarized adjoint acts by ordinary conjugation on $G_K$
+and by
+\[
+                           X\longmapsto-B^{-1}X^tB
+ \tag{RX.25}
+\]
+at $c$.  These are the usual Lie-algebra formulas for the polarized
+extension to $\mathcal G_4$.  Any symmetric polarization pairing
+with the same multiplier on $G_K$ differs from $B$ by a scalar:
+the ratio gives an endomorphism of the irreducible $r|_{G_K}$.
+Thus this formula agrees with the pairing used for the normalized
+automorphic representation, and is independent of its scalar
+normalization.
+
+For completeness (RX.19) gives that same representation without
+choosing a basis for $B$.  Conjugation by a symplectic similitude
+commutes with $\dagger$, hence with the idempotent $P$.
+The two summands $\operatorname{im}P$ and $\ker P$ are invariant;
+(RX.19) is their ordinary and quadratic-twisted action, so is a
+representation.  On $G_K$ it is ordinary conjugation.  At $c$,
+\[
+ P(X)-(X-P(X))=-X^\dagger
+\]
+makes (RX.19) equal to (RX.25), using (RX.23).
+Since $G_K$ and $c$ generate $G$, the representations agree.
+Now apply \cite[Theorem~6.1]{RX-Thorne}, with $F=K$, $F^+=\mathbb Q$
+and $n=4$.  It gives $H^1_f(\mathbb Q,\mathcal R)=0$.
+The local condition away from $\ell$ is restriction to inertia,
+and the condition at $\ell$ is a $B_{\mathrm{cris}}$ primitive.
+These are exactly \texttt{Af.IsBK}, by BX1--BX2 and the original
+decomposition-group comparison.  At the real place positive
+cohomology vanishes by averaging, since the coefficients have
+characteristic zero.  There is no additional omitted archimedean
+condition.
+
+We also justify the literal algebraic-closure coefficient scope.
+The action $\mathcal R$ is defined over a finite field $E_0$ by
+RX1.  For any continuous $\mathcal R$-cocycle $a$, use the countable
+cofinal family of finite fields constructed in RV4, enlarged to
+contain $E_0$.  The sets
+$H_i=\{g:a(g)\in M_4(E_i)\}$ are closed subgroups: the cocycle
+and inverse formulas preserve these matrices because all action
+coefficients lie in $E_0$.  They cover the compact group $G$.
+Baire's theorem makes one $H_i$ open; adjoining the finitely many
+matrix entries of $a$ on representatives of $G/H_i$ then captures
+all its values in one finite extension $E$.
+For a local primitive with coefficients in the algebraic closure,
+its finitely many coefficient entries lie in some finite $E'/E$.
+An $E$-linear retraction $E'\to E$ fixing $1$ commutes with the
+action and returns that primitive to $M_4(E)$; at $\ell$ tensor
+the retraction with $1$ on $B_{\mathrm{cris}}$.
+This is done separately at each place and does not require a
+single field containing infinitely many chosen local witnesses.
+Thus every cocycle in the literal \texttt{Af.IsBK} condition is
+already in the usual finite-coefficient Selmer group after one
+finite extension.  Thorne's vanishing gives its actual coboundary
+there and hence in the original algebraic closure.
+\end{proof}
+% END RX5
+
+% BEGIN RX6
+\begin{theorem}[RX6: literal actual irreducible rigidity]
+\label{thm:rx-literal-rigidity}
+For every good original datum $D$, every embedding
+$\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C$, and every
+irreducible actual point $r$,
+\[
+          \texttt{IsAut4Alt}(\iota,r)
+                       \quad\Longrightarrow\quad D.\texttt{RigidAt}(r).
+ \tag{RX.26}
+\]
+Consequently the universally quantified source proposition
+\texttt{RigiditySymplecticFour} is supplied.
+\end{theorem}
+
+\begin{proof}
+Let $r'$ be any actual dual-number point reducing entrywise to $r$.
+RX3 supplies the original cocycle $z$ and all its finite local
+conditions.  It takes values in $\operatorname{im}P$, and
+\[
+ P\circ\operatorname{Ad}_r(g)
+             =\mathcal R(g)\circ P,\qquad Pz=z.
+ \tag{RX.27}
+\]
+Apply $P$ to every cochain identity and to every local primitive.
+For the prime-$\ell$ condition use $P\otimes1$ on the actual
+$B_{\mathrm{cris}}$ tensor module.  Formula (RX.27) proves directly
+that the unchanged function $z$ is a cocycle for $\mathcal R$ and
+satisfies its actual \texttt{IsBK} conditions.
+
+RX5 gives a matrix $X$ with $z(g)=\mathcal R(g)X-X$.
+Apply $P$ once more and multiply on the right by $r(g)$:
+\[
+    \dot r(g)=r(g)P(X)-P(X)r(g)
+                   =Y r(g)-r(g)Y,\qquad Y=-P(X)\in\mathfrak{sp}_4.
+ \tag{RX.28}
+\]
+This proves exactly the existential matrix and the entrywise
+identity required by $D.\texttt{RigidAt}(r)$, for every allowed
+$r'$; no normalization or choice of its local frames was added.
+
+The literal \texttt{RigiditySymplecticFour} statement assumes
+$\texttt{Ctx2}(D)\lor\texttt{Ctx3}(D)$, a positive level $N$
+killing the three finite characters, and then the displayed
+actual-point and automorphy premises.  Either context includes
+$D.\texttt{Good}$.  Applying (RX.26) therefore proves all its
+quantifiers, with the same original $D$, $\Omega$, $O$, $\iota$
+and $r$.  The unused extra level hypotheses need not be strengthened.
+\end{proof}
+% END RX6
+
+% BEGIN RX7
+\begin{corollary}[RX7: installation on the same selected datum]
+\label{cor:rx-same-datum}
+Fix an original host $h$, a threshold $t$ with $h.\texttt{Big}(t)$,
+an odd prime $\ell$, the original coefficient ring $O$, an integer
+$0<e<t$, and $\psi\in h.X(O,e)$.  Let $D$ be the original datum
+with $D.\texttt{Good}$ and the literal
+$\texttt{OfCase}(D,h,e,\psi)$ in either paired-count case.
+The literal \texttt{SymplecticFourImageDense} premise supplies an
+embedding $\iota$ and
+$D.\texttt{AllIrr}(\texttt{IsAut4Alt}(\iota,\cdot))$ on that
+same datum.  It follows that
+\[
+                          D.\texttt{AllIrr}(D.\texttt{RigidAt}).
+ \tag{RX.29}
+\]
+In the already reconstructed paired-count chain, the independent
+actual-rigidity premise can therefore be removed from the cut:
+the remaining automorphic requirements are the same-datum image
+density supplier and the exact finite catalogue with its trace
+nonvanishing guard.
+\end{corollary}
+
+\begin{proof}
+Choose the one embedding supplied by image density.  For every
+$r$, its actual-point and irreducibility assumptions give the
+corresponding \texttt{IsAut4Alt} assertion at this embedding.
+RX6 proves $D.\texttt{RigidAt}(r)$ pointwise, which is exactly
+the quantifier order in \texttt{AllIrr}.
+This argument changes neither the selected coefficient ring nor
+any local subgroup.  AX10, the actual model constructor MX10,
+the model comparison PX1--PX10 and SP10 can therefore consume the
+result on their existing common $D$.  Their coefficient-extension
+and return steps, the separate \texttt{Fin0}/\texttt{NoEnd}
+consequences of image density, and the catalogue's guarded trace
+quantifiers retain precisely their previous scope.
+No assertion is made here that image density or that catalogue
+holds without its own supplier, or that either count or the full
+RH/GRH argument is thereby unconditional.
+\end{proof}
+% END RX7
+
+\subsection{Source boundary and bibliography}
+
+The source chain begins at \texttt{RigSp4.\allowbreak rigSp4\_alt}.
+Its auxiliary CM-field theorem obtains adjoint vanishing from
+\texttt{UnramifiedInputs} and
+\texttt{Adjoint\allowbreak Lifting\allowbreak Theorem}.
+The exact declaration and its proof range are recorded in the source ledger.
+RX4--RX5 replace that intermediate supplier by the stated
+cyclotomic irreducibility proof and Thorne's published theorem.
+RX1--RX3 reconstruct the actual \texttt{CopNormLt.\allowbreak coPt},
+\texttt{TbTriDiag.\allowbreak tanBK}, ordinary crystalline induction and
+finite-index primitive descent.  RX6 uses exactly the projection
+and sign in \texttt{RigSp4.\allowbreak rg\_alg}.  Source anchors distinguish
+the literal endpoints from the intentionally bypassed larger
+interfaces.  In particular this chapter does not promote the
+whole Hida automorphy-lifting, unramified tower, or modularity
+packages.
+
+\begin{thebibliography}{9}
+\bibitem{RX-Fontaine}
+J.-M. Fontaine, \emph{Repr\'esentations $p$-adiques semi-stables},
+Ast\'erisque \textbf{223} (1994), 113--184,
+Proposition~1.5.2 (printed p.~124; PDF index 12),
+\S\S5.1.3--5.1.7 (printed pp.~155--158; PDF indices 43--46).
+\url{https://www.numdam.org/item/AST_1994__223__113_0.pdf}.
+
+\bibitem{RX-JS}
+H. Jacquet and J. A. Shalika,
+\emph{On Euler Products and the Classification of Automorphic Forms II},
+Amer. J. Math. \textbf{103} (1981), 777--815, Theorem~4.2,
+printed pp.~806--807 (PDF indices 30--31); its linear independence
+statement implies the strong multiplicity-one form used here.
+\url{https://www.math.columbia.edu/~hj/On%20Euler%20products%20II.pdf}.
+
+\bibitem{RX-BLGGT}
+T. Barnet-Lamb, T. Gee, D. Geraghty and R. Taylor,
+\emph{Potential automorphy and change of weight},
+Ann. of Math. \textbf{179} (2014), 501--609,
+\S2.1 and Theorem~2.1.1, printed pp.~535--538
+(published PDF indices 34--37).
+\url{https://annals.math.princeton.edu/wp-content/uploads/annals-v179-n2-p03-p.pdf}.
+
+\bibitem{RX-Thorne}
+J. A. Thorne, \emph{On the vanishing of adjoint Bloch--Kato Selmer
+groups of irreducible automorphic Galois representations},
+Pure Appl. Math. Q. \textbf{18} (2022), no.~5,
+Theorem~6.1; author preprint printed p.~24 (PDF index 23).
+The definition of the polarized adjoint is recalled on pp.~3 and 25.
+\url{https://arxiv.org/pdf/2207.04925}.
+DOI: \url{https://doi.org/10.4310/PAMQ.2022.v18.n5.a5}.
+
+\bibitem{RX-Milne}
+J. S. Milne, \emph{Algebraic Number Theory}, version 3.08 (2020),
+Theorem~8.31, printed p.~147 (PDF index 148).
+\url{https://www.jmilne.org/math/CourseNotes/ANT.pdf}.
+\end{thebibliography}

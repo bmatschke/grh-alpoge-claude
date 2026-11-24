@@ -1,0 +1,856 @@
+HARMONIC MODELS, ACTUAL CLEANED LATTICES, AND THE KEY DENSITY INEQUALITY
+Version 0.10; claims HM1--HM12.
+
+Source: CocoSgt/riemann-hypothesis-lean, pinned commit
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+SCOPE
+
+The conclusions below concern the literal polynomial spaces, H0/Hten lattices,
+edge normalizations and kF used in ColumnSpanDensity. They prove RestDims,
+TwoLetterModelIdentification, SingleWeightLatticeComparison,
+LatticeFunctorComparison, RhoSumLowerBoundEdge, RestEdge and
+RhoUpperBoundSmallDepth, and deduce the actual KeyIneq from an explicitly
+stated HH rank certificate. HM9--HM12 additionally prove the actual middle-
+weight cloud maps and coefficient-ring independence. No semisimple
+decomposition is asserted over the
+valuation ring. The integral harmonic maps have a stated denominator.
+
+The pre-transport HH rank certificate is a separate interface, supplied by
+the aggregate coarse-rank/paired-lift argument. RL by itself does not assert
+that certificate. FixedWeightNumericalFacts and the final numerical bound on
+the box sizes are also explicit interfaces. HM8 records the actual dual-height
+basis/inclusions needed later. General non-flat cloud maps and transfer
+between coefficient rings do not enter KeyIneq; they are proved separately
+below. The final rank applications of those maps remain distinct from their
+construction. This is a human reconstruction of
+the named source arguments, not a Lean build or a proof of RH/Dirichlet GRH.
+
+NOTATION
+
+Write k=m+1>=3, N=|TT| and q=p^{n'}. Use a coefficient setting RS(p,n'):
+O is the ramified discrete valuation ring, F its fraction field, w its
+uniformizer, and w^2=p. Normalize v(p)=1, hence v(w)=1/2. The unramified
+ring W has residue field F_q. All polynomial actions below use the source
+row-substitution convention, which is an anti-action in its matrix argument.
+For an integer d>=0 put
+
+  S_d = binom(d+k-1,k-1),  S_{-1}=0,
+  H_ab = S_a S_b - S_{a-1} S_{b-1}.
+
+Thus source dimPol m d=S_d and dimHar m a b=H_ab. Set
+
+  Ne = gaussianNumber(q,k) = (q^k-1)/(q-1).
+
+Polynomial coefficients in O may equally be viewed in its image in F. A
+Gauss lattice means polynomials whose ordinary monomial coefficients belong
+to O. Every finite tensor product below is implemented by multiplication in
+disjoint variable blocks; it is not an unspecified vector-space isomorphism.
+
+1. HM1: THE EXPLICIT TWO-LETTER MODEL AND ITS DIMENSIONS
+
+Let Z be a k by k matrix of variables, with indices 0,...,k-1. Define
+
+  c_i(Z)=(-1)^i det Z_{rows other than i, columns 0,...,k-2}.
+
+With two independent matrices Z^+,Z^-, the source map PsiXY is exactly
+
+  Psi: F[x_0,...,x_{k-1},y_0,...,y_{k-1}] -> F[Z^+,Z^-],
+  x_i |-> Z^+_{i0},   y_i |-> c_i(Z^-).
+
+It is injective, including in positive characteristic. Indeed the leading
+monomial of c_i in column-lex order is the diagonal monomial of that minor,
+with coefficient (-1)^i. In a product prod_i c_i^{b_i}, the exponent at
+Z_{t+1,t}, 0<=t<=k-2, is sum_{i<=t} b_i. The total degree in column 0 is
+sum_i b_i. These quantities recover all b_i. Distinct y-monomials therefore
+have distinct leading monomials. The x variables lie in a disjoint block,
+so distinct x/y monomials retain distinct leading monomials as well. This
+also proves integral saturation: eliminating the largest leading monomial
+shows that Psi(f) has integral coefficients only if f does.
+
+Let P_ab be polynomials homogeneous of degree a in x and b in y. CB2 identifies
+the actual vector-letter module with polynomials in Z_{i0}. The covector-letter
+module has normalized column shape (b,...,b,0): its tableaux have b columns
+of height k-1. Such a tableau is exactly a multiset of omitted rows, sorted
+in decreasing order, so its basis consists of the signed-minor monomials
+prod c_i^{b_i}. Hence Psi(P_ab) is literally twoSp, and Psi(P_ab(O)) is
+twoLat at the standard lattice. No dimension comparison is needed for this
+identification or for its integral version.
+
+Identify the two matrix blocks by the source deltaB. The resulting map is
+
+  beta_ab(f)(Z)=f(Z_{00},...,Z_{k-1,0}, c_0(Z),...,c_{k-1}(Z)).
+
+Its image is the actual dualWeyl module of normalized shape
+(a+b,b,...,b,0), corresponding to weight (a,0,...,0,-b). Every tableau
+minor product of that shape has a first-column factors and b height-(k-1)
+factors. Therefore it is in the image, integrally, by CB2/CB6.
+
+Put h=sum_i x_i y_i. Expansion of a determinant with its first column
+repeated gives beta(h)=sum_i Z_{i0} c_i(Z)=0. Multiplication by h is
+injective. CB3's Weyl product in this particular shape is
+
+  ((a+b+k-1)/(k-1)) binom(a+k-2,k-2) binom(b+k-2,k-2)
+    = S_a S_b-S_{a-1}S_{b-1} = H_ab.                         (HM1.1)
+
+The equality also holds when a=0 or b=0. Rank-nullity now gives, over F,
+
+  ker beta_ab = h P_{a-1,b-1},                              (HM1.2)
+
+where a negative degree means the zero space. This is a kernel statement
+for the displayed map, not an isomorphism inferred merely from equal ranks.
+
+There is also an exact description at EVERY lattice Lambda=g O^k. In the
+source convention let g act on x by g and on y by g^{-transpose}. The signed
+minor identity
+
+  c(g^{-1}Z)=det(g)^{-1} g^transpose c(Z)
+
+shows
+
+  twoLat(Lambda)=Psi(glAct(g^{-1}) P_ab(O)),
+  H0((a,0,...,-b),Lambda)=beta_ab(glAct(g^{-1}) P_ab(O)).    (HM1.3)
+
+For example the covector letter is det(g)^b times rowAct(g^{-1}) of the
+standard covector lattice; this determinant factor cancels the det(g)^{-b}
+introduced by the minors. CB7/EL2 justify basis independence of H0 and its
+identification with the actual integral invariant module. Thus (HM1.3)
+contains the correct inverse matrix and determinant twist, not a generic
+Schur-module convention.
+
+At an even s in TT the two degrees are (A_s,B_s); at an odd s they are
+(B_s,A_s), since lamAt reverses and negates the weight. The number H_ab is
+symmetric in a,b. Off TT the factor is the one-dimensional constant module.
+Disjoint-block multiplication and the monic CB2 bases therefore give
+
+  dim HH(A,B)=prod_s S_{A_s}S_{B_s},
+  dim V(flatW(A,B))=prod_s H_{A_s B_s}.                    (HM1.4)
+
+This proves the actual RestDims. The scalar telescoping identity
+sum_{j=0}^{min(A,B)} H_{A-j,B-j}=S_A S_B, multiplied over s, gives
+
+  sum_{0<=j_s<=min(A_s,B_s)} dim V(flatW(A-j,B-j))/Ne
+       = dim HH(A,B)/Ne.                                  (HM1.5)
+
+2. HM2: HARMONIC PROJECTIONS WITH THEIR INTEGRAL DENOMINATOR
+
+Let Delta=sum_i partial_{x_i} partial_{y_i}; write H_ab^harm=ker Delta in
+P_ab. Direct differentiation gives [Delta,h]F=(a+b+k)F on P_ab. Consequently
+for harmonic W of degree (a,b),
+
+  Delta(h^i W)=i(a+b+k+i-1)h^{i-1}W.                     (HM2.1)
+
+For F in P_AB define
+
+  pi_AB F = sum_{l=0}^{min(A,B)}
+       (-1)^l binom(A+B+k-2,l)^{-1} (h^l/l!)(Delta^l/l!)F.
+
+To verify this formula, the coefficient of h^{l-1}Delta^l F in its
+Delta-image is c_{l-1}+l(A+B+k-l-1)c_l=0, where
+c_l=(-1)^l/[l!(A+B+k-2)(A+B+k-3)...(A+B+k-l-1)]. Also pi F-F is a multiple
+of h. If hG is harmonic, the commutator forces G to be divisible by h;
+repeating this finitely many times proves h P_{A-1,B-1} intersects H_AB^harm
+trivially. Thus pi is the projection onto H_AB^harm along h P_{A-1,B-1}.
+Induction gives the unique decomposition
+
+  P_AB = direct_sum_{j=0}^{min(A,B)} h^j H_{A-j,B-j}^harm.
+
+Its jth projection is the SOURCE formula
+
+  E_j = binom(A+B+k-j-1,j)^{-1}
+        (h^j/j!) pi_{A-j,B-j} (Delta^j/j!).              (HM2.2)
+
+Indeed apply (HM2.1) to each h^i W. Terms i<j vanish after Delta^j; terms
+i>j are killed by pi; the remaining coefficient at i=j is precisely the
+binomial in (HM2.2). Hence sum_j E_j=1.
+
+Here is a short quantitative proof with the actual ordinary-coefficient
+lattice. The auxiliary lattice with basis x^alpha/alpha! times y^beta is
+preserved by both h^l/l! and Delta^l/l!. For the former, expansion over
+multiindices nu has coefficients prod binom(alpha_i+nu_i,nu_i); for the
+latter they are prod binom(beta_i,nu_i). These are integers. Further,
+
+  v_p binom(n,r) = sum_{a>=1}(floor(n/p^a)-floor(r/p^a)
+                                     -floor((n-r)/p^a))
+                 <= floor(log_p n).                     (HM2.3)
+
+Each summand is 0 or 1 and vanishes beyond that logarithm. Therefore, if
+L=floor(log_p(A+B+k)), p^L pi and p^{2L} E_j preserve this auxiliary lattice.
+
+On x-degree A the Gauss lattice G and that auxiliary lattice B satisfy
+
+  A! B subset G,
+  p^{(k-1)L}(A!)^{-1} G subset B.                        (HM2.4)
+
+The second inclusion follows because A!/alpha! is a product of k-1 binomial
+coefficients with upper arguments at most A, so its valuation is at most
+(k-1)L; the first is immediate. The scalar A! cancels on conjugating any
+degree-preserving map. Thus
+
+  p^{(k+1)L} pi(G) subset G,
+  p^{(k+1)L} E_j(G) subset G.                            (HM2.5)
+
+All maps commute with glAct(g): h and Delta are invariant under the vector/
+covector substitutions. So the same bounds hold on glAct(g)G for every g.
+There is no claim that glAct(g) preserves G itself.
+
+Write E_jF=h^j D_jF. Since h has a monic leading term, Gauss's elementary
+leading-coefficient argument gives h^jG integral iff G integral. It applies
+also after glAct(g), which fixes h. Consequently p^{(k+1)L}D_j maps G into
+P_{A-j,B-j}(O). Define actual quotient maps
+
+  pr_j=beta_{A-j,B-j} D_j Psi^{-1},
+  io_j(beta f)=Psi(h^j pi_{A-j,B-j} f).                 (HM2.6)
+
+The second is well-defined by (HM1.2), since pi kills ker beta. Equations
+(HM2.2)/(HM2.6) give sum io_j pr_j=1. They give both integral bounds in
+SingleWeightLatticeComparison with exponent
+
+  U=ceil((m+2) lgA(p,a,m)),  lgA(p,a,m)=log_p(8a+m)+1,
+
+provided A+B+1<=8a: (k+1)L<=(m+2)log_p(8a+m)<=U. Multiplication by the
+additional integral power of p only enlarges the bound. This proves the
+integral comparison directly; field-level complete reducibility is unused.
+
+3. HM3: TENSOR MAPS, MIDPOINTS, AND THE EXACT NORMALIZED PAIRING
+
+Take the tensor products of (HM2.6), swapping A_s,B_s at odd s and adjoining
+the constant factors off TT. These are the source IO/PR maps on literal
+disjoint-block products, extended linearly on the monomial tensor basis.
+For every family of lattices M_s, both maps lose at most
+
+  u=N U
+
+p-powers. In particular p^u pr_j maps HHten(M) into Hten_j(M), and p^u io_j
+maps Hten_j(M) into HHten(M). Sum_j io_j pr_j=1 still holds.
+
+Let A_H=AHH(A,B), A_j=Ar(1,flatW(A-j,B-j)), and d_j=A_H-A_j>=0.
+The inequality is termwise: at even s the first weight is A_s-j_s<=A_s;
+at odd s it is B_s-j_s<=B_s. Use the source's rescaled maps
+
+  I_j=w^{-d_j}io_j,   P_j=w^{d_j}pr_j.                  (HM3.1)
+
+They still sum to identity after composition. The actual HH edge lattice
+is w^{-A_H}HHten(M_edge); the harmonic edge lattice is w^{-A_j}Hten_j(M_edge).
+The midpoint family M_edge is the source LeAt, with ordinary source and
+target lattices at its two ends (EL5/EL6). For a cleaned HH vector x and
+cleaned HH dual Phi at height t and conductor c, set
+
+  x_j=p^u P_j x,
+  Phi_j=p^{2u+d_j}(Phi composed with I_j).              (HM3.2)
+
+These lie in the literal CCL_j(t,c,e) and CCL'_j(t,c,e). To see all three
+conditions rather than just the midpoint condition, apply the tensor bounds
+to the source family, the midpoint family, and EVERY competing edge family.
+The scalar w^{d_j} turns w^{-A_H} into w^{-A_j} at a midpoint, and the same
+calculation preserves w^c on competing edges. At an ordinary source or
+target family d_j>=0 ensures that the image remains inside height w^{-t}.
+For the dual statement p^u io_j(L_j) subset L_H implies
+p^u(Phi composed with io_j) belongs to the dual lattice; (HM3.2) uses the
+source's harmless extra p^u. Its total w-factor is w^{d_j} after the negative
+factor in I_j cancels one of the two copies in p^{d_j}=w^{2d_j}. Thus the
+dual height and all same-target competing-edge conditions hold as stated.
+
+No inverse normalization is suppressed: be_H(x,Phi)=p^{A_H}Phi(x), whereas
+be_j(y,psi)=p^{A_j}psi(y). Directly from (HM3.1)--(HM3.2),
+
+  be_j(x_j,Phi_j)
+     = p^{3u} be_H(io_j pr_j x,Phi).                    (HM3.3)
+
+The exponent is A_j+u+2u+d_j=3u+A_H. This is the exact source identity.
+It is 3u before the later bound is weakened to 4u; no square-root factor is
+being silently discarded.
+
+4. HM4: SPLITTING A SMALL-SMITH-FACTOR CERTIFICATE
+
+Use the precise meaning of FactorsLE: integral combinations of a selected
+dual family make the pairing matrix z I_n, with z!=0 and v(z)<=D. Absorb
+that integral matrix into the dual family first. This does not affect any
+of the cleaned lattice conditions. Applying HM3 gives integral matrices
+A_j whose sum is p^{3u} z I_n.
+
+The following elementary DVR fact is sufficient. If sum_j A_j=z0 I_n,
+z0!=0, let nu_j be the number of Smith factors of A_j whose valuation is
+at most v(z0), counting zero factors as infinite. Then sum_j nu_j>=n.
+Otherwise, the rows detecting these small factors, stacked for all j,
+are fewer than n integral linear equations. Their exact common kernel in
+O^n contains a nonzero primitive vector: the kernel is saturated, and a
+nonzero vector can be divided by its largest common uniformizer power.
+For this vector x every A_jx is divisible by w^{ord_w(z0)+1}, because all
+remaining Smith factors are. This contradicts sum A_jx=z0 x and primitivity.
+Finally each retained Smith factor divides z0; scaling its chosen row by
+z0 divided by that factor gives integral P_j,Q_j with
+
+  P_j A_j Q_j=z0 I_{nu_j}.
+
+Apply this with z0=p^{3u}z. The resulting polynomial families are integral
+linear combinations of (HM3.2), so remain in the actual cleaned lattices.
+If the original HH certificate has mass X, choose n>=X from RhoGE. We get
+
+  X<=sum_j nu_j,
+  FacL(flatW(A-j,B-j), t,c,e, nu_j, D+3u).              (HM4.1)
+
+Since u>=0, this implies source RhoSumLowerBoundEdge, whose displayed loss
+is D+4N ceil((m+2)lgA). The zero-certificate branch simply takes all nu_j=0.
+This proves the sum-rank step without assuming the projections integral or
+the summands orthogonal over O.
+
+5. HM5: EDGE TRANSPORT AND THE SMALL-DEPTH UPPER BOUND
+
+Any two rank-one edges are related by g in GL_k(Q_q). This is elementary
+divisor normal form for the pair L subset L': in a basis of L,
+L'=p^{-1}O_W e_1 + sum_{i>1}O_W e_i. Transport each twisted polynomial
+factor by
+
+  T_{g_s,lambda_s}F=det(g_s)^{-lambda_s,last}
+                    rowAct(g_s^{-1})F,
+  g_s=(iota composed with sigma^s)(g).
+
+The source anti-action identity, or CB7/EL8, gives exactly H0(Lambda) ->
+H0(g_s Lambda), hence HL and the actual LeAt/HLe midpoint lattices. Inverse
+transport gives equality. Transport a dual by Phi -> Phi composed with
+T^{-1}. It preserves evaluation and therefore be. It also permutes all
+same-source and all same-target competing edges. Consequently it transports
+CCL, CCL' and every FactorsLE certificate with the SAME t,c,n,D. This proves
+the literal RestEdge, including the competing-edge intersection conditions.
+
+Fix a source lattice L. Its rank-one outgoing edges are parametrized by
+the one-dimensional subspaces of L/pL: the target is L+p^{-1}W v for any
+primitive lift v. There are exactly Ne=(q^k-1)/(q-1) such edges. One may
+complete v to a basis by replacing a column of the identity at a coordinate
+whose residue is nonzero; its determinant is a unit. This proves both the
+edge condition and the parametrization without an unspecified lift theorem.
+
+Suppose every edge has a FactorsLE certificate of n factors at depth D,
+with primal vectors in CCL and dual vectors merely in R'_e, where D>=0
+and 2D<c. For each outgoing edge absorb its integral matrix to
+write its diagonal pairing z_e I_n, with ord_w(z_e)<=2D<c. Between distinct
+edges e,f, the source-cleaning condition puts each source vector for e in
+w^c R_f, while the dual vector for f is in R'_f. EL6's exact normalized
+duality then makes the cross pairing divisible by w^c. Divide the fth
+block of columns by z_f. The combined Ne*n square pairing matrix is I
+modulo w, and hence invertible over F. All Ne*n source vectors are linearly
+independent. Therefore
+
+  n <= dim V(lambda)/Ne.                                (HM5.1)
+
+This proves nLeD_all. The preceding edge transport also preserves R'_e, so
+a certificate at a single edge suffices: transport it to every edge and
+apply the argument. This is the exact one-sided nLeD statement. Taking
+dual vectors in the smaller CCL' proves RhoUpperBoundSmallDepth. The
+condition is 2D<c because c is measured in w-powers and D in p-valuations.
+Perfect normalized pairing, not an unscaled evaluation pairing, is used
+in the off-diagonal estimate.
+
+6. HM6: THE ACTUAL KEYINEQ, WITH AN EXACT INPUT INTERFACE
+
+Fix the source Dat X and constants K. Let a=ceil(ar),
+
+  J0=cleaningBudget(K.C0,m,N1,a,b'),  J=floor(J0),
+  U=ceil((m+2)lgA(p,a,m)), D0=totalDegreeBudget(K.CA,...),
+  D1=D0+4NU,  c=c4=cStar+2N*ccl+2n'*ccl,
+  t_*(alpha,beta)=ceil(t0(alpha,beta)+NJ0).
+
+The actual extended scalar boxes are
+  SaP=[a,ua+J+ccl], SbP=[lb,ub+J+ccl],
+  ua=floor(ar+ar/((m+1)Y)), lb=ceil(bl), ub=floor(bu).
+At each TT coordinate choose A in SaP and B in SbP.
+
+The needed rank interface is, for one actual rank-one edge e0,
+
+  RhoGE_HH(t=floor(t0(A,B)), c=c4, D=D0,
+       mass=(1-kx(A,B))*dimHH(A,B)/Ne).                  (HM6.1)
+
+Here kx is LITERALLY Dat.kx: kapPI plus the sum over segments of kapTI over
+the given ring O. The present proof does not replace it by an arbitrary
+postulated density. RL supplies the paired polynomials used to establish
+(HM6.1); aggregate upper/lower coarse ranks and numerical hypotheses are
+additional necessary inputs.
+
+For KeyIneq assume the literal FixedWeightNumericalFacts record. It states:
+the rounded HypI with Yb/2; CBoundI with constant 4; D0>=0 and 4D0<c4;
+2D1<c4; J0>=0; J<=a,lb; m>=2; extended-box upper bounds by
+a+a/((m+1)Y)+2J0 and bu+2J0; and the sum of the two extended upper endpoints
+plus 1 is <=8a. The first, second, depth-D0 and window assumptions enable
+the preceding argument to supply (HM6.1). Once (HM6.1) is provided, this
+structural proof uses the remaining degree, J and D1 inequalities directly.
+
+Apply HM4 to get nu_j with sum nu_j at least the mass in (HM6.1), for
+0<=j_s<=min(A_s,B_s), and depth D1. By HM5 each certificate transports to
+all edges, and nu_j<=d_j, where
+
+  d_j=dim V(flatW(A-j,B-j))/Ne.
+
+For j_s<=J, the original height is at most t_*(A-j,B-j). Indeed the only
+degree-dependent part of t0 is the sum of segment terms
+min(B_z,A_start/p^{distance}); subtracting at most J from each A,B lowers
+each minimum by at most J0, since p^{distance}>=1. The segment positions
+are disjoint and their total number is <=N. Thus
+
+  t0(A,B)<=t0(A-j,B-j)+NJ0,
+  floor(t0(A,B))<=t_*(A-j,B-j).                          (HM6.2)
+
+Increasing height only enlarges the cleaned source/dual lattices. The
+definition of kF is the infimum of nonnegative kappa for which all edges
+have mass (1-kappa)d_j at that larger height and depth D1. The defining
+set is nonempty because kappa=1 permits the zero certificate; it is bounded
+below by 0, so 0<=kF<=1. Since nu_j<=d_j, kappa=1-nu_j/d_j is permitted
+when d_j>0. Hence nu_j<=(1-kF(A-j,B-j))d_j. If d_j=0, then nu_j=0 and
+the same conclusion holds without division. For j outside the small box
+use only nu_j<=d_j. Sum and invoke the exact dimension telescoping (HM1.5):
+
+  sum_{0<=j_s<=J} kF(A-j,B-j) d_j
+      <= kx(A,B) dimHH(A,B)/Ne.                         (HM6.3)
+
+This is exactly KeyIneq. It uses neither non-flat cloud maps nor a change
+of coefficient ring. The precise source numerical supplier is
+ThresholdFixedWeightFacts.fixed_weight_facts_of_hyp: K.Pos and
+CH>=K.TM and X.Hyp(K.C0,CH) imply the record, with
+K.TM=max(K.TLP, max(4K.CH+1,2K.Cm+24)). Its threshold verification belongs
+to the independent uniform-numerics component.
+
+7. HM7: THE ACTUAL HARMONIC DENSITY AND FINITE-BOX AVERAGING
+
+Divide (HM6.3) by the positive dimHH/Ne. Its weight at a scalar coordinate is
+
+  P1(alpha,beta,j)=H_{alpha,beta}/(S_{alpha+j}S_{beta+j}).
+
+For fixed alpha,beta put R_j=S_alpha S_beta/(S_{alpha+j}S_{beta+j}). Since
+S_{d-1}/S_d=d/(d+k-1) increases with d,
+
+  H_{alpha,beta}/(S_alpha S_beta)
+    >=1-(alpha+j+1)(beta+j+1)
+                 /((alpha+j+k)(beta+j+k)).
+
+Multiplying by R_j gives P1(alpha,beta,j)>=R_j-R_{j+1}. Thus the exact,
+finite lower bound
+
+  sum_{j=0}^J P1(alpha,beta,j)
+     >=1-S_alpha S_beta/(S_{alpha+J+1}S_{beta+J+1})       (HM7.1)
+
+holds for all nonnegative alpha,beta, including zero. For L=J+1,
+
+  R_L=prod_{i=1}^{k-1}(alpha+i)/(alpha+L+i)
+                         * (beta+i)/(beta+L+i)
+      <=exp(-(k-1)L/(beta+L+k-1)).                       (HM7.2)
+
+The inequality follows from 1-z<=exp(-z), using only the beta factors;
+retaining both products gives a sharper endpoint bound if desired. It is
+uniform over a finite rectangle by substituting its upper endpoints.
+
+Here is the exact remaining averaging calculation. Let Sa,Sb be any finite
+short boxes with alpha+j in SaP and beta+j in SbP for every 0<=j<=J. Let
+delta>=0 be a common lower bound in (HM7.1). The injection
+
+  (alpha,beta,j) |-> (A=alpha+j,B=beta+j,j)
+
+acts coordinatewise on TT. Sum the normalized KeyIneq over the extended
+boxes, then retain its nonnegative terms indexed by this injection. The
+sum over the independent j_s factors into a product, each >=delta. Hence
+
+  delta^N sum_{alpha in Sa^TT,beta in Sb^TT} kF(alpha,beta)
+        <= sum_{A in (SaP)^TT,B in (SbP)^TT} kx(A,B).      (HM7.3)
+
+If the extended boxes are nonempty and
+
+  |SaP|^N |SbP|^N <= 2 delta^N |Sa|^N |Sb|^N,            (HM7.4)
+
+division gives mean_short(kF)<=2 mean_extended(kx). Empty short boxes have
+mean 0 under the source's zero-denominator convention; otherwise (HM7.4)
+forces delta^N>0, so no division by zero occurs. The actual short boxes
+Wa(tau)=[a+tau,ua+tau], Wb(tau)=[lb+tau,ub+tau], 0<=tau<=ccl, satisfy
+the shift inclusion and have the same cardinalities as at tau=0. Thus
+DensityNumericalFacts supplies exactly (HM7.4) and this proves source Avg.
+
+The new bound (HM7.1) is a human derivation, not a claimed named Lean theorem.
+The source establishes a sufficient density/cardinality inequality through
+ThresholdDensityFacts and harmonic dimension estimates. We have separated
+the exact averaging step from that numerical hypothesis; no average kx
+estimate or final numerical absorption is imported here.
+
+8. HM8: ACTUAL DUAL-HEIGHT BASIS AND PERFECT EDGE PAIRING
+
+For completeness, the later source interfaces DualHeightBasis,
+DualHeightInclusion, BePerfect and HLSpans follow from the already proved
+CB2/CB7 and EL5/EL6 with no additional integral representation theorem.
+Choose an elementary-divisor basis for an edge of rank r. Take the monic
+CB2 tableau basis in each actual H0 factor, tensor it, and perform the
+source determinant-twisted change of row variables. Denote the resulting
+basis of V by x_i. Each tableau is row-multihomogeneous, so the diagonal
+edge change acts on x_i by p^{pi_i}; the midpoint acts by w^{pi_i}. If
+A=Ar(r,lambda) and o_i=A-pi_i, then
+
+  H_src = direct_sum O x_i,
+  H_tgt = direct_sum O p^{pi_i}x_i,
+  H_mid = direct_sum O w^{pi_i}x_i,
+  R_e   = direct_sum O w^{-o_i}x_i,
+  R'_e  = direct_sum O w^{-o_i}p^{-pi_i}x_i^*.           (HM8.1)
+
+For a single factor pi_i is the row degree in the first r rows plus
+r*lambda_last. A semistandard tableau has at most sum_{j<r}nu_j entries
+in these rows, since entries strictly increase in its columns. Thus
+pi_i<=sum_{j<r}lambda_j; summing over all factors gives o_i>=0. This proves
+the order inequality and both source/target dual inclusions in (HM8.1).
+It also gives the literal HLSpans, rather than only a finite-index lattice.
+
+Finally be(x,Phi)=p^A Phi(x), and its matrix on the last two bases in
+(HM8.1) is the identity, because
+p^A w^{-2o_i}p^{-pi_i}=p^{A-o_i-pi_i}=1. Therefore R'_e is exactly the
+be-dual of R_e and conversely. Arbitrary integral row/column combinations
+introduce no additional index. This supplies the normalized perfect-pairing
+fact used in HM3--HM5 as well as the named later dual-height interfaces.
+
+The actual RestTensor interface is also elementary in this model. Split
+the letter indices into TT and its complement. The source topW and othW
+put zero weight in the opposite set; the zero-weight polynomial module
+is the constants. Thus multiplication in the disjoint variable blocks
+gives an isomorphism V(topW) tensor V(othW) -> V(lambda). Products of the
+CB2 bases form its basis, and products of the transported integral bases
+form the actual Hten lattice for EVERY family of ordinary lattices.
+Apply this also to the actual midpoint family LeAt to obtain the two
+Pr equalities in RestTensor. The dual map is defined on this product
+basis by nu(G,rho)(F*r)=G(F)rho(r), extended linearly. Independence of
+the product basis proves well-definedness and the exact evaluation
+identity. The basis cardinalities multiply, proving its final dimension
+clause. No finite-index identification or denominator occurs here.
+
+9. HM9: AN INTEGRAL PAIRING FOR COMPLEMENTARY MIDDLE SHAPES
+
+Let r>=1, let alpha_0>=...>=alpha_{r-1}>=0 and alpha_i<=M, and set
+alpha'_i=M-alpha_{r-1-i}. Assume alpha_0-alpha_{r-1}<=c<=8a. We construct
+the actual QPh input, rather than retaining its SmithP or TauP wrappers.
+Let e=alpha_{r-1}, gamma=alpha-e and T=M-e. Write J for the anti-diagonal
+permutation matrix and Y for the r by r matrix of middle variables. On
+the complementary module define
+
+  tau(f)(Y)=det(Y)^T f(Y^{-transpose}J).                 (HM9.1)
+
+This expression is initially a rational function, but it is an integral
+polynomial on the prescribed module. To see this, expand f in the CB2
+minor-product basis. Jacobi's complementary-minor identity replaces an
+initial-column h-minor of Y^{-transpose}J by a signed complementary
+initial-column (r-h)-minor of Y, divided by det(Y). The number of tableau
+columns for alpha' is alpha'_0=T, so all determinant denominators cancel.
+For the inverse operation, a gamma-tableau has gamma_0<=T columns; the
+remaining factor det(Y)^{T-gamma_0} is also integral. Degrees show that the
+output shape is T-alpha'_rev=gamma, and the reverse output is alpha'.
+Moreover the rational formula squares to det(J)^T times the identity.
+Thus tau is an actual integral isomorphism, up to the harmless unit sign,
+between these two standard lattices. It is not merely a dual-representation
+identification over F. The r=1 case is the same determinant calculation.
+
+For any invertible l, direct substitution gives
+
+  rowAct(l^transpose) tau(rowAct(l)f)=det(l)^T tau(f).    (HM9.2)
+
+Let M_gamma be the integral invariant lattice of shape gamma and B0 the
+IW5 normalized Fock pairing (highest vector has squared norm 1). IW3/IW5
+give, with
+
+  kappa=binom(r,2) floor(log_p(gamma_0+r-1)),
+  p^kappa M_gamma subset M_gamma^{#} subset M_gamma.    (HM9.3)
+
+For r=1 or gamma=0 take kappa=0, as the corresponding module is a determinant
+line after removal of e. The Gram elementary divisors of B0 on M_gamma
+therefore have normalized valuations in [-kappa,0]. Consequently
+B=p^kappa B0 is integral, nondegenerate, and has elementary valuations in
+[0,kappa]. Smith reduction over O gives two integral bases with diagonal
+entries d_b. If a d_b has a half-integral p-valuation, multiply its dual
+vector by p^{ceil(v(d_b))}/d_b, an integral scalar. We obtain full-rank
+integral families x_b,x'_b such that
+
+  B(x_b,x'_a)=delta_ab p^{kappa_b},  0<=kappa_b<=kappa.  (HM9.4)
+
+They need not remain bases after this last scaling, and no basis claim is
+needed. B retains the exact adjoint identity for rowAct(l), rowAct(l^t).
+
+Every polynomial of shape alpha is det(Y)^e times a unique polynomial of
+shape gamma, integrally: each CB2 tableau has exactly e full-height columns.
+Define
+
+  L(f,f')=B(f/det(Y)^e, tau(f'))                         (HM9.5)
+
+on the two indicated modules and extend it bilinearly to ambient polynomial
+spaces. Its values on the required lattices are integral. Combining (HM9.2)
+with the adjoint identity proves
+
+  L(rowAct(l)f,rowAct(l)f')=det(l)^M L(f,f').            (HM9.6)
+
+Take u_b=det(Y)^e x_b and choose integral u'_a with tau(u'_a)=x'_a. Their
+pairings are exactly (HM9.4). Their number is dim dualWeyl(alpha), which is
+weylDim(alpha) by CB3 and is unchanged on subtracting e. Finally
+
+  kappa<=ceil((r+1)^2[log_p(8a+r+1)+1])
+        =ceil(kappaOneExponent(p,a,r+1)).               (HM9.7)
+
+Indeed gamma_0<=c<=8a and binom(r,2)<=(r+1)^2. This proves every clause of
+the source QPh, including its exact integer p-power diagonals and bound.
+
+10. HM10: THE ACTUAL MIDDLE-COLUMN CONTRACTION
+
+Now the full matrix has size k=r+2, with a first and last column surrounding
+r middle columns. Fix a dominant weight
+
+  lambda=(P+c, lambda_1,...,lambda_r, -Q-c),
+  |lambda_i|<=c,
+
+and put mu=(P,0,...,0,-Q), ell=lambda-mu,
+ell'=(-ell_last,...,-ell_first), zeta=(2c,0,...,0,-2c).
+The target weight is mu+zeta. Set beta_i=lambda_i+c, so 0<=beta_i<=2c.
+The normalized middle column shapes of lambda and ell' are respectively
+
+  alpha=beta+Q,  alpha'=2c-beta_rev,
+
+which are complements in the rectangle M=Q+2c. Apply HM9 with c there
+equal to 2c here; the hypothesis is exactly 2c<=8a. Obtain L and families
+u_b,u'_a with the indicated diagonal.
+
+Let D(Y)=diag(1,Y,1). For a full-matrix polynomial v, the source subY is
+EXACTLY v(Z D(Y)), with coefficients viewed as polynomials in Z and
+coefficients in O[Y]. Every Z-coefficient belongs to the middle invariant
+module of shape nu(v)_middle: middle-column scalings and generic column
+additions in Y are those same column operations in Z. This also proves
+coefficient base change, integrality, and preservation of each row degree.
+For v,t in the two full modules define
+
+  Lambda(v,t)(Z)=L_{Y,Y'}(v(ZD(Y)) t(ZD(Y'))),           (HM10.1)
+
+where L is applied coefficientwise in the independent Y,Y' variables.
+This is literally lamOf, not a representation-theoretic map chosen up to
+scalar. It commutes with every full row substitution, since those act on Z
+and commute with coefficient extraction. It is integral because the
+coefficient modules are those on which L is integral.
+
+Its image has normalized shape
+(nu(v)_0+nu(t)_0,M,...,M,0). For middle-column transformations Z->ZD(l),
+the two middle-variable polynomials undergo simultaneous rowAct(l), so
+(HM9.6) gives determinant weight M. Adding the first column to a middle
+column leaves both substituted polynomials unchanged by their original
+generic column invariance. The last column is absent. These operations,
+together with the first-column degree, give exactly the defining generic
+upper-column invariance and column degrees. Thus Lambda maps to the actual
+dualWeyl module of mu+zeta. CB2's coefficient saturation gives its full
+integral-lattice membership.
+
+The diagonal families lift explicitly. Write u_b=det(Y)^Q v_b, integrally,
+where v_b has shape beta. Given a CB2 minor product of shape beta, replace
+each h-minor by the (h+1)-minor obtained by adjoining row 0 and column 0,
+and multiply by Z_00^{2c-beta_0}. This gives a polynomial s_b of full shape
+(2c,beta,0), row-0 degree 2c and last-row degree 0. Evaluating at
+Z=diag(1,Y,1) recovers v_b. The identical lift of u'_a gives s'_a of shape
+(2c,2c-beta_rev,0), with those same row degrees. Extend linearly to the
+integral families; no denominator is introduced.
+
+For a flat polynomial F of weight mu, HM1's first-column/minor description
+gives the exact identity
+
+  F(ZD(Y))=det(Y)^Q F(Z).                               (HM10.2)
+
+Hence Lambda(F s_b,s'_a)=F Psi_ab, for a polynomial Psi_ab independent of
+F. It belongs to the module of zeta: choose the nonzero highest flat vector
+F0 of weight (0,...,0,-Q); Lambda(F0 s_b,s'_a) has the target column degrees
+and invariance, and division by the known polynomial factor F0 transfers
+both properties to Psi_ab in the integral-domain polynomial ring.
+
+Moreover Psi_ab has row-0 degree 4c and last-row degree 0. In shape
+(4c,2c,...,2c,0), the CB2 row-homogeneous basis shows that this is a single
+line. Every height-(k-1) column must use all rows except the last, and every
+height-one column must use row 0. Its generator is the actual highest
+minor product H_zeta, with H_zeta(I)=1. Evaluation of (HM10.1) at I therefore
+identifies the scalar without any normalization ambiguity:
+
+  Lambda(F s_b,s'_a)=delta_ab p^{kappa_b} H_zeta F.      (HM10.3)
+
+The number of b is the Weyl dimension of the middle weight
+(lambda_1,...,lambda_r), since determinant shifts leave that dimension
+unchanged. Equations (HM10.1)--(HM10.3), the integral row-degree lifts and
+(HM9.7) prove the source ContractionStandardLattice.
+
+To pass to an arbitrary ordinary lattice g O^k, apply the literal twisted
+row action rho_lambda(g)=det(g)^{-lambda_last}rowAct(g^{-1}) to the factors.
+The determinant exponents add under Lambda, so its integral image assertion
+transports to every lattice. If D(xi)=diag(xi^{-1},1,...,1), the row degrees
+just proved show
+
+  rho_ell(gD(xi))s_b=xi^c rho_ell(g)s_b,
+  rho_ell'(gD(xi))s'_a=xi^c rho_ell'(g)s'_a,
+  rho_zeta(gD(xi))H_zeta=xi^{2c}rho_zeta(g)H_zeta.       (HM10.4)
+
+The last vector is primitive in that lattice because its coordinate in the
+transported CB2 basis is 1. Thus every lattice and primitivity clause of
+the source CloudOne holds for ALL nonzero xi, including xi=1,w,p.
+
+11. HM11: TENSOR CLOUD MAPS AND THE CLEANED DUAL LOSS
+
+Take the disjoint-block tensor products of HM10, using the reversed dual
+weight at odd s. Off TT all factors are constant and their one-element
+families have exponent zero. Write H=flatW(A,B), H+=flatW(A+2c,B+2c),
+ell=lambda-H, ell'=dualW(ell), and Z=flatW(2c,2c). Then
+
+  A_ell=A_ell'=Nc=:d,  A_Z=2d,
+  A_lambda=A_H+d,  A_H+=A_lambda+d.
+
+The actual tensor maps are multiplication m_H,m_U and the tensor product
+of the coefficientwise contractions Lambda. They are integral on EVERY
+family of ordinary lattices, by HM10 and disjoint-block expansion. Their
+families satisfy
+
+  L_a U_b F=delta_ab p^{kappa_b} io(F),
+  io(F)=z0 F,
+  #b=dimCl(TT,lambda),
+  kappa_b<=N ceil(kappaOneExponent(p,a,m)).              (HM11.1)
+
+Here m=k-1, z0 is the product of the transported highest vectors, U_b is
+multiplication by s_b, and L_a(v)=Lambda(v,s'_a). These are precisely the
+maps in RestCloudMaps.
+
+Multiplication by z0 has the claimed EXACT lattice preimage. In standard
+coordinates each factor z0 is a primitive integral polynomial. The product
+of primitive polynomials is primitive, since reduction modulo w is a domain.
+The least coefficient valuation is therefore additive under multiplication.
+If z0 F is integral then F is integral, and its invariant-module membership
+is already known. CB2 identifies integral coefficients with the actual
+lattice. Twisted changes of basis preserve the multiplication identity
+because the weights add; the same proof applies to any family M_s and to
+its tensor products. At a midpoint the normalizing exponents also add,
+so
+
+  io(F) in R_{H+,e} iff F in R_{H,e}.                   (HM11.2)
+
+For the chosen edge, (HM10.4) at xi=1,w gives z0,s_b in their source
+lattices and their normalized edge lattices, and s'_a in its normalized
+edge lattice. At xi=p it gives p^d s'_a in the target lattice. Multiplication
+and Lambda preserve normalized edge lattices because the A exponents add.
+For any competing same-source edge, HM8 gives H_src subset R; hence
+io and U_b preserve all source cleaning conditions, height t and conductor
+c2 unchanged.
+
+The outgoing dual map is EXACTLY
+
+  g |-> p^{A_H+-A_lambda}(g composed with L_a)
+        =p^d(g composed with L_a).                      (HM11.3)
+
+It preserves the target height because p^d s'_a belongs to the target
+lattice. It preserves the chosen-edge dual condition since s'_a belongs
+to its normalized edge lattice and be is perfect. For a different edge
+e' with the same target, all elementary exponents pi of ell' lie in
+[-d,d]. The upper bound was proved in HM8; the lower bound follows by
+applying the same tableau argument to the reversed dual weight. Thus
+H_{ell',target} subset R_{ell',e'}, since the exponent difference is
+2pi-(pi-d)=pi+d>=0. Consequently s'_a belongs to w^{-2d}R_{ell',e'}.
+Testing (HM11.3) against F in R_{lambda,e'} gives
+
+  be_lambda(F,p^d g composed with L_a)=be_H+(L_aF,g).
+
+If g is w^{c2}-clean on e', the right side is in w^{c2-2d}O. Perfect duality
+proves that (HM11.3) is in w^{c2-2d}R'_{lambda,e'}. Provided c2>=2d, the
+literal new conductor is c2-2Nc; neither the original conductor nor an
+extra p-power is silently preserved. This proves every clause of the
+source RestCloudMaps from CB/IW and the explicit actual polynomial maps.
+
+12. HM12: COMPATIBLE COEFFICIENT RINGS AND LPprime TRANSPORT
+
+Two RS settings with the same p,n' admit a compatible ring isomorphism.
+Here is a direct construction, replacing the WittIdent/RestOIso wrappers
+for this purpose. The only local-ring background is completeness, finite
+fields, and the simple-root form of Hensel's lemma. For clarity that form
+follows by Newton lifting: if f(a) is in the maximal ideal and f'(a) is a
+unit, recursively choose corrections in successive powers of the ideal to
+double the precision of f(a); completeness gives a root, and factoring
+f(x)-f(y) proves uniqueness within the chosen residue class.
+
+First W has characteristic zero: positive characteristic l=p would make p
+zero, and l!=p would make p a unit. Since p is a uniformizer, the completion
+map Z_p -> W is injective. Choose an isomorphism of the two residue fields
+F_q and a common monic polynomial f in Z_p[T] lifting the minimal polynomial
+over F_p of a residue-field generator. It has degree n' and separable
+reduction. Hensel lift the corresponding roots theta_i in W_i. The powers
+1,theta_i,...,theta_i^{n'-1} form a Z_p-basis: independence follows by
+dividing a putative relation by its least coefficient p-power and reducing
+mod p; spanning follows by successive residue expansions and p-adic
+completeness. Therefore coefficient transport theta_1->theta_2 is an actual
+ring isomorphism phi_W.
+
+The given sigma preserves W by the HidaSetting.frob clause, and its inverse
+does too by the period clause. It is continuous, fixes Z_p, and induces
+Frobenius on the residue field. Hence sigma(theta_i) is the unique Hensel
+root of f reducing to theta_bar_i^p. The chosen residue-field isomorphism
+commutes with Frobenius, so phi_W intertwines the two sigmas, and therefore
+does so on the fraction fields as well.
+
+The residue field of O is F_{q^2}. The embedding of W into O induces the
+subfield F_q: a W-unit maps to a unit, while a W-nonunit belongs to pW and
+maps into (w), since p maps to w^2. Thus the kernel of W -> O/(w) is exactly
+pW. Choose a monic
+quadratic over W_1 lifting a separable irreducible quadratic over F_q;
+transport its coefficients to W_2. Both polynomials have residue roots in
+the respective F_{q^2}, outside F_q. Hensel lift them to eta_1,eta_2 in O_i.
+Then
+
+  1, eta_i, w_i, eta_i w_i                              (HM12.1)
+
+is a W_i-basis of O_i. To span, recursively write each residue digit as
+a+b eta_i, with a,b chosen in W_i, and expand any x in powers of w_i.
+Even and odd powers regroup, using w_i^2=p, into four convergent p-adic
+coefficient series in W_i. For independence, a relation
+a+b eta+w(c+d eta)=0 reduces modulo w to a=b=0 modulo p, since 1,eta_bar
+are F_q-independent. Divide by w, then reduce to get c=d=0 modulo p.
+Repeat; all four coefficients belong to every p^nW and are zero.
+
+Multiplication in (HM12.1) is determined by the common quadratic equation
+of eta, by w^2=p, and commutativity. Transport its four coefficients by
+phi_W, send eta_1 to eta_2 and w_1 to w_2. This is a ring isomorphism phi_O
+extending phi_W through j. Extending to fraction fields yields phi_Q,phi_F,
+and the equality of the two embeddings iota follows on W and then on
+fractions. Together these maps satisfy every clause of source RSIso.
+
+Finally apply phi_F coefficientwise to the ACTUAL polynomial modules, and
+phi_Q coordinatewise to the underlying W-lattices. These are semilinear
+bijections, not F-linear maps between different fields. Generic column
+identities, fixed degrees and their CB2 bases transport exactly, so do H0,
+Hten, HL, LeAt and HLe; sigma compatibility preserves every twist. On the
+dual use Phi -> [v |-> phi_F(Phi(Psi^{-1}v))]. Evaluation transforms by
+phi_F; since p and w are fixed in their respective rings, all normalized
+be values and scaled source/dual lattices match exactly. Intersections over
+competing edges match because edges are bijected.
+
+A GoodRankK certificate is the literal integral matrix identity
+M*(pairing against an integral linear map u)=p^D I. Apply phi_O to its
+matrix and transport u semilinearly; the same identity holds in the second
+ring with unchanged D and rank. Dimensions and edge cardinalities are
+unchanged. Thus all clauses of LPprime, including the conductor inequality,
+transport in both directions. This proves RestRSIso, RestHLTransport and
+LPRingIndep for the actual RS settings. No algebraic-closure assumption or
+unproved invariance of the error statistic under arbitrary field extension
+is used. The extra square roots of integers in RS are not needed for this
+isomorphism argument.
+
+13. WHAT HAS AND HAS NOT BEEN IDENTIFIED
+
+Proved here, on the actual source objects:
+  HM1: model, kernel, integral lattice transport, RestDims;
+  HM2: both bounded integral harmonic maps;
+  HM3: tensor regrouping and all cleaned source/dual conditions;
+  HM4: RhoSumLowerBoundEdge;
+  HM5: RestEdge, one-sided nLeD, and RhoUpperBoundSmallDepth;
+  HM6: KeyIneq from (HM6.1) and FixedWeightNumericalFacts;
+  HM7: exact density lower bound and Avg from the displayed finite-box bound;
+  HM8: DualHeightBasis/Inclusion, BePerfect, HLSpans and RestTensor.
+  HM9: integral complementary-middle pairing QPh with bounded p-power diagonals;
+  HM10: actual ContractionStandardLattice and CloudOne;
+  HM11: full RestCloudMaps, with exact dual loss 2N*ccl;
+  HM12: RestRSIso, RestHLTransport and LPRingIndep.
+
+Still separate from this report:
+  (i) the aggregate HH RhoGE certificate (HM6.1), using RL plus coarse
+      upper/lower ranks and their scalar losses;
+  (ii) the uniform numerical implications giving FixedWeightNumericalFacts,
+      (HM7.4), the mean kx bound, and t_* plus the final shifts <=tI;
+  (iii) the resulting CloudWeightLowerBound/ResidueClassCount rank applications
+      of HM11 and their final MidLP/Type-I assembly. The explicit maps are
+      now proved, but their subsequent counting argument is a distinct task.
+
+The provenance ledger records exact pinned declarations and independent
+proof locations, distinguishing these remaining interfaces from proved
+claims. None of these local conclusions asserts a completed Type-I theorem,
+global host/window theorem, or the announced RH/Dirichlet-GRH result.

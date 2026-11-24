@@ -1,0 +1,712 @@
+ACTUAL COARSE UPPER RANK ON DIGITS — v0.10
+Owner: /root/lean_audit
+Pinned source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+RESULT AND SCOPE
+===============
+Under the literal Std(C0,Cde,CE1,CE2,H,X) with H>=1, the upper
+rank-on-digits inequality is proved for every segment, every compatible
+digit class, every margin M>=0, and the actual characteristic-zero
+coefficient DVR. There is no further representation, first-row, matching,
+or finite-count premise. The formula is
+
+ rankOnDigits <= h_(r+1)(A_*) product_i[h_(r+1)(A_i)h_(r+1)(C_i)]
+                           h_(r+1)(B),
+ h_d(g)=binom(g+d-1,d-1).
+
+Here r=X.m, k=r+1, A_*=S.A0(p), A_i=coarseA_i, C_i=coarseC_i,
+and B=S.bPlus. These are the exact source mmB, not bounds replacing its
+degrees. The report closes SW8's upper-rank input. The lower estimate is
+the separate RD component. Root's uniform numerical component supplies
+Std from HIext and the nested constant choices; RU8 spells out the
+composition with that result without claiming to reprove it here.
+
+RU9--RU11 additionally close the actual segment-to-HH assembly. They
+use RD9's proved fixed-digit lower estimate and RL11's proved pair
+lifts, sum the compatible digits, recover the full tensor dimension,
+extract block-supported partners, and remove the pairing error. The
+conclusion is precisely HerrExtensionClass / aux_3 for supplied
+GoodShare data, with depth sum_j D_j+4 kappa_0 and mass
+(1-kappa_P-sum_j kappa_j) dimHH/gaussian(q,k). Supplying the final
+particular GoodShare depths and averaging their losses is the
+separate SW/RD/NP numerical application, not an unstated consequence
+of this assembly lemma.
+
+No source file was edited and no Lean compilation or kernel replay was
+performed. The short proofs below are checked against declarations in
+provenance.json. Already proved shared inputs are SW1, SW10, IP3--IP4
+and CB3; every use and its exact interface is explained.
+
+NOTATION AND THE LITERAL DATA
+============================
+O is a DVR, K its fraction field. For the path dimensions K has
+characteristic zero. In the source's UniformizedDVR p O, this follows
+from p being nonzero and lying in the maximal ideal: positive
+characteristic p contradicts p!=0; positive characteristic q!=p makes
+p an integer unit, also impossible. There is no need to identify K
+with Q_p or to assume integral semisimplicity.
+
+A segment has s interior positions i=0,...,s-1, split at sigma into
+early positions i<sigma and late positions i>=sigma. For actual segment
+data 0<=sigma<=s. Its physical distances d_i are strictly increasing,
+and P_i=p^(G-d_i), Q_j=p^G. A compatible digit class consists of
+rho_i^z,rho_i^y in {0,...,P_i-1}^{r+1} with sums at most the relevant
+physical degrees b_i,a_i and with the differences divisible by P_i.
+Consequently
+
+ A_i=(b_i-sum_c rho^z_(i,c))/P_i,
+ C_i=(a_i-sum_c rho^y_(i,c))/P_i
+
+are nonnegative integers. A_*=floor((a-E0)/Q_j) is an INTEGER in the
+definition; its positivity is proved below. The endpoint degree is B.
+
+The actual block data consist of nonnegative o_i,w_i,s_i and o_+.
+We write s_i for the source field sg_i, to avoid confusing it with the
+segment length. The relevant exact Kept clauses are:
+
+ early i: o_i=0, w_i<=A_i, s_i<=C_i,
+          s_i<=2 lambda A_*/k;
+ late i:  o_i<=A_i, w_i=s_i=0.
+
+Kept also imposes its displayed finer upper bounds on w_i+s_i, o_i
+and o_+. Those conditions are not dropped from the source set; the
+upper-bound proof simply works for the larger set obeying the clauses
+used here. Define e_i=w_i+s_i early and e_i=o_i late, and
+
+ c_n=A_*+sum_(i<n)(A_i-e_i).                              (R.1)
+
+These are exactly oEff and cap. The polynomial chain is
+V_0,E_0,...,V_(s-1),E_(s-1),U: V_i and U are vector letters,
+E_i are covectors. A level is (j_i for late i, j_+), where
+0<=j_i<=min(o_i,C_i) and 0<=j_+<=min(o_+,B).
+Extend j_i=0 on early positions. The residual chain degrees are
+
+             degree V_i                 degree E_i
+ early       w_i                        C_i-s_i
+ late        o_i-j_i                    C_i-j_i,
+ degree U=o_+-j_+.                                      (R.2)
+
+All displayed differences are ordinary nonnegative differences; this
+checks the source's natural subtraction rather than interpreting it
+as an unrestricted integer difference.
+
+The actual prefix constraints are the first-weight cutoffs
+floor(c_i-M) just after V_i for every late i, and floor(c_s-M)
+at the full word. The auxiliary xi polynomial has degree B-j_+.
+This is literally blockData.lettersAt, blockData.T and LevelOK.
+The powers z_i=A_i-o_i for late i and z_+=aPlus-o_+ enter only as
+fixed Z-variable multipliers. Even where the latter is the source
+natural subtraction, none of the dimension or matching steps changes it.
+
+RU1. THE ACTUAL BLOCK RANK, NOT AN AMBIENT SUBSTITUTE
+==================================================
+For any source BlockData D, let Y_(j,j_+) be the constrained residual
+chain space over K and Y_(j,j_+),O its intersection with O[X].
+Let Xi_b be the degree-b polynomial module in the r independent xi
+variables. A level maps by multiplication into the actual polynomial
+ring as
+
+ (f,g) -> (product_i Ehat_i^j_i) Eplus^j_+
+          (product_i Z_i^z_i) Z_+^z_+ f(X)g(xi).          (R.3)
+
+The Ehat_i are Z_i S_i plus their actual vector-covector pairing;
+Eplus is Z_+ S_+ plus the terminal pairing with xi.
+
+SW1's proof is valid for this literal map: take the lexicographically
+largest S-degree (j_1,...,j_t,j_+) in a finite relation. Its coefficient
+is the nonzero fixed Z monomial times the corresponding coefficient
+polynomial f(X)g(xi); smaller levels cannot contribute to it. The X
+and xi variable sets are disjoint, so multiplication identifies their
+tensor product. The coefficient ring is a domain. Therefore (R.3),
+summed over all legal levels, is injective.
+
+Its integral image is the definition of SSZ. Every rational f in Y
+has an integral multiple in Y_O by clearing its finitely many
+coefficients; scalar multiplication preserves the rational prefix
+conditions. The same holds for the xi factor. Thus extension to K
+gives precisely the direct sum of all Y_(j,j_+) tensor Xi_(B-j_+).
+There are finitely many levels by LevelOK, and
+
+ blockRank(D)=sum_(legal j,j_+) dim_K Y_(j,j_+) h_r(B-j_+). (R.4)
+
+This proves BlockRankAt, with the actual integral span in its left
+side. It works over any DVR at this step. It also is the rank of the
+actual blockLat: blockLat lies in K SSZ and contains SSZ because
+ordinary integral coefficients satisfy the factorial-weighted
+coefficient inequalities. Equivalently, multiplying a rational
+basis by a sufficiently high uniformizer power gives full rank in
+that weighted lattice. No equality between the weighted lattice and
+the coefficient lattice is asserted.
+
+RU2. THE EXACT PREFIX DIMENSION AND UNRESTRICTED PATH MASS
+=======================================================
+For a dominant integer r-tuple lambda define
+
+ D_r(lambda)=product_(0<=a<b<r)
+                 (lambda_a-lambda_b+b-a)/(b-a).
+
+A signed strip path starts at kappa^0=0. At a vector step of degree d,
+kappa^(l+1)/kappa^l is a horizontal strip of size d; at a covector
+step the reverse difference is a horizontal strip. In coordinates
+the first condition is
+
+ kappa^l_a<=kappa^(l+1)_a,
+ kappa^(l+1)_(a+1)<=kappa^l_a,
+ sum_a(kappa^(l+1)_a-kappa^l_a)=d.                         (R.5)
+
+This is exactly CountDefs.Strip and IsChain. It implies dominance
+at every stage. Each coordinate stays between minus the total
+covector degree and the total vector degree, so the path set is
+finite, independently of any formal infinite-sum convention.
+
+IP3 is the integral basis by the literal signed path polynomials and
+standard terminal column choices. IP4 says the simultaneous prefix
+maximum conditions select exactly the basis paths with
+kappa^(J_l)_0<=M_l. The source YCond is the largest Lie-stable
+subspace with that coordinate-weight cutoff. In characteristic zero
+this equals the generic-group weight condition in IP4: a Lie-stable
+subspace is stable under exponentials of the nilpotent root actions;
+the diagonal operators decompose it into weight spaces, and the
+torus and elementary root subgroups generate GL_r. Conversely a
+group-stable space is Lie-stable by differentiation. Thus IP4 applies
+to the literal Yjt, with no new filtration identification assumed.
+
+For fixed path, the number of standard terminal choices is
+D_r(kappa^N) by IP3's tableau identification and CB3's finite
+Vandermonde count. Adding a common integer determinant shift to make
+the endpoint a partition changes neither that number nor D_r.
+Therefore
+
+ dim_K Yjt(LL,J,M)
+   = sum_(signed paths with prefix bounds) D_r(kappa^N).  (R.6)
+
+This is the exact DimYAt, for arbitrary finite prefix constraints,
+including infinite thresholds. Prefix J=0 is either unrestricted
+or zero according to its cutoff; this agrees on both sides.
+For no constraints, the left side has its ordinary monomial basis:
+
+ sum_(all paths) D_r(kappa^N)=product_l h_r(d_l).          (R.7)
+
+This proves ChainDimAt. Alternatively (R.7) follows by iterated
+signed Pieri insertion from IP3; no new representation dimension
+formula is required. Combining (R.4)--(R.6), and summing over kept
+blocks in a fixed digit class, proves exactly rankOnDigits_cast.
+Every source path carries weight D_r(kappa^N)h_r(B-j_+).
+
+RU3. INTERLACING BRANCHING AND THE TERMINAL SUM
+=============================================
+For every dominant integer (r+1)-tuple nu,
+
+ D_(r+1)(nu)=sum_(nu_(a+1)<=lambda_a<=nu_a) D_r(lambda).   (R.8)
+
+This is NumBranchAt. It follows directly from CB3: removing the
+largest tableau entries gives the interlacing shape, and the discrete
+Vandermonde determinant evaluates the count. Explicitly, for strictly
+decreasing x_0>...>x_r,
+
+ sum_(x_(a+1)<=y_a<x_a) Delta(y)=Delta(x)/r!.
+
+Write Delta(y) as a determinant of powers, sum each row using a
+polynomial antiderivative for the forward difference, and take
+successive differences of the rows of the augmented determinant
+with final column 1. Its leading coefficients multiply to 1/r!.
+Set x_a=nu_a+r-a and y_a=lambda_a+r-1-a. A common integral shift
+handles signed nu. If r=0, both sides are 1.
+
+For r>=1 the remaining terminal sum is the exact hockey-stick identity
+
+ sum_(j_+=0)^B h_r(B-j_+)=h_(r+1)(B).                    (R.9)
+
+It counts monomials of total degree B in r+1 variables by the
+exponent j_+ of the last variable. Both (R.8) and (R.9) keep the
+actual terminal symmetric-power degree; it is not replaced by a
+cruder upper bound.
+
+RU4. THE EARLY PARTIAL WIDTH REALLY FITS THE ACTUAL CAP
+====================================================
+Here use the literal Std hypotheses with H>=1. Put
+lambda=X.La C0, epsilon=N1 lambda/k, delta=X.de C0 Cde, beta=be.
+SW10 supplies, with the exact physical-distance geometry,
+
+ k>=5, N1>=1, lambda>=1, p>=k^2, s<=N1,
+ 40epsilon<=delta<1/6, 0<=beta<=delta/2-18epsilon,
+ E0>=0, E0+Q<=epsilon a, b'>=k^3 Q, a>=b',
+ A_i(1+delta)<A_* for early i.                         (R.10)
+
+The last assertion is the early half of the already proved coarse
+degree alternative, not an added numerical premise. These also show
+epsilon<1/240 and beta<1/12. Since Q_j<=Q,
+
+ A_* > (a-E0-Q_j)/Q_j >= (a-E0-Q)/Q >= a/(2Q).
+
+Thus A_*>=k: indeed a>=b'>=k^3 Q and k>=5. The source's slightly
+weaker non-strict half-ratio estimate gives the same conclusion.
+This checks the positivity of A_* before converting its integer value
+to the natural degree in mmLetters.
+
+Compatible digits give the exact coarse inequalities
+
+ A_l P_l<=b_l,              b_i-kP_i<A_i P_i.             (R.11)
+
+For l<i, strict increase of the integer physical distances gives
+P_l>=pP_i. The degree window b'(1-beta)<=b_i<=b'(1+beta)
+therefore implies
+
+ A_l <= 2(A_i+k)/p.                                      (R.12)
+
+Indeed A_l pP_i<=b'(1+beta), whereas
+b'(1-beta)<(A_i+k)P_i. Divide by positive quantities and use
+(1+beta)/(1-beta)<=13/11<2. This proves the source
+coarse_ratio_small with a strict improvement that is not needed.
+
+For early i, Kept bounds s_l<=2lambda A_*/k for every l<=i.
+Hence
+
+ sum_(l<=i)(A_l+s_l)
+ <= A_i+s[2(A_i+k)/p+2lambda A_*/k].                     (R.13)
+
+To bound this by A_*, use the actual gap in (R.10). Since
+A_i(1+delta)<A_*, with A_i>=0,
+
+ (A_*-A_i)(1+delta)>A_*delta>=40epsilon A_*,
+ A_*-A_i>34epsilon A_*.
+
+Also A_i<=A_*, k<=A_*, p>=k^2, lambda>=1 and k>=5 give
+
+ 2(A_i+k)/p<=4A_*/k^2<=lambda A_*/k.
+
+The added term in (R.13) is at most 3epsilon A_*, strictly below
+the available gap. Thus sum_(l<=i)(A_l+s_l)<=A_*.
+
+Finally, for every n<=i+1, (R.1) and w_l<=A_l show
+
+ sum_(l<=i)w_l-c_n
+ = sum_(l<n)(2w_l+s_l-A_l)+sum_(n<=l<=i)w_l-A_*
+ <=sum_(l<=i)(A_l+s_l)-A_*<=0.                          (R.14)
+
+This is the actual partial_width_le_cap, simultaneously for all
+n<=i+1, including n=i and n=i+1. It does not assume that cap is
+monotone on early positions; in general it need not be.
+
+RU5. ALL THE FIRST-ROW CONDITIONS, INCLUDING THE ENDPOINT
+========================================================
+Let kappa be a residual path satisfying the actual prefix cutoffs.
+During any vector strip its first coordinate increases by at most
+the strip size; during a covector strip it cannot increase. Thus at
+an early V_i,
+
+ kappa^(2i+1)_0<=sum_(l<=i)w_l<=min(c_i,c_(i+1)).          (R.15)
+
+For late i, the literal cutoff gives
+kappa^(2i+1)_0<=floor(c_i-M)<=c_i because M>=0.
+Here c_(i+1)-c_i=A_i-o_i>=0 by Kept, so it is also <=c_(i+1).
+The full-word cutoff gives
+
+ kappa^(2s+1)_0<=floor(c_s-M)<=c_s.                      (R.16)
+
+These prove every FirstRowsAt clause. The early argument is needed
+precisely because those earlier cuts are absent from the source TieData.
+
+RU6. THE ACTUAL MATCHING MAP AND ITS INVERSE ON THE IMAGE
+=======================================================
+Insert an extra first row into the residual path, with a one-step
+delay:
+
+ nu^0=0,
+ nu^(2i+1)=(c_i,kappa^(2i))                    (0<=i<=s),
+ nu^(2i+2)=(c_i+A_i-d_(2i),kappa^(2i+1))       (0<=i<s).  (R.17)
+
+The target signed word has degrees
+
+             +A_*, +A_0, -C_0, ...,+A_(s-1),-C_(s-1).
+
+The first state is (A_*,0,...,0). The rest follows from the elementary
+strip extension rule: if nu/mu is a horizontal strip of size d,
+f<=f', and nu_0<=f, then (f',nu)/(f,mu) is a horizontal strip of
+size d+f'-f. This is checked directly from the adjacent interlacing
+inequalities and the difference of the row sums.
+
+For a positive target step, d_(2i)<=A_i. The first-row inequality
+needed by the extension rule is kappa^(2i+1)_0<=c_i, given by RU5.
+Its total added size is exactly A_i.
+
+For the following negative target step, put
+b_i=c_i+A_i-d_(2i). Then
+
+ b_i-c_(i+1)=e_i-d_(2i)=
+      s_i on early positions, j_i on late positions,
+ (b_i-c_(i+1))+d_(2i+1)=C_i.                            (R.18)
+
+Both differences are nonnegative; these equalities use (R.2)
+and its checked nonnegative subtractions. The first-row bound
+kappa^(2i+1)_0<=c_(i+1) supplies the remaining interlacing inequality.
+Thus nu is literally an IsChain for mmLetters.
+
+Set lambda=kappa^(2s+1). The final positive residual strip says
+kappa^(2s)_a<=lambda_a and lambda_(a+1)<=kappa^(2s)_a.
+Together with lambda_0<=c_s from RU5 this is exactly
+
+ nu^(2s+1)_(a+1)<=lambda_a<=nu^(2s+1)_a.                (R.19)
+
+The target is the triple (nu,lambda,j_+). It preserves the weight
+D_r(lambda)h_r(B-j_+) exactly, and j_+<=B.
+
+It is injective on actual source data. From the tail r coordinates
+of nu^(l+1), recover every kappa^l through l=2s. The stored lambda
+recovers its endpoint. Strip row-sum differences recover all residual
+degrees d_l. Digits fix A_i and C_i, so
+
+ early: w_i=d_(2i), s_i=C_i-d_(2i+1), o_i=0;
+ late:  j_i=C_i-d_(2i+1), o_i=d_(2i)+j_i, w_i=s_i=0;
+ end:   o_+=d_(2s)+j_+.                                 (R.20)
+
+These formulas recover the complete SegBlock and every level. They
+are valid at zero degrees and the extremes of LevelOK. This proves
+SrcInjAt and MatchUp for the actual block family, rather than merely
+postulating a weight-preserving injection.
+
+RU7. THE FINITE WEIGHTED UPPER COUNT
+==================================
+Enlarge the image of (R.17) to all triples (nu,lambda,j_+) with nu
+an unrestricted target-word path, lambda interlacing its endpoint,
+and 0<=j_+<=B. Every such path is finite in number by the coordinate
+bounds of RU2, every interlacing range is finite, and all weights are
+nonnegative. RU6 is injective and weight preserving; therefore the
+source total is at most this target total. No interchange of an
+infinite divergent sum is involved.
+
+Sum first over j_+ using (R.9), then over lambda using (R.8), and
+then over nu using (R.7) in rank r+1. The result is
+
+ h_(r+1)(B) sum_nu D_(r+1)(nu^end)
+ =h_(r+1)(B) h_(r+1)(A_*)
+        product_i[h_(r+1)(A_i)h_(r+1)(C_i)].              (R.21)
+
+This is exactly Gt_sum plus prod_kLetters and countUp_of, now with
+all their combinatorial inputs proved. The coefficients in the sum
+are positive rational Weyl products, in fact integers by RU2--RU3.
+The source finite-support convention consequently creates no hidden
+zero branch. If a constrained source space is zero, it contributes
+zero, and the same argument applies.
+
+RU8. RETURN TO THE ACTUAL LATTICE AND THE UNIFORM STATEMENT
+=========================================================
+RU1--RU2 identify the source weighted total with the actual
+rankOnDigits. RU7 gives (R.21), whose right side is the literal mmB:
+symDim(k,A_*) equals h_k(A_*) because A_*>=0, and the remaining
+coarse degrees and B are natural. Rational-to-integer casting
+preserves the inequality. Thus
+
+ rankOnDigits O C0 CE1 CE2 X j M rho^z rho^y
+       <= mmB C0 CE1 CE2 X j rho^z rho^y                 (R.22)
+
+for every M>=0 and compatible digit class under Std(H), H>=1.
+In particular M=0 is exactly the ExtendedDigitRankBound upper
+inequality used in SW8.1. The proof is independent of the actual
+finite residue field, the choice of chart, and the valuation depth.
+
+For transparency, the source's RestUp is the following ordered
+constant package: for every Cc>=0 choose T0>0, then for every C0>=T0
+choose T1>0, then for every CE1,CE2,Cm>=T1 choose T2>0, after which
+the result holds for every CYb,Cde,Ck,CD,Cb>=T2. The proven root
+Std-supply theorem with H=1 permits the explicit choices
+
+ T0=T1=1,
+ T2=1000(CE1+CE2+1)(Cc+1).                              (R.23)
+
+RU itself does not reprove that numerical supply; it takes the
+literal Std implication from that companion. Once supplied, (R.22)
+proves UpAt and (R.23) proves RestUp with the original quantifier
+order. Cm is unused by the upper argument and may still obey the
+common threshold. There is no dependence of these constants on
+segment, digit class, O, M, or a chosen path.
+
+RU9. SUM THE DIGITS AND RECOVER THE ACTUAL HH DIMENSION
+======================================================
+This part uses RD9's exact LowAt, with its original lower-margin
+condition. It does not infer a lower rank from RU8's upper bound.
+For the fully reconstructed application, RD9 is supplied under
+C0>=880 and Std(H=4). The conversion itself only needs Std(H),
+H>=1, once that LowAt inequality is available. Let J be the number
+of segments, N=card(TT),
+q_j=p^(segG_j), q=p^n', M>=0 and Ckap>=3. Write
+
+ eta=exp(-lambda/8), eta2=exp(-lambda/3),
+ Bcal=eta+k Q(M+N1 k)/b'+1/Y+k E0/a,
+ kappa_P=Ckap N Bcal.                                    (R.24)
+
+These are precisely brk and kappaMarginBound; at M=m0 they are the
+source Loc.kapP. Denote the actual segRank at margin M by R_j.
+
+9.1. Exact digit sum.
+For a physical degree g and positive integer radix P, coordinatewise
+division gives a bijection
+
+ {e in N^k:sum e=g} <->
+ disjoint union_(rho in [0,P)^k, sum rho<=g,
+                 P divides g-sum rho)
+       {u in N^k:sum u=(g-sum rho)/P},
+             e=rho+P u.
+
+Therefore the sum over compatible rho of h_k((g-sum rho)/P)
+is exactly h_k(g), not just an asymptotic estimate. Apply this
+independently to every interior vector and covector digit row.
+Every kept block has exactly one such digit class. Summing RD9
+gives, whenever ceil(M)<=A_*j N1 lambda/k,
+
+ R_j >= L_j h_k(A_*j)
+        product_(i interior j)[h_k(b_i)h_k(a_i)] h_k(b_next),
+ L_j=(1-eta)(1-eta2)(1-r ceil(M)/A_*j).                   (R.25)
+
+All sums here are finite. Digits are bounded by P_i, o_i,w_i by
+the physical b_i, and sg_i by a_i. Also
+cap_s<=A_*j+sum_i b_i; substituting this in the explicit Oplus
+bound gives a finite upper bound for o_+. Hence the entire kept
+set is finite even before fixing a digit class. This establishes
+the actual finite support needed by segRank and segLat.
+
+9.2. The first coefficient and the small-loss case.
+Assume Bcal<1/6. Put
+
+ S=kQ/a, t=kQ(M+N1 k)/b',
+ delta_f=2/(kY)+(E0+Q)/a, theta=1-delta_f.
+
+Std gives k>=5, N1 lambda>=1, N1 k>=5, b'<=a,
+A_*j>=a/(2Q), and Q>=q_j>=1. Consequently
+t>=S(M+5), and
+
+ k ceil(M)/A_*j < 2S(M+1) <= 2t < 1/3.
+
+In particular the margin condition in (R.25) is automatic. Set
+x_j=r ceil(M)/A_*j. We have 0<=x_j<1 and
+
+ k delta_f=2/Y+kE0/a+S<=2 Bcal<1/3,
+ eta+eta2+x_j+r delta_f
+ <=2eta+S(2M+3)+2/Y+kE0/a <=3 Bcal.                    (R.26)
+
+The last constant 3 matches the source. The displayed elementary
+bound even permits 2, but no downstream constant is changed.
+All four loss factors lie in [0,1]. Bernoulli and the elementary
+product inequality therefore yield
+
+ L_j theta^r >= (1-eta)(1-eta2)(1-x_j)(1-r delta_f)
+                >=1-3 Bcal.                            (R.27)
+
+The actual head degree g=aT(segStart_j) satisfies
+a<=g<=a+2a/(kY). Since A_*j=floor((a-E0)/q_j), for u=1,...,r,
+
+ theta(g+u)
+ <=a+2a/(kY)+u-delta_f a=a-E0+u-Q
+ <=a-E0+u-1<q_j(A_*j+u).
+
+Multiplying these r inequalities and dividing by r! gives
+
+ theta^r h_k(g) <= q_j^r h_k(A_*j).                     (R.28)
+
+Combining (R.25)--(R.28), with nonnegative factors, yields
+
+ (1-3 Bcal) T_j <= q_j^r R_j,
+ T_j=h_k(a_start) product_(i interior j)
+            [h_k(a_i)h_k(b_i)] h_k(b_next).              (R.29)
+
+9.3. Literal cyclic geometry and the tensor dimension.
+The even positions of TT, in their increasing cyclic order, are
+the segment starts. Consecutive starts partition the cycle into
+disjoint half-open intervals; each selected odd position lies in
+exactly one of their interiors. The cyclic successor permutes the
+starts. Thus every selected a-factor and b-factor occurs once in
+product_j T_j. There are at least two starts under Std, so the
+cyclic distances are positive and telescope to n':
+sum_j segG_j=n', product_j q_j=q. Also J<=N and N>=2.
+
+The actual VHH is a tensor product, in disjoint matrix variables,
+of dual-Weyl modules with vector weight (d,0,...,0) or covector
+weight (0,...,0,-d). In the latter case nuOf gives
+(d,...,d,0). CB3's standard-monomial basis and its Vandermonde
+dimension give h_k(d) in both cases: all Weyl factors cancel
+except respectively product_(u=1)^r(d+u)/u or the same product
+in reverse order. Tensor products of those bases are independent
+because their variables are disjoint. This proves the source's
+DimHHAt for its literal polynomial VHH, rather than substituting
+a different symmetric-power model:
+
+ product_j T_j=dim_K VHH=product_(s in TT)h_k(a_s)h_k(b_s).
+                                                               (R.30)
+
+If kappa_P>=1, the desired rank lower bound has nonpositive left
+side and is immediate. Otherwise Ckap>=3 and N>=2 imply Bcal<1/6,
+so (R.29) applies. Multiply it over segments, use Bernoulli and
+gaussian(q,k)=1+q+...+q^r>=q^r to obtain
+
+ (1-kappa_P) dimHH
+ <=(1-3 Bcal)^J dimHH<=q^r product_j R_j
+ <=gaussian(q,k) product_j R_j.                          (R.31)
+
+This is the exact ExtendedModelRank, valid for every M>=0. No
+extra smallness or ceil(M) premise remains in its statement: the
+nontrivial case itself implies the condition needed by RD9.
+
+RU10. THE ACTUAL WEIGHTED LATTICE AND BLOCK-SUPPORTED PARTNERS
+============================================================
+Return to the actual ramified coefficient setting with uniformizer
+w, w^2=p and v_p(w)=1/2. For each kept block beta, let V_beta be
+the rational span of its literal SSZ generators and let
+
+ L_beta=V_beta intersect bbSpec(specConst_beta).
+
+Every legal level has fixed finite polynomial degree; there are
+finitely many levels. Hence V_beta has finite dimension and only
+finitely many monomials occur in a basis, and thus in any vector.
+The coefficient definition of bbSpec is exactly
+
+ v_p(c_alpha)>=-(v_p(alpha!)+v_p(specConst_beta))/2.
+
+Its allowed coefficients at those finitely many monomials lie in
+the free fractional module with basis
+w^(-v_p(alpha!)-v_p(specConst_beta)) X^alpha. Thus L_beta is a
+submodule of a finite free O-module. A DVR is Noetherian, so this
+is a finite free O-module, and RU1's denominator clearing gives
+rank_O L_beta=dim_K V_beta. The kept support is finite by 9.1;
+therefore L=segLat is their finite direct sum and
+
+ rank_O L=sum_beta blockRank_beta=segRank.                (R.32)
+
+This proves RkAt without assuming that a rational rank definition
+automatically equals the rank of its weighted lattice.
+
+The actual form is block diagonal:
+beta_L(f,g)=sum_beta specConst_beta fock(f_beta,g_beta).
+It is O-valued on L. Indeed a coefficient contribution has valuation
+
+ v_p(specConst)+v_p(alpha!)+v_p(f_alpha)+v_p(g_alpha)>=0.
+
+The Fock sum is finite, so the ultrametric inequality preserves
+integrality. In particular ordinary Smith normal form can be
+applied separately to the pairing matrix on each finite free
+L_beta. Concatenating the resulting two bases produces bases
+a_i,b_i of L, each supported in a single block, with
+beta_L(a_i,b_l)=delta_il d_i and d_i in O (possibly zero).
+This conclusion also follows by clearing denominators first, as
+the source does; the direct integrality check saves that step.
+
+Let L1 be an actual GoodSub of L at depth D>=0 and g=rank L1.
+Call a diagonal index good when d_i!=0 and v_p(d_i)<=D.
+If fewer than g indices were good, the coordinate map from L1
+to the good coordinates would have a nonzero kernel. This follows
+after tensoring with K and clearing denominators. Choose a nonzero
+kernel vector and divide all its coordinates by their largest
+common power of w. The divided vector still lies in L, and lies
+in L1 because L1 is saturated in L. At least one coordinate is
+a unit, so the vector is primitive in L and consequently in L1.
+Its good coordinates remain zero. Every pairing against L then
+has valuation strictly greater than D (zero has valuation infinity),
+contradicting the defining primitive-partner property of GoodSub.
+Thus at least g indices are good. Selecting any g of them proves
+the literal BlockDiag and PartnersToFactorsAt, including single
+block support, nonzero integral diagonals, and the unchanged depth D.
+
+RU11. TENSOR THE ACTUAL PAIR LIFTS AND REMOVE THE ERROR
+=====================================================
+Use the already proved RL11 PairLiftAt under the literal Std,
+CE1,CE2>=17, Cm>=17 and Ct>=30, with its actual kept/order
+prerequisites supplied by NP and RL. In the combined application
+we retain C0>=880 and Std(H=4) from RD9. Fix M=m0, an actual edge e and
+GoodShare segment data (D_j,kappa_j) with D_j,kappa_j>=0. Choose
+the saturated modules L1_j promised by GoodShare and write
+
+ g_j=rank L1_j >= (1-kappa_j)R_j,
+ D_*=sum_j D_j+4 kappa_0,       c>4D_*.                  (R.33)
+
+RU10 gives g_j block-supported pairs for each segment. Index
+their tensor choices by I in product_j{1,...,g_j}. RL11 gives
+actual F_I in CCe and G_I in CCe', at height floor(t0) and
+other-edge precision c. Its diagonal scalar depends on the block
+pattern beta(I), and has valuation at most 4 kappa_0. Hence
+
+ beHH(F_I,G_J)=delta_I 1_(I=J)+w^c nu_IJ,
+ delta_I=kappa_(beta(I)) product_j d_(j,I_j) in O\{0},
+ v_p(delta_I)<=D_*,                     nu_IJ in O.       (R.34)
+
+For I!=J with different block patterns RL gives zero modulo w^c;
+for equal patterns a differing segment index gives a zero Smith
+factor. This checks the two cases, rather than assuming the pair
+lift is a linear tensor map. The literal pairing here is
+beHH(F,G)=p^AHH G(F), exactly the normalization preserved by RL10.
+
+If product_j g_j=0, FactorsLE is immediate by its zero branch.
+Otherwise let B be the finite matrix in (R.34) and Delta its
+diagonal part. Since v_w(delta_I)=2v_p(delta_I)<=2D_*<c,
+
+ B=Delta(I+E),            E_IJ=w^c nu_IJ/delta_I in wO.
+
+Reduction modulo w makes I+E the identity. Its determinant is
+therefore a unit, and its adjugate gives an inverse over O.
+Choose delta_max with maximal w-valuation among the finite
+nonzero diagonals. Each delta_max/delta_I belongs to O, and
+
+ B (I+E)^(-1) diag(delta_max/delta_I)=delta_max I.         (R.35)
+
+This is precisely the integral matrix in FactorsLE. Equivalently,
+take the indicated O-linear combinations of the G_I: CCe' is an
+O-submodule, so membership, height and every other-edge divisibility
+condition are preserved. The common scalar delta_max has v_p<=D_*.
+The source requires c>4D_*; the argument actually needs c>2D_*,
+but we retain its stronger hypothesis throughout the application.
+
+For completeness, first split off the case
+kappa_P+sum_j kappa_j>=1, when the desired right side is nonpositive.
+Otherwise 0<=kappa_P<1 and every kappa_j lies in [0,1], with
+sum_j kappa_j<1. Thus product_j(1-kappa_j)>=1-sum_j kappa_j.
+Combining the GoodShare rank inequalities with (R.31) at M=m0
+now only multiplies inequalities by nonnegative factors and gives
+
+ product_j g_j >=
+ (1-kappa_P-sum_j kappa_j) dimHH/gaussian(q,k).            (R.36)
+
+The nonnegative cross-term kappa_P sum_j kappa_j is discarded.
+Formulae (R.33)--(R.36) are the
+literal HerrExtensionClass / aux_3 certificate: RhoGE on the
+actual CCe, CCe' at floor(t0), with depth D_* and exactly this mass.
+
+The conclusion is a proved implication for supplied GoodShare
+data, not a claim that arbitrary lattices have a large good share.
+SW's weighted partner estimate, RD's lower count and NP's numerical
+application supply those particular data. Once their bounds give
+sum_j D_j+4kappa_0<=D0 and kappa_P+sum_j kappa_j<=kx, monotonicity
+gives the exact HH RhoGE input of HM at D0 and mass
+(1-kx)dimHH/gaussian(q,k). Neither the harmonic-model transport nor
+the later global number-field/analytic argument is part of RU.
+
+STATUS AND PRECISION CHECKS
+==========================
+1. Actual coefficient lattice and weighted block lattice are
+   distinguished. Their common rational rank is proved in RU1.
+2. The prefix-space dimension is justified by IP4's integral basis
+   identification and the characteristic-zero Lie/group comparison;
+   it is not inferred from an unrestricted ambient dimension.
+3. The terminal endpoint lambda and terminal level j_+ are part of
+   the target. Omitting either would break recovery or the weighted
+   sum. The exact factor h_(r+1)(B) is retained.
+4. cap need not be monotone early. RU4 proves both neighboring
+   cap bounds instead of assuming this.
+5. Every natural subtraction used in the recovery and strip-size
+   identities is checked by Kept or LevelOK.
+6. The upper estimate works for every real M>=0; no ceil(M) bound
+   from the separate lower estimate has been imported.
+7. No new local combinatorial or representation input remains in
+   RU1--RU8. Uniform Std supply is the named companion dependency.
+8. RU9 uses RD9's lower estimate, not the upper count alone. The
+   head-factor recovery, full tensor dimension and digit sum are
+   proved explicitly. The small-loss case supplies its own margin
+   hypothesis, and the other case has nonpositive target mass.
+9. RU10 proves both finite generation and actual rank equality
+   for the factorial-weighted lattices before using Smith form.
+   Its selected pairs retain their individual block support.
+10. RU11 retains the source p^AHH normalization and w^2=p. It
+    uses RL11's actual lifts and only integral column operations;
+    there is no extra height loss or changed precision c.
+11. The aggregate HH assembly is complete for the supplied
+    GoodShare data. Their final numerical choice, the harmonic
+    passage and the later global argument remain separately named
+    companion results, not silent hypotheses of the rank count.

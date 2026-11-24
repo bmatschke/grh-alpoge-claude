@@ -1,0 +1,883 @@
+[GQT_N_01] src/Formalism/SharpRestriction/GlobalTheoremInputs.lean:40-48
+SHA256 d0ea5c27e50eef50333c36b84a894e4c096c4b0d999bba60860ac01bf4c15929
+def LinkN_at {D : D7} (L : SizeData₂ D) (j : ℕ) (C : ℝ) : Prop :=
+  Summable (vvTerm D) →
+    etaSum L j ≤ (L.dZ0 j : ℝ) * (C * ((D.R.f : ℝ) * D.R.m * L.sc.b * L.sc.L ^ 2 +
+      Real.log L.sc.x ^ 2 * L.Nc) + ∑' l, vvTerm D l)
+
+def LinkN {eps : ℝ} (Fm : FamP eps) : Prop :=
+  ∃ C x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ShaFinOdd (Fm.D x i) →
+    ∀ j ∈ SizeData₂.lifts (Fm.D x i), LinkN_at (Fm.L x i) j C
+
+
+
+[GQT_N_02] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/LinkNAlongFamilyOfLocalBounds.lean:11-17
+SHA256 d936ee2a69d7ba050417424aa321bfc4924386e4bbafb0ae27b509b12edd7517
+theorem main : ∀ {eps : ℝ} (Fm : FamP eps), ConclF Fm → Formalism.MainNotions.LinkN Fm := by
+  intro eps Fm hC
+  obtain ⟨C, x0, h⟩ := hC
+  have hA : Formalism.MainNotions.TwistedPlaces.AdmF Fm := ⟨C, x0, fun x hx hx1 i hS => by
+    obtain ⟨X, hX⟩ := h x hx hx1 i hS
+    exact GlobalTheory.T.admittedStatements_of_localBoundsConclusion_alt _ _ _ X C hX⟩
+  exact Formalism.MainNotions.N.linkN_of Fm hA (Formalism.MainNotions.TwistedPlaces.stmtF_holds Fm)
+
+
+[GQT_N_03] src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/LinkNFam.lean:35-63
+SHA256 929731a2cdcf05a68fe6f640ce04ff3f43cce194c6d3d8067359d1193cbd39ec
+def CutGivesAlt : Prop := ∀ (D : D7) (nch : NChoice D), _root_.UpperTheory.GalC.GaloisPreconditions D nch → Tie4 D →
+  ∃ c : CutD D, c.Good ∧ _root_.GlobalTheory.NFacts.NormChoiceFacts (cut D c) (nchTr c nch) ∧ Tie4 (cut D c)
+theorem linkN_of_twGood_galoisPreconditions (hP : Hypotheses₂) (hG : _root_.UpperTheory.GalC.CutGivesAlt) {eps : ℝ} (Fm : FamP eps) (hTw : TwGood Fm)
+    (hF : ∀ (x : ℝ) (hx : Fm.x1 < x) (i : Fm.Ix x), _root_.UpperTheory.GalC.GaloisPreconditions (Fm.D x i) (Fm.ex x hx i).nch ∧ Tie4 (Fm.D x i)) : LinkN Fm := by
+  classical
+  obtain ⟨C, CT, hC, hEx⟩ := _root_.GlobalTheory.T.exists_const_tieChi_bound_of_facts hP
+  have key : ∀ x (i : Fm.Ix x), ∃ c : CutD (Fm.D x i), ∀ hx : Fm.x1 < x, c.Good ∧
+      _root_.GlobalTheory.NFacts.NormChoiceFacts (cut (Fm.D x i) c) (nchTr c (Fm.ex x hx i).nch) ∧ Tie4 (cut (Fm.D x i) c) := fun x i => by
+    by_cases hx : Fm.x1 < x
+    · obtain ⟨c, h⟩ := hG _ _ (hF x hx i).1 (hF x hx i).2
+      exact ⟨c, fun _ => h⟩
+    · exact ⟨CutD.all _, fun h => absurd h hx⟩
+  choose c hc using key
+  have hFF : _root_.GlobalTheory.NLink.FactsFAlt (gd Fm c) C CT := fun x hx i =>
+    ⟨(hc x i hx).2.1, hEx _ _ (hc x i hx).2.1 (hc x i hx).2.2⟩
+  refine linkN_of_gd Fm c (fun x hx i => ⟨(hc x i hx).1, ?_, (hF x hx i).1.what₂.rank _⟩)
+    (GlobalTheory.T.linkN_along_family_of_localBounds _ (_root_.GlobalTheory.T.conclF_of_family_facts_and_bound_at_two_three hP _ C CT hC (twGood_gd Fm c hTw) hFF (_root_.UpperTheory.N.at23_family_alt hP _)))
+  have p := (hF x hx i).1
+  exact GlobalTheory.T.goodPointMultiplicityLeRank_proof _ _ p.Conclusion1.2.2 p.z p.adm.2.2 p.c2
+theorem linkN_of_boundAtTwoThree_slot (hP : Hypotheses₂) (hG : _root_.UpperTheory.GalC.CutGivesAlt) (Q : GlobalTheory.Mem.Top.V4.Slot) (Lk : GlobalTheory.Fc.LkT _root_.GlobalTheory.Fc.BundleCondition)
+    (hE : GlobalTheory.Fc.RowE Q Lk (fun _ D O _ _ => _root_.UpperTheory.GalC.GaloisPreconditions D O.ex.nch ∧ Tie4 D))
+    (h23 : _root_.GlobalTheory.Fc.R1.SlotNormCondition Q Lk (fun 𝒞 => Closed 𝒞 fun Fm _ => _root_.GlobalTheory.NLink.BoundAtTwoThreeFamilyFonAlt Fm)) :
+    _root_.GlobalTheory.Fc.R1.SlotNormCondition Q Lk (fun 𝒞 => Closed 𝒞 fun Fm _ => Formalism.MainNotions.LinkN Fm) := by
+  refine ((GlobalTheory.Fc.RowE.row hE).and h23).imp fun 𝒜 σ _ hh => ?_
+  obtain ⟨hA, ε1, hε, hcl⟩ := hh
+  refine ⟨ε1, hε, fun e he hle => ?_⟩
+  obtain ⟨K, hK⟩ := hcl e he hle
+  refine ⟨K, fun Fm CH hc hL => ?_⟩
+  exact _root_.UpperTheory.GalC.linkN_of_twGood_galoisPreconditions hP hG Fm hc.1.2 fun x hx i => hA Fm (GlobalTheory.Cp.d3_a hc) x hx i
+
+
+[GQT_IRR_01] src/Formalism/SharpRestriction/GlobalTheoremInputs.lean:55-58
+SHA256 427e14cc820afc593e8a8ad9bf40b22efe5462a1e5bd12289949238e5d0d49e9
+def LinkIRR {eps : ℝ} (Fm : FamP eps) : Prop :=
+  ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x,
+    Rows.DelpNonneg (Fm.D x i).what₂ ∧ (Fm.D x i).what₂.delp ≤ Real.exp (-(x ^ (Fm.ez / 7)))
+
+
+
+[GQT_IRR_02] src/Formalism/LocalToGlobal/GlobalTheory/IrreducibleOfCountSizes.lean:56-78
+SHA256 54e18eae60f6b8cfd6d6db9c316aa672ecbfc68e72f4397b0053ac3382447193
+
+def Wg (f m N g q₁ d : ℕ) : ℝ :=
+  3 * (f : ℝ) / (g : ℝ) +
+    23 * (f : ℝ) * Real.log (g : ℝ) / Real.sqrt (g : ℝ) +
+    2 * (f : ℝ) * (m : ℝ) * (1 / (4 * ((min q₁ d : ℕ) : ℝ)) + (1 + Real.log (N : ℝ)) / ((g : ℝ) - 1)) +
+    (N : ℝ) / 2 * (7 / 8 : ℝ) ^ f +
+    Real.exp (-(f : ℝ) / (5 * Real.log (N : ℝ)))
+
+def epsC (c : ℝ) (N f : ℕ) : ℝ := Real.exp (-(c * (N : ℝ) * (f : ℝ) * Real.log (N : ℝ)))
+
+def SizesAt (x ε Cs : ℝ) (f m N g q₁ d : ℕ) : Prop :=
+  Real.exp (8 * x ^ ε) ≤ (g : ℝ) ∧ x ^ 2 ≤ (f : ℝ) ∧ (f : ℝ) ≤ x ^ Cs ∧ (m : ℝ) ≤ x ^ Cs ∧
+    100 ≤ N ∧ (N : ℝ) ≤ x ^ Cs ∧ Real.exp (x ^ (ε / 6)) ≤ ((min q₁ d : ℕ) : ℝ)
+
+def WeightNumbersBound : Prop :=
+  ∀ ε Cs : ℝ, 0 < ε → ε ≤ 1 → ∀ᶠ x : ℝ in Filter.atTop, ∀ f m N g q₁ d : ℕ,
+    SizesAt x ε Cs f m N g q₁ d → Wg f m N g q₁ d ≤ x ^ (3 * Cs + 3) * Real.exp (-(x ^ (ε / 6)))
+
+def EpsilonBoundLargeX : Prop :=
+  ∀ c : ℝ, 0 < c → ∀ᶠ x : ℝ in Filter.atTop, ∀ N f : ℕ, 100 ≤ N → x ^ 2 ≤ (f : ℝ) → epsC c N f ≤ 1 / 2
+
+def IrreducibleOfCountSizes : Prop :=
+  Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.ShareFromCount → Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.StretchedExponentialDominance →
+
+
+[GQT_IRR_03] src/Formalism/LocalToGlobal/GlobalTheory/IrreducibleOfCountSizes.lean:180-199
+SHA256 a1ba2379817189970e31c5a2985599792f31dd6becadd50f98cbd7607efa3fe9
+def DstarE {D : D7} (A : AllRows D) (e : A.B.I.Gf → ℂ) : ℝ :=
+  A.B.I.Dstar (Formalism.MainNotions.PlaceDegreeData.fdegAll A.B.I A.B.σ A.B.w) A.B.μf A.B.fund e
+
+def CountAllRows {D : D7} (A : AllRows D) (εC : ℝ) : Prop :=
+  0 ≤ εC ∧ εC < 1 ∧ 0 < DstarE A A.B.e ∧
+    ∀ (k : Fin 2) (S : Set (Tup D k)),
+      |(A.dimT (cyl D k S) : ℝ) - DstarE A (A.eT (cyl D k S))| ≤ εC * DstarE A (A.eT (cyl D k S))
+
+def WeightAllRows {D : D7} (A : AllRows D) : Prop :=
+  (∀ (k : Fin 2) v f, 0 ≤ wtOf D k (A.eVec k v) f) ∧
+    ∀ (k : Fin 2) (S : Finset (Tup D k)), (∀ t ∈ S, ¬ goodAt D k t) →
+      locShare D A.eVec k S ≤ Wg D.R.f D.R.m D.R.r (D.host.g k) D.host.q D.host.d
+
+def FamilyIrreducibleOfCountWeightSizes : Prop :=
+  Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.ShareFromCount → Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.StretchedExponentialDominance →
+  ∀ (eps Cs c : ℝ), 0 < eps → eps ≤ 1 → 0 < c → ∀ (Fm : FamP eps),
+    (∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i),
+      LabelCountGoodInjective A ∧
+      CountAllRows A (epsC c (Fm.D x i).R.r (Fm.D x i).R.f) ∧
+      WeightAllRows A ∧
+
+
+[GQT_IRR_04] src/Formalism/SharpRestriction/LevelLetterCocycles/ArithmeticCylinders.lean:245-275
+SHA256 1070d3afc00dca83bb96052eaae33541bdb6ee23208e80a4851a0f6bd84a8402
+  B : Formalism.MainNotions.S.RowsAut
+  n_eq : B.I.n = D.R.r
+  f_eq : B.I.f = D.R.f
+  labAll : ∀ k, Fin D.what₂.Dall → D.nd.PlG k → (ZMod (D.host.g k))[X]
+  labAll_label : ∀ k σ v, IsLabel D k (labAll k σ v)
+  inc : Fin D.what₂.Drows → Fin D.what₂.Dall
+  eVec : ∀ k, D.nd.PlG k → MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k)))
+  eVec_idem : ∀ k v, eVec k v * eVec k v = eVec k v
+  eT : Set (Tup2 D) → B.I.Gf → ℂ
+  ReT : Set (Tup2 D) → (B.I.L2 B.μf B.fund →L[ℂ] B.I.L2 B.μf B.fund)
+  ReT_spec : ∀ S, B.I.IsRConvF B.μf B.fund B.R (eT S) (ReT S)
+  eT_univ : eT Set.univ = B.e
+  ReT_univ : ReT Set.univ = B.Re
+  eT_one : ∀ (k : Fin 2) (S : Finset (Tup D k)),
+    (eT (cyl D k (S : Set (Tup D k))) 1).re =
+      (B.e 1).re * ∑ t ∈ S, ∏ v, wtOf D k (eVec k v) (t v)
+
+variable {D}
+
+def AllRows.dimT (A : AllRows D) (S : Set (Tup2 D)) : ℕ :=
+  A.B.I.Dcount A.B.σs A.B.μf A.B.fund A.B.R (A.ReT S)
+
+def DimEqTotalCount (A : AllRows D) : Prop := D.what₂.Dall = A.B.D
+
+def DimEqGoodCount (A : AllRows D) : Prop := D.what₂.Drows = A.dimT {t | D.ntypes.goodTuple t}
+
+def LabelCountGoodInjective (A : AllRows D) : Prop :=
+  (∀ S : Set (Tup2 D), A.dimT S = Nat.card {τ : Fin D.what₂.Dall // (fun k => A.labAll k τ) ∈ S}) ∧
+    Function.Injective A.inc ∧ (∀ k σ, A.labAll k (A.inc σ) = D.nd.lab k (D.what₂.ft σ)) ∧
+    ∀ τ : Fin D.what₂.Dall, D.ntypes.goodTuple (fun k => A.labAll k τ) ↔ τ ∈ Set.range A.inc
+
+
+
+[GQT_IRR_05] src/Formalism/SharpRestriction/LevelLetterCocycles/ArithmeticCylinders.lean:355-361
+SHA256 e2067384368b92c0e3d099c65aa6c7cb18b84cccc0e449a974c64a2b91dd5d1e
+def goodAt (k : Fin 2) (t : Tup D k) : Prop :=
+  haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+  Formalism.CyclotomicNorms.IsGood D.R.r (D.host.g k) t (D.nd.chiT k) ∧
+    Formalism.CyclotomicNorms.IsGood D.R.r (D.host.g k) t (fun v j => (D.nd.chiT k v j)⁻¹)
+
+def locShare (eV : VecAt D) (k : Fin 2) (S : Finset (Tup D k)) : ℝ :=
+  ∑ t ∈ S, ∏ v, wtOf D k (eV k v) (t v)
+
+
+[GQT_IRR_06] src/Formalism/SharpRestriction/CuspSpanNormBounds/GlobAut.lean:203-207
+SHA256 53bf9b47503ad177272fc59d874051c365be30f9f3b0322918b8b740b9a78d3c
+def vol (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA) : ℝ := ((I.muA μf) fund).toReal
+
+def Dstar (d : ℝ) (μf : Measure I.Gf) [SigmaFinite μf] (fund : Set I.GA) (e : I.Gf → ℂ) : ℝ :=
+  d * I.vol μf fund * (e 1).re
+
+
+
+[GQT_IRR_07] src/Formalism/LocalToGlobal/GlobalTheory/ConcNP.lean:130-338
+SHA256 9fefa7d74147e83ee82a13fd4ddda6f21f9c1656eaaa4d61e9350e3545b76d4d
+theorem weight_numbers_bound : WeightNumbersBound := by
+  intro ε Cs hε hε1
+  filter_upwards [Filter.eventually_ge_atTop (max 10 (100 * Cs ^ 2 + 1))] with x hx
+  intro f m N g q₁ d hS
+  obtain ⟨hg, hf2, hfP, hmP, hN100, hNP, hmin⟩ := hS
+  have hx10 : (10 : ℝ) ≤ x := le_trans (le_max_left _ _) hx
+  have hxC : 100 * Cs ^ 2 + 1 ≤ x := le_trans (le_max_right _ _) hx
+  have hx0 : 0 < x := by linarith
+  have hx1 : 1 ≤ x := by linarith
+  have hN : (100 : ℝ) ≤ (N : ℝ) := by exact_mod_cast hN100
+  have hP100 : (100 : ℝ) ≤ x ^ Cs := le_trans hN hNP
+  have hCs : 0 < Cs := by
+    by_contra h
+    push Not at h
+    have : x ^ Cs ≤ 1 := Real.rpow_le_one_of_one_le_of_nonpos hx1 h
+    linarith
+  set P := x ^ Cs with hPdef
+  set E := x ^ ε with hEdef
+  set u := x ^ (ε / 6) with hudef
+  have hE1 : 1 ≤ E := Real.one_le_rpow hx1 hε.le
+  have hu1 : 1 ≤ u := Real.one_le_rpow hx1 (by positivity)
+  have huE : u ≤ E := Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
+  have hux : u ≤ x := by
+    calc u ≤ x ^ (1 : ℝ) := Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
+      _ = x := Real.rpow_one x
+  set eu := Real.exp (-u) with heu
+  have heu0 : 0 < eu := Real.exp_pos _
+  have hf0 : (0 : ℝ) ≤ (f : ℝ) := Nat.cast_nonneg _
+  have hm0 : (0 : ℝ) ≤ (m : ℝ) := Nat.cast_nonneg _
+  have hP1 : 1 ≤ P := by linarith
+
+  have h8E : 1 + 8 * E ≤ Real.exp (8 * E) := by have := Real.add_one_le_exp (8 * E); linarith
+  have hg9 : (9 : ℝ) ≤ (g : ℝ) := by linarith
+  have hgpos : (0 : ℝ) < (g : ℝ) := by linarith
+  have hginv : 1 / (g : ℝ) ≤ eu := by
+    rw [div_le_iff₀ hgpos]
+    have h1 : Real.exp (-u) * Real.exp (8 * E) ≤ Real.exp (-u) * (g : ℝ) :=
+      mul_le_mul_of_nonneg_left hg heu0.le
+    have h2 : Real.exp (-u) * Real.exp (8 * E) = Real.exp (8 * E - u) := by
+      rw [← Real.exp_add]; ring_nf
+    have h3 : 1 ≤ Real.exp (8 * E - u) := Real.one_le_exp (by linarith)
+    linarith
+
+  have hT1 : 3 * (f : ℝ) / (g : ℝ) ≤ 3 * P * eu := by
+    have : 3 * (f : ℝ) / (g : ℝ) = 3 * (f : ℝ) * (1 / (g : ℝ)) := by ring
+    rw [this]
+    exact mul_le_mul (by linarith) hginv (by positivity) (by positivity)
+
+  set s := Real.sqrt (Real.sqrt (g : ℝ)) with hsdef
+  have hsg : Real.sqrt (g : ℝ) = s ^ 2 := by
+    rw [hsdef, Real.sq_sqrt (Real.sqrt_nonneg _)]
+  have hs4 : (g : ℝ) = s ^ 4 := by
+    have : s ^ 4 = (s ^ 2) ^ 2 := by ring
+    rw [this, ← hsg, Real.sq_sqrt hgpos.le]
+  have hs0 : 0 < s := by
+    rw [hsdef]; exact Real.sqrt_pos.2 (Real.sqrt_pos.2 hgpos)
+  have hlogs : Real.log (g : ℝ) ≤ 4 * s := by
+    rw [hs4, Real.log_pow]
+    have := Real.log_le_sub_one_of_pos hs0
+    push_cast; linarith
+  have hsE : Real.exp (2 * E) ≤ s := by
+    have h4 : Real.exp (2 * E) ^ 4 ≤ s ^ 4 := by
+      rw [← hs4, ← Real.exp_nat_mul]; push_cast
+      calc Real.exp (4 * (2 * E)) = Real.exp (8 * E) := by ring_nf
+        _ ≤ (g : ℝ) := hg
+    exact (pow_le_pow_iff_left₀ (Real.exp_pos _).le hs0.le (by norm_num)).1 h4
+  have hsinv : 1 / s ≤ eu := by
+    rw [div_le_iff₀ hs0]
+    have h1 : Real.exp (-u) * Real.exp (2 * E) ≤ Real.exp (-u) * s := mul_le_mul_of_nonneg_left hsE heu0.le
+    have h2 : Real.exp (-u) * Real.exp (2 * E) = Real.exp (2 * E - u) := by
+      rw [← Real.exp_add]; ring_nf
+    have h3 : 1 ≤ Real.exp (2 * E - u) := Real.one_le_exp (by linarith)
+    linarith
+  have hT2 : 23 * (f : ℝ) * Real.log (g : ℝ) / Real.sqrt (g : ℝ) ≤ 92 * P * eu := by
+    rw [hsg]
+    have hlog0 : 0 ≤ Real.log (g : ℝ) := Real.log_nonneg (by linarith)
+    have hA : 23 * (f : ℝ) * Real.log (g : ℝ) / s ^ 2 ≤ 92 * (f : ℝ) * (1 / s) := by
+      rw [div_le_iff₀ (by positivity)]
+      have : 92 * (f : ℝ) * (1 / s) * s ^ 2 = 23 * (f : ℝ) * (4 * s) := by field_simp; ring
+      rw [this]
+      exact mul_le_mul_of_nonneg_left hlogs (by positivity)
+    refine hA.trans ?_
+    have : 92 * (f : ℝ) * (1 / s) ≤ 92 * P * eu :=
+      mul_le_mul (by linarith) hsinv (by positivity) (by positivity)
+    exact this
+
+  have hM : Real.exp u ≤ ((min q₁ d : ℕ) : ℝ) := hmin
+  have hMpos : 0 < ((min q₁ d : ℕ) : ℝ) := lt_of_lt_of_le (Real.exp_pos _) hM
+  have hA3 : 1 / (4 * ((min q₁ d : ℕ) : ℝ)) ≤ eu := by
+    rw [div_le_iff₀ (by positivity)]
+    have h1 : Real.exp (-u) * Real.exp u = 1 := by rw [← Real.exp_add]; simp
+    have h2 : Real.exp (-u) * Real.exp u ≤ Real.exp (-u) * ((min q₁ d : ℕ) : ℝ) :=
+      mul_le_mul_of_nonneg_left hM heu0.le
+    have h3 : Real.exp (-u) * (4 * ((min q₁ d : ℕ) : ℝ)) = 4 * (Real.exp (-u) * ((min q₁ d : ℕ) : ℝ)) := by ring
+    rw [heu, h3]; linarith
+  have hlogN : 1 + Real.log (N : ℝ) ≤ P := by
+    have := Real.log_le_sub_one_of_pos (show (0 : ℝ) < N by linarith)
+    linarith
+  have hlogN0 : 0 ≤ 1 + Real.log (N : ℝ) := by
+    have := Real.log_nonneg (show (1 : ℝ) ≤ N by linarith); linarith
+  have hB4 : (1 + Real.log (N : ℝ)) / ((g : ℝ) - 1) ≤ 2 * P * eu := by
+    have hg1 : 0 < (g : ℝ) - 1 := by linarith
+    rw [div_le_iff₀ hg1]
+    have h1 : 1 ≤ eu * (g : ℝ) := by rwa [div_le_iff₀ hgpos] at hginv
+    have h2 : eu * 9 ≤ eu * (g : ℝ) := mul_le_mul_of_nonneg_left hg9 heu0.le
+    have h2' : eu * ((g : ℝ) - 1) = eu * (g : ℝ) - eu := by ring
+    have h3 : 1 / 2 ≤ eu * ((g : ℝ) - 1) := by linarith
+    have h4 : 2 * P * (1 / 2) ≤ 2 * P * (eu * ((g : ℝ) - 1)) := mul_le_mul_of_nonneg_left h3 (by linarith)
+    have h5 : 2 * P * eu * ((g : ℝ) - 1) = 2 * P * (eu * ((g : ℝ) - 1)) := by ring
+    linarith
+  have hT34 := third_fourth_terms_bound (f : ℝ) (m : ℝ) P (1 / (4 * ((min q₁ d : ℕ) : ℝ)))
+    ((1 + Real.log (N : ℝ)) / ((g : ℝ) - 1)) eu hf0 hm0 hfP hmP (by positivity)
+    (by have hg1 : 0 < (g : ℝ) - 1 := by linarith
+        positivity) hA3 hB4
+
+  have h78 : (7 / 8 : ℝ) ≤ Real.exp (-(1 / 8)) := by
+    have := Real.add_one_le_exp (-(1 / 8 : ℝ)); linarith
+  have hT5 : (N : ℝ) / 2 * (7 / 8 : ℝ) ^ f ≤ P * eu := by
+    have hpow : (7 / 8 : ℝ) ^ f ≤ Real.exp (-(1 / 8)) ^ f := pow_le_pow_left₀ (by norm_num) h78 f
+    rw [← Real.exp_nat_mul] at hpow
+    have h8x : 8 * x ≤ x ^ 2 := by rw [sq]; exact mul_le_mul_of_nonneg_right (by linarith) hx0.le
+    have hfu : u ≤ (f : ℝ) / 8 := by linarith
+    have hexp : Real.exp ((f : ℝ) * (-(1 / 8))) ≤ eu := Real.exp_le_exp.2 (by linarith)
+    have hN2 : (N : ℝ) / 2 ≤ P := by linarith
+    calc (N : ℝ) / 2 * (7 / 8 : ℝ) ^ f ≤ P * Real.exp ((f : ℝ) * (-(1 / 8))) :=
+          mul_le_mul hN2 hpow (by positivity) (by linarith)
+      _ ≤ P * eu := mul_le_mul_of_nonneg_left hexp (by linarith)
+
+  have hlogNpos : 0 < Real.log (N : ℝ) := Real.log_pos (by linarith)
+  have hlogNx : Real.log (N : ℝ) ≤ Cs * Real.log x := by
+    rw [← Real.log_rpow hx0]
+    exact Real.log_le_log (by linarith) hNP
+  have hsqx : 10 * Cs ≤ Real.sqrt x := by
+    rw [Real.le_sqrt (by linarith) hx0.le]
+    have : (10 * Cs) ^ 2 = 100 * Cs ^ 2 := by ring
+    linarith
+  have hlogx : Real.log x ≤ 2 * Real.sqrt x := by
+    have hsx : 0 < Real.sqrt x := Real.sqrt_pos.2 hx0
+    have h1 : Real.log x = 2 * Real.log (Real.sqrt x) := by
+      rw [← Real.log_rpow hsx]; congr 1
+      rw [show (2 : ℝ) = ((2 : ℕ) : ℝ) by norm_num, Real.rpow_natCast, Real.sq_sqrt hx0.le]
+    have := Real.log_le_sub_one_of_pos hsx
+    linarith
+  have hxx : Real.sqrt x * Real.sqrt x = x := Real.mul_self_sqrt hx0.le
+  have hT6 : Real.exp (-(f : ℝ) / (5 * Real.log (N : ℝ))) ≤ eu := by
+    apply Real.exp_le_exp.2
+    have hkey : u * (5 * Real.log (N : ℝ)) ≤ (f : ℝ) := by
+      have h1 : u * (5 * Real.log (N : ℝ)) ≤ x * (5 * (Cs * Real.log x)) :=
+        mul_le_mul hux (mul_le_mul_of_nonneg_left hlogNx (by norm_num)) (by positivity) hx0.le
+      have h2 : x * (5 * (Cs * Real.log x)) ≤ x * (5 * (Cs * (2 * Real.sqrt x))) :=
+        mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_left hlogx hCs.le) (by norm_num)) hx0.le
+      have h3 : x * (5 * (Cs * (2 * Real.sqrt x))) ≤ x ^ 2 := by
+        have h10 : 10 * Cs * Real.sqrt x ≤ Real.sqrt x * Real.sqrt x :=
+          mul_le_mul_of_nonneg_right hsqx (Real.sqrt_nonneg x)
+        have : 5 * (Cs * (2 * Real.sqrt x)) ≤ x := by
+          calc 5 * (Cs * (2 * Real.sqrt x)) = 10 * Cs * Real.sqrt x := by ring
+            _ ≤ Real.sqrt x * Real.sqrt x := h10
+            _ = x := hxx
+        have h11 : x * (5 * (Cs * (2 * Real.sqrt x))) ≤ x * x := mul_le_mul_of_nonneg_left this hx0.le
+        rw [sq]; exact h11
+      linarith
+    rw [neg_div, neg_le_neg_iff, le_div_iff₀ (by positivity)]
+    exact hkey
+
+  have hpow3 : x ^ (3 * Cs + 3) = P ^ 3 * x ^ 3 := by
+    rw [show 3 * Cs + 3 = Cs * 3 + 3 by ring, Real.rpow_add hx0, Real.rpow_mul hx0.le]
+    rw [show (3 : ℝ) = ((3 : ℕ) : ℝ) by norm_num, Real.rpow_natCast, Real.rpow_natCast]
+  have hx3 : (103 : ℝ) ≤ x ^ 3 := by
+    have : (10 : ℝ) ^ 3 ≤ x ^ 3 := pow_le_pow_left₀ (by norm_num) hx10 3
+    norm_num at this; linarith
+  unfold Wg
+  rw [hpow3]
+  exact wsum _ _ _ _ _ P eu (x ^ 3) hP1 heu0.le hx3 hT1 hT2 hT34 hT5 hT6
+
+theorem epsilon_bound_large_x : EpsilonBoundLargeX := by
+  intro c hc
+  filter_upwards [Filter.eventually_ge_atTop (max 1 (1 / c))] with x hx N f hN hf
+  have hx1 : 1 ≤ x := le_trans (le_max_left _ _) hx
+  have hxc : 1 / c ≤ x := le_trans (le_max_right _ _) hx
+  have hcx : 1 ≤ c * x := by
+    rw [div_le_iff₀ hc] at hxc; linarith
+  have hcx2 : 1 ≤ c * x ^ 2 := by nlinarith
+  have hN' : (100 : ℝ) ≤ N := by exact_mod_cast hN
+  have hlog : 1 ≤ Real.log N := by
+    have h1 : Real.exp 1 ≤ (N : ℝ) := by
+      have := Real.exp_one_lt_d9
+      linarith
+    have h2 := Real.log_le_log (Real.exp_pos 1) h1
+    rwa [Real.log_exp] at h2
+  have h2 : 1 ≤ c * f := le_trans hcx2 (mul_le_mul_of_nonneg_left hf hc.le)
+  have h3 : 1 ≤ (N : ℝ) * Real.log N := by nlinarith
+  have key : 1 ≤ c * (N : ℝ) * (f : ℝ) * Real.log (N : ℝ) := by
+    calc (1 : ℝ) ≤ (c * f) * (N * Real.log N) := one_le_mul_of_one_le_of_one_le h2 h3
+      _ = c * (N : ℝ) * (f : ℝ) * Real.log (N : ℝ) := by ring
+  unfold epsC
+  have hle : Real.exp (-(c * (N : ℝ) * (f : ℝ) * Real.log (N : ℝ))) ≤ Real.exp (-1) :=
+    Real.exp_le_exp.mpr (by linarith)
+  have he := Real.add_one_le_exp (1 : ℝ)
+  have hm : Real.exp (-1) * Real.exp 1 = 1 := by
+    rw [← Real.exp_add]; norm_num
+  have hp : 0 < Real.exp (-1) := Real.exp_pos _
+  nlinarith
+
+theorem irreducible_of_count_sizes : IrreducibleOfCountSizes := by
+  intro hSF hND ε Cs c hε hε1 hc
+  have hW := weight_numbers_bound ε Cs hε hε1
+  have hE := epsilon_bound_large_x c hc
+  have hNm := numbers_dominant_large hND (3 * Cs + 3) ε hε
+  obtain ⟨x0, hx0⟩ := Filter.eventually_atTop.mp (hW.and (hE.and hNm))
+
+
+[GQT_IRR_08] src/Formalism/LocalToGlobal/GlobalTheory/ConcNP.lean:509-657
+SHA256 e371afcac81f3b4a26956252072e51a8b24e31fce622c3d0e4e419aa8c798b4a
+theorem delp_of_allRows (hSF : Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.ShareFromCount) {D : D7} (A : AllRows D) (εC x ε : ℝ)
+    (hT3 : LabelCountGoodInjective A) (hC : CountAllRows A εC) (hW : WeightAllRows A)
+    (hnum : (1 + εC) / (1 - εC) *
+      (Wg D.R.f D.R.m D.R.r (D.host.g 0) D.host.q D.host.d + Wg D.R.f D.R.m D.R.r (D.host.g 1) D.host.q D.host.d)
+        ≤ LChain6.E7 x ε) :
+    Rows.DelpNonneg D.what₂ ∧ D.what₂.delp ≤ Real.exp (-(x ^ (ε / 7))) := by
+  classical
+  obtain ⟨hT3a, hinj, hlab, hgood⟩ := hT3
+  obtain ⟨h0, hlt, hdSpos, hcount⟩ := hC
+  obtain ⟨hwt, hW⟩ := hW
+  set dS := DstarE A A.B.e with hdS
+
+  have hDS : ∀ (k : Fin 2) (S : Finset (Tup D k)),
+      DstarE A (A.eT (cyl D k (S : Set (Tup D k)))) = dS * locShare D A.eVec k S := by
+    intro k S
+    simp only [hdS, DstarE, Formalism.MainNotions.S.AutInst.Dstar, locShare]
+    rw [A.eT_one k S]
+    ring
+
+  have hdimU : A.dimT (cyl D 0 Set.univ) = D.what₂.Dall := by
+    rw [hT3a]
+    have hall : ∀ τ : Fin D.what₂.Dall, (fun k => A.labAll k τ) ∈ cyl D 0 Set.univ := fun τ => by simp [cyl]
+    rw [Nat.card_congr (Equiv.subtypeUnivEquiv hall), Nat.card_eq_fintype_card, Fintype.card_fin]
+  have hU := hcount 0 Set.univ
+  rw [hdimU, Formalism.MainNotions.FamilyNumericLemmas.cyl_univ, A.eT_univ] at hU
+
+  let Sk : (k : Fin 2) → Finset (Tup D k) := fun k =>
+    (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D k (A.labAll k τ)).image fun τ => A.labAll k τ
+  have hSk : ∀ k, ∀ t ∈ Sk k, ¬ goodAt D k t := by
+    intro k t ht
+    obtain ⟨τ, hτ, rfl⟩ := Finset.mem_image.mp ht
+    exact (Finset.mem_filter.mp hτ).2
+  have hmem : ∀ (k : Fin 2) (τ : Fin D.what₂.Dall),
+      (fun k => A.labAll k τ) ∈ cyl D k ((Sk k : Finset (Tup D k)) : Set (Tup D k)) ↔
+        ¬ goodAt D k (A.labAll k τ) := by
+    intro k τ
+    constructor
+    · intro hτ; exact hSk k _ hτ
+    · intro hτ
+      show A.labAll k τ ∈ ((Sk k : Finset (Tup D k)) : Set (Tup D k))
+      exact Finset.mem_coe.mpr (Finset.mem_image.mpr ⟨τ, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hτ⟩, rfl⟩)
+  have hdimK : ∀ k, A.dimT (cyl D k ((Sk k : Finset (Tup D k)) : Set (Tup D k))) =
+      (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D k (A.labAll k τ)).card := by
+    intro k
+    rw [hT3a, ← Nat.card_eq_finsetCard]
+    exact Nat.card_congr (Equiv.subtypeEquivRight (fun τ => by rw [hmem k τ]; simp))
+
+  have hDrows : (Finset.univ.filter fun τ : Fin D.what₂.Dall => D.ntypes.goodTuple (fun k => A.labAll k τ)).card =
+      D.what₂.Drows := by
+    have : (Finset.univ.filter fun τ : Fin D.what₂.Dall => D.ntypes.goodTuple (fun k => A.labAll k τ)) =
+        Finset.univ.image A.inc := by
+      ext τ
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_image]
+      rw [hgood τ]
+      simp [Set.mem_range]
+    rw [this, Finset.card_image_of_injective _ hinj, Finset.card_univ, Fintype.card_fin]
+  have hle : D.what₂.Drows ≤ D.what₂.Dall := by
+    rw [← hDrows]
+    exact (Finset.card_filter_le _ _).trans (by rw [Finset.card_univ, Fintype.card_fin])
+  have hbad : D.what₂.Dall ≤ D.what₂.Drows +
+      (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 0 (A.labAll 0 τ)).card +
+      (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 1 (A.labAll 1 τ)).card := by
+    have hsub : (Finset.univ : Finset (Fin D.what₂.Dall)) ⊆
+        ((Finset.univ.filter fun τ : Fin D.what₂.Dall => D.ntypes.goodTuple (fun k => A.labAll k τ)) ∪
+          (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 0 (A.labAll 0 τ))) ∪
+        (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 1 (A.labAll 1 τ)) := by
+      intro τ _
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_union]
+      by_cases hg : D.ntypes.goodTuple (fun k => A.labAll k τ)
+      · exact Or.inl (Or.inl hg)
+      · by_contra hc
+        push Not at hc
+        apply hg
+        intro k
+        fin_cases k
+        · exact hc.1.2
+        · exact hc.2
+    have := (Finset.card_le_card hsub).trans
+      ((Finset.card_union_le _ _).trans (Nat.add_le_add_right (Finset.card_union_le _ _) _))
+    rw [Finset.card_univ, Fintype.card_fin, hDrows] at this
+    exact this
+
+  have hloc : ∀ k, 0 ≤ locShare D A.eVec k (Sk k) := by
+    intro k
+    unfold locShare
+    exact Finset.sum_nonneg (fun t _ => Finset.prod_nonneg (fun v _ => hwt k v (t v)))
+  have hK : ∀ k, |((Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D k (A.labAll k τ)).card : ℝ) -
+      locShare D A.eVec k (Sk k) * dS| ≤ εC * (locShare D A.eVec k (Sk k) * dS) := by
+    intro k
+    have h := hcount k ((Sk k : Finset (Tup D k)) : Set (Tup D k))
+    rw [hdimK k, hDS k (Sk k)] at h
+    rwa [mul_comm dS] at h
+  have hbadR : (D.what₂.Dall : ℝ) - (D.what₂.Drows : ℝ) ≤
+      ((Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 0 (A.labAll 0 τ)).card : ℝ) +
+      ((Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 1 (A.labAll 1 τ)).card : ℝ) := by
+    have : ((D.what₂.Dall : ℕ) : ℝ) ≤ ((D.what₂.Drows +
+      (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 0 (A.labAll 0 τ)).card +
+      (Finset.univ.filter fun τ : Fin D.what₂.Dall => ¬ goodAt D 1 (A.labAll 1 τ)).card : ℕ) : ℝ) := by
+      exact_mod_cast hbad
+    push_cast at this
+    linarith
+  have hsh := hSF εC _ _ (locShare D A.eVec 0 (Sk 0)) (locShare D A.eVec 1 (Sk 1)) _ _ (D.what₂.Dall : ℝ) dS
+    ((D.what₂.Dall : ℝ) - (D.what₂.Drows : ℝ)) h0 hlt hdSpos (hloc 0) (hW 0 (Sk 0) (hSk 0)) (hloc 1)
+    (hW 1 (Sk 1) (hSk 1)) hU (hK 0) (hK 1) hbadR
+  have hApos : 0 < (D.what₂.Dall : ℝ) := by
+    have := (abs_sub_le_iff.1 hU).2
+    nlinarith
+  have hbE : (D.what₂.Dall : ℝ) - (D.what₂.Drows : ℝ) ≤ LChain6.E7 x ε * (D.what₂.Dall : ℝ) := by
+    have := hsh.trans hnum
+    rwa [div_le_iff₀ hApos] at this
+  have hDeq := D.what₂.D_eq
+  have hdel : D.what₂.delp * (D.what₂.Dall : ℝ) = (D.what₂.Dall : ℝ) - (D.what₂.Drows : ℝ) := by linarith
+  have hle' : (D.what₂.Drows : ℝ) ≤ (D.what₂.Dall : ℝ) := by exact_mod_cast hle
+  refine ⟨?_, ?_⟩
+  · show 0 ≤ D.what₂.delp
+    by_contra hneg
+    push Not at hneg
+    have : D.what₂.delp * (D.what₂.Dall : ℝ) < 0 := mul_neg_of_neg_of_pos hneg hApos
+    linarith
+  · have : D.what₂.delp * (D.what₂.Dall : ℝ) ≤ LChain6.E7 x ε * (D.what₂.Dall : ℝ) := by rw [hdel]; exact hbE
+    exact le_of_mul_le_mul_right this hApos
+
+theorem link_irreducible_all_rows : FamilyIrreducibleOfCountWeightSizes := by
+  intro hSF hV7 eps Cs c he he1 hc Fm hIn
+  obtain ⟨x0, hx0⟩ := hIn
+  have hez : 0 < Fm.ez := div_pos he (lt_of_lt_of_le one_pos Fm.one_le_J)
+  have hez1 : Fm.ez ≤ 1 := (div_le_self he.le Fm.one_le_J).trans he1
+  have hev := ((numbers_dominant_large hV7 (3 * Cs + 3) Fm.ez hez).and (weight_numbers_bound Fm.ez Cs hez hez1)).and (epsilon_bound_large_x c hc)
+  obtain ⟨x1, hx1⟩ := Filter.eventually_atTop.1 hev
+  refine ⟨max x0 x1, fun x hx i => ?_⟩
+  obtain ⟨A, hT3, hC, hW, hS⟩ := hx0 x (le_trans (le_max_left _ _) hx) i
+  obtain ⟨⟨hnum, hw⟩, heps⟩ := hx1 x (le_trans (le_max_right _ _) hx)
+  have hN : NumbersAt x Fm.ez (epsC c (Fm.D x i).R.r (Fm.D x i).R.f) (3 * Cs + 3)
+      (Wg (Fm.D x i).R.f (Fm.D x i).R.m (Fm.D x i).R.r ((Fm.D x i).host.g 0) (Fm.D x i).host.q (Fm.D x i).host.d)
+      (Wg (Fm.D x i).R.f (Fm.D x i).R.m (Fm.D x i).R.r ((Fm.D x i).host.g 1) (Fm.D x i).host.q (Fm.D x i).host.d) :=
+    ⟨(Real.exp_pos _).le, heps _ _ (hS 0).2.2.2.2.1 (hS 0).2.1, hw _ _ _ _ _ _ (hS 0), hw _ _ _ _ _ _ (hS 1)⟩
+  exact delp_of_allRows hSF A _ x Fm.ez hT3 hC hW (hnum _ _ _ hN)
+
+theorem linkIRR_of_allRows :
+    ∀ (eps Cs c : ℝ), 0 < eps → eps ≤ 1 → 0 < c → ∀ (Fm : FamP eps),
+      (∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i),
+        LabelCountGoodInjective A ∧
+        CountAllRows A (epsC c (Fm.D x i).R.r (Fm.D x i).R.f) ∧
+        WeightAllRows A ∧
+        SizesRec (Fm.D x i) x Fm.ez Cs) →
+      LinkIRR Fm :=
+  link_irreducible_all_rows Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.share_from_count Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.dominant_numbers_sharp_holds
+
+end AllRowsIn
+
+
+[GQT_IRR_09] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkIRROfJoinEx.lean:17-38
+SHA256 98be2564ee803eea7a50a79bf9c8c2fdc3c7895e95f726258b17619401b44e0c
+theorem linkIRR_of_join_ex (eps Cs c : ℝ) (he : 0 < eps) (he1 : eps ≤ 1) (hc : 0 < c) (Fm : FamP eps)
+    (h : ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i),
+      LabelCountGoodInjective A ∧ AllJoinA A ∧ admLq (Fm.D x i) ∧
+        CountAllRows A (epsC c (Fm.D x i).R.r (Fm.D x i).R.f) ∧ SizesRec (Fm.D x i) x Fm.ez Cs) :
+    LinkIRR Fm := by
+  obtain ⟨x0, hx0⟩ := h
+  have hez : 0 < Fm.ez := div_pos he (lt_of_lt_of_le one_pos Fm.toFamCore.one_le_J)
+  refine linkIRR_of_allRows eps Cs c he he1 hc Fm ⟨max x0 ((3 / 2 : ℝ) ^ (1 / Fm.ez)), fun x hx i => ?_⟩
+  obtain ⟨A, hT, hJ, hL, hC, hS⟩ := hx0 x (le_trans (le_max_left _ _) hx) i
+  have hx1 : (3 / 2 : ℝ) ^ (1 / Fm.ez) ≤ x := le_trans (le_max_right _ _) hx
+  have hxe : 3 / 2 ≤ x ^ Fm.ez := by
+    have hpos : 0 ≤ (3 / 2 : ℝ) ^ (1 / Fm.ez) := by positivity
+    calc (3 / 2 : ℝ) = ((3 / 2 : ℝ) ^ (1 / Fm.ez)) ^ Fm.ez := by
+          rw [← Real.rpow_mul (by norm_num), one_div_mul_cancel hez.ne', Real.rpow_one]
+      _ ≤ x ^ Fm.ez := Real.rpow_le_rpow hpos hx1 hez.le
+  exact ⟨A, hT, hC, weight_of_join hL (tieAdmG_holds _) (rangeW_of_sizes hS hxe) hJ, hS⟩
+
+end
+
+section
+open Formalism.BasicNotions Formalism.MainNotions
+
+
+
+[GQT_IRR_10] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkIRROfJoinEx.lean:143-166
+SHA256 c6f2b5f87d81a5c5590a47bd70c5ac1eb47b9026682336124a37e8e2d5d17f04
+theorem link_irr : GlobalTheory.GLq.Green → ∀ (𝒜 : FamClass)
+    (sel : Formalism.L2.TSel 𝒜)
+    (cIc : ℝ)
+    (hcI : 0 < cIc)
+    (irrC : Closed (D3 3 𝒜) fun Fm _ => ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : Formalism.MainNotions.ArithmeticCylinders.AllRows (Fm.D x i),
+      Formalism.MainNotions.ArithmeticCylinders.LabelCountGoodInjective A ∧ Formalism.L2.GlobalTheoryTheory.AllJoin.AllJoinA A ∧
+        Formalism.L2.GlobalTheoryTheory.ConcN.CountAllRows A (Formalism.L2.GlobalTheoryTheory.ConcN.epsC cIc (Fm.D x i).R.r (Fm.D x i).R.f)), Closed (D3 3 𝒜) fun Fm _ => LinkIRR Fm := by
+  intro hG 𝒜 sel cIc hcI irrC
+  have irr : Closed (D3 3 𝒜) fun {eps} Fm _ => ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : Formalism.MainNotions.ArithmeticCylinders.AllRows (Fm.D x i),
+      Formalism.MainNotions.ArithmeticCylinders.LabelCountGoodInjective A ∧ Formalism.L2.GlobalTheoryTheory.AllJoin.AllJoinA A ∧ Formalism.MainNotions.ArithmeticCylinders.admLq (Fm.D x i) ∧
+        Formalism.L2.GlobalTheoryTheory.ConcN.CountAllRows A (Formalism.L2.GlobalTheoryTheory.ConcN.epsC cIc (Fm.D x i).R.r (Fm.D x i).R.f) ∧
+        Formalism.L2.GlobalTheoryTheory.ConcN.SizesRec (Fm.D x i) x Fm.ez 6 :=
+    closed_of_mem (irrC.imp fun Fm _ _ H hc => by
+      obtain ⟨x0, H⟩ := H
+      refine ⟨max (max x0 (sel Fm (d3_a hc)).1) (max (Fm.x1 + 1) 4), fun x hx i => ?_⟩
+      have h1 : Fm.x1 < x := by have := le_trans (le_trans (le_max_left _ _) (le_max_right _ _)) hx; linarith
+      have hs : (sel Fm (d3_a hc)).1 ≤ x := le_trans (le_trans (le_max_right _ _) (le_max_left _ _)) hx
+      obtain ⟨A, a, b, c⟩ := H x (le_trans (le_trans (le_max_left _ _) (le_max_left _ _)) hx) i
+      exact ⟨A, a, b, GlobalTheory.Top.Lq.admissibleLabelWeights_of_greenCuspidalParametrisation hG _ _ ((sel Fm (d3_a hc)).2 x h1 hs i).T.n.types, c,
+        sizesRec_at Fm h1 (le_trans (le_trans (le_max_right _ _) (le_max_right _ _)) hx) i le_rfl⟩)
+  exact (irr.and (closed_eps_le_one _)).imp fun Fm _ he ⟨h, h1⟩ =>
+      linkIRR_of_join_ex _ 6 cIc he h1 hcI Fm h
+
+end GlobalTheory.Top.Irr
+
+
+[GQT_DIV_01] src/Formalism/SharpRestriction/GlobalTheoremInputs.lean:66-96
+SHA256 82a3725163fce6695bee3293538c5b13bf32a8315c315ef202959c3ba12846d7
+  D.BuRational ∧ ∃ V : D.what₂.EE ≃ₗᵢ[ℂ] D.what₂.EE, ∀ u, ∃ a : ℂ, a ≠ 0 ∧
+    ∃ U : D.what₂.Mu u ≃ₗᵢ[ℂ] D.what₂.Mu u, ∀ φ F, D.what₂.Bu u φ F = a * D.besS u (U φ) (V F)
+
+def NprimeMuR {D : D7} (L : SizeData₂ D) (C : ℝ) : Prop :=
+  ∀ u, |(D.div.Nu u).mu - (L.NuH u).mu - ∑ w ∈ L.supp, SizeData₂.sz w (L.sg u w)| ≤ C * L.sc.X'' D.R.n
+
+def NuFullF {eps : ℝ} (Fm : FamP eps) : Prop := ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, (Fm.D x i).NuFull
+
+def LinkMu {eps : ℝ} (Fm : FamP eps) : Prop :=
+  ∃ C x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, NprimeMuR (Fm.L x i) C
+
+def LinkDIV_at {D : D7} (L : SizeData₂ D) (C Cabs CH : ℝ) : Prop :=
+  D.div.OneMapIntoCC ∧ sFrame D.div.Nu D.div.h + D.div.RR.muMax ≤ L.sc.x ^ CH * L.sc.b ∧
+  L.ZeroAbove ∧ BesselId D ∧ D.RRFull ∧
+  (∀ u, D.div.Bk u ≠ 0 → Formalism.HN.htMap (D.div.Nu u).b (D.div.Nu u).X D.div.RR.dualB D.div.RR.dualX (D.div.Bk u) ≤
+    D.div.h u) ∧
+  (∀ u, D.div.RR.muDual + D.div.h u - L.Fo ≤ L.MAIN u +
+    C * (D.host.TT.card : ℝ) * L.sc.a * L.La +
+    C * (D.R.m : ℝ) * (L.B0 + L.Nc) * L.sc.x ^ (Cabs * L.sc.eps)) ∧
+  (∀ u, ∀ j ∈ SizeData₂.lifts D, |(∑ w ∈ L.supp, SizeData₂.sz w (L.E u j w)) -
+    (∑ t : D.host.TT, (L.aT t : ℝ)) * Real.log ((D.host.g 0 : ℝ) * (D.host.g 1 : ℝ))| ≤ C * L.B0) ∧
+  (∀ u u', |(D.div.h u + (∑ t : D.host.TT, (L.aT t : ℝ)) * Real.log ((D.mem u).A.T : ℝ)) -
+    (D.div.h u' + (∑ t : D.host.TT, (L.aT t : ℝ)) * Real.log ((D.mem u').A.T : ℝ))| ≤
+    C * ((D.host.TT.card : ℝ) * L.sc.a * L.La + (D.R.m : ℝ) * L.B0))
+
+def LinkDIV {eps : ℝ} (Fm : FamP eps) (Cabs CH : ℝ) : Prop :=
+  ∃ C x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, LinkDIV_at (Fm.L x i) C Cabs CH
+
+def LinkDIVt {eps : ℝ} (Fm : FamP eps) (Cabs CH : ℝ) : Prop :=
+  LinkEta Fm → DIVinN Fm → LinkDIV Fm Cabs CH
+
+
+
+[GQT_DIV_02] src/Formalism/LocalRingCardinality/DataParams₂.lean:218-235
+SHA256 28cee3d8d5df71e59a15f82c24127f62d99f7864731f04ae86226d36e0a3463a
+def Fo : ℝ := ∑ j ∈ lifts D, ∑ w ∈ L.supp, sz w (L.F j w)
+
+def Ga : ℝ := ∑ w ∈ L.supp, sz w ((∑ j ∈ lifts D, L.gainD j w) - L.tau w)
+
+def Ee (u : D.what₂.Word) : ℝ := ∑ j ∈ lifts D, ∑ w ∈ L.supp, sz w (L.E u j w)
+
+def logOm : ℝ := Real.eulerMascheroniConstant + Real.log (Real.pi / D.host.v) - L.logDerivativeAtOne
+
+def La : ℝ := Real.log (L.sc.a * D.host.rdE)
+
+def B0 : ℝ := sizeBudget D.R L.sc.x L.sc.eps
+
+def Nc : ℝ := budgetNc D.R L.sc.x L.sc.eps D.host.T2.card
+
+def MAIN (u : D.what₂.Word) : ℝ :=
+  ∑ t : D.host.TT, ((D.R.m : ℝ) * (phF (L.aT t) - (L.aT t : ℝ) * L.logOm) -
+    (L.aT t : ℝ) * Real.log ((D.mem u).A.T : ℝ))
+
+
+
+[GQT_DIV_03] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkBrest.lean:7-25
+SHA256 8ffd23ef52d06a487abc944a5c8d05f7be963b596fba70e865695cfb8d794c72
+theorem GlobalTheory.Top.link_brest : ∀ (𝒜 : FamClass)
+    (sel : Formalism.L2.TSel 𝒜)
+    (selS : SelS 𝒜 sel)
+    (selP : BaseLevelCompatibleSelection 𝒜 sel)
+    (selDH : SelDH 𝒜 sel)
+    (selC : ColumnCompatibleSelection 𝒜 sel selP)
+    (selB : SelB 𝒜 sel selS selP selDH selC)
+    (hRB : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.IndefR.RowsB (selB Fm hc x hx h i))
+    (hPA : PrimAll sel (selIOf selB))
+    (hDivG : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.DIV.DivRows3G (selP Fm hc x hx h i).1)
+    (hDcPtG : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.DIV.DcPtG (selP Fm hc x hx h i).1)
+    (rRows : Closed (D3 3 𝒜) fun Fm CH => ∀ hc : D3 3 𝒜 Fm, RowsAtSel sel (selIOf selB) (fun Fm hc x hx h i C CH => Formalism.L2.Top4Wire2.DefRowsF (selIOf selB) Fm hc x hx h i C CH) (OneMapOf selB)
+        Fm (d3_a hc) CH)
+    (tie : Closed (D3 3 𝒜) fun Fm _ => RealPlaceSecondLayerConditions Fm), Closed (D3 3 𝒜) fun Fm CH => ∀ hc : D3 3 𝒜 Fm, TuSize Fm → DGamSize Fm → RemainingDivisionBounds Fm 2 CH :=
+  fun 𝒜 sel selS selP selDH selC selB hRB hPA hDivG hDcPtG rRows tie =>
+    Formalism.L2.DIV.RestAll.bRest_all 𝒜 2 sel selS selP selDH selC selB hRB hPA hDivG hDcPtG rRows tie
+
+
+[GQT_DIV_04] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/WireSel.lean:11-41
+SHA256 affb9add4af0331c0831368f89232c8d20bbb625841093c24d9385cc61e156d3
+theorem GlobalTheory.Top.wire_sel : ∀ (𝒜 : FamClass)
+    (sel : Formalism.L2.TSel 𝒜)
+    (selS : SelS 𝒜 sel)
+    (selP : BaseLevelCompatibleSelection 𝒜 sel)
+    (selDH : SelDH 𝒜 sel)
+    (selC : ColumnCompatibleSelection 𝒜 sel selP)
+    (selB : SelB 𝒜 sel selS selP selDH selC)
+    (hTw : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.DIV.TieTwRec (Fm.L x i) (selP Fm hc x hx h i).1.S0.Tw)
+    (hPA : PrimAll sel (selIOf selB))
+    (hDivG : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.DIV.DivRows3G (selP Fm hc x hx h i).1)
+    (hDcPtG : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.DIV.DcPtG (selP Fm hc x hx h i).1), Wire4 sel selS selP selDH selC (selKOf selB) (selIOf selB) hPA (fun Fm hc x hx h i C CH => Formalism.L2.Top4Wire2.DefRowsF (selIOf selB) Fm hc x hx h i C CH) (OneMapOf selB) 2 := by
+  intro 𝒜 sel selS selP selDH selC selB hTw hPA hDivG hDcPtG
+  haveI : ∀ {eps : ℝ} (Fm : FamP eps) (x : ℝ) (i : Fm.Ix x), NumberField.IsTotallyComplex (Fm.D x i).what₂.LL :=
+    fun Fm x i => (Fm.D x i).tcLL
+  have hDivR : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.DIV.DivRows3 (Fm.D x i) (selP Fm hc x hx h i).1.A3 (selP Fm hc x hx h i).1.P0 (selP Fm hc x hx h i).1.ψ0 (selP Fm hc x hx h i).1.Ps
+        (selP Fm hc x hx h i).1.ψs (selP Fm hc x hx h i).1.Zs (selP Fm hc x hx h i).1.S0 (selP Fm hc x hx h i).1.S1 (Fm.ex x hx i).p0 (selP Fm hc x hx h i).1.C (selP Fm hc x hx h i).1.NuC (selP Fm hc x hx h i).1.I :=
+    fun Fm hc x hx h i => (hDivG Fm hc x hx h i).toRows (Formalism.IndefR.LevelRealisationRankEquality.tupAllUsed_of_real (selB Fm hc x hx h i).Q)
+  have hDcPt : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.Rows.RowsHoldDcPt3 (selP Fm hc x hx h i).1 :=
+    fun Fm hc x hx h i => Formalism.L2.DIV.dcPt_of_G (Formalism.IndefR.LevelRealisationRankEquality.tupAllUsed_of_real (selB Fm hc x hx h i).Q) (hDcPtG Fm hc x hx h i)
+  have hD0 : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      (Fm.D x i).what₂.D0 = ((selP Fm hc x hx h i).1.A3.A.fam.R (selP Fm hc x hx h i).1.A3.A.fam.μ0).dZ
+        ((selP Fm hc x hx h i).1.A3.A.fam.lvl (selP Fm hc x hx h i).1.P0 (selP Fm hc x hx h i).1.ψ0)
+        ((selP Fm hc x hx h i).1.Zs.Z (selP Fm hc x hx h i).1.A3.A.fam.μ0) :=
+    fun Fm hc x hx h i => Formalism.IndefR.LevelRealisationRankEquality.base_rank_eq_of_realisation (selB Fm hc x hx h i).Q
+  intro eps Fm hc CH
+  exact Formalism.L2.Top4Wire2.wire4F (selIOf selB) hPA (OneMapOf selB) 2 (by norm_num) hTw hD0 hDcPt hDivR Fm hc CH
+
+
+[GQT_G_01] src/Formalism/SharpRestriction/GlobalTheoremInputs.lean:101-141
+SHA256 db632e9285e16a1c3eff916c37a870eb184cbe2ae41fec57ffe197c5c5fdb46a
+  C * (D.R.f : ℝ) * (D.R.N D.R.m : ℝ) ^ 2 * Real.logb p L.sc.a +
+    C * (D.R.f : ℝ) * (Real.logb p L.sc.a) ^ 2
+
+def rG (eps : ℝ) : ℕ := ⌈8 * ((2 + 8 * eps) + 2) / eps⌉₊ + 1
+
+def leastPowerExponent {D : D7} (L : SizeData₂ D) (p : ℕ) : ℕ :=
+  ⌈Real.logb p ((D.R.k : ℝ) ^ 2 * L.sc.x ^ (3 * Scale.A))⌉₊ + 1
+
+def loG {D : D7} (L : SizeData₂ D) (C bo : ℝ) (p : ℕ) : ℝ :=
+  let s := L.sc
+  let pr : ℝ := if D.host.cls p = PrimeClass.inertClass then
+      (if (p : ℝ) < s.p0 D.R.k then C * (rG s.eps : ℝ) * s.b' * Real.log s.x
+       else if (p : ℝ) < s.X' then
+         C * (s.b' / s.x + L.etaSz + L.Sc + (s.w'' D.R.n + D.R.t) * Real.log s.x / s.delta1) + bo
+       else 0) else 0
+  let orr : ℝ := if D.host.cls p = PrimeClass.inertClass ∧ (p : ℝ) < s.X' then
+      C * Real.log s.x * (L.LaG * s.a / ((p : ℝ) * D.R.k) +
+        (if (p : ℝ) < s.p0 D.R.k then s.a * (p : ℝ) ^ (-(leastPowerExponent L p : ℝ)) else s.a / (p : ℝ) ^ 2))
+      else 0
+  C * (L.Sc + D.R.k + L.etaSz) * Real.logb p (2 * s.a) + pr + orr
+
+def LinkG_at {D : D7} {L : SizeData₂ D} (X : G.Inst D L) (K : G.Consts) (C bo : ℝ) : Prop :=
+  (∀ u w, D.what₂.places.resChar w ≠ (D.mem u).A.T →
+    DV.LocLe (D.plEq w) ⌊DV.ur D w (L.tau w)⌋₊ (L.NuLat u) (DV.MramL D u) ∧
+    (L.lenMN u w : ℝ) ≤ (D.duS u : ℝ) * (L.tau w + L.io w) ∧
+    (G.VV X K (G.aL L) (G.bL L) (D.what₂.places.resChar w) = ∅ → L.tau w = 0 ∧ L.io w = 0 ∧ L.lenMN u w = 0)) ∧
+  (∀ p, ∀ t0 ∈ G.VV X K (G.aL L) (G.bL L) p,
+    G.Sv X K (G.aL L) (G.bL L) p t0 ≤ 2 * (D.R.m : ℝ) * (G.Nv X p t0 : ℝ) * L.sc.a / p) ∧
+  (∀ w, InertK D (D.what₂.places.resChar w) → (D.what₂.places.resChar w : ℝ) ≤ L.sc.X'' D.R.n →
+    (∀ j ∈ SizeData₂.lifts D, 0 ≤ L.gain j w ∧
+      L.gain j w ≤ 4 * (D.host.TT.card : ℝ) * L.sc.a / (D.what₂.places.resChar w : ℝ)) ∧
+    (∑ j ∈ SizeData₂.lifts D, ∑ t ∈ L.TTw w,
+        (L.vonMangoldtClassSum j t (D.what₂.places.resChar w) - loG L C bo (D.what₂.places.resChar w))) -
+      (D.R.m : ℝ) * flG L C (D.what₂.places.resChar w) ≤
+      ((∑ j ∈ SizeData₂.lifts D, L.gain j w) - L.tau w)) ∧
+  G.ServedOrbitsContained X K (G.aL L) (G.bL L) ∧ G.MeanKappaBound X K
+
+def LinkG {eps : ℝ} (Fm : FamP eps) : Prop :=
+  ∃ (C x0 : ℝ) (δ : ℝ → ℝ), Filter.Tendsto δ Filter.atTop (nhds 0) ∧
+    ∀ x ≥ x0, ∀ i : Fm.Ix x, LinkG_at (Fm.Gx x i) Fm.GK C ((Fm.L x i).sc.b ^ δ x)
+
+
+
+[GQT_G_02] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkG.lean:14-27
+SHA256 95dacee1304998e9a1e18e921522d4dd27ee31a043e99f34e701637bae6d863b
+theorem GlobalTheory.Top.link_g : ∀ (𝒜 : FamClass)
+    (sel : Formalism.L2.TSel 𝒜)
+    (hduty : ∀ {eps : ℝ} (Fm : FamP eps), 𝒜 Fm → Duty Fm), Closed (D3 3 𝒜) fun Fm _ => LinkG Fm := by
+  intro 𝒜 sel hduty
+  have hRec : ∀ {eps : ℝ} (Fm : FamP eps), 𝒜 Fm → Formalism.L2.LayerTwoFamilyClass Fm := fun Fm hc =>
+    class_of_record_of_choice (sel Fm hc) (class_duties_of_choice (sel Fm hc) (hduty Fm hc))
+  have hG2 : Closed (D3 3 𝒜) fun Fm _ => Formalism.MainNotions.G.Adm2F Fm :=
+    Closed.of_class fun Fm _ hc => admissible_tops_mertens Fm (topsF_of_chosenE Fm hc.2.1.choose_spec)
+  have hGt : Closed (D3 3 𝒜) fun Fm _ => Formalism.L2.G.GroupCompatibilityFamily Fm :=
+    Closed.of_class fun Fm _ hc => Formalism.L2.gTiedF_of_C2Rec Fm (hRec Fm (d3_a hc))
+  have lG := Formalism.L2.G.linkG_concrete5 (D3 3 𝒜) hGt hG2
+  exact lG
+
+end
+
+
+[GQT_G_03] src/Formalism/LocalToGlobal/GroupLattices/LinkGConcreteNoKer.lean:36-58
+SHA256 e5dd531e4980c43aaec98a7d5f4f1ee5e742601b78970e34e99238c05e128bac
+    (hT : Closed 𝒞 fun Fm _ => GroupCompatibilityFamily Fm)
+    (hsys : Closed 𝒞 fun Fm _ => Ev Fm fun x i => LocalDataSystem (Fm.Gx x i) (Fm.Gy x i) (Formalism.MainNotions.AuxBlock8.lowU (Fm.D x i)))
+    (hsysS : Closed 𝒞 fun Fm _ => Ev Fm fun x i => LocalDataSystem (Fm.Gx x i) (Fm.Gy x i) (Formalism.MainNotions.G.lowFE (Fm.L x i)))
+    (h2 : Closed 𝒞 fun Fm _ => Adm2F Fm) :
+    Closed 𝒞 fun Fm _ => LinkG Fm := by
+  refine link_of_numbers_proved 𝒞 h ?_ h2 (hT.imp fun Fm _ _ ht => npDescF_of_tied Fm ht)
+  exact ((hT.and hsys).and hsysS).imp fun Fm _ _ hh =>
+    { gatE := gatEF_of_tied Fm hh.1.1
+      stdSub := stdSubF_of_tied Fm hh.1.1
+      localSystemLowTerm := hh.1.2
+      localSystemSizeLowTerm := hh.2 }
+
+theorem linkG_concrete_noKer (𝒞 : FamClass) (h : Loc)
+    (hT : Closed 𝒞 fun Fm _ => GroupCompatibilityFamily Fm) (h2 : Closed 𝒞 fun Fm _ => Adm2F Fm) :
+    Closed 𝒞 fun Fm _ => LinkG Fm :=
+  link_of_local_closed 𝒞 h (hT.imp fun Fm _ _ ht => gatEF_of_tied Fm ht) (hT.imp fun Fm _ _ ht => stdSubF_of_tied Fm ht)
+    h2 (hT.imp fun Fm _ _ ht => npDescF_of_tied Fm ht)
+
+theorem linkG_concrete5 (𝒞 : FamClass) (hT : Closed 𝒞 fun Fm _ => GroupCompatibilityFamily Fm) (h2 : Closed 𝒞 fun Fm _ => Adm2F Fm) :
+    Closed 𝒞 fun Fm _ => LinkG Fm :=
+  linkG_concrete_noKer 𝒞 loc_proved hT h2
+
+end Formalism.L2.G
+
+
+[GQT_S_01] src/Formalism/SharpRestriction/GlobalTheoremInputs.lean:143-157
+SHA256 20270e27d7994032ae7c5b517d8591e6ce14eb77fd3438d2d309c32c5f71c614
+  S.hsNormSq (S.KD D u u - ContinuousLinearMap.id ℂ (D.s.Cu u))
+
+def LinkS_at {D : D7} (L : SizeData₂ D) (C0 Gam eta0 eta1 e0 : ℝ) : Prop :=
+  (∀ u, C0⁻¹ ≤ (D.duS u : ℝ) * Gam ^ 2 / D.what₂.Dstar ∧ (D.duS u : ℝ) * Gam ^ 2 / D.what₂.Dstar ≤ C0) →
+  (∀ u u', u ≠ u' → L.hsSq u u' ≤ (1 + eta0) * (D.duS u : ℝ) * (D.duS u' : ℝ) / D.what₂.Dstar) ∧
+  (∀ u, hsDiagFull D u ≤ e0 * (D.duS u : ℝ)) ∧ (D.what₂.Dall : ℝ) ≤ (1 + eta1) * D.what₂.Dstar
+
+def GamOf {D : D7} (L : SizeData₂ D) : ℝ := Real.exp (L.CGam * (D.R.m : ℝ) ^ 5 * D.R.f * L.sc.L)
+
+def LinkS {eps : ℝ} (Fm : FamP eps) (C0 : ℝ) : Prop :=
+  ∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ eta0 eta1 e0 : ℝ, 0 ≤ e0 ∧
+    eta0 ≤ Real.exp (-(x ^ (eps / 8))) ∧ eta1 ≤ Real.exp (-(x ^ (eps / 8))) ∧
+    Real.sqrt e0 ≤ Real.exp (-(x ^ (eps / 8))) ∧
+    LinkS_at (Fm.L x i) C0 (GamOf (Fm.L x i)) eta0 eta1 e0
+
+
+
+[GQT_S_02] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkAlt.lean:16-50
+SHA256 025145f49dba6d9c8b22588087a489171b0eb594c8d7781ab9a3d851f5a6130c
+theorem GlobalTheory.Top.link_alt : ∀ (𝒜 : FamClass)
+    (sel : Formalism.L2.TSel 𝒜)
+    (selS : SelS 𝒜 sel)
+    (hWu : Formalism.L2.SG.Pf.WuDecayOfGap)
+    (hRF : Formalism.L2.SG.RowsDef.RowsFinDim)
+    (hTF : Closed (D3 3 𝒜) fun Fm _ => Formalism.MainNotions.PX.TFrame Fm (Fm.CYL + 1) (1 / 4) 3 (1 / 2) Fm.CTu 3)
+    (c30 : List ℝ → Formalism.MainNotions.S.CountingConstants)
+    (hc30 : ∀ {eps : ℝ} (Fm : FamP eps), 0 ≤ (c30 Fm.cOut).C ∧ 2 * (Fm.CYL + 1) ≤ (c30 Fm.cOut).A)
+    (sTy : Formalism.L2.SG.RowsPos.TypeP)
+    (sNG : Formalism.L2.SG.RowsPos.RowNGP)
+    (sM : Formalism.L2.SG.RowsPos.RowMainEqP)
+    (sLp : Formalism.L2.SG.ThmSOwn.LoopRowS 3 (D3 3 𝒜) (fun Fm hc => ⟨(sel Fm (d3_a hc)).1, fun x hx h i => (selS Fm (d3_a hc) x hx h i).toSTies⟩))
+    (sO : Closed (D3 3 𝒜) fun Fm _ => ∀ hc : D3 3 𝒜 Fm, Formalism.L2.SG.ThmSOwn.TheoremSSelected Fm 3
+      ⟨(sel Fm (d3_a hc)).1, fun x hx h i => (selS Fm (d3_a hc) x hx h i).toSTies⟩)
+    (h30 : Closed (D3 3 𝒜) fun Fm _ => Formalism.MainNotions.S.CountE.CountAllPointsClass Formalism.L2.SG.ThmSOwn.PLevT' Fm (c30 Fm.cOut).n0 (c30 Fm.cOut).A
+      (c30 Fm.cOut).C (c30 Fm.cOut).c (c30 Fm.cOut).cb)
+    (hInstR : ∀ {eps : ℝ} (Fm : FamP eps) (hc : 𝒜 Fm) (x : ℝ) (hx : Fm.x1 < x) (h : (sel Fm hc).1 ≤ x) (i : Fm.Ix x),
+      Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.VolSigIndep (Fm.D x i) ∧ Formalism.L2.GlobalTheoryTheory.GenusMassVolumes.ClassItemsAt (Fm.D x i) ((Fm.D x i).sp.Y 0).rank), Closed (D3 3 𝒜) fun Fm _ => TuSize Fm → LinkS Fm 3 := by
+  intro 𝒜 sel selS hWu hRF hTF c30 hc30 sTy sNG sM sLp sO h30 hInstR
+  have hC0 : (3 : ℝ) ≤ 3 := le_refl _
+  have hC0' : (0 : ℝ) < 3 := by norm_num
+  have hCe : Real.exp 1 ≤ 3 := le_trans (le_of_lt (lt_trans Real.exp_one_lt_d9 (by norm_num))) hC0
+  have sRes : Closed (D3 3 𝒜) fun Fm _ => Formalism.MainNotions.S.ResidEv Fm := Formalism.L2.SG.ResidEvFree.residEv_closed_free (D3 3 𝒜)
+  let ssel : Formalism.L2.SG.ThmSOwn.SSel (D3 3 𝒜) :=
+    fun Fm hc => ⟨(sel Fm (d3_a hc)).1, fun x hx h i => (selS Fm (d3_a hc) x hx h i).toSTies⟩
+  have lS := Formalism.L2.SG.ThmSOwn.theoremS_transport_link_zero (C0 := 3) (D3 3 𝒜) ssel hWu hRF
+    (fun Fm hc x hx h i => (selS Fm (d3_a hc) x hx h i).locTied)
+    (fun Fm hc x hx h i => Formalism.L2.SG.ThmSOwn.instTie_of_record (selS Fm (d3_a hc) x hx h i).inst
+      (Formalism.MainNotions.RT.volTie_of_realTied _ ((sel Fm (d3_a hc)).2 x hx h i).T.theta.real) (hInstR Fm (d3_a hc) x hx h i).1
+      (hInstR Fm (d3_a hc) x hx h i).2 (Fm.ties x i).cdScale_tie)
+    (fun Fm hc x hx h i => Formalism.L2.SG.ThmSOwn.one_le_qqI_of_inst (selS Fm (d3_a hc) x hx h i).inst)
+    hTF c30 (by linarith) hc30 sRes sTy sNG sM sLp sO h30
+  exact lS
+
+end
+
+
+[GQT_S_03] src/Formalism/SharpRestriction/GlobalSchurBounds/QuadraticLogDerivCongr.lean:188-197
+SHA256 f9cb55c3ff1541beb5ff70077103181d5d94796a0fcbe7cb6c3881848efdf0f4
+def Frame_at (D : D7) (etaB eB : ℝ) : Prop :=
+  ∃ η e : ℝ, 0 ≤ η ∧ η ≤ etaB ∧ 0 ≤ e ∧ e ≤ eB ∧
+    ∀ HH : ℝ, sFrame D.div.Nu D.div.h - D.div.RR.muMinDual ≤ HH → 0 < HH →
+      sFrame D.div.Nu D.div.h - Real.log (Fintype.card D.what₂.Word : ℝ) -
+        (1 - D.what₂.delp)⁻¹ * (4 * uFrame D.div.Nu D.div.h * Real.log (1 + HH / uFrame D.div.Nu D.div.h) +
+          (η + 4 * Real.sqrt e) * HH) ≤ D.div.RR.muDual
+
+structure Reads (e : Formalism.HC.Frame) (m : ℕ) (TT : Finset e.A) (a : e.A → ℝ) (w : Fin m → E0 × e.A → ℝ) : Prop where
+  he : D.R.toFrame = e
+  hm : D.R.m = m
+
+
+[GQT_S_04] src/Formalism/SharpRestriction/GlobalSchurBounds/QuadraticLogDerivCongr.lean:258-261
+SHA256 54ef506775014ea45289657639fa157dd8e4783ae98884487e4e82c91bddfb30
+def FrameF (CH : ℝ) : Prop :=
+  ∃ x0 : ℝ, ∀ x ≥ x0, ∃ etaB eB : ℝ, 0 ≤ etaB ∧ 0 ≤ eB ∧ eB ≤ 1 / 4 ∧
+    (etaB + 4 * Real.sqrt eB) * x ^ CH ≤ 6 ∧ ∀ i : Fm.Ix x, Frame_at (Fm.D x i) etaB eB
+
+
+
+[GQT_S_05] src/Formalism/SharpRestriction/GlobalSchurBounds/LossesSmallShares.lean:464-467
+SHA256 97244c1764aebfa3e1cb2c1372ce6da664a3e82d00fafbcf637f989a07ff58dc
+def LinkGLOBAL7 (Fm : FamP eps) (Cabs CH C0 eD eL : ℝ) : Prop :=
+  WeightVectorSmallSharesSeven Fm C0 CH → GlobalTheoremInputs Fm Cabs CH C0 →
+    ∃ K cHH eK CL x0 : ℝ, ∀ x ≥ x0, x ∈ Fm.Win → ChainTied Fm eD eL K cHH eK CL x
+
+

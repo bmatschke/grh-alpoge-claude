@@ -1,0 +1,304 @@
+RESIDUE-FAMILY SUMMATION AND ITS ACTUAL NUMERICAL HYPOTHESES
+Working version 0.7, 21 November 2026. Claims RS1–RS8.
+Pinned source: CocoSgt/riemann-hypothesis-lean,
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+STATUS AND SCOPE
+This proves the source's RestPad 1088 and RestSum 1088 1 under literal
+Dat.Hyp and CLa,Ck>=1088. In particular all components of SumFacts are
+proved; none is retained as a black-box numerical input. RestSum is a
+universal theorem about nonnegative segment functions G satisfying the
+explicit SegOK summation conditions. Constructing those functions is the
+separate GP argument. Turning their dimensions into independent residue
+polynomials is the separate LA argument. Thus this report does not by
+itself prove RestCount, RestRank, RH or Dirichlet GRH.
+
+The source uses natural subtraction and natural division. We mark a
+positive part by (x)_+=max(0,x), and floors of nonnegative numbers have
+their ordinary meaning. The human proofs below show exactly when natural
+subtraction can be replaced by ordinary subtraction.
+
+RS1. DATA, PERIODIC GEOMETRY AND THE TWO-OCCURRENCE BOUND
+
+Write k=r+K, N=|TT|, and f_{j,i}=fr(j,i), 0<=i<r. Put
+z_j=f_{j,r-1}, s_j=f_{j-1,0}, D_j=z_j-s_j. The frames obey
+f_{j+J,i}=f_{j,i}+n', increase strictly within each frame, and satisfy
+z_j<f_{j+1,0}. Their entries are even selected letters. There are no
+other selected letters between successive entries of a frame.
+
+The segment letters are TT lifted to [s_j,z_j]. Its old frame W_j is
+the frame j-1. Its late letters are the selected lifts in (z_{j-1},z_j];
+these split disjointly into LL_j, the selected lifts in
+(z_{j-1},f_{j,0}), and the current frame f_{j,i}.
+The late intervals for j=0,...,J-1 tile an interval of length n', so
+reduction modulo n' identifies their union bijectively with TT. Hence
+products over TT equal products over all those late letters, J<=N,
+and every selected residue has a unique late occurrence in one period.
+
+A full segment lies in (z_{j-2},z_j], the union of two consecutive
+late intervals. Each of the two families of such intervals tiles a
+period. Consequently a fixed residue occurs at most twice in the full
+segment-letter sets, counting occurrences, over j=0,...,J-1. This proof
+does not assume that every entire segment is shorter than a period.
+
+The literal Hyp further supplies p>=13 prime, even n', r>=2,
+a<=deg_t<=2a on TT, |letters_j|<=Ns, Ns<=N1, Ns<=2N,
+Ns+r<=K, p^dist(j,x)<=Q, Y>=1, E'_t<=E0, and
+  Ck Ns^2 log a <= k,
+  128 k^2 Ns Y^2 <= p^(L1-1),
+  32 p Y k^2 Ns Q^2 (E0+mStar+1) <= a.
+Frame validity also contains the gap and cardinal conditions stated in
+SegRing.lean; they are preserved in the theorem, even where this
+summation proof uses only the preceding geometric subset.
+Nonemptiness of a frame gives Ns>=1. Thus k>=2r+Ns>=5, r<=k, Q>=1,
+and a>=32. These elementary consequences will be used below.
+
+RS2. COST OF THE DETERMINANT MULTIPLIER AND THE REMAINING DEGREE
+
+For a late letter x, let y_0 be the oldest of its last r even
+predecessors and y_i the other rows of its determinant. The multiplier
+exponent is
+  sg(j,x)=floor(deg(pos y_0)/(p^dist(j,y_0) k^2 Y)).
+As y_i>=y_0, dist(j,y_i)<=dist(j,y_0). Therefore
+  sg(j,x) p^dist(j,y_i) <= 2a/(k^2Y).
+Its contribution to the physical degree of residue t is zero unless
+pos(y_i)=t. The rows y_i are distinct segment letters. For a fixed
+segment, each determinant's contributions to t are thus bounded by
+2a/(k^2Y) times the number of occurrences of t in that segment.
+There are at most Ns late letters per segment. RS1's two-occurrence
+bound gives
+  Et_t <= 4 Ns a/(k^2Y).                                      (RS2.1)
+Off TT every term is zero.
+
+Since a>=32, log a>=1. For Ck>=32, the first size inequality gives
+k>=32 Ns^2 log a>=32 Ns; k>=5 and Y>=1 imply
+k^2Y>=160 Ns. Hence Et_t<=a/40. The last size inequality implies
+E0<=a/32. On TT, the ordinary integers
+  d_t=deg_t-E'_t,       a'_t=d_t-Et_t
+are nonnegative and agree with the source's natural subtractions.
+Indeed E'_t+Et_t< a/10<=deg_t/10, so
+  a'_t >= (9/10)deg_t >= (9/10)a,       Et_t<=d_t.             (RS2.2)
+Off TT both d_t and Et_t vanish. This proves the complete
+TopCountLowerBounds interface, including its all-residue clause.
+
+We also need the sharper Y-dependent total loss. Put
+U=8Yk^2Ns. From the last size inequality and Q>=1,
+  E0 kY <= a.
+From (RS2.1) and Ns<=k,
+  Et_t kY <= 4a.
+Consequently
+  deg_t-a'_t=E'_t+Et_t <= 5a/(kY) <= 5deg_t/(kY).            (RS2.3)
+
+RS3. COARSE SCALES AND ALL REQUIRED NUMERICAL MARGINS
+
+Define T_j=a/(U p^D_j), R_j=log_p(floor(T_j)),
+P_j(x)=p^(dist(j,x)+R_j), and
+Q_j=p^((z_{j+1}-z_j+R_{j+1}-R_j)_+).
+Here log_p is the natural integer logarithm used in the source.
+The twist bound p^D_j<=Q and the last size inequality give
+  T_j >= 4p(E0+mStar+1)>=1.
+Thus the defining floor and integer logarithm give
+  p^R_j <= T_j < p^(R_j+1),
+  p^R_j > 4(E0+mStar+1) > mStar.                            (RS3.1)
+For every letter y in segment j, dist(j,y)<=D_j, so
+  U P_j(y) <= a,
+  a'_(pos y)/P_j(y) >= (36/5)Yk^2Ns.                       (RS3.2)
+In particular kP_j(y)<=a'_(pos y), and a>=32Y.
+
+The scale exponents have a compact exact description. Put
+H=log_p(floor(a/U)). Since D_j is a nonnegative integer,
+floor((a/U)/p^D_j)=floor(floor(a/U)/p^D_j). If H>=D_j, the
+largest power of p below that quotient has exponent H-D_j;
+if H<D_j, the quotient is zero and its natural logarithm is zero.
+Therefore R_j=(H-D_j)_+, and
+  A_j:=z_j+R_j=max(z_j,H+s_j).
+Both z_j and s_j increase strictly, so A_{j+1}>A_j. For x<=z_j,
+  P_j(x)=p^(A_j-x),       Q_j=p^(A_{j+1}-A_j),
+  P_j(x)Q_j=P_{j+1}(x).                                  (RS3.3)
+Periodicity gives A_{j+J}=A_j+n', hence
+  product_{j=0}^{J-1} Q_j=p^n'=q.                         (RS3.4)
+The same geometry gives periodicity of R_j,Q_j and of the old-frame
+degrees below. Equal-residue late occurrences differ by simultaneous
+shifts j->j+mJ, x->x+mn', so their P_j(x) agree.
+This proves the source's uniqP, prodQ and perW clauses, including
+removal of the positive-part ambiguity in the exponent of Q_j.
+
+For x=f_{j,i}, apply (RS3.2) in segment j+1 and (RS3.3):
+  a'_(pos x)/(P_j(x)Q_j) >= (36/5)Yk^2Ns >= k+r+1.          (RS3.5)
+This is the exact margin used by LA to recover all multidegrees.
+
+RS4. ALL DEGREE FAMILIES ARE ADMISSIBLE (RESTPAD)
+
+An admissible label at a selected residue t is a vector
+lambda_t=(lambda_{t,1},...,lambda_{t,k}) with
+0<=lambda_{t,c}<P, L_t=sum_c lambda_{t,c}<=a'_t, and
+L_t congruent a'_t modulo P. RS3 makes P independent of the chosen
+late representative of t. Put n_j(x)=(a'_(pos x)-L_(pos x))/P_j(x),
+an exact nonnegative integer. Then
+  a'_t/P_j(x)-k < n_j(x) <= a'_t/P_j(x).                   (RS4.1)
+These are exactly the source's AdmLL inequalities for x in LL_j.
+
+For each current-frame position choose 0<=e_{j,i}<rQ_j with
+e_{j,i} congruent n_j(f_{j,i}) modulo Q_j. The actual degree family is
+  b_j(x)=n_j(x)                      for x in LL_j;
+  b_j(f_{j,i})=e_{j,i};
+  b_{j+1}(f_{j,i})=(n_j(f_{j,i})-e_{j,i})_+/Q_j;
+and zero off the segment. Define
+  Bw_j(y)=floor(a'_(pos y)/P_j(y))-(k+r+1).
+
+Here is a shorter floor lemma than the source's arithmetic proof.
+For n,s,e>=0, P,Q>=1, s<kP and e<rQ, set
+  A=floor(n/(PQ)), U0=floor((n-s)_+/P),
+  W0=floor((U0-e)_+/Q).
+Then U0>=AQ-k, whence
+  W0 >= A-r-ceil(k/Q) >= A-r-k.
+For the first inequality, floor((n-s)/P)>=floor(n/P)-k
+and truncating a negative numerator can only increase the result.
+Apply the same observation at scale Q and use
+floor((AQ-k)/Q)=A-ceil(k/Q). This proves in particular the source's
+slightly weaker W0>=A-(k+r+1).
+
+Apply it with n=a'_t, s=L_t, P=P_j(f_{j,i}), Q=Q_j and
+e=e_{j,i}; equation (RS3.3) identifies PQ with P_{j+1}(f_{j,i}).
+Thus b_{j+1}(f_{j,i})>=Bw_{j+1}(f_{j,i}). Together with
+(RS4.1) this is RestPad for every admissible lambda,e and every
+integer segment index (the indices are extended periodically).
+
+For clarity, there is no hidden cancellation of truncated subtraction:
+by (RS3.5) and L_t<kP,
+  n_j(f_{j,i})>Q_j(k+r+1)-k>=rQ_j>e_{j,i}.
+Consequently n-e>=0 and the defining congruence gives the exact
+identity e+Q_j*((n-e)/Q_j)=n. This also supplies LA's degree step.
+
+RS5. DIGIT SUMS AND THEIR EXACT COMBINATORIAL MEANING
+
+Let B_k(n)=binom(n+k-1,k-1). It counts k-tuples of nonnegative
+integers with sum n. The unique decomposition w_c=lambda_c+Pv_c
+gives the exact identity
+  B_k(n)=sum_{0<=lambda_c<P, L<=n, L congruent n mod P}
+             B_k((n-L)/P).                               (RS5.1)
+Thus any larger admissible label set gives the corresponding lower
+bound. When kP<=n, every residue vector satisfying the sum congruence
+automatically has sum<n. There are exactly P^(k-1) such vectors,
+because any k-1 coordinates determine the last modulo P.
+
+For the source's label set at t, all late representatives impose the
+same P by RS3. Its global label set LA is a product over t. Define
+  H_t(lambda_t)=product_{j,x in LL_j, pos x=t}
+                     B_k((a'_t-L_t)/P_j(x)),
+  S_t=sum_{lambda_t admissible} H_t(lambda_t).
+Every factor is >=1. If t has an LL occurrence, (RS5.1) gives
+S_t>=B_k(a'_t). If t is a frame residue represented by f_{j,i},
+the label count and (RS3.2) give S_t>=P_j(f_{j,i})^(k-1).
+If t is not selected, the zero label shows S_t>=1.
+Finite distributivity gives exactly
+  sum_lambda product_{j,x in LL_j} B_k(n_j(x))=product_t S_t. (RS5.2)
+The source uses inequalities to tolerate extraneous allowed labels;
+the unique late representative explains why the basic digit identity
+is itself an equality. No equidistribution or primality is needed here.
+
+RS6. THE TWO BINOMIAL COMPARISONS
+
+The general elementary estimate is as follows. For nonnegative integers
+x,y,M, if 0<=theta<=1, s>=1 and
+s(x+1+l)>=(y+1+l)(1-theta) for 0<=l<M, then
+  s^M binom(x+M,M)>=binom(y+M,M)(1-M theta).               (RS6.1)
+Multiply the M inequalities, divide by M!, and apply
+(1-theta)^M>=1-M theta. This is the source's factorial/product argument.
+
+Take M=k-1. First put x=a'_t, y=deg_t, s=1 and
+theta=5/(kY). RS2.3 gives a'_t>=deg_t(1-theta), so the
+individual inequalities follow; the added positive l+1 only helps.
+Since M theta<=5/Y,
+  B_k(a'_t)>=B_k(deg_t)(1-5/Y).                           (RS6.2)
+This remains valid when the right side is nonpositive.
+
+For the frame comparison, let n=a'_t, P'=P_j(f_{j,i})Q_j,
+m0=k Ns+1, and b=(floor(n/P')-(k+r+1)-m0)_+.
+The floor estimate and k>=5,r<=k,Ns>=1 give
+  P'b >= n-4kNs P',
+because k+r+3+kNs<=4kNs. By RS3.2 in segment j+1,
+n/P'>=(36/5)Yk^2Ns>=4Yk^2Ns. Thus the deficit is at most
+n/(kY). Apply (RS6.1) with x=b,y=n,s=P',theta=1/(kY):
+  (P')^(k-1)B_k(b)>=B_k(a'_t)(1-1/Y).                    (RS6.3)
+These are the full compA and compW clauses of SumFacts.
+
+RS7. SUMMING THE ACTUAL SEGMENT FAMILIES
+
+Let alpha=1-a^(-Ns^2), tau=max(0,1-r/(2Y)), and
+  W_j=product_{i<r} B_k((Bw_j(f_{j-1,i})-m0)_+),
+  T_j^*= [Q_j^(r-1) tau]^r.
+The source's segment lower bound is
+  segBound_j(b)=alpha W_j T_j^* product_{x in LL_j} B_k(b(x)).
+
+Assume functions G_j(b) are nonnegative, depend only on the degrees
+on the late letters, and their sum over every permitted terminal-frame
+residue class is at least segBound_j(b) when b satisfies AdmLL.
+These are exactly the hypotheses of RestSum; no dimension statement
+is being assumed in this paragraph.
+
+For a fixed lambda, the EE choices factor independently over j.
+On late letters b_j agrees with n_j on LL_j and has terminal values
+e_j, so the late-degree dependence of G_j gives
+  sum_e product_j G_j(b_j(lambda,e))
+    =product_j sum_{e_j} G_j(setTau_j(n_j,e_j))
+    >=product_j segBound_j(n_j).                          (RS7.1)
+All factors are nonnegative once the final target is positive, as
+checked in RS8. RS4 provides AdmLL. Sum (RS7.1) over lambda and use
+(RS5.2), obtaining
+  total >= alpha^J product_j W_j T_j^* product_t S_t.      (RS7.2)
+
+The frame periodicity permits replacing product_j W_j by
+product_j W_(j+1). Use RS1's disjoint tiling and RS5's lower bounds
+for S_t. Multiplication by q^(rK), with q=product_j Q_j, assigns
+a factor Q_j^K to each of the r frame entries of segment j.
+At a frame residue t=pos f_{j,i}, the assembled contribution is
+  B_k((Bw_(j+1)(f_{j,i})-m0)_+) * Q_j^(r-1)tau
+      * P_j(f_{j,i})^(k-1) * Q_j^K
+  =tau (P_j(f_{j,i})Q_j)^(k-1)
+      B_k((Bw_(j+1)(f_{j,i})-m0)_+),
+since (r-1)+K=k-1. Equations RS6.2–RS6.3 bound this below by
+  (1-5/Y)(1-1/Y)tau B_k(deg_t).
+At each LL residue the same bound follows from RS6.2, because the
+other two factors lie in [0,1]. Therefore, putting
+eta=(1-5/Y)(1-1/Y)(1-r/(2Y)),
+  q^(rK) total >= alpha^J eta^N product_{t in TT} B_k(deg_t). (RS7.3)
+This explains the q^(-rK) loss: it is the exact exponent needed to
+complete the frame dimension factors, not an unproved heuristic count.
+
+RS8. FINAL LOSS, FULL RESTSUM AND ITS DEPENDENCY BOUNDARY
+
+If 1-Nr^2k/Y<=0, the target is nonpositive and total>=0 proves
+RestSum immediately. Suppose it is positive. Then Y>Nr^2k,
+N>=J>=1,r>=2,k>=5, so every factor of eta lies in [0,1],
+tau=1-r/(2Y), and alpha lies in [0,1]. RS3 gives a>=32Y;
+as Ns>=1, alpha>=1-1/(32Y).
+
+The elementary loss estimate already proved as SD7 now applies with
+all its actual hypotheses discharged:
+  alpha^J eta^N >= 1-Nr^2k/Y.
+For completeness, product(1-x)>=1-sum x gives
+alpha eta>=1-(7+r/2)/Y; alpha^J>=alpha^N as J<=N.
+Bernoulli then gives (alpha eta)^N>=1-N(7+r/2)/Y,
+which is at least 1-Nr^2k/Y. The weaker coefficient 7 absorbs
+the exact loss 6+1/32. Combining with RS7.3 proves
+  total >= q^(-rK)(1-Nr^2k/Y) product_{t in TT}B_k(deg_t).
+
+This is RestSum 1088 1. Together with RS4's RestPad, an actual
+RestSeg construction supplies G_j(b)<=rank_O M_j(b_j), and the
+actual RestLam injection bounds the summed products of those ranks
+by dim_F LamBar. Nonnegative termwise multiplication gives RestCount.
+The congruence CG and nonzero multiplier SD3 then give RestRank;
+SD1 produces the primitive selected summand and SD4 its degree bound.
+This last paragraph records the exact assembly, with RestSeg, RestLam
+and CG established in their companion reports rather than assumed
+silently. A report's own remaining-input status always governs whether
+the complete local rank theorem is available in the merged note.
+
+PROVENANCE AND LIMITS
+The ledger records exact declarations and inclusive line ranges for
+every RS claim, with full-file and range SHA256 hashes checked against
+the pinned git blobs. The leading floor argument, common-cutoff scale
+description and exact digit-partition identity are shorter human
+presentations; downstream constants and source statements are preserved.
+No Lean source was edited and no full Lean build or kernel replay was run.

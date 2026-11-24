@@ -1,0 +1,3539 @@
+[RTC_SRC_CO] Original IsCO, residue preservation and adic continuity
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/ResMapBijective.lean#L9-L75
+class IsCO (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] : Prop
+    extends IsLocalRing R, IsNoetherianRing R where
+  complete : IsAdicComplete (maximalIdeal R) R
+  isLocalHom : IsLocalHom (algebraMap O R)
+  res_surj : ∀ x : R, ∃ a : O, x - algebraMap O R a ∈ maximalIdeal R
+
+attribute [instance] IsCO.complete IsCO.isLocalHom
+
+instance IsCO.self (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+    [IsAdicComplete (maximalIdeal O) O] : IsCO O O where
+  complete := inferInstance
+  isLocalHom := ⟨fun _ h => h⟩
+  res_surj x := ⟨x, by simp⟩
+
+section Res
+
+variable (O R : Type) [CommRing O] [IsLocalRing O] [CommRing R] [Algebra O R] [IsCO O R]
+
+theorem resMap_bijective : Function.Bijective (ResidueField.map (algebraMap O R)) := by
+  refine ⟨(ResidueField.map (algebraMap O R)).injective, fun y => ?_⟩
+  obtain ⟨x, rfl⟩ := residue_surjective y
+  obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) x
+  refine ⟨residue O a, ?_⟩
+  rw [ResidueField.map_residue]
+  exact ((Ideal.Quotient.eq).2 ha).symm
+
+def res : R →ₐ[O] ResidueField O :=
+  { ((RingEquiv.ofBijective _ (resMap_bijective O R)).symm.toRingHom.comp (residue R)) with
+    commutes' := fun a => by
+      show (RingEquiv.ofBijective _ (resMap_bijective O R)).symm (residue R (algebraMap O R a)) = residue O a
+      rw [RingEquiv.symm_apply_eq]
+      exact (ResidueField.map_residue _ _).symm }
+
+theorem res_eq_zero_iff (x : R) : res O R x = 0 ↔ x ∈ maximalIdeal R := by
+  show (RingEquiv.ofBijective _ (resMap_bijective O R)).symm (residue R x) = 0 ↔ _
+  rw [map_eq_zero_iff _ (RingEquiv.injective _), residue_eq_zero_iff]
+
+variable {O R} in
+
+theorem res_map {R' : Type} [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R') (x : R) :
+    res O R' (f x) = res O R x := by
+  obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) x
+  have h1 : res O R x = algebraMap O _ a := by
+    have := (res_eq_zero_iff O R _).2 ha
+    rwa [map_sub, AlgHom.commutes, sub_eq_zero] at this
+  have hm : ∀ y ∈ maximalIdeal R, f y ∈ maximalIdeal R' := fun y hy => by
+    obtain ⟨b, hb⟩ := IsCO.res_surj (O := O) (f y)
+    by_cases hu : IsUnit b
+    · exfalso
+      have h2 : IsUnit (y - algebraMap O R b) := by
+        by_contra hn
+        have h3 : y - algebraMap O R b ∈ maximalIdeal R := hn
+        have h4 : algebraMap O R b ∈ maximalIdeal R := by simpa using Ideal.sub_mem _ hy h3
+        exact h4 (hu.map _)
+      have h5 := h2.map f
+      rw [map_sub, AlgHom.commutes] at h5
+      exact hb h5
+    · have h6 : algebraMap O R' b ∈ maximalIdeal R' := fun h => hu (IsLocalHom.map_nonunit b h)
+      simpa using Ideal.add_mem _ hb h6
+  have h2 := (res_eq_zero_iff O R' _).2 (hm _ ha)
+  rw [map_sub, map_sub, AlgHom.commutes, AlgHom.commutes, sub_eq_zero] at h2
+  rw [h2, h1]
+
+end Res
+
+def AdicCont {Γ R : Type} [TopologicalSpace Γ] [CommRing R] (I : Ideal R) (f : Γ → R) : Prop :=
+  ∀ N : ℕ, IsLocallyConstant fun g => Ideal.Quotient.mk (I ^ N) (f g)
+
+
+[RTC_SRC_WEIGHTS] Formal weight parts, homogeneous kernel, WPres and its actual graded algebra
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/ResMapBijective.lean#L77-L196
+section Weights
+
+variable (O : Type) [CommRing O] {σ X : Type} [AddCommGroup X] (wt : σ → X)
+
+def wtPart (j : X) : Submodule O (MvPowerSeries σ O) where
+  carrier := {f | ∀ n, Finsupp.weight wt n ≠ j → coeff n f = 0}
+  add_mem' ha hb n hn := by rw [map_add, ha n hn, hb n hn, add_zero]
+  zero_mem' n _ := map_zero _
+  smul_mem' c f hf n hn := by rw [map_smul, hf n hn, smul_zero]
+
+open Classical in
+
+def wcomp (j : X) : MvPowerSeries σ O →ₗ[O] MvPowerSeries σ O where
+  toFun f := fun n => if Finsupp.weight wt n = j then coeff n f else 0
+  map_add' f g := funext fun n => by
+    show (if _ then _ else _) = (if _ then _ else _) + (if _ then _ else (0 : O))
+    split_ifs <;> simp
+  map_smul' c f := funext fun n => by
+    show (if _ then _ else _) = c • (if _ then _ else (0 : O))
+    split_ifs <;> simp
+
+open Classical in
+theorem coeff_wcomp (j : X) (f : MvPowerSeries σ O) (n : σ →₀ ℕ) :
+    coeff n (wcomp O wt j f) = if Finsupp.weight wt n = j then coeff n f else 0 := rfl
+
+theorem wcomp_mem (j : X) (f : MvPowerSeries σ O) : wcomp O wt j f ∈ wtPart O wt j :=
+  fun n hn => by rw [coeff_wcomp, if_neg hn]
+
+theorem mul_mem_wtPart {i j : X} {f g : MvPowerSeries σ O} (hf : f ∈ wtPart O wt i) (hg : g ∈ wtPart O wt j) :
+    f * g ∈ wtPart O wt (i + j) := fun n hn => by
+  classical
+  rw [coeff_mul]
+  refine Finset.sum_eq_zero fun p hp => ?_
+  by_cases h1 : Finsupp.weight wt p.1 = i
+  · have h2 : Finsupp.weight wt p.2 ≠ j := fun h2 => hn (by
+      rw [← Finset.HasAntidiagonal.mem_antidiagonal.1 hp, map_add, h1, h2])
+    rw [hg _ h2, mul_zero]
+  · rw [hf _ h1, zero_mul]
+
+theorem one_mem_wtPart : (1 : MvPowerSeries σ O) ∈ wtPart O wt 0 := fun n hn => by
+  classical
+  rw [coeff_one, if_neg]
+  rintro rfl
+  exact hn (map_zero _)
+
+theorem X_mem_wtPart (i : σ) : (MvPowerSeries.X i : MvPowerSeries σ O) ∈ wtPart O wt (wt i) := fun n hn => by
+  classical
+  rw [coeff_X, if_neg]
+  rintro rfl
+  exact hn (by simp [Finsupp.weight_single])
+
+instance : SetLike.GradedMonoid (wtPart O wt) where
+  one_mem := one_mem_wtPart O wt
+  mul_mem _ _ _ _ := mul_mem_wtPart O wt
+
+def IsHomog (J : Ideal (MvPowerSeries σ O)) : Prop := ∀ f ∈ J, ∀ j, wcomp O wt j f ∈ J
+
+end Weights
+
+def gradedSub {O R X : Type} [CommRing O] [CommRing R] [Algebra O R] [AddCommGroup X] (𝒜 : X → Submodule O R)
+    [SetLike.GradedMonoid 𝒜] : Subalgebra O R :=
+  (⨆ j, 𝒜 j).toSubalgebra (le_iSup 𝒜 0 (SetLike.GradedOne.one_mem)) fun x y hx hy => by
+    refine Submodule.iSup_induction 𝒜 (motive := fun x => x * y ∈ ⨆ j, 𝒜 j) hx (fun i a ha => ?_) (by simp)
+      (fun a b ha hb => by rw [add_mul]; exact add_mem ha hb)
+    exact Submodule.iSup_induction 𝒜 (motive := fun y => a * y ∈ ⨆ j, 𝒜 j) hy
+      (fun j b hb => le_iSup 𝒜 (i + j) (SetLike.GradedMul.mul_mem ha hb)) (by simp)
+      (fun b c hb hc => by rw [mul_add]; exact add_mem hb hc)
+
+structure WPres (O X R : Type) [CommRing O] [AddCommGroup X] [CommRing R] [Algebra O R] where
+  σ : Type
+  [fin : Fintype σ]
+  wt : σ → X
+  π : MvPowerSeries σ O →ₐ[O] R
+  surj : Function.Surjective π
+  homog : IsHomog O wt (RingHom.ker π)
+
+attribute [instance] WPres.fin
+
+namespace WPres
+
+variable {O X R : Type} [CommRing O] [AddCommGroup X] [CommRing R] [Algebra O R] (W : WPres O X R)
+
+def free (O : Type) [CommRing O] {σ : Type} [Fintype σ] (wt : σ → X) : WPres O X (MvPowerSeries σ O) where
+  σ := σ
+  wt := wt
+  π := AlgHom.id O _
+  surj := Function.surjective_id
+  homog f hf j := by
+    have : f = 0 := hf
+    subst this
+    simp
+
+def z (i : W.σ) : R := W.π (MvPowerSeries.X i)
+
+def part (j : X) : Submodule O R := (wtPart O W.wt j).map W.π.toLinearMap
+
+instance : SetLike.GradedMonoid W.part where
+  one_mem := ⟨1, one_mem_wtPart O W.wt, map_one W.π⟩
+  mul_mem := by
+    rintro i j _ _ ⟨f, hf, rfl⟩ ⟨g, hg, rfl⟩
+    exact ⟨f * g, mul_mem_wtPart O W.wt hf hg, map_mul W.π f g⟩
+
+theorem z_mem (i : W.σ) : W.z i ∈ W.part (W.wt i) := ⟨_, X_mem_wtPart O W.wt i, rfl⟩
+
+def A : Subalgebra O R := gradedSub W.part
+
+def gr (j : X) : Submodule O W.A := (W.part j).comap W.A.val.toLinearMap
+
+instance : SetLike.GradedMonoid W.gr where
+  one_mem := (SetLike.GradedOne.one_mem : (1 : R) ∈ W.part 0)
+  mul_mem _ _ _ _ ha hb := (SetLike.GradedMul.mul_mem ha hb : _ ∈ W.part _)
+
+theorem part_le_A {j : X} {x : R} (hx : x ∈ W.part j) : x ∈ W.A := le_iSup W.part j hx
+
+def zA (i : W.σ) : W.A := ⟨W.z i, W.part_le_A (W.z_mem i)⟩
+
+def HasOrigin : Prop := ∀ f, W.π f = 0 → constantCoeff f = 0
+
+def origin (h : W.HasOrigin) : R →ₐ[O] O :=
+  (Ideal.Quotient.liftₐ (RingHom.ker W.π)
+
+
+[RTC_SRC_SPACE] Original NRep, IsBar, Space, B/A/gr, maximal ideal and BB core
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/LeAdicClosure.lean#L9-L259
+def w (n : ℕ) (i : Fin n) : ℤ := if n = 3 then 1 - (i : ℕ) else (n : ℤ) - 1 - 2 * (i : ℕ)
+
+variable {l : ℕ} [Fact l.Prime] {k : Type} [Field k] (F : Frame l k) (n : ℕ)
+
+def ordProd {H K : Type} [CommRing K] {n : ℕ} (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H) :
+    Matrix (Fin n) (Fin n) K := (List.ofFn fun i => r (g i) - ψ i (g i) • (1 : Matrix (Fin n) (Fin n) K)).prod
+
+theorem ordProd_map {H K K' : Type} [CommRing K] [CommRing K'] {n : ℕ} (f : K →+* K')
+    (r : H → Matrix (Fin n) (Fin n) K) (ψ : Fin n → H → K) (g : Fin n → H) :
+    ordProd (fun s => f.mapMatrix (r s)) (fun i s => f (ψ i s)) g = f.mapMatrix (ordProd r ψ g) := by
+  simp only [ordProd, map_list_prod, List.map_ofFn]
+  congr 1
+  refine congrArg List.ofFn (funext fun i => ?_)
+  simp only [Function.comp_apply, map_sub]
+  congr 1
+  ext a b
+  by_cases h : a = b <;> simp [h, Matrix.one_apply]
+
+@[ext] structure NRep (K : Type) [CommRing K] where
+  r : F.G0 →* Matrix (Fin n) (Fin n) K
+  ψ : ∀ v, Fin n → F.Gv v →* Kˣ
+  pol : ∀ g, r (F.star g) = Jmat K n * (r g)ᵀ * Jmat K n
+  diag : ∀ i j, i ≠ j → (r F.g0 - r (F.star F.g0)) i j = 0
+  ord : ∀ v g, ordProd (fun s => r (F.loc0 v s)) (fun i s => (ψ v i s : K)) g = 0
+
+namespace NRep
+
+variable {F n} {K K' : Type} [CommRing K] [CommRing K']
+
+def map (f : K →+* K') (ρ : NRep F n K) : NRep F n K' where
+  r := (f.mapMatrix : Matrix (Fin n) (Fin n) K →+* _).toMonoidHom.comp ρ.r
+  ψ v i := (Units.map f.toMonoidHom).comp (ρ.ψ v i)
+  pol g := by
+    show f.mapMatrix (ρ.r (F.star g)) = Jmat K' n * (f.mapMatrix (ρ.r g))ᵀ * Jmat K' n
+    rw [ρ.pol, map_mul, map_mul]
+    simp only [RingHom.mapMatrix_apply, Jmat_map, Matrix.transpose_map]
+  diag i j h := by
+    show f (ρ.r F.g0 i j) - f (ρ.r (F.star F.g0) i j) = 0
+    rw [← map_sub]
+    exact (congrArg f (ρ.diag i j h)).trans (map_zero f)
+  ord v g := (ordProd_map f _ _ g).trans (by rw [ρ.ord, map_zero])
+
+@[simp] theorem map_r (f : K →+* K') (ρ : NRep F n K) (g : F.G0) (i j : Fin n) :
+    (ρ.map f).r g i j = f (ρ.r g i j) := rfl
+
+@[simp] theorem map_ψ (f : K →+* K') (ρ : NRep F n K) (v : F.V) (i : Fin n) (g : F.Gv v) :
+    ((ρ.map f).ψ v i g : K') = f (ρ.ψ v i g) := rfl
+
+theorem map_map {K'' : Type} [CommRing K''] (f : K →+* K') (f' : K' →+* K'') (ρ : NRep F n K) :
+    (ρ.map f).map f' = ρ.map (f'.comp f) := rfl
+
+def restrict {O : Type} [CommRing O] [Algebra O K] (ρ : NRep F n K) (A : Subalgebra O K)
+    (h1 : ∀ g i j, ρ.r g i j ∈ A) (h2 : ∀ v i g, (ρ.ψ v i g : K) ∈ A) : NRep F n A where
+  r :=
+    { toFun := fun g => Matrix.of fun i j => ⟨ρ.r g i j, h1 g i j⟩
+      map_one' := by
+        ext i j
+        by_cases h : i = j <;> simp [h, Matrix.one_apply]
+      map_mul' := fun g h => by
+        ext i j
+        simp [Matrix.mul_apply] }
+  ψ v i :=
+    { toFun := fun g => ⟨⟨ρ.ψ v i g, h2 v i g⟩, ⟨ρ.ψ v i g⁻¹, h2 v i g⁻¹⟩, Subtype.ext (by simp), Subtype.ext (by simp)⟩
+      map_one' := by ext; simp
+      map_mul' := fun g h => by ext; simp }
+  pol g := by
+    refine Matrix.map_injective (f := (A.val : A →+* K)) Subtype.val_injective ?_
+    show _ = (A.val : A →+* K).mapMatrix _
+    rw [map_mul, map_mul]
+    simp only [RingHom.mapMatrix_apply, Jmat_map]
+    exact ρ.pol g
+  diag i j h := Subtype.ext (ρ.diag i j h)
+  ord v g := by
+    refine Matrix.map_injective (f := (A.val : A →+* K)) Subtype.val_injective ?_
+    show (A.val : A →+* K).mapMatrix _ = (A.val : A →+* K).mapMatrix _
+    rw [← ordProd_map, map_zero]
+    exact ρ.ord v g
+
+def Cont (I : Ideal K) (ρ : NRep F n K) : Prop :=
+  (∀ i j, AdicCont I fun g => ρ.r g i j) ∧ ∀ v i, AdicCont I fun g => (ρ.ψ v i g : K)
+
+def IsBar (f : k →+* K) (ρ : NRep F n K) : Prop :=
+  (∀ g i, ρ.r g i i = f ((F.Ψ g ^ w n i : kˣ) : k)) ∧ ∀ v i g, (ρ.ψ v i g : K) = f ((F.Ψ (F.loc v g) ^ w n i : kˣ) : k)
+
+def IsDiag (ρ : NRep F n K) : Prop := ∀ g i j, i ≠ j → ρ.r g i j = 0
+
+def triP (ρ : NRep F n K) : Ideal K := Ideal.span {x | ∃ g i j, j < i ∧ x = ρ.r g i j}
+
+def triM (ρ : NRep F n K) : Ideal K := Ideal.span {x | ∃ g i j, i < j ∧ x = ρ.r g i j}
+
+def ee (ρ : NRep F n K) : Ideal K := Ideal.span {x | ∃ g i j, Odd (w n i - w n j) ∧ x = ρ.r g i j}
+
+def OffTri (ρ : NRep F n K) (p : Ideal K) : Prop := ¬ ρ.triP ≤ p ∧ ¬ ρ.triM ≤ p
+
+def TI (ρ : NRep F n K) (p : Ideal K) : Prop := ρ.OffTri p ∧ (n = 3 → ¬ ρ.ee ≤ p)
+
+def TE (ρ : NRep F n K) (p : Ideal K) : Prop := ρ.OffTri p ∧ n = 3 ∧ ρ.ee ≤ p
+
+def Coin (ρ : NRep F n K) (p : Ideal K) (v : F.V) (i j : Fin n) : Prop :=
+  ∀ g ∈ F.Nv v, (ρ.ψ v i g : K) - ρ.ψ v j g ∈ p
+
+def mon (ρ : NRep F n K) (j : ℤ) : Set K :=
+  {x | ∃ L : List (F.G0 × Fin n × Fin n), (L.map fun s => w n s.2.1 - w n s.2.2).sum = j ∧
+    x = (L.map fun s => ρ.r s.1 s.2.1 s.2.2).prod}
+
+end NRep
+
+def Irr {H K : Type} [Field K] {ι : Type} [Fintype ι] (r : H → Matrix ι ι K) : Prop :=
+  ∀ U : Submodule K (ι → K), (∀ g, ∀ u ∈ U, r g *ᵥ u ∈ U) → U = ⊥ ∨ U = ⊤
+
+def adicClosure {O R : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] (S : Subalgebra O R) :
+    Subalgebra O R where
+  carrier := {x | ∀ N : ℕ, ∃ y ∈ S, x - y ∈ maximalIdeal R ^ N}
+  mul_mem' {a b} ha hb N := by
+    obtain ⟨x, hx, h1⟩ := ha N
+    obtain ⟨y, hy, h2⟩ := hb N
+    refine ⟨x * y, mul_mem hx hy, ?_⟩
+    have : a * b - x * y = (a - x) * b + x * (b - y) := by ring
+    rw [this]
+    exact add_mem (Ideal.mul_mem_right _ _ h1) (Ideal.mul_mem_left _ _ h2)
+  add_mem' {a b} ha hb N := by
+    obtain ⟨x, hx, h1⟩ := ha N
+    obtain ⟨y, hy, h2⟩ := hb N
+    refine ⟨x + y, add_mem hx hy, ?_⟩
+    rw [add_sub_add_comm]
+    exact add_mem h1 h2
+  algebraMap_mem' c N := ⟨_, S.algebraMap_mem c, by simp⟩
+
+theorem le_adicClosure {O R : Type} [CommRing O] [CommRing R] [IsLocalRing R] [Algebra O R] (S : Subalgebra O R) :
+    S ≤ adicClosure S := fun x hx _ => ⟨x, hx, by simp⟩
+
+class IsCoef (l : outParam ℕ) (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] : Prop where
+  complete : IsAdicComplete (maximalIdeal O) O
+  fin : Finite (ResidueField O)
+  char : CharP (ResidueField O) l
+
+attribute [instance] IsCoef.complete IsCoef.fin IsCoef.char
+
+section Space
+
+variable {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] (F : Frame l (ResidueField O)) (n : ℕ)
+
+variable {F n} in
+
+def IsLift {R : Type} [CommRing R] [Algebra O R] [IsCO O R] (ρ : NRep F n R) : Prop :=
+  ρ.Cont (maximalIdeal R) ∧ (ρ.map (res O R : R →+* ResidueField O)).IsBar (RingHom.id _) ∧
+    (ρ.map (res O R : R →+* ResidueField O)).IsDiag
+
+structure Space : Type 1 where
+  R : Type
+  [cr : CommRing R]
+  [al : Algebra O R]
+  [co : IsCO O R]
+  ρ : NRep F n R
+  lift : IsLift O ρ
+  univ : ∀ (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (ρ' : NRep F n C), IsLift O ρ' →
+    ∃! f : R →ₐ[O] C, ρ.map (f : R →+* C) = ρ'
+
+attribute [instance] Space.cr Space.al Space.co
+
+namespace Space
+
+variable {O F n} (S : Space O F n)
+
+def B : Subalgebra O S.R :=
+  adicClosure (Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)}))
+
+def A : Subalgebra O S.R := Algebra.adjoin O ((S.B : Set S.R) ∪ {x | ∃ g i j, x = S.ρ.r g i j})
+
+theorem B_le_A : S.B ≤ S.A := fun _ hx => Algebra.subset_adjoin (Or.inl hx)
+
+theorem ψ_mem (v : F.V) (i : Fin n) (g : F.Gv v) : (S.ρ.ψ v i g : S.R) ∈ S.B :=
+  le_adicClosure _ (Algebra.subset_adjoin (Or.inr ⟨v, i, g, rfl⟩))
+
+theorem mon_mem {x : S.R} (hx : x ∈ S.ρ.mon 0) : x ∈ S.B := le_adicClosure _ (Algebra.subset_adjoin (Or.inl hx))
+
+theorem r_mem (g : F.G0) (i j : Fin n) : S.ρ.r g i j ∈ S.A := Algebra.subset_adjoin (Or.inr ⟨g, i, j, rfl⟩)
+
+def inc : S.B →ₐ[O] S.A := Subalgebra.inclusion S.B_le_A
+
+instance : Algebra S.B S.A := (S.inc : S.B →+* S.A).toAlgebra
+
+instance : IsScalarTower O S.B S.A := IsScalarTower.of_algebraMap_eq fun _ => rfl
+
+def u : NRep F n S.A := S.ρ.restrict S.A S.r_mem fun v i g => S.B_le_A (S.ψ_mem v i g)
+
+def ψB (v : F.V) (i : Fin n) (g : F.Gv v) : S.B := ⟨S.ρ.ψ v i g, S.ψ_mem v i g⟩
+
+def aB (g : F.G0) (i : Fin n) : S.B := ⟨S.ρ.r g i i, S.mon_mem ⟨[(g, i, i)], by simp, by simp⟩⟩
+
+def trB (g : F.G0) : S.B := ∑ i, S.aB g i
+
+def mB : Ideal S.B := (maximalIdeal S.R).comap (S.B.val : S.B →+* S.R)
+
+def π (p : Ideal S.A) : Ideal S.B := p.comap (S.inc : S.B →+* S.A)
+
+def gr (j : ℤ) : Submodule S.B S.A := Submodule.span S.B (S.u.mon j)
+
+def IsHom (I : Ideal S.A) : Prop := I = Ideal.span {x | x ∈ I ∧ ∃ j, x ∈ S.gr j}
+
+def lamId : Ideal S.B :=
+  (maximalIdeal O).map (algebraMap O S.B) ⊔
+    Ideal.span {x | ∃ v i g, g ∈ F.Iv v ∧ F.Ψ (F.loc v g) = 1 ∧ x = S.ψB v i g - 1}
+
+def FinLam (I : Ideal S.B) : Prop := S.mB ≤ (I ⊔ S.lamId).radical
+
+def BB : Set (PrimeSpectrum S.A) := {p | S.mB ≤ S.π p.asIdeal ∧ ¬ S.u.triP ≤ p.asIdeal}
+
+structure Loc (x : Ideal S.A) : Type 1 where
+  O' : Type
+  [cO : CommRing O']
+  [dO : IsDomain O']
+  [vO : IsDiscreteValuationRing O']
+  [coef : IsCoef l O']
+  [aO : Algebra O O']
+  [fO : Module.Finite O O']
+  unr : (maximalIdeal O).map (algebraMap O O') = maximalIdeal O'
+  R : Type
+  [cr : CommRing R]
+  [al' : Algebra O' R]
+  [co : IsCO O' R]
+  [al : Algebra O R]
+  [tw : IsScalarTower O O' R]
+  ι : S.A →ₐ[O] R
+  lies : (maximalIdeal R).comap (ι : S.A →+* R) = x
+  univ : ∀ (C : Type) [CommRing C] [Algebra O' C] [IsCO O' C] [Algebra O C] [IsScalarTower O O' C]
+    (f : S.A →ₐ[O] C), (∀ a, res O' C (f a) = res O' R (ι a)) → ∃! g : R →ₐ[O'] C, ∀ a, g (ι a) = f a
+
+attribute [instance] Loc.cO Loc.dO Loc.vO Loc.coef Loc.aO Loc.fO Loc.cr Loc.al' Loc.co Loc.al Loc.tw
+
+namespace Loc
+
+variable {S} {x : Ideal S.A} (L : S.Loc x)
+
+def ρ : NRep F n L.R := S.u.map (L.ι : S.A →+* L.R)
+
+def im (P : Ideal L.R) : Ideal S.A := P.comap (L.ι : S.A →+* L.R)
+
+def π (P : Ideal L.R) : Ideal S.B := S.π (L.im P)
+
+end Loc
+
+end Space
+
+end Space
+
+structure IsThickMod {F : Frame l k} {Q : Type} [CommRing Q] (ρ : NRep F 3 Q) (r : F.G0 →* Matrix (Fin 3) (Fin 3) Q) :
+    Prop where
+  even : ∀ g i j, ¬ Odd (w 3 i - w 3 j) → r g i j = ρ.r g i j
+  sub : ∀ g, r g 1 0 = 0 ∧ r g 1 2 = 0
+  ord : ∀ v g, ordProd (fun s => r (F.loc0 v s)) (fun i s => (ρ.ψ v i s : Q)) g = 0
+
+
+[RTC_SRC_FRAME] Original frame and all Ok fields; no Big is added to core connectedness
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/ContinuousCoboundaries2.lean#L124-L214
+  [tgv : ∀ v, IsTopologicalGroup (Gv v)]
+  [cv : ∀ v, CompactSpace (Gv v)]
+  [t2v : ∀ v, T2Space (Gv v)]
+  [tdv : ∀ v, TotallyDisconnectedSpace (Gv v)]
+  loc0 : ∀ v, Gv v →* del.ker
+  Iv : ∀ v, Subgroup (Gv v)
+  dv : V → ℕ
+  Inf : Type
+  [fI : Fintype Inf]
+  cw : Inf → Γ
+  eps : Γ →* ℤ_[l]ˣ
+  Ψ : Γ →* kˣ
+  g0 : del.ker
+
+attribute [instance] Frame.grp Frame.top Frame.tg Frame.cpt Frame.t2 Frame.td Frame.fV Frame.gv Frame.tv Frame.tgv
+  Frame.cv Frame.t2v Frame.tdv Frame.fI
+
+namespace Frame
+
+variable {l : ℕ} [Fact l.Prime] {k : Type} [Field k] (F : Frame l k)
+
+abbrev G0 : Type := F.del.ker
+
+def loc (v : F.V) : F.Gv v →* F.Γ := F.del.ker.subtype.comp (F.loc0 v)
+
+def conj : F.G0 →* F.G0 := (MulAut.conjNormal F.c : MulAut F.G0).toMonoidHom
+
+def star (g : F.G0) : F.G0 := F.conj g⁻¹
+
+def loc2 (p : F.V × Bool) : F.Gv p.1 →* F.G0 := if p.2 then F.conj.comp (F.loc0 p.1) else F.loc0 p.1
+
+def d : ℕ := ∑ v, F.dv v
+
+def om (K : Type) [CommRing K] [CharP K l] : F.Γ →* Kˣ :=
+  (Units.map ((ZMod.castHom (dvd_refl l) K).comp PadicInt.toZMod).toMonoidHom).comp F.eps
+
+def delK (K : Type) [CommRing K] : F.Γ →* Kˣ := (Units.map (Int.castRingHom K).toMonoidHom).comp F.del
+
+def Nv (v : F.V) : Subgroup (F.Gv v) := F.Iv v ⊓ (F.eps.comp (F.loc v)).ker
+
+def ext {k' : Type} [Field k'] (f : k →+* k') : Frame l k' :=
+  { F with Ψ := (Units.map f.toMonoidHom).comp F.Ψ }
+
+def EC : Prop :=
+  ∀ (K W : Type) [Field K] [Finite K] [CharP K l] [AddCommGroup W] [Module K W] [Module.Finite K W]
+    (ρ : Representation K F.Γ W) (b : F.V → Submodule K W), IsOpen (ρ.ker : Set F.Γ) →
+    (∀ v s, ∀ X ∈ b v, ρ (F.loc v s) X ∈ b v) →
+    (∀ f : W →ₗ[K] K, (∀ g X, f (ρ g X) = F.om K g * f X) → f = 0) →
+    Module.Finite K (coneH2 F.loc ρ b) ∧
+    Module.finrank K (coneH2 F.loc ρ b) + Module.finrank K (coneH0 ρ b) + ∑ v, F.dv v * Module.finrank K (b v) ≤
+      Module.finrank K (H1C F.loc ρ b) + ∑ w, Module.finrank K (LinearMap.ker (ρ (F.cw w) - 1))
+
+structure Ok [CharP k l] (C₀ : ℕ) : Prop where
+  l_odd : l ≠ 2
+  fin : Finite k
+  del_open : IsOpen (F.del.ker : Set F.Γ)
+  c_sq : F.c * F.c = 1
+  del_c : F.del F.c = -1
+  loc_cont : ∀ v, Continuous (F.loc0 v)
+  eps_cont : Continuous F.eps
+  Ψ_open : IsOpen (F.Ψ.ker : Set F.Γ)
+  Ψ_c : F.Ψ F.c = 1
+  baseSubgroup_spec : F.Ψ F.g0 ^ 2 ≠ 1
+  phi : PhiCond F.Γ l
+  card_inf : Fintype.card F.Inf = F.d
+  cw_sq : ∀ w, F.cw w * F.cw w = 1
+  del_cw : ∀ w, F.del (F.cw w) = -1
+  f2a : ∃ g : F.G0, F.om k g ≠ 1
+  f2b : ∀ j : ℤ, j = 1 ∨ j = -1 → ∃ g : F.G0, F.om k g * F.Ψ g ^ j ≠ 1
+  f2c : ∀ j : ℤ, j = 2 ∨ j = -2 → ∃ g, F.om k g * F.Ψ g ^ j * F.delK k g ≠ 1
+  f3 : ∀ v, ∃ g, F.Ψ (F.loc v g) ^ 2 ≠ 1
+  f4 : Nontrivial (H1C F.loc (chRep (F.Ψ⁻¹ * F.delK k)) fun _ => ⊥)
+  f4' : Nontrivial (H1C F.loc (chRep (F.Ψ⁻¹ ^ 2 * F.delK k)) fun _ => ⊥)
+  f5 : ¬ ∃ j : ℤ, ∀ g : F.G0, F.om k g = F.Ψ g ^ j
+  Ψ_N : ∀ v, ∀ g ∈ F.Nv v, F.Ψ (F.loc v g) = 1
+
+  gen : ∀ v, ∃ (u : Fin (F.dv v) → F.Gv v) (a₀ : Fin (F.dv v)), (∀ a, u a ∈ F.Iv v ∧ F.Ψ (F.loc v (u a)) = 1) ∧
+    (∀ a, a ≠ a₀ → u a ∈ F.Nv v) ∧
+    ∀ (A : Type) [CommGroup A] [Finite A], IsPGroup l A → ∀ χ : F.Gv v →* A, IsOpen (χ.ker : Set (F.Gv v)) →
+      (∀ a, χ (u a) = 1) → ∀ g ∈ F.Iv v, χ g = 1
+
+  cl : ∃ h : ℕ, h ≠ 0 ∧ ∀ (A : Type) [CommGroup A] [Finite A], IsPGroup l A → ∀ χ : F.G0 →* A,
+    IsOpen (χ.ker : Set F.G0) → (∀ p : F.V × Bool, ∀ g ∈ F.Iv p.1, χ (F.loc2 p g) = 1) → ∀ g, χ g ^ h = 1
+  ec : F.EC
+  b1p : Module.rank k (H1C F.loc (chRep (F.Ψ⁻¹ ^ 2 * F.delK k)) fun _ => ⊥) ≤ C₀
+  b1 : Module.rank k (H1C F.loc2 (chRep (F.Ψ⁻¹.comp F.del.ker.subtype)) fun _ => ⊥) ≤ C₀
+  h1 : Module.rank k (H1C F.loc (chRep (1 : F.Γ →* kˣ)) fun _ => ⊤) ≤ 1 + C₀
+
+def Big (C₀ : ℕ) : Prop := 3 * C₀ + 5 + 2 < F.d ∧ ∀ v, 5 < F.dv v
+
+end Frame
+
+
+[RTC_SRC_CONE] Literal strict Z1C, continuous boundaries and H1C quotient
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/ContinuousCoboundaries2.lean#L11-L63
+
+variable {k G W V : Type} [CommRing k] [Group G] [TopologicalSpace G] [AddCommGroup W] [Module k W]
+  {Gv : V → Type} [∀ v, Group (Gv v)] [∀ v, TopologicalSpace (Gv v)]
+  (loc : ∀ v, Gv v →* G) (ρ : Representation k G W) (b : V → Submodule k W)
+
+def coneH0 : Submodule k W where
+  carrier := {X | (∀ g, ρ g X = X) ∧ ∀ v, X ∈ b v}
+  add_mem' := by
+    rintro x y ⟨a1, a2⟩ ⟨b1, b2⟩
+    exact ⟨fun g => by rw [map_add, a1, b1], fun v => add_mem (a2 v) (b2 v)⟩
+  zero_mem' := ⟨fun g => map_zero _, fun v => zero_mem _⟩
+  smul_mem' := by
+    rintro c x ⟨a1, a2⟩
+    exact ⟨fun g => by rw [map_smul, a1], fun v => Submodule.smul_mem _ c (a2 v)⟩
+
+def Z1C : Submodule k ((G → W) × (V → W)) where
+  carrier := {x | IsLocallyConstant x.1 ∧ (∀ s t, x.1 (s * t) = x.1 s + ρ s (x.1 t)) ∧
+    ∀ v s, x.1 (loc v s) - (ρ (loc v s) (x.2 v) - x.2 v) ∈ b v}
+  add_mem' := by
+    rintro x y ⟨a1, a2, a3⟩ ⟨b1, b2, b3⟩
+    refine ⟨a1.add b1, fun s t => ?_, fun v s => ?_⟩
+    · simp only [Prod.fst_add, Pi.add_apply, a2, b2, map_add]; abel
+    · convert add_mem (a3 v s) (b3 v s) using 1
+      simp only [Prod.fst_add, Prod.snd_add, Pi.add_apply, map_add]; abel
+  zero_mem' := ⟨IsLocallyConstant.const 0, by simp, by simp⟩
+  smul_mem' := by
+    rintro c x ⟨a1, a2, a3⟩
+    refine ⟨a1.comp (c • ·), fun s t => by simp [a2], fun v s => ?_⟩
+    convert Submodule.smul_mem _ c (a3 v s) using 1
+    simp [smul_sub]
+
+def continuousCoboundaries1 : Submodule k ((G → W) × (V → W)) where
+  carrier := {x | ∃ X : W, (∀ s, x.1 s = ρ s X - X) ∧ ∀ v, x.2 v - X ∈ b v}
+  add_mem' := by
+    rintro x y ⟨X, a1, a2⟩ ⟨Y, b1, b2⟩
+    refine ⟨X + Y, fun s => ?_, fun v => ?_⟩
+    · simp only [Prod.fst_add, Pi.add_apply, a1, b1, map_add]; abel
+    · convert add_mem (a2 v) (b2 v) using 1
+      simp only [Prod.snd_add, Pi.add_apply]; abel
+  zero_mem' := ⟨0, by simp, by simp⟩
+  smul_mem' := by
+    rintro c x ⟨X, a1, a2⟩
+    refine ⟨c • X, fun s => by simp [a1, smul_sub], fun v => ?_⟩
+    convert Submodule.smul_mem _ c (a2 v) using 1
+    simp [smul_sub]
+
+abbrev H1C : Type := Z1C loc ρ b ⧸ (continuousCoboundaries1 ρ b).comap (Z1C loc ρ b).subtype
+
+def continuousCocycles2 : Submodule k ((G × G → W) × (∀ v, Gv v → W)) where
+  carrier := {x | IsLocallyConstant x.1 ∧ (∀ v, IsLocallyConstant (x.2 v)) ∧
+    (∀ s t u, ρ s (x.1 (t, u)) + x.1 (s, t * u) = x.1 (s * t, u) + x.1 (s, t)) ∧
+    ∀ v s t, x.1 (loc v s, loc v t) - dOne (ρ.comp (loc v)) (x.2 v) (s, t) ∈ b v}
+  add_mem' := by
+
+
+[RTC_SRC_STRICT] Original strS and linear transport
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/StrYMap.lean#L33-L71
+
+def strS : Submodule k (F.G0 → M) where
+  carrier := {a | IsLocallyConstant a ∧
+    (∀ g h : F.G0, a (g * h) = (F.Ψ h : k) • a g + (((F.Ψ g)⁻¹ : kˣ) : k) • a h) ∧ (∀ g, a (F.star g) = a g) ∧
+    ∀ v, ∃ γ : M, ∀ s, a (F.loc0 v s) = ((F.Ψ (F.loc v s) : k) - (((F.Ψ (F.loc v s))⁻¹ : kˣ) : k)) • γ}
+  add_mem' := by
+    rintro x y ⟨a1, a2, a3, a4⟩ ⟨b1, b2, b3, b4⟩
+    refine ⟨a1.add b1, fun g h => ?_, fun g => by simp [a3, b3], fun v => ?_⟩
+    · simp only [Pi.add_apply, a2, b2, smul_add]; abel
+    · obtain ⟨α, h⟩ := a4 v
+      obtain ⟨α', h'⟩ := b4 v
+      exact ⟨α + α', fun s => by rw [Pi.add_apply, h, h', smul_add]⟩
+  zero_mem' := ⟨IsLocallyConstant.const 0, by simp, fun _ => rfl, fun _ => ⟨0, by simp⟩⟩
+  smul_mem' := by
+    rintro c x ⟨a1, a2, a3, a4⟩
+    refine ⟨a1.comp (c • ·), fun g h => ?_, fun g => by simp [a3], fun v => ?_⟩
+    · simp only [Pi.smul_apply, a2, smul_add, smul_comm c]
+    · obtain ⟨α, h⟩ := a4 v
+      exact ⟨c • α, fun s => by rw [Pi.smul_apply, h, smul_comm]⟩
+
+variable {F M} {M' : Type} [AddCommGroup M'] [Module k M']
+
+theorem strY_map (f : M →ₗ[k] M') {y : F.G0 → M} (hy : y ∈ F.strY M) : (fun g => f (y g)) ∈ F.strY M' := by
+  obtain ⟨h1, h2, h3, h4, h5⟩ := hy
+  refine ⟨h1.comp f, fun g h => ?_, congrArg f h3, fun v => ?_, fun v => ?_⟩
+  · simp only [h2, map_add, map_smul]
+  · obtain ⟨α, hα⟩ := h4 v
+    exact ⟨f α, fun s => by simp only [hα, map_smul]⟩
+  · obtain ⟨β, hβ⟩ := h5 v
+    exact ⟨f β, fun s => by simp only [hβ, map_smul]⟩
+
+theorem strS_map (f : M →ₗ[k] M') {a : F.G0 → M} (ha : a ∈ F.strS M) : (fun g => f (a g)) ∈ F.strS M' := by
+  obtain ⟨h1, h2, h3, h4⟩ := ha
+  refine ⟨h1.comp f, fun g h => ?_, fun g => congrArg f (h3 g), fun v => ?_⟩
+  · simp only [h2, map_add, map_smul]
+  · obtain ⟨γ, hγ⟩ := h4 v
+    exact ⟨f γ, fun s => by simp only [hγ, map_smul]⟩
+
+end UpperTheory.V.Fr.Frame
+
+
+[RTC_SRC_FPT] Original scalar multiplication, FPt and arbitrary-map composition
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/StrSMul.lean#L70-L91
+theorem strS_mul (t : Q) (ha : a ∈ F.strS Q) : (fun g => t * a g) ∈ F.strS Q :=
+  strS_map (LinearMap.mulLeft k t) ha
+
+end Frame
+
+namespace Space
+
+variable {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)} {n : ℕ}
+  {Q Q' : Type} [CommRing Q] [Algebra (ResidueField O) Q] [CommRing Q'] [Algebra (ResidueField O) Q']
+
+structure FPt (S : Space O F n) (ξ : S.A →+* Q) : Prop where
+  x0 : S.x0 ≤ RingHom.ker ξ
+  alg : ∀ c : O, ξ (algebraMap O S.A c) = algebraMap (ResidueField O) Q (residue O c)
+
+theorem FPt.comp {S : Space O F n} {ξ : S.A →+* Q} (h : S.FPt ξ) (φ : Q →ₐ[ResidueField O] Q') :
+    S.FPt ((φ : Q →+* Q').comp ξ) where
+  x0 x hx := by
+    have : ξ x = 0 := h.x0 hx
+    show φ (ξ x) = 0
+    rw [this, map_zero]
+  alg c := by
+    show φ (ξ _) = _
+
+
+[RTC_SRC_CO_SPAN] Relative cotangent-space generation from maps determined by coordinates
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/CoSpan.lean#L15-L108
+theorem UpperTheory.V.Alg.co_span :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (B : Type) [CommRing B] [Algebra O B] [IsCO O B] (i : B →ₐ[O] R) (S : Set R), S ⊆ maximalIdeal R →
+      (∀ f f' : R →ₐ[O] DualNumber (ResidueField O), f.comp i = f'.comp i → (∀ s ∈ S, f s = f' s) → f = f') →
+      maximalIdeal R ≤ Ideal.span S ⊔ (maximalIdeal B).map i ⊔ maximalIdeal R ^ 2 := by
+  intro O _ _ R _ _ _ B _ _ _ i S hS H x hx
+  set I : Ideal R := Ideal.span S ⊔ (maximalIdeal B).map i ⊔ maximalIdeal R ^ 2 with hI
+  by_contra hxI
+  have hIm : I ≤ maximalIdeal R := by
+    refine sup_le (sup_le (Ideal.span_le.2 hS) (Ideal.map_le_iff_le_comap.2 fun b hb => ?_))
+      (Ideal.pow_le_self two_ne_zero)
+    show i b ∈ maximalIdeal R
+    rw [← res_eq_zero_iff O, res_map, res_eq_zero_iff]
+    exact hb
+  have hB : ∀ b ∈ maximalIdeal B, i b ∈ I := fun b hb =>
+    Ideal.mem_sup_left (Ideal.mem_sup_right (Ideal.mem_map_of_mem _ hb))
+  have hO : ∀ a ∈ maximalIdeal O, algebraMap O R a ∈ I := fun a ha => by
+    have := hB (algebraMap O B a) (fun h => ha (IsLocalHom.map_nonunit a h))
+    rwa [AlgHom.commutes] at this
+  let N : Submodule O R := I.restrictScalars O ⊔ Submodule.span O {1}
+  have hIN : ∀ y ∈ I, y ∈ N := fun y hy => Submodule.mem_sup_left hy
+  have hON : ∀ a : O, algebraMap O R a ∈ N := fun a =>
+    Submodule.mem_sup_right (Submodule.mem_span_singleton.2 ⟨a, (Algebra.algebraMap_eq_smul_one a).symm⟩)
+  have hxN : N.mkQ x ≠ 0 := by
+    intro h
+    obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.1 ((Submodule.Quotient.mk_eq_zero N).1 h)
+    obtain ⟨a, rfl⟩ := Submodule.mem_span_singleton.1 hz
+    rw [← Algebra.algebraMap_eq_smul_one] at hyz
+    have h1 : algebraMap O R a ∈ maximalIdeal R := by
+      have := Ideal.sub_mem _ hx (hIm hy)
+      rwa [← hyz, add_sub_cancel_left] at this
+    have h2 : a ∈ maximalIdeal O := fun h => h1 (h.map _)
+    exact hxI (hyz ▸ I.add_mem hy (hO a h2))
+  have htor : Module.IsTorsionBySet O (R ⧸ N) (maximalIdeal O) := by
+    rintro y ⟨a, ha⟩
+    obtain ⟨y, rfl⟩ := N.mkQ_surjective y
+    show a • N.mkQ y = 0
+    rw [← map_smul]
+    refine (Submodule.Quotient.mk_eq_zero N).2 (hIN _ ?_)
+    rw [Algebra.smul_def]
+    exact I.mul_mem_right _ (hO a ha)
+  obtain ⟨φ, hφ⟩ := co_span_dual O _ htor _ hxN
+  let D : R →ₗ[O] ResidueField O := φ ∘ₗ N.mkQ
+  have hD : ∀ y ∈ N, D y = 0 := fun y hy => by
+    show φ (N.mkQ y) = 0
+    rw [show N.mkQ y = 0 from (Submodule.Quotient.mk_eq_zero N).2 hy, map_zero]
+  have hres : ∀ (y : R) (a : O), y - algebraMap O R a ∈ maximalIdeal R → res O R y = algebraMap O _ a :=
+    fun y a ha => by
+      have := (res_eq_zero_iff O R _).2 ha
+      rwa [map_sub, AlgHom.commutes, sub_eq_zero] at this
+  have hmul : ∀ y z, D (y * z) = res O R y * D z + D y * res O R z := fun y z => by
+    obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) y
+    obtain ⟨b, hb⟩ := IsCO.res_surj (O := O) z
+    have h1 : D ((y - algebraMap O R a) * (z - algebraMap O R b)) = 0 :=
+      hD _ (hIN _ (Ideal.mem_sup_right (by rw [pow_two]; exact Ideal.mul_mem_mul ha hb)))
+    have h2 : y * z = (y - algebraMap O R a) * (z - algebraMap O R b) + a • z + b • y
+        - algebraMap O R (a * b) := by
+      simp only [Algebra.smul_def, map_mul]; ring
+    rw [h2, map_sub, map_add, map_add, h1, hD _ (hON _), map_smul, map_smul, hres y a ha, hres z b hb]
+    simp only [Algebra.smul_def]; ring
+  let f : R →ₐ[O] DualNumber (ResidueField O) :=
+    { toFun := fun y => (res O R y, D y)
+      map_one' := by
+        ext
+        · exact map_one (res O R)
+        · exact hD _ (by simpa using hON 1)
+      map_mul' := fun y z => by
+        ext
+        · exact map_mul (res O R) y z
+        · exact hmul y z
+      map_zero' := by
+        ext
+        · exact map_zero (res O R)
+        · exact map_zero D
+      map_add' := fun y z => by
+        ext
+        · exact map_add (res O R) y z
+        · exact map_add D y z
+      commutes' := fun a => by
+        ext
+        · exact (res O R).commutes a
+        · exact hD _ (hON a) }
+  let f' : R →ₐ[O] DualNumber (ResidueField O) :=
+    (TrivSqZeroExt.inlAlgHom O (ResidueField O) (ResidueField O)).comp (res O R)
+  have key : ∀ y, D y = 0 → f y = f' y := fun y hy => by
+    ext
+    · rfl
+    · exact hy
+  have hff : f = f' := by
+    refine H f f' (AlgHom.ext fun b => key _ ?_) fun s hs => key _ (hD _ (hIN _ ?_))
+    · obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) b
+      have := hD _ (hIN _ (hB _ ha))
+      rwa [map_sub, AlgHom.commutes, map_sub, hD _ (hON a), sub_zero] at this
+    · exact Ideal.mem_sup_left (Ideal.mem_sup_left (Ideal.subset_span hs))
+  exact hφ (congrArg (fun g : R →ₐ[O] DualNumber (ResidueField O) => (g x).snd) hff)
+
+
+[RTC_SRC_CO_SURJ] Formal coefficient-algebra surjectivity
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/CoSurj.lean#L6-L32
+theorem UpperTheory.V.Alg.co_surj :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R'), maximalIdeal R' ≤ (maximalIdeal R).map f ⊔ maximalIdeal R' ^ 2 → Function.Surjective f := by
+  intro O _ _ R _ _ _ R' _ _ _ f hf
+  have hle : (maximalIdeal R).map f ≤ maximalIdeal R' := by
+    rw [Ideal.map_le_iff_le_comap]
+    intro x hx
+    rw [Ideal.mem_comap, ← res_eq_zero_iff O R', res_map, res_eq_zero_iff]
+    exact hx
+  have heq : (maximalIdeal R).map (f : R →+* R') = maximalIdeal R' := by
+    refine le_antisymm hle ?_
+    have hfg : (maximalIdeal R').FG := IsNoetherian.noetherian _
+    refine Submodule.le_of_le_smul_of_le_jacobson_bot hfg (maximalIdeal_le_jacobson _) ?_
+    rw [smul_eq_mul, ← pow_two]
+    exact hf
+  haveI : IsAdicComplete (maximalIdeal R) R := IsCO.complete (O := O)
+  haveI : IsAdicComplete (maximalIdeal R') R' := IsCO.complete (O := O)
+  haveI : IsHausdorff ((maximalIdeal R).map (f : R →+* R')) R' := by
+    rw [heq]
+    infer_instance
+  apply surjective_of_mk_map_comp_surjective (I := maximalIdeal R) (f : R →+* R')
+  intro y
+  obtain ⟨y0, rfl⟩ := Ideal.Quotient.mk_surjective y
+  obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) y0
+  refine ⟨algebraMap O R a, ?_⟩
+  show Ideal.Quotient.mk _ ((f : R →+* R') (algebraMap O R a)) = Ideal.Quotient.mk _ y0
+  rw [Ideal.Quotient.eq, heq, AlgHom.coe_toRingHom, AlgHom.commutes, ← neg_sub]
+  exact neg_mem ha
+
+
+[RTC_SRC_CO_MVPS] Finite-variable power-series coefficient algebras
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/CoMvps.lean#L21-L40
+theorem UpperTheory.V.Alg.co_mvps :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : Type) [Finite σ], IsCO O (MvPowerSeries σ R) := by
+  intro O _ _ R _ _ hR σ _
+  have hc : IsAdicComplete (maximalIdeal R) R := IsCO.complete (O := O)
+  have hl : IsLocalHom (algebraMap O R) := IsCO.isLocalHom
+  have hn : IsNoetherianRing R := hR.toIsNoetherian
+  obtain ⟨n, ⟨e⟩⟩ := Finite.exists_equiv_fin σ
+  refine
+    { toIsLocalRing := inferInstance
+      toIsNoetherian := MvPowerSeries.isNoetherianRing R
+      complete := co_mvps_equiv (renameEquiv R e.symm).toRingEquiv (co_mvps_fin R n)
+      isLocalHom := ⟨fun a ha => ?_⟩
+      res_surj := fun x => ?_ }
+  · have h := isUnit_constantCoeff _ ha
+    rw [MvPowerSeries.algebraMap_apply, constantCoeff_C] at h
+    exact IsLocalHom.map_nonunit a h
+  · obtain ⟨a, ha⟩ := IsCO.res_surj (O := O) (constantCoeff x)
+    refine ⟨a, fun h => ha ?_⟩
+    have h2 := isUnit_constantCoeff _ h
+    rwa [map_sub, MvPowerSeries.algebraMap_apply, constantCoeff_C] at h2
+
+
+[RTC_SRC_COORD] Weighted coordinates from uniqueness and diagonal-torus stability
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/CoordGrading.lean#L29-L93
+theorem UpperTheory.V.Alg.coord_grading :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (S : Type) (e : S → R) (wt : S → X), (∀ s, e s ∈ maximalIdeal R) →
+      (∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f f' : R →ₐ[O] R'), (∀ s, f (e s) = f' (e s)) → f = f') →
+      (∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R') (t : Multiplicative X →* R'ˣ), (∀ j, res O R' (t j) = 1) →
+        ∃ f' : R →ₐ[O] R', ∀ s, f' (e s) = t (Multiplicative.ofAdd (wt s)) * f (e s)) →
+      ∃ (W : WPres O X R) (u : W.σ → S), (∀ i, W.z i = e (u i) ∧ W.wt i = wt (u i)) ∧ ∀ s, e s ∈ W.part (wt s) := by
+  intro O _ _ _ _ X _ _ _ R _ _ _ S e wt hem hgen hst
+  classical
+  have hspan : maximalIdeal R ≤ Ideal.span (Set.range e) ⊔ (maximalIdeal O).map (Algebra.ofId O R) ⊔
+      maximalIdeal R ^ 2 := by
+    refine co_span O R O (Algebra.ofId O R) (Set.range e) (by rintro _ ⟨s, rfl⟩; exact hem s) ?_
+    intro f f' _ h
+    haveI := (co_res O).2
+    exact hgen _ f f' fun s => h _ ⟨s, rfl⟩
+  obtain ⟨T, hT, hTs⟩ := (Submodule.fg_span_iff_fg_span_finset_subset (R := R) (Set.range e)).1
+    (IsNoetherian.noetherian _)
+  choose u hu using fun i : T => hT i.2
+  obtain ⟨π, ⟨hπC, hπX⟩, -⟩ := co_ev O O R T (Algebra.ofId O R) (fun i => e (u i)) fun i => hem _
+  have hsurj : Function.Surjective π := by
+    haveI := co_mvps O O T
+    refine co_surj O (MvPowerSeries T O) R π (hspan.trans (sup_le_sup_right (sup_le ?_ ?_) _))
+    · show Submodule.span R (Set.range e) ≤ _
+      rw [hTs, Submodule.span_le]
+      intro x hx
+      have h1 : x = π (MvPowerSeries.X ⟨x, hx⟩) := by rw [hπX, hu]
+      rw [h1]
+      refine Ideal.mem_map_of_mem π fun hU => ?_
+      have := hU.map π
+      rw [hπX] at this
+      exact hem _ this
+    · rw [Ideal.map_le_iff_le_comap]
+      intro a ha
+      rw [Ideal.mem_comap, ← hπC]
+      refine Ideal.mem_map_of_mem π fun hU => ?_
+      have := hU.map (constantCoeff : MvPowerSeries T O →+* O)
+      rw [constantCoeff_C] at this
+      exact ha this
+  have hπm : ∀ i, π (MvPowerSeries.X i) ∈ maximalIdeal R := fun i => by rw [hπX]; exact hem _
+  have hhom : IsHomog O (fun i : T => wt (u i)) (RingHom.ker π) := by
+    refine homog_of_stable O X R T _ π hπm ?_
+    intro R' _ _ _ f t ht hf f' hf' x hx
+    let g : R →ₐ[O] R' := (Ideal.Quotient.liftₐ (RingHom.ker π) f hf).comp
+      (Ideal.quotientKerAlgEquivOfSurjective hsurj).symm.toAlgHom
+    have hg : ∀ y, g (π y) = f y := fun y => by
+      have : (Ideal.quotientKerAlgEquivOfSurjective hsurj).symm (π y) = Ideal.Quotient.mk _ y := by
+        rw [AlgEquiv.symm_apply_eq]; rfl
+      show Ideal.Quotient.liftₐ (RingHom.ker π) f hf ((Ideal.quotientKerAlgEquivOfSurjective hsurj).symm (π y)) = _
+      rw [this]
+      rfl
+    obtain ⟨g', hg'⟩ := hst R' g t ht
+    have : g'.comp π = f' := ext_X _ _ (fun i => map_mem_max g' (hπm i)) fun i => by
+      rw [AlgHom.comp_apply, hf', ← hg, hπX, hg']
+    rw [← this, AlgHom.comp_apply, hx, map_zero]
+  let W : WPres O X R := { σ := T, wt := fun i => wt (u i), π := π, surj := hsurj, homog := hhom }
+  refine ⟨W, u, fun i => ⟨hπX i, rfl⟩, fun s => eigen_mem O X R W hπm (e s) (wt s) ?_⟩
+  intro R' _ _ _ f f' t ht h
+  obtain ⟨g', hg'⟩ := hst R' f t ht
+  have h1 : g'.comp π = f'.comp π := ext_X _ _ (fun i => map_mem_max g' (hπm i)) fun i => by
+    have h2 : f' (π (MvPowerSeries.X i)) = t (Multiplicative.ofAdd (wt (u i))) * f (π (MvPowerSeries.X i)) := h i
+    rw [AlgHom.comp_apply, AlgHom.comp_apply, h2, hπX, hg']
+  have h3 : f' (e s) = g' (e s) := by
+    obtain ⟨y, hy⟩ := hsurj (e s)
+    rw [← hy]
+    exact (DFunLike.congr_fun h1 y).symm
+  rw [h3, hg']
+
+
+[RTC_SRC_TWIST] Actual normalized-representation diagonal twist
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/AlgTwist.lean#L54-L72
+theorem UpperTheory.V.Fr.alg_twist :
+    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k} {n : ℕ} {K : Type} [CommRing K] (u : Kˣ) (ρ : NRep F n K), ∃ ρ' : NRep F n K, (∀ g i j, ρ'.r g i j = ((u ^ (w n i - w n j) : Kˣ) : K) * ρ.r g i j) ∧ ρ'.ψ = ρ.ψ := by
+  intro l _ k _ F n K _ u ρ
+  refine ⟨⟨(tw n u).toRingHom.toMonoidHom.comp ρ.r, ρ.ψ, ?_, ?_, ?_⟩, fun g i j => rfl, rfl⟩
+  · intro g
+    ext i j
+    rw [J_apply]
+    show tw n u (ρ.r (F.star g)) i j = tw n u (ρ.r g) j.rev i.rev
+    rw [tw_apply, tw_apply, ρ.pol, J_apply, w_rev, w_rev]
+    congr 3
+    ring
+  · intro i j h
+    have := ρ.diag i j h
+    rw [Matrix.sub_apply] at this ⊢
+    show tw n u (ρ.r F.g0) i j - tw n u (ρ.r (F.star F.g0)) i j = 0
+    rw [tw_apply, tw_apply, ← mul_sub, this, mul_zero]
+  · intro v g
+    have := ordProd_tw u (fun s => ρ.r (F.loc0 v s)) (fun i s => ((ρ.ψ v i s : Kˣ) : K)) g
+    exact this.trans (by rw [ρ.ord, map_zero])
+
+
+[RTC_SRC_COORDINATE_ENTRIES] Universal twists, coordinate uniqueness and selected centered entries
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/ContMap.lean#L117-L297
+private theorem cont_map {O Γ R R' : Type} [CommRing O] [IsLocalRing O] [TopologicalSpace Γ] [CommRing R] [Algebra O R]
+    [IsCO O R] [CommRing R'] [Algebra O R'] [IsCO O R'] (f : R →ₐ[O] R') (c : R') {a : Γ → R}
+    (ha : AdicCont (maximalIdeal R) a) : AdicCont (maximalIdeal R') fun g => c * f (a g) := by
+  have hm : Ideal.map f.toRingHom (maximalIdeal R) ≤ maximalIdeal R' := by
+    rw [Ideal.map_le_iff_le_comap]
+    intro x hx
+    show f x ∈ maximalIdeal R'
+    rw [← res_eq_zero_iff O R', res_map, res_eq_zero_iff]
+    exact hx
+  intro N
+  have hN : maximalIdeal R ^ N ≤ Ideal.comap f.toRingHom (maximalIdeal R' ^ N) := by
+    rw [← Ideal.map_le_iff_le_comap, Ideal.map_pow]
+    exact Ideal.pow_right_mono hm N
+  have e : (fun g => Ideal.Quotient.mk (maximalIdeal R' ^ N) (c * f (a g))) =
+      (fun q => Ideal.Quotient.mk (maximalIdeal R' ^ N) c *
+        Ideal.quotientMap (maximalIdeal R' ^ N) f.toRingHom hN q) ∘
+        (fun g => Ideal.Quotient.mk (maximalIdeal R ^ N) (a g)) := by
+    funext g
+    simp [Ideal.quotientMap_mk]
+  rw [e]
+  exact (ha N).comp _
+
+private theorem twist_lemma {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)}
+    {n : ℕ} (S : Space O F n) (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (f : S.R →ₐ[O] C)
+    (c : Fin n → Fin n → C) (hc : ∀ i, c i i = 1) (ρ' : NRep F n C)
+    (hr : ∀ g i j, ρ'.r g i j = c i j * f (S.ρ.r g i j)) (hψ : ∀ v i g, (ρ'.ψ v i g : C) = f (S.ρ.ψ v i g)) :
+    IsLift O ρ' := by
+  obtain ⟨⟨hc1, hc2⟩, ⟨hb1, hb2⟩, hd⟩ := S.lift
+  refine ⟨⟨fun i j => ?_, fun v i => ?_⟩, ⟨fun g i => ?_, fun v i g => ?_⟩, fun g i j hij => ?_⟩
+  · simpa only [hr] using cont_map f (c i j) (hc1 i j)
+  · simpa only [hψ, one_mul] using cont_map f 1 (hc2 v i)
+  · show (res O C) (ρ'.r g i i) = _
+    rw [hr, hc, one_mul, res_map]
+    exact hb1 g i
+  · show (res O C) ((ρ'.ψ v i g : Cˣ) : C) = _
+    rw [hψ, res_map]
+    exact hb2 v i g
+  · show (res O C) (ρ'.r g i j) = 0
+    rw [hr, map_mul, res_map]
+    have h0 : (res O S.R) (S.ρ.r g i j) = 0 := hd g i j hij
+    rw [h0, mul_zero]
+
+private theorem twist {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)}
+    {n : ℕ} (S : Space O F n) (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (f : S.R →ₐ[O] C) (u : Cˣ) :
+    ∃ f' : S.R →ₐ[O] C, (∀ g i j, f' (S.ρ.r g i j) = ((u ^ (w n i - w n j) : Cˣ) : C) * f (S.ρ.r g i j)) ∧
+      ∀ v i g, f' (S.ρ.ψ v i g) = f (S.ρ.ψ v i g) := by
+  obtain ⟨ρ', hr, hψ⟩ := alg_twist u (S.ρ.map (f : S.R →+* C))
+  have hl : IsLift O ρ' := twist_lemma S C f (fun i j => ((u ^ (w n i - w n j) : Cˣ) : C)) (by simp) ρ'
+    (fun g i j => by rw [hr]; rfl) (fun v i g => by rw [hψ]; rfl)
+  obtain ⟨f', hf', -⟩ := S.univ C ρ' hl
+  refine ⟨f', fun g i j => ?_, fun v i g => ?_⟩
+  · calc f' (S.ρ.r g i j) = (S.ρ.map (f' : S.R →+* C)).r g i j := rfl
+      _ = ρ'.r g i j := by rw [hf']
+      _ = _ := by rw [hr]; rfl
+  · calc f' (S.ρ.ψ v i g : S.R) = (((S.ρ.map (f' : S.R →+* C)).ψ v i g : Cˣ) : C) := rfl
+      _ = (ρ'.ψ v i g : C) := by rw [hf']
+      _ = _ := by rw [hψ]; rfl
+
+private theorem uniq {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)}
+    {n : ℕ} (S : Space O F n) (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (f f' : S.R →ₐ[O] C)
+    (h1 : ∀ g i j, f (S.ρ.r g i j) = f' (S.ρ.r g i j)) (h2 : ∀ v i g, f (S.ρ.ψ v i g) = f' (S.ρ.ψ v i g)) :
+    f = f' := by
+  have hl : IsLift O (S.ρ.map (f : S.R →+* C)) := twist_lemma S C f (fun _ _ => 1) (fun _ => rfl) _
+    (fun g i j => by rw [one_mul]; rfl) (fun v i g => rfl)
+  refine (S.univ C _ hl).unique rfl (NRep.ext ?_ ?_)
+  · exact MonoidHom.ext fun g => Matrix.ext fun i j => (h1 g i j).symm
+  · funext v i
+    exact MonoidHom.ext fun g => Units.ext (h2 v i g).symm
+
+private theorem coord {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] [IsNoetherianRing O]
+    [IsAdicComplete (maximalIdeal O) O] {F : Frame l (ResidueField O)} {n : ℕ} (S : Space O F n) :
+    ∃ W : WPres O ℤ S.R, (∀ s, W.z s ∈ maximalIdeal S.R) ∧ (∀ g i j, S.ρ.r g i j ∈ W.part (w n i - w n j)) ∧
+      (∀ v i g, (S.ρ.ψ v i g : S.R) ∈ W.part 0) ∧
+      ∀ s, (∃ g i j, W.z s = S.ρ.r g i j ∧ W.wt s = w n i - w n j) ∨
+        (W.wt s = 0 ∧ W.z s ∈ Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})) := by
+  classical
+  let a : S.R → O := fun x => Classical.choose (IsCO.res_surj (O := O) x)
+  have ha : ∀ x, x - algebraMap O S.R (a x) ∈ maximalIdeal S.R := fun x =>
+    Classical.choose_spec (IsCO.res_surj (O := O) x)
+  let e : (F.G0 × Fin n × Fin n) ⊕ (Σ v : F.V, Fin n × F.Gv v) → S.R := Sum.elim
+    (fun p => if p.2.1 = p.2.2 then S.ρ.r p.1 p.2.1 p.2.2 - algebraMap O S.R (a (S.ρ.r p.1 p.2.1 p.2.2))
+      else S.ρ.r p.1 p.2.1 p.2.2)
+    (fun q => (S.ρ.ψ q.1 q.2.1 q.2.2 : S.R) - algebraMap O S.R (a (S.ρ.ψ q.1 q.2.1 q.2.2)))
+  let wt : (F.G0 × Fin n × Fin n) ⊕ (Σ v : F.V, Fin n × F.Gv v) → ℤ := Sum.elim
+    (fun p => w n p.2.1 - w n p.2.2) (fun _ => 0)
+  have eon : ∀ g i, e (Sum.inl (g, i, i)) = S.ρ.r g i i - algebraMap O S.R (a (S.ρ.r g i i)) :=
+    fun g i => if_pos rfl
+  have eoff : ∀ g i j, i ≠ j → e (Sum.inl (g, i, j)) = S.ρ.r g i j := fun g i j h => if_neg h
+  have eψ : ∀ v i g, e (Sum.inr ⟨v, i, g⟩) =
+      (S.ρ.ψ v i g : S.R) - algebraMap O S.R (a (S.ρ.ψ v i g)) := fun v i g => rfl
+  have hoff : ∀ g i j, i ≠ j → S.ρ.r g i j ∈ maximalIdeal S.R := fun g i j h =>
+    (res_eq_zero_iff O S.R _).mp (by exact S.lift.2.2 g i j h)
+  have he : ∀ s, e s ∈ maximalIdeal S.R := by
+    rintro (⟨g, i, j⟩ | ⟨v, i, g⟩)
+    · by_cases h : i = j
+      · subst h
+        rw [eon]
+        exact ha _
+      · rw [eoff g i j h]
+        exact hoff g i j h
+    · rw [eψ]
+      exact ha _
+  have huniq : ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f f' : S.R →ₐ[O] R'),
+      (∀ s, f (e s) = f' (e s)) → f = f' := by
+    intro R' _ _ _ f f' h
+    apply uniq S R' f f'
+    · intro g i j
+      by_cases hij : i = j
+      · subst hij
+        have h1 := h (Sum.inl (g, i, i))
+        rw [eon, map_sub, map_sub, AlgHom.commutes, AlgHom.commutes] at h1
+        exact sub_left_injective h1
+      · have h1 := h (Sum.inl (g, i, j))
+        rw [eoff g i j hij] at h1
+        exact h1
+    · intro v i g
+      have h1 := h (Sum.inr ⟨v, i, g⟩)
+      rw [eψ, map_sub, map_sub, AlgHom.commutes, AlgHom.commutes] at h1
+      exact sub_left_injective h1
+  have htw : ∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : S.R →ₐ[O] R')
+      (t : Multiplicative ℤ →* R'ˣ), (∀ j, res O R' (t j) = 1) →
+      ∃ f' : S.R →ₐ[O] R', ∀ s, f' (e s) = (t (Multiplicative.ofAdd (wt s)) : R') * f (e s) := by
+    intro R' _ _ _ f t _
+    obtain ⟨f', h1, h2⟩ := twist S R' f (t (Multiplicative.ofAdd 1))
+    have ht : ∀ k : ℤ, t (Multiplicative.ofAdd k) = t (Multiplicative.ofAdd 1) ^ k := by
+      intro k
+      rw [← map_zpow, ← ofAdd_zsmul, smul_eq_mul, mul_one]
+    refine ⟨f', ?_⟩
+    rintro (⟨g, i, j⟩ | ⟨v, i, g⟩)
+    · by_cases hij : i = j
+      · subst hij
+        show f' (e (Sum.inl (g, i, i))) = (t (Multiplicative.ofAdd (w n i - w n i)) : R') * _
+        rw [sub_self, eon, map_sub, map_sub, AlgHom.commutes, AlgHom.commutes, h1]
+        simp
+      · show f' (e (Sum.inl (g, i, j))) = (t (Multiplicative.ofAdd (w n i - w n j)) : R') * _
+        rw [eoff g i j hij, h1, ht (w n i - w n j)]
+    · show f' (e (Sum.inr ⟨v, i, g⟩)) = (t (Multiplicative.ofAdd 0) : R') * _
+      rw [eψ, map_sub, map_sub, AlgHom.commutes, AlgHom.commutes, h2]
+      simp
+  obtain ⟨W, u, hWu, hpart⟩ := coord_grading O ℤ S.R _ e wt he huniq htw
+  have h1mem : ∀ c : O, algebraMap O S.R c ∈ W.part 0 := fun c => by
+    rw [Algebra.algebraMap_eq_smul_one]
+    exact Submodule.smul_mem _ c SetLike.GradedOne.one_mem
+  refine ⟨W, fun s => by rw [(hWu s).1]; exact he _, ?_, ?_, ?_⟩
+  · intro g i j
+    by_cases hij : i = j
+    · subst hij
+      have hp : S.ρ.r g i i - algebraMap O S.R (a (S.ρ.r g i i)) ∈ W.part 0 := by
+        have := hpart (Sum.inl (g, i, i))
+        rw [eon] at this
+        simpa [wt] using this
+      rw [sub_self, ← sub_add_cancel (S.ρ.r g i i) (algebraMap O S.R (a (S.ρ.r g i i)))]
+      exact add_mem hp (h1mem _)
+    · have hp := hpart (Sum.inl (g, i, j))
+      rw [eoff g i j hij] at hp
+      exact hp
+  · intro v i g
+    have hp : (S.ρ.ψ v i g : S.R) - algebraMap O S.R (a (S.ρ.ψ v i g)) ∈ W.part 0 :=
+      hpart (Sum.inr ⟨v, i, g⟩)
+    rw [← sub_add_cancel (S.ρ.ψ v i g : S.R) (algebraMap O S.R (a (S.ρ.ψ v i g)))]
+    exact add_mem hp (h1mem _)
+  · intro s
+    obtain ⟨hz, hw⟩ := hWu s
+    rcases hs : u s with ⟨g, i, j⟩ | ⟨v, i, g⟩
+    · rw [hs] at hz hw
+      by_cases hij : i = j
+      · subst hij
+        right
+        refine ⟨by rw [hw]; exact sub_self _, ?_⟩
+        rw [hz, eon]
+        exact Subalgebra.sub_mem _ (Algebra.subset_adjoin (Or.inl ⟨[(g, i, i)], by simp, by simp⟩))
+          (Subalgebra.algebraMap_mem _ _)
+      · left
+        exact ⟨g, i, j, by rw [hz, eoff g i j hij], hw⟩
+    · rw [hs] at hz hw
+      right
+      refine ⟨hw, ?_⟩
+      rw [hz, eψ]
+      exact Subalgebra.sub_mem _ (Algebra.subset_adjoin (Or.inr ⟨v, i, g, rfl⟩))
+        (Subalgebra.algebraMap_mem _ _)
+
+
+
+[RTC_SRC_WPRES] Full original wpres for both allowed ranks
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/ContMap.lean#L307-L402
+theorem UpperTheory.V.Fr.wpres :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∃ W : WPres O ℤ S.R, (∀ s, W.z s ∈ maximalIdeal S.R) ∧ (∀ g i j, S.ρ.r g i j ∈ W.part (w n i - w n j)) ∧ (∀ y, y ∈ S.B ↔ y ∈ W.part 0) ∧ S.A = W.A ∧ ∀ j (a : S.A), a ∈ S.gr j ↔ (a : S.R) ∈ W.part j := by
+  intro l _ O _ _ _ _ F C₀ n _ _ S
+  obtain ⟨W, hz, hr, hψ, hgen⟩ := coord S
+  let D : Subalgebra O S.R := Algebra.adjoin O (S.ρ.mon 0 ∪ {x | ∃ v i g, x = (S.ρ.ψ v i g : S.R)})
+  have hmon : ∀ m, ∃ b ∈ D, ∃ x ∈ S.ρ.mon (Finsupp.weight W.wt m),
+      W.π (MvPowerSeries.monomial m 1) = b * x := mono S.ρ W D hgen
+  have hD : ∀ m, Finsupp.weight W.wt m = 0 → W.π (MvPowerSeries.monomial m 1) ∈ D := by
+    intro m hm
+    obtain ⟨b, hb, x, hx, e⟩ := hmon m
+    rw [e]
+    rw [hm] at hx
+    exact D.mul_mem hb (Algebra.subset_adjoin (Or.inl hx))
+  have P0 : ∀ y, y ∈ W.part 0 → y ∈ S.B := fun y hy => dense W hz D hD hy
+  let P : Subalgebra O S.R := (W.part 0).toSubalgebra SetLike.GradedOne.one_mem (fun x y hx hy => by
+    have := SetLike.GradedMul.mul_mem hx hy
+    rwa [add_zero] at this)
+  have BP : ∀ y, y ∈ S.B → y ∈ W.part 0 := by
+    intro y hy
+    have hDP : D ≤ P := Algebra.adjoin_le (by
+      rintro x (hx | ⟨v, i, g, rfl⟩)
+      · exact mon_part S.ρ W hr hx
+      · exact hψ v i g)
+    have hy' : ∀ N : ℕ, ∃ d ∈ D, y - d ∈ maximalIdeal S.R ^ N := hy
+    refine part_closed O ℤ S.R W hz 0 y fun N => ?_
+    obtain ⟨d, hd, hyd⟩ := hy' N
+    exact ⟨d, hDP hd, hyd⟩
+  have dec : ∀ j y, y ∈ W.part j → ∃ μ : Finset (W.σ →₀ ℕ), ∃ c x : (W.σ →₀ ℕ) → S.R,
+      (∀ m, c m ∈ S.B) ∧ (∀ m ∈ μ, x m ∈ S.ρ.mon j) ∧ y = ∑ m ∈ μ, c m * x m := by
+    intro j y hy
+    simp only [WPres.part, Submodule.mem_map] at hy
+    obtain ⟨f, hf, rfl⟩ := hy
+    obtain ⟨μ, hμ, hspan⟩ := part_span O S.R ℤ W {m | Finsupp.weight W.wt m = j} j (fun m hm => hm)
+    obtain ⟨b, hb, hfb⟩ := hspan f (fun m hm => hf m hm)
+    choose B hB X hX hBX using hmon
+    refine ⟨μ, fun m => W.π (b m) * B m, X,
+      fun m => S.B.mul_mem (P0 _ (Submodule.mem_map_of_mem (hb m))) (le_adicClosure D (hB m)),
+      fun m hm => ?_, ?_⟩
+    · have := hX m
+      have hw : Finsupp.weight W.wt m = j := hμ (Finset.mem_coe.mpr hm)
+      rwa [hw] at this
+    · simp only [AlgHom.toLinearMap_apply]
+      rw [hfb, map_sum]
+      refine Finset.sum_congr rfl fun m _ => ?_
+      rw [map_mul, hBX, mul_assoc]
+  refine ⟨W, hz, hr, fun y => ⟨BP y, P0 y⟩, ?_, ?_⟩
+  · apply le_antisymm
+    · refine Algebra.adjoin_le ?_
+      rintro x (hx | ⟨g, i, j, rfl⟩)
+      · exact W.part_le_A (BP x hx)
+      · exact W.part_le_A (hr g i j)
+    · intro x hx
+      have hx' : x ∈ ⨆ j, W.part j := hx
+      have hle : (⨆ j, W.part j) ≤ Subalgebra.toSubmodule S.A := by
+        refine iSup_le fun j y hy => ?_
+        rw [Subalgebra.mem_toSubmodule]
+        obtain ⟨μ, c, X, hc, hX, rfl⟩ := dec j y hy
+        refine Subalgebra.sum_mem _ fun m hm => S.A.mul_mem (Algebra.subset_adjoin (Or.inl (hc m))) ?_
+        obtain ⟨L, -, hXL⟩ := hX m hm
+        rw [hXL, ← val_prod S L]
+        exact SetLike.coe_mem _
+      exact hle hx'
+  · intro j a
+    constructor
+    · intro ha
+      refine Submodule.span_induction (p := fun (a : S.A) _ => (a : S.R) ∈ W.part j) ?_ ?_ ?_ ?_
+        (show a ∈ Submodule.span S.B (S.u.mon j) from ha)
+      · rintro x ⟨L, hL, rfl⟩
+        rw [val_prod]
+        exact mon_part S.ρ W hr ⟨L, hL, rfl⟩
+      · simp
+      · intro x y _ _ hx hy
+        simpa using add_mem hx hy
+      · intro b x _ hx
+        have := SetLike.GradedMul.mul_mem (BP b b.2) hx
+        rw [zero_add] at this
+        have hbx : ((b • x : S.A) : S.R) = (b : S.R) * (x : S.R) := by
+          first | rfl | simp [Algebra.smul_def] | simp [Subalgebra.smul_def]
+        rw [hbx]
+        exact this
+    · intro ha
+      obtain ⟨μ, c, X, hc, hX, e⟩ := dec j _ ha
+      have hXu : ∀ m ∈ μ, ∃ a' ∈ S.u.mon j, (a' : S.R) = X m := by
+        intro m hm
+        obtain ⟨L, hL, e'⟩ := hX m hm
+        exact ⟨_, ⟨L, hL, rfl⟩, by rw [val_prod, e']⟩
+      choose! A' hA' hA'e using hXu
+      have hsum : a = ∑ m ∈ μ, (⟨c m, hc m⟩ : S.B) • A' m := by
+        apply Subtype.ext
+        rw [e]
+        simp only [AddSubmonoidClass.coe_finset_sum]
+        refine Finset.sum_congr rfl fun m hm => ?_
+        rw [← hA'e m hm]
+        rfl
+      rw [hsum]
+      exact Submodule.sum_mem _ fun m hm => Submodule.smul_mem _ _ (Submodule.subset_span (hA' m hm))
+
+
+[RTC_SRC_HOMOG] Kernel homogeneity; RTC gives direct integer-weight formal-unit argument
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/HomogOfStable.lean#L136-L194
+theorem UpperTheory.V.Alg.homog_of_stable :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (σ : Type) [Finite σ] (wt : σ → X) (π : MvPowerSeries σ O →ₐ[O] R), (∀ s, π (MvPowerSeries.X s) ∈ maximalIdeal R) →
+      (∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f : MvPowerSeries σ O →ₐ[O] R') (t : Multiplicative X →* R'ˣ), (∀ j, res O R' (t j) = 1) → (∀ x, π x = 0 → f x = 0) →
+        ∀ f' : MvPowerSeries σ O →ₐ[O] R', (∀ s, f' (MvPowerSeries.X s) = t (Multiplicative.ofAdd (wt s)) * f (MvPowerSeries.X s)) → ∀ x, π x = 0 → f' x = 0) →
+      IsHomog O wt (RingHom.ker π) := by
+  intro O _ _ _ _ X _ _ _ R _ _ _ σ _ wt π hπ hstab
+  intro x hx j
+  have hx' : π x = 0 := hx
+  show π (wcomp O wt j x) = 0
+  haveI : IsAdicComplete (maximalIdeal R) R := IsCO.complete (O := O)
+  apply GlobalTheory.eq_of_forall_sub_mem_ideal_pow (maximalIdeal R)
+  intro N
+  rw [sub_zero]
+  refine Ideal.pow_le_pow_right (Nat.le_succ N) ?_
+  obtain ⟨I, hI⟩ : ∃ I : Ideal R, I = maximalIdeal R ^ (N + 1) := ⟨_, rfl⟩
+  rw [← hI]
+  have hIm : I ≤ maximalIdeal R := hI ▸ Ideal.pow_le_self (Nat.succ_ne_zero N)
+  have hItop : I ≠ ⊤ := fun h =>
+    (maximalIdeal.isMaximal R).ne_top (top_le_iff.1 (h ▸ hIm))
+  haveI : Nontrivial (R ⧸ I) := by
+    refine ⟨⟨0, 1, fun h => hItop ((Ideal.eq_top_iff_one _).2 ?_)⟩⟩
+    rw [← map_one (Ideal.Quotient.mk I)] at h
+    exact Ideal.Quotient.eq_zero_iff_mem.1 h.symm
+  let q : R →ₐ[O] R ⧸ I := Ideal.Quotient.mkₐ O I
+  haveI : IsCO O (R ⧸ I) := co_quot O R (R ⧸ I) q (Ideal.Quotient.mkₐ_surjective O I)
+  have hmap : ∀ r ∈ maximalIdeal R, q r ∈ maximalIdeal (R ⧸ I) := by
+    intro r hr
+    rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff]
+    rintro ⟨u, hu⟩
+    obtain ⟨v, hv⟩ := Ideal.Quotient.mk_surjective ((u⁻¹ : (R ⧸ I)ˣ) : R ⧸ I)
+    have hrv : r * v - 1 ∈ I := by
+      rw [← Ideal.Quotient.eq, map_mul, hv, map_one]
+      show q r * _ = 1
+      rw [← hu, Units.mul_inv]
+    apply (maximalIdeal.isMaximal R).ne_top
+    rw [Ideal.eq_top_iff_one]
+    have h1 := Ideal.sub_mem _ (Ideal.mul_mem_right v _ hr) (hIm hrv)
+    simpa using h1
+  have hle : maximalIdeal (R ⧸ I) ≤ Ideal.map (Ideal.Quotient.mk I) (maximalIdeal R) := by
+    intro y hy
+    obtain ⟨r, rfl⟩ := Ideal.Quotient.mk_surjective y
+    apply Ideal.mem_map_of_mem
+    by_contra hr
+    rw [IsLocalRing.mem_maximalIdeal, mem_nonunits_iff, not_not] at hr
+    exact (IsLocalRing.mem_maximalIdeal _).1 hy (hr.map _)
+  have hJ : maximalIdeal (R ⧸ I) ^ (N + 1) = ⊥ := by
+    rw [eq_bot_iff]
+    calc maximalIdeal (R ⧸ I) ^ (N + 1)
+        ≤ Ideal.map (Ideal.Quotient.mk I) (maximalIdeal R) ^ (N + 1) := Ideal.pow_right_mono hle _
+      _ = Ideal.map (Ideal.Quotient.mk I) I := by rw [← Ideal.map_pow, hI]
+      _ = ⊥ := Ideal.map_quotient_self I
+      _ ≤ ⊥ := le_rfl
+  have hp : ∀ s, (q.comp π) (MvPowerSeries.X s) ∈ maximalIdeal (R ⧸ I) := fun s =>
+    hmap _ (hπ s)
+  have key := hos_art wt (q.comp π) (N + 1) hJ hp x
+    (fun R' _ _ _ i t ht f' hf' =>
+      hstab R' ((i.comp q).comp π) t ht (fun y hy => by simp [hy]) f' (fun s => (hf' s).trans rfl) x hx') j
+  rw [AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem] at key
+  exact key
+
+
+[RTC_SRC_EIGEN] Actual eigenvectors in the homogeneous parts
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/EigenMem.lean#L55-L111
+theorem UpperTheory.V.Alg.eigen_mem :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → ∀ (x : R) (j : X),
+      (∀ (R' : Type) [CommRing R'] [Algebra O R'] [IsCO O R'] (f f' : R →ₐ[O] R') (t : Multiplicative X →* R'ˣ), (∀ i, res O R' (t i) = 1) →
+        (∀ s, f' (W.z s) = t (Multiplicative.ofAdd (W.wt s)) * f (W.z s)) → f' x = t (Multiplicative.ofAdd j) * f x) → x ∈ W.part j := by
+  intro O _ _ _ _ X _ _ _ R _ _ hR W hz x j H
+  classical
+  obtain ⟨n, t0, ht1, hind⟩ := tchar O X
+  haveI : IsCO O (MvPowerSeries (Fin n) R) := co_mvps O R (Fin n)
+  let f : R →ₐ[O] MvPowerSeries (Fin n) R :=
+    { (C : R →+* MvPowerSeries (Fin n) R) with commutes' := fun a => (MvPowerSeries.algebraMap_apply).symm }
+  have hf : ∀ a, f a = C a := fun _ => rfl
+  let t : Multiplicative X →* (MvPowerSeries (Fin n) R)ˣ :=
+    (Units.map (MvPowerSeries.map (σ := Fin n) (algebraMap O R)).toMonoidHom).comp t0
+  have ht : ∀ i, (t i : MvPowerSeries (Fin n) R) =
+      MvPowerSeries.map (algebraMap O R) (t0 i : MvPowerSeries (Fin n) O) := fun _ => rfl
+  have hres : ∀ i, res O (MvPowerSeries (Fin n) R) (t i) = 1 := fun i => by
+    have h : (t i : MvPowerSeries (Fin n) R) - 1 ∈ maximalIdeal (MvPowerSeries (Fin n) R) := fun hu => by
+      have h2 := isUnit_constantCoeff _ hu
+      rw [map_sub, ht, constantCoeff_map, ht1, map_one, map_one, sub_self] at h2
+      exact not_isUnit_zero h2
+    have := (res_eq_zero_iff O _ _).2 h
+    rwa [map_sub, map_one, sub_eq_zero] at this
+  obtain ⟨f', hf', -⟩ := tact O X R W hz (MvPowerSeries (Fin n) R) f t
+  have hx := H _ f f' t hres (fun s => hf' _ _ (W.z_mem s))
+  obtain ⟨g, rfl⟩ := W.surj x
+  suffices h : W.π (wcomp O W.wt j g) - W.π g = 0 by
+    rw [sub_eq_zero] at h
+    exact ⟨_, wcomp_mem O W.wt j g, h⟩
+  haveI : IsAdicComplete (maximalIdeal R) R := IsCO.complete (O := O)
+  refine IsHausdorff.haus (I := maximalIdeal R) inferInstance _ fun N => ?_
+  rw [SModEq.zero, smul_eq_mul, Ideal.mul_top]
+  obtain ⟨s, hjs, hs⟩ := eigen_split W.wt j N g
+  have h1 := eigen_low ((maximalIdeal R).map (C : R →+* MvPowerSeries (Fin n) R))
+    ((f'.comp W.π : MvPowerSeries W.σ O →ₐ[O] _) : MvPowerSeries W.σ O →+* _) (fun s => by
+      show f' (W.z s) ∈ _
+      rw [hf' _ _ (W.z_mem s)]
+      exact Ideal.mul_mem_left _ _ (Ideal.mem_map_of_mem _ (hz s))) N _ hs
+  let q := Ideal.Quotient.mk (maximalIdeal R ^ N)
+  have h2 : MvPowerSeries.map (σ := Fin n) q (f' (W.π (g - ∑ i ∈ s, wcomp O W.wt i g))) = 0 := by
+    rw [← Ideal.map_pow] at h1
+    refine (Ideal.map_le_iff_le_comap.2 (fun a ha => ?_) : _ ≤ RingHom.ker (MvPowerSeries.map (σ := Fin n) q)) h1
+    rw [Ideal.mem_comap, RingHom.mem_ker, map_C, Ideal.Quotient.eq_zero_iff_mem.2 ha, map_zero]
+  have hq : ∀ i, MvPowerSeries.map (σ := Fin n) q (t i) =
+      MvPowerSeries.map (algebraMap O (R ⧸ maximalIdeal R ^ N)) (t0 i : MvPowerSeries (Fin n) O) := fun i => by
+    ext d
+    rfl
+  have h3 := hind (R ⧸ maximalIdeal R ^ N) s
+    (fun i => q (W.π (wcomp O W.wt i g)) - if i = j then q (W.π g) else 0) (by
+      rw [map_sub, map_sub, hx, map_sum, map_sum, Finset.sum_congr rfl
+        (fun i _ => hf' i (W.π (wcomp O W.wt i g)) ⟨_, wcomp_mem O W.wt i g, rfl⟩), map_sub, map_sum] at h2
+      simp only [map_mul, hq, hf, map_C] at h2
+      simp only [map_sub, mul_sub, Finset.sum_sub_distrib, apply_ite C, map_zero, mul_ite, mul_zero,
+        Finset.sum_ite_eq', if_pos hjs]
+      rw [← neg_eq_zero, neg_sub]
+      exact h2) j hjs
+  simp only [if_true] at h3
+  rwa [← map_sub, Ideal.Quotient.eq_zero_iff_mem] at h3
+
+
+[RTC_SRC_PART_CLOSED] Closedness of homogeneous parts
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/PartClosed.lean#L74-L134
+theorem UpperTheory.V.Alg.part_closed :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → ∀ (j : X) (x : R), (∀ N : ℕ, ∃ y ∈ W.part j, x - y ∈ maximalIdeal R ^ N) → x ∈ W.part j := by
+  intro O _ _ _ _ X _ _ _ _ R _ _ hR W hz j x hx
+  classical
+  have hl : IsLocalHom (algebraMap O R) := IsCO.isLocalHom
+  have hn : IsNoetherianRing R := hR.toIsNoetherian
+  let S : Set (MvPowerSeries W.σ O) :=
+    Set.range MvPowerSeries.X ∪ algebraMap O _ '' (maximalIdeal O : Set O)
+  have hS : ∀ a ∈ S, ∃ c, a ∈ wtPart O W.wt c := by
+    rintro _ (⟨i, rfl⟩ | ⟨a, -, rfl⟩)
+    · exact ⟨_, X_mem_wtPart O W.wt i⟩
+    · refine ⟨0, ?_⟩
+      rw [Algebra.algebraMap_eq_smul_one]
+      exact Submodule.smul_mem _ _ (one_mem_wtPart O W.wt)
+  have hle : (Ideal.span S).map W.π ≤ maximalIdeal R := by
+    rw [Ideal.map_le_iff_le_comap, Ideal.span_le]
+    rintro _ (⟨i, rfl⟩ | ⟨a, ha, rfl⟩)
+    · exact hz i
+    · show W.π (algebraMap O _ a) ∈ maximalIdeal R
+      rw [AlgHom.commutes]
+      exact fun h => ha (IsLocalHom.map_nonunit a h)
+  have hmap : (Ideal.span S).map W.π = maximalIdeal R := by
+    refine le_antisymm hle fun r hr => ?_
+    obtain ⟨f, rfl⟩ := W.surj r
+    have h1 : f - algebraMap O _ (constantCoeff f) ∈ Ideal.span S := by
+      refine Ideal.span_mono Set.subset_union_left (mem_span_X _ ?_)
+      simp [MvPowerSeries.algebraMap_apply]
+    have h2 : constantCoeff f ∈ maximalIdeal O := fun hu =>
+      hr ((MvPowerSeries.isUnit_iff_constantCoeff.2 hu).map W.π)
+    have h3 : algebraMap O _ (constantCoeff f) ∈ Ideal.span S :=
+      Ideal.subset_span (Or.inr ⟨_, h2, rfl⟩)
+    exact Ideal.mem_map_of_mem _ (by simpa using add_mem h1 h3)
+  obtain ⟨f, rfl⟩ := W.surj x
+  have key : ∀ N : ℕ, W.π (f - wcomp O W.wt j f) ∈ maximalIdeal R ^ N := by
+    intro N
+    obtain ⟨_, ⟨y, hy, rfl⟩, hxy⟩ := hx N
+    rw [← hmap, ← Ideal.map_pow] at hxy ⊢
+    obtain ⟨g, hg, hgxy⟩ := (Ideal.mem_map_iff_of_surjective W.π W.surj).1 hxy
+    have h1 : f - y - g ∈ RingHom.ker W.π := by
+      rw [RingHom.mem_ker, map_sub, map_sub, hgxy]
+      exact sub_self _
+    have h2 := W.homog _ h1 j
+    have h3 : wcomp O W.wt j y = y := by
+      ext n
+      rw [coeff_wcomp]
+      split_ifs with h
+      · rfl
+      · exact (hy n h).symm
+    have h4 : g - wcomp O W.wt j g ∈ Ideal.span S ^ N :=
+      sub_mem hg (homog_span_pow W.wt S hS N g hg j)
+    have h5 : f - wcomp O W.wt j f =
+        (f - y - g) - wcomp O W.wt j (f - y - g) + (g - wcomp O W.wt j g) := by
+      rw [map_sub, map_sub, h3]; ring
+    rw [h5, map_add, (RingHom.mem_ker).1 (sub_mem h1 h2), zero_add]
+    exact Ideal.mem_map_of_mem _ h4
+  have h0 : W.π (f - wcomp O W.wt j f) = 0 := by
+    have := Ideal.iInf_pow_eq_bot_of_isLocalRing (maximalIdeal R) (maximalIdeal.isMaximal R).ne_top
+    rw [← Ideal.mem_bot, ← this, Ideal.mem_iInf]
+    exact key
+  rw [map_sub, sub_eq_zero] at h0
+  exact ⟨_, wcomp_mem O W.wt j f, h0.symm⟩
+
+
+[RTC_SRC_PART_SPAN] Finite homogeneous monomial spanning
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/PartSpan.lean#L5-L51
+theorem UpperTheory.V.Alg.part_span :
+    ∀ (O R : Type) [CommRing O] [CommRing R] [Algebra O R] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] (W : WPres O X R) (S : Set (W.σ →₀ ℕ)) (j : X), (∀ n ∈ S, Finsupp.weight W.wt n = j) →
+      ∃ μ : Finset (W.σ →₀ ℕ), (μ : Set _) ⊆ S ∧ ∀ f : MvPowerSeries W.σ O, (∀ n, n ∉ S → coeff n f = 0) →
+        ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O, (∀ m, b m ∈ wtPart O W.wt 0) ∧ f = ∑ m ∈ μ, b m * monomial m 1 := by
+  intro O R _ _ _ X _ _ _ W S j hS
+  classical
+  haveI := W.fin
+  have hMfin : {m : W.σ →₀ ℕ | Minimal (· ∈ S) m}.Finite :=
+    WellQuasiOrderedLE.finite_of_isAntichain (setOf_minimal_antichain _)
+  have hex : ∀ n ∈ S, ∃ m ∈ {m : W.σ →₀ ℕ | Minimal (· ∈ S) m}, m ≤ n := by
+    intro n hn
+    obtain ⟨b, hb, hmin⟩ := (Set.isPWO_of_wellQuasiOrderedLE S).exists_le_minimal hn
+    exact ⟨b, hmin, hb⟩
+  choose! c hcM hcle using hex
+  refine ⟨hMfin.toFinset, ?_, ?_⟩
+  · rw [Set.Finite.coe_toFinset]
+    exact fun m hm => hm.1
+  · intro f hf
+    obtain ⟨b, hb⟩ : ∃ b : (W.σ →₀ ℕ) → MvPowerSeries W.σ O, ∀ m k,
+        coeff k (b m) = if k + m ∈ S ∧ c (k + m) = m then coeff (k + m) f else 0 :=
+      ⟨fun m k => if k + m ∈ S ∧ c (k + m) = m then coeff (k + m) f else 0, fun _ _ => rfl⟩
+    refine ⟨b, ?_, ?_⟩
+    · intro m k hk
+      rw [hb, if_neg]
+      rintro ⟨h1, h2⟩
+      apply hk
+      have hm : Finsupp.weight W.wt m = j := hS m (by rw [← h2]; exact (hcM _ h1).1)
+      have hkm := hS _ h1
+      rw [map_add, hm] at hkm
+      simpa using hkm
+    · ext n
+      rw [map_sum, Finset.sum_congr rfl
+        (g := fun m => if c n = m then (if n ∈ S then coeff n f else 0) else 0), Finset.sum_ite_eq]
+      · by_cases hn : n ∈ S
+        · rw [if_pos ((Set.Finite.mem_toFinset hMfin).2 (hcM n hn)), if_pos hn]
+        · rw [hf n hn]
+          simp
+      · intro m _
+        rw [MvPowerSeries.coeff_mul_monomial, mul_one]
+        by_cases hmn : m ≤ n
+        · rw [if_pos hmn, hb, tsub_add_cancel_of_le hmn]
+          by_cases h1 : n ∈ S <;> by_cases h2 : c n = m <;> simp [h1, h2]
+        · rw [if_neg hmn]
+          by_cases h1 : n ∈ S
+          · have h3 : c n ≠ m := fun h => hmn (h ▸ hcle n h1)
+            simp [h3]
+          · simp [h1]
+
+
+[RTC_SRC_PART_FILT] Fixed-weight cofinality of the ideal filtrations
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/PartFilt.lean#L54-L175
+theorem UpperTheory.V.Alg.part_filt :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → ∀ (j : X) (n : ℕ), ∃ M : ℕ, W.part j ⊓ (maximalIdeal R ^ M).restrictScalars O ≤ (W.part 0 ⊓ (maximalIdeal R).restrictScalars O) ^ n * W.part 0 * W.part j := by
+  intro O _ _ _ _ X _ _ _ _ R _ _ _ W _ j k
+  classical
+  set Q : Submodule O R := W.part 0 ⊓ (maximalIdeal R).restrictScalars O with hQ
+  have hloc : IsLocalHom (W.π : MvPowerSeries W.σ O →+* R) := IsLocalHom.of_surjective _ W.surj
+  have hone : (1 : R) ∈ W.part 0 := ⟨1, one_mem_wtPart O W.wt, map_one W.π⟩
+
+  have hmono : ∀ k : ℕ, ∃ N : ℕ, ∀ n : W.σ →₀ ℕ, Finsupp.weight W.wt n = j → N ≤ n.degree →
+      W.π (monomial n 1) ∈ Q ^ k * W.part j := by
+    obtain ⟨D, hD⟩ := UpperTheory.V.Alg.part_filt_split W.wt j
+    intro k
+    induction k with
+    | zero =>
+      refine ⟨0, fun n hn _ => ?_⟩
+      rw [pow_zero, one_mul]
+      exact ⟨_, UpperTheory.V.Alg.part_filt_monomial W.wt hn 1, rfl⟩
+    | succ k ih =>
+      obtain ⟨N, hN⟩ := ih
+      refine ⟨N + D + 1, fun n hn hd => ?_⟩
+      obtain ⟨g, n', hg0, hgw, hgd, rfl⟩ := hD n hn (by omega)
+      rw [map_add] at hd
+      rw [map_add, hgw, zero_add] at hn
+      have h1 := hN n' hn (by omega)
+      have h2 : W.π (monomial g 1) ∈ Q := by
+        refine ⟨⟨_, UpperTheory.V.Alg.part_filt_monomial W.wt hgw 1, rfl⟩, ?_⟩
+        intro hu
+        have h3 : IsUnit (monomial g (1 : O)) := hloc.map_nonunit _ hu
+        rw [MvPowerSeries.isUnit_iff_constantCoeff, ← coeff_zero_eq_constantCoeff_apply, coeff_monomial,
+          if_neg hg0.symm] at h3
+        exact not_isUnit_zero h3
+      have h4 : (monomial (g + n') (1 : O) : MvPowerSeries W.σ O) = monomial g 1 * monomial n' 1 := by
+        rw [monomial_mul_monomial, one_mul]
+      rw [h4, map_mul, pow_succ', mul_assoc]
+      exact Submodule.mul_mem_mul h2 h1
+
+  have hconst : ∀ k : ℕ, ∀ c ∈ maximalIdeal O ^ k, algebraMap O R c ∈ Q ^ k := by
+    intro k
+    induction k with
+    | zero =>
+      intro c _
+      rw [pow_zero]
+      exact Submodule.algebraMap_mem c
+    | succ k ih =>
+      intro c hc
+      rw [pow_succ] at hc
+      refine Submodule.mul_induction_on hc (fun a ha b hb => ?_) (fun a b ha hb => ?_)
+      · rw [map_mul, pow_succ]
+        refine Submodule.mul_mem_mul (ih a ha) ⟨?_, ?_⟩
+        · rw [Algebra.algebraMap_eq_smul_one]
+          exact Submodule.smul_mem _ _ hone
+        · exact fun hu => hb (IsLocalHom.map_nonunit (f := algebraMap O R) b hu)
+      · rw [map_add]
+        exact add_mem ha hb
+  obtain ⟨N, hN⟩ := hmono k
+  refine ⟨N + k, ?_⟩
+  rintro x ⟨⟨f, hf, hfx⟩, hx⟩
+  have hfx' : W.π f = x := hfx
+  have hle : maximalIdeal R ≤ (maximalIdeal (MvPowerSeries W.σ O)).map W.π := by
+    intro y hy
+    obtain ⟨g, rfl⟩ := W.surj y
+    exact Ideal.mem_map_of_mem _ fun hu => hy (hu.map W.π)
+  have hx' : x ∈ (maximalIdeal (MvPowerSeries W.σ O) ^ (N + k)).map W.π := by
+    rw [Ideal.map_pow]
+    exact Ideal.pow_right_mono hle _ hx
+  obtain ⟨g, hg, hgx⟩ := (Ideal.mem_map_iff_of_surjective W.π W.surj).1 hx'
+  set h := wcomp O W.wt j g with hh
+  have hhx : W.π h = x := by
+    have h1 : f - g ∈ RingHom.ker W.π := by
+      rw [RingHom.mem_ker, map_sub, hfx', hgx, sub_self]
+    have h2 := W.homog _ h1 j
+    have h3 : wcomp O W.wt j f = f := by
+      ext n
+      rw [coeff_wcomp]
+      split_ifs with hn
+      · rfl
+      · exact (hf n hn).symm
+    rw [map_sub, h3, RingHom.mem_ker, map_sub, hfx', sub_eq_zero] at h2
+    exact h2.symm
+  have hhj : h ∈ wtPart O W.wt j := wcomp_mem O W.wt j g
+  have hhc : ∀ n : W.σ →₀ ℕ, n.degree < N → coeff n h ∈ maximalIdeal O ^ k := by
+    intro n hn
+    rw [hh, coeff_wcomp]
+    split_ifs
+    · exact Ideal.pow_le_pow_right (by omega) (UpperTheory.V.Alg.part_filt_coeff _ g hg n)
+    · exact zero_mem _
+  have hfin : {n : W.σ →₀ ℕ | n.degree < N}.Finite :=
+    (Finsupp.finite_of_degree_le N).subset fun n (hn : n.degree < N) => hn.le
+  set low : MvPowerSeries W.σ O := ∑ n ∈ hfin.toFinset, monomial n (coeff n h) with hlow
+  have hlowc : ∀ m, coeff m low = if m.degree < N then coeff m h else 0 := by
+    intro m
+    rw [hlow, map_sum]
+    simp only [coeff_monomial]
+    rw [Finset.sum_ite_eq]
+    simp
+  obtain ⟨μ, hμ, hspan⟩ := UpperTheory.V.Alg.part_span O R X W
+    {n | Finsupp.weight W.wt n = j ∧ N ≤ n.degree} j fun n hn => hn.1
+  obtain ⟨b, hb, hhigh⟩ := hspan (h - low) (by
+    intro n hn
+    rw [map_sub, hlowc]
+    split_ifs with hd
+    · exact sub_self _
+    · rw [sub_zero]
+      exact hhj n fun hw => hn ⟨hw, not_lt.1 hd⟩)
+  have hsum : x = W.π low + W.π (h - low) := by rw [← map_add, add_sub_cancel, hhx]
+  rw [hsum]
+  refine add_mem ?_ ?_
+  · rw [hlow, map_sum]
+    refine Submodule.sum_mem _ fun n hn => ?_
+    by_cases hw : Finsupp.weight W.wt n = j
+    · have h1 : W.π (monomial n (coeff n h)) = algebraMap O R (coeff n h) * 1 * W.π (monomial n 1) := by
+        rw [mul_one, ← Algebra.smul_def, ← map_smul, ← map_smul, smul_eq_mul, mul_one]
+      rw [h1]
+      exact Submodule.mul_mem_mul
+        (Submodule.mul_mem_mul (hconst k _ (hhc n (hfin.mem_toFinset.1 hn))) hone)
+        ⟨_, UpperTheory.V.Alg.part_filt_monomial W.wt hw 1, rfl⟩
+    · rw [hhj n hw, map_zero, map_zero]
+      exact zero_mem _
+  · rw [hhigh, map_sum]
+    refine Submodule.sum_mem _ fun m hm => ?_
+    rw [map_mul, mul_comm (Q ^ k), mul_assoc]
+    exact Submodule.mul_mem_mul ⟨_, hb m, rfl⟩ (hN m (hμ hm).1 (hμ hm).2)
+
+
+[RTC_SRC_ZERO_CO] Degree-zero complete Noetherian coefficient ring
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/WPresGrZeroIsCOOfMemMaximalIdeal.lean#L71-L107
+theorem UpperTheory.V.Alg.wPres_gr_zero_isCO_of_mem_maximalIdeal :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → IsCO O (W.gr 0) := by
+  intro O _ _ _ _ X _ _ _ _ R _ _ _ W _
+  obtain ⟨g, hg, hgen, -⟩ := UpperTheory.V.Alg.gordan W.σ X W.wt
+  obtain ⟨φ, hφ, hs⟩ := weight_zero_power_series_surjective O W.wt (fun s : g => (s : W.σ →₀ ℕ)) (fun s => (hg s s.2).1)
+    (fun s => (hg s s.2).2) (fun n hn => by
+      have h := hgen n hn
+      induction h using AddSubmonoid.closure_induction with
+      | mem x hx => exact ⟨Finsupp.single ⟨x, hx⟩ 1, by simp⟩
+      | zero => exact ⟨0, map_zero _⟩
+      | add x y hx hy ihx ihy =>
+        have hw : ∀ z ∈ AddSubmonoid.closure (g : Set (W.σ →₀ ℕ)), Finsupp.weight W.wt z = 0 := by
+          intro z hz
+          induction hz using AddSubmonoid.closure_induction with
+          | mem x hx => exact (hg x hx).2
+          | zero => exact map_zero _
+          | add x y _ _ hx hy => rw [map_add, hx, hy, add_zero]
+        obtain ⟨d, hd⟩ := ihx (hw x hx)
+        obtain ⟨d', hd'⟩ := ihy (hw y hy)
+        exact ⟨d + d', by rw [map_add, hd, hd']⟩)
+  have hp : ∀ F, W.π (φ F) ∈ W.part 0 := fun F => ⟨φ F, hφ F, rfl⟩
+  let p : MvPowerSeries g O →ₐ[O] W.gr 0 :=
+    { toFun := fun F => ⟨⟨W.π (φ F), W.part_le_A (hp F)⟩, hp F⟩
+      map_one' := Subtype.ext (Subtype.ext (by simp))
+      map_mul' := fun F G => Subtype.ext (Subtype.ext (by simp))
+      map_zero' := Subtype.ext (Subtype.ext (by simp))
+      map_add' := fun F G => Subtype.ext (Subtype.ext (by simp))
+      commutes' := fun c => Subtype.ext (Subtype.ext (by
+        show W.π (φ (algebraMap O _ c)) = algebraMap O R c
+        rw [AlgHom.commutes, AlgHom.commutes])) }
+  haveI : IsCO O (MvPowerSeries g O) := UpperTheory.V.Alg.co_mvps O O g
+  haveI : Nontrivial (W.gr 0) := ⟨⟨0, 1, fun h =>
+    zero_ne_one (α := R) (congrArg (fun x : W.gr 0 => ((x : W.A) : R)) h)⟩⟩
+  refine UpperTheory.V.Alg.co_quot O (MvPowerSeries g O) (W.gr 0) p ?_
+  rintro ⟨⟨x, hxA⟩, f, hf, hx⟩
+  obtain ⟨F, rfl⟩ := hs f hf
+  exact ⟨F, Subtype.ext (Subtype.ext hx)⟩
+
+
+[RTC_SRC_GR_NOETH] Finite homogeneous pieces and Noetherian graded algebra
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CommutativeAlgebra/GrNoeth.lean#L8-L74
+theorem UpperTheory.V.Alg.gr_noeth :
+    ∀ (O : Type) [CommRing O] [IsLocalRing O] [IsNoetherianRing O] [IsAdicComplete (maximalIdeal O) O] (X : Type) [AddCommGroup X] [Module.Free ℤ X] [Module.Finite ℤ X] [DecidableEq X] (R : Type) [CommRing R] [Algebra O R] [IsCO O R] (W : WPres O X R), (∀ s, W.z s ∈ maximalIdeal R) → IsNoetherianRing W.A ∧ Algebra.FiniteType (W.gr 0) W.A ∧ ∀ j, ∃ s : Finset W.A, (∀ a ∈ s, a ∈ W.gr j) ∧ W.gr j = W.gr 0 * Submodule.span O (s : Set W.A) := by
+  intro O _ _ _ _ X _ _ _ _ R _ _ _ W hz
+  classical
+  haveI := W.fin
+  haveI hco : IsCO O (W.gr 0) := wPres_gr_zero_isCO_of_mem_maximalIdeal O X R W hz
+  haveI : IsNoetherianRing (W.gr 0) := IsCO.toIsNoetherian O
+  have hgen : Algebra.adjoin (W.gr 0) (Set.range W.zA) = ⊤ := by
+    rw [eq_top_iff]
+    rintro a -
+    have ha : a ∈ Algebra.adjoin O ((W.gr 0 : Set W.A) ∪ Set.range W.zA) := by
+      rw [gr_gen O R X W]
+      trivial
+    induction ha using Algebra.adjoin_induction with
+    | mem x hx =>
+      rcases hx with hx | ⟨i, rfl⟩
+      · have e : algebraMap (W.gr 0) W.A ⟨x, hx⟩ = x := rfl
+        rw [← e]
+        exact Subalgebra.algebraMap_mem _ _
+      · exact Algebra.subset_adjoin ⟨i, rfl⟩
+    | algebraMap r =>
+      have hr : algebraMap O W.A r ∈ W.gr 0 := SetLike.algebraMap_mem_graded W.gr r
+      have e : algebraMap (W.gr 0) W.A ⟨_, hr⟩ = algebraMap O W.A r := rfl
+      rw [← e]
+      exact Subalgebra.algebraMap_mem _ _
+    | add x y _ _ hx hy => exact Subalgebra.add_mem _ hx hy
+    | mul x y _ _ hx hy => exact Subalgebra.mul_mem _ hx hy
+  haveI hft : Algebra.FiniteType (W.gr 0) W.A :=
+    ⟨⟨Finset.univ.image W.zA, by rw [Finset.coe_image, Finset.coe_univ, Set.image_univ, hgen]⟩⟩
+  refine ⟨Algebra.FiniteType.isNoetherianRing (W.gr 0) W.A, hft, ?_⟩
+  intro j
+  have hmono : ∀ m : W.σ →₀ ℕ, monomial m (1 : O) ∈ wtPart O W.wt (Finsupp.weight W.wt m) := by
+    intro m n hn
+    rw [coeff_monomial, if_neg]
+    rintro rfl
+    exact hn rfl
+  obtain ⟨μ, hμS, hμ⟩ := part_span O R X W {n | Finsupp.weight W.wt n = j} j (fun n hn => hn)
+  let mA : (W.σ →₀ ℕ) → W.A := fun m =>
+    ⟨W.π (monomial m 1), W.part_le_A (Submodule.mem_map_of_mem (hmono m))⟩
+  have hsj : ∀ a ∈ μ.image mA, a ∈ W.gr j := by
+    intro a ha
+    obtain ⟨m, hm, rfl⟩ := Finset.mem_image.mp ha
+    have hw : Finsupp.weight W.wt m = j := hμS hm
+    show (W.π (monomial m 1) : R) ∈ W.part j
+    rw [← hw]
+    exact Submodule.mem_map_of_mem (hmono m)
+  refine ⟨μ.image mA, hsj, ?_⟩
+  apply le_antisymm
+  · intro a ha
+    have ha' : (a : R) ∈ W.part j := ha
+    obtain ⟨f, hf, hfa⟩ := Submodule.mem_map.mp ha'
+    obtain ⟨b, hb, hfb⟩ := hμ f (fun n hn => hf n hn)
+    let bA : (W.σ →₀ ℕ) → W.A := fun m =>
+      ⟨W.π (b m), W.part_le_A (Submodule.mem_map_of_mem (hb m))⟩
+    have hsum : a = ∑ m ∈ μ, bA m * mA m := by
+      apply Subtype.ext
+      rw [← hfa]
+      simp [hfb, map_sum, map_mul, bA, mA]
+    rw [hsum]
+    refine Submodule.sum_mem _ fun m hm => Submodule.mul_mem_mul ?_ ?_
+    · show (W.π (b m) : R) ∈ W.part 0
+      exact Submodule.mem_map_of_mem (hb m)
+    · exact Submodule.subset_span (Finset.mem_coe.mpr (Finset.mem_image_of_mem mA hm))
+  · rw [Submodule.mul_le]
+    intro x hx y hy
+    have hy' : y ∈ W.gr j := (Submodule.span_le.mpr fun z hz => hsj z hz) hy
+    simpa using SetLike.GradedMul.mul_mem hx hy'
+
+
+[RTC_SRC_COB] Full original co_B
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/CoB.lean#L8-L26
+theorem UpperTheory.V.Fr.co_B :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∃ h : IsCO O S.B, @maximalIdeal _ _ h.toIsLocalRing = S.mB := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S
+  obtain ⟨W, hz, -, hB, -, -⟩ := UpperTheory.V.Fr.wpres hF hn S
+  haveI h0 : IsCO O (W.gr 0) := UpperTheory.V.Alg.wPres_gr_zero_isCO_of_mem_maximalIdeal O ℤ S.R W hz
+  let p : W.gr 0 →ₐ[O] S.B :=
+    { toFun := fun b => ⟨((b : W.A) : S.R), (hB _).2 b.2⟩
+      map_one' := rfl
+      map_mul' := fun _ _ => rfl
+      map_zero' := rfl
+      map_add' := fun _ _ => rfl
+      commutes' := fun _ => rfl }
+  have hp : Function.Surjective p := fun y =>
+    ⟨⟨⟨y.1, W.part_le_A ((hB _).1 y.2)⟩, (hB _).1 y.2⟩, rfl⟩
+  haveI h : IsCO O S.B := UpperTheory.V.Alg.co_quot O (W.gr 0) S.B p hp
+  refine ⟨h, ?_⟩
+  ext b
+  show _ ↔ S.B.val b ∈ maximalIdeal S.R
+  rw [← res_eq_zero_iff O, ← res_eq_zero_iff O, res_map]
+
+
+[RTC_SRC_GRA] Full original gr_A, upstream of FinPt/FinEnd/FinA
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/IsInternalCongr.lean#L81-L86
+theorem UpperTheory.V.Fr.gr_A :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, DirectSum.IsInternal S.gr ∧ SetLike.GradedMonoid S.gr ∧ S.gr 0 = 1 ∧ (∀ j, (S.gr j).FG) ∧ Algebra.FiniteType S.B S.A ∧ IsNoetherianRing S.A ∧ ∀ g i j, S.u.r g i j ∈ S.gr (w n i - w n j) := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S
+  obtain ⟨W, hz, hr, hB, hA, hgr⟩ := UpperTheory.V.Fr.wpres hF hn S
+  obtain ⟨h1, h2, h3, h4, h5, h6⟩ := gr_transfer O S.R W hz S.B S.A (fun _ => rfl) S.gr hB hA hgr
+  exact ⟨h1, h2, h3, h4, h5, h6, fun g i j => (hgr _ _).2 (hr g i j)⟩
+
+
+[RTC_SRC_CONTU] Full original cont_u, including every graded-piece filtration clause
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/MemPowSmulLe.lean#L14-L110
+theorem UpperTheory.V.Fr.cont_u :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, S.u.Cont S.x0 ∧ (∀ i, AdicCont S.mB fun g => S.aB g i) ∧ (∀ v i, AdicCont S.mB (S.ψB v i)) ∧ ∀ j (N : ℕ), ∃ M : ℕ, ∀ a ∈ S.gr j, (a : S.R) ∈ maximalIdeal S.R ^ M → a ∈ S.mB ^ N • S.gr j := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S
+  obtain ⟨W, hz, hr, hB, hA, hgr⟩ := wpres hF hn S
+  have hAW : ∀ (j : ℤ) (q : S.R), q ∈ W.part j → q ∈ S.A := by
+    intro j q hq
+    rw [hA]
+    exact Submodule.mem_iSup_of_mem j hq
+  have hmulB : ∀ (N : ℕ) (Q : Submodule O S.R),
+      (∀ y ∈ Q, ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N) →
+      ∀ y ∈ Q * W.part 0, ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N := by
+    intro N Q hQ y hy
+    refine Submodule.mul_induction_on hy ?_ ?_
+    · intro p hp q hq
+      obtain ⟨p', rfl, hp'⟩ := hQ p hp
+      have hq0 : q ∈ S.B := (hB q).2 hq
+      exact ⟨p' * ⟨q, hq0⟩, rfl, Ideal.mul_mem_right _ _ hp'⟩
+    · rintro x z ⟨x', rfl, hx'⟩ ⟨z', rfl, hz'⟩
+      exact ⟨x' + z', rfl, Ideal.add_mem _ hx' hz'⟩
+  have hP : ∀ (N : ℕ) (y : S.R), y ∈ (W.part 0 ⊓ Submodule.restrictScalars O (maximalIdeal S.R)) ^ N →
+      ∃ b : S.B, (b : S.R) = y ∧ b ∈ S.mB ^ N := by
+    intro N
+    induction N with
+    | zero =>
+      intro y hy
+      rw [pow_zero, Submodule.mem_one] at hy
+      obtain ⟨o, rfl⟩ := hy
+      exact ⟨algebraMap O S.B o, rfl, by simp⟩
+    | succ N ih =>
+      intro y hy
+      rw [pow_succ] at hy
+      refine Submodule.mul_induction_on hy ?_ ?_
+      · intro p hp q hq
+        obtain ⟨p', rfl, hp'⟩ := ih p hp
+        have hq0 : q ∈ S.B := (hB q).2 hq.1
+        have hqm : (⟨q, hq0⟩ : S.B) ∈ S.mB := by
+          show q ∈ maximalIdeal S.R
+          exact hq.2
+        refine ⟨p' * ⟨q, hq0⟩, rfl, ?_⟩
+        rw [pow_succ]
+        exact Ideal.mul_mem_mul hp' hqm
+      · rintro x z ⟨x', rfl, hx'⟩ ⟨z', rfl, hz'⟩
+        exact ⟨x' + z', rfl, Ideal.add_mem _ hx' hz'⟩
+  have hT : ∀ (N : ℕ) (j : ℤ) (y : S.R),
+      y ∈ (W.part 0 ⊓ Submodule.restrictScalars O (maximalIdeal S.R)) ^ N * W.part 0 * W.part j →
+      ∃ a : S.A, (a : S.R) = y ∧ a ∈ S.mB ^ N • S.gr j ∧ a ∈ S.x0 ^ N := by
+    intro N j y hy
+    refine Submodule.mul_induction_on hy ?_ ?_
+    · intro p hp q hq
+      obtain ⟨b, rfl, hb⟩ := hmulB N _ (hP N) p hp
+      have hqA : q ∈ S.A := hAW j q hq
+      refine ⟨b • (⟨q, hqA⟩ : S.A), rfl, Submodule.smul_mem_smul hb ((hgr j ⟨q, hqA⟩).2 hq), ?_⟩
+      have hib : S.inc b ∈ S.x0 ^ N := by
+        rw [Space.x0, ← Ideal.map_pow]
+        exact Ideal.mem_map_of_mem _ hb
+      show S.inc b * ⟨q, hqA⟩ ∈ S.x0 ^ N
+      exact Ideal.mul_mem_right _ _ hib
+    · rintro x z ⟨x', rfl, hx1, hx2⟩ ⟨z', rfl, hz1, hz2⟩
+      exact ⟨x' + z', rfl, Submodule.add_mem _ hx1 hz1, Ideal.add_mem _ hx2 hz2⟩
+  have hcA : ∀ {Γ : Type} [TopologicalSpace Γ] (j : ℤ) (f : Γ → S.A), (∀ g, (f g : S.R) ∈ W.part j) →
+      AdicCont (maximalIdeal S.R) (fun g => (f g : S.R)) → AdicCont S.x0 f := by
+    intro Γ _ j f hf hc N
+    obtain ⟨M, hM⟩ := part_filt O ℤ S.R W hz j N
+    have hcM := hc M
+    rw [IsLocallyConstant.iff_eventually_eq] at hcM ⊢
+    intro x
+    filter_upwards [hcM x] with y hy
+    rw [Ideal.Quotient.eq] at hy ⊢
+    obtain ⟨a, ha, -, ha2⟩ := hT N j _ (hM ⟨Submodule.sub_mem _ (hf y) (hf x), hy⟩)
+    have hax : f y - f x = a := Subtype.ext (by rw [ha]; rfl)
+    rw [hax]
+    exact ha2
+  have hcB : ∀ {Γ : Type} [TopologicalSpace Γ] (f : Γ → S.B),
+      AdicCont (maximalIdeal S.R) (fun g => (f g : S.R)) → AdicCont S.mB f := by
+    intro Γ _ f hc N
+    obtain ⟨M, hM⟩ := part_filt O ℤ S.R W hz 0 N
+    have hcM := hc M
+    rw [IsLocallyConstant.iff_eventually_eq] at hcM ⊢
+    intro x
+    filter_upwards [hcM x] with y hy
+    rw [Ideal.Quotient.eq] at hy ⊢
+    have hd : ((f y : S.R) - f x) ∈ W.part 0 := (hB _).1 (S.B.sub_mem (f y).2 (f x).2)
+    obtain ⟨b, hb, hb2⟩ := hmulB N _ (hmulB N _ (hP N)) _ (hM ⟨hd, hy⟩)
+    have hbx : f y - f x = b := Subtype.ext (by rw [hb]; rfl)
+    rw [hbx]
+    exact hb2
+  refine ⟨⟨fun i j => ?_, fun v i => ?_⟩, fun i => ?_, fun v i => ?_, fun j N => ?_⟩
+  · exact hcA (w n i - w n j) (fun g => S.u.r g i j) (fun g => hr g i j) (S.lift.1.1 i j)
+  · exact hcA 0 (fun g => (S.u.ψ v i g : S.A)) (fun g => (hB _).1 (S.ψB v i g).2) (S.lift.1.2 v i)
+  · exact hcB (fun g => S.aB g i) (S.lift.1.1 i i)
+  · exact hcB (S.ψB v i) (S.lift.1.2 v i)
+  · obtain ⟨M, hM⟩ := part_filt O ℤ S.R W hz j N
+    refine ⟨M, fun a ha hm => ?_⟩
+    obtain ⟨b, hb, hb1, -⟩ := hT N j _ (hM ⟨(hgr j a).1 ha, hm⟩)
+    have hba : b = a := Subtype.ext hb
+    rw [← hba]
+    exact hb1
+
+
+[RTC_SRC_SMOOTH_CHAR] Full original automatic local constancy, IsBar and uniqueness for FPt
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/SmoothCharacterExtendsToOpenSubgroup.lean#L7-L52
+theorem UpperTheory.smoothCharacter_extends_to_open_subgroup :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ (S : Space O F n) (Q : Type) [CommRing Q] [Algebra (ResidueField O) Q] (ξ : S.A →+* Q), S.FPt ξ → (S.u.map ξ).IsBar (algebraMap (ResidueField O) Q) ∧ (∀ i j, IsLocallyConstant fun g => (S.u.map ξ).r g i j) ∧ ∀ ξ' : S.A →+* Q, S.FPt ξ' → (∀ g i j, ξ' (S.u.r g i j) = ξ (S.u.r g i j)) → ξ' = ξ := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S Q _ _ ξ hξ
+  have hkey : ∀ ζ : S.A →+* Q, S.FPt ζ → ∀ (b : S.B) (c : O), b - algebraMap O S.B c ∈ S.mB →
+      ζ (S.inc b) = algebraMap (ResidueField O) Q (residue O c) := by
+    intro ζ hζ b c hbc
+    have h1 : S.inc (b - algebraMap O S.B c) ∈ S.x0 := Ideal.mem_map_of_mem _ hbc
+    have h2 := hζ.x0 h1
+    rw [RingHom.mem_ker, map_sub, AlgHom.commutes, map_sub, sub_eq_zero] at h2
+    rw [h2, hζ.alg]
+  have hres : ∀ (b : S.B) (y : ResidueField O), res O S.R b.val = y →
+      ∀ ζ : S.A →+* Q, S.FPt ζ → ζ (S.inc b) = algebraMap (ResidueField O) Q y := by
+    intro b y hb ζ hζ
+    obtain ⟨c, rfl⟩ := IsLocalRing.residue_surjective y
+    apply hkey ζ hζ b c
+    show (b - algebraMap O S.B c).val ∈ maximalIdeal S.R
+    rw [← res_eq_zero_iff O S.R]
+    simp [hb]
+  refine ⟨⟨fun g i => ?_, fun v i g => ?_⟩, fun i j => ?_, fun ξ' hξ' hag => ?_⟩
+  · have h := S.lift.2.1.1 g i
+    exact hres (S.aB g i) _ (by simpa [NRep.map, Space.aB] using h) ξ hξ
+  · have h := S.lift.2.1.2 v i g
+    exact hres (S.ψB v i g) _ (by simpa [NRep.map, Space.ψB] using h) ξ hξ
+  · have hc := ((cont_u hF hn S).1.1 i j) 1
+    let f := Ideal.Quotient.lift (S.x0 ^ 1) ξ (fun a ha => hξ.x0 (by rwa [pow_one] at ha))
+    convert hc.comp f using 1
+    funext g
+    rfl
+  · apply RingHom.ext
+    rintro ⟨x, hx⟩
+    refine Algebra.adjoin_induction (p := fun x hx => ξ' ⟨x, hx⟩ = ξ ⟨x, hx⟩) ?_ ?_ ?_ ?_ hx
+    · rintro x (hxB | ⟨g, i, j, rfl⟩)
+      · obtain ⟨c, hc⟩ := IsCO.res_surj (O := O) x
+        have hc' : (⟨x, hxB⟩ : S.B) - algebraMap O S.B c ∈ S.mB := hc
+        show ξ' (S.inc ⟨x, hxB⟩) = ξ (S.inc ⟨x, hxB⟩)
+        rw [hkey ξ' hξ' _ c hc', hkey ξ hξ _ c hc']
+      · exact hag g i j
+    · intro r
+      show ξ' (algebraMap O S.A r) = ξ (algebraMap O S.A r)
+      rw [hξ'.alg, hξ.alg]
+    · intro x y hx hy h1 h2
+      show ξ' ((⟨x, hx⟩ : S.A) + ⟨y, hy⟩) = ξ ((⟨x, hx⟩ : S.A) + ⟨y, hy⟩)
+      rw [map_add, map_add, h1, h2]
+    · intro x y hx hy h1 h2
+      show ξ' ((⟨x, hx⟩ : S.A) * ⟨y, hy⟩) = ξ ((⟨x, hx⟩ : S.A) * ⟨y, hy⟩)
+      rw [map_mul, map_mul, h1, h2]
+
+
+[RTC_SRC_NORMALIZE] Full original normalized nonzero strict cocycle; no continuity of arbitrary chi required
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/SmoothVectorFixedByOpenSubgroup.lean#L6-L90
+theorem UpperTheory.smooth_vector_fixed_by_open_subgroup :
+    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ}, F.Ok C₀ → ∀ χ : F.Γ →* kˣ, χ F.c = -1 → (∀ v, ∃ s, χ (F.loc v s) ≠ 1) → Nontrivial (H1C F.loc (chRep χ) fun _ => ⊥) → ∃ x : F.Γ → k, IsLocallyConstant x ∧ (∀ g h, x (g * h) = x g + χ g * x h) ∧ x F.c = 0 ∧ (∀ v, ∃ Y : k, ∀ s, x (F.loc v s) = χ (F.loc v s) * Y - Y) ∧ ∃ g : F.G0, x g ≠ 0 := by
+  intro l _ k _ _ F C₀ hok χ hc hloc hnt
+  obtain ⟨q, hq⟩ := exists_ne (0 : H1C F.loc (chRep χ) fun _ => ⊥)
+  obtain ⟨z, rfl⟩ := Submodule.Quotient.mk_surjective _ q
+  rw [Ne, Submodule.Quotient.mk_eq_zero, Submodule.mem_comap] at hq
+  obtain ⟨⟨x, y⟩, hz⟩ := z
+  obtain ⟨hlc, hcoc, hlocz⟩ := hz
+  simp only [chRep_apply] at hcoc
+  simp only [chRep_apply, Submodule.mem_bot] at hlocz
+  have h2 : (2 : k) ≠ 0 := by
+    intro h
+    have h' : ((2 : ℕ) : k) = 0 := by exact_mod_cast h
+    rw [CharP.cast_eq_zero_iff k l] at h'
+    exact hok.l_odd ((Nat.prime_dvd_prime_iff_eq (Fact.out) Nat.prime_two).1 h')
+  have hx1 : x 1 = 0 := by
+    have e := hcoc 1 1
+    rw [mul_one, map_one, Units.val_one, one_mul] at e
+    linear_combination -e
+  have hχ : ∀ s, (χ s : k) * x F.c = x (s * F.c) - x s := by
+    intro s
+    rw [hcoc]
+    ring
+  set X : k := -(x F.c) / 2 with hX
+  set x' : F.Γ → k := fun s => x s - ((χ s : k) * X - X) with hx'
+  have hform : x' = fun s => (x s + x (s * F.c) - x F.c) / 2 := by
+    funext s
+    simp only [hx', hX]
+    rw [show x (s * F.c) = (χ s : k) * x F.c + x s by rw [hχ]; ring]
+    field_simp
+    ring
+  have hcoc' : ∀ g h, x' (g * h) = x' g + (χ g : k) * x' h := by
+    intro g h
+    simp only [hx']
+    rw [hcoc, map_mul, Units.val_mul]
+    ring
+  have hc' : x' F.c = 0 := by
+    rw [hform]
+    simp only
+    rw [hok.c_sq, hx1]
+    ring
+  have hloc' : ∀ v s, x' (F.loc v s) = (χ (F.loc v s) : k) * (y v - X) - (y v - X) := by
+    intro v s
+    simp only [hx']
+    have e := hlocz v s
+    linear_combination e
+  refine ⟨x', ?_, hcoc', hc', fun v => ⟨y v - X, hloc' v⟩, ?_⟩
+  · rw [hform]
+    exact IsLocallyConstant.comp₂ hlc (hlc.comp_continuous (continuous_mul_right F.c))
+      (fun a b => (a + b - x F.c) / 2)
+  · by_contra hall
+    push_neg at hall
+    have hzero : ∀ γ, x' γ = 0 := by
+      intro γ
+      rcases Int.units_eq_one_or (F.del γ) with hd | hd
+      · exact hall ⟨γ, hd⟩
+      · have hm : γ * F.c ∈ F.del.ker := by
+          rw [MonoidHom.mem_ker, map_mul, hd, hok.del_c]
+          rfl
+        have e : γ = (γ * F.c) * F.c := by
+          rw [mul_assoc, hok.c_sq, mul_one]
+        rw [e, hcoc', hc', mul_zero, add_zero]
+        exact hall ⟨_, hm⟩
+    have hy : ∀ v, y v - X = 0 := by
+      intro v
+      obtain ⟨s, hs⟩ := hloc v
+      have e := hloc' v s
+      rw [hzero] at e
+      have e' : ((χ (F.loc v s) : k) - 1) * (y v - X) = 0 := by
+        linear_combination -e
+      rcases mul_eq_zero.1 e' with h | h
+      · exact absurd (by
+          have : (χ (F.loc v s) : k) = 1 := sub_eq_zero.1 h
+          exact Units.val_eq_one.1 this) hs
+      · exact h
+    apply hq
+    refine ⟨X, fun s => ?_, fun v => ?_⟩
+    · have e := hzero s
+      simp only [hx'] at e
+      show x s = (chRep χ s) X - X
+      rw [chRep_apply]
+      linear_combination e
+    · show y v - X ∈ (⊥ : Submodule k k)
+      rw [Submodule.mem_bot]
+      exact hy v
+
+
+[RTC_SRC_NONZERO] Full original nonzero strS supplier from f4'
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/ExistsMemStrSNeZeroOfFrameOk.lean#L12-L61
+theorem UpperTheory.exists_mem_strS_ne_zero_of_frameOk :
+    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ}, F.Ok C₀ → ∃ b ∈ F.strS k, b ≠ 0 := by
+  intro l _ k _ _ F C₀ h
+  have hχ0 : ∀ g : F.G0, (F.Ψ⁻¹ ^ 2 * F.delK k) g = (F.Ψ g)⁻¹ ^ 2 := fun g => by
+    have : F.del g = 1 := g.2
+    simp [Frame.delK, this]
+  have hχ : ∀ g : F.G0, (((F.Ψ⁻¹ ^ 2 * F.delK k) g : kˣ) : k) = ((F.Ψ g : k))⁻¹ ^ 2 := fun g => by
+    rw [hχ0]; simp
+  have hc : (F.Ψ⁻¹ ^ 2 * F.delK k) F.c = -1 := by
+    apply Units.ext
+    simp [Frame.delK, h.Ψ_c, h.del_c]
+  obtain ⟨x, x1, x2, x3, x4, g₁, x5⟩ := UpperTheory.smooth_vector_fixed_by_open_subgroup h (F.Ψ⁻¹ ^ 2 * F.delK k) hc (fun v => by
+    obtain ⟨s, hs⟩ := h.f3 v
+    refine ⟨s, fun e => hs ?_⟩
+    have e' := (hχ0 (F.loc0 v s)).symm.trans e
+    rw [inv_pow, inv_eq_one] at e'
+    exact e') h.f4'
+  have x0 : x 1 = 0 := by
+    have := x2 1 1
+    rw [mul_one, map_one] at this
+    simpa using this
+  have hci : F.c⁻¹ = F.c := inv_eq_of_mul_eq_one_right h.c_sq
+  refine ⟨fun g => x g * F.Ψ g, ⟨?_, fun g g' => ?_, fun g => ?_, fun v => ?_⟩, fun e => ?_⟩
+  · exact (x1.mul ((lc_of_ker F.Ψ h.Ψ_open).comp Units.val)).comp_continuous continuous_subtype_val
+  · have := (F.Ψ g).ne_zero
+    simp only [Subgroup.coe_mul, x2, hχ, map_mul, Units.val_mul, smul_eq_mul, Units.val_inv_eq_inv_val]
+    field_simp
+  · have hs : ((F.star g : F.G0) : F.Γ) = F.c * ((g : F.Γ)⁻¹ * F.c) := by
+      rw [← mul_assoc]
+      nth_rewrite 2 [← hci]
+      rfl
+    have h0 := (F.Ψ g).ne_zero
+    have e1 := x2 g (g : F.Γ)⁻¹
+    rw [mul_inv_cancel, x0, hχ] at e1
+    show x (F.star g) * F.Ψ (F.star g) = x g * F.Ψ g
+    rw [(star h).2.2.1 g, hs, x2, x2, x3, hc, Units.val_inv_eq_inv_val]
+    have e2 : x g = -((F.Ψ g : k)⁻¹ ^ 2 * x (g : F.Γ)⁻¹) := by linear_combination -e1
+    rw [e2]
+    simp only [Units.val_neg, Units.val_one]
+    field_simp
+    ring
+  · obtain ⟨Y, hY⟩ := x4 v
+    refine ⟨-Y, fun s => ?_⟩
+    have h0 := (F.Ψ (F.loc v s)).ne_zero
+    have e : (((F.Ψ⁻¹ ^ 2 * F.delK k) (F.loc v s) : kˣ) : k) = ((F.Ψ (F.loc v s) : k))⁻¹ ^ 2 := hχ (F.loc0 v s)
+    show x (F.loc v s) * F.Ψ (F.loc v s) = _
+    rw [hY, e, Units.val_inv_eq_inv_val, smul_eq_mul]
+    field_simp
+    ring
+  · exact mul_ne_zero x5 (F.Ψ g₁).ne_zero (congrFun e g₁)
+
+
+[RTC_SRC_REP] Actual lower-triangular normalized rank-two representation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/PreconnectedRankTwo.lean#L12-L131
+private theorem pol2 {Q : Type} [CommRing Q] (x y z : Q) :
+    (!![z, 0; y, x] : Matrix (Fin 2) (Fin 2) Q) = Jmat Q 2 * (!![x, 0; y, z])ᵀ * Jmat Q 2 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [Jmat, Matrix.mul_apply, Fin.sum_univ_two, Matrix.transpose_apply]
+
+private theorem ord2 {H Q : Type} [CommRing Q] (r : H → Matrix (Fin 2) (Fin 2) Q) (ψ : Fin 2 → H → Q) (γ : Q)
+    (h : ∀ s, r s = !![ψ 0 s, 0; (ψ 0 s - ψ 1 s) * γ, ψ 1 s]) (g : Fin 2 → H) : ordProd r ψ g = 0 := by
+  have e : ∀ i : Fin 2, List.ofFn (fun i => r (g i) - ψ i (g i) • (1 : Matrix (Fin 2) (Fin 2) Q)) =
+      [r (g 0) - ψ 0 (g 0) • 1, r (g 1) - ψ 1 (g 1) • 1] := fun _ => by
+    simp [List.ofFn_succ]
+  unfold ordProd
+  rw [e 0, h, h]
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [Matrix.mul_apply, Fin.sum_univ_two] <;> ring
+
+private theorem hom_ex {G Q : Type} [Group G] [CommRing Q] (p q : G →* Q) (a : G → Q) (a0 : a 1 = 0)
+    (h : ∀ g g', a (g * g') = a g * p g' + q g * a g') :
+    ∃ r : G →* Matrix (Fin 2) (Fin 2) Q, ∀ g, r g = !![p g, 0; a g, q g] := by
+  refine ⟨{ toFun := fun g => !![p g, 0; a g, q g],
+            map_one' := ?_, map_mul' := ?_ }, fun g => rfl⟩
+  · simp only [map_one, a0]
+    ext i j
+    fin_cases i <;> fin_cases j <;> simp
+  · intro g g'
+    simp only [h]
+    ext i j
+    fin_cases i <;> fin_cases j <;>
+      simp [Matrix.mul_apply, Fin.sum_univ_two, map_mul] <;> ring
+
+private theorem isLocallyConstant_psi_restrict_of_isOpen_ker {l : ℕ} [Fact l.Prime] {k : Type} [Field k] {F : Frame l k}
+    (hΨ : IsOpen (F.Ψ.ker : Set F.Γ)) : IsLocallyConstant fun g : F.G0 => F.Ψ (g : F.Γ) := by
+  rw [IsLocallyConstant.iff_isOpen_fiber_apply]
+  intro g
+  have hK : IsOpen ((fun h : F.G0 => ((g⁻¹ * h : F.G0) : F.Γ)) ⁻¹' (F.Ψ.ker : Set F.Γ)) :=
+    hΨ.preimage (continuous_subtype_val.comp (continuous_const.mul continuous_id))
+  convert hK using 1
+  ext h
+  simp only [Set.mem_preimage, Set.mem_singleton_iff, SetLike.mem_coe, MonoidHom.mem_ker,
+    Subgroup.coe_mul, Subgroup.coe_inv, map_mul, map_inv]
+  constructor
+  · intro e
+    rw [e, inv_mul_cancel]
+  · intro e
+    exact (inv_mul_eq_one.mp e).symm
+
+private theorem rep_ex {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ}
+    (hF : F.Ok C₀) (Q : Type) [CommRing Q] [Algebra k Q] {a : F.G0 → Q} (ha : a ∈ F.strS Q) :
+    ∃ ρ : NRep F 2 Q, ρ.IsBar (algebraMap k Q) ∧ ρ.triM = ⊥ ∧ (∀ i j, IsLocallyConstant fun g => ρ.r g i j) ∧
+      ∀ g, ρ.r g 1 0 = a g := by
+  classical
+  obtain ⟨hlc, hmul, hstar, hloc⟩ := ha
+  let φ : F.G0 →* kˣ := F.Ψ.comp F.del.ker.subtype
+  let p : F.G0 →* Q := (algebraMap k Q).toMonoidHom.comp ((Units.coeHom k).comp φ)
+  let q : F.G0 →* Q := (algebraMap k Q).toMonoidHom.comp ((Units.coeHom k).comp φ⁻¹)
+  have hp : ∀ g, p g = algebraMap k Q (F.Ψ (g : F.Γ) : k) := fun g => rfl
+  have hq : ∀ g, q g = algebraMap k Q ((F.Ψ (g : F.Γ))⁻¹ : kˣ) := fun g => rfl
+  have hΨstar : ∀ g : F.G0, F.Ψ ((F.star g : F.G0) : F.Γ) = (F.Ψ (g : F.Γ))⁻¹ := by
+    intro g
+    simp only [Frame.star, Frame.conj, MulEquiv.coe_toMonoidHom, MulAut.conjNormal_apply,
+      map_mul, map_inv, Subgroup.coe_inv]
+    rw [mul_comm, ← mul_assoc, inv_mul_cancel, one_mul]
+  have a0 : a 1 = 0 := by
+    have h1 := hmul 1 1
+    simp only [mul_one, map_one, Units.val_one, one_smul, inv_one] at h1
+    simpa using h1
+  have hmul' : ∀ g g', a (g * g') = a g * p g' + q g * a g' := by
+    intro g g'
+    rw [hmul, hp, hq, Algebra.smul_def, Algebra.smul_def, mul_comm (algebraMap k Q _) (a g)]
+  obtain ⟨r, hr⟩ := hom_ex p q a a0 hmul'
+  let χ : (v : F.V) → F.Gv v →* Qˣ := fun v => (Units.map (algebraMap k Q).toMonoidHom).comp (F.Ψ.comp (F.loc v))
+  have hpstar : ∀ g, p (F.star g) = q g := fun g => by rw [hp, hq, hΨstar]
+  have hqstar : ∀ g, q (F.star g) = p g := fun g => by rw [hp, hq, hΨstar, inv_inv]
+  let ρ : NRep F 2 Q :=
+    { r := r
+      ψ := fun v => ![χ v, (χ v)⁻¹]
+      pol := by
+        intro g
+        rw [hr, hr, hpstar, hqstar, hstar]
+        exact pol2 _ _ _
+      diag := by
+        intro i j hij
+        rw [hr, hr]
+        fin_cases i <;> fin_cases j
+        · exact absurd rfl hij
+        · simp
+        · simp [hstar]
+        · exact absurd rfl hij
+      ord := by
+        intro v g
+        obtain ⟨γ, hγ⟩ := hloc v
+        refine ord2 _ _ γ (fun s => ?_) g
+        rw [hr, hγ]
+        simp [χ, hp, hq, Algebra.smul_def, Frame.loc] }
+  refine ⟨ρ, ⟨?_, ?_⟩, ?_, ?_, ?_⟩
+  · intro g i
+    show r g i i = _
+    rw [hr]
+    fin_cases i <;> simp [w, hp, hq]
+  · intro v i g
+    fin_cases i <;> simp [ρ, χ, w]
+  · apply Ideal.span_eq_bot.mpr
+    rintro _ ⟨g, i, j, hij, rfl⟩
+    show r g i j = 0
+    rw [hr]
+    fin_cases i <;> fin_cases j <;> simp at hij ⊢
+  · have hl : IsLocallyConstant fun g : F.G0 => F.Ψ (g : F.Γ) := isLocallyConstant_psi_restrict_of_isOpen_ker hF.Ψ_open
+    intro i j
+    show IsLocallyConstant fun g => r g i j
+    simp only [hr]
+    fin_cases i <;> fin_cases j
+    · exact hl.comp fun z => algebraMap k Q (z : k)
+    · exact IsLocallyConstant.const _
+    · exact hlc
+    · exact hl.comp fun z => algebraMap k Q ((z⁻¹ : kˣ) : k)
+  · intro g
+    show r g 1 0 = a g
+    rw [hr]
+    simp
+
+
+[RTC_SRC_FIBER] Full original extraction of a strict cocycle from a triangular rank-two representation
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/FramePointFiberNonempty.lean#L6-L64
+theorem UpperTheory.V.Fr.framePoint_fiber_nonempty :
+    ∀ {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ : ℕ}, F.Ok C₀ → ∀ (Q : Type) [CommRing Q] [Algebra k Q] (ρ : NRep F 2 Q), ρ.IsBar (algebraMap k Q) → ρ.triM = ⊥ → (∀ i j, IsLocallyConstant fun g => ρ.r g i j) → (fun g => ρ.r g 1 0) ∈ F.strS Q := by
+  intro l _ k _ _ F C₀ hF Q _ _ ρ hbar htri hlc
+  have hd0 : ∀ g : F.G0, ρ.r g 0 0 = algebraMap k Q ((F.Ψ (g : F.Γ) : k)) := by
+    intro g
+    have h := hbar.1 g 0
+    simpa [w] using h
+  have hd1 : ∀ g : F.G0, ρ.r g 1 1 = algebraMap k Q ((F.Ψ (g : F.Γ) : k))⁻¹ := by
+    intro g
+    have h := hbar.1 g 1
+    simpa [w] using h
+  have hup : ∀ g : F.G0, ρ.r g 0 1 = 0 := by
+    intro g
+    have h : ρ.r g 0 1 ∈ ρ.triM := Ideal.subset_span ⟨g, 0, 1, by decide, rfl⟩
+    rw [htri, Ideal.mem_bot] at h
+    exact h
+  have hψ0 : ∀ v (s : F.Gv v), ((ρ.ψ v 0 s : Qˣ) : Q) = algebraMap k Q ((F.Ψ (F.loc v s) : k)) := by
+    intro v s
+    have h := hbar.2 v 0 s
+    simpa [w] using h
+  have hψ1 : ∀ v (s : F.Gv v), ((ρ.ψ v 1 s : Qˣ) : Q) = algebraMap k Q ((F.Ψ (F.loc v s) : k))⁻¹ := by
+    intro v s
+    have h := hbar.2 v 1 s
+    simpa [w] using h
+  refine ⟨hlc 1 0, ?_, ?_, ?_⟩
+  · intro g h
+    simp only [map_mul, Matrix.mul_apply, Fin.sum_univ_two, Algebra.smul_def, Units.val_inv_eq_inv_val]
+    rw [hd0, hd1]
+    ring
+  · intro g
+    show ρ.r (F.star g) 1 0 = ρ.r g 1 0
+    rw [(UpperTheory.V.Fr.star hF).2.2.2.2 ρ g 1 0]
+    rfl
+  · intro v
+    obtain ⟨t, ht⟩ := hF.f3 v
+    set d : k := ((F.Ψ (F.loc v t) : k)) - ((F.Ψ (F.loc v t) : k))⁻¹ with hdd
+    have hne := Units.ne_zero (F.Ψ (F.loc v t))
+    have hd : d ≠ 0 := by
+      intro h
+      apply ht
+      rw [hdd, sub_eq_zero] at h
+      rw [Units.ext_iff, Units.val_pow_eq_pow_val, Units.val_one, pow_two]
+      calc ((F.Ψ (F.loc v t) : k)) * (F.Ψ (F.loc v t) : k)
+          = (F.Ψ (F.loc v t) : k) * ((F.Ψ (F.loc v t) : k))⁻¹ := by rw [← h]
+        _ = 1 := mul_inv_cancel₀ hne
+    refine ⟨algebraMap k Q d⁻¹ * ρ.r (F.loc0 v t) 1 0, fun s => ?_⟩
+    have h10 := congrFun (congrFun (ρ.ord v ![s, t]) 1) 0
+    simp only [ordProd, List.ofFn_succ, List.ofFn_zero, List.prod_cons, List.prod_nil, mul_one,
+      Matrix.mul_apply, Fin.sum_univ_two, Matrix.sub_apply, Matrix.smul_apply, Matrix.one_apply,
+      Matrix.zero_apply, Matrix.cons_val_zero, Matrix.cons_val_one, Fin.succ_zero_eq_one, (by decide : (1 : Fin 2) ≠ 0), if_false, if_true, smul_zero,
+      sub_zero, smul_eq_mul, mul_one] at h10
+    have hl : ∀ s, ((F.loc0 v s : F.G0) : F.Γ) = F.loc v s := fun _ => rfl
+    rw [hd0, hd1, hψ0, hψ1, hl, hl] at h10
+    simp only [mul_zero, sub_zero] at h10
+    have hinv : (algebraMap k Q ((F.Ψ (F.loc v t) : k)) - algebraMap k Q ((F.Ψ (F.loc v t) : k))⁻¹)
+        * algebraMap k Q d⁻¹ = 1 := by
+      rw [← map_sub, ← map_mul, ← hdd, mul_inv_cancel₀ hd, map_one]
+    simp only [Algebra.smul_def, Units.val_inv_eq_inv_val, map_sub]
+    linear_combination algebraMap k Q d⁻¹ * h10 - ρ.r (F.loc0 v s) 1 0 * hinv
+
+
+[RTC_SRC_SMOOTH_HOM] Original realization theorem; RTC supplies its rank-two case only
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/SmoothHomWeightSumNeg.lean#L53-L115
+theorem UpperTheory.smoothHom_weight_sum_neg :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ (S : Space O F n) (Q : Type) [CommRing Q] [Nontrivial Q] [Algebra (ResidueField O) Q] (ρ : NRep F n Q), ρ.IsBar (algebraMap (ResidueField O) Q) → ρ.triM = ⊥ → (∀ i j, IsLocallyConstant fun g => ρ.r g i j) → ∃ ξ : S.A →+* Q, S.FPt ξ ∧ S.u.map ξ = ρ := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S Q _ _ _ ρ hbar htri hlc
+  letI : IsCO O (ResidueField O) := (co_res O).1
+  letI : Algebra O Q := ((algebraMap (ResidueField O) Q).comp (algebraMap O (ResidueField O))).toAlgebra
+  haveI : IsScalarTower O (ResidueField O) Q := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  haveI : CompactSpace F.G0 := by
+    have hc : IsCompact (F.del.ker : Set F.Γ) := (Subgroup.isClosed_of_isOpen _ hF.del_open).isCompact
+    exact isCompact_iff_compactSpace.1 hc
+  have hres : ∀ c : ResidueField O, res O (ResidueField O) c = c := by
+    intro c
+    obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective c
+    exact (res O (ResidueField O)).commutes a
+  have hinj : Function.Injective (algebraMap (ResidueField O) Q) := (algebraMap (ResidueField O) Q).injective
+  have hz : ∀ g i j, i < j → ρ.r g i j = 0 := by
+    intro g i j h
+    have hm : ρ.r g i j ∈ ρ.triM := Ideal.subset_span ⟨g, i, j, h, rfl⟩
+    rw [htri] at hm
+    exact Ideal.mem_bot.1 hm
+  have hΨ : IsLocallyConstant (F.Ψ : F.Γ → (ResidueField O)ˣ) := lc_hom F.Ψ hF.Ψ_open
+  have hcone : Cone O (ResidueField O) ρ := by
+    refine ⟨fun g i => ⟨_, (hbar.1 g i).symm, hres _⟩, fun L hsum hex => ?_,
+      fun i j => Submodule.fg_span (hlc i j).range_finite, fun i j N => (hlc i j).comp _, ?_⟩
+    · refine ⟨0, Ideal.zero_mem _, ?_⟩
+      rw [map_zero, eq_comm]
+      apply List.prod_eq_zero
+      rw [List.mem_map]
+      by_contra hcon
+      push_neg at hcon
+      have hle : ∀ t ∈ L, w n t.2.1 - w n t.2.2 ≤ 0 := by
+        intro t ht
+        rcases lt_trichotomy t.2.1 t.2.2 with h | h | h
+        · exact absurd (hz _ _ _ h) (hcon t ht)
+        · rw [h, sub_self]
+        · exact (w_lt h).le
+      obtain ⟨s, hs, hne⟩ := hex
+      have hlt : w n s.2.1 - w n s.2.2 < 0 := by
+        rcases lt_trichotomy s.2.1 s.2.2 with h | h | h
+        · exact absurd (hz _ _ _ h) (hcon s hs)
+        · exact absurd h hne
+        · exact w_lt h
+      have h2 : (L.map fun t : F.G0 × Fin n × Fin n => w n t.2.1 - w n t.2.2).sum < 0 :=
+        sum_neg (fun t : F.G0 × Fin n × Fin n => w n t.2.1 - w n t.2.2) L hle ⟨s, hs, hlt⟩
+      exact absurd hsum (ne_of_lt h2)
+    · refine ⟨fun v i g => ((F.Ψ (F.loc v g) ^ w n i : (ResidueField O)ˣ) : ResidueField O),
+        fun v i => ⟨fun N => ?_, fun g => hres _⟩, fun v i g => (hbar.2 v i g).symm⟩
+      have hcont : Continuous (F.loc v) :=
+        continuous_subtype_val.comp (hF.loc_cont v)
+      exact (hΨ.comp_continuous hcont).comp
+        (fun u => Ideal.Quotient.mk (maximalIdeal (ResidueField O) ^ N)
+          ((u ^ w n i : (ResidueField O)ˣ) : ResidueField O))
+  obtain ⟨ξ, β, hmap, hβ⟩ := alg hF hn S (ResidueField O) Q hinj ρ hcone
+  obtain ⟨hco, hmax⟩ := co_B hF hn S
+  refine ⟨(ξ : S.A →+* Q), ⟨?_, fun c => ξ.commutes c⟩, hmap⟩
+  rw [Space.x0, Ideal.map_le_iff_le_comap]
+  intro b hb
+  rw [Ideal.mem_comap, RingHom.mem_ker]
+  have hb' : b ∈ maximalIdeal S.B := by rw [hmax]; exact hb
+  have h0 : β b = 0 := by
+    rw [← hres (β b), res_map β b]
+    exact (res_eq_zero_iff O S.B b).2 hb'
+  show ξ (S.inc b) = 0
+  rw [hβ b, h0, map_zero]
+
+
+[RTC_SRC_PT_EX] Original rank-two pt_ex; RTC constructs it directly over arbitrary target k-algebras
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/PreconnectedRankTwo.lean#L139-L152
+private theorem pt_ex (Q : Type) [CommRing Q] [Nontrivial Q] [Algebra (ResidueField O) Q] {a : F.G0 → Q}
+    (h : a ∈ F.strS Q) : ∃ ξ : S.A →+* Q, S.FPt ξ ∧ S.u.triM ≤ RingHom.ker ξ ∧ ∀ g, ξ (S.u.r g 1 0) = a g := by
+  haveI : CharP (ResidueField O) l := IsCoef.char
+  obtain ⟨ρ, hbar, htri, hlc, h10⟩ := rep_ex hF Q h
+  obtain ⟨ξ, hξ, hmap⟩ := UpperTheory.smoothHom_weight_sum_neg hF (Or.inl rfl) S Q ρ hbar htri hlc
+  refine ⟨ξ, hξ, ?_, fun g => ?_⟩
+  · rw [NRep.triM, Ideal.span_le]
+    rintro _ ⟨g, i, j, hij, rfl⟩
+    rw [SetLike.mem_coe, RingHom.mem_ker]
+    have hm : ρ.r g i j ∈ ρ.triM := Ideal.subset_span ⟨g, i, j, hij, rfl⟩
+    rw [htri, Ideal.mem_bot] at hm
+    rw [← hm, ← hmap, NRep.map_r]
+  · rw [← h10, ← hmap, NRep.map_r]
+
+
+
+[RTC_SRC_PT_UNIQ] Original rank-two pt_uniq
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/PreconnectedRankTwo.lean#L153-L172
+private theorem pt_uniq {Q : Type} [CommRing Q] [Algebra (ResidueField O) Q] {ξ ξ' : S.A →+* Q}
+    (h : S.FPt ξ) (h' : S.FPt ξ') (t : S.u.triM ≤ RingHom.ker ξ) (t' : S.u.triM ≤ RingHom.ker ξ')
+    (e : ∀ g, ξ' (S.u.r g 1 0) = ξ (S.u.r g 1 0)) : ξ' = ξ := by
+  have H := UpperTheory.smoothCharacter_extends_to_open_subgroup hF (Or.inl rfl) S Q ξ h
+  have H' := UpperTheory.smoothCharacter_extends_to_open_subgroup hF (Or.inl rfl) S Q ξ' h'
+  refine H.2.2 ξ' h' (fun g i j => ?_)
+  have z : ∀ {ζ : S.A →+* Q}, S.u.triM ≤ RingHom.ker ζ → ζ (S.u.r g 0 1) = 0 := fun hz =>
+    RingHom.mem_ker.mp (hz (Ideal.subset_span ⟨g, 0, 1, by decide, rfl⟩))
+  have d : ∀ i : Fin 2, ξ' (S.u.r g i i) = ξ (S.u.r g i i) := by
+    intro i
+    have d1 := H.1.1 g i
+    have d2 := H'.1.1 g i
+    rw [NRep.map_r] at d1 d2
+    rw [d1, d2]
+  fin_cases i <;> fin_cases j
+  · exact d 0
+  · exact (z t').trans (z t).symm
+  · exact e g
+  · exact d 1
+
+
+
+[RTC_SRC_PT_MEM] Original rank-two pt_mem
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/PreconnectedRankTwo.lean#L173-L184
+private theorem pt_mem {Q : Type} [CommRing Q] [Algebra (ResidueField O) Q] {ξ : S.A →+* Q}
+    (h : S.FPt ξ) (t : S.u.triM ≤ RingHom.ker ξ) : (fun g => ξ (S.u.r g 1 0)) ∈ F.strS Q := by
+  have H := UpperTheory.smoothCharacter_extends_to_open_subgroup hF (Or.inl rfl) S Q ξ h
+  haveI : CharP (ResidueField O) l := IsCoef.char
+  have htri : (NRep.map ξ S.u).triM = ⊥ := by
+    apply Ideal.span_eq_bot.mpr
+    rintro _ ⟨g, i, j, hij, rfl⟩
+    rw [NRep.map_r]
+    exact RingHom.mem_ker.mp (t (Ideal.subset_span ⟨g, i, j, hij, rfl⟩))
+  have h2 := framePoint_fiber_nonempty hF Q (NRep.map ξ S.u) H.1 htri H.2.1
+  simpa only [NRep.map_r] using h2
+
+
+
+[RTC_SRC_DUAL] Original core residue-field point supplier; RTC supplies its rank-two case
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/SmoothDualExact.lean#L7-L31
+theorem UpperTheory.smoothDual_exact :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ (S : Space O F n), ∀ p ∈ S.BB, ∃ (K : Type) (_ : Field K) (_ : Algebra (ResidueField O) K) (ξ : S.A →+* K), RingHom.ker ξ = p.asIdeal ∧ S.FPt ξ ∧ S.u.triM ≤ RingHom.ker ξ := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S p hp
+  obtain ⟨h1, h2⟩ := hp
+  let ξ : S.A →+* p.asIdeal.ResidueField := algebraMap S.A p.asIdeal.ResidueField
+  have hk : RingHom.ker ξ = p.asIdeal := Ideal.ker_algebraMap_residueField _
+  have hz : ∀ c ∈ maximalIdeal O, ξ.comp (algebraMap O S.A) c = 0 := by
+    intro c hc
+    have hm : algebraMap O S.B c ∈ S.mB := by
+      show algebraMap O S.R c ∈ maximalIdeal S.R
+      exact map_nonunit (algebraMap O S.R) c hc
+    have : algebraMap O S.A c ∈ p.asIdeal := h1 hm
+    rw [← hk] at this
+    exact this
+  let φ : ResidueField O →+* p.asIdeal.ResidueField :=
+    Ideal.Quotient.lift (maximalIdeal O) (ξ.comp (algebraMap O S.A)) hz
+  refine ⟨p.asIdeal.ResidueField, inferInstance, φ.toAlgebra, ξ, hk, ?_, ?_⟩
+  · letI := φ.toAlgebra
+    refine ⟨?_, fun c => rfl⟩
+    rw [hk]
+    exact Ideal.map_le_iff_le_comap.2 h1
+  · rcases (types hF hn S _ ξ).2 (by rw [hk]; exact h1) with h | h
+    · rw [hk] at h
+      exact absurd h h2
+    · exact h
+
+
+[RTC_SRC_LINE] Original polynomial-line generic prime and all later evaluation maps
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/PreconnectedRankTwo.lean#L185-L204
+private theorem line {K : Type} [Field K] [Algebra (ResidueField O) K] {A : F.G0 → Polynomial K}
+    (h : A ∈ F.strS (Polynomial K)) :
+    ∃ η : PrimeSpectrum S.A, S.mB ≤ S.π η.asIdeal ∧
+      ∀ (c : K) (ξ : S.A →+* K), S.FPt ξ → S.u.triM ≤ RingHom.ker ξ →
+        (∀ g, (A g).eval c = ξ (S.u.r g 1 0)) → η.asIdeal ≤ RingHom.ker ξ := by
+  obtain ⟨ξA, hA, tA, vA⟩ := pt_ex hF S (Polynomial K) h
+  refine ⟨⟨RingHom.ker ξA, RingHom.ker_isPrime ξA⟩, ?_, ?_⟩
+  · exact Ideal.le_comap_map.trans (Ideal.comap_mono hA.x0)
+  · intro c ξ hξ tξ vξ
+    let φ : Polynomial K →ₐ[ResidueField O] K := (Polynomial.aeval c).restrictScalars (ResidueField O)
+    have hφ : S.FPt ((φ : Polynomial K →+* K).comp ξA) := hA.comp φ
+    have tφ : S.u.triM ≤ RingHom.ker ((φ : Polynomial K →+* K).comp ξA) := fun x hx => by
+      rw [RingHom.mem_ker, RingHom.comp_apply, RingHom.mem_ker.mp (tA hx), map_zero]
+    have heq : (φ : Polynomial K →+* K).comp ξA = ξ := pt_uniq hF S hξ hφ tξ tφ (fun g => by
+      rw [RingHom.comp_apply, vA g, ← vξ g]
+      simp [φ, Polynomial.coe_aeval_eq_eval])
+    intro x hx
+    rw [RingHom.mem_ker, ← heq, RingHom.comp_apply, RingHom.mem_ker.mp hx, map_zero]
+
+end
+
+
+[RTC_SRC_PRECONNECTED] Full original preconnected_rank_two
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/PreconnectedRankTwo.lean#L206-L264
+theorem UpperTheory.V.Fr.preconnected_rank_two :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ}, F.Ok C₀ → ∀ S : Space O F 2, IsPreconnected S.BB := by
+  intro l _ O _ _ _ _ F C₀ hF S
+  classical
+  haveI : CharP (ResidueField O) l := IsCoef.char
+  obtain ⟨b, hb, hb0⟩ := UpperTheory.exists_mem_strS_ne_zero_of_frameOk hF
+  obtain ⟨ξb, hbF, hbt, hbv⟩ := pt_ex hF S (ResidueField O) hb
+  let qb : PrimeSpectrum S.A := ⟨RingHom.ker ξb, RingHom.ker_isPrime ξb⟩
+  have hnz : ∃ g, b g ≠ 0 := by
+    by_contra hc
+    push_neg at hc
+    exact hb0 (funext hc)
+  obtain ⟨g1, hg1⟩ := hnz
+  have hqb : qb ∈ S.BB := by
+    refine ⟨Ideal.le_comap_map.trans (Ideal.comap_mono hbF.x0), fun hle => hg1 ?_⟩
+    have hm : S.u.r g1 1 0 ∈ S.u.triP := Ideal.subset_span ⟨g1, 1, 0, by decide, rfl⟩
+    rw [← hbv g1]
+    exact RingHom.mem_ker.mp (hle hm)
+  refine isPreconnected_of_forall qb (fun p hp => ?_)
+  obtain ⟨K, _, _, ξ, hker, hξ, tξ⟩ := UpperTheory.smoothDual_exact hF (Or.inl rfl) S p hp
+  have ha := pt_mem hF S hξ tξ
+  let bK : F.G0 → K := fun g => algebraMap (ResidueField O) K (b g)
+  have hbK : bK ∈ F.strS K := F.strS_map (Algebra.linearMap (ResidueField O) K) hb
+  let Lin : K →ₗ[ResidueField O] Polynomial K :=
+    (Algebra.linearMap K (Polynomial K)).restrictScalars (ResidueField O)
+  let A : F.G0 → Polynomial K := fun g =>
+    (1 - Polynomial.X) * Lin (ξ (S.u.r g 1 0)) + Polynomial.X * Lin (bK g)
+  have hAmem : A ∈ F.strS (Polynomial K) :=
+    Submodule.add_mem _ (F.strS_mul _ (F.strS_map Lin ha)) (F.strS_mul _ (F.strS_map Lin hbK))
+  obtain ⟨η, hηB, hη⟩ := line hF S hAmem
+  have hη0 : η.asIdeal ≤ p.asIdeal := by
+    rw [← hker]
+    exact hη 0 ξ hξ tξ (fun g => by simp [A, Lin])
+  let ι : ResidueField O →ₐ[ResidueField O] K := Algebra.ofId _ _
+  have tb' : S.u.triM ≤ RingHom.ker ((ι : ResidueField O →+* K).comp ξb) := fun x hx => by
+    rw [RingHom.mem_ker, RingHom.comp_apply, RingHom.mem_ker.mp (hbt hx), map_zero]
+  have hη1 : η.asIdeal ≤ qb.asIdeal := by
+    have h1 := hη 1 ((ι : ResidueField O →+* K).comp ξb) (hbF.comp ι) tb'
+      (fun g => by simp [A, Lin, bK, hbv, ι])
+    intro x hx
+    have hx1 := h1 hx
+    rw [RingHom.mem_ker, RingHom.comp_apply] at hx1
+    exact RingHom.mem_ker.mpr ((ι : ResidueField O →+* K).injective (by rw [hx1, map_zero]))
+  have hηBB : η ∈ S.BB := ⟨hηB, fun hle => hp.2 (hle.trans hη0)⟩
+  refine ⟨{η, p, qb}, ?_, by simp, by simp, ?_⟩
+  · intro z hz
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+    rcases hz with rfl | rfl | rfl
+    · exact hηBB
+    · exact hp
+    · exact hqb
+  · refine (isPreconnected_singleton (x := η)).subset_closure (by simp) ?_
+    intro z hz
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hz
+    rw [← PrimeSpectrum.le_iff_mem_closure]
+    rcases hz with rfl | rfl | rfl
+    · exact le_rfl
+    · exact hη0
+    · exact hη1
+
+
+[RTC_SRC_GL2] Actual rank-two consumer; other local/global data remain explicit
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/ComponentsGoodRankTwo.lean#L31-L163
+  {F : Frame l (ResidueField O)} {C₀ : ℕ}
+
+private def gd (S : Space O F 2) (M : Ideal S.B) : GlobData (PrimeSpectrum S.A) where
+  TI := {p | S.u.TI p.asIdeal}
+  Good := {p | M ≤ S.π p.asIdeal}
+  Core := S.BB
+  Cl := {p | p ∈ S.BB ∧ p.asIdeal.IsMaximal}
+  EE := ∅
+
+private def ld {S : Space O F 2} (M : Ideal S.B) {x : Ideal S.A} (L : S.Loc x) : LocData L.R where
+  D1 := 2 * F.d + 1
+  TI := {p | L.ρ.TI p.asIdeal}
+  TE := ∅
+  Good := {p | M ≤ L.π p.asIdeal}
+  Nice := {p | Nice L.ρ p.asIdeal}
+  Thick := ∅
+  sharp := ⊥
+
+private theorem ti_down {R : Type} [CommRing R] (ρ : NRep F 2 R) {P Q : Ideal R} (h : P ≤ Q) (hQ : ρ.TI Q) :
+    ρ.TI P :=
+  ⟨⟨fun a => hQ.1.1 (a.trans h), fun a => hQ.1.2 (a.trans h)⟩, fun a => absurd a (by decide)⟩
+
+private theorem ld_ok (hF : F.Ok C₀) (hB : F.Big C₀) {S : Space O F 2} {M : Ideal S.B} (hM : S.FinLam M)
+    (h1 : P1' S M) {x : Ideal S.A} (hx : ¬ S.u.triP ≤ x) (L : S.Loc x) : (ld M L).Ok := by
+  obtain ⟨hc, ht⟩ := sharp2 hF S x L hB hx
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · intro P Q h hP
+    exact le_trans hP (Ideal.comap_mono (Ideal.comap_mono h))
+  · intro P Q h hQ
+    exact ti_down _ h hQ
+  · intro p hp
+    exact Or.inl ⟨hp.off, fun a => absurd a (by decide)⟩
+  · intro I hI hd
+    obtain ⟨p, hp, hle⟩ := exists_nice_prime_above_of_large_dim l O F C₀ 2 hF hB (Or.inl rfl) S x L hx M hM I.asIdeal hI hd
+    exact ⟨⟨p, hp.prime⟩, hp, hle⟩
+  · intro e he
+    exact absurd he (Set.notMem_empty _)
+  · intro P _ hP
+    exact hP
+  · intro P Q hP hQ
+    have key : ∀ q : Ideal L.R, Relation.ReflTransGen
+        (fun P Q => P ∈ (⊥ : Ideal L.R).minimalPrimes ∧ Q ∈ (⊥ : Ideal L.R).minimalPrimes ∧
+          ((2 * F.d + 1 : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (L.R ⧸ (P ⊔ Q))) P.asIdeal q →
+        ∀ Q : PrimeSpectrum L.R, Q.asIdeal = q → Relation.ReflTransGen (ld M L).Adj P Q := by
+      intro q h
+      induction h with
+      | refl =>
+        intro Q hQ
+        rw [PrimeSpectrum.ext hQ]
+      | @tail b c _ hbc ih =>
+        intro Q hQ
+        subst hQ
+        exact (ih ⟨b, hbc.1.1.1⟩ rfl).tail hbc
+    exact key _ (hc.2 _ hP _ hQ) Q rfl
+  · intro P hP
+    exact Or.inl (ht _ hP)
+  · intro p hp hI hG P hP
+    exact h1 x L p.asIdeal hp hI hG P.asIdeal P.2 hP
+  · intro p _ he
+    exact absurd he (Set.notMem_empty _)
+
+private theorem ti_open (S : Space O F 2) (M : Ideal S.B) : IsOpen (gd S M).TI := by
+  have : (gd S M).TI = (PrimeSpectrum.zeroLocus (S.u.triP : Set S.A))ᶜ ∩
+      (PrimeSpectrum.zeroLocus (S.u.triM : Set S.A))ᶜ := by
+    ext p
+    exact ⟨fun h => h.1, fun h => ⟨h, fun a => absurd a (by decide)⟩⟩
+  rw [this]
+  exact (PrimeSpectrum.isClosed_zeroLocus _).isOpen_compl.inter (PrimeSpectrum.isClosed_zeroLocus _).isOpen_compl
+
+private theorem good_closed (S : Space O F 2) (M : Ideal S.B) : IsClosed (gd S M).Good := by
+  have : (gd S M).Good = PrimeSpectrum.zeroLocus (M.map (S.inc : S.B →+* S.A) : Set S.A) := by
+    ext p
+    exact Ideal.map_le_iff_le_comap.symm
+  rw [this]
+  exact PrimeSpectrum.isClosed_zeroLocus _
+
+private theorem at_pt (hF : F.Ok C₀) (hB : F.Big C₀) {S : Space O F 2} {M : Ideal S.B} (hM : S.FinLam M)
+    (h1 : P1' S M) {x : PrimeSpectrum S.A} (hx : ¬ S.u.triP ≤ x.asIdeal) (L : S.Loc x.asIdeal) :
+    (∀ Y Y', (gd S M).CompI Y → (gd S M).CompI Y' → x ∈ Y → x ∈ Y' → Y ⊆ (gd S M).Good → Y' ⊆ (gd S M).Good) ∧
+      (∃ Y, (gd S M).CompI Y ∧ x ∈ Y) ∧
+      ((∃ I ∈ (ld M L).Good, I ∈ (ld M L).TI ∧ ((ld M L).D1 : WithBot ℕ∞) ≤ qdim I.asIdeal) →
+        ∃ Y, (gd S M).CompI Y ∧ Y ⊆ (gd S M).Good) := by
+  obtain ⟨hc, ht⟩ := sharp2 hF S x.asIdeal L hB hx
+  letI : Algebra S.A L.R := (L.ι : S.A →+* L.R).toAlgebra
+  haveI : Module.Flat S.A L.R := (loc_flat hF (Or.inl rfl) S x.asIdeal L).1
+  have ch := chartOfFlat (PrimeSpectrum S.A) S.A id Topology.IsOpenEmbedding.id L.R
+  have hpt : id (PrimeSpectrum.comap (algebraMap S.A L.R) (closedPoint L.R)) = x := PrimeSpectrum.ext L.lies
+  rw [hpt] at ch
+  have hr := (loc_rho hF (Or.inl rfl) S x.asIdeal L).2.2.1
+  obtain ⟨a, b, c⟩ := globOfCharts _ (gd S M) (ti_open S M) (good_closed S M) x L.R _ ch (ld M L) (by
+    ext p
+    exact and_congr (and_congr (hr p.asIdeal).1.not (hr p.asIdeal).2.1.not)
+      (imp_congr Iff.rfl (hr p.asIdeal).2.2.not)) rfl (locProp _ _ (ld_ok hF hB hM h1 hx L))
+  refine ⟨a fun P hP => le_trans ?_ (hc.1 P hP), b fun P hP => ht _ hP, c⟩
+  exact Nat.cast_le.2 (Nat.le_succ _)
+
+end
+
+theorem UpperTheory.V.Pr.components_good_rank_two :
+    UpperTheory.V.Pr.PropagationTheoremGL2 := by
+  intro l _ O _ _ _ _ F C₀ hF hB S M hM h1 hS
+  haveI : IsNoetherianRing S.A := (gr_A hF (Or.inl rfl) S).2.2.2.2.2.1
+  have hok : (gd S M).Ok := by
+    refine ⟨fun p hp => hp.1, preconnected_rank_two hF S, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    · rintro C hC ⟨p, hp, hp'⟩
+      obtain ⟨x, ⟨⟨a, -⟩, b⟩, c⟩ := jac hF (Or.inl rfl) S C hC Set.univ isOpen_univ ⟨p, ⟨hp, trivial⟩, hp'⟩
+      exact ⟨x, a, b, c⟩
+    · intro p hp
+      rw [mem_closure_iff]
+      intro U hU hpU
+      obtain ⟨x, ⟨⟨-, a⟩, b⟩, c⟩ := jac hF (Or.inl rfl) S Set.univ isClosed_univ U hU ⟨p, ⟨trivial, hpU⟩, hp⟩
+      exact ⟨x, a, ⟨b, c⟩, Set.notMem_empty _⟩
+    · rintro Y ⟨hY, p, hp, hpI⟩
+      obtain ⟨η, hη, hi⟩ := comp_min hY
+      obtain ⟨x, -, b, c⟩ := l41 hF (Or.inl rfl) S η hη.1.1 (min_hom hF (Or.inl rfl) S η hη)
+        fun h => hpI.1.1 (h.trans ((hi p).1 hp))
+      exact ⟨x, (hi x).2 c, b⟩
+    · intro x hx
+      obtain ⟨L⟩ := loc_ex hF (Or.inl rfl) S x.asIdeal hx.2 hx.1.1
+      exact (at_pt hF hB hM h1 hx.1.2 L).1
+    · rintro x ⟨hx, -⟩
+      obtain ⟨L⟩ := loc_ex hF (Or.inl rfl) S x.asIdeal hx.2 hx.1.1
+      exact (at_pt hF hB hM h1 hx.1.2 L).2.1
+    · obtain ⟨ξ, Z, hξ, hI, hZ, hMZ, hZξ, hd⟩ := hS
+      obtain ⟨x, hm, hx, H⟩ := seedpt hF (Or.inl rfl) S Z ξ hZ hξ hI hZξ
+      obtain ⟨L⟩ := loc_ex hF (Or.inl rfl) S x.asIdeal hm hx.1
+      obtain ⟨P, hP, hPI, hπ, hdim⟩ := H L
+      refine (at_pt hF hB hM h1 hx.2 L).2.2 ⟨⟨P, hP⟩, hMZ.trans hπ.ge, hPI, ?_⟩
+      show ((2 * F.d + 1 : ℕ) : WithBot ℕ∞) ≤ ringKrullDim (L.R ⧸ P)
+      rw [hdim, show ringKrullDim (S.B ⧸ Z) = _ from hd]
+      exact_mod_cast (by omega : 2 * F.d + 1 ≤ 1 + 2 * F.d + 1)
+  intro p hp hI
+  exact globProp _ (gd S M) hok (a := ⟨p, hp⟩) hI
+
+
+[RTC_SRC_PROP_DEFS] Original propagation and finite-point predicates
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/PropagationTheoremGL2.lean#L31-L84
+
+def P1' (S : Space O F n) (M : Ideal S.B) : Prop :=
+  ∀ (x : Ideal S.A) (L : S.Loc x) (p : Ideal L.R), Nice L.ρ p → L.ρ.TI p → M ≤ L.π p →
+    ∀ P : Ideal L.R, P.IsPrime → P ≤ p → M ≤ L.π P
+
+def P23' (S : Space O F 3) (M : Ideal S.B) : Prop :=
+  ∀ (x : Ideal S.A) (L : S.Loc x) (p q : Ideal L.R), Nice L.ρ p → L.ρ.TE p → Relation.ReflTransGen (ThickLink L.ρ) p q →
+    (∃ P : Ideal L.R, P.IsPrime ∧ P ≤ p ∧ L.ρ.TI P ∧ M ≤ L.π P) →
+    ∀ P' : Ideal L.R, P'.IsPrime → P' ≤ q → L.ρ.TI P' → M ≤ L.π P'
+
+def SeedIn (S : Space O F n) (M : Ideal S.B) : Prop :=
+  ∃ (ξ : Ideal S.A) (Z : Ideal S.B), ξ.IsPrime ∧ S.u.TI ξ ∧ Z.IsPrime ∧ M ≤ Z ∧ Z ≤ S.π ξ ∧
+    qdim Z = ((1 + n * F.d : ℕ) : WithBot ℕ∞)
+
+def AllGood (S : Space O F n) (M : Ideal S.B) : Prop := ∀ p : Ideal S.A, p.IsPrime → S.u.TI p → M ≤ S.π p
+
+def OffFin (S : Space O F n) : Prop := ∃ I : Ideal S.B, S.FinLam I ∧ ∀ p : Ideal S.A, p.IsPrime → S.u.OffTri p → I ≤ S.π p
+
+end Input
+
+def PropagationTheoremGL2 : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O]
+    (F : Frame l (ResidueField O)) (C₀ : ℕ), F.Ok C₀ → F.Big C₀ → ∀ (S : Space O F 2) (M : Ideal S.B),
+    S.FinLam M → P1' S M → SeedIn S M → AllGood S M
+
+def PropagationTheoremGL3 : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O]
+    (F : Frame l (ResidueField O)) (C₀ : ℕ), F.Ok C₀ → F.Big C₀ → ∀ (S₂ : Space O F 2) (M₂ : Ideal S₂.B),
+    S₂.FinLam M₂ → AllGood S₂ M₂ → ∀ (S : Space O F 3) (M : Ideal S.B),
+    S.FinLam M → P1' S M → P23' S M → SeedIn S M → AllGood S M ∧ OffFin S
+
+section Points
+
+variable {l : ℕ} [Fact l.Prime] (O : Type) [CommRing O] [IsLocalRing O] {F : Frame l (ResidueField O)} {n : ℕ}
+
+structure IsLiftA {A : Type} [CommRing A] [IsLocalRing A] [Algebra O A] [IsLocalHom (algebraMap O A)]
+    (ρ : NRep F n A) : Prop where
+  cont : ρ.Cont (maximalIdeal A)
+  bar : (ρ.map (residue A)).IsBar (ResidueField.map (algebraMap O A))
+  diag : (ρ.map (residue A)).IsDiag
+
+variable (F n) in
+
+def FinPt : Prop :=
+  ∀ (A : Type) [CommRing A] [Algebra O A] [IsCD O A] [Algebra (ResidueField O) A] [IsScalarTower O (ResidueField O) A]
+    (ρ : NRep F n A), IsLiftA O ρ → (∀ v i, ∀ g ∈ F.Iv v, F.Ψ (F.loc v g) = 1 → ρ.ψ v i g = 1) →
+    ∀ g, (ρ.r g).charpoly =
+      ∏ i, (Polynomial.X - Polynomial.C (algebraMap (ResidueField O) A ((F.Ψ g ^ w n i : (ResidueField O)ˣ) : ResidueField O)))
+
+end Points
+
+def FinPtOf : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (O : Type) [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O]
+    (F : Frame l (ResidueField O)) (C₀ : ℕ), F.Ok C₀ → ∀ S : Space O F 3, OffFin S → FinPt O F 3
+
+
+[RTC_SRC_CD] Full original IsCD, including finite residue field
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/IsUnitOrIsUnitOfAddOne.lean#L107-L110
+class IsCD (O A : Type) [CommRing O] [CommRing A] [Algebra O A] : Prop extends IsDomain A, IsDiscreteValuationRing A where
+  complete : IsAdicComplete (maximalIdeal A) A
+  isLocalHom : IsLocalHom (algebraMap O A)
+  fin : Finite (ResidueField A)
+
+
+[RTC_SRC_FPD_EXT] Actual common test-DVR extension supplier; RTC constructs finite residue fields directly
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/FinPtDown.lean#L53-L102
+private theorem fpd_ext {A k k₁ : Type} [CommRing A] [IsDomain A] [IsDiscreteValuationRing A]
+    [IsAdicComplete (maximalIdeal A) A] [Finite (ResidueField A)] [Field k] [Field k₁] [Finite k₁]
+    (f : k →+* k₁) (j : k →+* A) :
+    ∃ (B : Type) (_ : CommRing B) (_ : IsDomain B) (_ : IsDiscreteValuationRing B) (φ : A →+* B) (j₁ : k₁ →+* B),
+      IsAdicComplete (maximalIdeal B) B ∧ Finite (ResidueField B) ∧ Function.Injective φ ∧ IsLocalHom φ ∧
+        ∀ a, j₁ (f a) = φ (j a) := by
+  classical
+  let K := FractionRing A
+  let Kb := AlgebraicClosure K
+  letI : Algebra k k₁ := f.toAlgebra
+  letI : Algebra k Kb := ((algebraMap A Kb).comp j).toAlgebra
+  haveI : Module.Finite k k₁ := Module.Finite.of_finite
+  haveI : Module.IsTorsionFree k k₁ := DivisionSemiring.to_moduleIsTorsionFree
+  haveI : Module.IsTorsionFree k Kb := DivisionSemiring.to_moduleIsTorsionFree
+  let g : k₁ →ₐ[k] Kb := IsAlgClosed.lift
+  have hint : ∀ x : k₁, IsIntegral A (g x) := by
+    intro x
+    rcases eq_or_ne x 0 with rfl | hx
+    · simpa using isIntegral_zero
+    · have h1 : IsOfFinOrder (Units.mk0 x hx) := isOfFinOrder_of_finite _
+      obtain ⟨m, hm, h2⟩ := isOfFinOrder_iff_pow_eq_one.1 h1
+      have h3 : x ^ m = 1 := by simpa using congrArg Units.val h2
+      refine IsIntegral.of_pow hm ?_
+      rw [← map_pow, h3, map_one]
+      exact isIntegral_one
+  let L := IntermediateField.adjoin K (Set.range g)
+  haveI : Finite (Set.range g) := (Set.finite_range g).to_subtype
+  haveI : FiniteDimensional K L :=
+    IntermediateField.finiteDimensional_adjoin (by
+      rintro _ ⟨x, rfl⟩
+      exact (hint x).tower_top)
+  obtain ⟨hfin, hdvr⟩ := UpperTheory.V.Pr.T.completeDVRExt (A := A) (K := K) (L := L)
+  let gL : k₁ →+* L := (g : k₁ →+* Kb).codRestrict L fun x => IntermediateField.subset_adjoin _ _ ⟨x, rfl⟩
+  have hmem : ∀ x, gL x ∈ integralClosure A L := fun x =>
+    (isIntegral_algHom_iff (L.val.restrictScalars A) Subtype.val_injective).1 (hint x)
+  have hinj : Function.Injective (algebraMap A (integralClosure A L)) := by
+    intro x y h
+    have h' : algebraMap A L x = algebraMap A L y := congrArg Subtype.val h
+    rw [IsScalarTower.algebraMap_apply A K L, IsScalarTower.algebraMap_apply A K L y] at h'
+    exact IsFractionRing.injective A K ((algebraMap K L).injective h')
+  have hf : (algebraMap A (integralClosure A L)).Finite := RingHom.finite_algebraMap.2 hfin
+  haveI hl : IsLocalHom (algebraMap A (integralClosure A L)) := hf.to_isIntegral.isLocalHom hinj
+  refine ⟨integralClosure A L, inferInstance, inferInstance, hdvr, algebraMap _ _,
+    gL.codRestrict (integralClosure A L) hmem, fpd_complete (R := A), Module.finite_of_finite (ResidueField A),
+    hinj, hl, fun a => ?_⟩
+  apply Subtype.ext
+  apply Subtype.ext
+  exact g.commutes a
+
+open IsLocalRing UpperTheory.V.Alg in
+
+
+[RTC_SRC_FPD_CONT] Original continuity transport under a local map
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/FinPtDown.lean#L103-L112
+private theorem fpd_cont {Γ A B : Type} [TopologicalSpace Γ] [CommRing A] [CommRing B] [IsLocalRing A] [IsLocalRing B]
+    (φ : A →+* B) [IsLocalHom φ] {x : Γ → A} (h : AdicCont (maximalIdeal A) x) :
+    AdicCont (maximalIdeal B) fun g => φ (x g) := by
+  intro N
+  have hle : maximalIdeal A ^ N ≤ (maximalIdeal B ^ N).comap φ := by
+    refine le_trans ?_ (Ideal.le_comap_pow φ N)
+    exact Ideal.pow_right_mono (fun a ha => map_nonunit φ a ha) N
+  exact (h N).comp (Ideal.quotientMap _ φ hle)
+
+open IsLocalRing UpperTheory.V.Fr in
+
+
+[RTC_SRC_FPD] Full original finPtDown at arbitrary rank
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/FinPtDown.lean#L113-L155
+theorem UpperTheory.V.Pr.finPtDown :
+    UpperTheory.V.Pr.FinPtDown := by
+  intro l _ c c₁ f _ _ Φ n H A _ _ hA _ _ ρ hρ hψ g
+  haveI : IsDiscreteValuationRing A := hA.toIsDiscreteValuationRing
+  haveI := UpperTheory.V.UnitaryThreeInertia.Coef.finite_residue c₁
+  obtain ⟨B, _, _, hB, φ, j₁, hc, hfin, hinj, hloc, hj⟩ :=
+    fpd_ext (A := A) f (algebraMap (ResidueField c.O) A)
+  letI : Algebra (ResidueField c₁.O) B := j₁.toAlgebra
+  letI : Algebra c₁.O B := (j₁.comp (residue c₁.O)).toAlgebra
+  haveI : IsScalarTower c₁.O (ResidueField c₁.O) B := IsScalarTower.of_algebraMap_eq fun _ => rfl
+  haveI hl : IsLocalHom (algebraMap c₁.O B) := RingHom.isLocalHom_comp j₁ (residue c₁.O)
+  haveI : IsCD c₁.O B := { toIsDiscreteValuationRing := hB, complete := hc, isLocalHom := hl, fin := hfin }
+  let ρ₀ := ρ.map φ
+  let ρ₁ : NRep (Φ.ext f) n B := ⟨ρ₀.r, ρ₀.ψ, ρ₀.pol, ρ₀.diag, ρ₀.ord⟩
+  have key : ∀ a, ResidueField.map φ (ResidueField.map (algebraMap c.O A) a) =
+      ResidueField.map (algebraMap c₁.O B) (f a) := by
+    intro a
+    obtain ⟨b, hb⟩ := residue_surjective (f a)
+    obtain ⟨a, rfl⟩ := residue_surjective a
+    rw [← hb, ResidueField.map_residue, ResidueField.map_residue, ResidueField.map_residue,
+      IsScalarTower.algebraMap_apply c.O (ResidueField c.O) A, ← hj]
+    exact congrArg (fun t => residue B (j₁ t)) hb.symm
+  have hz : ∀ (s : Φ.Γ) (m : ℤ), (((Φ.ext f).Ψ s ^ m : (ResidueField c₁.O)ˣ) : ResidueField c₁.O) =
+      f ((Φ.Ψ s ^ m : (ResidueField c.O)ˣ) : ResidueField c.O) := by
+    intro s m
+    show ((Units.map f.toMonoidHom (Φ.Ψ s) ^ m : (ResidueField c₁.O)ˣ) : ResidueField c₁.O) = _
+    rw [← map_zpow]
+    rfl
+  have h1 : IsLiftA c₁.O ρ₁ := by
+    refine ⟨⟨fun i j => fpd_cont φ (hρ.cont.1 i j), fun v i => fpd_cont φ (hρ.cont.2 v i)⟩,
+      ⟨fun s i => ?_, fun v i s => ?_⟩, fun s i j hij => ?_⟩
+    · exact (congrArg (ResidueField.map φ) (hρ.bar.1 s i)).trans ((key _).trans (congrArg _ (hz _ _).symm))
+    · exact (congrArg (ResidueField.map φ) (hρ.bar.2 v i s)).trans ((key _).trans (congrArg _ (hz _ _).symm))
+    · exact (congrArg (ResidueField.map φ) (hρ.diag s i j hij)).trans (map_zero _)
+  have h2 := H B ρ₁ h1 (fun v i s hs h => by
+    have h' : Φ.Ψ (Φ.loc v s) = 1 := Units.ext (f.injective ((congrArg Units.val h).trans (map_one f).symm))
+    show Units.map φ.toMonoidHom (ρ.ψ v i s) = 1
+    rw [hψ v i s hs h', map_one]) g
+  apply Polynomial.map_injective φ hinj
+  rw [← Matrix.charpoly_map, Polynomial.map_prod]
+  refine h2.trans (Finset.prod_congr rfl fun i _ => ?_)
+  rw [Polynomial.map_sub, Polynomial.map_X, Polynomial.map_C, ← hj]
+  exact congrArg (fun t => Polynomial.X - Polynomial.C (j₁ t)) (hz _ _)
+
+
+[RTC_SRC_FPD_CONTRACT] Literal original FinPtDown contract and prescribed coefficient maps
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/EveryPointSatisfiesFrameCondition.lean#L133-L137
+def FinPtDown : Prop :=
+  ∀ (l : ℕ) [Fact l.Prime] (c c₁ : Coef l) (f : ResidueField c.O →+* ResidueField c₁.O), c.O ≤ c₁.O →
+    (∀ (a : c.O) (b : c₁.O), a.1 = b.1 → f (residue c.O a) = residue c₁.O b) →
+    ∀ (Φ : Fr.Frame l (ResidueField c.O)) (n : ℕ), FinPt c₁.O (Φ.ext f) n → FinPt c.O Φ n
+
+
+
+[RTC_SRC_FINEND] Inherited AFE20 original-frame FinPt-to-FinEnd consumer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/FinEndOfFinPt.lean#L9-L48
+theorem UpperTheory.V.Pr.finEnd_of_finPt :
+    ∀ {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsLocalRing O] {η : G ℚ Ω →* ℤˣ} {Ψ : G ℚ Ω →* Oˣ} {σ g₁ : G ℚ Ω} {B : ValuationSubring Ω} {M : ℕ}
+      {L : Type} [Field L] [NumberField L] [Algebra L Ω] {Φ : Fr.Frame l (ResidueField O)} (k : GalLink η Ψ σ g₁ B M L Φ) [CharP (ResidueField O) l] {C₀ : ℕ}, Φ.Ok C₀ → l ∣ M → σ * σ = 1 →
+    FinPt O Φ 3 → FinEnd l η Ψ σ g₁ B := by
+  intro Ω _ _ _ l _ O _ _ η Ψ σ g₁ B M L _ _ _ Φ k _ C₀ hok hl hσ hF
+  haveI : Module.IsTorsionFree L Ω := DivisionSemiring.to_moduleIsTorsionFree
+  haveI : IsAlgClosure L Ω := ⟨IsAlgClosure.isAlgClosed ℚ, Algebra.IsAlgebraic.tower_top (K := ℚ) L⟩
+  have hidx : (Base.galOf ℚ L Ω).index = Module.finrank ℚ L := (Base.galEmbTop ℚ L Ω).2.2
+  refine ⟨Base.galOf ℚ L Ω, ⟨by rw [hidx]; exact Module.finrank_pos.ne'⟩, ?_⟩
+  intro A _ _ _ h0 r hr g hg _
+  haveI : IsNoetherianRing A := PrincipalIdealRing.isNoetherianRing
+  let f : ResidueField O →+* A := Ideal.Quotient.lift (maximalIdeal O) (algebraMap O A) h0
+  have hf : ∀ a : O, f (residue O a) = algebraMap O A a := fun a => rfl
+  letI : Algebra (ResidueField O) A := f.toAlgebra
+  haveI : IsScalarTower O (ResidueField O) A := IsScalarTower.of_algebraMap_eq fun a => (hf a).symm
+  obtain ⟨ρ, h1, h2, h3⟩ := exists_nrep3 k hok hl hσ r hr
+  have hpow : ∀ (s : G ℚ Ω) (n : ℤ), algebraMap O A ((Ψ s ^ n : Oˣ) : O) =
+      f ((barChar O Ψ s ^ n : (ResidueField O)ˣ) : ResidueField O) := by
+    intro s n
+    rw [← hf]
+    congr 1
+    exact congrArg Units.val (map_zpow (Units.map (residue O).toMonoidHom) (Ψ s) n)
+  have key := hF A ρ h1 (by
+    intro v i g hg h
+    apply Units.ext
+    rw [h3 v i g hg, UnitaryThreeInertia.psi, hpow]
+    rw [k.j_loc, k.psi] at h
+    rw [h]; simp)
+  obtain ⟨s, rfl⟩ : ∃ s, Base.galEmb ℚ L Ω s = g := (Base.range_galEmb ℚ L Ω).ge hg
+  rw [← h2, key]
+  have : ((r0 η Ψ (Base.galEmb ℚ L Ω s)).mat).map (algebraMap O A) = Matrix.diagonal fun i =>
+      algebraMap O A ((Ψ (Base.galEmb ℚ L Ω s) ^ wt1 i : Oˣ) : O) := by
+    rw [GG.mat, unitaryThreeReflection_left, tor_val, Matrix.diagonal_map (map_zero _)]
+  rw [this, Matrix.charpoly_diagonal]
+  refine Finset.prod_congr rfl fun i _ => ?_
+  rw [hpow]
+  have h5 : Φ.Ψ (k.p0 s) = barChar O Ψ (Base.galEmb ℚ L Ω s) := k.psi _
+  have h6 : Fr.w 3 i = wt1 i := by fin_cases i <;> rfl
+  rw [h5, h6]
+  rfl
+
+
+[RTC_SRC_TWORUNS] Actual extended-frame finite-point output, with separate spaces and ideals
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/TwoRuns.lean#L80-L109
+theorem UpperTheory.Gal.projectedFormsSystemPart.twoRuns_alt (hA : GlobalTheory.Published.GlobalArtinReciprocity) (hMod : _root_.UpperTheory.V.W.ModUAlt) (hLam : W.LamEx)
+    {Ω : Type} [Field Ω] [CharZero Ω] [IsAlgClosure ℚ Ω] {l : ℕ} [Fact l.Prime] (ι : Qbar l ≃+* ℂ) {c : Coef l}
+    [CharP (ResidueField c.O) l] {N : ℕ} [NeZero N] {e : ℕ} {ψ : DirichletCharacter c.O N}
+    {η : G ℚ Ω →* ℤˣ} {σ g₁ : G ℚ Ω} {B : ValuationSubring Ω} {M : ℕ} (H : LinkHyp c N e η σ B M)
+    {L : Type} [Field L] [NumberField L] [IsCMField L] [Algebra L Ω] [IsAlgClosure L Ω] {Φ : Fr.Frame l (ResidueField c.O)}
+    {k : GalLink η (Chr.Psi l e (Chr.dirG ℚ Ω ψ)) σ g₁ B M L Φ} (v : Φ.V)
+    {c₁ : Coef l} [Fr.IsCoef l c₁.O] {f : ResidueField c.O →+* ResidueField c₁.O}
+    {ka kb : G L Ω →* (Qbar l)ˣ} (hL : W.Large L c₁) (ha : IsKa σ M ι 2 ka) (hb : IsKa σ M ι 3 kb)
+    (e₂ : ∀ p₀ : ℕ, p₀ ≠ 0 → ∃ R : CReal k c₁ f 2 ka, ¬ R.s.p ∣ p₀)
+    (e₃ : ∀ p₀ : ℕ, p₀ ≠ 0 → ∃ R : CReal k c₁ f 3 kb, ¬ R.s.p ∣ p₀)
+    (s₂ : ∀ (R : CReal k c₁ f 2 ka) J, R.B₀.PointTheoremBaseObject ι J → R.T.IdealSpecializationPoint J)
+    (s₃ : ∀ (R : CReal k c₁ f 3 kb) J, R.B₀.PointTheoremBaseObject ι J → R.T.IdealSpecializationPoint J) :
+    FinPt c₁.O (Φ.ext f) 3 ∧ _root_.UpperTheory.V.Pr.AutPtAlt k 3 ι kb ∧ _root_.UpperTheory.V.Pr.AutPtAlt k 2 ι ka := by
+  have one : ∀ (R₂ : CReal k c₁ f 2 ka) (R₃ : CReal k c₁ f 3 kb), FinPt c₁.O (Φ.ext f) 3 ∧
+      _root_.UpperTheory.Gal.projectedFormsSystemPart.AutPtOAlt R₃.s.v0 k 3 ι kb ∧ _root_.UpperTheory.Gal.projectedFormsSystemPart.AutPtOAlt R₂.s.v0 k 2 ι ka := fun R₂ R₃ => by
+    obtain ⟨J₂, h₂, d₂⟩ := _root_.UpperTheory.V.Pr.modularity_linked_ends hMod hLam ι H v R₂ hL (s₂ R₂)
+    obtain ⟨J₃, h₃, d₃⟩ := _root_.UpperTheory.V.Pr.modularity_linked_ends hMod hLam ι H v R₃ hL (s₃ R₃)
+    obtain ⟨g₂, g₃, hfin⟩ := UpperTheory.V.Pr.absMain l c₁.O _ R₂.T R₃.T J₂ J₃ h₂ h₃
+    exact ⟨hfin, _root_.UpperTheory.Gal.projectedFormsSystemPart.autPtO_alt hA Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 3 _ R₃ hb J₃ g₃ d₃,
+      _root_.UpperTheory.Gal.projectedFormsSystemPart.autPtO_alt hA Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 2 ka R₂ ha J₂ g₂ d₂⟩
+  obtain ⟨R₂, -⟩ := e₂ 1 one_ne_zero
+  obtain ⟨R₃, -⟩ := e₃ 1 one_ne_zero
+  obtain ⟨R₂', n₂⟩ := e₂ R₂.s.p R₂.s.p_prime.ne_zero
+  obtain ⟨R₃', n₃⟩ := e₃ R₃.s.p R₃.s.p_prime.ne_zero
+  obtain ⟨hfin, a₃, a₂⟩ := one R₂ R₃
+  obtain ⟨-, b₃, b₂⟩ := one R₂' R₃'
+  exact ⟨hfin, fun A _ _ _ ρ h1 h2 r h3 h4 => _root_.UpperTheory.Gal.projectedFormsSystemPart.glueN (by norm_num) (UpperTheory.Gal.projectedFormsSystemPart.v0_ne n₃)
+      (a₃ A ρ h1 h2 r h3 h4) (b₃ A ρ h1 h2 r h3 h4),
+    fun A _ _ _ ρ h1 h2 r h3 h4 => _root_.UpperTheory.Gal.projectedFormsSystemPart.glueN (by norm_num) (UpperTheory.Gal.projectedFormsSystemPart.v0_ne n₂)
+      (a₂ A ρ h1 h2 r h3 h4) (b₂ A ρ h1 h2 r h3 h4)⟩
+
+
+[RTC_SRC_LINKED] Actual linked endpoint uses finPtDown at line 67
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/ModularityArgument/ThresholdArguments/DenseThresholdCases/LinkedEndE.lean#L18-L67
+theorem UpperTheory.Gal.projectedFormsSystemPart.linked_endomorphism_dense :
+    GlobalTheory.Published.GlobalArtinReciprocity → UpperTheory.V.W.LocCFTAll → _root_.UpperTheory.V.W.ModUAlt → UpperTheory.V.W.LevEx → UpperTheory.V.W.LamEx → UpperTheory.V.W.ProModularRingExists → _root_.UpperTheory.V.Z.Sym.UnitaryThreeAutomorphyDense → _root_.UpperTheory.V.Sd.Seed2Alt → UpperTheory.V.Sd.Twist → UpperTheory.V.Sd.AlgCyc → UpperTheory.V.Sd.AlgRes → _root_.UpperTheory.V.Z.Sym.Pl.LinkedEndEAlt := by
+  intro hA _ hMod hLev hLam hB0 hS3 hS2 hTw hCyc hRes Ω _ _ _ l _ ι c _ N _ e ψ he hev η σ g₁ B M hM hram L _ _ _ _ Φ C₀ k hB hok hbig hseed
+  obtain ⟨K, _, _, _, N', w, χ', η', θ, j, hD, hne, hord, hη, hcong, hdisc⟩ := hseed
+  haveI : IsAlgClosure L Ω :=
+    { isAlgClosed := IsAlgClosure.isAlgClosed ℚ
+      isAlgebraic := haveI : Algebra.IsAlgebraic ℚ Ω := IsAlgClosure.isAlgebraic
+        Algebra.IsAlgebraic.tower_top (K := ℚ) L }
+  have hM0 : M ≠ 0 := by
+    rintro rfl
+    obtain ⟨hσ, hc⟩ := k.c
+    have h1 : σ ∈ η.ker := k.split ⊤ (by rw [← ValuationSubring.mem_nonunits_iff, Nat.cast_zero]; exact zero_mem _) ⟨by
+      refine mem_Dec.2 (eq_top_iff.2 fun x _ => ?_)
+      rw [ValuationSubring.mem_pointwise_smul_iff_inv_smul_mem]
+      exact ValuationSubring.mem_top _, hσ⟩
+    have h2 := k.del ⟨σ, hσ⟩
+    rw [hc, hok.del_c] at h2
+    have h3 : η σ = 1 := h1
+    rw [h3] at h2
+    exact absurd h2 (by decide)
+  have H : UpperTheory.V.Pr.LinkHyp c N e η σ B M := ⟨he, hM, hM0, hram, hB, hD.cc⟩
+  have hv : Nonempty Φ.V := by
+    by_contra h
+    rw [not_nonempty_iff] at h
+    have := hbig.1
+    simp [UpperTheory.V.Fr.Frame.d] at this
+  obtain ⟨v⟩ := hv
+  have hker : η.ker = galOf ℚ K Ω := by
+    rw [← hD.η_ker]
+    ext s
+    rw [MonoidHom.mem_ker, MonoidHom.mem_ker, ← Units.val_eq_one, ← Units.val_eq_one, hη s]
+    exact_mod_cast Iff.rfl
+  haveI := hD.imag
+  obtain ⟨κ, hκ⟩ := hTw K Ω hD.quad l hok.l_odd hdisc ι σ hD.cc
+  obtain ⟨hk3, hk2⟩ := UpperTheory.V.Pr.kaOf hCyc hRes Ω l ι c N e ψ η σ g₁ B M H L Φ k
+  obtain ⟨ka, hk2, hka⟩ := hk2 K hker κ hκ
+  obtain ⟨c₁, hle, hL, hv3, hv2, f, hf⟩ := UpperTheory.V.Pr.coefEx l c L Ω _ _ hk3.alg.1 hk2.alg.1
+  haveI := UpperTheory.V.Pr.coefIs l c₁
+  obtain ⟨m₃, hm₃, -, r₃, -, s₃⟩ := hS3 K L Ω l ι σ N' w χ' η' θ j hD hne M hM0
+    (by rw [mul_comm]; exact (Nat.mul_dvd_mul_left l hev.two_dvd).trans hM)
+    (UpperTheory.V.Z.Sym.Pl.linkUnr Ω l _ η _ σ g₁ B M L Φ k) (UpperTheory.V.Z.Sym.Pl.chiUnr Ω l c N e ψ χ' j hord hcong M hM L) 2
+  obtain ⟨m₂, hm₂, -, r₂, -, -, -, s₂⟩ := hS2 K L Ω l ι σ N' w χ' η' θ j hD κ ka hκ hka 2
+  obtain ⟨hfin, a₃, a₂⟩ := _root_.UpperTheory.Gal.projectedFormsSystemPart.twoRuns_alt hA hMod hLam ι H v hL hk2 hk3
+    (UpperTheory.Gal.projectedFormsSystemPart.cRealAv hLev hB0 Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 2 ka C₀ (Or.inl rfl) hok hbig hle hf hk2 hv2)
+    (UpperTheory.Gal.projectedFormsSystemPart.cRealAv hLev hB0 Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 3 _ C₀ (Or.inr rfl) hok hbig hle hf hk3 hv3)
+    (fun R₂ => _root_.UpperTheory.V.Pr.seedPtOf_alt hA Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 2 ka R₂ hk2 χ' j hord hcong m₂ hm₂ _ (by
+      convert s₂ using 2 with i i i <;> fin_cases i <;> simp [UpperTheory.V.Fr.w]))
+    (fun R₃ => _root_.UpperTheory.V.Pr.seedPtOf_alt hA Ω l ι c N e ψ η σ g₁ B M H L Φ k c₁ f 3 _ R₃ hk3 χ' j hord hcong m₃ hm₃ _ (by
+      convert s₃ using 2 with i i i <;> fin_cases i <;> simp [UpperTheory.V.Fr.w]))
+  exact ⟨UpperTheory.V.Pr.finPtDown l c c₁ f hle hf Φ 3 hfin, a₃, ka, hk2.alg, a₂⟩
+
+
+[RTC_SRC_LOCCPL] Retained actual local completion from its universal property
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/LocCpl.lean#L100-L188
+private theorem cpl_of_univ {O D R : Type} [CommRing O] [IsLocalRing O] [CommRing D] [Algebra O D] [IsNoetherianRing D]
+    [CommRing R] [Algebra O R] [IsCO O R] (ι : D →ₐ[O] R)
+    (univ : ∀ (C : Type) [CommRing C] [Algebra O C] [IsCO O C] (f : D →ₐ[O] C),
+      (∀ a, res O C (f a) = res O R (ι a)) → ∃! g : R →ₐ[O] C, ∀ a, g (ι a) = f a) :
+    @UpperTheory.V.CA.IsCplAt _ _ ((maximalIdeal R).comap ι.toRingHom) R _ ι.toRingHom.toAlgebra _ := by
+  letI : Algebra D R := ι.toRingHom.toAlgebra
+  have hy : ∀ a, a ∈ (maximalIdeal R).comap ι.toRingHom ↔ ι a ∈ maximalIdeal R := fun a => Iff.rfl
+  have hmg : ∀ {C : Type} [CommRing C] [Algebra O C] [IsCO O C] (g : R →ₐ[O] C),
+      Ideal.map g (maximalIdeal R) ≤ maximalIdeal C := by
+    intro C _ _ _ g
+    rw [Ideal.map_le_iff_le_comap]
+    intro r hr
+    rw [Ideal.mem_comap, ← res_eq_zero_iff O C]
+    show res O C (g r) = 0
+    rw [res_map]
+    exact (res_eq_zero_iff O R r).2 hr
+  refine ⟨inferInstance, IsCO.complete (O := O), fun n => ?_, fun n r => ?_⟩
+  · rcases Nat.eq_zero_or_pos n with rfl | hn
+    · simp
+    obtain ⟨hco, hnil, hres⟩ := co_pow ι _ hy n hn.ne'
+    letI := hco
+    obtain ⟨g, hg, -⟩ := univ _ (Ideal.Quotient.mkₐ O _) (fun a => hres a)
+    apply le_antisymm
+    · intro a ha
+      have hgm : ∀ r ∈ maximalIdeal R ^ n, g r = 0 := by
+        intro r hr
+        have h1 : Ideal.map g (maximalIdeal R ^ n) ≤ ⊥ := by
+          rw [Ideal.map_pow, ← hnil]
+          exact Ideal.pow_right_mono (hmg g) n
+        exact Ideal.mem_bot.1 (h1 (Ideal.mem_map_of_mem g hr))
+      rw [← Ideal.Quotient.eq_zero_iff_mem, ← Ideal.Quotient.mkₐ_eq_mk O, ← hg a]
+      exact hgm _ ha
+    · exact Ideal.le_comap_pow _ n
+  · rcases Nat.eq_zero_or_pos n with rfl | hn
+    · exact ⟨0, by simp⟩
+    haveI : Nontrivial (R ⧸ maximalIdeal R ^ n) := Ideal.Quotient.nontrivial_iff.2
+      (ne_top_of_le_ne_top (IsLocalRing.maximalIdeal.isMaximal R).ne_top (Ideal.pow_le_self hn.ne'))
+    letI hcoR : IsCO O (R ⧸ maximalIdeal R ^ n) :=
+      co_quot O R _ (Ideal.Quotient.mkₐ O _) (Ideal.Quotient.mkₐ_surjective O _)
+    obtain ⟨hco, hnil, hres⟩ := co_pow ι _ hy n hn.ne'
+    letI := hco
+    obtain ⟨g, hg, -⟩ := univ _ (Ideal.Quotient.mkₐ O _) (fun a => hres a)
+    have hker : ∀ a ∈ ((maximalIdeal R).comap ι.toRingHom) ^ n,
+        ((Ideal.Quotient.mkₐ O (maximalIdeal R ^ n)).comp ι) a = 0 := by
+      intro a ha
+      rw [AlgHom.comp_apply, Ideal.Quotient.mkₐ_eq_mk, Ideal.Quotient.eq_zero_iff_mem]
+      exact Ideal.le_comap_pow _ n ha
+    let hbar := Ideal.Quotient.liftₐ _ ((Ideal.Quotient.mkₐ O (maximalIdeal R ^ n)).comp ι) hker
+    have hbar_mk : ∀ d, hbar (Ideal.Quotient.mk _ d) = Ideal.Quotient.mk _ (ι d) := fun d => rfl
+    obtain ⟨g0, -, huniq⟩ := univ (R ⧸ maximalIdeal R ^ n) ((Ideal.Quotient.mkₐ O _).comp ι)
+      (fun a => res_map (Ideal.Quotient.mkₐ O _) (ι a))
+    have e1 := huniq (Ideal.Quotient.mkₐ O _) (fun a => rfl)
+    have e2 := huniq (hbar.comp g) (fun a => by
+      rw [AlgHom.comp_apply, hg a, Ideal.Quotient.mkₐ_eq_mk, hbar_mk]
+      rfl)
+    obtain ⟨d, hd⟩ := Ideal.Quotient.mk_surjective (g r)
+    refine ⟨d, ?_⟩
+    rw [← Ideal.Quotient.eq]
+    have h3 : Ideal.Quotient.mkₐ O (maximalIdeal R ^ n) r = (hbar.comp g) r := by rw [e1, e2]
+    rw [AlgHom.comp_apply, ← hd, hbar_mk, Ideal.Quotient.mkₐ_eq_mk] at h3
+    exact h3
+
+theorem UpperTheory.V.Fr.loc_cpl :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), ∀ ι' : TensorProduct O L.O' S.A →ₐ[L.O'] L.R, (∀ a, ι' (1 ⊗ₜ a) = L.ι a) → @UpperTheory.V.CA.IsCplAt _ _ ((maximalIdeal L.R).comap ι'.toRingHom) L.R _ ι'.toRingHom.toAlgebra _ := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S x L ι' hι'
+  obtain ⟨-, -, -, -, -, hnoeth, -⟩ := gr_A hF hn S
+  haveI : IsNoetherianRing (TensorProduct O S.A L.O') := IsNoetherianRing.of_finite S.A _
+  haveI : IsNoetherianRing (TensorProduct O L.O' S.A) :=
+    isNoetherianRing_of_ringEquiv _ (Algebra.TensorProduct.comm O S.A L.O').toRingEquiv
+  apply cpl_of_univ ι'
+  intro C _ _ _ f hf
+  letI : Algebra O C := Algebra.compHom C (algebraMap O L.O')
+  haveI : IsScalarTower O L.O' C := IsScalarTower.of_algebraMap_eq (fun _ => rfl)
+  let f' : S.A →ₐ[O] C := (f.restrictScalars O).comp Algebra.TensorProduct.includeRight
+  obtain ⟨g, hg, hu⟩ := L.univ C f' (fun a => by
+    show res L.O' C (f (1 ⊗ₜ a)) = _
+    rw [← hι' a]
+    exact hf _)
+  refine ⟨g, fun t => ?_, fun g' hg' => hu g' (fun a => by
+    rw [← hι' a]
+    exact hg' _)⟩
+  have hcomp : g.comp ι' = f := by
+    apply Algebra.TensorProduct.ext_ring
+    apply AlgHom.ext
+    intro a
+    show g (ι' (1 ⊗ₜ a)) = f (1 ⊗ₜ a)
+    rw [hι', hg]
+    rfl
+  exact AlgHom.congr_fun hcomp t
+
+
+[RTC_SRC_LOCFLAT] Retained actual arithmetic local chart flatness
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/LocFlat.lean#L37-L69
+theorem UpperTheory.V.Fr.loc_flat :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), (L.ι : S.A →+* L.R).Flat ∧ x.IsMaximal ∧ S.mB ≤ S.π x := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S x L
+  refine ⟨?_, ?_, ?_⟩
+  · have hA : IsNoetherianRing S.A := (gr_A hF hn S).2.2.2.2.2.1
+    have hD : IsNoetherianRing (TensorProduct O L.O' S.A) := by
+      have h1 : IsNoetherianRing (TensorProduct O S.A L.O') :=
+        Algebra.FiniteType.isNoetherianRing S.A _
+      exact isNoetherianRing_of_ringEquiv _ (Algebra.TensorProduct.comm O S.A L.O').toRingEquiv
+    let ι' : TensorProduct O L.O' S.A →ₐ[L.O'] L.R :=
+      Algebra.TensorProduct.lift (Algebra.ofId _ _) L.ι fun _ _ => Commute.all _ _
+    have hι : ∀ a, ι' (1 ⊗ₜ a) = L.ι a := fun a => by simp [ι']
+    have hc := loc_cpl hF hn S x L ι' hι
+    haveI := max_of_fin (O := L.O') ι'.toRingHom
+    have h1 : ι'.toRingHom.Flat := (@UpperTheory.V.CA.c3a _ _ _ _ _ ι'.toRingHom.toAlgebra _ _ _ hc).1
+    haveI : Module.Flat O L.O' := flat_dvr L.unr
+    have h2 : (Algebra.TensorProduct.includeRight (R := O) (A := L.O') (B := S.A)).toRingHom.Flat := by
+      have h3 : (algebraMap S.A (TensorProduct O S.A L.O')).Flat := RingHom.flat_algebraMap_iff.2 inferInstance
+      have h4 := h3.comp (RingHom.Flat.of_bijective (f := (Algebra.TensorProduct.comm O S.A L.O').toRingEquiv.toRingHom)
+        (Algebra.TensorProduct.comm O S.A L.O').bijective)
+      exact h4
+    have e : (L.ι : S.A →+* L.R) = ι'.toRingHom.comp
+        (Algebra.TensorProduct.includeRight (R := O) (A := L.O') (B := S.A)).toRingHom :=
+      RingHom.ext fun a => (hι a).symm
+    rw [e]
+    exact h2.comp h1
+  · rw [← L.lies]
+    exact max_of_fin (O := L.O') _
+  · obtain ⟨h, hm⟩ := co_B hF hn S
+    have h1 := max_of_fin (O := L.O') ((L.ι : S.A →+* L.R).comp (S.inc : S.B →+* S.A))
+    rw [← Ideal.comap_comap, L.lies] at h1
+    rw [← hm]
+    exact (eq_maximalIdeal h1).ge
+
+
+[RTC_SRC_LOCRHO] Retained actual local representation and ideal dictionary
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/LocRho.lean#L40-L66
+theorem UpperTheory.V.Fr.loc_rho :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), L.ρ.Cont (maximalIdeal L.R) ∧ (∀ f, IsResMap O L.R f → (L.ρ.map (residue L.R)).IsBar f) ∧ (∀ P : Ideal L.R, (L.ρ.triP ≤ P ↔ S.u.triP ≤ L.im P) ∧ (L.ρ.triM ≤ P ↔ S.u.triM ≤ L.im P) ∧ (L.ρ.ee ≤ P ↔ S.u.ee ≤ L.im P)) ∧ (¬ S.u.triP ≤ x → L.ρ.triP = ⊤ ∧ L.ρ.triM ≤ maximalIdeal L.R) := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S x L
+  obtain ⟨-, -, hx⟩ := UpperTheory.V.Fr.loc_flat hF hn S x L
+  obtain ⟨⟨hc1, hc2⟩, -⟩ := UpperTheory.V.Fr.cont_u hF hn S
+  have hx0 : S.x0 ≤ (maximalIdeal L.R).comap (L.ι : S.A →+* L.R) := by
+    rw [L.lies]
+    exact Ideal.map_le_iff_le_comap.2 hx
+  have h3 : ∀ P : Ideal L.R, (L.ρ.triP ≤ P ↔ S.u.triP ≤ L.im P) ∧ (L.ρ.triM ≤ P ↔ S.u.triM ≤ L.im P) ∧
+      (L.ρ.ee ≤ P ↔ S.u.ee ≤ L.im P) := fun P =>
+    ⟨span_le_iff (L.ι : S.A →+* L.R) (fun g i j => S.u.r g i j) (fun i j => j < i) P,
+      span_le_iff (L.ι : S.A →+* L.R) (fun g i j => S.u.r g i j) (fun i j => i < j) P,
+      span_le_iff (L.ι : S.A →+* L.R) (fun g i j => S.u.r g i j) (fun i j => Odd (w n i - w n j)) P⟩
+  have him : L.im (maximalIdeal L.R) = x := L.lies
+  refine ⟨⟨fun i j => cont_map _ hx0 (hc1 i j), fun v i => cont_map _ hx0 (hc2 v i)⟩,
+    fun f hf => ⟨fun g i => ?_, fun v i g => ?_⟩, h3, fun hP => ⟨?_, ?_⟩⟩
+  · exact (res_b S x L hx f hf (S.aB g i)).trans (congrArg f (S.lift.2.1.1 g i))
+  · exact (res_b S x L hx f hf (S.ψB v i g)).trans (congrArg f (S.lift.2.1.2 v i g))
+  · by_contra hne
+    exact hP (him ▸ (h3 _).1.1 (IsLocalRing.le_maximalIdeal hne))
+  · have hk : RingHom.ker ((residue L.R).comp (L.ι : S.A →+* L.R)) = x := by
+      rw [← RingHom.comap_ker, IsLocalRing.ker_residue]
+      exact L.lies
+    have := (UpperTheory.V.Fr.types hF hn S (ResidueField L.R) ((residue L.R).comp (L.ι : S.A →+* L.R))).2
+    rw [hk] at this
+    rw [(h3 _).2.1, him]
+    exact (this hx).resolve_left hP
+
+
+[RTC_SRC_SHARP2] Retained rank-two sharp component chains and dimensions
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/ChainedBot.lean#L51-L86
+theorem UpperTheory.V.Fr.sharp2 :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ}, F.Ok C₀ → ∀ S : Space O F 2, ∀ (x : Ideal S.A) (L : S.Loc x), F.Big C₀ → ¬ S.u.triP ≤ x → Chained (⊥ : Ideal L.R) (2 * F.d + 1) ∧ ∀ P ∈ minimalPrimes L.R, L.ρ.TI P := by
+  intro l _ O _ _ _ _ F C₀ hok S x L hbig hx
+  obtain ⟨N, N', p, f, hN, hs, hk⟩ := pres hok (Or.inl rfl) S x L
+  haveI : IsAdicComplete (maximalIdeal L.O') L.O' := IsCoef.complete (l := l)
+  haveI : IsCO L.O' (MvPowerSeries (Fin N) L.O') := co_mvps _ _ _
+  have hdim := ((UpperTheory.V.CA.cl_cm).1 L.O' N).2
+  have hch : Chained (Ideal.span (Set.range f)) (2 * F.d + 1) := by
+    apply c1ch _ N' (2 * F.d + 1) f
+    · rw [nilradical_eq_zero, Ideal.zero_eq_bot]
+      exact Ideal.bot_prime
+    · exact ⟨L.O', inferInstance, inferInstance, inferInstance, inferInstance, inferInstance, inferInstance⟩
+    · intro i
+      have hi : f i ∈ RingHom.ker p := hk ▸ Ideal.subset_span ⟨i, rfl⟩
+      exact IsLocalRing.le_maximalIdeal (RingHom.ker_ne_top p) hi
+    · rw [hdim]
+      exact le_of_eq (congrArg (fun n : ℕ => (n : WithBot ℕ∞)) (by omega))
+  have h1 : Chained (⊥ : Ideal L.R) (2 * F.d + 1) := by
+    refine chained_bot_of_chained_ker_of_surjective (p : MvPowerSeries (Fin N) L.O' →+* L.R) hs _ ?_
+    rw [← hk] at hch
+    exact hch
+  refine ⟨h1, fun P hP => ?_⟩
+  have hr := (loc_rho hok (Or.inl rfl) S x L).2.2.2 hx
+  have hl := (krull_dim_lt_of_not_le_triangular hok (Or.inl rfl) S x L hbig hx).1
+  have hPp : P.IsPrime := hP.1.1
+  refine ⟨⟨?_, ?_⟩, fun h => absurd h (by decide)⟩
+  · rw [hr.1, top_le_iff]
+    exact hPp.ne_top
+  · intro hle
+    have hge := h1.1 P hP
+    have hmono : ringKrullDim (L.R ⧸ P) ≤ ringKrullDim (L.R ⧸ L.ρ.triM) :=
+      ringKrullDim_le_of_surjective (Ideal.Quotient.factor hle) (Ideal.Quotient.factor_surjective hle)
+    have hlt : ((2 * F.d + 1 + 1 : ℕ) : WithBot ℕ∞) < ((2 * F.d : ℕ) : WithBot ℕ∞) :=
+      lt_of_le_of_lt (hge.trans hmono) hl
+    have : 2 * F.d + 1 + 1 < 2 * F.d := by exact_mod_cast hlt
+    omega
+
+
+[RTC_SRC_DIM] Retained triangular/coincident-character dimension bounds
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/KrullDimLtOfNotLeTriangular.lean#L36-L58
+theorem UpperTheory.V.Fr.krull_dim_lt_of_not_le_triangular :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (x : Ideal S.A) (L : S.Loc x), F.Big C₀ → ¬ S.u.triP ≤ x → ringKrullDim (L.R ⧸ L.ρ.triM) < (n * F.d : ℕ) ∧ ∀ I : Ideal S.B, S.FinLam I → ∀ v i j, i ≠ j → ringKrullDim (L.R ⧸ (I.map L.b ⊔ (maximalIdeal O).map (algebraMap O L.R) ⊔ Ideal.span {y | ∃ g ∈ F.Nv v, y = (L.ρ.ψ v i g : L.R) - L.ρ.ψ v j g})) < (n * F.d : ℕ) := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S x L hB hx
+  obtain ⟨h1, h2⟩ := l51 hF hn S x L hx
+  obtain ⟨hd, hdv⟩ := hB
+  have hlt : ((n * F.d - 1 : ℕ) : WithBot ℕ∞) < (n * F.d : ℕ) := by
+    have : n * F.d - 1 < n * F.d := by rcases hn with rfl | rfl <;> omega
+    exact_mod_cast this
+  have hT : ringKrullDim (L.R ⧸ L.ρ.triM) ≤ (n * F.d - 1 : ℕ) := by
+    refine h1.trans ?_
+    have : (n - 1) * F.d + 2 + (3 * C₀ + 5) ≤ n * F.d - 1 := by rcases hn with rfl | rfl <;> omega
+    exact_mod_cast this
+  refine ⟨hT.trans_lt hlt, fun I hI v i j hij => lt_of_le_of_lt (dim_le_of_primes _ _ fun P hP hle => ?_) hlt⟩
+  by_cases hM : L.ρ.triM ≤ P
+  · exact (dim_anti hM).trans hT
+  have hoff : L.ρ.OffTri P := ⟨fun h => hP.ne_top (top_le_iff.1 (h2 ▸ h)), hM⟩
+  have hIP : I ≤ L.π P :=
+    (Ideal.map_le_iff_le_comap (f := L.b)).1 (le_sup_left.trans (le_sup_left.trans hle))
+  have hco : L.ρ.Coin P v i j := fun g hg => (le_sup_right.trans hle) (Ideal.subset_span ⟨g, hg, rfl⟩)
+  have h := (l52 hF hn S x L I hI v i j hij P hP hoff hIP hco).2 (le_sup_right.trans (le_sup_left.trans hle))
+  refine le_of_add_le h ?_
+  have := hdv v
+  rcases hn with rfl | rfl <;> omega
+
+
+[RTC_SRC_SEED] Retained actual seed-prime incidence and dimension comparison
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/Seedpt.lean#L9-L30
+theorem UpperTheory.V.Fr.seedpt :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (p : Ideal S.B) (ξ : Ideal S.A), p.IsPrime → ξ.IsPrime → S.u.TI ξ → p ≤ S.π ξ → ∃ x : PrimeSpectrum S.A, x.asIdeal.IsMaximal ∧ x ∈ S.BB ∧ ∀ L : S.Loc x.asIdeal, ∃ P : Ideal L.R, P.IsPrime ∧ L.ρ.TI P ∧ L.π P = p ∧ ringKrullDim (L.R ⧸ P) = ringKrullDim (S.B ⧸ p) + 1 := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S p ξ hp hξ hTI hpξ
+  obtain ⟨η, hηp, hhom, hπ, hTIη, htd⟩ := frobenius_corner_lift_two_to_three hF hn S p ξ hp hξ hTI hpξ
+  have hTIη' := hTIη
+  unfold NRep.TI NRep.OffTri at hTIη'
+  obtain ⟨x, hxmax, hxBB, hηx⟩ := l41 hF hn S η hηp hhom hTIη'.1.1
+  refine ⟨x, hxmax, hxBB, fun L => ?_⟩
+  have htd' : S.td η = ((1 : ℕ) : _) := by
+    rw [htd]
+    rfl
+  obtain ⟨P, hP, himP, hdim⟩ := (loc_dim hF hn S x.asIdeal L).2 η hηp hηx 1 htd'
+  have hloc := (loc_rho hF hn S x.asIdeal L).2.2.1 P
+  rw [himP] at hloc
+  refine ⟨P, hP, ?_, ?_, ?_⟩
+  · unfold NRep.TI NRep.OffTri
+    exact ⟨⟨fun h => hTIη'.1.1 (hloc.1.mp h), fun h => hTIη'.1.2 (hloc.2.1.mp h)⟩,
+      fun h3 h => hTIη'.2 h3 (hloc.2.2.mp h)⟩
+  · show S.π (L.im P) = p
+    rw [himP, hπ]
+  · rw [hdim, hπ]
+    norm_num
+
+
+[RTC_SRC_CORNER] Retained rank-two-to-rank-three corner and exceptional ideal
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/QuotientHomNonvanishingBound.lean#L221-L236
+theorem UpperTheory.V.Fr.l53 :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ}, F.Ok C₀ → ∀ (S₂ : Space O F 2) (S₃ : Space O F 3) (I₂ : Ideal S₂.B), S₂.FinLam I₂ → (∀ ξ : Ideal S₂.A, ξ.IsPrime → S₂.u.TI ξ → I₂ ≤ S₂.π ξ) → ∃ I₃ : Ideal S₃.B, S₃.FinLam I₃ ∧ ∀ ξ : Ideal S₃.A, ξ.IsPrime → S₃.u.TE ξ → I₃ ≤ S₃.π ξ := by
+  intro l _ O _ _ _ _ F C₀ hF S₂ S₃ I₂ hI₂ hT
+  by_cases htop : S₃.u.ee = ⊤
+  · refine ⟨⊤, ?_, ?_⟩
+    · show S₃.mB ≤ _
+      rw [top_sup_eq, Ideal.radical_top]
+      exact le_top
+    · intro P hP hTE
+      exact absurd (top_le_iff.mp (htop ▸ hTE.2.2)) hP.ne_top
+  · haveI : Nontrivial (S₃.B ⧸ S₃.u.ee.comap S₃.inc) :=
+      Ideal.Quotient.nontrivial_iff.mpr (Ideal.comap_ne_top _ htop)
+    exact finite_lambda_two_three_surjection_compat hF S₂ S₃ I₂ hI₂ hT (S₃.B ⧸ S₃.u.ee.comap S₃.inc) (S₃.A ⧸ S₃.u.ee)
+      (Ideal.Quotient.mkₐ O _) (Ideal.Quotient.mkₐ O _) (Ideal.quotientMapₐ S₃.u.ee S₃.inc le_rfl)
+      (Ideal.Quotient.mkₐ_surjective O _) (Ideal.Quotient.mkₐ_surjective O _)
+      Ideal.quotientMap_injective (fun b => rfl) (Ideal.Quotient.mkₐ_ker O _)
+
+
+[RTC_SRC_GL3] Retained full rank-three propagation and OffFin producer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CurveDVRSpecialization/PropagationTheoremGL3.lean#L213-L229
+theorem UpperTheory.V.Pr.components_good_rank_three :
+    UpperTheory.V.Pr.PropagationTheoremGL3 := by
+  intro l _ O _ _ _ _ F C₀ hF hB S₂ M₂ hM₂ hG₂ S M hM h1 h23 hs
+  obtain ⟨I₃, hI₃, hE⟩ := l53 hF S₂ S M₂ hM₂ hG₂
+  haveI : IsNoetherianRing S.A := (gr_A hF (Or.inr rfl) S).2.2.2.2.2.1
+  have hG : AllGood S M := fun p hp hT =>
+    globProp _ (gd S M) (gd_ok hF hB hM h1 h23 hs hI₃ hE) (a := ⟨p, hp⟩) hT
+  refine ⟨hG, M ⊓ I₃, ?_, fun p hp ho => ?_⟩
+  · unfold Space.FinLam
+    rw [Ideal.radical_eq_sInf]
+    refine le_sInf fun J hJ => ?_
+    rcases hJ.2.inf_le.1 (le_sup_left.trans hJ.1) with h | h
+    · exact hM.trans (hJ.2.radical_le_iff.2 (sup_le h (le_sup_right.trans hJ.1)))
+    · exact hI₃.trans (hJ.2.radical_le_iff.2 (sup_le h (le_sup_right.trans hJ.1)))
+  · rcases Classical.em (S.u.ee ≤ p) with h | h
+    · exact inf_le_right.trans (hE p hp ⟨ho, rfl, h⟩)
+    · exact inf_le_left.trans (hG p hp ⟨ho, fun _ => h⟩)
+
+
+[RTC_SRC_POINTLOC] Broader general point_loc remains separate; it is not imported in RTC15
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/FrobeniusSmoothVectors/PointLoc.lean#L1-L349
+import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSmoothVectors.AlgVring
+import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSmoothVectors.Imports
+import Development.AutomorphicArithmetic.AutomorphicVarieties.FrobeniusSmoothVectors.CoB
+import Development.AutomorphicArithmetic.AutomorphicVarieties.CommutativeAlgebraHeight.ClSub
+
+open IsLocalRing Matrix UpperTheory.V.Alg UpperTheory.V.U3 UpperTheory.V.Fr
+
+private theorem cont_sub {Γ S C : Type} [TopologicalSpace Γ] [CommRing S] [IsNoetherianRing S] [CommRing C]
+    [Algebra S C] [Module.Finite S C] (I : Ideal S) (J : Ideal C)
+    (h : ∀ N, ∀ c ∈ J ^ N, c ∈ (I ^ N • ⊤ : Submodule S C)) (a : Γ → C) (ha : AdicCont J a) (N : ℕ) :
+    IsLocallyConstant fun g => (I ^ N • Submodule.span S (Set.range a)).mkQ (a g) := by
+  classical
+  obtain ⟨k, hk⟩ := Ideal.exists_pow_inf_eq_pow_smul I (Submodule.span S (Set.range a))
+  set M := Submodule.span S (Set.range a)
+  let φ : Γ → C ⧸ J ^ (N + k) := fun g => Ideal.Quotient.mk (J ^ (N + k)) (a g)
+  let f : Γ → C ⧸ (I ^ N • M) := fun g => (I ^ N • M).mkQ (a g)
+  have key : ∀ g g', φ g = φ g' → f g = f g' := by
+    intro g g' hgg
+    have h1 : a g - a g' ∈ J ^ (N + k) := Ideal.Quotient.eq.1 hgg
+    have h2 : a g - a g' ∈ (I ^ (N + k) • ⊤ : Submodule S C) ⊓ M :=
+      ⟨h _ _ h1, M.sub_mem (Submodule.subset_span ⟨g, rfl⟩) (Submodule.subset_span ⟨g', rfl⟩)⟩
+    rw [hk (N + k) (by omega), Nat.add_sub_cancel] at h2
+    have h3 : a g - a g' ∈ I ^ N • M := Submodule.smul_mono le_rfl inf_le_right h2
+    exact (Submodule.Quotient.eq _).2 h3
+  have hf : f = (fun x => if hx : ∃ g, φ g = x then f hx.choose else 0) ∘ φ := by
+    funext g
+    have hx : ∃ g', φ g' = φ g := ⟨g, rfl⟩
+    simp only [Function.comp_apply, dif_pos hx]
+    exact key _ _ hx.choose_spec.symm
+  change IsLocallyConstant f
+  rw [hf]
+  exact (ha (N + k)).comp _
+
+private theorem two_zero {K : Type} [Field K] {x y s t : K} (h : s ≠ t) (h1 : x + y = 0) (h2 : s * x + t * y = 0) :
+    x = 0 ∧ y = 0 := by
+  have hy : y = -x := by linear_combination h1
+  subst hy
+  have hx : (s - t) * x = 0 := by linear_combination h2
+  rcases mul_eq_zero.1 hx with h3 | h3
+  · exact absurd (sub_eq_zero.1 h3) h
+  · exact ⟨h3, by simp [h3]⟩
+
+private theorem or_zero {G K : Type} [Field K] {a b : G → K} (h : ∀ g g', a g * b g' = 0) :
+    (∀ g, a g = 0) ∨ ∀ g, b g = 0 := by
+  by_contra hc
+  push_neg at hc
+  obtain ⟨⟨g, hg⟩, ⟨g', hg'⟩⟩ := hc
+  exact mul_ne_zero hg hg' (h g g')
+
+private theorem tri_of_bar {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ}
+    (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3) {K : Type} [Field K] (f : k →+* K) (ρ : NRep F n K) (hρ : ρ.IsBar f) :
+    (∀ g i j, j < i → ρ.r g i j = 0) ∨ ∀ g i j, i < j → ρ.r g i j = 0 := by
+  have hst := UpperTheory.V.Fr.star hF
+  have hd : ∀ g h : F.G0, ∀ i, ρ.r (g * h) i i = ρ.r g i i * ρ.r h i i := by
+    intro g h i
+    rw [hρ.1, hρ.1, hρ.1]
+    simp [mul_zpow, map_mul]
+  rcases hn with rfl | rfl
+  · have hE : ∀ g h : F.G0, ρ.r g 0 1 * ρ.r h 1 0 = 0 := by
+      intro g h
+      have e := hd g h 0
+      rw [map_mul, Matrix.mul_apply, Fin.sum_univ_two] at e
+      linear_combination e
+    rcases or_zero hE with h01 | h10
+    · right
+      intro g i j hij
+      fin_cases i <;> fin_cases j <;> simp at hij
+      exact h01 g
+    · left
+      intro g i j hij
+      fin_cases i <;> fin_cases j <;> simp at hij
+      exact h10 g
+  · set X := ρ.r F.g0 - ρ.r (F.star F.g0) with hXdef
+    have hX : ∀ a b : Fin 3, a ≠ b → X a b = 0 := fun a b hab => ρ.diag a b hab
+    have hXm : ∀ g h : F.G0, ρ.r (g * F.g0 * h) - ρ.r (g * F.star F.g0 * h) = ρ.r g * X * ρ.r h := by
+      intro g h
+      simp only [map_mul, hXdef, Matrix.mul_sub, Matrix.sub_mul]
+    have hT : ∀ g h : F.G0, ∀ i : Fin 3, (ρ.r g * X * ρ.r h) i i = ρ.r g i i * X i i * ρ.r h i i := by
+      intro g h i
+      rw [← hXm, Matrix.sub_apply, hd, hd, hd, hd, hXdef, Matrix.sub_apply]
+      ring
+    have hE : ∀ g h : F.G0, ∀ i : Fin 3, (ρ.r g * ρ.r h) i i = ρ.r g i i * ρ.r h i i := by
+      intro g h i
+      rw [← map_mul, hd]
+    have hp : (F.Ψ ↑F.g0 : kˣ) ^ 2 ≠ 1 := hF.baseSubgroup_spec
+    set p := F.Ψ ↑F.g0 with hpdef
+    have hw0 : w 3 0 = 1 := by simp [w]
+    have hw1 : w 3 1 = 0 := by simp [w]
+    have hw2 : w 3 2 = -1 := by simp [w]
+    have hs : F.Ψ ↑(F.star F.g0) = p⁻¹ := hst.2.2.1 F.g0
+    have hX0 : X 0 0 = f ↑p - f ↑p⁻¹ := by
+      rw [hXdef, Matrix.sub_apply, hρ.1, hρ.1, hw0, hs]
+      simp [← hpdef]
+    have hX1 : X 1 1 = 0 := by
+      rw [hXdef, Matrix.sub_apply, hρ.1, hρ.1, hw1]
+      simp
+    have hX2 : X 2 2 = f ↑p⁻¹ - f ↑p := by
+      rw [hXdef, Matrix.sub_apply, hρ.1, hρ.1, hw2, hs]
+      simp [← hpdef]
+    have hq : f ↑p - f ↑p⁻¹ ≠ 0 := by
+      intro e
+      apply hp
+      have e2 : f ((p : k) * p) = f ((p : k) * ↑p⁻¹) := by
+        rw [map_mul, map_mul, sub_eq_zero.1 e]
+      rw [Units.mul_inv] at e2
+      have e3 : (p : k) * p = 1 := f.injective (by rw [e2, map_one])
+      ext
+      simpa [pow_two] using e3
+    have h2 : (2 : K) ≠ 0 := by
+      have hk2 : (2 : k) ≠ 0 := by
+        intro e
+        have : (l : ℕ) ∣ 2 := by
+          have := (CharP.cast_eq_zero_iff k l 2).1 (by exact_mod_cast e)
+          exact this
+        have hl := (Fact.out : l.Prime)
+        rcases (Nat.le_of_dvd (by norm_num) this).lt_or_eq with h | h
+        · have := hl.two_le
+          omega
+        · exact hF.l_odd h
+      intro e
+      apply hk2
+      apply f.injective
+      rw [map_ofNat, e, map_zero]
+    have hA : ∀ g h : F.G0, ρ.r g 0 1 * ρ.r h 1 0 = 0 ∧ ρ.r g 0 2 * ρ.r h 2 0 = 0 := by
+      intro g h
+      have e1 := hE g h 0
+      have e2 := hT g h 0
+      simp only [Matrix.mul_apply, Fin.sum_univ_three, hX 0 1 (by decide), hX 0 2 (by decide),
+        hX 1 0 (by decide), hX 1 2 (by decide), hX 2 0 (by decide), hX 2 1 (by decide)] at e1 e2
+      refine two_zero (s := X 1 1) (t := X 2 2) ?_ ?_ ?_
+      · rw [hX1, hX2]
+        intro e
+        exact hq (by linear_combination e)
+      · linear_combination e1
+      · linear_combination e2
+    have hB : ∀ g h : F.G0, ρ.r g 1 0 * ρ.r h 0 1 = 0 ∧ ρ.r g 1 2 * ρ.r h 2 1 = 0 := by
+      intro g h
+      have e1 := hE g h 1
+      have e2 := hT g h 1
+      simp only [Matrix.mul_apply, Fin.sum_univ_three, hX 0 1 (by decide), hX 0 2 (by decide),
+        hX 1 0 (by decide), hX 1 2 (by decide), hX 2 0 (by decide), hX 2 1 (by decide)] at e1 e2
+      refine two_zero (s := X 0 0) (t := X 2 2) ?_ ?_ ?_
+      · rw [hX0, hX2]
+        intro e
+        apply h2
+        have : (2 : K) * (f ↑p - f ↑p⁻¹) = 0 := by linear_combination e
+        exact (mul_eq_zero.1 this).resolve_right hq
+      · linear_combination e1
+      · linear_combination e2
+    have s01 : ∀ g, ρ.r (F.star g) 0 1 = ρ.r g 1 2 := fun g => hst.2.2.2.2 ρ g 0 1
+    have s10 : ∀ g, ρ.r (F.star g) 1 0 = ρ.r g 2 1 := fun g => hst.2.2.2.2 ρ g 1 0
+    have t12 : (∀ g : F.G0, ρ.r g 0 1 = 0) → ∀ g : F.G0, ρ.r g 1 2 = 0 := fun h g => by
+      rw [← s01]; exact h _
+    have t21 : (∀ g : F.G0, ρ.r g 1 0 = 0) → ∀ g : F.G0, ρ.r g 2 1 = 0 := fun h g => by
+      rw [← s10]; exact h _
+    have t10 : (∀ g : F.G0, ρ.r g 2 1 = 0) → ∀ g : F.G0, ρ.r g 1 0 = 0 := fun h g => by
+      rw [← hst.1 g, s10]; exact h _
+    have hP : ∀ g h : F.G0, (ρ.r g * ρ.r h) = ρ.r (g * h) := fun g h => (map_mul _ _ _).symm
+    have hL : (∀ g : F.G0, ρ.r g 1 0 = 0) → (∀ g : F.G0, ρ.r g 2 0 = 0) → (∀ g : F.G0, ρ.r g 2 1 = 0) →
+        (∀ (g : F.G0) (i j : Fin 3), j < i → ρ.r g i j = 0) := by
+      intro a b c g i j hij
+      fin_cases i <;> fin_cases j <;> simp at hij
+      · exact a g
+      · exact b g
+      · exact c g
+    have hR : (∀ g : F.G0, ρ.r g 0 1 = 0) → (∀ g : F.G0, ρ.r g 0 2 = 0) → (∀ g : F.G0, ρ.r g 1 2 = 0) →
+        (∀ (g : F.G0) (i j : Fin 3), i < j → ρ.r g i j = 0) := by
+      intro a b c g i j hij
+      fin_cases i <;> fin_cases j <;> simp at hij
+      · exact a g
+      · exact b g
+      · exact c g
+    rcases or_zero (fun g h => (hA g h).1) with a01 | a10
+    · have a12 := t12 a01
+      rcases or_zero (fun g h => (hA g h).2) with a02 | a20
+      · exact Or.inr (hR a01 a02 a12)
+      · have hC : ∀ g h : F.G0, ρ.r g 0 2 * ρ.r h 2 1 = 0 := by
+          intro g h
+          have e := congrFun (congrFun (hP g h) 0) 1
+          simp only [Matrix.mul_apply, Fin.sum_univ_three, a01, a01 h] at e
+          linear_combination e
+        rcases or_zero hC with a02 | a21
+        · exact Or.inr (hR a01 a02 a12)
+        · exact Or.inl (hL (t10 a21) a20 a21)
+    · have a21 := t21 a10
+      rcases or_zero (fun g h => (hA g h).2) with a02 | a20
+      · have hC : ∀ g h : F.G0, ρ.r g 2 0 * ρ.r h 0 1 = 0 := by
+          intro g h
+          have e := congrFun (congrFun (hP g h) 2) 1
+          simp only [Matrix.mul_apply, Fin.sum_univ_three, a21, a21 h] at e
+          linear_combination e
+        rcases or_zero hC with a20 | a01
+        · exact Or.inl (hL a10 a20 a21)
+        · exact Or.inr (hR a01 a02 (t12 a01))
+      · exact Or.inl (hL a10 a20 a21)
+
+private theorem wsum {G : Type} {n : ℕ} (hn : n = 2 ∨ n = 3) (L : List (G × Fin n × Fin n))
+    (h : ∀ s ∈ L, s.2.1 ≤ s.2.2) (h0 : (L.map fun s => w n s.2.1 - w n s.2.2).sum = 0) : ∀ s ∈ L, s.2.1 = s.2.2 := by
+  have hw : ∀ i j : Fin n, i ≤ j → 0 ≤ w n i - w n j ∧ (w n i - w n j = 0 → i = j) := by
+    intro i j hij
+    have hij' : (i : ℕ) ≤ j := hij
+    rcases hn with rfl | rfl
+    · simp only [w]
+      refine ⟨by norm_num; omega, fun e => Fin.ext ?_⟩
+      norm_num at e
+      omega
+    · simp only [w]
+      refine ⟨by norm_num; omega, fun e => Fin.ext ?_⟩
+      norm_num at e
+      omega
+  induction L with
+  | nil => simp
+  | cons s L ih =>
+    intro s' hs'
+    have hs := hw s.2.1 s.2.2 (h s (List.mem_cons_self ..))
+    have hL : ∀ t ∈ L, t.2.1 ≤ t.2.2 := fun t ht => h t (List.mem_cons_of_mem _ ht)
+    have hnn : 0 ≤ (L.map fun s => w n s.2.1 - w n s.2.2).sum := by
+      apply List.sum_nonneg
+      intro x hx
+      obtain ⟨t, ht, rfl⟩ := List.mem_map.1 hx
+      exact (hw _ _ (hL t ht)).1
+    rw [List.map_cons, List.sum_cons] at h0
+    have e1 : w n s.2.1 - w n s.2.2 = 0 := by linarith [hs.1]
+    have e2 : (L.map fun s => w n s.2.1 - w n s.2.2).sum = 0 := by linarith [hs.1]
+    rcases List.mem_cons.1 hs' with rfl | hs'
+    · exact hs.2 e1
+    · exact ih hL e2 s' hs'
+
+private theorem cyc_mem {l : ℕ} [Fact l.Prime] {k : Type} [Field k] [CharP k l] {F : Frame l k} {C₀ n : ℕ}
+    (hF : F.Ok C₀) (hn : n = 2 ∨ n = 3) {C : Type} [CommRing C] [IsLocalRing C] (f : k →+* ResidueField C)
+    (ρ : NRep F n C) (hρ : (ρ.map (residue C)).IsBar f) (L : List (F.G0 × Fin n × Fin n))
+    (h0 : (L.map fun s => w n s.2.1 - w n s.2.2).sum = 0) (h1 : ∃ s ∈ L, s.2.1 ≠ s.2.2) :
+    (L.map fun s => ρ.r s.1 s.2.1 s.2.2).prod ∈ maximalIdeal C := by
+  have hr : ∀ g i j, (ρ.map (residue C)).r g i j = residue C (ρ.r g i j) := fun _ _ _ => rfl
+  rw [← IsLocalRing.residue_eq_zero_iff, map_list_prod, List.map_map]
+  apply List.prod_eq_zero
+  rcases tri_of_bar hF hn f (ρ.map (residue C)) hρ with ht | ht
+  · by_cases hex : ∃ s ∈ L, s.2.2 < s.2.1
+    · obtain ⟨s, hs, hlt⟩ := hex
+      refine List.mem_map.2 ⟨s, hs, ?_⟩
+      simp only [Function.comp_apply]
+      rw [← hr]
+      exact ht _ _ _ hlt
+    · push_neg at hex
+      exfalso
+      obtain ⟨s, hs, hne⟩ := h1
+      exact hne (wsum hn L hex h0 s hs)
+  · by_cases hex : ∃ s ∈ L, s.2.1 < s.2.2
+    · obtain ⟨s, hs, hlt⟩ := hex
+      refine List.mem_map.2 ⟨s, hs, ?_⟩
+      simp only [Function.comp_apply]
+      rw [← hr]
+      exact ht _ _ _ hlt
+    · push_neg at hex
+      exfalso
+      obtain ⟨s, hs, hne⟩ := h1
+      have hL' : ∀ t ∈ L.map (fun s => (s.1, s.2.2, s.2.1)), t.2.1 ≤ t.2.2 := by
+        intro t ht
+        obtain ⟨s, hs, rfl⟩ := List.mem_map.1 ht
+        exact hex s hs
+      have h0' : ((L.map (fun s => (s.1, s.2.2, s.2.1))).map fun s => w n s.2.1 - w n s.2.2).sum = 0 := by
+        have e : ((L.map (fun s => (s.1, s.2.2, s.2.1))).map fun s => w n s.2.1 - w n s.2.2) =
+            (L.map fun s => w n s.2.1 - w n s.2.2).map Neg.neg := by
+          simp [List.map_map, Function.comp_def]
+        have hneg : ∀ m : List ℤ, (m.map Neg.neg).sum = -m.sum := by
+          intro m
+          induction m with
+          | nil => simp
+          | cons a m ih => simp only [List.map_cons, List.sum_cons, ih]; ring
+        rw [e, hneg, h0, neg_zero]
+      exact hne (wsum hn _ hL' h0' (s.1, s.2.2, s.2.1) (List.mem_map.2 ⟨s, hs, rfl⟩)).symm
+
+private theorem lc_lemma {X A B : Type} [TopologicalSpace X] (φ : X → A) (g : X → B)
+    (hφ : IsLocallyConstant φ) (h : ∀ x y, φ x = φ y → g x = g y) : IsLocallyConstant g := by
+  classical
+  rcases isEmpty_or_nonempty X with hX | ⟨⟨x₀⟩⟩
+  · exact IsLocallyConstant.of_constant _ (fun x => (hX.false x).elim)
+  have e : g = (fun a => if ha : ∃ x, φ x = a then g ha.choose else g x₀) ∘ φ := by
+    funext x
+    have ha : ∃ y, φ y = φ x := ⟨x, rfl⟩
+    simp only [Function.comp_apply, dif_pos ha]
+    exact h _ _ ha.choose_spec.symm
+  rw [e]
+  exact hφ.comp _
+
+theorem UpperTheory.V.Fr.point_loc :
+    ∀ {l : ℕ} [Fact l.Prime] {O : Type} [CommRing O] [IsDomain O] [IsDiscreteValuationRing O] [IsCoef l O] {F : Frame l (ResidueField O)} {C₀ : ℕ} {n : ℕ}, F.Ok C₀ → (n = 2 ∨ n = 3) → ∀ S : Space O F n, ∀ (C : Type) [CommRing C] [IsLocalRing C] [Algebra O C], UpperTheory.V.CA.IsCL O C → ∀ (f : ResidueField O →+* ResidueField C), IsResMap O C f → ∀ ρ : NRep F n C, ρ.Cont (maximalIdeal C) → (ρ.map (residue C)).IsBar f → ∃ ξ : S.A →ₐ[O] C, S.u.map (ξ : S.A →+* C) = ρ ∧ S.x0 ≤ (maximalIdeal C).comap (ξ : S.A →+* C) := by
+  intro l _ O _ _ _ _ F C₀ n hF hn S C _ _ _ hCL f hf ρ hρc hρ
+  obtain ⟨S', hmem, hfin, hCO, hpow⟩ := UpperTheory.V.CA.cl_sub O C hCL
+  obtain ⟨hBco, hmB⟩ := co_B hF hn S
+  have hJ : ∀ c ∈ maximalIdeal C, c ∈ S' := fun c hc => (hmem c).2 ⟨0, by simpa using hc⟩
+  have hmax : ∀ c : S', c ∈ maximalIdeal S' ↔ (c : C) ∈ maximalIdeal C := by
+    intro c
+    simpa using hpow 1 c
+  have hin : ∀ (c : C) (t : ResidueField O), residue C c = f t → c ∈ S' := by
+    intro c t h
+    obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective t
+    refine (hmem c).2 ⟨a, ?_⟩
+    rw [← IsLocalRing.residue_eq_zero_iff, map_sub, h, hf a, sub_self]
+  have hres : ∀ (c : S') (t : ResidueField O), residue C (c : C) = f t → res O S' c = t := by
+    intro c t h
+    obtain ⟨a, rfl⟩ := IsLocalRing.residue_surjective t
+    have d : c - algebraMap O S' a ∈ maximalIdeal S' := by
+      rw [hmax]
+      rw [← IsLocalRing.residue_eq_zero_iff]
+      simp only [Subalgebra.coe_sub, Subalgebra.coe_algebraMap, map_sub, h, hf a, sub_self]
+    have d2 := (res_eq_zero_iff O S' _).2 d
+    rw [map_sub, AlgHom.commutes, sub_eq_zero] at d2
+    rw [d2, IsLocalRing.ResidueField.algebraMap_eq]
+  have hJN : ∀ N, ∀ c ∈ maximalIdeal C ^ N, c ∈ ((maximalIdeal S' ^ N • ⊤ : Submodule S' C)) := by
+    intro N c hc
+    have hle : maximalIdeal C ≤ Ideal.map (algebraMap S' C) (maximalIdeal S') := by
+      intro c hc
+      exact Ideal.mem_map_of_mem (algebraMap S' C) ((hmax ⟨c, hJ c hc⟩).2 hc)
+    have hc' := Ideal.pow_right_mono hle N hc
+    rw [← Ideal.map_pow] at hc'
+    rw [Ideal.smul_top_eq_map]
+    exact hc'
+  have cone : Cone O S' ρ := by
+    refine ⟨?_, ?_, ?_, ?_, ?_⟩
+    · intro g i
+      exact ⟨⟨ρ.r g i i, hin _ _ (hρ.1 g i)⟩, rfl, hres ⟨ρ.r g i i, hin _ _ (hρ.1 g i)⟩ _ (hρ.1 g i)⟩
+    · intro L h0 h1
+      have hp := cyc_mem hF hn f ρ hρ L h0 h1
+      exact ⟨⟨_, hJ _ hp⟩, (hmax _).2 hp, rfl⟩
+    · intro i j
+      haveI : IsNoetherian S' C := isNoetherian_of_isNoetherianRing_of_finite S' C
+      exact IsNoetherian.noetherian _
+    · intro i j N
+      exact cont_sub (maximalIdeal S') (maximalIdeal C) hJN (fun g => ρ.r g i j) (hρc.1 i j) N
+    · refine ⟨fun v i g => ⟨((ρ.ψ v i g : Cˣ) : C), hin _ _ (hρ.2 v i g)⟩, ?_, fun v i g => rfl⟩
+      intro v i
+      refine ⟨?_, fun g => hres _ _ (hρ.2 v i g)⟩
+      intro N
+      refine lc_lemma _ _ (hρc.2 v i N) ?_
+      intro x y hxy
+      apply Ideal.Quotient.eq.2
+      rw [hpow]
+      exact Ideal.Quotient.eq.1 hxy
+  obtain ⟨ξ, β, h1, h2⟩ := alg hF hn S S' C Subtype.val_injective ρ cone
+  refine ⟨ξ, h1, ?_⟩
+  rw [Space.x0, Ideal.map_le_iff_le_comap]
+  intro b hb
+  rw [← hmB] at hb
+  show ξ (S.inc b) ∈ maximalIdeal C
+  rw [h2]
+  apply (hmax _).1
+  rw [← res_eq_zero_iff O S', res_map]
+  exact (res_eq_zero_iff O S.B b).2 hb

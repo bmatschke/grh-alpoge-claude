@@ -1,0 +1,344 @@
+\section{Decomposing the actual classical and ordinary spaces}
+\label{sec:classical-parts-v43}
+
+This chapter proves the original \texttt{TClParts.clParts\_alt} and its
+version for an arbitrary predicate on the parts.  The input is the original
+\texttt{AutomorphicHeckeSet}: vectors in the big automorphic space, with
+some finite level and some Iwahori depth, are algebraic sums of the stated
+parts.  The conclusion preserves the \emph{given} level, finite-part
+character, depth, and ordinary generalized-eigenvalue condition.  In
+particular, no passage to a closure or to a different automorphic space is
+made.  The proof of the big automorphic decomposition, and the arithmetic
+construction of the Galois data decorating each part, are distinct inputs.
+
+All source correspondences use commit
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+The notation is that of FNL, OST, and ASP.  Fix the original datum
+\(H\), satisfying \(H.\mathrm{Ax}\), a complete Noetherian local
+coefficient ring \(A\), its original weight character \(\theta\),
+an arithmetic point \(x:A\to\overline{\mathbf Q}_\ell\),
+the fixed field isomorphism \(\iota\), an admitted weight \(\lambda\),
+and the original algebraic representation \(\xi\) on \(\mathbf C^d\).
+Write
+\[
+ \mathcal M=\{F:G^a\times G^\ell\longrightarrow
+                  \mathbf C^{m}\otimes\mathbf C^d\}.
+\]
+This is the same ambient function space as the source's iterated function
+type.  Let \(\rho_a\) denote the away action with coefficient factor
+\(\tau_C\), and \(\rho_p\) the product local right action.  For an
+auxiliary level \(K=(K_q)\), depth \(e\), and the original finite-part
+character \(\phi=\mathrm{finPart}(\theta,x,\lambda)\), put
+\(C_{K,e}=H.\mathrm{ClAt}(\theta,\iota,x,\lambda,\xi,K,e)\).
+The ordinary space is denoted \(O_{K,e}\).
+
+An original \emph{part} \(Y\) is the actual subspace in a
+\texttt{PartAltAlt} record.  Among its fields are \(Y\subset H.\mathrm{Big}\),
+nonvanishing, and local isotypic presentations at every auxiliary place
+and every place above \(\ell\).  Its other fields retain the spherical
+eigenvalues, Galois representation, and local comparison conditions.  This
+chapter never modifies any of these fields.  A family may be selected by
+\(P(\lambda,r_Y)\), as in \texttt{clParts\_alt}, or by a predicate on the
+whole record, as needed in \texttt{OrdPartPt}.
+
+\subsection{Averaging while preserving all scalar equations}
+
+% BEGIN CFD1
+\paragraph{CFD1. The scalar profile of one vector.}
+\label{claim:CFD1}
+Let \(\rho:G\to\operatorname{GL}(M)\) be a representation over
+\(\mathbf C\), \(K\le G\), and \(F\in M\).  Define
+\[
+ E_K(F)=\{y\in M: \rho(k)F=aF\Longrightarrow \rho(k)y=ay
+                       \text{ for every }k\in K,\ a\in\mathbf C\}.
+\]
+This is a linear subspace.  Every endomorphism commuting with all
+\(\rho(k)\), \(k\in K\), preserves it.  If \(F\ne0\), then
+\[
+ S=\{k\in K:\rho(k)F\in\mathbf C F\}
+\]
+is a subgroup and there is a unique character
+\(\chi:S\to\mathbf C^\times\) with \(\rho(s)F=\chi(s)F\).
+Moreover
+\[
+ E_K(F)=\{y:\rho(s)y=\chi(s)y\ (s\in S)\}.
+\]
+
+For the first assertions, apply linearity to each displayed scalar
+equation, and move a commuting endomorphism across \(\rho(k)\).
+When \(F\ne0\), the scalar in such an equation is unique and nonzero,
+since \(\rho(k)\) is invertible.  Applying \(\rho(s)\rho(t)\) to
+\(F\) proves multiplicativity of the scalar; applying \(\rho(s^{-1})\)
+proves the inverse assertion.  These calculations prove both the subgroup
+claim and the description of \(E_K(F)\).  The nonzero hypothesis is used
+only for this description; the definition itself also covers \(F=0\).
+% END CFD1
+
+% BEGIN CFD2
+\paragraph{CFD2. Finite-index averaging without a normality assumption.}
+\label{claim:CFD2}
+Let \(\pi:S\to\operatorname{GL}(M)\), and let \(U\le S\) have
+finite index.  Choose representatives \(r_q\) of the left cosets
+\(S/U\), and define the endomorphism
+\[
+ P=\frac1{[S:U]}\sum_{q\in S/U}\pi(r_q).
+\]
+If \(y\) is \(U\)-fixed, then \(Py\) is \(S\)-fixed and does not
+depend on the chosen representatives.  If \(y\) is already \(S\)-fixed,
+then \(Py=y\).  Finally \(P\) preserves every \(S\)-stable subspace.
+
+Replacing \(r_q\) by \(r_qu\), \(u\in U\), does not change its
+action on a \(U\)-fixed vector.  For \(s\in S\), the representatives
+\(sr_q\) enumerate the same left cosets, so \(\pi(s)Py=Py\).
+The other assertions follow term by term.  No assertion that \(P\)
+projects all of \(M\) is needed: invariance of \(Py\) is asserted on
+the \(U\)-fixed domain.  In particular the argument does not incorrectly
+treat a nonnormal \(U\) as a quotient group.
+% END CFD2
+
+% BEGIN CFD3
+\paragraph{CFD3. Refinement of a finite sum to the scalar profile.}
+\label{claim:CFD3}
+Let \((Y_i)_{i\in I}\) be subspaces of \(M\), stable under \(K\).
+Suppose every \(y\in Y_i\) is fixed by a subgroup \(U_y\le G\) for
+which \([K:K\cap U_y]<\infty\).  If
+\(F\in\sum_iY_i\), then
+\[
+                         F\in\sum_i(Y_i\cap E_K(F)).
+\]
+The sum here is algebraic, so each membership involves only finitely many
+summands.
+
+There is nothing to prove for \(F=0\).  Otherwise write
+\(F=\sum_{i\in I_0}y_i\), with \(I_0\) finite.  Let \(S,\chi\)
+be as in CFD1, and put \(U=S\cap\bigcap_{i\in I_0}U_{y_i}\).
+Its index in \(S\) is finite: restriction embeds each coset set into the
+corresponding finite coset set for \(K\), and intersections inject into
+products of these coset sets.  Every \(u\in U\) fixes all \(y_i\), hence
+fixes their nonzero sum, so \(\chi(u)=1\).  Apply CFD2 to the twisted
+representation \(\pi(s)=\chi(s)^{-1}\rho(s)\) and this \(U\).
+Each \(y_i\) is \(\pi(U)\)-fixed; therefore \(Py_i\) belongs to
+\(Y_i\cap E_K(F)\).  Since \(F\) is \(\pi(S)\)-fixed,
+\(F=PF=\sum_iPy_i\).  This proves the assertion without assuming that
+the original sum of the \(Y_i\)'s is direct.
+% END CFD3
+
+% BEGIN CFD4
+\paragraph{CFD4. Simultaneous refinement for commuting local factors.}
+\label{claim:CFD4}
+Suppose a finite family of groups \(G_j\) acts on \(M\), the actions
+of distinct factors commute, and every \(Y_i\) satisfies the hypotheses
+of CFD3 for each \(K_j\le G_j\).  Then
+\[
+ F\in\sum_iY_i\quad\Longrightarrow\quad
+ F\in\sum_i\left(Y_i\cap\bigcap_j E_{K_j}(F)\right).
+\]
+
+Apply CFD3 to the first factor.  By CFD1 and commutation, every later
+factor preserves the scalar-profile subspace already imposed.  Its
+intersection with a \(Y_i\) is still stable, and its vectors still have
+the required finite-index stabilizers, since they are vectors of \(Y_i\).
+Induction on the finite set of factors proves the displayed formula.
+An empty family gives the initial algebraic sum itself.
+% END CFD4
+
+% BEGIN CFD5
+\paragraph{CFD5. Local isotypic sums supply the required stabilizers.}
+\label{claim:CFD5}
+Let \(G\) be a topological group, \(K\le G\) compact, and let
+\(Y\) be an algebraic sum of images of equivariant maps from one smooth
+representation \(\sigma\).  Then \(Y\) is \(G\)-stable and every
+\(y\in Y\) is fixed by a subgroup \(U\) with
+\([K:K\cap U]<\infty\).
+
+Write \(y\) as a finite sum of images of vectors of \(\sigma\).
+Smoothness gives an open stabilizer for each vector; their finite
+intersection \(U\) fixes \(y\).  The open cosets of \(K\cap U\)
+cover compact \(K\), so finitely many suffice.  Equivariance proves
+stability term by term.  This is exactly the content of the original
+\texttt{IsoSum} fields of a part at each auxiliary place and each place
+above \(\ell\).  Irreducibility of \(\sigma\) is not required for
+this particular implication, although it remains part of the original
+part record.
+% END CFD5
+
+\subsection{The original level and ordinary operators}
+
+% BEGIN CFD6
+\paragraph{CFD6. Commutation on the original ambient function space.}
+\label{claim:CFD6}
+The actions at different auxiliary places commute, the actions at
+different places above \(\ell\) commute, and every auxiliary action
+commutes with every action above \(\ell\).  Every original part is
+stable under the whole product \(G^\ell\).
+
+For the first assertion, the \(Q\)-\(Q\) field of \(H.\mathrm{Ax}\)
+identifies the original sections as commuting elements in \(U_b\).
+Apply the coefficient action \(\rho_a\) to that identity.  For the
+second assertion, the local elements lie in distinct coordinates of
+\(G^\ell\), hence commute.  For the mixed assertion, on each coordinate
+of a function the two expressions are
+\[
+  \tau_C(u)F\bigl(g(u,1)(1,b)\bigr),\qquad
+  \tau_C(u)F\bigl(g(1,b)(u,1)\bigr),
+\]
+which agree.  These are the original actions; no abstract conjugacy is
+used.  FNL12 verifies the relevant section identities for the actual
+unitary datum.  Local stability of a part follows from CFD5, and finite
+coordinate factorization gives stability under all of \(G^\ell\).
+% END CFD6
+
+% BEGIN CFD7
+\paragraph{CFD7. Exact classical equations imply the required Iwahori fixedness.}
+\label{claim:CFD7}
+The original classical space is exactly the space of \(F\in H.\mathrm{Big}\)
+satisfying
+\begin{align*}
+ \rho_a(u)F&=F &&(u\in H.\mathrm{lev}(K)),\\
+ \rho_p(b)F&=F &&(b\in N\text{ or }b\in N^-(e)),\\
+ \rho_p(e_V(v,i,y))F&=\iota(\phi(v,i,y))^{-1}F
+                  &&(y\in\mathcal O_{L_{w(v)}}^\times).
+\end{align*}
+Suppose the specialization datum has depth \(c_0\), so that
+\(\phi(v,i,y)=1\) on the original \(U_c(c_0+1)\).  For every
+\(e\ge c_0\), a vector of \(C_{K,e}\) is fixed by \(I_1(e)\).
+
+The first assertion is expansion of the original definition, as already
+identified in ASP5.  The subgroup \(I_1(e)\) is generated by
+\(N,T_c(e),N^-(e)\).  The first and last are fixed by the displayed
+equations.  Each torus coordinate of \(T_c(e)\) is a product of the
+original elementary diagonal elements \(e_V(v,i,y_i)\), with
+\(y_i\in U_c(e+1)\subset U_c(c_0+1)\).  The finite-part character
+is therefore one on each factor.  This fixes the middle generator too.
+The factorization and the shift by one are the exact GL and product
+Iwahori identities in OST26--OST27 and ASP4, not a replacement convention
+for depth.
+% END CFD7
+
+% BEGIN CFD8
+\paragraph{CFD8. The actual distinguished operator preserves all required spaces.}
+\label{claim:CFD8}
+Let \(T=H.\mathrm{uzC}(\iota,\lambda,d)\), with its original
+\(\mathrm{lowVal}\) normalization.  If \(e\ge c_0\), then \(T\)
+preserves \(C_{K,e}\).  It also preserves every original part \(Y\).
+
+On the product action, \(T\) is its stated nonzero scalar times the
+finite \(N\)-coset sum defining \(U_z\).  CFD6 shows that each part is
+stable under every term.  The big space and its away level condition are
+also preserved term by term: finite right translation preserves rational
+equivariance, and the away action commutes with it.
+
+For the remaining classical conditions, CFD7 gives \(I_1(e)\)-fixedness.
+The original Iwahori level calculation, OST5--OST6, shows that \(U_z\)
+preserves this fixedness at depth \(e\).  The same double-coset calculation
+commutes \(U_z\) with each elementary integral torus element on
+\(N\)-fixed vectors.  Thus its prescribed scalar equation is preserved.
+Together these give every equation in CFD7.  Multiplication by the
+original normalization scalar does not change stability.  This also
+agrees with the positive-operator identification in ASP6.
+% END CFD8
+
+% BEGIN CFD9
+\paragraph{CFD9. A decomposition in big parts preserves the given classical space.}
+\label{claim:CFD9}
+Let \((Y_i)\) be any family of original parts and let
+\(F\in C_{K,e}\cap\sum_iY_i\).  Then
+\[
+                         F\in\sum_i(Y_i\cap C_{K,e}).
+\]
+This implication does not require \(e\ge c_0\).
+
+Apply CFD4 first to the auxiliary groups with their compact subgroups
+\(K_q\), and then to the factors above \(\ell\) with
+\(\mathrm{GL}_n(\mathcal O_{L_{w(v)}})\).  CFD5 gives finite-index
+stabilizers and CFD6 gives all commutations.  We obtain a finite sum
+\(F=\sum_iF_i\), where \(F_i\in Y_i\) and every \(F_i\) satisfies
+every scalar equation of \(F\) under those compact subgroups.
+
+Since \(Y_i\subset H.\mathrm{Big}\), the base away subgroup is already
+fixed on \(F_i\).  The extra \(K_q\)-conditions are inherited from
+the scalar profile, with scalar one.  They generate
+\(H.\mathrm{lev}(K)\) together with that base subgroup.  The original
+\(N\), \(N^-(e)\), and integral torus all lie in the above maximal
+compact product, by the GL Iwahori identities of OST26.  Their fixedness
+or prescribed finite-part scalar equations are inherited from \(F\).
+Thus all equations of CFD7 hold for each \(F_i\), proving the claim.
+Neither the level \(K\) nor the depth \(e\) has changed.
+% END CFD9
+
+% BEGIN CFD10
+\paragraph{CFD10. Polynomial projection preserves a decomposition into invariant pieces.}
+\label{claim:CFD10}
+Let \(W\) be a finite-dimensional complex vector space, \(T\in
+\operatorname{End}(W)\), and let \(W=\sum_iW_i\), with every
+\(W_i\) stable under \(T\).  Then, for each \(\mu\in\mathbf C\),
+\[
+ W[\mu]_{\mathrm{gen}}
+       =\sum_i\bigl(W_i\cap W[\mu]_{\mathrm{gen}}\bigr).
+\]
+
+If \(\mu\) is not an eigenvalue, both sides vanish.  Otherwise factor
+the minimal polynomial as \(\prod_\nu(X-\nu)^{a_\nu}\).  The elementary
+Chinese remainder theorem supplies \(p_\mu\in\mathbf C[X]\) that is one
+modulo \((X-\mu)^{a_\mu}\) and zero modulo every other factor.
+Consequently \(p_\mu(T)\) is the identity on the \(\mu\)-generalized
+eigenspace and zero on the others.  Given a finite expression
+\(w=\sum_iw_i\), apply \(p_\mu(T)\): stability keeps each projected
+term in \(W_i\).  This proves the nontrivial inclusion; the other is
+immediate.  No diagonalizability and no directness of \(\sum_iW_i\)
+has been assumed.
+% END CFD10
+
+% BEGIN CFD11
+\paragraph{CFD11. Refinement to the exact ordinary generalized eigenspaces.}
+\label{claim:CFD11}
+Assume \(e\ge c_0\), the original specialization assertions, and
+\(C_{K,e}=\sum_i(Y_i\cap C_{K,e})\).  Then
+\[
+                         O_{K,e}=\sum_i(Y_i\cap O_{K,e}).
+\]
+
+The original \(O_{K,e}\) is the sum, inside \(C_{K,e}\), of the
+generalized eigenspaces of \(T\) with
+\(\lvert\iota^{-1}(\mu)\rvert_\ell=1\).  This identification is ASP6;
+it involves no continuity of \(\iota\).  The original specialization
+finiteness clause, proved in ASP10, makes \(C_{K,e}\) finite-dimensional.
+CFD8 proves stability of both \(C_{K,e}\) and \(Y_i\cap C_{K,e}\).
+Apply CFD10 to every eigenvalue with the indicated norm and add the
+equalities.  Each resulting summand lies in \(Y_i\cap O_{K,e}\).
+The reverse inclusion is automatic.  The argument includes nilpotent
+Jordan parts and uses the source's unit condition, without replacing it
+by a condition on the complex absolute value.
+% END CFD11
+
+% BEGIN CFD12
+\paragraph{CFD12. Full original classical-parts endpoint and its predicate refinement.}
+\label{claim:CFD12}
+Under every hypothesis of the original \texttt{clParts\_alt}, for every
+original \(K\) and \(e\ge c_0\),
+\begin{align*}
+ C_{K,e}&=\sum_{Y:\,P(\lambda,r_Y)}(Y\cap C_{K,e}),\\
+ O_{K,e}&=\sum_{Y:\,P(\lambda,r_Y)}(Y\cap O_{K,e}).
+\end{align*}
+The same conclusion holds with a predicate on the whole part record,
+provided the corresponding big-space decomposition is supplied.
+
+For \(F\in C_{K,e}\), membership in \(H.\mathrm{Big}\) and the
+given away level are among its defining equations.  CFD7 gives the
+required Iwahori-fixedness.  The algebraic-representation assertion of
+the original specialization datum supplies the exact algebraic-weight
+hypothesis.  Apply \(H.\mathrm{AutomorphicHeckeSet}\) at this
+\(\lambda,\xi,F\), obtaining membership in the stated sum of parts.
+CFD9 preserves the original level and depth in that sum, proving the
+first equality.  CFD11 proves the second.  The proof used the selecting
+predicate only to specify the family being summed, so it proves the
+predicate refinement as well.
+
+This closes the original generic structural theorem, including every
+level and the original map and depth assertions.  For the actual unitary
+construction, FNL16 supplies \(H.\mathrm{Ax}\), and ASP13 supplies
+the specialization datum; the automorphic part producer remains a
+separate arithmetic input until it is explicitly constructed.  In
+particular no nonvanishing of a selected residual Hecke block is inferred
+from either equality when the block could be zero.
+% END CFD12

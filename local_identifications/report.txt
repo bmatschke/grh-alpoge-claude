@@ -1,0 +1,570 @@
+FROBENIUS ORBITS AS ACTUAL LOCAL PLACES — v0.12
+
+Pinned source: https://github.com/CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Claim IDs: LI1–LI8.
+This is a human mathematical reconstruction with an exact source ledger.
+No Lean source modification, compilation, or independent kernel replay is claimed.
+
+RESULT AND BOUNDARY
+
+For the actual supplied host and a prime satisfying GIdx, this report constructs
+all of the source LocId data: the bijection between Frobenius orbits and ALL
+primes of the real subfield above p; the common unramified completion and its
+valuation ring; a quadratic split-completion map; and a frame for the first
+projection of the given global lattice. The construction is aligned with the
+given complex and coefficient-field embeddings at every orbit position. It
+also gives the exact positive-valuation characterization of each local place.
+
+Under the source's additional Joint0 and LevelZeroCharacterRational hypotheses,
+we construct the inverse away-from-p character with values in the units of the
+actual coefficient DVR. Thus the literal exists_locId and exists_psi endpoints
+are reconstructed, rather than retained as unexplained existence assertions.
+
+The host, global level data, and rationality of the level-zero characters are
+supplied hypotheses. In particular we do not infer those objects from local
+Witt-ring existence. Nor do we identify the entire global automorphic lattice
+with the local function lattice: comparison_statements, ValIntRec,
+comparison_lattice_span_eq, and the class-rank equality pack_d_eq remain a
+separate branch. The stronger simultaneous global-frame condition in
+IsLocalFamily uses StdTied and Companion; our arbitrary local frame alone
+does not establish that condition. Global reciprocity, Weber and local
+Langlands assumptions used to construct a host or the later linked family
+are neither used as hidden local lemmas nor discharged here.
+
+Classical background consists of finite fields; Witt rings and their
+Teichmuller expansions as in BC1; number-field integer rings being finite
+over Z and Dedekind; localization/completion of a DVR; lying over for an
+integral extension; and the elementary Galois inertia identity |I_P|=e_P.
+The proofs below expand the required Hensel lifting, completion comparison,
+prime/orbit classification, splitting, lattice and character arguments.
+BC1–BC3 supply the actual finite coefficient ring and its prescribed-place
+embedding; none of their finite-normalization arguments is repeated.
+
+0. NOTATION AND THE EXACT HOST HYPOTHESES
+
+Write A for the actual finite abelian group R.MA and
+
+  G=( {+1,-1} x {+1,-1} ) x A,
+  c=((-1,-1),1),
+  Psi={((epsilon,+1),a): epsilon=+1 or -1, a in A}.
+
+This is the literal Frame group, with c=R.cc and Psi=R.Psi. In particular
+G=Psi x <c>. A supplied host identifies G with Gal(E/Q), where E is a
+Galois CM number field, c acts as complex conjugation, and F=E^<c>.
+For g in G, denote the corresponding field automorphism by sigma_g.
+Its multiplication convention is sigma_(gg')=sigma_g composed sigma_g'.
+Fix phi_0:E->C and put phi_g=phi_0 composed sigma_g.
+
+For the prime under consideration let
+
+  f=((-1,-1),h), z=((+1,+1),h) in Psi,
+  n=ord(h), n>=2, n even.                                 (LI0.1)
+
+Thus f=zc, ord(f)=ord(z)=n. The arithmetic hypotheses are:
+
+  (U) p is prime and every prime P of O_E above p is unramified;
+  (Frob) the arithmetic Frobenius at every such P is sigma_f.
+
+Arithmetic Frobenius means x -> x^p on the residue field. These are precisely
+the hun and hfr premises of exists_locId_host. LI7 explains how the literal
+GIdx and the already supplied Host fields furnish them. The source calls this
+prime class inertClass. That name does NOT mean E/F is inert at these primes;
+the even-order condition will prove that E/F splits there.
+
+Set k_n=F_(p^n), W_n=W(k_n), Q_n=Frac(W_n), and let Fr be the Witt Frobenius
+(residue action a->a^p). The source names are Wn/Qn/Fr or WQ/QQ/sig.
+We normalize v_p on Q_n by v_p(p)=1.
+
+1. LI1 — THE UNRAMIFIED LOCAL RING AND AN EXACT COMPLETION COMPARISON
+
+1.1 The needed form of Hensel's argument.
+
+Let B be a complete DVR, with p a uniformizer and residue field k=F_(p^m).
+Choose a generator alpha of k/F_p and let P_0 in F_p[T] be its monic minimal
+polynomial of degree m. Finite fields are perfect, so P_0'(alpha)!=0.
+Lift P_0 to a monic P in Z_p[T]. For any lift b_0 of alpha to B, the iteration
+
+  b_(r+1)=b_r-P(b_r)/P'(b_r)
+
+is defined, leaves the residue unchanged, and at least doubles the order of
+the error P(b_r). Taylor expansion shows the error is a multiple of
+P(b_r)^2. The sequence converges to a root beta. The root with that residue
+is unique: P(u)-P(v)=(u-v)Q(u,v), and Q(u,v) reduces to P_0'(alpha), a unit,
+whenever u and v reduce to alpha.
+
+Every element of B is uniquely a sum sum_(j=0)^(m-1) a_j beta^j with
+a_j in Z_p. To obtain the coefficients, express the residue in the basis
+1,alpha,...,alpha^(m-1), subtract a lift of that expression, divide by p,
+and repeat. The coefficients converge in Z_p. If a nonzero relation existed,
+divide its coefficients by their smallest common p-power and reduce modulo p;
+this contradicts the residue-field basis. Consequently
+
+  Z_p[T]/(P) -> B,  T |-> beta,
+
+is an isomorphism. Apply the same construction to W(k), where p is a
+uniformizer by BC1. This proves B is isomorphic to W(k), with a prescribed
+residue-field identification. It proves uniqueness as well: a continuous
+Z_p-map between such rings is determined by the residue map, since it must
+send beta to the unique root with the prescribed residue.
+
+This proof also works for a map W(k)->S into a complete DVR extension whose
+uniformizer need not be p. The same simple root lifts in S, while p-adic
+continuity follows from the ramification relation. Only uniqueness will be
+needed for such targets.
+
+1.2 Apply this to a global prime.
+
+Let P be a prime of O_E above p, unramified over Z. The completed local ring
+B=O_(E_P) is a complete DVR with uniformizer p and finite residue field
+O_E/P=F_(p^m), m>=1. The preceding construction gives an embedding
+
+  i:E -> Q_m
+
+whose integer restriction g:O_E->W_m satisfies
+
+  i(x)=g(x),  g mod p is surjective,  ker(g mod p)=P.       (LI1.1)
+
+The maps into fraction fields are understood in the first equality.
+This is exactly the source predicate Good(P,i), not merely a field embedding.
+It proves the substantive content of exists_wittHom and exists_good without
+leaving a formal-smoothness lifting theorem as an unexplained local input.
+
+1.3 Completion from any such Good embedding.
+
+This useful converse does not assume unramifiedness separately. Suppose
+j:L->Q_m is an embedding of a number field and its integer restriction has
+the three properties (LI1.1) for a prime v of O_L. Then
+
+  x in O_(L,v)  iff  j(x) in W_m.                        (LI1.2)
+
+In one direction write x=a/b, b outside v; j(b) has nonzero residue and is
+a unit. Conversely, if x is not in the local DVR, x^-1 is in its maximal
+ideal. Write x^-1=a/b with a in v, b outside v. Its image lies in pW_m,
+so j(x) cannot be integral. This also proves the assertion at x=0.
+
+O_L is dense in W_m under j. More precisely, for y in W_m and r>=0 one can
+find a in O_L with j(a)-y in p^r W_m. Start modulo p using residue surjectivity.
+If j(a)-y=p^r b, choose a' with j(a') congruent to b modulo p and replace
+a by a-p^r a'. This raises the precision by one.
+
+O_L is also dense in O_(L_v). Indeed the local ring O_(L,v) is dense by the
+definition of completion. A denominator b outside v has an inverse modulo
+every power v^r: (b)+v^r=O_L, so Bezout gives an inverse represented by an
+integer of L. Thus local fractions can be approximated by global integers.
+Since p lies in v, the p-adic and v-adic ideal powers are cofinal in the DVR.
+
+For a in O_L and r>=0, (LI1.2) applied to a/p^r gives the exact equivalence
+
+  j(a) in p^rW_m  iff  a in p^r O_(L,v).                 (LI1.3)
+
+The same equivalence holds for differences. Hence the two dense maps induce
+identical quotient rings at every precision. Passing to their complete,
+separated inverse limits gives a unique ring isomorphism, then its extension
+to fraction fields,
+
+  e:Q_m ~= L_v,
+  e(j(x))=x for x in L,
+  e(W_m)=O_(L_v).                                        (LI1.4)
+
+This spells out exists_equiv_of_dense and exists_completion_equiv. In
+particular (LI1.4) carries p to p, so the prime v is unramified and its
+integer-valued valuation agrees with v_p on this completion.
+
+2. LI2 — FROBENIUS, RESIDUE DEGREE, AND EMBEDDINGS AT ONE PRIME
+
+2.1 Finite-field calculation and unique lifting.
+
+Every F_p-embedding of F_(p^m) into an algebraic closure is a power of
+a->a^p, and the m powers with exponents 0,...,m-1 are distinct. For completeness,
+if Frobenius^r were the identity with 0<r<m, the polynomial T^(p^r)-T would
+have p^m roots, more than its degree. Frobenius^m is the identity; division
+of exponents by m proves that its order is exactly m. There are at most m
+embeddings, since a primitive element has degree m, and these m powers
+therefore account for all of them.
+
+Two Good embeddings E->Q_m inducing the same prime P consequently differ
+by a unique Fr^s, 0<=s<m. Their residue maps differ by that power; their
+maps on O_(E,P) are continuous and extend to the completion. Indeed the
+maximal ideal maps into pW_m, hence each of its powers maps into the
+corresponding p-power. The lift uniqueness from LI1.1 then proves equality
+on the completion and on E. Conversely Fr preserves W_m and its maximal
+ideal, so applying it does not change the prime. This is the exact content
+of Good.exists_pow / Good.ov in the current application.
+
+2.2 Identify the Frobenius and its degree.
+
+If i:E->Q_m is Good, then Fr composed i is another embedding of E into Q_m.
+Normality of E/Q implies that
+
+  Fr composed i = i composed sigma_g
+
+for some g in G. One elementary justification is to take a primitive
+element of E/Q: its images are roots of the same polynomial, all lying in
+i(E), and the two embeddings therefore differ by an automorphism of E.
+Reduction modulo p shows sigma_g is arithmetic Frobenius at P. Thus the
+supplied Frobenius law gives
+
+  Fr(i(x))=i(sigma_f(x)),
+  Fr^s(i(x))=i(sigma_(f^s)(x)).                            (LI2.1)
+
+The residue degree m is exactly n. Since Fr^m=1, (LI2.1) and injectivity
+give f^m=1, hence n divides m. Since f^n=1, residue surjectivity in (LI1.1)
+gives Frobenius^n=1 on all F_(p^m), hence m divides n. Therefore m=n.
+The order of f is n because ord(f)=lcm(2,ord(h)) and n is even.
+
+2.3 Classify all E-primes.
+
+Fix a Good i:E->Q_n and put
+
+  i_g=i composed sigma_g,
+  P_g={x in O_E : i_g(x) in pW_n}.                        (LI2.2)
+
+Every i_g is Good: sigma_g permutes O_E, so residue surjectivity remains true.
+The preceding one-prime uniqueness gives
+
+  P_g'=P_g  iff  g'=g f^s for some integer s.              (LI2.3)
+
+The orientation is worth checking: i_g'=Fr^s composed i_g
+=i composed sigma_g composed sigma_(f^s), because (LI2.1) applies to i_g.
+Thus injectivity of i identifies g' with g f^s, as written.
+
+Every prime P of E above p occurs. LI1 constructs a Good j:E->Q_m for P;
+LI2.2 makes m=n; and normality supplies g with j=i composed sigma_g.
+Thus no unspecified collection of local places is being substituted for
+the actual set of all primes above p.
+
+3. LI3 — THE REAL-SUBFIELD PRIMES ARE EXACTLY THE z-ORBITS
+
+First c is not in <f>. If f^s=c, then h^s=1, so n divides s and s is even;
+but the first component of f^s=c requires s odd. Hence P_(gc)!=P_g by
+(LI2.3). Put v_g=P_g intersect O_F.
+
+The restriction i_g|F is Good with residue field F_(p^n). To prove the
+nontrivial residue-surjectivity clause, take x in O_E with any prescribed
+residue at P_g. The two distinct maximal ideals P_g and P_(gc) are comaximal.
+Choose b with b congruent to x modulo P_g and b congruent to 0 modulo P_(gc).
+Then
+
+  t=b+c(b) belongs to O_F,  t congruent to x modulo P_g,  (LI3.1)
+
+because c(b) belongs to P_g. No division by 2 occurs in this integral
+argument. The kernel of the restricted residue map is exactly v_g.
+LI1 now gives Q_n ~= F_(v_g), preserving the integer rings. In particular
+E/F has two split completions above each v_g, not one inert completion.
+
+Here is an elementary proof of the exact equivalence of contractions:
+
+  v_g'=v_g  iff  P_g'=P_g or P_g'=P_(gc).                (LI3.2)
+
+For the forward implication take y in P_g'. The norm y c(y) belongs to
+O_F and v_g', hence to P_g. Since P_g is prime, either y belongs to P_g
+or c(y) belongs to P_g, the latter meaning y belongs to P_(gc).
+Thus the ideal P_g' is contained in P_g union P_(gc). An additive subgroup
+contained in the union of two subgroups lies in one of them: otherwise
+elements in opposite differences have a sum in neither. Maximality now
+gives the asserted equality. The converse follows because c fixes F.
+
+Combining (LI3.2) and (LI2.3) shows
+
+  v_g'=v_g iff g' in g <f,c> = g <z,c>.                  (LI3.3)
+
+Every prime v of F above p has a prime P of E above it by lying over;
+LI2.3 represents P by some g. Write g=a c^epsilon with a in Psi. Its
+contraction is v_a. Restricting (LI3.3) to Psi eliminates the c factor,
+because c is not in Psi and G=Psi x <c>. Therefore
+
+  Psi/<z> -> {v in Spec(O_F): v divides p},
+  [a] |-> v_a, is a bijection.                          (LI3.4)
+
+This proves place_injective and place_surjective together with their actual
+surjectivity target. Its cardinal is |Psi|/n=[F:Q]/n. Choose the literal
+source section a_v=orbRep(z,v); then
+
+  pos(v,s)=a_v z^s,  0<=s<n,                            (LI3.5)
+
+is a bijection from the disjoint union of these n-cycles to Psi. Quotient
+classes recover v and cancellation followed by ord(z)=n recovers s.
+Thus the arbitrary but fixed source orbit section, rather than a replacement
+enumeration, can be used throughout.
+
+4. LI4 — SIMULTANEOUS COMPLEX AND p-ADIC POSITION COMPATIBILITY
+
+Let L be the actual coefficient number field, with e_C:L->C, and let
+e:L->K be the prescribed-place embedding from BC2 into the actual finite
+coefficient extension K=KfRec. Write O=ORec. It is a finite extension of
+Q_p: BC1 makes the standard field finite over Q_p, and BC2 adjoins only
+the finite number-field extension. Choose a Q_p-embedding
+
+  i_K:K -> Qbar_p -> C_p.
+
+It identifies O with the elements having norm at most one. Here is a direct
+normalization check. O is the integral closure of Z_p in K, by transitivity
+and integral closedness. A root of a monic polynomial over Z_p has norm
+at most one, since a leading term of norm greater than one would strictly
+dominate all other terms. Thus images of units of O have norm exactly one,
+applying this also to the inverse. If pi is a uniformizer and p=u pi^e,
+then |i_K(pi)|=p^(-1/e), so the entire valuation is the usual normalized
+one and |i_K(x)|<=1 iff x is in O.
+
+The embedding i_K composed e extends from e_C(L) to the field Qbar_C of
+complex numbers algebraic over Q. To see this, identify e_C(L) with L and
+extend an embedding over successive algebraic elements into Qbar_p; Zorn's
+lemma supplies a maximal extension, and algebraic closedness of Qbar_p
+forces its domain to be Qbar_C. Denote it by lambda. Then
+
+  i_K(e(l))=lambda(e_C(l)) for every l in L.              (LI4.1)
+
+No map on arbitrary transcendental complex numbers is needed. The source's
+lamV agrees with lambda on every argument used here, since those arguments
+are algebraic over Q.
+
+Let iota:Q_n->K be the actual inclusion and kappa=i_K composed iota.
+Start with any Good i_0:E->Q_n. The embeddings kappa composed i_0 and
+lambda composed phi_0 of the normal number field E differ by an
+automorphism sigma_gamma. Replace i_0 by i=i_0 composed sigma_gamma.
+Then i is still Good and
+
+  kappa(i(x))=lambda(phi_0(x)).                          (LI4.2)
+
+For the source orbit representatives a_v define i_v=i composed sigma_(a_v).
+The bijection in LI3 is understood for this adjusted i, which is legitimate
+because no prime enumeration was fixed before the alignment. Applying
+(LI2.1) repeatedly gives the EXACT source position identity
+
+  i_K(iota(Fr^s(i_v(x))))
+    =lambda(phi_(a_v z^s c^s)(x)), 0<=s<n.              (LI4.3)
+
+Indeed f=zc, so a_v f^s=a_v z^s c^s. The factor c^s is essential: odd
+positions apply complex conjugation. On F this factor is invisible, but
+on E it must not be dropped. Equation (LI4.3) is precisely PosCompat and
+therefore LocPack.posOK. It is independent of the away character psi.
+
+5. LI5 — EXPLICIT SPLITTING AND THE LITERAL LATTICE FRAME
+
+Let v=v_a, let e_a:Q_n->F_v be (LI1.4), and put j=e_a composed i_a:E->F_v.
+It restricts to the canonical inclusion of F. Choose any nonzero b in E
+with c(b)=-b; for example b=u-c(u) with u not fixed by c. In the actual
+host take sqrtMinusD. Since [E:F]=2, the pair 1,b is an F-basis. The map
+
+  Phi:E tensor_F F_v -> F_v x F_v,
+  Phi(x tensor t)=(j(x)t,j(c(x))t)                       (LI5.1)
+
+is an isomorphism. In coordinates its inverse sends (u,v) to
+
+  1 tensor (u+v)/2 + b tensor (u-v)/(2j(b)).             (LI5.2)
+
+Both denominators are nonzero in the characteristic-zero field F_v.
+Thus Phi sends 1 tensor t to (t,t), and applying c to the E factor swaps
+the two coordinates. Its first component on E is exactly j. These are all
+the spl_alg, spl_sig and prescribed-iw clauses; (LI5.1) need not be taken
+as an unspecified splitting isomorphism.
+
+Now let Lambda=L.Lb be the ACTUAL finitely generated O_E-lattice in E^k,
+assumed to span E^k as required in ColLevel. Let intV be the source subring
+of E tensor F_v generated by O_E and O_v, and locL the intV-span of Lambda.
+Write pi_1 for the first component of Phi. Then
+
+  pi_1(intV)=O_v,
+  pi_1(locL)=M_v:=O_v-span j(Lambda).                    (LI5.3)
+
+For the first assertion, every algebraic integer of E maps into O_v: a
+root of a monic integer polynomial is integral over the integrally closed
+DVR O_v. Conversely the diagonal elements 1 tensor a, a in O_v, give
+every a. The second assertion follows by applying pi_1 to the actual
+finite linear combinations defining the span, in both directions.
+
+The module M_v is finitely generated over O_v, since Lambda has finitely
+many O_E-generators and j(O_E) is contained in O_v. It is torsion free,
+being a submodule of F_v^k, and has rank k: choose an E-basis from Lambda,
+whose nonzero determinant remains nonzero under j. A finite torsion-free
+module over a DVR is free (one may clear denominators and apply Smith
+normal form). Choose its O_v-basis as the columns of B_v in GL_k(F_v).
+Then
+
+  t in pi_1(locL) iff B_v^(-1)t in O_v^k.                (LI5.4)
+
+This is EXACTLY LocId.fr_lat for the supplied global lattice, not an
+arbitrary substitute lattice. It supplies exists_first_frame by a shorter
+argument than the source's dual-frame construction. Together (LI3.4),
+(LI1.4), and (LI5.1)–(LI5.4) give all fields of LocId, with
+I.iw(v)=i_v by construction.
+
+The matrix B_v is allowed to depend on v. A single global B whose base
+changes give these frames is a stronger subsequent condition; it is not
+asserted by (LI5.4).
+
+6. LI6 — THE ACTUAL PLACE/VALUATION IDENTITY AND RAMIFICATION NORMALIZATION
+
+Let theta_g:E->L be the coefficient-field embedding at the complex position
+g in Psi, so that e_C composed theta_g=phi_g. These are the literal tauLL
+or Cmp.tEL maps in the actual datum. The embedding equality (LI4.1) and
+the position identity (LI4.3), followed by injectivity of i_K, give
+
+  e(theta_(a_v z^s)(c^s(x)))=iota(Fr^s(i_v(x))).          (LI6.1)
+
+The source writes c^s(x) as x at even s and sigD(x) at odd s. The diagram
+commutes with the actual coefficient-field embedding e=embRec, not merely
+with some unrelated embedding into an algebraic closure.
+
+Let w be the prescribed prime of L and write nu_w for its additive integer
+valuation, with nu_w(0)=+infinity. BC3's exact valuation scaling and the fact
+that Fr preserves v_p imply, for x in F nonzero,
+
+  nu_w(theta_(a_v z^s)(x))/nu_w(p)=v_p(i_v(x)).           (LI6.2)
+
+Indeed both sides are the valuation of their equal images in K divided by
+the valuation of p. This proves that the ramification of ORec causes no
+spurious integer factor: only the normalized ratio is identified.
+For x in O_F, including x=0, we therefore obtain
+
+  x in v  iff  nu_w(theta_(a_v z^s)(x))>0.               (LI6.3)
+
+This is the substantive prime-membership statement in place_of_tie and
+mem_localPlace_asIdeal_iff_val_pos. The source proves it using integrality
+of inverses, a proof valid without introducing normalized ratios:
+x in v iff x=0 or i_v(x)^(-1) not in W_n; finite coefficient extension
+and Fr preserve that integrality test; BC2 translates it into
+nu_w(theta(x))>0. Both proofs retain the zero branch explicitly.
+
+This statement uses the supplied theta_g maps and their complex embedding
+identity. It does not prove surjectivity of a global comparison map or
+equality of a global integral lattice with the entire local function lattice.
+
+7. LI7 — SPECIALIZE TO THE LITERAL GIdx AND exists_locId ENDPOINT
+
+The actual predicate is
+
+  GIdx(H,T,p) := p prime, p>=5, H.cls(p)=inertClass,
+                HNeZero(H,p), p not in H.levelPrimes, p not dividing T.
+
+HNeZero says that the A-component of EVERY arithmetic Frobenius at p has
+even order. The already supplied Host fields include the Galois identification,
+the conductor law, and the Frobenius/inertia law away from the conductor.
+Here is the precise specialization, with no abundance claim.
+
+First inertClass excludes the conductor primes: its defining clauses exclude
+the small primes, q and d, while condN=QS*q*d and the small primes are the
+prime divisors of QS. Thus p does not divide condN. The host Frobenius law
+at such a p gives trivial inertia at each P above p. The usual identity
+e_P=|I_P| gives e_P=1, i.e. hypothesis (U). This is the source lemma
+unramified_of_inertia, whose short proof is precisely that cardinality argument.
+
+The two quadratic components of the Frobenius are both -1 in inertClass:
+the class definition has Jacobi(-d,p)!=1 and psAt(p)!=1, and outside the
+conductor each belongs to {+1,-1}. Its remaining A-component is the common
+hOf(H,p); this is frob_val. The source hP(D,p) is chosen from an arithmetic
+Frobenius, so injectivity of the host group identification gives
+
+  h=R.iota(hP(D,p)),  f=((-1,-1),h)
+
+at EVERY P above p, exactly (Frob). This is frob_eq. A prime over p exists
+by lying over; its finite group element h has positive order. HNeZero makes
+that order even, hence n>=2. Also
+
+  frobOrder(D,p)=ord(zPsi(h))=ord(h)=n.
+
+This supplies all the hypotheses used in LI1–LI5 and yields
+
+  I : LocId(Lc,p,nOrb(zPsi(h)),W_n,Q_n),
+  i_K : KfRec(D,w,n) -> C_p,
+  lambda : Qbar_C -> C_p,
+
+with (LI4.1) on the original number field D.what_2.LL and with posOK for
+EVERY psi. This is the full literal conclusion of exists_locId at the pin.
+All finite places over p are included, and the source representatives
+orbRep and position map posG are the ones used in the construction.
+
+The global source record D7 is supplied; no new existence of D7 is asserted.
+In particular, the Host's Frobenius/conductor law is a retained global input
+whose concrete host-construction supplier belongs to the independent host
+branch. The local specialization just proved does not invoke a new reciprocity,
+Weber, or local-Langlands hypothesis. Such hypotheses may still be needed
+upstream to construct that host or downstream to assemble the linked family.
+
+8. LI8 — THE INVERSE AWAY-FROM-p CHARACTER IS AN ACTUAL INTEGRAL UNIT CHARACTER
+
+8.1 The finite-adelic truncation is canonical.
+
+Let S be the source level subgroup with character chi:S.U->C^*, and let Lc
+be the column level. Joint0 supplies the matching local subgroups after the
+literal change of matrix index. The matching hermitian matrix is the separate
+structural identity Cmp.gramN_zero D; it is not a field of Joint0/SameCar.
+For an element a of awayFrom_2(Lc,p), define K(a) componentwise by
+
+  K(a)_v=1 for v dividing p,
+  K(a)_v=a_v for v not dividing p,                       (LI8.1)
+
+where the fixed matrix-index identification is implicit on the right.
+There are finitely many v dividing p because the nonzero ideal (p) has a
+finite factorization. Changing finitely many components preserves the
+finite-adelic restricted product. The unitary matrix equation holds at every
+component, and every component now belongs to S.Uloc, so K(a) belongs to S.U.
+The embedding of the finite adelic tensor algebra into its local components
+is injective: expand in any F-basis of the finite-dimensional field E and
+use componentwise injectivity for finite adeles. Hence (LI8.1) determines K(a)
+uniquely. Multiplication is componentwise, so K is a group homomorphism.
+This proves the existence and uniqueness hidden in exists_away_mem and
+the map used in exists_psiTied.
+
+8.2 Integrality and rationality of the level-zero character.
+
+An additive character eta of a finite abelian group B satisfies
+eta(b)^|B|=eta(|B|b)=1. Thus eta(b), and also its inverse eta(-b), is an
+algebraic integer. At level zero the source character chi is a finite
+product of precisely such residue-field additive-character values or
+their inverses: the additional block-character product has length zero.
+Consequently every chi(kappa) and its inverse is an algebraic integer.
+This is the full argument of addChar_isIntegral and chi_isIntegral.
+
+LevelZeroCharacterRational says each of those additive-character values
+lies in e_C(L). Products and inverses therefore show that for every kappa
+there is a unique r(kappa) in L with
+
+  e_C(r(kappa))=chi(kappa).                              (LI8.2)
+
+Since e_C is injective, r(1)=1 and r(ab)=r(a)r(b). Integrality descends along
+the field embedding: a monic integer polynomial vanishing on e_C(r) also
+vanishes on r. Thus r(kappa) is in O_L. Apply the same fact to kappa^-1;
+then r(kappa)^(-1) is also in O_L. BC2 sends both to ORec, so e(r(kappa))
+is an ACTUAL unit of ORec, not just an element with nonnegative valuation.
+
+Define
+
+  psi(a)=e(r(K(a)))^(-1) in ORec^*.                      (LI8.3)
+
+The preceding multiplicativity proves this is a group homomorphism. For any
+kappa agreeing with (LI8.1), uniqueness gives kappa=K(a), and (LI8.2)–(LI8.3)
+give
+
+  e_C(r(kappa))=chi(kappa),  psi(a)*e(r(kappa))=1.         (LI8.4)
+
+These are exactly all quantifiers and conclusions in PsiTied. This proves
+the actual AddCharIsIntegral.exists_psi under its literal Joint0 and
+LevelZeroCharacterRational assumptions, with O=ORec and e=embRec.
+
+8.3 What simultaneous choice now gives, and what it does not.
+
+For every supplied word u and coefficient prime w with GIdx, LI7 chooses
+I,i_K,lambda and LI8 chooses psi. The position condition holds for every psi,
+so these choices are compatible without any further constraint. Ordinary
+choice gives these pointwise data simultaneously for all u,w. Their fields,
+the coefficient embedding, and the literal orbit labels stay those of D7.
+
+To conclude the stronger IsLocalFamily/gatOf construction one still needs
+the exact class-rank equality pack_d_eq and a single standard global B,
+with its frame identity supplied in source by StdTied plus Companion and
+locIdStd. To pass from that family to GroupCompatibilityAll one additionally
+needs comparison_statements, including its actual global-to-local lattice
+equality. No combination of LI1–LI8 or BC1–BC8 alone proves those remaining
+statements. The source files IsRecGOfIsLocalFamily and ExistsGIs assemble
+them only after those inputs have been supplied.
+
+INDEPENDENT REVIEW TARGETS
+
+Highest-value checks are LI2.3's orientation and degree comparison;
+LI3's two-prime contraction argument and integral CRT residue lift;
+LI4's c^s position factor and simultaneous embedding alignment;
+LI5's equality with the literal first projection of locL;
+LI6's normalized valuation factor and zero branch; and LI8's use of the
+same coefficient embedding with unit, rather than mere integral, values.

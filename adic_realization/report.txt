@@ -1,0 +1,612 @@
+RH/GRH reconstruction, version 0.20
+Component: adic_realization
+Claim identifiers: GA1--GA23
+Pinned source: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+1. Result and scope
+===================
+
+This component proves the normalized one-dimensional adic character
+construction left as AR-next-02. Given the actual global Artin map,
+an algebraic Hecke character, a finite DVR over Z_l with its specified
+adic topology, and compatible embeddings of its specified field of
+values, the character is constructed in the actual DVR unit group.
+It has the literal IsLAdicOf/IsGal normalization. The proof does not
+assume a second published Hecke-to-adic existence theorem.
+
+The two principal literal endpoints are:
+
+* GlobalTheory.HeckeGal.IsGlobalArtin.exists_isLAdicOf, proved by GA4--6;
+* GlobalTheory.GalChar.exists_isGal, proved by GA1--3, GA6--8.
+
+These yield the exact Triple.exists_shift and exists_blockChar,
+reading independence, and identification of the already installed
+firstTwistCharacter under its actual NormalizedCharacterCompatibility.
+They also yield all five substantive character statements at the
+end of InertialOrderFifteenCharAuxiliaryPrimeSpec:
+
+* HeckeTwistCharactersDeltaChi;
+* ToricHeckeQuotientCharacter;
+* LocalisationCharacterSpec;
+* LocalisationTwistCharacterCompat;
+* TameInertiaGeneratorCharacterSpec.
+
+The actual local coefficient extension in chi1_loc_isGal is proved,
+and a conditional strengthening recovers full DeltaRead from the
+cofinite normalized delta reading and its actual field of values.
+
+Global Artin reciprocity is still an explicit named input. This
+component does not construct a compatible nonempty NTw/SideB.
+It does not supply all coefficient places, an arbitrary prescribed
+IsPsi(l,Q), the common LL0 containment, representation-valued Galois
+objects, MtReal/NExpTied, or the fixed-context RowPk/ColW/Pre2/St joins.
+The exact source exists_isTripleOf is addressed only with its empty
+local-index assumption and its empty representation/zero form spaces.
+
+The mathematical text consists of 23 proofs. The accompanying ledger
+binds each paragraph to inclusive pinned source ranges and SHA-256
+hashes. Sources are evidence for the claimed literal interfaces;
+the human arguments, not a Lean compilation, are the deliverable.
+No Lean source or old component was changed.
+
+2. Conventions and hypotheses
+=============================
+
+E is a number field, Omega its algebraic closure, G_E its absolute
+Galois group with the Krull topology, and G_E^ab its topological
+abelianization. The specified map Art:I_E -> G_E^ab has the literal
+IsGlobalArtin properties: it is an open surjective quotient map;
+its kernel is the closure of principal ideles times the connected
+infinite component; it identifies local unit images with inertia,
+local uniformizer images with inverse arithmetic Frobenius, and
+the closure of local multiplicative images with decomposition.
+
+These precise clauses matter. The inertia formula contains no
+inverse. Arithmetic Frobenius gives the inverse of the unramified
+Hecke value. A character into a commutative group is invariant under
+conjugating the valuation/Frobenius pair. The finite/cofinite
+Frobenius detection lemma used throughout is RC4, proved from these
+Artin clauses and weak approximation; no Chebotarev statement is
+quietly added.
+
+Qbar_l is the algebraic closure of Q_l with its extended norm.
+It is not C_p, and it is generally incomplete. The ring isomorphism
+iota:Qbar_l -> C is not assumed continuous. Continuity in the
+construction is obtained before or after an open-kernel argument,
+never by composing an arbitrary continuous map with iota.
+
+O is a domain DVR, finite as a Z_l-module. Its topology is the
+specified maximal-ideal-adic topology, not an arbitrarily imposed
+topology. Kappa:Frac(O)->Qbar_l agrees with the standard Q_l map on
+Z_l. Write g for its restriction to O. The field K of Hecke values
+is supplied with epsilon:K->C and f:K->Frac(O), with iota kappa f
+=epsilon. AlmostIn requires these same images at cofinitely many
+finite places. The proof neither chooses unrelated images for each
+Frobenius nor replaces K by an unannounced extension.
+
+For the host applications C is the actual HFrame from HF, all e(j,tau)
+are integral, and the actual host supplies the CM involution and its
+unramified quadratic valuation law. Complete splitting of the two
+type primes is retained wherever needed; it is what changes the
+residue-cardinality exponent q-1 to g_k-1. The source's row rank is
+r=k+m-1, and nV=r+t. Both k,m are even and t is odd, hence r is odd.
+
+3. GA1--GA3: actual DVR integrality, closed image and topology
+============================================================
+
+For a in O, finite generation over Z_l gives a monic polynomial
+P(a)=0 with coefficients in Z_l. If |g(a)|>1, the leading term
+has norm |g(a)|^deg P. Every other term has strictly smaller norm
+because its coefficient has norm at most one. In a nonarchimedean
+field a sum with exactly one term of maximal norm cannot be zero:
+if that term were the negative sum of the rest, the ultrametric
+inequality would contradict its larger norm. Thus |g(a)|<=1.
+The same assertion for a unit and its inverse proves unit norm one.
+
+The given compatibility maps l to the usual l-adic element of norm
+1/l. Thus l is a nonzero nonunit of O. If pi is a uniformizer,
+l=u*pi^e with e>=1. Unit norm one implies
+|g(pi)|=(1/l)^(1/e), strictly between zero and one.
+Every nonzero fraction is pi^a times a unit for an integer a.
+Its norm is |g(pi)|^a, so its valuation sign is exactly detected
+by the norm. This proves both directions of (GA.3), including
+reflection of membership in O and O^times.
+
+For closedness, take finite Z_l-generators s_i of O. Every nonzero
+b=ub*pi^a divides l^a: use the multiplier ub^(-1)*u^a*pi^((e-1)a).
+Hence any a0/b is l^(-a) times an integral element. Its image is
+in the Q_l-span of g(s_i). The reverse inclusion holds because the
+fraction field image contains all Q_l scalars and all g(s_i).
+Thus the field image is a finite-dimensional Q_l-vector subspace.
+
+A finite-dimensional subspace of any normed Q_l-space is complete
+and closed. One proof uses coordinates: the induced norm on a finite
+basis is bounded above by a multiple of the sup norm; the lower
+bound is a positive minimum on the coordinate unit sphere. That
+sphere is compact because Z_l is compact. Linear independence
+excludes a zero minimum. A Cauchy sequence thus has Cauchy
+coordinates, which converge in complete Q_l. This explicitly
+explains why no completeness of Qbar_l is being assumed.
+
+The same norm detects the topology. If c=|g(pi)|<1,
+pi^a O maps into the closed norm ball of radius c^a.
+Conversely |g(x)|<c^a implies |kappa(x/pi^a)|<1, so x/pi^a
+lies in O. These inclusions show equality of neighborhood filters
+at zero; translation gives a topological embedding everywhere.
+The proof uses the actual IsAdic property to identify pi^a O as
+a neighborhood basis.
+
+The coefficient-map variant is useful when O' is not a DVR or
+domain. It is enough that O' is local and adic and that the image
+of l lies in its maximal ideal. A unital ring map t sends the unit u
+to a unit, and t(pi)^(ea)=t(u)^(-a)t(l)^a lies in m(O')^a.
+Hence t(pi^(ea)O) is contained in m(O')^a. This proves continuity
+directly. No unexplained extension of kappa to O' is needed in
+the toric quotient construction.
+
+4. GA4--GA6: construction from the Artin quotient
+=================================================
+
+The infinite factor F_inf multiplies j(x_v) to the prescribed
+integer exponent n(j|E), for all continuous embeddings of each
+infinite completion. The l-adic factor F_l does the same for
+continuous embeddings E_v->Qbar_l, with the exponent indexed by
+iota j|E. Only the finitely many v dividing l contribute.
+
+Finiteness of each embedding set follows by restriction to the
+dense number field, which is injective, and finiteness of the
+number of field embeddings. A continuous map at a place not above
+l cannot exist: a positive power of its residue rational prime
+converges to zero locally but always has l-adic norm one after
+the map.
+
+Every embedding E->Qbar_l induces a place over l. It takes all
+integers to integral elements by the same monic-polynomial argument
+as GA1. Its nontrivial valuation is that place up to positive
+scaling, so it is continuous in the place topology. Its image
+generates a finite extension of Q_l. That extension is complete,
+as explained in GA2, and therefore the map uniquely extends from
+E to E_v. The place is recovered from the valuation, and density
+gives uniqueness of the extension. This proves the required
+bijection between embeddings of completions and embeddings of E.
+At infinity, the corresponding extensions to R or C give the
+same statement, with two continuous embeddings of each complex
+completion. On principal ideles the two products are therefore
+the same product over embeddings, transported by iota.
+
+The IsAlgPos condition is initially only an equality at totally
+positive principal infinite values. It becomes an equality on the
+entire connected component as follows. E^times is dense in the
+infinite unit group by weak approximation. The connected component
+is open, so the intersection of this dense subgroup with it is
+dense in that component. Points of the intersection are totally
+positive, exactly as required. Two continuous maps agreeing there
+agree on the component.
+
+The remainder theta=chi/F_inf is continuous and trivial on that
+component. Its finite-idele restriction has open kernel.
+For explicitness choose an image neighborhood |z-1|<1/2 and an
+open congruence subgroup H of finite ideles lying in its preimage.
+The subgroup can be given by both u-1 and u^(-1)-1 lying in
+N times the integral finite adeles. Multiplication is closed
+because (1+Na)(1+Nb)=1+N(a+b+Nab), and the inverse condition
+is symmetric. All powers of an element of H are still in H.
+
+If all positive powers of a complex number z satisfy |z^a-1|<1/2,
+then z=1: put S_a=sum_{h<a} z^h. The bound |S_a-a|<=a/2 implies
+|S_a|>=a/2, whereas |(z-1)S_a|=|z^a-1|<1/2. For z!=1 the
+two bounds contradict each other at large a. This proves H is
+killed. Combining it with the open infinite connected component
+gives an open kernel in the whole idele group.
+
+It is at this point, and only at this point, that the algebraic
+isomorphism iota^(-1) is applied to theta. A homomorphism with
+open kernel is locally constant, so its composite with any
+homomorphism remains continuous. Multiplication by continuous
+F_l gives Psi=iota^(-1)(chi/F_inf)*F_l.
+
+Psi kills principal ideles because chi is one there and the two
+algebraic products cancel. It kills the connected infinite ideles
+because theta and F_l are one there. Its kernel is closed in a
+Hausdorff group. It therefore kills the closure in the literal
+Artin kernel. The open quotient property supplies a continuous
+character of G_E^ab. Pulling back to G_E proves IsLAdicOf exactly.
+Surjectivity of Art means that any other such character has the
+same value on every Galois element, proving uniqueness.
+
+This is substantive construction from global reciprocity.
+HeckeLAdicCharacter is not retained as a separate primitive input.
+
+5. GA7--GA10: local identities, descent, finite order, conjugation
+================================================================
+
+Evaluating the global formula on a local finite idele gives
+r(sigma)=iota^(-1)(chi_v(x))*locPow(x). The correction locPow
+vanishes if v is not over l, or if n=0. The Artin inertia clause
+then identifies the image of the whole inertia group with the
+image of the entire local unit group. It follows that unramifiedness,
+exponents and finite orders are preserved. To pass from the local
+multiplicative group to the whole decomposition group, use exactly
+the source's closure clause and continuity. The closed kernel
+contains the closure if it contains the local image.
+
+For Frobenius the inverse matters: Art of a uniformizer is the
+abelianization of sigma^(-1). Taking the inverse in the character
+gives r(sigma)=iota^(-1)(chi(P)^(-1)). This is compatible with
+the direct local unit formula, which has no inverse.
+
+For coefficient descent form L=kappa(Frac O), already proved
+closed. L^times is a closed subgroup of Qbar_l^times. The quotient
+is a Hausdorff commutative topological group, so RC4 applies.
+If chi(P)=epsilon(x_P), then at every good Frobenius the value
+lies in kappa f(K)^times, hence in L^times. Thus the quotient
+character kills cofinally many Frobenii and is identically one.
+Every Galois value belongs to the field image.
+
+Compactness of G_E now matters. Norms of the character values are
+bounded by continuity and compactness. A value of norm greater
+than one would have unbounded powers, and a value of norm less
+than one has inverse of norm greater than one. All norms are
+one. GA1 puts every preimage in O^times. Multiplicativity and
+uniqueness follow by injectivity of kappa. GA3 restores continuity
+in the actual topology. This proves exists_isGal for the same
+algebraic type n, not merely some unspecified finite-order avatar.
+
+For finite-order Hecke characters, an mth root in each connected
+infinite factor proves IsAlgPos with type zero. Hence their adic
+realizations are m-torsion directly from the global formula.
+The finite root set has one isolated from its other points,
+so the kernel is open. Conversely a continuous m-torsion Galois
+character descends to G_E^ab, composes with Art, and transfers
+through iota. Its open kernel supplies continuity. It kills
+principals and is the unique finite-order Hecke character read
+this way. The proof includes the l-adic places because type zero
+removes the local algebraic correction there.
+
+For anticyclotomic symmetry use the actual host involution on E
+and its supplied extension to Omega. Its action by conjugation
+on G_E is continuous: to fix a finite field after conjugation
+it suffices to fix the finite field generated by the inverse
+conjugates of a basis. At conjugate unramified primes P,Pbar the
+Hecke values multiply to one. This follows by evaluating the
+restriction to F on a uniformizer and using the source's unramified
+quadratic valuation law. At a conjugation-fixed prime this same
+argument gives value one; it is not replaced by a false assumption
+that every prime splits.
+
+Conjugation sends a Frobenius at P to a Frobenius at Pbar with
+the same norm. The product character r(conj sigma)*r(sigma) thus
+kills all Frobenii outside a finite conjugation-stable exceptional
+set. RC4 makes it trivial on all G_E. Injectivity then gives the
+same anticyclotomic identity in O^times. These are the exact
+IsGal.anti and host local hypotheses; arbitrary ramified quadratic
+extensions are not substituted.
+
+6. GA11--GA15: odd blocks and the installed first character
+=========================================================
+
+The host CM type lists one embedding from each conjugate pair.
+The pairs exhaust all embeddings, since two embeddings define
+the same infinite place exactly when they agree or are conjugate,
+and the host is totally complex.
+
+If z!=0, (z/|z|)^(2a)=z^a*conj(z)^(-a). An even argument
+exponent is therefore an integral algebraic type. In the actual
+mu0 record the argument exponent is -2e, so the type at a pair
+is (-e,e). Eta has argument exponent one. For r=2h+1,
+
+  (z/|z|)^(-1) * |z|^(-r)
+       = z^(-h-1) * conj(z)^(-h).
+
+The norm factor at a complex place has two embeddings; forgetting
+that multiplicity would give the wrong half-integral exponents.
+The result supplies integral type for eta^(-1)|.|^(-r/2).
+It also applies to the odd t in the shift character.
+
+At a finite unramified place the block value is
+mu(P)*eta(P)^(-1)*N(P)^(r/2), with the positive square root
+under the real-to-complex convention of the source.
+If eta(P)*N(P)^(-1/2)=epsilon(z) and mu(P)=epsilon(y),
+then the value is epsilon(y*z^(-1)*N(P)^h) when r=2h+1.
+All factors now lie in the same K. The actual ValLL0 inputs
+therefore give AlmostIn for both shift and block. Product and
+inverse operations only enlarge a finite exceptional set.
+
+For each existing NTw index and side, a Reading includes the
+finite DVR embedding kappa, the algebraic complex isomorphism iota,
+compatibility on Z_l, and the exact LL0 square. Apply exists_isGal
+to that square. The construction comes after this index and
+reading; it creates neither of them. This ordering is essential
+for the distinction from SideB.cover.
+
+Reading independence uses only common integral values. If
+rho_C(y)=emb_LL0(x), then y=embSide(x) in the fraction field,
+by injectivity. A second reading sends y to the same complex
+value. Build a block realization for the second reading.
+At cofinally many unramified primes the inverse Hecke value
+belongs to LL0, so both integral characters have the same
+Frobenius values in the actual O0. Their continuity and RC4
+give equality everywhere. The tame generator statement similarly
+uses its lift to a local unit and the two identical local formulas.
+
+For the installed first character, NormalizedCharacterCompatibility
+already contains a cofinite Read identity. In its exact notation
+the Hecke value alpha is that of mu0*delta*eta^(-1), and the
+coefficient value is alpha^(-1)*sqrt(N(P))^(-r).
+The positive square-root identity says this is precisely the inverse
+value of block(mu0*delta,eta,r). The three retained equality fields
+eta_eq, mu_eq and del_eq must be used on the actual D and frame.
+The reading gives equality with the newly constructed realization
+at Frobenius for the selected valuation. Conjugating valuations
+and Frobenii is harmless only because the target is commutative;
+the exact norm stays fixed. Thus RC4 applies to every valuation,
+and the installed character is the constructed one.
+
+This supplies the literal firstTwistCharacter_eq_ladic_heckeCharacter.
+It does not construct NormalizedCharacterCompatibility. A character
+with the same order or same ramification support would not suffice
+to identify the installed one.
+
+7. GA16--GA18: both sides, exact inertia order and tame calibration
+=================================================================
+
+The two base embeddings read epsilon and its complex conjugate.
+For the false side use conjugate(iota) together with the second
+embedding; their two conjugations cancel. Both sides therefore
+read the same Hecke block, with their exact respective embeddings.
+
+Select pde' only when l=pde, otherwise pde. The source's distinctness
+conditions make the selected prime different from l and both type
+primes. HF12 gives the finite-order delta character with exact
+inertial exponent 15 there. GA8 constructs its integral realization.
+GA7 transfers the exponent exactly, and a subgroup of roots of
+unity in a field is cyclic. Hence cardinality is exactly 15, not
+merely at most 15. Off the auxiliary support delta is unramified.
+The selected rational prime is 1 mod 15; every residue norm over
+it is a power of it and also 1 mod 15.
+
+At an auxiliary place all mu0 factors and eta are trivial on local
+units. Thus chi_j,true on inertia is Delta. On the false side the
+reading is conjugated; finite-order values satisfy conj(z)=z^(-1),
+so chi_j,false on inertia is Delta^(-1). This explains the side
+sign rather than guessing an inverse from the Frobenius formula.
+
+Tameness of a local Hecke character gives exponent q-1 on units,
+because the residue units have order q-1. The converse wild-order
+statement used for toric quotient characters is more precise.
+Continuity first gives an open kernel on local units: take a
+small congruence subgroup mapped into |z-1|<1/2 and use the
+all-powers no-small-subgroup argument of GA5.
+Hensel lifts each nonzero residue to a (q-1)st root of unity:
+the polynomial derivative is a unit. After dividing by that
+root, a unit lies in 1+m. Each qth power raises its additive
+depth at least one, by the geometric-sum formula. Once the depth
+lies in the character's open kernel, its image has order dividing
+q^a. The proof works at residue characteristic two as well.
+
+For Galois tame generators, a continuous character with inertial
+exponent m prime to the residue characteristic kills wild inertia.
+This reduces to a finite quotient: a neighborhood of one can be
+chosen to exclude the finitely many nontrivial mth roots, and an
+open normal subgroup can be chosen inside that neighborhood.
+The finite ramification argument of AR3 applies. By the literal
+definition of TameGenAt, inertia is the closure of the subgroup
+generated by the chosen element and wild inertia. The image
+therefore lies in the finite cyclic group generated by its value
+on the chosen element.
+
+For the uniform calibration fix the actual tame generator at a
+type place. Its Artin local-unit lift has residue a in F_p^times.
+HF's local rule evaluates mu0,j as omega(a)^(-2(j+1)).
+The row j=0 is available since m>=2. Realize mu0,0 adically
+at the different prime pde; this uses the general Artin construction,
+not a second coefficient-field containment assumption.
+Its inertia has exponent p-1. Comparing the given generator with
+the inertia lift of each residue b shows b^2 belongs to <a^2>.
+Thus a^2 generates all squares.
+
+To recover a full generator, write a=z^d in a cyclic group of order
+n=p-1. The square condition says gcd(2d,n)=gcd(2,n). If n is
+odd, gcd(d,n)=1. If n is even and a is not already a generator,
+gcd(d,n)=2 and n/2 is odd; multiplying a by the unique element
+of order two gives a generator without changing its square.
+This also covers the n=1 case.
+
+The source's omega and the specified Teichmuller map are injective
+on F_p^times, so both images are the full n-th roots of unity.
+Transport the selected generator between those images.
+The resulting gamma has the exact formula (GA.24) simultaneously
+for all coefficient primes different from p, all allowed rings,
+all readings, every row, and every unramified extra factor.
+This order of quantifiers is the main content of the tame supplier.
+It produces a new TameTie array. Identifying that array with an
+already fixed nd.chiT remains a separate compatibility premise.
+
+8. GA19--GA21: quotient, localization and exact coefficient transport
+====================================================================
+
+For the toric quotient character, construct the realization of
+mu0*delta*vartheta^(-1) using its integral type and actual value
+field. It is anticyclotomic because every factor is trivial on F.
+Map it to any target adic local coefficient ring by GA3. Outside
+the stipulated S0, all factors are unramified and the prime is
+away from l. At an auxiliary prime the quotient by the selected
+side of Delta is read as vartheta_P^(-1) on local units.
+If vartheta kills the local roots of unity of order q-1, GA17
+shows each such quotient value has q-power order. This is the
+literal existential exponent; it is not a statement of uniform
+bounded order or triviality.
+
+The integral X(P) is defined by evaluating the O-valued character
+at a chosen Frobenius and then mapping to O'. Equation (GA.11)
+makes this independent of valuation and Frobenius at P outside S0.
+It yields an actual ring element, not just a complex value.
+
+For localization, IsPsi(l,Q) is a genuine supplied Hecke character
+with l-power order, triviality on F, tameness, exact ramification Q,
+trivial entire local character above l, and split support.
+There is no construction here for arbitrary prescribed nonempty Q.
+The prescribed separation makes the mu0 and delta factors trivial
+on units at every P in Q. Hence the block realization has
+nontrivial inertia at every such P: otherwise the exact inertia
+image identity would make psi unramified there.
+
+The family is chi_c=chi_1*cyc_l^(-(c-1)). This is an integer
+exponent, so the source defines it for every natural c, even zero.
+At c=1 the extra factor is one. Cyclotomic continuity follows
+from its Z_l-valued continuity and the actual compatible embedding
+of Z_l into O. At Frobenius away from l its value is N(P):
+Frobenius acts by N(P) on residues of l-power roots of unity;
+reduction is injective on these roots because their polynomial
+has unit derivative. Thus
+
+  iota kappa(chi_c(Frob_P))
+    =(mu0*delta*psi*eta^(-1))(P)^(-1)
+       * N(P)^(-r/2-(c-1)).
+
+The source writes -r/2 as (t-1)/2+(1-nV)/2. The exact nV=r+t
+identity verifies that equality. No global chain length is changed.
+The psi_l factor has exact ramification Q, open kernel, l-power
+order, anticyclotomic symmetry, and triviality of the entire
+decomposition groups above l; the last property uses the full
+local triviality field atl, not merely unramifiedness.
+
+For coefficient transport, the two readings need not agree on
+the whole coefficient fraction field. They must agree through
+the supplied K and through the literal integral relation:
+if y in O0 equals f0(x), then t(y) equals f(x) in Frac O.
+Cofinitely many first-block inverse values lie in K. At those
+Frobenii, this exact relation permits transport, and multiplication
+of Hecke characters then gives the intended product. Continuity
+and RC4 promote the equality to all Galois elements.
+This proves chi=t_*(chi1)*psi_l, with the same l, rather than
+asserting it merely from two unrelated complex embeddings.
+
+9. GA22--GA23: local reading upgrade and precise stage boundary
+=============================================================
+
+The local upgrade is the abstract argument behind the literal
+chi1_loc_isGal proof. A continuous installed O0-valued character
+has cofinite normalized readings in LL0. The actual twist_2 map
+and local embK map transport those integral values into the
+target DVR. The actual Sp.iq and AutSpec.iotaQ identities make
+the target complex reading agree on LL0. These data put the
+Hecke values cofinitely in the target field, so exists_isGal
+constructs a comparison character there. At the specified
+Frobenii the two characters agree. Conjugation transfers that
+agreement to all valuations, and RC4 identifies them everywhere.
+
+The source chi1_loc_isGal is stated with further ChoiceSide,
+MtInput, split auxiliary, ChebSplit, local-index and automorphic
+data. This reconstruction keeps the literal input package when
+claiming that endpoint, while isolating the smaller exact character
+argument. It does not announce construction of unused fields.
+The proof still requires the maps and equalities of that same
+package; an abstract isomorphic tuple cannot silently replace it.
+
+Likewise the cofinite normalized delta reading, together with
+its actual value-field containment, first identifies the installed
+delta with its unique normalized realization. At every unramified
+place the contained Hecke value then provides the required LL0
+element and injectivity gives the full fraction-field equality.
+This proves the full DeltaRead implication from those stronger
+data. It does not prove DeltaRead for an arbitrary preinstalled
+delta with only the same order and support.
+
+Mapping delta into a local ring uses the stipulated side embedding.
+On the false side its complex value is conjugated; since delta is
+finite order this is inverted. This gives the actual IsGalOf
+statement with exponent zero. For psi the same construction gives
+NGalChrTied.psiL only when the supplied tuple component equals
+that same psi. These are explicit same-object conditions.
+
+The Chars record is fully constructed for every already given
+Tw index once star stability and actual ValLL0 are supplied.
+Its fields are not merely asserted: they are the conclusions
+of GA13--GA18. The source's exists_isTripleOf then modifies the
+NTw/NExp over that existing index set under IsEmpty(nd.Loc)
+and a TameTie for the specified nd.chiT. It leaves the coefficient
+rings and Tw in place, replaces the delta and chi1 characters,
+empties Sig and abelian_2, and sets Fm to the zero PUnit module.
+The representation and occurrence parts of IsTripleOf are then
+empty-domain assertions. They do not recover the actual Mt or
+row form space.
+
+The remaining simultaneous supplier must produce actual nonempty
+twist/local data on the same D, the cover for every actual
+coefficient place, the normalized character/field/readings, the
+required NExp and genuine representation spaces, and the matching
+local maps and tuples. SideB.cover is literally forall w exists i,
+with residue prime equality and the true-side valuation condition.
+There is no implication from forall existing i construct a character
+to that covering statement. The old LS empty-Tw construction
+still cannot supply NChoice.twI or this cover.
+
+10. Endpoint and remaining-input audit
+======================================
+
+The builder records the exact discharged endpoints and their
+conditions rather than counting bare names as unconditional proofs.
+The principal closures are normalized Artin realization; closed
+coefficient descent; both shift and block characters; reading
+independence; firstTwistCharacter identification; the five host
+character laws; chars_nonempty; exact local chi1_loc_isGal; and
+the explicitly empty-local version of exists_isTripleOf.
+Supporting closed lemmas include embedding_closed_integral,
+continuous_ringHom, even/odd algebraicity, AlmostIn.block, local
+orders_on_units, and tame generator calibration.
+
+Current retained supplier families are:
+
+1. GlobalArtinReciprocity, with its precise local and quotient clauses.
+2. Actual same-field containment and readings for the fixed D and
+   coefficient rings. HF16 supplies the finite field; inclusion in
+   the already fixed LL0 and compatible place selections must match.
+3. Genuine nonempty NTw/local data and SideB.cover on the same D.
+4. The actual normalized character compatibility for an installed
+   stage, including the chosen psi and the integral transport maps.
+   Newly constructed characters may satisfy the laws, but replacing
+   fields does not transport all old form/cohomology data.
+5. A genuine IsPsi(l,Q), or an equivalent anticyclotomic realization
+   with exact nonempty ramification, when such a Q is required.
+6. The stipulated tame array agreement for the already fixed nd.chiT.
+7. The remaining representation and same-object form/cohomology
+   suppliers from AR/RC/NC: MtReal, MtFam/MtAd, NExpTied, local
+   realizations, RankTie/MuIsW joins and fixed ColW/Pre2/St/RowPk.
+
+Some of these are joint conditions rather than independent arbitrary
+choices. In particular changing D, LL0, Tw or the tuples can invalidate
+the reading and integral comparison maps. The next-target file
+therefore groups the exact compatible-witness tasks and identifies
+their source declarations. It does not re-list the now-proved
+exists_isGal, shift, block or firstTwist helper as mathematical gaps.
+
+11. Verification
+================
+
+The reproducible builder reads only pinned Git objects and checks
+any present checkout file against its Git blob. Each source record
+includes its full-file SHA-256, inclusive range SHA-256, exact
+declaration, byte count and pinned URL. It separately inventories
+the source files and the current TeX paragraph hashes.
+
+The arithmetic identities were checked directly:
+
+* coefficient uniformizer norm c with l=u*pi^e, e>=1;
+* denominator b=u_b*pi^a divides l^a;
+* finite-idele geometric-sum no-small-subgroup bound;
+* infinity exponents (-e,e) and (-h-1,-h);
+* block field value y*z^(-1)*N(P)^h;
+* Frobenius inverse and positive local-unit sign;
+* side inversion only from conjugation of finite-order values;
+* exact cyclic inertia order 15;
+* tame square-generator factor-of-two case;
+* localization exponent -r/2-(c-1);
+* nV=r+t and the literal normalized expression in the source;
+* coefficient agreement only on integral values from K;
+* true-side coverage quantifiers and the empty-local replacement.
+
+No PDF or Lean compilation was performed. Independent review files,
+when present and binding the current paragraph hashes, are attached
+by the builder. Any retained published input is explicitly marked;
+no RH/GRH conclusion is inferred from these conditional suppliers.

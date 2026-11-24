@@ -1,0 +1,529 @@
+GOOD ORBITS, THEIR ACTUAL COUNTS, AND UNIFORM TYPE-II SUPPLY — v0.11
+Pinned source: CocoSgt/riemann-hypothesis-lean
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Stable claims: GII1–GII10.
+
+STATUS AND SCOPE
+
+The deterministic part proves the literal AuxBlock8.adm1, the family logarithmic
+window bound, every field of NumII and HypIIAt, and the actual local Type-II to
+AuxBlock8.adm6 comparison. It uses the already reconstructed local Type II
+(EA9, with CP8/OR8), not an unexpanded local theorem.
+
+The probabilistic part is separate: it proves the conditional probability that
+a selected point belongs to a bad orbit, then proves existence of a subset with
+the exact TopsOK cardinality and weighted bad-orbit bounds. Existence of that
+subset does not identify it with an arbitrary pre-existing D.host.TT. The final
+host/point/family construction must preserve the selected subset and its
+Frobenius steps. That identification is retained explicitly in section 11.
+
+All statements concern the pinned polynomial/lattice formalism. No formal
+build, kernel replay, global RH proof, or simultaneous construction of all
+arithmetic/metric/cohomological data is asserted here.
+
+0. NOTATION AND THE EXACT GLOBAL SCALE
+
+Write epsilon=eps, 0<epsilon<1/52, x>1, zeta=ez=epsilon/J>0 and A=26. Set
+  delta=x^(-epsilon/8), h=2+8epsilon,
+  K0=ceil(8(h+2)/epsilon), r=K0+1,
+  u=ceil(1/delta), R=6r+1, ell=Ru,
+  P0=10^(-R), M=ceil((h+3)log(x)/P0), G=(M+5)ell,
+  N1=ceil(max(6eG delta,(h+3)log_2 x))+1.
+These are exactly delta1, hG, KG, rG, goodU, goodEll,
+orbitSmallMultiplicity, Gp/goodG' and N1/orbitWindowCount. All ceilings
+are the source's nonnegative integer ceilings. Their arguments here are
+positive. In sections 1–2, r>=1,h>=0 and 0<delta<=1 may be fixed separately.
+
+Other actual scales are
+  a=x exp(x^epsilon), X'=exp(x^(epsilon/3)), b'=a/X',
+  p0=k^2 x^26, Q=p^G,
+  L1(p)=ceil(log_p((k x^26)^4)),
+  L2=2 sup{L1(p): p prime and of inertClass},
+  c=cG=4 Sc, c0=2b'+2c, Nplus=40n' delta.
+The supremum is the natural-number supremum; a uniform finite bound on the
+set makes it the ordinary bounded supremum. An empty set has supremum zero.
+
+Use bold C for the fixed nonnegative Consts tuple, and its entries
+C_D=C.DII, C_s=C.szII, C_k'=C.kII', C_La=C.La, C_t=C.tII,
+C_k=C.kII, C_rho=C.rho, C_N=C.CN. Put
+  Lambda=C_La N1^2 log a,
+  D_II=ceil(C_D Nplus(N1^3+r^5+k^2)log_p a
+             +2rn'c+r Nplus c0),
+  t_II=C_t rN(Lambda a/(pk)+a p^(-L1)+c0+kQ)+2rn'c,
+  kappa_II=min(1,C_k N r^2 k x^(-26)).
+Here N is the number of selected tops on one orbit, not the number of orbits.
+These are the literal DIIf,tIIf,kapIIf; no rounding convention is changed.
+
+1. FINITE CYCLIC COUNTING AND THE ACTUAL SEGMENTS [GII1]
+
+Let T be a subset of {0,...,n'-1}, and write
+  W(i,L)={(i+j) mod n':0<=j<L}.
+Assume r,u>=1, G=(M+5)ell, 3G<=n', and the source's good-orbit conditions:
+  (A) every W(i,L2) contains at most K0 selected points;
+  (T) among the M+1 successive complete tiles beginning at any tile index,
+      at least one is marked, with tile indices read modulo t=floor(n'/ell);
+  (I) every W(i,G) contains at most N1 selected points.
+A complete tile has R cells of length u. In a marked tile the odd-numbered
+cells are empty; each even-numbered cell contains exactly one selected point,
+and that point is even. Thus it has 3r selected even points.
+
+There is an even selected point at positive cyclic distance at most G from
+EVERY residue i, including points in the incomplete remainder of the period.
+Here is a short proof which keeps that remainder. List the marked complete
+tile indices increasingly. Applying (T) immediately after a marked index
+shows that the next one is at tile distance at most M+1. Lift their starts
+periodically to the integers. If n'=t ell+R0, 0<=R0<ell, the physical gap
+between consecutive starts is D ell, or D ell+R0 at the wrap. It is therefore
+strictly less than (M+2)ell. Choose the first such start B strictly after i.
+The selected point in its second cell lies in [B+u,B+2u). Its distance from
+i is positive and <(M+2)ell+2u<G. This also proves existence of marked tiles:
+t>=3(M+5)>0 and (T) applies. This is the actual NextEvenTop argument; it does
+not replace n' by t ell at the wrap.
+
+For each i choose such a top z and distance d in {1,...,G}. The map
+(z,d) -> z-d modulo n' covers all residues. Consequently
+  n' <= |T|G.                                                   (GII1.1)
+For the upper bound, sum (I) over ALL n' cyclic starting positions. Because
+G<=n', each fixed top belongs to exactly G of these windows. Hence
+  |T|G <= n'N1.                                                (GII1.2)
+The source uses the weaker |T|G<=N1(n'+G), by covering with intervals
+beginning at multiples of G. Our cyclic double count is an explicitly
+identified sharpening under the present 3G<=n' hypothesis. Both imply
+the source SegmentCountBounds. We retain its downstream constant 40.
+
+For the rest of adm1, take K0=r-1 and L1<=L2<u. The previous L1 positions
+before a top inject into the L2 window starting at i-L1. Thus fewer than r
+selected even predecessors occur there. Choose the LEAST positive distance
+to an even selected successor. It is <=G; its open interior is contained in
+W(i+1,G), so contains at most N1 selected points. These are the literal
+EarliestMaximumFar and ConsecutiveMaximaClose clauses.
+
+The same proof gives the exact OrbitSegs required by the Type-I branch. There
+is an even selected point, and its even successor is distinct since G<n'.
+Thus numSeg, the number of even selected tops, is at least two. In the cyclic
+increasing enumeration of even tops, the next member minimizes the positive
+distance; its gap segG is <=G. The source segDists lists the strictly interior
+selected odd positions, whose distances are distinct and lie in the same
+G-window. Therefore segS<=N1. This is precisely EvenGapHyp, not a different
+segmentation. Source counterparts: bs_numSeg, bs_start_mem, bs_min, bs_segs
+and orbit_segments in TopChoiceBounds. The stronger r-plane frames have
+already been proved in FG1–FG8.
+
+2. EXACT CEILING BOUNDS, WITH A SINGLE CONSTANT [GII2]
+
+For x>=3, 0<delta<=1 and r>=1,h>=0, define
+  C_G=2(6r+1)((h+3)10^(6r+1)+6), Ce=20C_G.                      (GII2.1)
+Then
+  G delta<=C_G log x,
+  N1<=16.8G delta<=Ce log x,
+  G<=Ce log x/delta, N1<=20G delta.                             (GII2.2)
+
+Indeed 1<=u delta<1+delta<=2. With H=(h+3)log x/P0, the inequalities
+H<=M<H+1 and log x>=1 give
+  M+5<=((h+3)/P0+6)log x.
+Multiply by R u delta<=2R to obtain the first inequality. Also
+G delta=(M+5)R(u delta)>=M+5>=5, and
+  (h+3)log_2 x<=2(h+3)log x<=2M<=2G delta.
+Thus the maximum defining N1 is its first term and
+  N1<6eG delta+2<=16.8G delta,
+using e<2.72 and 2<=0.4G delta. This proves every rounding step; the
+constant does not depend on delta,x,n',T or any family member.
+
+Combining section 1 with (GII2.2), every good orbit with 3G<=n' satisfies
+  n'delta/(Ce log x)<=N=|T|<=16.8n'delta<=40n'delta.             (GII2.3)
+The left inequality could use C_G rather than Ce, but Ce is the actual
+single constant chosen in segment_count_log_bounds. No unproved density
+or asymptotic cancellation occurs in this lower bound.
+
+At r=ceil(8((2+8epsilon)+2)/epsilon)+1 and h=2+8epsilon, these constants
+depend ONLY on epsilon. In particular
+  G<=C_G log x*x^(epsilon/8), N1<=Ce log x.                     (GII2.4)
+The elementary estimate log x=o(x^eta), eta>0, implies eventually
+3G<=x^(epsilon/4). For completeness it follows on putting t=log x from
+exp(eta t)>=eta^2 t^2/2: t/exp(eta t)<=2/(eta^2 t). Thus no unspecified
+uniform-asymptotic theorem is needed. Every use below is a finite list of
+such comparisons with epsilon and the constant tuple fixed first.
+
+3. TRANSPORT TO ACTUAL VERTICES AND FAMILIES [GII3]
+
+For an inert prime p write h_p=hP(D,p), n'=ord(h_p). An actual representative
+t0 in reps(X,p) satisfies bs(h_p,t0)=t0. The map
+  y -> t0+y h_p, 0<=y<n',                                    (GII3.1)
+is a bijection onto that orbit. Injectivity is the definition of additive
+order. The identities bs(h,t+h)=bs(h,t) and the representative property
+identify the orbit with the fiber used in topsOn. Restricting (GII3.1) gives
+  Nv(X,p,t0)=|topsPos(D,p,t0)|.
+Also IsV at this point means precisely that its unique index y is even:
+for inert p, stepP=h_p and nP=n'. Forward and backward displacements preserve
+their actual modular distances under this bijection. Therefore all three
+clauses in section 1 and the count (GII2.3) give the literal AuxBlock8.adm1
+for every C31>=Ce. This is the substantive content of
+uniform_constant_of_master; no conclusion is inferred from that wrapper's
+name. The required L1<=L2 follows by boundedness of the defining supremum:
+log p>=log 2 uniformly for primes, so the ceil values are bounded.
+
+For a FamP epsilon, r and h have these same values at every index. Choose
+C31=Ce(epsilon) BEFORE x, the member i, p and its orbit. At
+  x>=max(3,Fm.x1+1),
+the scale identity L.sc.x=x and section 2 give adm1 simultaneously for every
+i in Fm.Ix(x). Its conditional hypotheses L2<u and 3G<=n' remain exactly as
+in adm1; sections 4–7 subsequently supply them for candidate primes.
+
+If the family constant C_N>=Ce(epsilon), the same threshold proves
+  N1<=C_N log x,
+the exact FamilyWindowLogBound/CbLarge statement. Nonnegative substitution
+then gives rho<=rhoB. With the actual family field Fm.rho_le this gives
+rho<=rhoB<=x^(-2); no prime-band sum is included in this assertion.
+
+Empty-index discipline: no index at the current x is chosen. If Fm.Ix(x)
+is empty the universal conclusion is vacuous. The source's Ix_zero is used
+only to infer the fixed valid epsilon and J>=1. If no FamP epsilon exists,
+the universal family-log-bound assertion is vacuous (one may choose threshold
+constant zero); in particular no invalid division by epsilon is required.
+
+4. LEVELS, PRIME SIZE, AND ACTUAL WEIGHT WINDOWS [GII4]
+
+Only the following clauses of SizesAt are used here and in the numerical
+proof: SizeN, SizeK, SizeLa, SizeBot and the sixth clause of SizeDel. They give
+  x^(9/2)<=k<=x^5<=x^6, n<=x^3,
+  x^epsilon<=LaG<=x^(epsilon+epsilon/100),
+  4Sc<=LaG*b'/k,
+plus the actual upper bounds for bT. The inequalities follow directly from
+epsilon<1/52 and x>1: in particular the literal SizeK upper exponent
+9/2+10epsilon+epsilon/100 is less than 5. The source relaxes the fourth inequality to
+Sc<=b'/x; indeed LaG*x<=k by comparing the displayed powers. Thus
+  0<=c=4Sc<=4b'/x, c0=2b'+2c.                                 (GII4.1)
+At x>=24, c<=b'/6; at x>=500, c<=b' and c0<=5b'. Also b'>=1 and 2b'<=a,
+since b'=x exp(x^epsilon-x^(epsilon/3)) and X'=exp(x^(epsilon/3))>e>2.
+
+For every prime, the defining logarithm and SizeK imply
+  L1(p)<=ceil(256 log x), L2<=2ceil(256 log x)<=514 log x        (GII4.2)
+when log x>=1. To see the numerical margin explicitly, log(kx^26)<=31log x
+and log p>=log 2>0.69, so 4log(kx^26)/log p<=124log x/0.69<256log x.
+Consequently 2L1(p)<=L2 at every inert prime. As 514log x<x^(epsilon/8)
+eventually, L2<u. Similarly (GII2.4) gives 3G<=x^(epsilon/4)<=n' whenever
+the orbit is a candidate. These bounds are uniform in the prime and member.
+
+The host has splitBound>=floor(x^(zeta/5)), and every prime p!=2 below that
+bound has Jacobi symbol(-d,p)=1. Inert classification excludes both these
+primes and 2 (2 belongs to the host's small-prime set). If p<=x^(zeta/5),
+integrality gives p<=floor(x^(zeta/5)), a contradiction. Thus
+  p>x^(zeta/5) for every inert p.                              (GII4.3)
+This proves EstimatedPrimesExceedScale directly; in particular p>=13
+eventually. It also gives the fixed bound
+  L2<=Lb:=2ceil(620/zeta),                                    (GII4.4)
+because 4log(kx^26)/log p<620/zeta. We use (GII4.2) for general numerical
+supply and (GII4.4) for uniform conditional probability constants.
+
+Set Ib=Nstar*x^epsilon*Lambda*b'/k, Nstar=2n delta. Assume the actual
+parameter equality Lambda=LaG and rho<=1/7. All terms in
+rho=4Nstar*x^epsilon*Lambda/k+C_rho*N1*Lambda/k are nonnegative, so
+Ib<=b'. SizeBot gives b'<=bT<=b'+Ib<=2b'. The source winA and winB are
+exactly the integer intervals obtained by ceiling/floor of
+  [a,a+a/(kx^13)], [b',b'+Ib].                                (GII4.5)
+Hence the actual aT,bT belong to them, and so do their orbit pullbacks wPos.
+
+Let cpp=floor(c). The stronger shifted weight inequalities needed by Type II
+are
+  (a-c)+cpp<=aT<=2(a-c)-cpp,
+  bT+2cpp<=c0.                                               (GII4.6)
+For the lower bound use cpp<=c and aT>=a. For the upper bound, x>=24 gives
+aT<=a+a/(kx^13)<=3a/2, whereas 3c<=b'/2<=a/4; hence
+aT<=2a-3c<=2(a-c)-cpp. The b-bound follows from bT<=2b'. Its left side is
+an integer, so it is also <=floor(c0), exactly as WeightHyp requires.
+Moreover a-c>=a-b'/6>=11a/12>=1 eventually. Thus all window, shift,
+nonnegativity and floor clauses are genuine consequences of actual records.
+
+5. THE FIRST SIX NUMII INEQUALITIES [GII5]
+
+Fix epsilon and the nonnegative tuple C, and C31>0. For every sufficiently
+large x, consider ANY actual SizeData matching epsilon, SizesAt, a prime
+2<=p<p0=k^2x^26, and integers
+  x^(epsilon/4)<=n'<=n, 0<=N<=n',
+  n'delta/(C31 log x)<=N.                                   (GII5.1)
+No goodness assumption is needed in this numerical lemma once its count
+has been supplied. There is a single threshold independent of D,L,p,n',N.
+
+Put y=x^(epsilon/24). Enlarge the threshold so that
+Ce log x<=y and C31 log x<=y. Since n'delta>=x^(epsilon/8)=y^3,
+the lower bound gives Ny>=y^3, hence
+  N1^2<=y^2<=N<=rN.                                         (GII5.2)
+The first inequality is stronger than the source needs. This is the exact
+place where the lower bound on the number of tops is indispensable.
+
+Eventually r<=x, N1<=x, N<=x^3 and k>=x^(9/2). Thus r<=x^26 and
+N1+3r<=4x<=x^4<=k. Also log a=log x+x^epsilon<=2x, so
+  C_k' N1^2 log a<=2C_k' x^3<=x^(9/2)<=k.                    (GII5.3)
+The fixed coefficient C_k' is chosen before the threshold.
+
+The ceiling in L1 gives p^L1>=(kx^26)^4. Dividing by p<k^2x^26 gives
+  p^(L1-1)>=k^2x^78.                                       (GII5.4)
+Since x>=500 and N<=x^3, 256N<=x^4<=x^26; therefore
+  256k^2N(x^26)^2<=k^2x^78.                                (GII5.5)
+Equations (GII5.2–5) and r<=x^26 are the first six literal NumII fields.
+They do not require a lower bound on p beyond primality.
+
+6. THE FULL Q^5 SIZE BUDGET [GII6]
+
+Still under (GII5.1), set z=x^(7epsilon/48) and E=exp(5z). From k<=x^6
+and p<p0 one has p<=x^38 and log p<=38log x. Therefore
+  log Q=G log p<=38C_G(log x)^2*x^(epsilon/8)<=z             (GII6.1)
+eventually: require 38C_G log x<=x^(epsilon/96) and
+log x<=x^(epsilon/96). Thus Q^5<=E. Also
+  log_p a<=4x, Nplus<=40x^3,
+and, once x>=max(500,480C_D),
+  D_II<=x^18 b'.                                            (GII6.2)
+For full rounding detail, the expression under its ceiling is at most
+  (x/480)(40x^3)(3x^12)(4x)+2x^4b'+200x^4b'
+   =x^17+202x^4b'.
+The ceiling is < that expression+1. Since b'>=1 and x>=500, this is at most
+204x^17b'<=x^18b'. This verifies the actual ceiling, not only its unrounded
+argument.
+
+For x>=max(500,C_s), the left side of the last NumII inequality is bounded by
+  x*(x^6)^3*x^2*x^3*E * (9x^18b') *x^26
+   =9x^68 E b'<=x^69 E b'.                                 (GII6.3)
+Here the bracket is the literal
+  8(D_II+1)+rNc0+2rn'c.
+It is <=8x^18b'+8+7x^4b'<=9x^18b', since 15x^4b'<=x^18b'.
+All factors are nonnegative. The source's polynomial exponents18 and69
+are thus reproduced explicitly.
+
+Because 7epsilon/48<epsilon/3, enlarge the threshold so that
+  140log x<=x^(epsilon/3), 10x^(7epsilon/48)<=x^(epsilon/3).
+Then 70log x+5z<=x^(epsilon/3), or x^70E<=X'. Since E>=1 and x>=2,
+  x^69E+1<=x^70E<=X'.
+Multiplying by b' and using c<=b' yields
+  x^69Eb'<=a-b'<=a-c.                                      (GII6.4)
+Combining (GII6.3–4) gives exactly
+  C_s k^3r^2NQ^5[8(D_II+1)+rNc0+2rn'c]x^26<=a-c.
+This closes NumII. The proof uses only a finite list of explicit power/log
+comparisons; it does not hide the Q^5 term in an unsupported big-O statement.
+
+7. ACTUAL HYP II AT AND THE FAMILY QUANTIFIERS [GII7]
+
+Fix epsilon,zeta>0, tuple C>=0. Choose C31=Ce(epsilon), then choose one
+threshold large enough for sections 4–6, x>=24, 7x^(-2)<=1 and
+x^(zeta/5)>=13. For every matching D,L,X with SizesAt, Lambda=LaG and
+rho<=x^(-2), consider Cand(D,L,C,p), p<p0 and t0 in goodReps(X,p).
+By definition p is prime and inert, n'=ord(h_p)>=x^(epsilon/4), and
+T=topsPos is a good orbit. Sections 2–4 give
+  2L1<=L2<u, 3G<=n', N<=Nplus,
+the literal weight windows and shifted inequalities, p>=13 and r>=2.
+Since n' divides the finite ambient group order n, n'<=n; also N<=n'.
+The lower count in (GII2.3) now supplies (GII5.1), so every field of NumII
+holds. Reading the definition shows this is ALL of HypIIAt, with no further
+arithmetic or local-lattice premise.
+
+For an actual FamP epsilon with C_N>=Ce(epsilon), take zeta=epsilon/Fm.J.
+All constants are fixed before x and i. GII3 gives rho<=rhoB<=x^(-2).
+FamP.sizes gives SizesAt, and FamP.fills gives Lambda=LaG. The latter is
+independent of the place: one may evaluate fills at any finite place;
+there is one above 2 by the elementary lying-over property for number fields.
+Increasing the threshold beyond Fm.x1+1 thus proves
+  exists x0, forall x>=x0, forall i in Fm.Ix(x),
+      HypIIAt(Fm.D(x,i),Fm.L(x,i),Fm.Gx(x,i),Fm.GK).            (GII7.1)
+No prime, member, or orbit is fixed before selecting x0. The threshold may
+depend on the fixed family constants, epsilon and J. Empty Ix(x), empty
+candidate sets and empty goodReps make the corresponding universals vacuous;
+they do not invalidate this proof or establish abundance by themselves.
+
+8. LOCAL TYPE II TO THE ACTUAL GLOBAL EXPONENTS [GII8]
+
+Let C>=4129 be an allowed local Type-II constant (EA9 with CP8/OR8), and
+assume each of C_k,C_t,C_La,C_D,C_s,C_k' is at least C. Also require c>=0
+and a-c>=1, as supplied by section 4 in the actual large-scale application.
+Fix any data covered by the literal AuxBlock8.adm6 premises. Use the local theorem at
+  m=k-1, a0=a-c, Y=x^26, cpp=floor c,
+  c0int=floor c0, Dp=D_II, cStar=8(D_II+1).                   (GII8.1)
+The setting is exactly the same UnramifiedQuadraticSetting; rank is
+m+1=k. Goodness plus 2L1<=L2<u and 3G<=n' is the exact OrbitHyp.
+The supplied shifted weight clauses, proved for actual weights in section 4,
+give WeightHyp including the floor of c0. The rank inequalities
+are N1^2<=rN, N1+3r<=k and C N1^2 log a0<=C_k' N1^2 log a<=k.
+Multiplying the two power bounds from NumII gives the local256 inequality.
+
+The denominator comparison is
+  C N k^2 log_p a0
+   <= C_D Nplus(N1^3+r^5+k^2)log_p a<=D_II.
+The source's two extra nonnegative terms in D_II only increase its budget.
+Floors decrease cpp and c0int, while C<=C_s, so the last NumII inequality
+gives the exact local size condition. Its error-depth condition is an
+identity 8(Dp+1)=cStar.
+
+The local height is no larger than t_II because
+  C N1^2 log a0<=Lambda, a0<=a, cpp<=c, c0int<=c0, C<=C_t,
+and all terms are nonnegative; p^(-L1) has the same meaning whether the
+integer or real exponent notation is used. Hence the integer ceil(t_II)
+is admissible. Its local loss C N r^2k/Y is at most the global untruncated
+loss C_k N r^2k x^(-26). Truncation by min(1,.) preserves LPprime: below 1
+it changes nothing; at or above 1 the required rank lower bound is nonpositive
+and the empty witness works. Monotonicity in loss therefore gives EXACTLY
+  LPprime(p,n',...,r,lam0,ceil(t_II),D_II,kappa_II,cStar).
+This proves type_two_hypothesis_of_counts and actual adm6, with no
+normalization change. It is a supplied-standard-coefficient-setting result;
+finite extension to the actual place is the separate BC/GJ argument.
+
+9. CONDITIONAL GOOD-ORBIT PROBABILITY, NOT JUST WITHIN-ORBIT COUNTS [GII9]
+
+Select every point of a finite ambient group H independently with probability
+delta. Fix a step of order n'>=x^(epsilon/4) and a point t, and CONDITION on
+t being selected. Its orbit coordinates are independent Bernoulli(delta)
+except for one forced index i0. This is the exact finite conditional measure
+condProbAt: a subset S containing i0 has weight
+delta^(|S|-1)(1-delta)^(n'-|S|). Summing over points outside this orbit
+contributes 1, because each independent outside factor is delta+(1-delta).
+Thus the unconditioned event {t selected and orbit bad} has probability
+delta times this conditional bad probability. The injective orbit map is
+(GII3.1); no representative is declared uniformly random.
+
+Assume delta<=1/10, L2<=Lb, n'<=n<=x^(h+epsilon/8), and 3G<=n'. We claim
+  Pr(bad orbit | t selected)<=Cb x^(-2),
+  Cb=(Lb+1)2^Lb+2.                                          (GII9.1)
+For the actual family use the fixed Lb=2ceil(620/zeta) from (GII4.4).
+
+Short windows. At most L2 starting positions yield an L2-window containing
+i0: the starting point is determined by its offset 0,...,L2-1. Failure of A
+means at least K0+1 selected points. A window containing i0 must then contain
+a selected K0-subset of unforced points; a window not containing it must
+contain a selected (K0+1)-subset. A union bound gives
+  L2 binom(L2,K0)delta^K0
+    +n' binom(L2,K0+1)delta^(K0+1).                           (GII9.2)
+Since delta^K0<=x^(-(h+2)), and binom(L2,j)<=2^Lb, these two terms are at
+most Lb2^Lb x^(-2) and 2^Lb x^(-2), respectively. Keeping the extra delta
+in the second term is essential: it cancels the epsilon/8 in the ambient
+upper bound. A crude n' binom(L2,K0)delta^K0 would lose that margin.
+
+Marked tiles. Write u=ceil(1/delta). The integral inequality
+log(1-delta)>=-delta/(1-delta) gives
+  (1-delta)^u>=exp(-(1+delta)/(1-delta))>=1/4.
+The last step uses delta<=1/10 and e^(4/3)<4. Also
+floor(u/2)delta>=(1-delta)/2>=9/20. A cell is empty with probability at
+least 1/4. Its event of exactly one selected even point has probability at
+least floor(u/2)delta(1-delta)^(u-1)>=9/80>1/10. Complete cells are disjoint,
+so a tile is marked with probability at least P0=10^(-(6r+1)).
+
+For each starting tile, its M+1 cyclic tiles are distinct because
+floor(n'/ell)>=M+1. At most one contains the forced point i0. Discard it;
+at least M unaffected disjoint tiles remain. Their marking events are
+independent under the conditioning. Therefore failure of Tiles has probability
+at most n'(1-P0)^M<=n'exp(-P0M)<=n'x^(-(h+3))<=x^(-2).
+The remainder interval causes no difficulty: if i0 lies there, no tile is
+affected. The parity of the interval start only improves the lower bound
+floor(u/2) on the number of even points in a cell.
+
+Long windows. Put B=N1-1=ceil(max(6eGdelta,(h+3)log_2x)). After conditioning,
+each G-window has at most one forced point. Failure of I is dominated by
+the event that at leastB points are selected in G independent trials. For
+B>0 its probability is at most
+  binom(G,B)delta^B<=(eGdelta/B)^B<=2^(-B)<=x^(-(h+3)).
+The first bound is the union bound over selected B-subsets; the factorial
+bound B!>=(B/e)^B follows, for example, by integrating log on [1,B]. If B>G
+the event is empty. As B>=6eGdelta>0, these cases cover every possibility.
+A union bound over n' windows gives at most x^(-2). Adding the four estimates
+proves (GII9.1), hence the exact BadProb(X,Cb).
+
+With epsilon,zeta fixed, section 4 gives Lb uniformly. SizeN implies the
+ambient upper bound because epsilon/100<=epsilon/8. Section 2 gives 3G<=n'
+eventually, and delta<=1/10 once x>=10^(8/epsilon). This proves
+FamilyBadPrimeBound, with Cb fixed before x, the family member, step and point.
+The argument applies to EVERY step of sufficiently large order, not only
+the Frobenius steps used later. It is a probability bound, not an assertion
+that the supplied host subset already has that distribution.
+
+10. A SUITABLE SUBSET EXISTS, WITH THE ACTUAL WEIGHTED MASS [GII10]
+
+Here is a direct proof of the exact finite selection statement Conclusion6.
+Let mu=delta|H|>=16 and let T be the Bernoulli subset. Then
+E|T|=mu and Var|T|=|H|delta(1-delta)<=mu. Chebyshev gives
+  Pr(||T|-mu|>=mu/2)<=4/mu<=1/4.
+Thus with probability at least 3/4, mu/2<=|T|<=2mu.
+
+For a finite set P of steps with nonnegative weights omega_p, let
+Z(T)=sum_p omega_p |{t in T: BAD(h_p,t,T)}|.
+If each pointwise unconditioned probability is at most beta delta, linearity
+of expectation gives E Z<=B:=beta mu sum_p omega_p. Nonnegativity of Z
+forces B>=0. If B>0, Markov gives Pr(Z>4B)<=1/4; if B=0 then Z=0 almost surely.
+The size and cost events therefore intersect with positive probability,
+giving a subset with
+  mu/2<=|T|<=2mu, Z(T)<=4beta mu sum_p omega_p.                (GII10.1)
+This even works without the source's extra orbit-locality premise for BAD;
+we do not need to change that premise in order to prove its Conclusion6.
+
+Apply (GII10.1) with beta=Cb x^(-2), BAD=BadOrb, h_p=hP(D,p), and
+omega_p=log p/p over the literal largeOrderResiduePrimes (p<X'). This is
+the exact existential TopsOK. It includes the zero-weight/empty-prime-set
+case without dividing by the total prime weight.
+
+An elementary factorial bound supplies the precise Mertens input. For y>=1
+and n=floor y>=1, every prime p<y satisfies p<=n. Since
+floor(n/p)>=n/(2p) and sum_{p<=n}floor(n/p)logp<=log(n!)<=nlogn,
+  sum_{p<y}log p/p<=2logn<=2logy.                             (GII10.2)
+The case n=1 is empty. The factorial inequality follows because the exponent
+of p in n! is at least floor(n/p). No prime number theorem is used.
+At y=X' this gives S:=sum_P log p/p<=2x^(epsilon/3).
+
+Since |T|>=mu/2, its weighted bad mass obeys
+  Z(T)<=8Cb |T| x^(-2)S
+       <=16Cb |T| x^(-2+epsilon/3)
+       <=|T|x^(-2+epsilon)                                  (GII10.3)
+once 16Cb<=x^(2epsilon/3). Also SizeN implies mu>=x^2, so the condition
+mu>=16 holds uniformly for x>=4. Thus there is one subset of the right
+density whose bad-orbit mass is small SIMULTANEOUSLY over all the indicated
+primes. This is genuine quantitative abundance, separate from GII1–GII2.
+
+If this selected subset is the actual D.host.TT, the orbit identification
+stepP=hP for inert primes and the equality of the two finite prime sets
+make (GII10.1) literally J.TopsOK and (GII10.3) literally AuxBlock8.adm2.
+Equivalently, supplied ChosenTT and ChosenBad with one fixed Cb yield this
+actual family conclusion after enlarging the threshold. This is an
+implication; no arbitrary host is silently replaced.
+
+11. THE REMAINING HOST-CHOICE JOIN AND OTHER BOUNDARIES
+
+The deterministic uniform Type-II supply GII7 and the conditional local-to-
+global exponent comparison GII8 are complete under the literal records.
+They require no probability assumption on the host. GII9–GII10 prove
+existence of a useful selected subset, but assembling that same subset into
+the arithmetic host and then into a FamP remains a distinct join.
+
+Precise upstream source targets are:
+  Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/
+    BadCharacterBound.lean: badOK_iff_badOfBase,
+    chBad_iff_badOfBase,badOfBase_of_host,chBad_of_from;
+  Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/
+    SzRowNumAt.lean: the NumAt/ChTT_at transport;
+  Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/
+    BandWidthLeInvSqOfRankBounds.lean: actual numeric/host count interface;
+  Development/AutomorphicArithmetic/CharacterBoxes/DesignS.lean:
+    the construction giving ChosenTT and ChosenBad from kits.
+The first file shows exactly what must be preserved: rank equality,
+the subset's residue-value image, q,d and prime classification, every
+Frobenius step's residue value, and the canonical representative map bsH.
+Its premises p.From H..., CanonInst and BadOK are not proved merely by
+observing that our finite probability argument exists.
+
+Other separate tasks remain the actual standard coefficient subring and
+finite base change (BC), assembly into joint orbit lattices (GJ), the Type-I
+branch (GI), common global degree choices, and the pre-existing global
+theta/metric/cohomological/prime-window arguments. No claim in this component
+asserts that these are automatic.
+
+12. SOURCE COMPARISON AND VALIDATION POLICY
+
+Original source arguments used directly: the exact scale/ceil definitions;
+conditional splitting of short windows into those containing the forced
+point and all others; the unchanged depth18/size69 budgets; literal
+HypIIAt and aux_3 parameter substitutions; and full family quantifier order.
+
+Explicit human simplifications: cyclic double counting strengthens the
+upper top count; periodic marked starts replace a modular case split;
+the exponential-versus-polynomial comparison is proved once; the factorial
+Mertens estimate and Chebyshev/Markov argument directly prove their exact
+interfaces. All retained downstream constants stay at the source values.
+
+build_provenance.py records exact declaration ranges, complete-file SHA256,
+range SHA256, first-line anchors and pinned URLs. It checks each file against
+its pinned git blob and does not modify or execute Lean. Claim dependencies
+are stable reconstruction IDs. A retained input is listed as such rather
+than hidden behind a source theorem that has not been reconstructed.

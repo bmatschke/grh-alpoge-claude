@@ -1,0 +1,1349 @@
+% Version 0.26.  Complete weighted intersection suppliers and the paired-count cut.
+\section{Weighted intersection lengths and the symplectic paired-count frontier}
+\label{sec:symplectic-count-closure}
+
+\status{SP1 proves the literal \texttt{LemmaM'}.  SP2--SP6 prove the
+literal \texttt{LemmaM}, including its finite orbit cover and its factor
+$2$, by a three-variable Rees calculation.  These are complete algebra
+suppliers for both the rank-three and rank-four routes.  The later
+statements separate the finite trace-product arithmetic and coefficient
+return from the still unproved construction and identification of the
+symplectic deformation model.  Neither generic automorphy nor a package
+named \texttt{HypothesesH'} is accepted as a classical citation leaf.}
+
+\subsection{The cotangent lattice and the additive-injection lemma}
+
+Let $O$ be a discrete valuation ring, with uniformizer $\pi$, and let
+$x:A\to O$ be an $O$-algebra augmentation.  Put
+\[
+ \mathfrak a=\ker x,\qquad
+ \mathfrak a^{(2)}=\{f\in A:\ cf\in\mathfrak a^2
+                         \text{ for some }0\ne c\in O\}.
+ \tag{SP.1}
+\]
+For a grading $A=\bigoplus_{j\in X}A_j$, define
+\[
+ C_j=\operatorname{im}(A_j\cap\mathfrak a\longrightarrow
+                          A/\mathfrak a^{(2)}),\qquad
+ C_j(F)=C_j/\langle\overline F_i\rangle_O
+ \quad(F_i\in A_j\cap\mathfrak a).
+ \tag{SP.2}
+\]
+Thus $C_j$ and $\ell_O C_j(F)$ are exactly \texttt{cotLat} and
+\texttt{cotLen}.  Length is allowed to be $\infty$.
+The source's \texttt{SpansCot} means that the $F_i$ span $C_j$ after
+inverting $\pi$; it does not mean that they span the integral lattice.
+
+\begin{proposition}[SP1: the literal \texttt{LemmaM'}]
+\label{claim:SP1}
+Suppose the residue field of $O$ is finite, $X$ is any abelian grading
+group, $x(A_j)=0$, and $0\ne c\in O$.  Let $M$ be an $O$-module and
+let
+\[
+ D:M\longrightarrow\operatorname{Hom}_O(A,O/(c))
+ \tag{SP.3}
+\]
+be an injective additive map.  Suppose $D\mu(F_i)=0$ for every $\mu,i$,
+and every $D\mu$ is the reduction of an $O$-valued derivation at $x$
+which vanishes on all weights other than $j$.  Then
+\[
+                    \ell_O M\le\ell_O C_j(F).
+ \tag{SP.4}
+\]
+No $O$-linearity of the assignment $\mu\mapsto D\mu$ is assumed.
+\end{proposition}
+
+\begin{proof}
+An $O$-valued derivation $\delta$ at $x$ kills $\mathfrak a^2$ by the
+Leibniz rule.  If $cf\in\mathfrak a^2$ and $c\ne0$, then
+$c\delta(f)=0$ in the domain $O$, so it also kills
+$\mathfrak a^{(2)}$.  Restricting the reductions to $A_j$ therefore
+gives an additive map
+\[
+ M\longrightarrow\operatorname{Hom}_O(C_j(F),O/(c)).
+ \tag{SP.5}
+\]
+It is injective: equality on $A_j$ implies equality on every homogeneous
+component, because both maps vanish on the other components; every
+element of $A$ is a finite sum of homogeneous elements.  Injectivity
+of (SP.3) then identifies the two elements of $M$.
+
+If $C_j(F)$ has infinite length, (SP.4) is immediate.  Otherwise the
+structure theorem over a DVR gives
+$C_j(F)\simeq\bigoplus_iO/(\pi^{a_i})$.  Writing $b=v_O(c)$, the
+target of (SP.5) has length $\sum_i\min(a_i,b)\le\sum_i a_i$ and
+cardinality $q^{\sum_i\min(a_i,b)}$, where $q=|O/\pi|>1$.
+The additive injection makes $M$ finite.  Every finite $O$-module has
+cardinality $q^{\ell_O M}$, so comparison of cardinalities proves
+(SP.4).  This also explains the finite-residue-field hypothesis in the
+source: an additive injection alone is what is available.
+\end{proof}
+
+\subsection{The exact weighted intersection problem}
+
+For SP2--SP6, $O$ is a complete DVR of characteristic zero,
+$E=\operatorname{Frac}(O)$, and $K$ is an algebraically closed field
+with a faithful $O$-algebra structure.  A valuation
+$v:K^\times\to\mathbb R$ is normalized by $v(\pi)=1$ and
+$v(c)=v_O(c)$ for $c\in O\setminus\{0\}$; these are exactly the
+nonzero-input clauses of \texttt{IsNVal}.  Let
+$A=\bigoplus_{j\in\mathbb Z}A_j$, $B=A_0$, where $B$ is complete
+Noetherian local, $O\to B$ is local, and the induced residue-field map
+is an isomorphism.  The last three conditions are \texttt{IsCO O B}.
+Assume that $A$ is generated over $B$ by finitely many elements of
+weights $-2,-1,1,2$, and that $x(A_j)=0$ for $j\ne0$.
+These are precisely the remaining clauses of \texttt{IsWRing}.
+
+Fix integers $r\ge1$, $s,r',s',m\ge0$ and equations
+\[
+\begin{array}{c|ccccc}
+ \text{equations}&F_0,\ldots,F_r&G_1,\ldots,G_s&E_1,\ldots,E_{r'}
+       &E'_1,\ldots,E'_{s'}&Z_1,\ldots,Z_m\\
+ \text{weights}&-1&-2&1&2&0 .
+\end{array}
+ \tag{SP.6}
+\]
+All $x(Z_i)$ vanish, and $I=(F,G,E,E',Z)$.  Write $S(K)$ for the
+$O$-algebra maps $\xi:A/I\to K$.  Such a point is \emph{two-sided}
+if it is nonzero on some negative and on some positive weight.
+The action is $(t\xi)(f_j)=t^j\xi(f_j)$.
+
+We use the following exact five hypotheses, with their source names
+recorded to make the endpoint checkable.
+\begin{enumerate}
+\item[(M1)] There is a weight-preserving formal chart
+$\phi:A\to E[[z_i]]$ with constant term $x$, whose linear coordinate
+functionals are independently realized by elements of $A$.  Their
+common kernel on $\ker x$ is $\mathfrak a^{(2)}$.  The numbers of
+coordinates of weights $-1,-2,1,2,0$ are respectively
+$r,s,r'+1,s'+1,m$, and there are no other weights.  The equations
+$F,G,Z$ span $C_{-1},C_{-2},C_0$ rationally.
+\item[(M2)] The image of $B$ in $A/I$ is a finite $O$-module.
+\item[(M3)] Over any fixed point $x_1\ne x$ of $S(K)$, the fibre of
+restriction to $B$ cannot contain both a nontrivial point supported
+only in nonnegative weights and a nontrivial point supported only in
+nonpositive weights.
+\item[(M4)] At every two-sided point of $S(K)$, any two $K$-valued
+point derivations annihilating $I$ are linearly dependent.
+\item[(M5)] The chosen $a\in B$ has $x(a)=0$ and $\xi(a)\ne0$ at
+every two-sided point of $S(K)$.
+\end{enumerate}
+The statement called \texttt{LemmaM} is that there is a finite set
+$T$ consisting entirely of two-sided points of $S(K)$ and covering
+all their orbits, that
+$\ell_OC_{-1}(F)<\infty$, and, for \emph{every} such cover,
+\[
+                    \ell_OC_{-1}(F)\le2\sum_{\xi\in T}v(\xi(a)).
+ \tag{SP.7}
+\]
+A cover may contain more than one representative of an orbit.
+
+We record two elementary finiteness observations used below.  Each
+$A_j$ is a finite $B$-module: in a monomial in the chosen generators,
+remove submonomials of total weight zero; a remaining monomial of
+fixed weight has bounded length, since the only nonzero generator
+weights are $\pm1,\pm2$.  The same grouping, separating a pair of
+weight-one factors or one weight-two factor, gives
+\[
+                       A_{2n}=A_2^n,\qquad A_{-2n}=A_{-2}^n
+                       \quad(n\ge0),
+ \tag{SP.8}
+\]
+where products are products of $B$-submodules of $A$.
+For example, a mixed monomial is reduced by removing opposite pairs
+or triples $(2,-1,-1)$ and $(-2,1,1)$; an even one-sided remainder
+partitions into blocks of weight $2$ or $-2$.
+Also $B$ acts on every $C_j$ through $x:B\to O$, since
+$(b-x(b))f\in\mathfrak a^2$ for $f\in\ker x$.  Thus $C_{-1}$ is
+finite over $O$, torsion free by (SP.1), and has rank $r$ by the
+injective and surjective linear-term clauses of the chart.
+
+\begin{lemma}[SP2: the multigraded Euler calculation]
+\label{claim:SP2}
+Let $R$ be a Noetherian $\mathbb N^k$-graded $B$-algebra with
+$R_0=B$, generated by finite $B$-modules in degrees
+$\mathbf e_1,\ldots,\mathbf e_k$, and put
+$R_{++}=\prod_i(R_{\mathbf e_i})R$.  Let $M$ be a finite graded
+$R$-module, and let $\mathbf t=(t_1,\ldots,t_h)$ be homogeneous
+sections of nonnegative multidegrees.  Suppose
+\[
+        (\mathfrak m_BR_{++})^N
+                  \subset\operatorname{Ann}_R(M)+(\mathbf t)
+                  \quad\text{for some }N.
+ \tag{SP.9}
+\]
+For all sufficiently large multidegrees $d$, the Koszul homology
+pieces have finite $B$-length.  Their alternating sum
+$\chi(\mathbf t;M)_d$ is additive in graded exact sequences,
+unchanged by permutation of the sections, and nonnegative.  It is
+monotone under a graded quotient, and
+\[
+ \chi(\mathbf t,\mathbf u;M)_d
+                 \le\chi(\mathbf u;M/(\mathbf t)M)_d.
+ \tag{SP.10}
+\]
+Suppose in addition that $\pi$ is injective on $M$, that $B$ acts on
+$M/\pi M$ through its residue field, and that $y_1,\ldots,y_n$ all
+have degree $\alpha$.  If the section list
+$(\pi^{b_i}y_i)_i,\mathbf u$ satisfies (SP.9), then
+\[
+ \chi((\pi^{b_i}y_i)_i,\mathbf u;M)_d
+ \ \ge\ \Big(\sum_i b_i\Big)
+       \Delta_\alpha^{n-1}\prod_{u\in\mathbf u}\Delta_{\deg u}
+                  \ell_B(M/\pi M)_d .
+ \tag{SP.11}
+\]
+Here $\Delta_\beta h(d)=h(d)-h(d-\beta)$ and every assertion is
+eventual in \emph{all} coordinates of $d$.
+\end{lemma}
+
+\begin{proof}
+Every Koszul homology module is finite graded and is annihilated by
+$\operatorname{Ann}(M)+(\mathbf t)$.  If its homogeneous generators
+have degrees $d_i$, then, once every coordinate of $d$ exceeds those
+of the $d_i$ by $N$, its degree-$d$ part is generated using
+$R_{++}^N$.  Consequently $\mathfrak m_B^N$ kills that part.  It is
+finite over $B$, hence has finite length.  Exact-sequence additivity
+follows from the homology long exact sequence.  Permuting a Koszul
+basis proves invariance under permutations.
+
+For completeness, positivity here does not invoke an unspecified
+intersection-multiplicity theorem.  A finite graded module has a
+finite filtration with factors $(R/\mathfrak p)(-b)$ for homogeneous
+prime ideals $\mathfrak p$.  Indeed, choose a nonzero homogeneous
+element with maximal annihilator; its annihilator is homogeneous
+prime, and iterate in the quotient.  Homogeneous primality implies
+primality by comparing highest terms in a translation-invariant
+ordering of $\mathbb Z^k$; Noetherianity makes the iteration finite.
+Additivity reduces positivity to a factor $R/\mathfrak p$.
+If $R_{++}\subset\mathfrak p$, its large graded pieces vanish.
+Otherwise there is a section outside $\mathfrak p$ of every
+nonnegative multidegree: multiply suitable sections of degrees
+$\mathbf e_i$ outside $\mathfrak p$.
+
+Induct on the number of sections.  If the first section $t$ is
+nonzero in $R/\mathfrak p$, it is a nonzerodivisor, and its Koszul
+complex reduces to the quotient by $t$; apply the induction
+hypothesis to the remaining list.  If $t=0$ there, its Euler
+contribution is the difference between the Euler functions of
+$R/\mathfrak p$ and its shift by $\deg t$.  Choose a section $s$ of
+that degree outside $\mathfrak p$.  The exact sequence for
+multiplication by $s$ identifies this difference with the Euler
+function on $(R/\mathfrak p)/s$.  The remaining list is admissible
+because $t$ was already zero.  Induction again gives nonnegativity.
+The case of an empty list is simply a length.  This proves
+positivity without an infinite-residue-field assumption.
+
+Monotonicity follows from additivity and positivity on the kernel.
+The recursion
+\[
+ \chi(t,\mathbf u;M)_d=
+ \chi(\mathbf u;M/tM)_d-
+ \chi(\mathbf u;M[t](-\deg t))_d
+ \tag{SP.12}
+\]
+and positivity give (SP.10), one section at a time.
+
+Finally the kernel--cokernel exact sequence for a product of two
+endomorphisms, or the equivalent two mapping cones, gives
+\[
+ \chi(\pi^b y,\mathbf u;M)
+       =b\,\chi(\pi,\mathbf u;M)+\chi(y,\mathbf u;M).
+ \tag{SP.13}
+\]
+There is no grading shift in the first term because $\pi$ has degree
+zero.  Injectivity of $\pi$ identifies that term with
+$\chi(\mathbf u;M/\pi M)$; its graded terms have finite length, so
+Euler--Poincar\'e identifies it with the indicated iterated difference
+of their lengths.  Peel the factors $\pi^{b_i}$ successively,
+permuting each $y_i$ to the end of the list after it is peeled.  The
+degrees of the other $n-1$ sections remain $\alpha$.  Each contributes
+$b_i$ times the same difference in (SP.11); the residual Euler
+function is nonnegative.  Replacing a section by its divisor only
+enlarges the section ideal, so admissibility holds at every step.
+\end{proof}
+
+\subsection{The Rees support argument and the two-sided fibres}
+
+By Smith normal form, change the $F_i$ by an invertible $O$-linear
+change of their $r+1$ generators, without changing their ideal or
+their cotangent span, so that
+\[
+ F_i\equiv\pi^{c_i}y_i\pmod{\mathfrak a^{(2)}}\quad(0\le i<r),
+ \qquad H:=F_r\in\mathfrak a^{(2)},\qquad
+ \ell_OC_{-1}(F)=\sum_{i<r}c_i .
+ \tag{SP.14}
+\]
+Here the classes of $y_i\in A_{-1}$ form an $O$-basis of $C_{-1}$.
+The extra generator is obtained from the rank-one kernel of the map
+$O^{r+1}\to\langle\overline F_i\rangle_O$; the target is free and
+the map splits.  In particular this change really preserves the
+integral span of the equations.
+
+Introduce three finite $B$-submodules of $A$ and their multigraded
+Rees algebra:
+\[
+ \begin{gathered}
+ N_0=A_{-2},\quad N_1=A_2,\quad
+ N_2=BH^2+A_{-2}^2A_2\subset A_{-2},\\
+ R=\bigoplus_{d\in\mathbb N^3}L_dT^d\subset A[T_0,T_1,T_2],
+ \qquad L_d=N_0^{d_0}N_1^{d_1}N_2^{d_2}.
+ \end{gathered}
+ \tag{SP.15}
+\]
+The section list is
+\[
+ \mathbf t=(F_i^2T_0)_{i<r},\ (G_iT_0)_i,\
+                  (E_i^2T_1)_i,\ (E'_iT_1)_i,\ H^2T_2.
+ \tag{SP.16}
+\]
+Put $D_0=(A_{-2}A_2)B\subset B$ and $I_0=I\cap B$.
+
+\begin{lemma}[SP3: support and admissibility on this Rees algebra]
+\label{claim:SP3}
+Assume (M2), (M3), and rational spanning by $F$ and $G$.
+Let $J'$ be any homogeneous ideal of $R$ containing $\mathbf t$
+and the $Z_i$.  For all sufficiently large $d$,
+$M_d=(R/J')_d$ is a finite $O$-module.  Every nonzero generic
+localization of $M_d$ is at a prime
+$\mathfrak p=\ker(\sigma:B\to K)$ with
+\[
+                     I_0\subset\mathfrak p,
+                     \qquad D_0\not\subset\mathfrak p.
+ \tag{SP.17}
+\]
+Such a $\sigma$ is the restriction of a two-sided point of $S(K)$.
+If also (M5) holds, then for every homogeneous ideal $J\subset R$ containing
+the $Z_i$, the list $(\mathbf t,a)$ satisfies (SP.9) on $R/J$.
+\end{lemma}
+
+\begin{proof}
+We give the prime argument, including the use of (M3).  Let $P$ be a
+prime of $R$ containing $\mathbf t,Z$ but not $R_{++}$.  Choose
+$f\in N_0$, $g\in N_1$, $h\in N_2$ such that
+$fT_0,gT_1,hT_2\notin P$.  The relation
+\[
+             (H^2T_0)(hT_2)=(hT_0)(H^2T_2)
+ \tag{SP.18}
+\]
+shows that $H^2T_0\in P$, so all $F_i^2T_0$ belong to $P$.
+Let $u=(fT_0)(gT_1)\notin P$.  If $cF_i$ has weight zero, then
+\[
+              (cF_i)^2u=(F_i^2T_0)(c^2fgT_1)\in P.
+\]
+For $cG_i$ use $(cG_i)u=(G_iT_0)(cfgT_1)$; the analogous identities
+for $E_i^2T_1$ and $E'_iT_1$ interchange the two variables.  Terms
+involving $Z_i$ already lie in $P$.  Taking weight-zero components
+in an expression for $b\in I$ now shows $I_0\subset P\cap B$.
+
+By (M2), $B/I_0$ is finite over $O$.  Its primes are either the
+closed prime $\mathfrak m_B$ or horizontal primes whose residue
+fraction fields are finite over $E$.  In the latter case choose an
+embedding into $K$, obtaining $\sigma:B\to K$ with
+$\ker\sigma=P\cap B$.  We show that $D_0\subset\ker\sigma$ is
+impossible.
+
+Here is an explicit construction of the two forbidden one-sided
+points.  For $\epsilon\in\{-1,1\}$ use the Rees direction $T_0$
+or $T_1$, respectively, and set
+\[
+ \iota_n(b)=\operatorname{pr}_{2\epsilon n}(b)T_\epsilon^n,
+ \qquad
+ J_\epsilon=\{b\in A:\ \iota_n(cb)\in P
+                         \text{ for all }c\in A,n\ge0\}.
+ \tag{SP.19}
+\]
+The notation $T_{-1}=T_0$, $T_1=T_1$ is used only in (SP.19).
+By (SP.8), every displayed monomial lies in $R$.
+The set $J_\epsilon$ is an ideal.  Choose $q\in A_{2\epsilon}$
+with $qT_\epsilon\notin P$.  For homogeneous elements the identities
+\[
+ \iota_{n+n'}(bc)=\iota_n(b)\iota_{n'}(c),\qquad
+ \iota_{2n}(b^2)=\iota_n(b)^2
+ \tag{SP.20}
+\]
+give the following facts by primality: $b^2\in J_\epsilon$ implies
+$b\in J_\epsilon$; $qb\in J_\epsilon$ implies
+$b\in J_\epsilon$; and $bT_\epsilon\in P$ for
+$b\in A_{2\epsilon}$ implies $b\in J_\epsilon$.
+To verify the last assertion for a test factor of weight
+$2\epsilon n-2\epsilon$, multiply it by $q$ and cancel
+$qT_\epsilon$ in (SP.20).  Likewise
+$P\cap B\subset J_\epsilon$ and
+$bq^n\notin J_\epsilon$ if $b\notin P\cap B$.
+Arbitrary test factors reduce to homogeneous ones by their finite
+weight decomposition.
+
+If $D_0\subset\ker\sigma$, then $qA_{-2\epsilon}$ lies in
+$P\cap B$, so cancellation puts $A_{-2\epsilon}$ in
+$J_\epsilon$.  Squaring and (SP.8) put every weight of the opposite
+sign in that ideal.  The section equations in the chosen direction
+put the equations of the same sign in it, using squares for weight
+$\epsilon$; (SP.18) includes the last $F$.  Thus
+$I\subset J_\epsilon$.
+The ideal $J_\epsilon$ is disjoint from the multiplicative set
+$\{bq^n:\sigma(b)\ne0\}$.  Put
+$L=\operatorname{Frac}(B/\ker\sigma)$.
+The algebra $((A/J_\epsilon)\otimes_B L)[1/q]$ is a nonzero
+finite-type $L$-algebra: disjointness proves nonvanishing, and the
+finite generation of $A$ over $B$ proves finite type.
+Faithfully flat extension from $L$ to $K$ preserves both properties.
+The Nullstellensatz applied to that algebra produces a point
+$\xi_\epsilon$ over $\sigma$
+annihilating $I$ and all weights of the opposite sign, with
+$\xi_\epsilon(q)\ne0$.
+
+There is also a fixed point over $\sigma$, namely
+$\xi_0(b)=\sigma(\operatorname{pr}_0b)$.  It is multiplicative:
+the square of a product of opposite nonzero weights is a product of
+elements of $A_{-2}A_2$ by (SP.8), so its value under $\sigma$ is
+zero.  The equations of nonzero weight and the $Z_i$ vanish at
+$\xi_0$.  If $\xi_0\ne x$, the two constructed points contradict
+(M3).  If $\xi_0=x$, use the negative point.  The functional
+$b\mapsto\xi_{-1}(\operatorname{pr}_{-1}b)$ kills
+$\mathfrak a^2$: in a product of two augmentation-zero homogeneous
+elements of total weight $-1$, at least one has nonnegative weight
+and evaluates to zero.  It kills the saturation as well, since
+$O\to K$ is injective.  Rational spanning by $F$ forces its
+vanishing on $A_{-1}$.  For total weight $-2$, the only additional
+case is a product of two weight-$-1$ elements; it now also vanishes.
+Rational spanning by $G$ forces vanishing on $A_{-2}$, and (SP.8)
+forces vanishing on all negative weights.  This contradicts the
+choice of $\xi_{-1}$.  We have proved that a relevant $P$ containing
+$D_0$ must contain $\mathfrak m_B$.
+
+These prime statements imply, by Noetherianity, power containments
+\[
+ (I_0R\,R_{++})^b\subset J',\qquad
+ (\mathfrak m_BR\,R_{++})^{b'}\subset J'+D_0R
+ \tag{SP.21}
+\]
+for some $b,b'$.  In large multidegrees they give
+$I_0^bM_d=0$ and $\mathfrak m_B^{b'}M_d\subset D_0M_d$.
+The first makes $M_d$ finite over $O$: $B/I_0^b$ is finite over
+$O$, by its filtration with finite $B/I_0$-modules.  At a horizontal
+prime containing $D_0$, $\pi$ is a unit, so the second containment
+and Nakayama give $(M_d)_{\mathfrak p}=0$.  This proves (SP.17).
+
+If (SP.17) holds, the degree-zero part of
+$K\otimes_B(A/I)$ is $K$, so this finite-type $K$-algebra is
+nonzero.  A $K$-point furnished by the Nullstellensatz restricts to
+$\sigma$.  A mixed product in $D_0$ has nonzero value, hence this
+point is two-sided.  Finally, a relevant prime containing
+$J,\mathbf t,a$ and not $\mathfrak m_B$ would yield such a point
+with $\xi(a)=0$, contradicting (M5).  Therefore
+$\mathfrak m_BR\,R_{++}$ lies in the radical of $J+(\mathbf t,a)$;
+a power lies in that ideal, which is (SP.9).
+\end{proof}
+
+\begin{lemma}[SP4: finite orbit cover and generic multiplicity one]
+\label{claim:SP4}
+Assume (M2) and (M4).  The two-sided points of $S(K)$ have finitely
+many $K^\times$-orbits.  If $\sigma:B\to K$ and
+$D_0\not\subset\ker\sigma$, then every weight piece of $A/I$,
+localized at $\ker\sigma$, has $B_{\ker\sigma}$-length at most one.
+Replacing all the $F_i$ and $E_i$ by their squares raises this bound
+to at most $2^{r+1+r'}$.
+\end{lemma}
+
+\begin{proof}
+Choose $f\in A_{-2}$ and $g\in A_2$.  Over $E$, the slice
+\[
+                   C=(A/I)[1/(\pi g)]/(f-1)
+ \tag{SP.22}
+\]
+is a finite-type algebra.  A $K$-point of it is two-sided.  Its Euler
+derivation on $A$ is $\mathcal E(b_j)=j\xi(b_j)$ and has
+$\mathcal E(f)=-2$.  Any point derivation of $C$ kills $f$.
+By (M4) it is linearly dependent with $\mathcal E$; evaluating that
+dependence on $f$ forces the Euler coefficient to be zero and then
+forces the other derivation to vanish.  After base change to $K$,
+every closed point thus has zero cotangent space.  Nakayama makes
+its local ring a field.  Nullstellensatz then shows that this
+zero-dimensional reduced finite-type algebra is a finite product
+of copies of $K$.  Consequently $C$ is a finite \emph{\'etale}
+$E$-algebra.
+
+Finite $B$-generating sets of $A_{-2}$ and $A_2$ supply finitely many
+such pairs $(f,g)$.  Every two-sided point has both one of the $f$'s
+and one of the $g$'s nonzero, by (SP.8).  A square root in $K$
+normalizes $f$ to $1$ by the torus action.  The finite point sets of
+the slices (SP.22) therefore give a finite orbit cover.
+
+We also need the scheme multiplicity, not just the number of points.
+On $U=(A/I)[1/(\pi fg)]$, $f$ is a unit.  Adjoin $z$ with
+$z^2=f$.  There is an explicit isomorphism
+\[
+ U[z,z^{-1}]/(z^2-f)\ \simeq\ C[t,t^{-1}],
+ \qquad b_j\longmapsto\overline b_jt^{-j},\quad z\longmapsto t.
+ \tag{SP.23}
+\]
+Its inverse sends $\overline b_j$ to $b_jz^j$.
+The left algebra is faithfully flat over $U$ (indeed finite free of
+rank two), and the right algebra is reduced.  Thus $U$ is reduced.
+This proves the required local reducedness directly, without
+assuming that a finite orbit set was already a reduced scheme.
+
+Let $\mathfrak p=\ker\sigma$.  If the localized quotient is zero
+there is nothing to prove.  Otherwise the image of $B$ in $A/I$ is
+finite over $O$, so its localization at this horizontal prime is an
+Artinian local $E$-algebra.  Choose $fg\notin\mathfrak p$.
+Its maximal ideal is nilpotent and acts by nilpotents on the reduced
+ring in (SP.23), hence acts by zero.  The localized ring is therefore
+an algebra over the residue field $L=\operatorname{Frac}(B/\mathfrak p)$,
+and its degree-zero part is $L$.  Its even weight pieces have
+dimension at most one, since $f$ is an invertible element of degree
+$-2$.  If a piece of odd weight $j$ contains $0\ne h$, reducedness
+gives $h^2\ne0$.  The even piece of weight $2j$ is one-dimensional,
+so $h^2f^j\in L^\times$.  Thus $h$ is invertible; every other
+element of weight $j$ is an $L$-multiple of $h$.  This proves the
+length-one assertion for every weight.
+
+For the final assertion filter a quotient by $u^2$ using
+$uM/u^2M$.  That subquotient is an image of $M/uM$, with the
+appropriate weight shift, and the other subquotient is $M/uM$.
+Since the length-one bound holds at every weight, each replacement
+of one equation by its square multiplies the bound by at most two.
+There are $r+1+r'$ such replacements.
+\end{proof}
+
+\subsection{The leading form and the exact factor two}
+
+\begin{lemma}[SP5: the lower Euler bound]
+\label{claim:SP5}
+Under (M1), make the Smith change (SP.14).  There is a
+weight-preserving chart $\phi_0$ with only nonzero-weight variables,
+with the same linear coordinates in those weights, and
+$\phi_0(Z_i)=0$ for all $i$.  Let $J\subset R$ consist of the Rees
+polynomials all of whose coefficients lie in $\ker\phi_0$.
+If $x(a)=0$ and $(\mathbf t,a)$ is admissible, then for all
+sufficiently large $d$,
+\[
+ 2^{r+r'}\sum_{i<r}c_i
+              \le\chi(\mathbf t;(R/J)/a(R/J))_d.
+ \tag{SP.24}
+\]
+\end{lemma}
+
+\begin{proof}
+The $m$ equations $Z_i$ have linearly independent linear terms in
+the $m$ zero-weight variables, because they rationally span that
+cotangent space.  Use those equations as the new zero-weight
+coordinates.  A formal substitution with invertible linear matrix
+has an inverse: after solving the linear terms, solve its
+homogeneous terms one total degree at a time.  Each correction has
+higher total degree, so the coefficients stabilize.  Uniqueness
+also makes the substitution weight preserving.  Set these new
+zero-weight coordinates to zero.  This constructs $\phi_0$ and
+preserves the linear terms of every remaining variable.
+
+For a monomial $z^\nu$ in these variables let $n_-(\nu)$ and
+$n_+(\nu)$ denote its negative and positive weighted degrees.
+Every coefficient of a Rees element of degree $d$ has weight
+$2(d_1-d_0-d_2)$, and its image under $\phi_0$ has
+\[
+                    n_-\ge 2d_0+4d_2.
+ \tag{SP.25}
+\]
+For $N_0$ and $N_1$ this follows from the weight.  For $N_2$, the
+term $A_{-2}^2A_2$ has this lower bound, while $H$ has no constant
+or linear term; a weight-$-1$ monomial without a linear term has
+$n_-\ge2$, so $H^2$ has $n_-\ge4$.  Products prove (SP.25).
+
+Let $Q\subset R$ be the ideal obtained by requiring strict inequality
+in (SP.25) in every Rees degree.  Leading coefficients show directly
+that it is a homogeneous ideal, $J\subset Q$, $a\in Q$, and
+$B$ acts on $R/Q$ through $x$.  It is $O$-torsion free: multiplying
+a leading coefficient in $E$ by a nonzero scalar cannot kill it.
+Moreover (SP.14) gives, in $R/Q$,
+\[
+                      F_i^2T_0=\pi^{2c_i}y_i^2T_0.
+ \tag{SP.26}
+\]
+Indeed the difference $F_i-\pi^{c_i}y_i$ has no linear term and
+has weight $-1$, so every term of the difference of squares has
+negative weighted degree strictly greater than $2$.
+
+The degree-$d$ part of $R/Q$ is a finite torsion-free $O$-module.
+Its rank is
+\[
+ H(d)=\#\{\nu:\ n_-(\nu)=2d_0+4d_2,
+                       \ n_+(\nu)=2d_1+2d_2\}.
+ \tag{SP.27}
+\]
+To check equality of the rank, rather than only an upper bound,
+use the independently realized linear coordinates in the chart.
+The leading weight-$\pm1$ forms are independent linear forms; the
+leading weight-$\pm2$ forms are independent linear forms in the
+weight-two variables plus quadratics in the weight-one variables.
+Subtract those quadratics over $E$.  These leading forms therefore
+generate the entire polynomial algebra on each sign of variables.
+Every monomial of even weighted degree is a product of
+weighted-degree-two monomials.  Finally
+\[
+             A_{-2}^{d_0+2d_2}A_2^{d_1+d_2}\subset L_d
+\]
+realizes every monomial counted in (SP.27).  This proves full rank
+after tensoring with $E$.  No claim that the integral lattice is
+unimodular is being used.  Reduction of a finite free $O$-lattice
+modulo $\pi$ has length its rank, so
+$\ell_B((R/Q)/\pi)_d=H(d)$.
+
+There is a graded surjection $(R/J)/a\to R/Q$.  Monotonicity in
+SP2 and the scaling inequality (SP.11), applied to the $r$ sections
+in (SP.26), give the lower bound
+\[
+ 2\sum_i c_i\,
+       \Delta_0^{r-1+s}\Delta_1^{r'+s'}\Delta_2H(d).
+ \tag{SP.28}
+\]
+All needed admissibility conditions descend under the surjection.
+The remaining numerical difference has a short exact calculation.
+The generating function for monomials of bidegree $(a,b)$ is
+\[
+ \frac{1}{(1-X)^r(1-X^2)^s(1-Y)^{r'+1}(1-Y^2)^{s'+1}}.
+\]
+The three differences in (SP.28) are shifts by $(2,0),(0,2),(4,2)$.
+After multiplying by their factors the generating function becomes
+\[
+ (1+X)^{r-1}(1+Y)^{r'}
+               \frac{1-X^4Y^2}{(1-X)(1-Y)(1-Y^2)}.
+ \tag{SP.29}
+\]
+For sufficiently large $a,b$, the coefficient in the last quotient
+is
+$(\lfloor b/2\rfloor+1)-(\lfloor(b-2)/2\rfloor+1)=1$.
+The polynomial factor therefore makes the coefficient exactly
+$2^{r-1+r'}$.  Substitution in (SP.28) proves (SP.24).
+\end{proof}
+
+\begin{theorem}[SP6: the literal \texttt{LemmaM}]
+\label{claim:SP6}
+Under exactly (M1)--(M5) and the ring and valuation hypotheses
+above, there is a finite cover of the two-sided orbits,
+$\ell_OC_{-1}(F)$ is finite, and (SP.7) holds for every finite orbit
+cover.  Thus \texttt{LemmaM} has no remaining bespoke input.
+\end{theorem}
+
+\begin{proof}
+The cotangent finiteness and (SP.14) already prove the finiteness of
+the left side, and SP4 supplies a finite cover.  We first arrange
+$\phi_0(a)\ne0$.  If it is zero, rational spanning by $F$ and the
+nonzero weight-$-1$ linear coordinate imply that some $F_i$ has
+nonzero chart image.  Choose $g\in A_1$ with nonzero chart image;
+there is such a linear coordinate because its dimension is $r'+1$.
+Replace $a$ by $a+gF_i$.  It still has weight zero and augmentation
+zero, it agrees with $a$ on $S(K)$, and its chart image is a product
+of two nonzero power series in a domain.  This replacement preserves
+(M5) and the right side of (SP.7).
+
+For the coefficientwise kernel $J$ of SP5, multiplication by $a$
+is injective on $R/J$: its image is multiplication by the nonzero
+series $\phi_0(a)$ on each coefficient.  SP3 supplies admissibility.
+Apply SP2, first moving $a$ past the other sections, then passing to
+their quotient.  Together with SP5 this gives
+\[
+ 2^{r+r'}\sum_i c_i
+ \le \chi(\mathbf t;(R/J)/a)_d
+ =\chi(\mathbf t,a;R/J)_d
+ \le\chi(a;R/(J+(\mathbf t)))_d .
+ \tag{SP.30}
+\]
+We bound the final term on the actual $B$-module
+$M_d=(R/(J+(\mathbf t)))_d$.
+
+By SP3, $M_d$ is finite over $O$, and its generic support satisfies
+(SP.17).  At such a prime choose $f\in A_{-2}$ and $g\in A_2$
+with $fg\notin\mathfrak p$.  They become invertible after
+localization, so $N_0,N_1,N_2$ all become free rank-one modules in
+their indicated weights; $N_2=N_0$ there since
+$f^2g=(fg)f\in A_{-2}^2A_2$.  In degree $d$ with $d_i\ge1$, the
+section relations (SP.16) impose every homogeneous multiple of the
+equations
+\[
+                    I^{[2]}=(F_i^2,G_i,E_i^2,E'_i,Z_i).
+\]
+Indeed one may take that multiple in degree $d-\mathbf e_i$ in
+the corresponding Rees direction.  Consequently the localized
+weight-$2(d_1-d_0-d_2)$ piece of $A/I^{[2]}$ surjects onto
+$(M_d)_{\mathfrak p}$.  SP4 gives
+\[
+                    \ell_{B_{\mathfrak p}}(M_d)_{\mathfrak p}
+                         \le2^{r+1+r'}.
+ \tag{SP.31}
+\]
+
+Here is the length--valuation formula needed to sum these
+multiplicities.  For any finitely generated $O$-module $M$ with a finite
+$B$-action and any $b\in B$ invertible on $E\otimes_OM$,
+\[
+ \ell_B(M/bM)-\ell_B(M[b])
+       =\sum_{\sigma}m_\sigma v(\sigma(b)),\qquad
+ m_\sigma=\ell_{B_{\ker\sigma}}M_{\ker\sigma}.
+ \tag{SP.32}
+\]
+The sum is over all embeddings of the generic support fields into
+$K$.  To prove it, remove the $O$-torsion of $M$; its kernel and
+cokernel under any endomorphism have the same finite length, so
+contribute zero.  On the remaining free $O$-lattice the left side is
+$v_O(\det(b\mid E\otimes_OM))$.  Decomposition of the finite
+commutative $E$-algebra acting on this vector space into Artinian
+local factors expresses this determinant as a product of field
+norms, each raised to the length of the corresponding localized
+module.  In characteristic zero each norm is the product over its
+embeddings into $K$; applying $v$ gives (SP.32).  Finite $B$-length
+equals finite $O$-length because their residue fields agree.
+
+Every embedding in (SP.32) is the restriction of a two-sided point
+by SP3, and hence of some representative in the given cover $T$.
+By (M5), $a$ is nonzero at all such embeddings and is invertible on
+$E\otimes_OM_d$.  Since the image of $B$ on $A/I$ is finite over
+$O$, each $\xi(a)$ is integral over $O$.  A root of a monic
+polynomial with coefficients of nonnegative valuation cannot have
+negative valuation: its leading power would be the unique term
+of smallest valuation.  Thus all $v(\xi(a))$ are nonnegative.
+Repeated restrictions in $T$ can therefore only increase their
+sum.  Equations (SP.31)--(SP.32) imply
+\[
+            \chi(a;M_d)\le
+                    2^{r+1+r'}\sum_{\xi\in T}v(\xi(a)).
+ \tag{SP.33}
+\]
+Combine (SP.30) and (SP.33), divide by $2^{r+r'}$, and use (SP.14).
+This is exactly (SP.7), including the source's constant $2$.
+\end{proof}
+
+The classical background used in SP1--SP6 is the DVR structure
+theorem, finite-dimensional linear algebra, the Nullstellensatz and
+Nakayama's lemma.  The special multigraded positivity, prime support,
+formal substitution, orbit reducedness and numerical difference
+arguments have been proved above.  For the two algebraic-geometric
+background statements, see the Stacks Project, Tags
+\href{https://stacks.math.columbia.edu/tag/00FV}{00FV} and
+\href{https://stacks.math.columbia.edu/tag/00DV}{00DV}; the finite
+\'etale conclusion in SP4 is also Tag
+\href{https://stacks.math.columbia.edu/tag/00U3}{00U3}.
+
+\subsection{From actual rank-four cocycles to this cotangent lattice}
+
+We now return to the source's original $\Omega$, odd prime $\ell$,
+coefficient ring $O=c.O\subset\overline{\mathbb Q}_\ell$, and datum
+$D:\texttt{Raw}\ \Omega\ c$.  The statement $D.\texttt{Good}$
+includes $e=D.e\ge2$, an open-kernel finite-order character $D.\psi$,
+the specified places $D.\mathrm{pl}(p)$, and
+$\Psi=D.\psi\chi_\ell^e$.  It also includes
+$\overline\Psi(g_0)\ne1$ and a local element at $\ell$ on which
+$\chi_\ell$ has infinite order and $D.\psi$ is trivial.
+Put
+\[
+ S_0=D.S,\quad
+ T=\{\ell\}\cup\{p\in S_0:p\ne\ell,
+                      \ \ell\mid|\psi(I_p)|\},\quad
+ W=\operatorname{Frac}(O)/O(\Psi^{-1}).
+ \tag{SP.34}
+\]
+The underlying torsion module in (SP.34) is the source's
+\texttt{QO}; its twist, valuations and decomposition subgroups are
+unchanged.  Let $\mathcal S$ be the strict Selmer module imposing
+trivial restriction to every inertia group and to the decomposition
+groups at primes in $S_0$.  Then
+$D.\mathrm{sha}=\ell_O\mathcal S$ by definition.
+
+\begin{proposition}[SP7: the actual \texttt{shaCoc} and \texttt{mPrime} comparison]
+\label{claim:SP7}
+Assume $D.\texttt{Good}$ and RV3.  Then $\mathcal S$ has finite
+length.  There is a single $a\in O\setminus\{0\}$ and an additive
+injection
+\[
+          Z:\mathcal S\lhook\joinrel\longrightarrow
+                  \{z:G_{\mathbb Q}\to O/(a)\}
+ \tag{SP.35}
+\]
+whose values are exactly of the source's type $D.\texttt{ShaCoc}$:
+locally constant $\Psi^{-1}$-cocycles, zero at $g_0$, zero on the
+residual-trivial inertia tested by $D.\texttt{UnrT}$, and
+coboundaries over $O/(a)$ on every specified decomposition group
+in $T$.
+For every actual $\mathcal M:\texttt{Model}\ D$, equipped with the
+source \texttt{GradedAlgebra} structure on its first-weight-zero
+algebra $A$ and its pieces \texttt{Model.gr}, one has
+\[
+       D.\mathrm{sha}\le
+       \ell_OC_{-1}(\mathcal M.F).
+ \tag{SP.36}
+\]
+Thus this particular incoming edge to the trace inequality is closed
+once an actual model is supplied; no additional cocycle comparison
+or choice-linearity hypothesis remains.
+\end{proposition}
+
+\begin{proof}
+The strict Selmer module for $S_0$ is a submodule of the one imposing
+only the decomposition condition at $\ell$, because $\ell\in S_0$.
+RV3 therefore gives finite length.  Choose $0\ne b\in O$ killing
+$\mathcal S$ and write $\theta=\Psi^{-1}$.
+The element $u=\theta(g_0)-1$ is a unit, since its reduction is
+nonzero.  Every cohomology class has the unique normalized cocycle
+\[
+                 N[z](g)=z(g)-(\theta(g)-1)u^{-1}z(g_0).
+ \tag{SP.37}
+\]
+Changing $z$ by a coboundary leaves (SP.37) unchanged; it vanishes
+identically exactly when the class is zero.  Hence $N$ is an
+$O$-linear injection into locally constant cocycles and every
+$N[z](g)$ is killed by $b$.
+
+For each $v\in T$, choose $s_v\in D_v$ with
+$\theta(s_v)\ne1$.  At $\ell$ use the infinite-order cyclotomic
+element specified by $D.\texttt{Good}$.  At $v\ne\ell$ the
+definition of $T$ makes $\psi(I_v)$ a nontrivial group of order
+divisible by $\ell$, while $\chi_\ell$ is unramified there; an
+element on which $\psi$ is nontrivial suffices.  Set
+\[
+                       a=b\prod_{v\in T}(\theta(s_v)-1)\ne0.
+ \tag{SP.38}
+\]
+The normalized cocycle is a local coboundary
+$N[z](g)=(\theta(g)-1)m_v$ on $D_v$.  Since
+$b(\theta(s_v)-1)m_v=bN[z](s_v)=0$, (SP.38) kills $m_v$ as well
+as all the values of $N[z]$.
+The map $O/(a)\to\operatorname{Frac}(O)/O$ sending
+$\overline y$ to $y/a+O$ identifies its source with the $a$-torsion.
+Transport both the cocycle and these local parameters through this
+map.  This constructs the additive injection (SP.35), with all its
+local and normalization properties.
+
+We check the potentially stronger-looking $\texttt{UnrT}$ clause.
+Outside $S_0$ the finite character is unramified; at a prime of
+$S_0\setminus T$ its inertia image has order prime to $\ell$.
+The cyclotomic character is unramified away from $\ell$.
+If the residual diagonal representation is trivial on an inertia
+element, then $\theta$ is $1$ modulo the maximal ideal there.  A
+root of unity of order prime to $\ell$ that is $1$ modulo that ideal
+equals $1$: divide $X^n-1$ by $X-1$ and evaluate at the root, where
+the second factor reduces to the unit $n$.
+Thus $\theta(g)=1$ for exactly the inertia elements needed in
+$\texttt{UnrT}$, and local coboundary gives $N[z](g)=0$.
+Conjugating the chosen places gives the same assertion for every
+valuation subring in that definition.  A valuation trivial on
+$\mathbb Q$ is trivial on its algebraic closure and has trivial
+inertia, so it adds no condition.  This verifies the literal
+$D.\texttt{ShaCoc}$ statement.
+
+It remains to use the actual model rather than postulate an
+injection into cotangent duals.  Its record supplies a surjection
+$q:R\to S$ onto the universal representation ring, a
+$\mathbb Z^2$-weighted presentation on $R$, and, for every cocycle
+$Z\mu$, an $O$-valued point derivation $\delta_\mu$ of weight
+$-w_\Psi=(0,-1)$.  It kills $\ker q$ modulo $a$.  On lifts of the
+two relevant universal matrix entries its reductions are
+\[
+ \delta_\mu(r(g)_{20})=D.\mathrm{th}(g)Z\mu(g),\qquad
+ \delta_\mu(r(g)_{31})=\Psi(g)Z\mu(g)
+                         \pmod a.
+ \tag{SP.39}
+\]
+All other entries have different weights.  These are precisely the
+\texttt{der}, \texttt{hom}, \texttt{at0} and \texttt{gen} fields of
+$\texttt{Model}$, including the universal quantification over
+possible lifts of an entry.
+
+The choices $\delta_\mu$ need not be additive.  Their reductions
+are additive.  First the augmentation descends through $q$:
+if $q(f)=0$, choose a lift $b$ of the $(0,0)$ entry at the identity;
+the \texttt{at0} field applied to $b+f$ and to $b$ gives
+$x(b+f)=x(b)$, hence $x(f)=0$.
+Now the derivation
+$\delta_{\mu+\nu}-\delta_\mu-\delta_\nu$ descends modulo $a$ to
+$S$, and is zero on every universal matrix entry by (SP.39) and
+the weight restriction.  Associate to it the square-zero algebra
+map $S\to O\oplus O/(a)$ with first coordinate the augmentation.
+The model's generation field says that two maps to this complete
+local $O$-algebra which agree on the universal representation are
+equal.  Compare with the zero derivation to deduce vanishing on
+all of $S$ and hence all of $R$.
+Restriction to the first-weight-zero subalgebra $A\subset R$
+therefore gives an additive map
+$\mathcal S\to\operatorname{Hom}_O(A,O/(a))$.
+It is injective: the $(2,0)$ entry lies in that subalgebra and
+the coefficient $D.\mathrm{th}(g)$ in (SP.39) is a unit, so a zero
+derivation forces $Z\mu=0$.
+Each equation $\mathcal M.F_i$ lies in $\ker q$ and has weight
+$-1$ in $A$.  The hypotheses of SP1 now all hold and yield
+(SP.36).  This proves the actual source \texttt{mPrime} conclusion
+without assuming that an arbitrary choice of lifts was linear.
+\end{proof}
+
+\subsection{Returning from auxiliary coefficients to the original character}
+
+\begin{proposition}[SP8: exact character invariants and coefficient return]
+\label{claim:SP8}
+Let $f:O\hookrightarrow O'$ be an injective compatible inclusion of
+coefficient DVRs in $\overline{\mathbb Q}_\ell$, and let
+$\psi' = f\circ\psi$ be a Dirichlet character of the same modulus
+$N$.  Then order, unit-character kernel, conductor, the parity
+condition $\psi(-1)=(-1)^e$, and all the source's quantities
+\[
+          \operatorname{comp}_r\psi,\quad\theta_0,\quad\theta_1,
+          \chi_P,\quad n_0,\quad c_2,\quad n_{\rm II},\quad n_{\rm III}
+ \tag{SP.40}
+\]
+are preserved or commute with $f$ as appropriate.  In particular
+membership in $h.X(c,e)$ and either case II or case III is preserved
+on the same host and the same $\Omega$.
+Together with RV1 this removes all auxiliary root-of-unity
+assumptions from a bound expressed using the normalized Selmer
+length: the identical bound holds over the original $O$.
+\end{proposition}
+
+\begin{proof}
+Injectivity gives $f(\psi(u))=1$ if and only if $\psi(u)=1$,
+for every unit $u$ modulo $N$, and $\psi'^n=1$ if and only if
+$\psi^n=1$.  Thus the unit kernels and orders agree.
+A character factors through $d\mid N$ exactly when its unit kernel
+contains the kernel of $(\mathbb Z/N)^\times\to(\mathbb Z/d)^\times$.
+Its complete set of possible conductors, and hence its conductor,
+is unchanged.  The operations $\operatorname{comp}_r$ are pullbacks
+by the fixed primary projection of $(\mathbb Z/N)^\times$; they
+commute with any coefficient map.
+The prime-to-$\ell$ part $\theta_0=\ell\mathrm{Prime}(\psi)$ is
+defined by group powers determined by the order.  It too commutes
+with $f$, as do
+\[
+ \theta_1=\theta_0(\operatorname{comp}_2\theta_0)^{-1},\qquad
+ \chi_P=\theta_0(\operatorname{comp}_\ell\theta_0)^{-1}.
+\]
+The definitions
+\[
+ \begin{aligned}
+ f_0&=\operatorname{ord}_{\operatorname{lcm}(4,\operatorname{ord}\theta_1)}(\ell),
+ &n_0&=v_2(\ell^{f_0}-1),\\
+ c_2&=v_2(\operatorname{cond}(\operatorname{comp}_2\psi))
+ \end{aligned}
+ \tag{SP.41}
+\]
+then prove their preservation.  So do the defining ceiling logarithms
+for $n_{\rm II}$ and $n_{\rm III}$, written in (SP.48) below.
+Injectivity also gives
+$f(\psi(-1))=(-1)^e\Longleftrightarrow\psi(-1)=(-1)^e$.
+Host character membership is a unit-kernel condition together with
+this parity.  Case II uses $e\ge2$, the parity of
+$\operatorname{ord}\chi_P$, and the fixed numerical condition on
+$\ell,h,e$; case III uses that same fixed numerical condition,
+odd order of $\psi$, and $\psi\ne1$.  All are therefore preserved.
+
+For an individual $\psi$, adjoin a primitive
+$2^{n_{\rm II}+n_{\rm III}}$-th root of unity to the finite
+coefficient field and take its compositum with the original field.
+Its ring of integers $O'$ is again an allowed coefficient ring,
+contains the required roots for each separate exponent, and
+contains $O$ injectively.  RV1 identifies the original strict
+Selmer module after this extension with its scalar extension.
+If $e_{O'/O}$ is the relative ramification index, then
+\[
+ \ell_{O'}\mathcal S'=e_{O'/O}\ell_O\mathcal S,
+ \qquad v_{O'}(\ell)=e_{O'/O}v_O(\ell),\qquad
+ \frac{\ell_{O'}\mathcal S'}{v_{O'}(\ell)}
+       =\frac{\ell_O\mathcal S}{v_O(\ell)}.
+ \tag{SP.42}
+\]
+Finiteness is equivalent in both directions.  Thus a bound proved
+over $O'$ gives the same bound over $O$, with its original
+character, conductor, parity, case, and normalization.  The chosen
+coefficient extension may depend on $\psi$; a constant selected
+before $\psi$ is not changed by this construction.
+\end{proof}
+
+\subsection{The exact arithmetic remaining after a finite trace catalogue}
+
+The existence of the following catalogue is a retained input, not a
+synonym for a general automorphy theorem.  Its quantifier order is
+part of the input.  There must be integers $c_*,A_*\ge0$ such that,
+for every $e\ge2$, $M\ge1$, and prime $p\ge5$ with $p\nmid M$,
+there is a finite set $\mathcal D$ of complex multisets
+$\beta_s$ of cardinality four with the following properties:
+\begin{enumerate}
+\item $|\mathcal D|\le c_*[M(e+2)]^{A_*}$, and every member of every
+$\beta_s$ is an algebraic integer.
+\item Every automorphism of $\mathbb C$ permutes the multisets
+$\beta_s$, with multiplicity, and
+\[
+ \left|\sum\beta_s\right|
+       \le (3\sqrt p+1)p^{(e+1)/2}.
+ \tag{SP.43}
+\]
+\item For every odd prime $\ell\ne p$, every original algebraic
+closure $\Omega/\mathbb Q$, every isomorphism
+$\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C$, and every
+representation satisfying the literal \texttt{AdmRAlt} conditions
+at level $M$, weights $(e+1,e,1,0)$ and duality weight $e+1$, there
+is a label $s\in\mathcal D$.  Equal labels imply representation
+isomorphism.  At every allowed place above $p$ and every arithmetic
+Frobenius $\sigma$ there,
+\[
+                  \iota(\operatorname{tr}r(\sigma))=\sum\beta_s.
+ \tag{SP.44}
+\]
+\end{enumerate}
+Here \texttt{AdmRAlt} includes irreducibility, the literal
+\texttt{IsAutQA} condition, \texttt{Level}, the stated cyclotomic
+dual twist, and \texttt{SafeRA}.  In the source the catalogue is
+first expressed using geometric Frobenius; its inverse is used in
+(SP.44).  Both this inverse convention and the classification of
+all the actual representations are required.  The catalogue is
+chosen before $\ell,\Omega,\iota$ and the representations.
+
+\begin{proposition}[SP9: the integral product and its uniform trace bound]
+\label{claim:SP9}
+The preceding catalogue input supplies the literal
+\texttt{NumberSp4Alt}, with
+\[
+                    C=c_*2^{A_*+1},\qquad A=A_*+1.
+ \tag{SP.45}
+\]
+More precisely, after $e,M,p,k>0$ and three $k$-th roots of unity
+$z_1,z_2,z_3$ have been fixed, there is a nonzero integer $N_*$,
+chosen before $\ell,\Omega,\iota$ and any finite representation
+family, such that
+\[
+ \begin{aligned}
+ \log|N_*|&\le C\varphi(k)[M(e+1)]^A\log p,\\
+ |N_*|_\ell&\le
+ \prod_{r\in\mathcal X}
+ \left|\operatorname{tr}r(\sigma)
+       -\iota^{-1}\bigl(p^{e+1}z_1+p^ez_2+pz_3+1\bigr)\right|_\ell.
+ \end{aligned}
+ \tag{SP.46}
+\]
+Every displayed trace difference is nonzero.  The second inequality
+holds for every finite set $\mathcal X$ of the specified actual
+representations, with no two distinct members isomorphic, at every
+place and Frobenius allowed in (SP.44).
+\end{proposition}
+
+\begin{proof}
+Put $y=p^e$ and $x=p^{(e+1)/2}$.  Since $e\ge2$ and $p\ge5$,
+$x\le y/2$ and $\sqrt p\,x\le y$, so (SP.43) is at most
+$7y/2$.  For any three complex numbers of modulus one, the leading
+term $p^{e+1}z_1$ has modulus $py$, whereas the sum of the trace and
+the other three terms has modulus at most
+\[
+          \frac72y+y+p+1<py.
+\]
+The strict inequality follows from
+$(p-9/2)p^e>p+1$, whose smallest case is $p=5,e=2$ and whose two
+sides then separate monotonically.  Thus the difference is nonzero;
+its modulus is less than $2py\le (py)^2=p^{2(e+1)}$.
+
+For $u\in(\mathbb Z/k)^\times$ let
+\[
+ b(s,u)=\sum\beta_s-
+          \bigl(p^{e+1}z_1^u+p^ez_2^u+pz_3^u+1\bigr),
+ \qquad N_* =\prod_{s,u}b(s,u).
+ \tag{SP.47}
+\]
+Every factor is an algebraic integer.  An automorphism of
+$\mathbb C$ permutes the $s$'s and acts on all $k$-th roots by one
+common unit modulo $k$; it therefore permutes the pairs $(s,u)$.
+Consequently $N_*$ is fixed by every automorphism of its normal
+number field over $\mathbb Q$, so is rational, hence an integer.
+The nonvanishing just proved gives $N_*\ne0$.  Its logarithmic
+size is at most
+$2|\mathcal D|\varphi(k)(e+1)\log p$.
+Use $e+2\le2(e+1)$ and $e+1\le M(e+1)$ to obtain (SP.45)--(SP.46).
+
+For a fixed finite family $\mathcal X$, assign to $r$ its label
+$s(r)$ and select the factor $b(s(r),1)$.  These selected factors
+are distinct because equal labels imply isomorphism.  Equation
+(SP.44) identifies their inverse $\iota$-images with exactly the
+trace differences in (SP.46).  Every omitted factor is still an
+algebraic integer and thus has $\ell$-adic norm at most one.
+Taking the norm of the complete product proves the asserted
+inequality.  The same argument with a singleton proves the
+nonvanishing for every individual representation.  All the choices
+defining $N_*$ preceded the auxiliary prime and the family, so no
+uniformity has been exchanged in this argument.
+\end{proof}
+
+\subsection{The paired-count join and its remaining geometric input}
+
+For precision, we state the outstanding input at the level at which
+the preceding proofs can actually use it.  The following two
+assertions remain to be reconstructed.
+\begin{enumerate}
+\item[(G1)] For every original host $h$, $h.\mathrm{Big}(t)$,
+odd $\ell$, $0<e<t$ and $\psi\in h.X(c,e)$ in case II or III,
+after adjoining the roots allowed in SP8 there is an actual
+$D:\texttt{Raw}\,\Omega\,c$ with \texttt{Good} and
+\texttt{OfCase}.  There are the source parameters $n',p_1,m_0$,
+with $m_0\mid h.o$, $c_2\le n'$, $D.e=e$ and
+$D.\psi=\operatorname{dirG}(\psi)$, for which
+\[
+ \begin{aligned}
+ n_{
+m II}&=\lceil\log_2\max
+       (\ell h.N4^{n_0},\,2^{c_2+6}h.o\ell^3h.q^2)\rceil,\\
+ n_{
+m III}&=\lceil\log_2\max
+       (\ell h.q\,p_{\!1}(\chi)4^{n_0},\,8\ell^2)\rceil,\\
+ (n',p_1)&=(n_{
+m II},1)\quad\hbox{or}\quad
+                  (n_{
+m III},p_{\!1}(\chi)),\\
+ L&=\ell 2^{n'}h.Np_1,
+ & k&=(\ell-1)2^{n'}(2h.o).
+ \end{aligned}
+ \tag{SP.48}
+\]
+Here $p_{\!1}(\chi)$ denotes the fixed source \texttt{pOne}, not
+the variable $p_1$.  The characters $D.\psi,D.\xi,D.\mathrm{om}$
+have $k$-th power one and satisfy the source \texttt{KillsMu}
+conditions at level $L$; $D.S$ is the prime support of
+$2\ell h.Np_1$.  With one common $\iota$, every actual irreducible
+$D.\mathrm{EPt}$ representation satisfies the \texttt{AdmRAlt}
+conditions used in SP9 at level $L$.
+\item[(G2)] For this same $D$ there is an actual
+$\mathcal M:\texttt{Model}\,D$ whose first-weight-zero algebra,
+point, grading and equations satisfy (M1)--(M4) above.  Every
+two-sided point of its equation scheme determines an irreducible
+$D.\mathrm{EPt}$ representation.  The assignment is compatible
+with the trace element $a_\sigma$:
+\[
+ x(a_\sigma)=0,\qquad
+ \xi(a_\sigma)=\operatorname{tr}\rho_\xi(\sigma)
+                       -\operatorname{tr}D.r_0(\sigma).
+ \tag{SP.49}
+\]
+Isomorphic assigned representations come from the same
+$\mathbb G_m$ orbit.  The trace element belongs to the degree-zero
+algebra, and the valuation and coefficient map are those of the
+original $D$, without a change of residual character or local
+condition.
+\end{enumerate}
+These assertions explicitly include the construction of the
+weighted model and its local-to-global comparison.  Naming
+\texttt{LemmaP}, \texttt{CohomologyHyp} or an automorphy package
+does not prove them.
+
+\begin{theorem}[SP10: the complete arithmetic and coefficient-return join]
+\label{claim:SP10}
+Assume (G1), (G2), and the finite catalogue preceding SP9.
+Then SP1--SP9, RV3 and RV1 imply the literal
+\texttt{CountII}$\wedge$\texttt{CountIII}.  In particular, for
+each primitive character $\chi$ there is one natural exponent
+$C_\chi$, chosen before $h,t,\Omega,\ell,c,e,\psi$, such that
+every original character in either case has finite strict Selmer
+length and
+\[
+ \frac{\ell_O V(\Omega,c,e,\psi)}{v_O(\ell)}\log\ell
+                         \le(\ell h.N e)^{C_\chi}.
+ \tag{SP.50}
+\]
+This is a conditional endpoint.  The theorem closes the join after
+the displayed geometric and catalogue inputs; it does not close
+(G1), (G2), or the catalogue itself.
+\end{theorem}
+
+\begin{proof}
+Choose $C,A$ from SP9, before any host or coefficient choices.
+For the current $h,\ell,e,\psi$, put
+$p=p_0(\ell h.Np_1)$, the least prime at least five not dividing
+$\ell h.Np_1$.  Bertrand's theorem applied to $\ell h.Np_1+5$
+gives
+\[
+                    5\le p\le2\ell h.Np_1+10.
+ \tag{SP.51}
+\]
+In particular $p\nmid L$ and $p\notin D.S$.  Choose arithmetic
+Frobenius $\sigma$ at $D$'s specified place over $p$.  Its
+cyclotomic value is $p$.  Set
+\[
+ \begin{aligned}
+ z_1&=\iota((D.\mathrm{om}^{-1}D.\xi D.\psi)(\sigma)),\quad
+ z_2=\iota(D.\psi(\sigma)),\quad
+ z_3=\iota((D.\mathrm{om}^{-1}D.\xi)(\sigma)).
+ \end{aligned}
+\]
+They are $k$-th roots of unity, and direct substitution in the four
+diagonal characters $D.r_0=(D.\mathrm{th},D.\Psi,D.\mathrm{al},1)$
+shows that its trace is
+$\iota^{-1}(p^{e+1}z_1+p^ez_2+pz_3+1)$.
+SP9 thus makes every irreducible trace difference nonzero.
+By (SP.49), $a_\sigma$ satisfies (M5).
+
+Apply SP6 to obtain a finite cover $T$ of two-sided points and the
+cotangent inequality.  Remove redundant representatives until
+there is one per orbit.  Its assigned representations form a
+finite set $\mathcal X$ with no two distinct members isomorphic:
+this is exactly the last orbit assertion of (G2).  The value of
+$a_\sigma$ is constant on each orbit.  SP7 and SP6 now give
+\[
+ \ell_O(D.\mathrm{Sha})
+       \le\ell_OC_{-1}(F)
+       \le2\sum_{r\in\mathcal X}
+                 v_O(\operatorname{tr}r(\sigma)
+                                  -\operatorname{tr}D.r_0(\sigma)).
+ \tag{SP.52}
+\]
+For an algebraic $\ell$-adic number $z\ne0$ the extension of the
+normalized $O$-valuation is
+$v_O(z)=-v_O(\ell)\log|z|_\ell/\log\ell$.
+Consequently (SP.52) is the source's actual $D.\mathrm{Ineq}(\sigma)$,
+with its exact factor two and its finite-length assertion.
+The product estimate (SP.46) then yields
+\[
+ \frac{\ell_O(D.\mathrm{Sha})}{v_O(\ell)}\log\ell
+ \le -2\log|N_*|_\ell
+ \le 2\log|N_*|
+ \le 2Ck[L(e+1)]^A\log p.
+ \tag{SP.53}
+\]
+The middle inequality is just
+$v_\ell(N_*)\log\ell\le\log|N_*|$ for a nonzero integer;
+the last also uses $\varphi(k)\le k$.  This explains why both the
+integrality and the order of the quantifiers in SP9 are needed.
+
+The original Selmer group injects into $D.\mathrm{Sha}$ even
+though $D.S$ can contain additional primes.  Indeed, at a prime
+$p\nmid\ell h.N$ the original character is unramified, and its
+negative-twist Frobenius value is $\zeta p^{-e}$ for a root of
+unity $\zeta$.  It is not one since $e>0$.  On $E/O$ multiplication
+by $\zeta p^{-e}-1\ne0$ is surjective.  Thus the unramified
+cohomology
+$(E/O)/(\zeta p^{-e}-1)(E/O)$ vanishes, and restriction from
+decomposition-group cohomology to inertia is injective.
+Every original class already vanishes on inertia at every place;
+it therefore vanishes on each added decomposition group as well.
+At a prime dividing $\ell h.N$ this was already its defining
+strict local condition.  This proves the exact inequality called
+\texttt{shaEq}, rather than an unwarranted equality, on the same
+$\Omega$ and all its chosen valuations.
+
+It remains to verify a single exponent uniformly in the host.
+Write $o=\operatorname{ord}\chi$, $P=p_{\!1}(\chi)\ge1$,
+$f=\varphi(4o)$, and $X=\ell h.Ne$.  The host's numerical and
+character conditions give
+\[
+ \begin{gathered}
+ X\ge16,\quad \ell,h.N,e,h.o,h.q\le X,\quad
+ 2^{c_2}\le h.N,\quad 2^{n_0}<\ell^f. 
+ \end{gathered}
+ \tag{SP.54}
+\]
+For clarity, the last bound uses no analytic theorem.  The order
+of $\theta_1$ is prime to $\ell$ and divides $2o$.
+Here is the finite-group reason for the latter statement.
+Under the Chinese remainder decomposition, a unit supported on an
+odd prime-power factor dividing $h.q$ has its $o$-th power in
+$h.H$: it is trivial at the other primary factors and its image
+under $\chi$ has order dividing $o$.  A unit supported on any
+other odd prime-power factor has its square in $h.H$, by the
+two square-subgroup conditions defining $h.H$.  Since
+$h.H\subset\ker\psi$, every odd primary component of $\psi$
+has order dividing $2o$.  Taking its prime-to-$\ell$ part preserves
+that divisibility, and removing its $2$-primary-modulus component
+leaves exactly $\theta_1$.  The product of the remaining primary
+components therefore has order dividing $2o$.
+It follows that
+$\operatorname{lcm}(4,\operatorname{ord}\theta_1)$ divides $4o$;
+the order $f_0$ of $\ell$ modulo this modulus divides its unit
+group order, hence is at most $\varphi(4o)$.  Therefore
+$2^{v_2(\ell^{f_0}-1)}\le\ell^{f_0}-1<\ell^f$.
+The other clauses use $16\mid h.N$, $h.q\mid h.N$,
+$h.o=o\le h.q$, and the conductor divisibility
+$2^{c_2}\mid h.N$, all on the original host and character.
+
+The inequality $2^{\lceil\log_2 m\rceil}\le2m$ for positive
+integers $m$ gives, from (SP.48) and (SP.54),
+\[
+ 2^{n_{
+m II}}\le X^{2f+10},\qquad
+ 2^{n_{
+m III}}\le X^{2f+P+3}.
+ \tag{SP.55}
+\]
+For the first, the two arguments of the maximum are at most
+$X^{2f+2}$ and $64X^7\le X^9$, and the extra factor two is at
+most $X$.  For the second they are at most $X^{2f+P+2}$ and
+$8X^2\le X^3$, using $P\le X^P$.  Set $a=2f+P+13$; either
+choice of $n'$ then satisfies $2^{n'}\le X^a$.  Directly,
+\[
+ \begin{aligned}
+ k&\le X^{a+3},& L(e+1)&\le X^{a+P+4},\\
+ 2C&\le X^{2C},& \log p&\le p\le X^{P+3}.
+ \end{aligned}
+ \tag{SP.56}
+\]
+For the last bound use (SP.51), $\ell h.Np_1\le X^{P+2}$
+and $X\ge16$.  Hence one explicit, deliberately generous choice is
+\[
+             C_\chi=2C+a+3+A(a+P+4)+P+3.
+ \tag{SP.57}
+\]
+It depends only on $\chi,C,A$.  Combining (SP.53), the original
+Selmer inclusion, and (SP.56) proves (SP.50) over the enlarged
+coefficient ring.  SP8 returns it to the original $O$ with the
+same exponent, case, order, kernel, conductor, parity and
+normalized length.  The same $C_\chi$ works for the union of the
+two cases, so gives the two literal count predicates separately.
+\end{proof}
+
+\paragraph{Precisely what is still open in the shared count branch.}
+The algebraic leaves \texttt{LemmaM'} and \texttt{LemmaM} have been
+proved in SP1 and SP6.  SP7 also proves \texttt{shaCoc} and
+\texttt{mPrime} for the actual model; RV7 supplies both
+\texttt{SoV} and \texttt{SoFin}, while BR7 supplies the literal
+\texttt{CorX}.  These remove complete suppliers from the source's
+\texttt{sp4Main\_alt} input list.  The following are still
+substantive inputs to the human reconstruction:
+\begin{enumerate}
+\item \texttt{SymplecticFourImageDense}, including both the finite
+weight-zero algebra and exclusion of the endoscopic locus, with
+one embedding valid for every actual irreducible point.
+\item The entire \texttt{CohomologyHyp} package.  LK2--LK4 and LD3
+cover identified finite local and finite duality pieces; they do
+not by themselves identify the arbitrary period-ring records in
+its Bloch--Kato local clause, or prove its remaining global
+finiteness, Euler, orthogonality and Greenberg--Wiles clauses.
+\item The application of the literal \texttt{LemmaP} to the actual
+Galois data, with its framed weighted representation functor,
+specified local conditions, relation weights and exact
+cohomological dimension counts.  The universal algebraic
+implication \texttt{LemmaP} is handled separately by the framed
+deformation component; this chapter does not infer its actual
+hypotheses or the resulting \texttt{exModel} comparison from that
+implication alone.  The cumulative ledger records the status and
+supplier of that separate algebraic theorem.
+\item The finite catalogue used in SP9, including its polynomial
+size, algebraicity, conjugation, purity and classification
+properties for the literal \texttt{AdmRAlt}.  The source derives
+it from a larger automorphic and local-level package; its name
+\texttt{Hypotheses'} is not a classical theorem citation.
+\item \texttt{RigiditySymplecticFour} at these actual points.  Its
+source producer uses the specified unramified deformation inputs
+and adjoint lifting theorem; no generic rigidity assertion has
+been substituted.
+\item The internal construction and comparison edges in (G1)--(G2):
+\texttt{dataEx}, \texttt{exModel}, the verification of (M1)--(M4),
+the two-sided point and conjugacy-orbit comparison, and the
+\texttt{level}/\texttt{safe4'} passage to the exact admissible
+representation class.  Their required inputs and source ranges
+are recorded separately in the provenance ledger.  They remain
+open human proof obligations even when their larger source input
+packages have been named.
+\end{enumerate}
+The source's exact top-level implication is recorded for navigation;
+SP10 is the readable conditional join actually proved here.  Thus
+this chapter does not assert that \texttt{CountII} or
+\texttt{CountIII}, the original-family \texttt{PointHV}, or RH/GRH
+has now been proved without the remaining suppliers.
+
+\paragraph{Classical reference for the prime choice.}
+The only additional number-theoretic theorem in the last join is
+Bertrand's theorem, in the form: for every integer $n>1$ a prime
+lies strictly between $n$ and $2n$.  See P.~Erd\H{o}s,
+\emph{Beweis eines Satzes von Tschebyschef}, Acta Sci. Math.
+(Szeged) \textbf{5} (1932), 194--198,
+\url{https://users.renyi.hu/~p_erdos/1932-01.pdf}.
+It is applied only with $n=\ell h.Np_1+5$ to obtain (SP.51).
+

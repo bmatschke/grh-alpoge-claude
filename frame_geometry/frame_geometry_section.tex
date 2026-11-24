@@ -1,0 +1,126 @@
+\section{Constructing the periodic frames from marked tiles}
+\label{sec:frame-geometry}
+
+\status{The actual \texttt{FramesOK} conclusion is proved from
+\texttt{OrbitHyp}, including its strict segment span and stronger $L_2$
+gaps. The construction below is the source's frame, with one common
+marked tile for all coordinates. Abundance of the good orbits remains
+a separate question.}
+
+\paragraph{FG1: the three concrete orbit conditions.}
+Write $n=n'>0$ for the even period and
+$T\subset\{0,\ldots,n-1\}$ for the selected residues. Put
+\[
+\begin{gathered}
+ u=\lceil1/\delta\rceil_+,\qquad \ell=(6r+1)u,\qquad
+ M=\lceil(h+3)10^{6r+1}\log x\rceil_+,\\
+ G'=(M+5)\ell,\qquad
+ N_1=\left\lceil\max\{6eG'\delta,(h+3)\log_2x\}\right\rceil_++1 .
+\end{gathered}                                                    \tag{FG.1}
+\]
+Here $\lceil\cdot\rceil_+$ is the nonnegative ceiling, $\delta=\texttt{de}$,
+$r\ge2$, $L_1\ge1$, and the actual hypotheses include
+$2L_1\le L_2<u$ and $3G'\le n$. Thus $u\ge1$, and $\delta>0$ follows.
+
+A cyclic window of length $L$ is
+$\{i,i+1,\ldots,i+L-1\}\pmod n$. The source requires at most $r-1$
+selected residues in every $L_2$ window and at most $N_1$ in every $G'$
+window. Its third condition concerns the $t=\lfloor n/\ell\rfloor$
+complete tiles. Tile $s$ has cells
+\[
+ C(s,c)=[s\ell+(c-1)u,s\ell+cu),\qquad 1\le c\le6r+1.
+\]
+It is \emph{marked} when its odd cells contain no selected point and
+each even cell contains exactly one selected point, itself even.
+Every cyclic block of $M+1$ tile indices must contain a marked tile.
+These are precisely \texttt{CondA}, \texttt{CondIntervals} and
+\texttt{CondTiles}; no frame existence is hidden in them.
+
+\paragraph{FG2--FG4: enumerate the tiles and take their middle block.}
+List all marked indices as $s_0<\cdots<s_{J-1}$.
+They exist by the tile condition; moreover $t\ge3(M+5)>M+1$.
+For every $j=qJ+a$ with $q\in\mathbb Z$ and $0\le a<J$, set
+\[
+ B_j=qn+s_a\ell.
+\]
+The next marked index has positive cyclic distance at most $M+1$:
+apply the tile condition immediately after the current index.
+Writing $n=t\ell+R$, $0\le R<\ell$, the successive physical gap is
+that cyclic distance times $\ell$, with an additional $R$ exactly
+at the wrap. Hence
+\[
+ B_{j+J}=B_j+n,\qquad
+ \ell\le B_{j+1}-B_j<(M+2)\ell.                         \tag{FG.2}
+\]
+The remainder $R$ is retained.
+
+In the lifted marked tile starting at $B_j$, let $a_{j,v}$ be its
+selected point in cell $2v+2$, $0\le v<3r$. Then
+\[
+ B_j+(2v+1)u\le a_{j,v}<B_j+(2v+2)u,\qquad
+ f_{j,i}:=a_{j,r+i}\quad(0\le i<r).                    \tag{FG.3}
+\]
+These are the actual \texttt{bf\_tp} and \texttt{bf\_F} choices.
+Because $n$ is even, all lifted selected points remain even.
+Uniqueness gives $f_{j+J,i}=f_{j,i}+n$.
+The frames are increasing and ordered, and no selected point lies
+between two consecutive entries of one frame. For a fixed $j$,
+the same index $s_a$ places every $f_{j,i}\pmod n$ in cell
+$2r+2+2i$. Every marked tile occurs.
+
+The empty odd cells also prove a stronger local fact: every selected
+$y<a_{j,v}$ satisfies $y+u<a_{j,v}$. Inside the tile, use the previous
+even cell; outside it, use its first empty cell. Thus this statement
+does not assume that intervening unmarked tiles are empty.
+
+\paragraph{FG5: exact endpoint and span conditions.}
+Let $\widetilde T$ be the periodic lift of $T$, and set
+\[
+ W_j=\widetilde T\cap[f_{j-1,0},f_{j,r-1}],\qquad
+ L_j=\widetilde T\cap(f_{j-1,r-1},f_{j,0}).
+\]
+The first $r$ members of $L_j$ are $a_{j-1,2r},\ldots,a_{j-1,3r-1}$;
+the last $r$ are $a_{j,0},\ldots,a_{j,r-1}$.
+All are even, and each has gap $>u>L_2$ from its preceding selected
+point. The same holds for $f_{j,0}$. These two lists are disjoint,
+so $|L_j|\ge2r$, which includes the required $|L_j|\ge r$.
+This checks the literal first/last-$r$ endpoint predicate, including
+its boundary inequalities.
+
+The exact cell positions and (FG.2) give
+\[
+ f_{j,r-1}-f_{j-1,0}
+ <B_j-B_{j-1}+(2r-1)u
+ <(M+3)\ell\le G'.                                    \tag{FG.4}
+\]
+The source's strict bound is preserved.
+
+\paragraph{FG6--FG7: counts and the oldest vector.}
+Reduction modulo $n$ is injective on every integer half-open interval
+of length at most $n$: two distinct congruent points differ by at
+least $n$. Since $G'\le n/3$, (FG.4) and the cyclic-window condition imply
+$|W_j|\le N_1$.
+
+For a selected $z\in W_j$ after the old frame, all $r$ old-frame
+entries are even predecessors. Thus the source's $r$-th most recent
+even predecessor $y=\operatorname{oldest}(j,z)$ exists; its
+default-zero branch is unused. If $z-y\le L_1$, the $r$ most recent
+even predecessors lie in $[y,z)\subseteq[y,y+L_2)$.
+This contradicts the $r-1$ window bound. Therefore
+\[
+ z-\operatorname{oldest}(j,z)>L_1.                    \tag{FG.5}
+\]
+Together, these facts prove every clause of
+$\texttt{Valid}(L_1,N_1)$, the strict span (FG.4), and both stronger
+$L_2$ gap conditions. With $F.TT=TT$, this is the exact
+\texttt{FramesOK}. The common-tile and coverage properties above also
+prove the stronger \texttt{RestFrames} conclusion.
+
+\paragraph{FG8: frame count and scope.}
+The marked complete tiles are disjoint and each contains $3r$ selected
+points, so $3rJ\le|TT|$. In particular the source's bound
+$Jr\le|TT|$ holds. More generally that weaker bound follows for any
+valid periodic frame by injecting its $Jr$ entries in one period into
+$TT$. The same interval injection gives $|W_j|\le|TT|$; the existing
+choice $N_s=\min(N_1,2|TT|)$ is retained. No numerical or probabilistic
+existence of the input orbit has been inferred from this construction.

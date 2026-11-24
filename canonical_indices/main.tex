@@ -1,0 +1,928 @@
+\section{Constructing the local indices and their canonical replacement}
+\label{sec:canonical-indices}
+
+\status{CI1--CI18 reconstruct the finite local calculations left open in
+TL20: finite admitted cosets, lattice normal forms, preservation of first
+unfolding nonvanishing, descent of the actual projected character, the
+auxiliary-prime one-coset calculation, and the resulting initial and
+canonical local-index records. CI19 identifies the exact contribution
+to the construction of \texttt{TC.Ok}. Arithmetic host, character, tuple,
+and ambient theta data remain hypotheses where stated; no analytic
+theta identity or stage of \texttt{Later} is inferred from these local
+calculations. These are mathematical reconstructions from the pinned
+source, without a Lean build or kernel-verification claim.}
+
+\paragraph{Local conventions.}
+Let $P$ be a nonzero prime of the integers of the number field $E$,
+$O=\mathcal O_{E,P}$, and $q=|\mathcal O_E/P|$. Except in the finite
+coset argument CI3, assume the literal \texttt{DegOneUnram} condition:
+$q$ is a rational prime and $q\notin P^2$. Thus $q$ is a uniformizer
+of the discrete valuation ring $O$, and $O/qO=\mathbb F_q$. The
+coefficient field $K$ has characteristic zero. All local lattices below
+are in rational $E$-vector spaces, rather than completions.
+
+At step $j$, put $n_j=k+j(t+1)$ and $c_j=m-1-j$, for
+$0\le j\le m-1$. The source rank assumptions include $m\ge4$ even
+and $k\ge m+3$. Write
+\[
+ Y_j=X_j\oplus\bigoplus_{a=0}^{c_j-1}Ee_a,
+ \qquad X_j=E^{n_j}.
+ \tag{CI.1}
+\]
+The group $R_j$ preserves $X_j+Ee_0+\cdots+Ee_{a-1}$,
+fixes $e_0$, and sends $e_a$ to $e_a$ plus an earlier vector.
+Its action on $X_j$ may be any invertible linear map; calling
+all of $R_j$ unipotent would be incorrect. Its kernel on $X_j$ is
+$N_j$. Set
+\[
+ a(r)=\sum_{a=0}^{c_j-2}(r e_{a+1})_{e_a}.
+ \tag{CI.2}
+\]
+Then $a(rs)=a(r)+a(s)$, as follows by multiplying these triangular
+matrices. At a twist prime the basic lattice is $O^{n_j+c_j}$;
+at an auxiliary, or type, prime it is
+$\Lambda_j=O^{n_j}\oplus\bigoplus_a q^{a+1}Oe_a$.
+The words ``nonzero unfolding'' always mean the source predicate
+\texttt{FiniteSumNonzeroLargeDepth}: all sufficiently deep box sums
+are nonzero as functions of the retained matrix variable. It is not
+an assertion about an unproved analytic integral.
+
+\paragraph{CI1: finite quotients, stable box sums, and affine transport.}
+For every $s\ge1$, the integers $0,\ldots,q^s-1$ represent $O/q^sO$
+exactly once. Indeed they represent $O/qO$; after removing that first
+digit and dividing by $q$, induction gives existence. Uniqueness
+follows because the $P$-valuation of a nonzero rational integer is
+its usual $q$-adic valuation. Consequently
+\[
+ \mathcal B_{A,B}=\{0,1,\ldots,q^{A+B}-1\}/q^A
+ \tag{CI.3}
+\]
+represents $q^{-A}O/q^BO$.
+
+Suppose $f:E^d\to K$ is supported in $q^{-A_0}O^d$ and is invariant
+under $q^{B_0}O^d$. For $A\ge A_0$, $B\ge B_0$, define
+\[
+ I(f)=q^{-Bd}\sum_{u\in\mathcal B_{A,B}^d}f(u).
+ \tag{CI.4}
+\]
+Increasing $A$ only adds zero support cosets; increasing $B$ by $b$
+splits each old period coset into $q^{bd}$ equal terms. The factor
+$q^{-Bd}$ cancels this multiplicity. Thus (CI.4) is independent of
+both sufficiently large depths. The same proof applies uniformly
+to a family with common support and period bounds.
+
+For an invertible $E$-linear map $T$ and $b\in E^d$, the functions
+$f$ and $f(Tu+b)$ have bounded support and a full period lattice.
+Their stable sums vanish simultaneously. To see this without a
+measure theorem, choose an $O$-lattice $L$ which is a period lattice
+for both functions. The change of variable identifies the sum over
+$L$-cosets for $f(Tu+b)$ with the sum over $TL$-cosets for $f$.
+Use the common sublattice $H=L\cap TL$, which has finite index in
+each, to compare either sum with the sum over $H$-cosets. The two
+comparisons multiply by the positive integers $[L:H]$ and $[TL:H]$.
+Every box normalization is also a nonzero rational number.
+Characteristic zero therefore proves the asserted equivalence.
+Bounds on the entries of $T,T^{-1},b$ choose the needed box depths;
+there is no unstated convergence argument.
+
+\paragraph{CI2: a nonzero finite sum forces an affine eigenvalue to be one.}
+Here an even more useful conclusion holds. Let $V$ be an additive
+group, $L\subset V$ a subgroup, and $f:V\to K$ be $L$-periodic,
+with only finitely many nonzero $L$-cosets and nonzero sum over them.
+Suppose $T$ is an additive automorphism and
+\[
+ f(Tv+b)=\chi f(v)\quad(v\in V).
+ \tag{CI.5}
+\]
+Then $\chi=1$, even if $T$ does not preserve the initially chosen
+period subgroup $L$.
+
+First $f\ne0$ and the surjectivity of $T+b$ give $\chi\ne0$.
+Let $M=\{u:f(v+u)=f(v)\ \text{for all }v\}$ be the full period
+group. Equation (CI.5) and its inverse imply $T(M)=M$. Fix
+$v_0$ with $f(v_0)\ne0$. Distinct classes in $M/L$ give distinct
+nonzero support classes $v_0+u+L$, so $[M:L]$ is finite.
+Each nonzero $M$-coset contributes exactly $[M:L]$ equal terms to
+the sum over $L$-cosets. Hence the sum over $M$-cosets is nonzero.
+But $T+b$ permutes these cosets and their finite nonzero support.
+Summing (CI.5) gives $S=\chi S$ with $S\ne0$, proving the claim.
+This is the actual finite-sum rigidity used in the projected-kernel
+argument; root-of-unity containment alone would not prove it.
+
+\paragraph{CI3: finitely many admitted local level cosets.}
+Let $\Lambda=\bigoplus_l Oq^{e_l}e_l$, and call $h$ admitted at
+depth $j$ if
+\[
+ h^{-1}\Lambda\subseteq\Lambda,
+ \qquad q^j h\Lambda\subseteq\Lambda.
+ \tag{CI.6}
+\]
+Color $h$ by the matrix of $q^jh$ in this lattice basis modulo
+$q^{j+1}$. There are finitely many colors. More literally, one may
+lift every local integral entry to $\mathcal O_E$ modulo
+$q^{j+1}O$ and use its class in the finite global quotient
+$\mathcal O_E/(q^{j+1})$, exactly as the source does. Such lifts
+exist because a denominator outside $P$ is invertible modulo a
+sufficient power of $P$; alternatively localization of this finite
+quotient is a quotient of it.
+
+Equal colors give $(h'-h)\Lambda\subseteq q\Lambda$.
+Applying $h^{-1}$ and using (CI.6) gives
+$(h^{-1}h'-1)\Lambda\subseteq q\Lambda$; interchanging $h,h'$
+gives the same assertion for its inverse. Thus $h^{-1}h'$ is an
+integral basis change congruent to one modulo $q$.
+
+Every local group $J_j$ in this construction contains that
+principal congruence subgroup. At a twist prime it preserves the
+two lattices defining $J_Q$; at a type prime it preserves the
+inverse images of the residue flags and fixes their prescribed
+residue basis vectors. These are direct consequences of being
+the identity on $\Lambda/q\Lambda$. Hence equal colors imply
+$h^{-1}h'\in J_j$, proving finiteness of admitted right cosets and
+therefore of admitted $R_j\backslash\mathrm{GL}(Y_j)/J_j$
+classes. The source's type-prime admission condition requires
+stabilizing $\Lambda_j$, and therefore implies (CI.6) automatically.
+This proves the actual
+\texttt{exists\_finite\_index\_of\_adm\_cosets} supplier.
+
+\paragraph{CI4: a rational normal form with integral projected group.}
+At a twist prime let $M=hO^{n+c}$ with
+$O^{n+c}\subseteq M\subseteq q^{-j}O^{n+c}$. Put
+$W_a=X+Ee_0+\cdots+Ee_a$. The image of $M\cap W_a$ under its
+$e_a$-coordinate is a nonzero fractional ideal of $O$, hence
+$q^{\nu_a}O$. Choose $v_a\in M\cap W_a$ with that coordinate
+$q^{\nu_a}$, and put $u_a=q^{-\nu_a}v_a$.
+Successively eliminating the last coordinate proves
+\[
+ M=(M\cap X)\oplus\bigoplus_{a=0}^{c-1}Oq^{\nu_a}u_a,
+ \qquad -j\le\nu_a\le0.
+ \tag{CI.7}
+\]
+The inequalities follow by comparing the same coordinate image
+with $O$ and $q^{-j}O$. Choose a unitriangular map which fixes
+$X,e_0$ and carries $u_a$ to $e_a$ for $a>0$; it exists by
+successive elimination. Write $u_0=e_0+z_0$. Since
+$\nu_0\le0$, $u_0\in M$, and since $e_0\in M$, one has
+$z_0\in M\cap X$. Now choose $g\in\mathrm{GL}(X)$ carrying
+the free full $O$-lattice $M\cap X$ onto $O^n$, and extend it
+by the identity on the tail. The resulting $\rho\in R_j$ gives
+\[
+ \rho M=O^n\oplus Oq^{\nu_0}(e_0+z)
+          \oplus\bigoplus_{a=1}^{c-1}Oq^{\nu_a}e_a,
+ \qquad z\in O^n.
+ \tag{CI.8}
+\]
+If $c=0$, only the first summand occurs. Formula (CI.8) again lies
+between $O^{n+c}$ and $q^{-j}O^{n+c}$, so the normalized matrix
+is still admitted. It is in the same double coset, with right
+factor equal to one.
+
+The intersection of (CI.8) with $X$ is exactly $O^n$.
+If $r\in R_j\cap h'J_jh'^{-1}$, then $r$ preserves $h'O^{n+c}$
+and $X$, and its inverse does too. Its restriction to $X$ therefore
+preserves $O^n$ in both directions. This proves the actual
+$\operatorname{pr}_X C_{h'}\subseteq\mathrm{GL}_n(O)$ clause,
+as well as \texttt{TwNF}, \texttt{TwBdd}, and \texttt{TwNormRep}.
+No global free basis for an $\mathcal O_E$-lattice has been assumed.
+
+\paragraph{CI5: the unfolding fibers are affine spaces, with the stated phase.}
+For a step with source tail $f_0,\ldots,f_c$ and target tail
+$e_0,\ldots,e_{c-1}$, the matrix $x(t)=\texttt{xx1}(x,t)$ is
+described by its columns:
+\[
+ \begin{array}{c|c}
+ \text{source column}&\text{image}\\ \hline
+ X'&x(X')\subseteq X\\
+ f_0&e_0\\
+ f_a\ (1\le a<c)&e_a+\text{an arbitrary vector in }
+             X+Ee_0+\cdots+Ee_{a-1}\\
+ f_c&\text{an arbitrary vector in }Y.
+ \end{array}
+ \tag{CI.9}
+\]
+The fixed row $f_0\mapsto e_0$ applies only when $c>0$.
+When $c=0$, the sole source tail column is $f_0=f_c$ and is
+the free last column; the target has no tail. The entries
+called arbitrary are the coordinates of $t$.
+For $r\in R_j$, with restriction $g$ to $X$, column substitution
+gives an invertible affine transformation $T_rt+b_r$ such that
+\[
+ r x(t)=\texttt{xx1}(gx,T_rt+b_r),\qquad
+ \operatorname{chArg}(r x(t))=
+       \operatorname{chArg}(x(t))+a(r).
+ \tag{CI.10}
+\]
+The inverse comes from $r^{-1}$. For the phase identity, the
+$e_a$-coordinate of the image of $f_{a+1}$ acquires precisely
+$(r e_{a+1})_{e_a}$ for $a<c-1$; the last column acquires no
+constant. All lower terms have zero $e_a$-coordinate.
+Right composition by a source $r'$ has the corresponding formula
+with retained variable $xg'$ and phase shift $a(r')$. Indeed
+each new source column is itself plus earlier columns, so only
+the immediately preceding tail column contributes to the phase.
+These calculations prove both left and right affine transports,
+including the invertibility and surjectivity on the retained
+matrix variable.
+
+\paragraph{CI6: twist-prime test functions, covariance, and uniform bounds.}
+Reorder coordinates as the first $k$ coordinates of $X$, then
+the $c$ tail coordinates, then the remaining coordinates of $X$.
+In these coordinates $J_Q$ consists of the matrices in
+$\mathrm{GL}(O)$ whose reduction preserves the first $r=k+j+c$
+coordinates. Thus its lower-left residue block is zero.
+The actual $\Phi_Q$ is supported on integral rectangular matrices
+with that lower-left block zero modulo $q$, and on this support is
+\[
+ \Phi_Q(y)=\xi\bigl(\det\overline{y}_{[0,r),[0,r)}\bigr),
+ \tag{CI.11}
+\]
+where a multiplicative character is extended by zero at zero.
+An element $\kappa\in J_Q$ and its inverse preserve this support.
+Block multiplication gives
+$\overline{(\kappa^{-1}y)}_{11}
+=\overline{\kappa^{-1}}_{11}\bar y_{11}$ and hence
+\[
+ \Phi_Q(\kappa^{-1}y)=
+   \xi(\det\overline{\kappa^{-1}}_{11})\Phi_Q(y).
+ \tag{CI.12}
+\]
+The scalar is nonzero, since the leading block and its inverse
+are inverse modulo $q$. Right multiplication has the same
+determinant calculation. Factoring the full determinant into
+the leading and complementary diagonal blocks identifies these
+scalars with the exact \texttt{lamRow} and \texttt{muAt} factors
+used by the source. In particular \texttt{lamRow} is a unit-valued
+character of $J_Q$, and is one on its principal congruence subgroup.
+
+Write the translated datum as
+$G_{a,h}(y)=s(a,h)\Phi_Q(h^{-1}ya)$. Its scalar $s(a,h)$ is the
+displayed product of local determinant characters and square-root
+powers in \texttt{Loc.om}. It is nonzero when the prescribed
+uniformizer character value and square root are nonzero:
+every nonzero element is uniquely $q^v u$ with $u\in O^\times$,
+so its local character is a nonzero power times $\xi(\bar u)$.
+If $a$ is admitted at step $i$ and $h$ at step $i+1$, then
+\[
+ G_{a,h}(y)\ne0\Longrightarrow q^{i+1}y\text{ is integral},
+ \qquad G_{a,h}(y+q^{i+1}z)=G_{a,h}(y)
+ \tag{CI.13}
+\]
+for integral $z$. For support, use $y=h(h^{-1}ya)a^{-1}$.
+For periodicity, $h^{-1}q^{i+1}za$ is divisible by $q$, because
+$h^{-1}$ is integral and $q^ia$ is integral. This preserves every
+residue entry in (CI.11), including the zero-support cases.
+The phase $\operatorname{chArg}$ is a sum of entries, so its value
+on this support lies in $q^{-(i+1)}O$. These are uniform bounds,
+not assumptions about the chosen matrix $y$.
+
+\paragraph{CI7: actual twisted double-coset nonvanishing.}
+Suppose $h'=r h\kappa$ with $r\in R_j$, $\kappa\in J_Q$, and
+$h,h'$ admitted. By (CI.12) and the determinant factors,
+\[
+ G_{a,h'}(y)=C\,G_{a,h}(r^{-1}y),\qquad C\ne0.
+ \tag{CI.14}
+\]
+Assume the depth-$D$ character $\psi$ is multiplicative under
+addition on $q^{-D}O$ and is one on $O$. It is nonzero throughout
+$q^{-D}O$, since $\psi(u)\psi(-u)=1$. Take $D\ge j$.
+If the translated test function has empty support, both
+unfoldings vanish. Otherwise choose a support point.
+Where either side of (CI.14) is nonzero, CI6 bounds both phase
+arguments in $q^{-D}O$. Their difference, the constant in
+(CI.10), is therefore in that group too. Consequently the two
+unfolding integrands are related by an invertible affine change
+of $t$ and a nonzero scalar, including their zero-support terms.
+CI1 proves that their stable sums vanish simultaneously. The
+invertible retained-variable change $x\mapsto g^{-1}x$ then gives
+\[
+ \texttt{FiniteSumNonzeroLargeDepth}(a,h)
+ \quad\Longleftrightarrow\quad
+ \texttt{FiniteSumNonzeroLargeDepth}(a,h').
+ \tag{CI.15}
+\]
+The same reasoning gives source-side transport whenever the
+source covariance law and corresponding support bounds hold.
+It uses only finite sums over commensurable lattices. This proves
+the twist-prime content of \texttt{TwistedEisensteinNonvanishing}
+and \texttt{unfoldingNonvanishingDoubleCoset\_holds}, including
+the actual normalized representative from CI4. The source's
+analytic-sounding name does not add an analytic hypothesis here.
+
+\paragraph{CI8: the actual projected-kernel character is trivial.}
+Put $C_h=R_j\cap hJ_jh^{-1}$ and
+\[
+ \chi_h(r)=\psi(a(r))^{-1}\lambda_j(h^{-1}rh).
+ \tag{CI.16}
+\]
+At a twist prime, $q^j r$ is integral for $r\in C_h$: use
+$r=h\kappa h^{-1}$ and admission of $h$. Thus $a(r)\in q^{-j}O$.
+For $D\ge j$, (CI.2), the character law of CI6, and additivity
+of $\psi$ prove that (CI.16) is a nonzero multiplicative character.
+
+Suppose a nonzero unfolding enters $h$ from some admitted $a$.
+If $r\in C_h$ acts identically on $X_j$, then it is triangular
+with every diagonal entry one, so $\det r=1$. The target
+covariance formula therefore gives
+$G_{a,h}(r y)=\lambda_j(h^{-1}rh)G_{a,h}(y)$ without an extra
+determinant factor. Fix a retained $x$ at which the stable
+unfolding sum is nonzero. By CI5 its integrand satisfies
+\[
+ f_x(T_rt+b_r)=\chi_h(r)f_x(t).
+ \tag{CI.17}
+\]
+The support and period bounds of CI6 make it a finite sum on a
+quotient of the free-coordinate lattice. CI2 proves
+$\chi_h(r)=1$. Thus \texttt{ChiTriv} is proved for the actual
+kernel, not merely for an assumed quotient character.
+
+Define $\bar\chi_h(g)=\chi_h(r)$ using any lift of
+$g\in\operatorname{pr}_X C_h$. Two lifts differ by the kernel,
+so this is well defined and multiplicative. CI4 places the group
+inside $\mathrm{GL}_n(O)$. This is the precise \texttt{TwChrOk}
+and \texttt{characterNonvanishing\_holds} conclusion. At the last
+index $c_j=0$ the projection has trivial kernel. At index zero
+$h=1$, the twist character is one: $a(r)\in O$ and the
+complementary determinant block in \texttt{lamQB} is empty,
+since $n_0=k$.
+
+\paragraph{CI9: recursive finite index sets with exact quantifiers.}
+Fix one local prime. Start with $F_0=\{1\}$. Given finite $F_i$,
+consider admitted matrices $h$ at step $i+1$ for which
+\emph{some} $a\in F_i$ has nonzero unfolding into $h$. CI3 gives
+finitely many possible double cosets. At a twist prime choose
+the normalized representative of CI4 in each retained class;
+CI7 preserves its nonzero predecessor. At a type prime retain
+any representative in the class. Choose exactly one per class.
+This constructs $F_{i+1}$, and proves, separately, its predecessor
+property, uniqueness modulo double cosets, and coverage of every
+admitted matrix having a nonzero predecessor. The construction
+is for $i<m-2$. Set $F_{m-1}=\{1\}$ and $F_j=\varnothing$ for
+$j>m-1$, exactly as in the source.
+
+At the finitely many local primes take
+$\beta_j=\prod_P F_{P,j}$. For a prescribed component in a
+nonempty $\beta_{i+1}$, predecessor choices at all primes form a
+member of $\beta_i$; hence the source's predecessor quantifier
+is satisfied. Similarly choose the covering representative
+componentwise. This proves the actual \texttt{exists\_step} and
+\texttt{exists\_sets} construction. Intermediate index sets are
+not asserted nonempty merely because the initial set is nonempty.
+Their exact nonemptiness requirements are handled by the
+nonvanishing arguments, not by changing an empty product silently.
+
+\paragraph{CI10: the actual symmetric residue pattern and its characters.}
+Put $s=m/2-1$, $r=k+m-1$, and use the reordered coordinates of
+CI6. For a square matrix of size $N=r+jt$, the allowed off-diagonal
+positions $(p,p')$ are precisely
+\[
+\begin{array}{c|l}
+ \text{column }p'&\text{allowed row }p\\ \hline
+ p'<k&p<p'\ \text{or}\ k\le p<k+s\\
+ k\le p'<r&k\le p<p'\ \text{or}\ (p'>k+s\ \text{and}\ p<k)\\
+ p'\ge r&p<r\ \text{or}\
+       \lfloor(p-r)/t\rfloor\le\lfloor(p'-r)/t\rfloor.
+\end{array}
+\tag{CI.18}
+\]
+Only indices within the matrix are used. When $t=0$ the last row
+of the table has no columns. Let $\mathcal A_N$ be the matrices
+whose off-diagonal support satisfies (CI.18). The relation
+``equal or allowed'' is transitive: for a column in the first
+two intervals, its allowed predecessors stay in those intervals
+and a second predecessor satisfies the same inequality; for a
+column in the last interval, block numbers can only decrease.
+The one missing corner, from column $k+s$ to a row $p<k$, cannot
+arise through an intermediate index, since that column has only
+earlier tail predecessors. Thus $\mathcal A_N$ is an algebra.
+
+On the first $r$ indices the strict allowed relation has no
+cycles. For example it strictly increases the ordering function
+which first lists $k,\ldots,k+s-1$, then $0,\ldots,k-1$, then
+$k+s,\ldots,r-1$. Hence
+$(AB)_{pp}=A_{pp}B_{pp}$ for $p<r$ in this algebra. An invertible
+$A\in\mathcal A_N$ has inverse in the algebra: multiplication
+by $A$ is injective on the finite-dimensional algebra, hence
+surjective, so its inverse is the element mapping to one.
+It follows that
+\[
+ J_N^{\rm res}=\{A\in\mathcal A_N^\times:A_{pp}=1\ (p<r)\}
+ \tag{CI.19}
+\]
+is a group. Conjugating the rational matrices by the diagonal
+basis of $\Lambda_j$ and reducing modulo $q$, the defining
+\texttt{JGsym} flag and residue-vector clauses are exactly
+(CI.19). In fact each flag is the inverse image of its span of
+earlier reordered basis vectors. Its exceptional boundary
+\texttt{bd5} imposes precisely the missing corner just described.
+This proves both directions of the entry description.
+
+Define
+\[
+ \ell(A)=\sum_{a=0}^{k-2}A_{a,a+1}
+          +\sum_{a=k}^{r-2}A_{a,a+1},\qquad
+ \lambda_j(A)=\psi_0(\ell(A))
+       \prod_{b=0}^{j-1}\chi_b(\det A_{[r+bt,r+(b+1)t)}).
+ \tag{CI.20}
+\]
+For each displayed adjacent pair, the matrix product has only
+the two possible intermediate indices equal to its endpoints:
+the table rules out all others. The omitted pair $(k-1,k)$ is
+zero throughout the pattern. Thus $\ell(AB)=\ell(A)+\ell(B)$.
+Each diagonal $t$-block multiplies as a block, since all
+intermediate indices outside it contribute zero. Its determinant
+is nonzero for a group member, by the same statement for its
+inverse. Therefore (CI.20) is a unit-valued character and is one
+on a matrix reducing to one. This reconstructs the actual
+symmetric \texttt{lamRow} character law.
+
+The rectangular test function has $a=r+(j-1)t$ columns and
+$a+t$ rows. On its pattern support it is
+\[
+ \Phi_S(Y)=\psi_0\!\left(\sum_{b=0}^{r-2}Y_{b,b+1}\right)
+ \frac{\prod_{b=0}^{j-2}\chi_b(\det Y_{[r+bt,r+(b+1)t)})}
+      {\chi_{j-1}(\det Y_{[0,a)})},
+ \tag{CI.21}
+\]
+with the same zero extension when a determinant vanishes.
+The pattern is stable under left and right multiplication by
+the corresponding groups (CI.19). To verify its covariance,
+multiply blocks: each old diagonal block determinant gains the
+corresponding determinant of the acting matrix, the leading
+$a$-determinant gains its leading determinant, and the adjacent
+entry sum gains $\ell$ of that matrix. For target multiplication
+the full determinant is the leading $a$-determinant times the
+new last $t$-block determinant. These identities give, with the
+source's exact local determinant character $\mu$,
+\[
+ \Phi(\kappa y)\mu(\det\kappa)
+    =\lambda_j(\kappa)\Phi(y),\qquad
+ \Phi(y\kappa')\mu(\det\kappa')
+    =\lambda_{j-1}(\kappa')\Phi(y).
+ \tag{CI.22}
+\]
+The identities also hold off support, because the inverse
+matrices preserve support. Reduction of the scaled rational
+entries gives the literal \texttt{PhiGS} source and target
+laws. This supplies the type-prime covariance needed below,
+rather than assuming it as part of a later column-law record.
+
+\paragraph{CI11: a nonzero residue unfolding has the identity double coset.}
+In CI11--CI13 assume $j+1<m$, hence $c=c_j\ge1$; this is
+the source's one-coset range. The zero-tail projected kernel
+is handled separately in CI8.
+Let $h\in\mathrm{GL}_{a+t}(\mathbb F_q)$. If the finite
+unfolding of $\Phi_S(h^{-1}\texttt{xx1}(x,t))$ is nonzero,
+some summand has $Y=h^{-1}\texttt{xx1}(x,t)$ on nonzero support.
+Its leading $a\times a$ block is invertible by (CI.21).
+Complete the $a$ columns of $Y$ by the last $t$ standard columns.
+The resulting square matrix $\kappa$ is invertible, has determinant
+that leading determinant, and belongs to $J_{a+t}^{\rm res}$
+by (CI.18).
+
+From (CI.9) choose $\nu\in N_j$ whose tail columns are the first
+$c$ tail columns of $\texttt{xx1}(x,t)$; its triangular diagonal
+is one. Then $g=\nu^{-1}h\kappa$ fixes every tail basis vector.
+Moreover it sends into $X$ each reordered source column outside
+the tail interval and its one free last column. Let $P_X,P_A$
+be the projections onto $X$ and the tail, and put
+$B=P_AgP_X$. Since $B$ kills the tail and takes values in it,
+$B^2=0$. The matrix $\kappa'=1+B$ is invertible with inverse
+$1-B$. The only possible nonzero entries of $B$ have a tail row
+and a column at or after the omitted free column; all these
+positions are allowed by (CI.18). Thus $\kappa'\in J_{a+t}^{\rm res}$.
+For $\gamma=g(1-B)$ the tail component of $\gamma v$ equals that
+of $v$, while $\gamma$ fixes the tail and maps $X$ into $X$.
+Consequently $\gamma\in R_j$. We obtain
+\[
+ h=\nu\gamma\kappa'\kappa^{-1}\in R_jJ_{a+t}^{\rm res}.
+ \tag{CI.23}
+\]
+This proves the support part of \texttt{OneCosetSharp} by matrix
+completion and elimination; cancellation in a Fourier sum has
+not been assumed to identify its support.
+
+\paragraph{CI12: an explicit nonzero residue unfolding at the identity.}
+Choose $x_0:E^{n'}\to E^n$ on coordinate vectors by
+$x_0e_b=e_b$ for $b<k$ and $x_0e_b=e_{b+1}$ for $b\ge k$.
+Use this same matrix over the residue field. For any free
+coordinates $t$, the reordered columns of
+$Y=\texttt{xx1}(x_0,t)$ outside $k<p'\le k+c$ are standard
+columns. If $Y$ satisfies the support conditions of (CI.21), its
+leading block is upper triangular with diagonal one, and its
+old $t$-blocks are identity matrices. Indeed in the remaining
+columns (CI.18) permits only rows strictly earlier than the
+column; all other columns were already standard. Hence all
+multiplicative-character factors in (CI.21) are one.
+The only possibly nonzero terms of its adjacent-entry sum are
+the $c$ terms of $\operatorname{chArg}(Y)$. Therefore
+\[
+ \Phi_S(\texttt{xx1}(x_0,t))
+       \psi_0(-\operatorname{chArg}(\texttt{xx1}(x_0,t)))
+   =\begin{cases}1&\text{if the support pattern holds},\\
+                  0&\text{otherwise}.
+     \end{cases}
+ \tag{CI.24}
+\]
+There is at least one supporting choice: all free entries zero
+except the entry sending the last source tail vector $f_c$ to
+the target vector $e_k$ in $X$, which is one. In reordered
+coordinates this is the rectangular identity matrix. The finite
+unfolding at $x_0$ is thus the positive integer counting these
+supporting choices. It is nonzero in characteristic zero.
+This proves the nonvanishing half of \texttt{OneCosetSharp};
+even a nontriviality hypothesis on $\psi_0$ is unnecessary for
+this particular finite-matrix calculation.
+
+\paragraph{CI13: reduction, lifting, and the actual type-prime one-coset theorem.}
+Let $h$ stabilize $\Lambda_j$. In its scaled basis, both $h$ and
+$h^{-1}$ are integral and reduce to inverse residue matrices.
+Its determinant is a unit, so the scalar in the translated
+$\Phi_{GS}$ is nonzero. The scaled entries of an unfolding
+matrix are again of the form (CI.9). More precisely, for a free
+entry in row $l$ and source column $b$, put
+\[
+ d_f=(b-n'+1)-\begin{cases}0&l<n,\\l-n+1&l\ge n.
+                       \end{cases}
+ \quad 1\le d_f\le c+1.
+ \tag{CI.25}
+\]
+Its scaled entry is $q^{d_f}t_f$. The retained $x$ entries
+remain unscaled. If one is nonintegral the unfolding is zero,
+since every nonzero test-function value requires integral
+scaled entries.
+
+For integral $x$, reduce it and every $q^{d_f}t_f$ modulo $q$.
+In a box (CI.3) with $A\ge c+1$, $B\ge1$, every residue value
+has exactly $q^{B+d_f-1}$ admissible representatives in the
+$f$th free coordinate. This follows by writing its numerator
+as $q^{A-d_f}(u+qv)$, where $u$ is the chosen residue digit.
+The phase satisfies
+$\overline{q\operatorname{chArg}(\texttt{xx1}(x,t))}
+=\operatorname{chArg}(\texttt{xx1}(\bar x,\bar t))$.
+The literal type-prime tie
+$\psi(a/q)=\psi_0(\bar a)$ consequently gives the exact identity
+\[
+ \sigma(E^{A,B}_{1,h}(x))
+   =\sigma(s(1,h))\,
+        q^{\sum_f(d_f-1)} E^{\rm res}_{1,\bar h}(\bar x).
+ \tag{CI.26}
+\]
+Here the residue function is (CI.21), and $\sigma:K\hookrightarrow
+\mathbb C$ is the specified embedding. All factors in front are
+nonzero. Every residue $x$ lifts entrywise to an integral rational
+$x$. Thus eventual nonzero unfolding is equivalent to nonzero
+residue unfolding, in both directions and with the stated
+uniform depths.
+
+Apply CI11 to $\bar h=\bar\rho\bar\kappa$. Lift the entries of
+$\bar\rho$ to $O$, preserving its zero entries and its entries
+equal to one. Its leading $X$ block has unit determinant; its
+triangular tail has diagonal one. Hence the lift and its inverse
+are integral. Conjugating back by the scaled lattice basis gives
+$\rho\in R_j\cap\operatorname{Stab}(\Lambda_j)$ with that
+reduction. The matrix $\rho^{-1}h$ has residue $\bar\kappa$ and
+therefore belongs to $J_j$ by CI10. Consequently
+\[
+ E_{1,h}\ne0\ \Longrightarrow\ h\in R_jJ_j,
+ \qquad E_{1,1}\ne0.
+ \tag{CI.27}
+\]
+The second assertion follows from CI12 and (CI.26).
+
+For completeness these statements transport in both source and
+target double cosets, with the stabilizer hypotheses present
+in the source. All source and target matrices then preserve the
+scaled lattices, so their moved Hom lattice is the same; it has
+bounded coordinates and a full period lattice. In that Hom
+lattice $q\operatorname{chArg}$ is integral, because successive
+tail exponents differ by one. Formula (CI.22), CI5, and the finite
+affine change of CI1 prove the two-sided transport exactly as in
+CI7, now with depth one. In particular, if the source matrix
+$a$ is in the identity double coset and both matrices stabilize
+their prescribed lattices, then
+\[
+ E_{a,h}\ne0\quad\Longleftrightarrow\quad h\in R_jJ_j.
+ \tag{CI.28}
+\]
+This is the actual auxiliary-prime input to \texttt{twSurjG},
+\texttt{twNonVanG}, and the reference-chart index matching.
+It has been proved independently of \texttt{TC.Laws}.
+
+\paragraph{CI14: the projected symmetric levels and their exact characters.}
+At the identity representative, restricting $r\in R_j\cap J_j$
+to $X_j$ gives an element of $\mathrm{GL}_{n_j}(O)$, since
+$\Lambda_j\cap X_j=O^{n_j}$. Its reduction $A$ has diagonal one
+for $p<k+j$; its allowed off-diagonal positions are
+\[
+\begin{array}{c|l}
+ p'<k&p<p'\ \text{or}\ (k\le p\ \text{and}\ p+s+2\le k+j)\\
+ k\le p'<k+j&k\le p<p'\ \text{or}\
+                     (p<k\ \text{and}\ k+j<p'+s+1)\\
+ p'\ge k+j&p<k+j\ \text{or}\
+       \lfloor(p-(k+j))/t\rfloor\le
+                 \lfloor(p'-(k+j))/t\rfloor.
+\end{array}
+\tag{CI.29}
+\]
+Indeed deleting the $c_j$ tail positions from (CI.18) replaces
+each remaining index $p\ge k$ by $p+c_j$, and
+$c_j+j=2s+1$. Substitution in the three inequalities gives
+exactly (CI.29). Conversely lift a residue matrix satisfying
+(CI.29) entrywise, with determinant a local unit, and extend it
+by the identity on the tail. The same substitutions show that
+this extension belongs to $R_j\cap J_j$. This proves the exact
+projected group, including surjectivity onto the residue group.
+
+For such an extension of $g$ with residue $A$, split the
+superdiagonal sum (CI.20) into the initial $X$ part, the tail
+part, the tail-to-$X$ boundary, and the remaining $X$ part.
+The boundary entry is zero because $rX\subseteq X$; the tail
+part is $q a(r)$ in scaled coordinates. The old block determinants
+are precisely the $X$ block determinants. Using
+$\psi(a(r))=\psi_0(\overline{q a(r)})$, (CI.16) therefore becomes
+\[
+ \bar\chi_j(A)=
+ \psi_0\!\left(\sum_{b=0}^{k-2}A_{b,b+1}
+             +\sum_{b=0}^{j-2}A_{k+b,k+b+1}\right)
+ \prod_{b=0}^{j-1}
+       \chi_b(\det A_{[k+j+bt,k+j+(b+1)t)}).
+ \tag{CI.30}
+\]
+The two copies of the tail phase cancel, with the inverse
+on $\psi$ exactly as in (CI.16). Formulas (CI.29)--(CI.30) are
+the source's \texttt{colLevSym} group and character; at $j=0$
+they give \texttt{colLev Ch 0}. Thus the actual
+\texttt{ocbGrpGLoc}, \texttt{ocbChrGLoc}, and
+\texttt{closedLevels\_by\_entries} assertions are proved.
+
+The same calculation also makes double-coset character
+transport explicit. If $h'=\rho h\kappa$, then
+$C_{h'}=\rho C_h\rho^{-1}$. Its projected group is conjugated
+by $g=\rho|_X$. By (CI.2), $a(\rho r\rho^{-1})=a(r)$, while
+$\lambda(\kappa^{-1}(h^{-1}rh)\kappa)=\lambda(h^{-1}rh)$.
+Hence the projected characters agree under that conjugation.
+At type primes the matrices involved preserve $\Lambda_j$, so
+$g\in\mathrm{GL}_{n_j}(O)$ and this is also the actual residue
+level conjugation used in reference-chart matching.
+
+\paragraph{CI15: constructing the full initial local-index record.}
+Assume the literal inputs of \texttt{exists\_chIdx\_of\_cst}:
+every row prime is degree one and unramified; twist and type
+prime sets are disjoint; $\texttt{sharp}=\texttt{true}$;
+\texttt{LocCst.Ok}, $m\le M\le A,B$, the specified unit $\xi_0$
+and Weil tie, the exact local determinant-character values and
+their type-prime residue tie, and
+\[
+ D_P=1\quad(P\text{ type}),\qquad
+ D_P\ge2M,\quad D_P\ge2(m-1)+1\quad(P\text{ twist}).
+ \tag{CI.31}
+\]
+These are explicit arithmetic and constant hypotheses, rather
+than an already supplied index record. CI9 constructs its finite
+sets and representatives. At type primes all chosen representatives
+are in the identity double coset: induct from $F_0=\{1\}$ using
+CI13. That local set is nonempty at every constructed step,
+because transport of $E_{1,1}\ne0$ supplies an eligible next
+representative. CI14 therefore constructs its residue level and
+character by conjugating the identity level. At twist primes use
+CI8's projected group and descended character. At zero choose
+the literal top twist level and \texttt{colLev Ch 0}; at the last
+step the zero tail makes kernel descent immediate.
+
+Here are the remaining bounds required by the record. They are
+included to avoid concealing them in a record-assembly assertion.
+For type primes write $\mathcal H_i=\operatorname{Hom}_O
+(\Lambda_i,\Lambda_{i+1})$. The datum is supported in
+$\mathcal H_i$ and invariant under $q\mathcal H_i$, by its
+integral-entry and residue definition. Admitted source and target
+matrices preserve this same Hom lattice. Its coordinate exponents
+are differences of numbers between $0$ and $m-1$; hence its
+support is contained in $q^{-m}$ times the ordinary integral Hom
+lattice, and its periods contain $q^m$ times that lattice.
+Also $q\operatorname{chArg}$ is integral on its support.
+At twist primes CI6 gives the sharper bound $i+1\le m$.
+Multiplication by the phase preserves these uniform period
+bounds, because the change of phase argument is integral.
+CI1 now proves the literal \texttt{deep} equality for all
+$A'\ge A$, $B'\ge B$.
+
+The retained $X$ entries of \texttt{xx1} are actual matrix
+entries. A nonzero summand therefore bounds them by $q^{-A}$;
+adding a matrix in $q^B\operatorname{Hom}(O^{n_i},O^{n_{i+1}})$
+changes every summand by a period and leaves its phase unchanged.
+Multiplication by the fixed \texttt{volN} factor in
+\texttt{XiAt} preserves both statements. At the terminal
+\texttt{joinCol} step the source tail has one coordinate and
+the target tail is zero. In the scaled bases its extra column
+is $q y$. Thus at a type prime support requires $q y$ integral,
+and $y\mapsto y+z$ with $z\in O^n$ changes that column by a
+$q$-period. The $x_0$ columns are integral and have $q$-periods.
+At a twist prime the same argument with (CI.13) gives support
+$q^{-M}$ and periods $q^M$ for $y$, and the weaker $q^{-A}$
+support and $q^B$ periods for $x_0$. These prove exactly
+\texttt{psiSupp}, \texttt{psiInv}, \texttt{xiSupp},
+\texttt{xiInv}, \texttt{psiSuppX}, and \texttt{psiInvX}.
+
+The projected integrality field follows from CI4 at twist
+primes and $\Lambda_j\cap X_j=O^{n_j}$ at type primes.
+The four group/character fields follow from the constructions
+above: at type primes a residue matrix and any integral lift
+give the same value by (CI.30), transported by CI14; at twist
+primes any two projected lifts give the same value by CI8.
+The zero and last uniqueness and matrix fields, predecessor,
+injectivity, and coverage fields are precisely CI9. The
+arithmetic character, depth, and Weil fields are the stated
+inputs (CI.31). This checks every field of
+\texttt{ChIdx.Ok} and proves the actual
+\texttt{exists\_chIdx\_of\_cst}, including its twist normal-form
+conclusion. No \texttt{Forms0}, \texttt{TC.Laws}, theta-algebraicity
+or \texttt{Later} record has entered this proof.
+
+\paragraph{CI16: the actual local constants, including the auxiliary Gauss sum.}
+The constant hypotheses used in CI15 can themselves be
+constructed from the root and local-character data already
+isolated in TL14--TL15. Suppose $\xi_0\in O^\times$, and the
+coefficient field contains a primitive $q^D$th root. Adjust its
+power so that its specified complex embedding is
+$\zeta=\exp(2\pi\mathrm i/q^D)$; two primitive roots differ by
+a power coprime to $q^D$. For $x\in q^{-D}O$, let $b$ satisfy
+$\xi_0x-b/q^D\in O$, and define
+\[
+ \psi(x)=\zeta_K^b;
+ \qquad\psi(x)=1\text{ outside }q^{-D}O.
+ \tag{CI.32}
+\]
+CI1 gives $b$, uniquely modulo $q^D$. Therefore the definition
+is independent of its representative, is additive into
+multiplication on $q^{-D}O$, is one on $O$, and is not one at
+$q^{-1}$, since $\xi_0$ is a local unit. The stated Weil formula
+holds for every allowed integer representative $b$, not just
+the chosen one. At a type prime take $D=1$; the supplied
+\texttt{Ch.WeilTied} formula identifies (CI.32) with
+$\psi_0(\overline{qx})$. Thus its \texttt{psi0} clause is also exact.
+
+For the canonical type-prime square root the source uses the
+quadratic Gauss sum, not an arbitrary root. Let $\epsilon$ be
+the quadratic character of $\mathbb F_q^\times$, extended by
+zero, and $G=\sum_x\epsilon(x)\psi_0(x)$. Here $q\equiv1\pmod4$
+and $\psi_0\ne1$. Translation of the complete additive sum
+shows $\sum_x\psi_0(ax)=0$ for $a\ne0$, and multiplication by
+a nonsquare shows $\sum_x\epsilon(x)=0$. With $y=xt$ in $G^2$,
+\[
+ G^2=\sum_t\epsilon(t)\sum_{x\ne0}\psi_0(x(1+t))
+     =\epsilon(-1)(q-1)-\sum_{t\ne-1}\epsilon(t)=q.
+ \tag{CI.33}
+\]
+The last equality uses $\epsilon(-1)=1$, since $4\mid q-1$.
+This proves the actual \texttt{ciSq} square identity over $K$.
+At twist primes a supplied square root witnesses the predicate
+defining \texttt{twSqrt}. Its chosen value therefore squares to
+$q$ and is nonzero. No sign or positive-embedding normalization
+is part of that definition.
+
+Choose $\mu_q$ to be the specified inverse reference local
+character value times the inverse twist value at type primes;
+at twist primes use the prescribed product of the two inverse
+coefficient-field units. Their nonvanishing and all \texttt{muq}
+equalities follow directly from those values and injectivity
+of the embedding. The residue-unit tie is the literal
+\texttt{Ch.Tied} clause. This constructs
+\texttt{exists\_locCst\_of\_values}.
+
+The tied data with integral weights also supply the required
+reference values at ramified primes. Here is the additional
+argument behind \texttt{locK\_mem\_of\_tied}. For a fixed local
+element $x\in E^\times$ at $P$, choose $a\in E^\times$ with
+$a/x\equiv1\pmod P$ and $a\equiv1$ at the other finitely many
+ramified primes. This is elementary approximation: clear the
+denominators by an integer $b$, solve for an algebraic integer
+$y$ modulo the requisite powers of the distinct prime ideals
+by the Chinese remainder theorem, and set $a=y/b$; choose a
+nonzero solution. Tameness gives $\mu_P(a)=\mu_P(x)$ and makes
+the other ramified factors one. At every unramified prime the
+local value at $a$ is an integral power of its tied uniformizer
+value in $K$, and only finitely many such powers are nonzero.
+The infinity type has exponents $-2z_\tau$ with $z_\tau\in\mathbb Z$,
+so its value is a product of
+$(\tau(a)/\overline{\tau(a)})^{-z_\tau}$, also in the embedded
+coefficient field. The Hecke product formula now places
+$\mu_P(x)$ in that field. This proves the reference-value
+supplier from the literal tied integral-weight data, and gives
+the full \texttt{exists\_locCst} used for the initial indices.
+
+For initial indices take $M=A=B=m$, $D_Q=2m$ and
+$D_G=1$. For canonical indices the actual definition is
+$M=m$, $A=B=m+1$, $D_Q=2m$, $D_G=1$, with
+\texttt{sharp=true}. The nine fields of \texttt{LocCst.Ok}
+now follow from (CI.32), (CI.33), the supplied twist square
+roots, and these inequalities. In particular the larger canonical
+box depths do not change $M$ to $m+1$.
+
+\paragraph{CI17: the specific canonical indices satisfy their full record.}
+Consider the source's actual \texttt{twCst} and \texttt{twIdx},
+not an arbitrary existence witness. Assume $X.\texttt{Ok}$,
+$Pr.\texttt{Ok}$, $Ch.\texttt{Ok}$, the given character and
+Weil ties, type-prime inverse reference values in $K$,
+$q_P\equiv1\pmod4$ at type primes, degree-one unramified twist
+primes disjoint from them, and the root, square-root, and
+local-unit clauses of \texttt{TwCstQ}.
+
+The canonical step selects a class at each twist prime among
+admitted matrices having a nonzero predecessor in the preceding
+global index set. CI3 makes this class set finite, so its
+``finite if finite, empty otherwise'' definition takes the
+finite branch. CI4 and CI7 provide a member of every such class
+satisfying all predicates in the choice of \texttt{twRep}:
+admission, normal form, projected integrality, and the original
+nonzero-predecessor condition. Thus the chosen representative
+has those properties, regardless of which eligible witness
+the choice operation returns.
+
+The canonical matrix is one at every type prime. The definition
+of \texttt{twNext} retains its explicit condition that every
+type prime have a predecessor into that identity matrix.
+CI13 proves the identity nonzero assertion and the one-coset
+support statement needed for this condition. For coverage,
+start with any tuple of admitted matrices having the required
+predecessors: its twist classes choose the product component,
+and its type components are in the identity double coset by
+CI13. Transport to the identity supplies the defining condition
+of \texttt{twNext}. Conversely this condition and the twist
+candidate condition give every requested predecessor. Equality
+of all local double cosets gives equality of the selected
+product of classes, hence equality of indices. This proves the
+actual predecessor, injectivity and coverage fields, without
+assuming that a candidate set is nonempty.
+
+At positive twist steps CI8 proves the actual character used
+by \texttt{twLam}; at the last step its projection kernel is
+zero, and at zero it is the trivial top level. At all type
+steps CI14 identifies the group and character with the actual
+\texttt{colLevSym} definition. The support, periodicity and
+depth fields follow from the uniform calculations in CI15,
+now with the canonical constants of CI16. The base and terminal
+index types are the one-element type stipulated by the source,
+and the types above the terminal step are empty. The arithmetic
+ties come from CI16 and the present literal hypotheses.
+This proves \texttt{twIdx\_ok\_closed}; its formerly separate
+\texttt{TwFinQ}, \texttt{TwNormDC}, \texttt{TwChrQ},
+\texttt{TwZeroQ}, and \texttt{TwAnQ} suppliers have all been
+proved by CI1--CI16.
+
+\paragraph{CI18: canonical replacement really preserves \texttt{Ok}.}
+Let $I$ be an actual supplied column datum with
+$I.\texttt{Ok}$ and old twist depths at least $2m$, as in the
+source's \texttt{Deep} hypothesis. TL20 already extracted its
+primitive $q^{2m}$th roots, square roots, and inverse reference
+local values. To recall the root step precisely: if the old
+depth is $D=2m+b$, insert
+$x=\xi_0^{-1}/q^{2m}$ and integer $q^b$ in its Weil identity.
+The local-unit clause verifies both allowed denominators, and
+the resulting value has complex image
+$\exp(2\pi\mathrm i/q^{2m})$. Its order is exactly $q^{2m}$
+by injectivity. This extracts the arithmetic premises only;
+the nonvanishing and kernel arguments are supplied by CI7,
+CI8, and CI10--CI14, not by this extraction.
+
+Apply CI17 for each tuple in $I$. Replacing its constants and
+indices by the defined \texttt{twCst} and \texttt{twIdx} gives
+their actual \texttt{ChIdx.Ok}. Every other field of $I$ is
+unchanged. The coordinate, host, character, tuple-reading,
+selection, and ambient-data fields of \texttt{TC.Ok} are
+therefore inherited literally. This proves
+\texttt{twIdx\_ok\_of\_ok} and \texttt{canon\_ok};
+\texttt{IsTw} follows from the definitions. TL13 then derives
+the column laws for the canonical datum. No use of those laws
+was made in proving its local-index predicates.
+
+\paragraph{CI19: the resulting canonical evaluation construction boundary.}
+For the initial constructor, choose the finite character family,
+tuples, residue characters and coefficient fields of TL14--TL16.
+Supply the literal field/host/selection data and the ambient
+period datum of the constructor. CI16 gives local constants
+with $M=A=B=m$ and twist depth $2m$; CI15 gives their actual
+indices. Installing those records therefore supplies the
+local-index fields of the initial \texttt{TC.Ok}. The other
+fields are precisely the supplied raw constructor data, and
+must be checked by their own arithmetic and ambient suppliers.
+CI18 now gives a canonical datum with \texttt{Ok} and
+\texttt{IsTw}, and TL13 gives \texttt{Laws}.
+
+Accordingly the local-coset, normal-form, projected-character,
+and first-unfolding boundary in TL20--TL21 is discharged. The
+remaining hypotheses in that \texttt{EvLg} construction include
+the actual host and raw arithmetic data and the normalized-theta
+vacuum/indicator identities, smoothness and covariance used by
+TL18--TL19 for \texttt{JetsIn}. In this version PA9 separately
+supplies the literal ambient period/trace-isometry record,
+and PA13 supplies its CM-field conclusion. They can be combined
+with the present construction using the same ambient datum;
+neither was a premise of CI1--CI18. AH17--AH18 separately construct
+the arithmetic host under their exact prime and splitting hypotheses,
+and TA10/TA12 supply the one-dimensional normalized theta arithmetic.
+These do not by themselves identify the actual vacuum and indicator
+family or prove its covariance. The coefficient-field containment
+antecedents and their original order of quantifiers remain
+unchanged. None of this produces the five independent stages
+of \texttt{Later}, or proves RH or GRH from the local index
+calculation alone.

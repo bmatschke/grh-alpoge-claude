@@ -1,0 +1,1883 @@
+[PCL_SRC_ORIGINAL_DATUM_AND_LEVEL] Original perfect alternating Datum and Level.M >= 3
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/TwoWeightEqOneAddRoot.lean#L30-L59
+structure Datum (H : Host E) where
+  La : Type
+  [acg : AddCommGroup La]
+  [mod : Module (𝓞 E) La]
+  fin : Module.Finite (𝓞 E) La
+  proj : Module.Projective (𝓞 E) La
+  EF : LinearMap.BilinForm ℤ La
+  alt : ∀ x, EF x x = 0
+  unimod : Function.Bijective EF
+  adj : ∀ (a : 𝓞 E) x y, EF (a • x) y = EF x (H.bar a • y)
+  p : ℕ
+  q : ℕ
+  rank : Module.finrank (𝓞 E) La = p + q
+  dom : ∃ J : ℝ ⊗[ℤ] La →ₗ[ℝ] ℝ ⊗[ℤ] La, (∀ x, J (J x) = -x) ∧
+    (∀ x y, EF.baseChange ℝ (J x) (J y) = EF.baseChange ℝ x y) ∧
+    (∀ x, x ≠ 0 → 0 < EF.baseChange ℝ (J x) x) ∧
+    ∀ (a : 𝓞 E) (A : ℝ ⊗[ℤ] La →ₗ[ℝ] ℝ ⊗[ℤ] La) (t : ℂ), (∀ x : La, A (1 ⊗ₜ x) = 1 ⊗ₜ (a • x)) →
+      t = ∑ τ ∈ Finset.univ.filter (fun τ : E →+* ℂ => τ (H.rt : E) = H.rt0),
+        ((p : ℂ) * τ (a : E) + (q : ℂ) * starRingEnd ℂ (τ (a : E))) →
+      J ∘ₗ A = A ∘ₗ J ∧ LinearMap.trace ℝ _ A = 2 * t.re ∧ LinearMap.trace ℝ _ (J ∘ₗ A) = -2 * t.im
+
+attribute [instance] Datum.acg Datum.mod
+
+structure Level (H : Host E) where
+  M : ℕ
+  three_le : 3 ≤ M
+  odd : Odd M
+  Mb : Ideal (𝓞 E)
+  fromK : Mb = Ideal.span {a | a ∈ Mb ∧ a ∈ Algebra.adjoin ℤ {H.w0}}
+  prod : Mb * Mb.map (H.bar : 𝓞 E →+* 𝓞 E) = Ideal.span {(M : 𝓞 E)}
+
+
+[PCL_SRC_HERMITIAN_COORDINATES] Literal exists_herm_coord_of_datum, trace nondegeneracy and original sign
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/UnitaryExistence/ExistsHermCoordOfDatum.lean#L11-L241
+variable {E : Type} [Field E] [NumberField E]
+
+open NumberField Matrix in
+open scoped nonZeroDivisors TensorProduct in
+variable {E : Type} [Field E] [NumberField E] in
+theorem _root_.GlobalTheory.DatumCoord.eq_of_trace_int {c d : E}
+    (h : ∀ a : 𝓞 E, Algebra.trace ℚ E ((a : E) * c) = Algebra.trace ℚ E ((a : E) * d)) :
+    c = d := by
+  by_contra hcd
+  have hne : c - d ≠ 0 := sub_ne_zero.2 hcd
+  have halg : IsAlgebraic ℤ (c - d)⁻¹ :=
+    IsFractionRing.isAlgebraic_iff ℤ ℚ _ |>.mpr (.of_finite ℚ _)
+  obtain ⟨y, hy, hint⟩ := halg.exists_integral_multiple
+  have key := h ⟨y • (c - d)⁻¹, hint⟩
+  rw [← sub_eq_zero, ← map_sub, ← mul_sub] at key
+  change Algebra.trace ℚ E (y • (c - d)⁻¹ * (c - d)) = 0 at key
+  rw [zsmul_eq_mul, mul_assoc, inv_mul_cancel₀ hne, mul_one,
+    show (y : E) = algebraMap ℚ E y by simp, Algebra.trace_algebraMap] at key
+  simp [hy, Module.finrank_pos.ne'] at key
+
+theorem exists_coord (M : Type) [AddCommGroup M] [Module (𝓞 E) M] [Module.Finite (𝓞 E) M]
+    (r : ℕ) (hr : Module.finrank (𝓞 E) M = r) :
+    ∃ φ : M →ₗ[𝓞 E] (Fin r → E), IsBaseChange E φ := by
+  have hb := TensorProduct.isBaseChange (𝓞 E) M E
+  have hl := (isLocalizedModule_iff_isBaseChange (𝓞 E)⁰ E _).2 hb
+  have h1 : Module.finrank E (E ⊗[𝓞 E] M) = r := by
+    rw [IsLocalization.finrank_eq E (𝓞 E)⁰ le_rfl,
+      IsLocalizedModule.finrank_eq (𝓞 E)⁰ (TensorProduct.mk (𝓞 E) E M 1) le_rfl, hr]
+  let e := (Module.finBasisOfFinrankEq E (E ⊗[𝓞 E] M) h1).equivFun
+  exact ⟨e.toLinearMap.restrictScalars (𝓞 E) ∘ₗ TensorProduct.mk (𝓞 E) E M 1,
+    IsBaseChange.of_equiv e fun _ => rfl⟩
+
+variable [IsCMField E]
+
+end GlobalTheory.DatumCoord
+
+namespace GlobalTheory
+
+open DatumCoord
+
+open NumberField Matrix in
+open scoped nonZeroDivisors TensorProduct in
+variable {E : Type} [Field E] [NumberField E] in
+private lemma exists_trace_mul_eq_of_addMonoidHom (f : 𝓞 E →+ ℤ) :
+    ∃ z : E, ∀ a : 𝓞 E, Algebra.trace ℚ E ((a : E) * z) = (f a : ℚ) := by
+  let g : E →ₗ[ℚ] ℚ := (integralBasis E).constr ℚ (fun i => (f (RingOfIntegers.basis E i) : ℚ))
+  have hnd := traceForm_nondegenerate ℚ E
+  obtain ⟨z, hz⟩ := ((Algebra.traceForm ℚ E).toDual hnd).surjective g
+  refine ⟨z, fun a => ?_⟩
+  have h1 : ∀ b : E, Algebra.trace ℚ E (b * z) = g b := fun b => by
+    rw [← hz]; simp [LinearMap.BilinForm.toDual_def, Algebra.traceForm_apply, mul_comm]
+  let u : 𝓞 E →ₗ[ℤ] ℚ :=
+    (g.restrictScalars ℤ).comp ((algebraMap (𝓞 E) E : 𝓞 E →+* E).toIntAlgHom.toLinearMap)
+  let v : 𝓞 E →ₗ[ℤ] ℚ := (Int.castRingHom ℚ).toIntAlgHom.toLinearMap.comp f.toIntLinearMap
+  have huv : u = v := (RingOfIntegers.basis E).ext fun i => by
+    simp [u, v, g, ← integralBasis_apply]
+  rw [h1]
+  exact congrArg (fun w : 𝓞 E →ₗ[ℤ] ℚ => w a) huv
+
+open NumberField Matrix in
+open scoped nonZeroDivisors TensorProduct in
+
+theorem _root_.GlobalTheory.exists_herm_coord_of_datum :
+    ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (D : _root_.ReciprocityTheory.ChartRestriction.G.Geo.Tor.Datum H) (ξ : E),
+      _root_.ReciprocityTheory.ChartRestriction.G.FD.cc ξ = -ξ → ξ ≠ 0 → ∀ r : ℕ, r = D.p + D.q →
+      ∃ (Gm : Matrix (Fin r) (Fin r) E) (φ : D.La →ₗ[𝓞 E] (Fin r → E)),
+        (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧
+          (∀ a b, _root_.ReciprocityTheory.ChartRestriction.G.FD.cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧
+          ∀ x y, ((D.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (ξ * _root_.ReciprocityTheory.ChartRestriction.G.FD.herm Gm (φ x) (φ y))) := by
+  intro E _ _ _ H D ξ hξ hξ0 r hr
+  have hz : ∀ x y : D.La, ∃ z : E, ∀ a : 𝓞 E,
+      Algebra.trace ℚ E ((a : E) * z) = (D.EF (a • x) y : ℚ) := fun x y =>
+    exists_trace_mul_eq_of_addMonoidHom (AddMonoidHom.mk' (fun a => D.EF (a • x) y) fun a b => by simp [add_smul])
+  choose h0 hh0 using hz
+  have huniq := fun c d h => _root_.GlobalTheory.DatumCoord.eq_of_trace_int (E := E) (c := c) (d := d) h
+  have hsmul : ∀ (b : 𝓞 E) x y, h0 (b • x) y = b * h0 x y := fun b x y => huniq _ _ fun a => by
+    rw [hh0, ← mul_assoc, ← map_mul, hh0, smul_smul]
+  have hadd : ∀ x x' y, h0 (x + x') y = h0 x y + h0 x' y := fun x x' y => huniq _ _ fun a => by
+    rw [hh0, mul_add, map_add, hh0, hh0]; simp [smul_add]
+  have hadd' : ∀ x y y', h0 x (y + y') = h0 x y + h0 x y' := fun x y y' => huniq _ _ fun a => by
+    rw [mul_add, map_add, hh0, hh0, hh0, map_add, Int.cast_add]
+  let σ : E ≃ₐ[ℚ] E := (IsCMField.complexConj E).restrictScalars ℚ
+  have hσ : ∀ e, σ e = _root_.ReciprocityTheory.ChartRestriction.G.FD.cc e := fun e => rfl
+  have hσσ : ∀ e, σ (σ e) = e := fun e => by simp [σ]
+  have hbar : ∀ b, ((H.bar b : 𝓞 E) : E) = σ b := fun b => H.bar_eq b
+  have hbb : ∀ b, H.bar (H.bar b) = b := fun b => RingOfIntegers.ext (by rw [hbar, hbar, hσσ])
+  have htr : ∀ e, Algebra.trace ℚ E (σ e) = Algebra.trace ℚ E e := fun e =>
+    Algebra.trace_eq_of_algEquiv σ e
+  have hanti : ∀ u v, D.EF u v = - D.EF v u := fun u v => by
+    have h := D.alt (u + v)
+    simp only [map_add, LinearMap.add_apply, D.alt u, D.alt v] at h
+    omega
+  have hsmul' : ∀ (b : 𝓞 E) x y, h0 x (b • y) = σ b * h0 x y := fun b x y => huniq _ _ fun a => by
+    rw [hh0, ← hbb b, ← D.adj, smul_smul, ← hh0, hbb]
+    congr 1
+    push_cast [hbar]
+    ring
+  have hherm : ∀ x y, h0 y x = - σ (h0 x y) := fun x y => huniq _ _ fun a => by
+    rw [hh0, hanti, ← hbb a, ← D.adj, Int.cast_neg, ← hh0, hbb, hbar, ← htr (σ a * h0 x y),
+      map_mul, hσσ, mul_neg, map_neg]
+  haveI := D.fin
+  have hrk : Module.finrank (𝓞 E) D.La = r := hr ▸ D.rank
+  obtain ⟨l, hl⟩ := exists_linearIndependent_of_le_finrank (R := 𝓞 E) (M := D.La) hrk.ge
+  have hmax : ∀ x : D.La, ∃ t : 𝓞 E, t ≠ 0 ∧ ∃ c : Fin r → 𝓞 E, ∑ i, c i • l i = t • x := by
+    intro x
+    have hnot : ¬ LinearIndependent (𝓞 E) (Fin.snoc l x : Fin (r + 1) → D.La) := fun h => by
+      have := h.fintype_card_le_finrank
+      simp [hrk] at this
+    obtain ⟨g, hg, i, hi⟩ := Fintype.not_linearIndependent_iff.1 hnot
+    rw [Fin.sum_univ_castSucc] at hg
+    simp only [Fin.snoc_castSucc, Fin.snoc_last] at hg
+    refine ⟨g (Fin.last r), fun hg0 => hi ?_, fun j => -g j.castSucc, ?_⟩
+    · rw [hg0, zero_smul, add_zero] at hg
+      have := Fintype.linearIndependent_iff.1 hl _ hg
+      rcases Fin.eq_castSucc_or_eq_last i with ⟨j, rfl⟩ | rfl
+      · exact this j
+      · exact hg0
+    · simp only [neg_smul, Finset.sum_neg_distrib]
+      exact neg_eq_of_add_eq_zero_right hg
+  have hz0 : ∀ y, h0 0 y = 0 := fun y => by simpa using hadd 0 0 y
+  have hz0' : ∀ x, h0 x 0 = 0 := fun x => by simpa using hadd' x 0 0
+  have hsumL : ∀ (c : Fin r → 𝓞 E) y, h0 (∑ i, c i • l i) y = ∑ i, (c i : E) * h0 (l i) y := by
+    intro c y
+    induction (Finset.univ : Finset (Fin r)) using Finset.induction_on with
+    | empty => simp [hz0]
+    | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, hadd, hsmul, ih]
+  have hsumR : ∀ (d : Fin r → 𝓞 E) x, h0 x (∑ j, d j • l j) = ∑ j, σ (d j) * h0 x (l j) := by
+    intro d x
+    induction (Finset.univ : Finset (Fin r)) using Finset.induction_on with
+    | empty => simp [hz0']
+    | insert a s ha ih => rw [Finset.sum_insert ha, Finset.sum_insert ha, hadd', hsmul', ih]
+  have hσ0 : ∀ s : 𝓞 E, s ≠ 0 → σ s ≠ 0 := fun s hs => by simpa using hs
+  have hnd : ∀ x, (∀ y, h0 x y = 0) → x = 0 := fun x hx => D.unimod.1 (LinearMap.ext fun y => by
+    have := hh0 x y 1
+    rw [hx, mul_zero, map_zero, one_smul] at this
+    simp only [map_zero, LinearMap.zero_apply]
+    exact_mod_cast this.symm)
+  let ψ : D.La →ₗ[𝓞 E] (Fin r → E) :=
+    { toFun := fun x j => h0 x (l j)
+      map_add' := fun x y => funext fun j => hadd _ _ _
+      map_smul' := fun b x => funext fun j => by simp [hsmul, Algebra.smul_def] }
+  have hψ : ∀ x j, ψ x j = h0 x (l j) := fun x j => rfl
+  have hinj : Function.Injective ψ := (injective_iff_map_eq_zero ψ).2 fun x hx => hnd x fun y => by
+    obtain ⟨s, hs, d, hd⟩ := hmax y
+    have h1 : σ s * h0 x y = 0 := by
+      rw [← hsmul', ← hd, hsumR]
+      exact Finset.sum_eq_zero fun j _ => by rw [← hψ, hx]; simp
+    exact (mul_eq_zero.1 h1).resolve_left (hσ0 s hs)
+  let gram : Matrix (Fin r) (Fin r) E := Matrix.of fun i j => h0 (l i) (l j)
+  have hgramσ : ∀ i j, σ (gram i j) = - gram j i := fun i j => by
+    simp [gram, hherm (l i) (l j), hσσ]
+  have hdet : gram.det ≠ 0 := by
+    intro h
+    obtain ⟨v, hv0, hv⟩ := Matrix.exists_vecMul_eq_zero_iff.2 h
+    obtain ⟨⟨m, hm⟩, hmv⟩ := IsLocalization.exist_integer_multiples (𝓞 E)⁰ Finset.univ v
+    choose c hc using fun i => hmv i (Finset.mem_univ i)
+    have hx : ∑ i, c i • l i = 0 := hinj <| funext fun j => by
+      rw [map_zero, Pi.zero_apply, hψ, hsumL]
+      have := congrFun hv j
+      simp only [Matrix.vecMul, dotProduct, Pi.zero_apply, gram, Matrix.of_apply] at this
+      simp only [hc, Submonoid.smul_def, Algebra.smul_def, mul_assoc, ← Finset.mul_sum, this,
+        mul_zero]
+    have hc0 := Fintype.linearIndependent_iff.1 hl c hx
+    apply hv0
+    funext i
+    have := hc i
+    rw [hc0 i, map_zero, Algebra.smul_def] at this
+    exact (mul_eq_zero.1 this.symm).resolve_left (by simpa using nonZeroDivisors.ne_zero hm)
+  refine ⟨-ξ⁻¹ • gram⁻¹, ψ, hinj, ?_, ?_, ?_, ?_⟩
+  · rw [eq_top_iff]
+    intro w _
+    have hw : w = ∑ i, (w ᵥ* gram⁻¹) i • ψ (l i) := by
+      have hsum : ∑ i, (w ᵥ* gram⁻¹) i • ψ (l i) = (w ᵥ* gram⁻¹) ᵥ* gram := by
+        funext j
+        simp [Matrix.vecMul, dotProduct, Finset.sum_apply, hψ, gram]
+      rw [hsum, Matrix.vecMul_vecMul, Matrix.nonsing_inv_mul _ (isUnit_iff_ne_zero.2 hdet),
+        Matrix.vecMul_one]
+    rw [hw]
+    exact Submodule.sum_mem _ fun i _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨l i, rfl⟩)
+  · have hu : IsUnit gram.det := isUnit_iff_ne_zero.2 hdet
+    have h1 : gram.map σ = -gramᵀ := by
+      ext i j
+      simp [hgramσ]
+    have e1 : (gram⁻¹).map σ * gram.map σ = 1 := by
+      have h3 : (gram⁻¹ * gram).map (σ : E →+* E) = (gram⁻¹).map σ * gram.map σ := Matrix.map_mul
+      rw [← h3, Matrix.nonsing_inv_mul _ hu]
+      exact Matrix.map_one _ (map_zero _) (map_one _)
+    have e2 : -(gram⁻¹)ᵀ * gram.map σ = 1 := by
+      rw [h1, neg_mul_neg, ← Matrix.transpose_mul, Matrix.mul_nonsing_inv _ hu, Matrix.transpose_one]
+    have hinvσ : (gram⁻¹).map σ = -(gram⁻¹)ᵀ :=
+      (Matrix.inv_eq_left_inv e1).symm.trans (Matrix.inv_eq_left_inv e2)
+    intro a b
+    have h2 := congrFun (congrFun hinvσ a) b
+    have hξσ : σ ξ = -ξ := hξ
+    simp only [Matrix.map_apply, Matrix.neg_apply, Matrix.transpose_apply] at h2
+    rw [← hσ]
+    simp [Matrix.smul_apply, map_inv₀, hξσ, h2]
+  · rw [Matrix.det_smul]
+    exact mul_ne_zero (pow_ne_zero _ (neg_ne_zero.2 (inv_ne_zero hξ0)))
+      (Matrix.isUnit_nonsing_inv_det _ (isUnit_iff_ne_zero.2 hdet)).ne_zero
+  · have hu : IsUnit gram.det := isUnit_iff_ne_zero.2 hdet
+    intro x y
+    obtain ⟨t, ht, c, hc⟩ := hmax x
+    obtain ⟨s, hs, d, hd⟩ := hmax y
+    have ht' : (t : E) ≠ 0 := by simpa using ht
+    let cv : Fin r → E := fun i => c i
+    let dv : Fin r → E := fun j => σ (d j)
+    have hA : (fun j => (t : E) * ψ x j) = cv ᵥ* gram := funext fun j => by
+      rw [hψ, ← hsmul, ← hc, hsumL]
+      simp [Matrix.vecMul, dotProduct, cv, gram]
+    have hB : (fun b => -(σ (s : E) * σ (ψ y b))) = gram *ᵥ dv := funext fun b => by
+      rw [hψ, hherm (l b) y, map_neg, hσσ, mul_neg, neg_neg, ← hsmul', ← hd, hsumR]
+      simp [Matrix.mulVec, dotProduct, dv, gram, mul_comm]
+    have hC : (t : E) * σ s * h0 x y = cv ⬝ᵥ (gram *ᵥ dv) := by
+      rw [mul_assoc, ← hsmul', ← hsmul, ← hc, ← hd, hsumL]
+      simp only [hsumR, Matrix.mulVec, dotProduct, Finset.mul_sum, cv, dv, gram, Matrix.of_apply]
+      exact Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => by ring
+    have key : ξ * _root_.ReciprocityTheory.ChartRestriction.G.FD.herm (-ξ⁻¹ • gram⁻¹) (ψ x) (ψ y) = h0 x y := by
+      apply mul_left_cancel₀ (mul_ne_zero ht' (hσ0 s hs))
+      rw [hC, ← vecMul_one cv, ← Matrix.mul_nonsing_inv _ hu, ← vecMul_vecMul, ← dotProduct_mulVec,
+        ← hA, ← hB]
+      unfold _root_.ReciprocityTheory.ChartRestriction.G.FD.herm
+      simp only [← hσ, dotProduct, Matrix.mulVec, Finset.mul_sum, Matrix.smul_apply, smul_eq_mul]
+      refine Finset.sum_congr rfl fun a _ => Finset.sum_congr rfl fun b _ => ?_
+      field_simp
+    have h1 := hh0 x y 1
+    rw [one_smul] at h1
+    rw [key, ← h1]
+    simp
+
+end GlobalTheory
+
+
+[PCL_SRC_ORIGINAL_HERMITIAN_DATA] Original left-linear Hermitian form, unitary stabilizer and complete Data
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/FundamentalDomains/Signature.lean#L12-L111
+def cc (x : E) : E := IsCMField.complexConj E x
+
+def herm {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) : E :=
+  ∑ a, ∑ b, x a * G a b * cc (y b)
+
+def hermC {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (u v : Fin r → ℂ) : ℂ :=
+  ∑ a, ∑ b, u a * τ (G a b) * conj (v b)
+
+def col {r : ℕ} (x : Matrix (Fin r) (Fin r) ℂ) (a : Fin r) : Fin r → ℂ := fun k => x k a
+
+def gram {r : ℕ} (τ : E →+* ℂ) (G : Matrix (Fin r) (Fin r) E) (x : Matrix (Fin r) (Fin r) ℂ) :
+    Matrix (Fin r) (Fin r) ℂ :=
+  Matrix.of fun a b => hermC τ G (col x a) (col x b)
+
+def lminor {r : ℕ} (M : Matrix (Fin r) (Fin r) ℂ) (i : Fin (r + 1)) : ℂ :=
+  (M.submatrix (Fin.castLE (Nat.le_of_lt_succ i.isLt)) (Fin.castLE (Nat.le_of_lt_succ i.isLt))).det
+
+def sgn (p0 a : ℕ) : ℝ := if a < p0 then 1 else -1
+
+def psgn (p0 i : ℕ) : ℝ := ∏ a ∈ Finset.range i, sgn p0 a
+
+abbrev Frame (Ψ : Finset (E →+* ℂ)) (r : ℕ) : Type := Ψ → Fin r → Fin r → ℂ
+
+def mat {Ψ : Finset (E →+* ℂ)} {r : ℕ} (x : Frame Ψ r) (τ : Ψ) : Matrix (Fin r) (Fin r) ℂ :=
+  Matrix.of (x τ)
+
+def dmin {Ψ : Finset (E →+* ℂ)} {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (x : Frame Ψ r) (τ : Ψ)
+    (i : Fin (r + 1)) : ℂ :=
+  lminor (gram τ.1 G (mat x τ)) i
+
+def GG (Ψ : Finset (E →+* ℂ)) {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (p0 : ℕ) : Set (Frame Ψ r) :=
+  {x | ∀ τ : Ψ, (mat x τ).det ≠ 0 ∧ ∀ i : Fin (r + 1), 0 < psgn p0 i * (dmin G x τ i).re}
+
+def Bor (Ψ : Finset (E →+* ℂ)) (r : ℕ) : Set (Frame Ψ r) :=
+  {b | ∀ τ : Ψ, (mat b τ).det ≠ 0 ∧ ∀ a c : Fin r, c < a → b τ a c = 0}
+
+def rmul {Ψ : Finset (E →+* ℂ)} {r : ℕ} (x b : Frame Ψ r) : Frame Ψ r :=
+  fun τ => (mat x τ * mat b τ : Matrix (Fin r) (Fin r) ℂ)
+
+def lact {Ψ : Finset (E →+* ℂ)} {r : ℕ} (γ : GL (Fin r) E) (x : Frame Ψ r) : Frame Ψ r :=
+  fun τ => ((γ : Matrix (Fin r) (Fin r) E).map τ.1 * mat x τ : Matrix (Fin r) (Fin r) ℂ)
+
+def IsUStab {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E))
+    (γ : GL (Fin r) E) : Prop :=
+  (∀ x y, herm G (Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) x) (Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) y) =
+    herm G x y) ∧
+  ∀ x, x ∈ Λ ↔ Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) x ∈ Λ
+
+def transvMat {r : ℕ} (G : Matrix (Fin r) (Fin r) E) (ξ : Fin r → E) (α : E) :
+    Matrix (Fin r) (Fin r) E :=
+  Matrix.of fun a b => (if a = b then 1 else 0) + α * ξ a * ∑ k, G b k * cc (ξ k)
+
+abbrev Wt (Ψ : Finset (E →+* ℂ)) (r : ℕ) : Type := Ψ → Fin r → ℤ
+
+def bchar {Ψ : Finset (E →+* ℂ)} {r : ℕ} (la : Wt Ψ r) (b : Frame Ψ r) : ℂ :=
+  ∏ τ, ∏ i, b τ i i ^ la τ i
+
+structure Data (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) where
+
+  Ψ : Finset (E →+* ℂ)
+  cmType : ∀ τ : E →+* ℂ, τ ∈ Ψ ↔ ComplexEmbedding.conjugate τ ∉ Ψ
+
+  Gm : Matrix (Fin r) (Fin r) E
+  Gm_herm : ∀ a b, cc (Gm a b) = Gm b a
+  Gm_det : Gm.det ≠ 0
+  p0 : ℕ
+  p0_le : p0 ≤ r
+
+  signature : ∀ τ : Ψ, ∃ P : Matrix (Fin r) (Fin r) ℂ, P.det ≠ 0 ∧
+    gram τ.1 Gm P = Matrix.diagonal fun a : Fin r => ((sgn p0 (a : ℕ) : ℝ) : ℂ)
+
+  Λ : Submodule (𝓞 E) (Fin r → E)
+  Λ_fg : Λ.FG
+  Λ_span : Submodule.span E (Λ : Set (Fin r → E)) = ⊤
+  den : 𝓞 E
+  den_ne : den ≠ 0
+  Λ_int : ∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ ((den : E) * herm Gm x y)
+
+  Γ : Subgroup (GL (Fin r) E)
+  Γ_stab : ∀ γ ∈ Γ, IsUStab Gm Λ γ
+  Γ_index : ∃ S : Finset (GL (Fin r) E), ∀ γ, IsUStab Gm Λ γ → ∃ s ∈ S, s⁻¹ * γ ∈ Γ
+  Γ_free : ∀ γ ∈ Γ, ∀ x ∈ GG Ψ Gm p0, ∀ b ∈ Bor Ψ r, lact γ x = rmul x b → γ = 1
+
+  χ : Wt Ψ r → GL (Fin r) E → ℂ
+  χ_mul : ∀ la, ∀ γ ∈ Γ, ∀ γ' ∈ Γ, χ la (γ * γ') = χ la γ * χ la γ'
+  χ_add : ∀ la la', ∀ γ ∈ Γ, χ (la + la') γ = χ la γ * χ la' γ
+  χ_fin : ∀ la, ∃ n : ℕ, 0 < n ∧ ∀ γ ∈ Γ, χ la γ ^ n = 1
+
+  ξ0 : E
+  ξ0_im : cc ξ0 = -ξ0
+  ξ0_ne : ξ0 ≠ 0
+
+  κ0 : E
+  κ0_xi : κ0 = 2 * ξ0 ∨ κ0 = -(2 * ξ0)
+  κ0_sign : ∀ τ : Ψ, (τ.1 κ0).im < 0
+  m : ℕ
+  m_pos : 0 < m
+  transv : ∀ ξ ∈ Λ, herm Gm ξ ξ = 0 → ∀ s : E, cc s = s → IsIntegral ℤ s →
+    ∃ γ ∈ Γ, (γ : Matrix (Fin r) (Fin r) E) = transvMat Gm ξ ((m : E) * s * κ0)
+
+
+
+[PCL_SRC_ORIGINAL_DATAX] EFf sign, every DataX field and exact fdeg/rdE normalization
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/FundamentalDomains/FundamentalDomainPointBound.lean#L12-L41
+
+def EFf {r : ℕ} (ξ0 : E) (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) : ℚ :=
+  Algebra.trace ℚ E (-ξ0 * herm G x y)
+
+structure DataX (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) extends Data E r where
+  k0 : ℝ
+  minWeight_pos : 0 < k0
+  k0_le : k0 ≤ 2
+  ξ0_abs : ∀ τ : Ψ, ‖τ.1 ξ0‖ = k0 / 2
+  EF_int : ∀ x ∈ Λ, ∀ y ∈ Λ, ∃ k : ℤ, EFf ξ0 Gm x y = k
+  EF_perf : ∀ φ : Λ →+ ℤ, ∃ x ∈ Λ, ∀ y : Λ, (φ y : ℚ) = EFf ξ0 Gm x y
+  L' : Submodule (𝓞 E) (Fin r → E)
+  L'_fg : L'.FG
+  L'_int : ∀ x ∈ L', ∀ y ∈ L', IsIntegral ℤ (herm Gm x y)
+  L'_dual : ∀ x, (∀ y ∈ L', IsIntegral ℤ (herm Gm x y)) → x ∈ L'
+  NA : ℕ
+  NC : ℕ
+  NA_pos : 0 < NA
+  NC_pos : 0 < NC
+  NA_sub : ∀ x ∈ Λ, (NA : E) • x ∈ L'
+  NC_sub : ∀ x ∈ L', (NC : E) • x ∈ Λ
+  g : ℕ
+  g_pos : 0 < g
+  cong : ∀ γ : GL (Fin r) E, IsUStab Gm Λ γ →
+    (∀ x ∈ Λ, ∃ y ∈ Λ, Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) x - x = (g : E) • y) → γ ∈ Γ
+
+def fdeg (E : Type) [Field E] [NumberField E] : ℕ := Module.finrank ℚ E / 2
+
+def dE (E : Type) [Field E] [NumberField E] : ℝ := |(NumberField.discr E : ℝ)|
+
+
+
+[PCL_SRC_IDEAL_DUALITY] Fractional-ideal conjugation, ideal-valued dual, scalar-product cancellation and lattice fullness
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/HermitianTraceForms/TraceFormDualOneTraceFormDual.lean#L14-L257
+theorem isIntegral_cc {a : E} (h : IsIntegral ℤ a) : IsIntegral ℤ (cc a) :=
+  (IsCMField.ringOfIntegersComplexConj E ⟨a, h⟩).isIntegral_coe
+
+theorem trace_cc (a : E) : Algebra.trace ℚ E (cc a) = Algebra.trace ℚ E a :=
+  Algebra.trace_eq_of_algEquiv ((IsCMField.complexConj E).restrictScalars ℚ) a
+
+def conjFrac : FractionalIdeal (𝓞 E)⁰ E ≃+* FractionalIdeal (𝓞 E)⁰ E :=
+  FractionalIdeal.ringEquivOfRingEquiv E E (IsCMField.ringOfIntegersComplexConj E).toRingEquiv
+
+private theorem fractionRing_conj (x : E) :
+    IsFractionRing.ringEquivOfRingEquiv (K := E) (L := E)
+      (IsCMField.ringOfIntegersComplexConj E).toRingEquiv x = cc x := by
+  obtain ⟨a, b, -, rfl⟩ := IsFractionRing.div_surjective (A := 𝓞 E) x
+  rw [map_div₀, IsFractionRing.ringEquivOfRingEquiv_algebraMap,
+    IsFractionRing.ringEquivOfRingEquiv_algebraMap, cc, map_div₀]
+  rfl
+
+theorem mem_conjFrac {a : FractionalIdeal (𝓞 E)⁰ E} {x : E} : x ∈ conjFrac a ↔ cc x ∈ a := by
+  constructor
+  · rintro ⟨y, hy, rfl⟩
+    have h := (congrArg cc (fractionRing_conj y)).trans (cc_cc y)
+    exact h.symm ▸ hy
+  · intro h
+    exact ⟨cc x, h, (fractionRing_conj (cc x)).trans (cc_cc x)⟩
+
+theorem cc_mem_conjFrac {a : FractionalIdeal (𝓞 E)⁰ E} {x : E} : cc x ∈ conjFrac a ↔ x ∈ a := by
+  rw [mem_conjFrac, cc_cc]
+
+@[simp] theorem conjFrac_conjFrac (a : FractionalIdeal (𝓞 E)⁰ E) : conjFrac (conjFrac a) = a := by
+  ext x; rw [mem_conjFrac, cc_mem_conjFrac]
+
+theorem conjFrac_ne_zero {a : FractionalIdeal (𝓞 E)⁰ E} (ha : a ≠ 0) : conjFrac a ≠ 0 :=
+  (map_ne_zero_iff _ conjFrac.injective).2 ha
+
+theorem conjFrac_inv (a : FractionalIdeal (𝓞 E)⁰ E) : conjFrac a⁻¹ = (conjFrac a)⁻¹ :=
+  map_inv₀ _ a
+
+theorem conjFrac_spanSingleton (x : E) :
+    conjFrac (FractionalIdeal.spanSingleton (𝓞 E)⁰ x) =
+      FractionalIdeal.spanSingleton (𝓞 E)⁰ (cc x) := by
+  ext y
+  rw [mem_conjFrac, FractionalIdeal.mem_spanSingleton, FractionalIdeal.mem_spanSingleton]
+  constructor
+  · rintro ⟨z, hz⟩
+    refine ⟨IsCMField.ringOfIntegersComplexConj E z, ?_⟩
+    rw [← cc_cc y, ← hz, Algebra.smul_def, Algebra.smul_def, cc_mul]; rfl
+  · rintro ⟨z, hz⟩
+    refine ⟨IsCMField.ringOfIntegersComplexConj E z, ?_⟩
+    rw [← hz, Algebra.smul_def, Algebra.smul_def, cc_mul, cc_cc]; rfl
+
+omit [IsCMField E] in
+theorem mem_one_fractionalIdeal_iff {x : E} :
+    x ∈ (1 : FractionalIdeal (𝓞 E)⁰ E) ↔ IsIntegral ℤ x := by
+  rw [FractionalIdeal.mem_one_iff]
+  exact ⟨fun ⟨z, hz⟩ => hz ▸ z.isIntegral_coe, fun h => ⟨⟨x, h⟩, rfl⟩⟩
+
+omit [IsCMField E] in
+
+theorem mem_inv_different_iff {x : E} :
+    x ∈ ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E)⁻¹ ↔
+      ∀ a : E, IsIntegral ℤ a → ∃ k : ℤ, Algebra.trace ℚ E (x * a) = k := by
+  rw [coeIdeal_differentIdeal ℤ ℚ E (𝓞 E), inv_inv,
+    FractionalIdeal.mem_dual (one_ne_zero (α := FractionalIdeal (𝓞 E)⁰ E))]
+  refine forall_congr' fun a => ?_
+  rw [mem_one_fractionalIdeal_iff, Algebra.traceForm_apply]
+  exact imp_congr_right fun _ => ⟨fun ⟨k, hk⟩ => ⟨k, hk.symm⟩, fun ⟨k, hk⟩ => ⟨k, hk.symm⟩⟩
+
+omit [IsCMField E] in
+theorem coe_different_ne_zero :
+    ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E) ≠ 0 := by
+  rw [coeIdeal_differentIdeal ℤ ℚ E (𝓞 E)]
+  exact inv_ne_zero (FractionalIdeal.dual_ne_zero ℤ ℚ one_ne_zero)
+
+theorem conjFrac_different :
+    conjFrac ((differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E) =
+      (differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) := by
+  apply inv_injective
+  rw [← conjFrac_inv]
+  ext x
+  rw [mem_conjFrac, mem_inv_different_iff, mem_inv_different_iff]
+  constructor
+  · intro h a ha
+    rw [← trace_cc, cc_mul]
+    exact h _ (isIntegral_cc ha)
+  · intro h a ha
+    rw [← trace_cc, cc_mul, cc_cc]
+    exact h _ (isIntegral_cc ha)
+
+omit [IsCMField E] in
+theorem fractionalIdeal_mul_smul (a b : FractionalIdeal (𝓞 E)⁰ E)
+    (Λ : Submodule (𝓞 E) (Fin r → E)) :
+    ((a * b : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) • Λ =
+      (a : Submodule (𝓞 E) E) • (b : Submodule (𝓞 E) E) • Λ := by
+  rw [FractionalIdeal.coe_mul]
+  exact Submodule.smul_assoc _ _ _
+
+omit [IsCMField E] in
+theorem fractionalIdeal_one_smul (Λ : Submodule (𝓞 E) (Fin r → E)) :
+    ((1 : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) • Λ = Λ := by
+  rw [FractionalIdeal.coe_one]
+  exact Submodule.one_smul _
+
+omit [IsCMField E] in
+theorem fractionalIdeal_smul_inv_smul {a : FractionalIdeal (𝓞 E)⁰ E} (ha : a ≠ 0)
+    (Λ : Submodule (𝓞 E) (Fin r → E)) :
+    (a : Submodule (𝓞 E) E) • ((a⁻¹ : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) • Λ = Λ := by
+  rw [← fractionalIdeal_mul_smul, mul_inv_cancel₀ ha, fractionalIdeal_one_smul]
+
+omit [IsCMField E] in
+theorem fractionalIdeal_inv_smul_smul {a : FractionalIdeal (𝓞 E)⁰ E} (ha : a ≠ 0)
+    (Λ : Submodule (𝓞 E) (Fin r → E)) :
+    ((a⁻¹ : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) • (a : Submodule (𝓞 E) E) • Λ = Λ := by
+  rw [← fractionalIdeal_mul_smul, inv_mul_cancel₀ ha, fractionalIdeal_one_smul]
+
+omit [IsCMField E] in
+
+theorem isLattice_fractionalIdeal_smul {a : FractionalIdeal (𝓞 E)⁰ E} (ha : a ≠ 0)
+    {Λ : Submodule (𝓞 E) (Fin r → E)} (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ) :
+    ReciprocityTheory.MultiplicativeHeights.IsLattice ((a : Submodule (𝓞 E) E) • Λ) := by
+  constructor
+  · obtain ⟨s, hs⟩ := FractionalIdeal.fg_of_isUnit a ha.isUnit
+    obtain ⟨t, ht⟩ := hΛ.1
+    classical
+    refine ⟨Finset.image₂ (· • ·) s t, le_antisymm ?_ ?_⟩
+    · rw [Submodule.span_le]
+      intro x hx
+      obtain ⟨α, hα, y, hy, rfl⟩ := Finset.mem_image₂.1 hx
+      exact Submodule.smul_mem_smul (hs ▸ Submodule.subset_span hα)
+        (ht ▸ Submodule.subset_span hy)
+    · rw [Submodule.smul_le, ← hs, ← ht]
+      intro α hα y hy
+      induction hα using Submodule.span_induction with
+      | mem α hα =>
+        induction hy using Submodule.span_induction with
+        | mem y hy => exact Submodule.subset_span (Finset.mem_coe.2 (Finset.mem_image₂_of_mem hα hy))
+        | zero => simp
+        | add y z _ _ hy hz => rw [smul_add]; exact add_mem hy hz
+        | smul c y _ hy => rw [smul_comm]; exact Submodule.smul_mem _ c hy
+      | zero => simp
+      | add α β _ _ hα hβ => rw [add_smul]; exact add_mem hα hβ
+      | smul c α _ hα => rw [smul_assoc]; exact Submodule.smul_mem _ c hα
+  · obtain ⟨α, hα0, hα⟩ : ∃ α : E, α ≠ 0 ∧ α ∈ a := by
+      by_contra h
+      push Not at h
+      exact ha (FractionalIdeal.eq_zero_iff.2 fun x hx => by_contra fun h0 => h x h0 hx)
+    rw [eq_top_iff, ← hΛ.2, Submodule.span_le]
+    intro y hy
+    have : y = α⁻¹ • α • y := by rw [smul_smul, inv_mul_cancel₀ hα0, one_smul]
+    rw [this]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span (Submodule.smul_mem_smul hα hy))
+
+omit [NumberField E] [IsCMField E] in
+theorem smul_mem_of_isIntegral (Λ : Submodule (𝓞 E) (Fin r → E)) {a : E} (ha : IsIntegral ℤ a)
+    {y : Fin r → E} (hy : y ∈ Λ) : a • y ∈ Λ :=
+  Λ.smul_mem (⟨a, ha⟩ : 𝓞 E) hy
+
+theorem herm_add_right (G : Matrix (Fin r) (Fin r) E) (x y y' : Fin r → E) :
+    herm G x (y + y') = herm G x y + herm G x y' := by
+  simp [herm, mul_add, Finset.sum_add_distrib]
+
+def hermDual (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E)) :
+    Submodule (𝓞 E) (Fin r → E) where
+  carrier := {x | ∀ y ∈ Λ, IsIntegral ℤ (herm G x y)}
+  add_mem' hx hx' y hy := by rw [herm_add_left]; exact (hx y hy).add (hx' y hy)
+  zero_mem' y _ := by simpa [herm] using isIntegral_zero
+  smul_mem' c x hx y hy := by
+    change IsIntegral ℤ (herm G ((c : E) • x) y)
+    rw [herm_smul_left]
+    exact c.isIntegral_coe.mul (hx y hy)
+
+variable {G : Matrix (Fin r) (Fin r) E} {Λ Λ₁ Λ₂ : Submodule (𝓞 E) (Fin r → E)}
+
+theorem mem_hermDual {x : Fin r → E} :
+    x ∈ hermDual G Λ ↔ ∀ y ∈ Λ, IsIntegral ℤ (herm G x y) := Iff.rfl
+
+theorem mem_smul_hermDual_iff {b : FractionalIdeal (𝓞 E)⁰ E} (hb : b ≠ 0) {x : Fin r → E} :
+    x ∈ (b : Submodule (𝓞 E) E) • hermDual G Λ ↔ ∀ y ∈ Λ, herm G x y ∈ b := by
+  constructor
+  · intro hx y hy
+    refine Submodule.smul_induction_on (p := fun x => herm G x y ∈ b) hx ?_ ?_
+    · intro β hβ w hw
+      rw [herm_smul_left, ← mul_one b]
+      exact FractionalIdeal.mul_mem_mul hβ (mem_one_fractionalIdeal_iff.2 (hw y hy))
+    · intro u v hu hv
+      rw [herm_add_left]
+      exact (b : Submodule (𝓞 E) E).add_mem hu hv
+  · intro h
+    have h1 : (1 : E) ∈ b * b⁻¹ := by
+      rw [mul_inv_cancel₀ hb]; exact FractionalIdeal.one_mem_one _
+    rw [← one_smul E x]
+    refine FractionalIdeal.mul_induction_on (C := fun t : E =>
+      t • x ∈ (b : Submodule (𝓞 E) E) • hermDual G Λ) h1 ?_ ?_
+    · intro β hβ γ hγ
+      rw [mul_smul]
+      refine Submodule.smul_mem_smul hβ fun y hy => ?_
+      rw [herm_smul_left, ← mem_one_fractionalIdeal_iff, ← inv_mul_cancel₀ hb]
+      exact FractionalIdeal.mul_mem_mul hγ (h y hy)
+    · intro u v hu hv
+      rw [add_smul]
+      exact add_mem hu hv
+
+theorem hermDual_smul {a : FractionalIdeal (𝓞 E)⁰ E} (ha : a ≠ 0) :
+    hermDual G ((a : Submodule (𝓞 E) E) • Λ) =
+      (((conjFrac a)⁻¹ : FractionalIdeal (𝓞 E)⁰ E) : Submodule (𝓞 E) E) • hermDual G Λ := by
+  ext x
+  rw [mem_smul_hermDual_iff (inv_ne_zero (conjFrac_ne_zero ha)), mem_hermDual]
+  constructor
+  · intro h y hy
+    rw [FractionalIdeal.mem_inv_iff (conjFrac_ne_zero ha)]
+    intro α hα
+    rw [mem_one_fractionalIdeal_iff, mul_comm, ← cc_cc α, ← herm_smul_right]
+    exact h _ (Submodule.smul_mem_smul (mem_conjFrac.1 hα) hy)
+  · intro h y hy
+    refine Submodule.smul_induction_on (p := fun y => IsIntegral ℤ (herm G x y)) hy ?_ ?_
+    · intro α hα w hw
+      rw [herm_smul_right, mul_comm, ← mem_one_fractionalIdeal_iff]
+      exact (FractionalIdeal.mem_inv_iff (conjFrac_ne_zero ha)).1 (h w hw) _
+        (cc_mem_conjFrac.2 hα)
+    · intro u v hu hv
+      rw [herm_add_right]
+      exact hu.add hv
+
+def traceFormBilin (ξ : E) (G : Matrix (Fin r) (Fin r) E) : LinearMap.BilinForm ℚ (Fin r → E) :=
+  LinearMap.mk₂ ℚ (EFf ξ G)
+    (fun x x' y => by simp only [EFf, herm_add_left, mul_add, map_add])
+    (fun c x y => by
+      rw [EFf, EFf, ← algebraMap_smul E c x, herm_smul_left, mul_left_comm, ← Algebra.smul_def,
+        map_smul])
+    (fun x y y' => by simp only [EFf, herm_add_right, mul_add, map_add])
+    (fun c x y => by
+      have hc : cc (algebraMap ℚ E c) = algebraMap ℚ E c := by simp [cc]
+      rw [EFf, EFf, ← algebraMap_smul E c y, herm_smul_right, hc, mul_left_comm,
+        ← Algebra.smul_def, map_smul])
+
+@[simp] theorem traceFormBilin_apply (ξ : E) (G : Matrix (Fin r) (Fin r) E) (x y : Fin r → E) :
+    traceFormBilin ξ G x y = EFf ξ G x y := rfl
+
+theorem EFf_smul_left (ξ : E) (G : Matrix (Fin r) (Fin r) E) (a : E) (x y : Fin r → E) :
+    EFf ξ G (a • x) y = EFf ξ G x (cc a • y) := by
+  rw [EFf, EFf, herm_smul_left, herm_smul_right, cc_cc]
+
+theorem traceFormBilin_nondegenerate {ξ : E} (hξ : ξ ≠ 0) (hG : G.det ≠ 0) :
+    (traceFormBilin ξ G).Nondegenerate := by
+  refine LinearMap.BilinForm.Nondegenerate.ofSeparatingLeft fun x hx => ?_
+
+
+[PCL_SRC_TRACE_DUALITY] Actual traceFormDual, exact different factor and equivalence with integral perfection
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/HermitianTraceForms/TraceFormDualOneTraceFormDual.lean#L258-L435
+  refine eq_zero_of_herm G hG x fun y => ?_
+  have h : -ξ * herm G x y = 0 := eq_zero_of_trace _ fun β => by
+    have := hx ((β : E) • y)
+    rwa [traceFormBilin_apply, EFf, herm_smul_right, mul_left_comm] at this
+  exact (mul_eq_zero.1 h).resolve_left (neg_ne_zero.2 hξ)
+
+def traceFormDual (ξ : E) (G : Matrix (Fin r) (Fin r) E) (Λ : Submodule (𝓞 E) (Fin r → E)) :
+    Submodule (𝓞 E) (Fin r → E) where
+  carrier := {x | ∀ y ∈ Λ, ∃ k : ℤ, EFf ξ G x y = k}
+  add_mem' {x x'} hx hx' y hy := by
+    obtain ⟨k, hk⟩ := hx y hy
+    obtain ⟨k', hk'⟩ := hx' y hy
+    refine ⟨k + k', ?_⟩
+    rw [← traceFormBilin_apply, map_add, LinearMap.add_apply, traceFormBilin_apply,
+      traceFormBilin_apply, hk, hk', Int.cast_add]
+  zero_mem' y _ := ⟨0, by simp [EFf, herm]⟩
+  smul_mem' c x hx y hy := by
+    change ∃ k : ℤ, EFf ξ G ((c : E) • x) y = k
+    rw [EFf_smul_left]
+    exact hx _ (smul_mem_of_isIntegral Λ (isIntegral_cc c.isIntegral_coe) hy)
+
+theorem mem_traceFormDual {ξ : E} {x : Fin r → E} :
+    x ∈ traceFormDual ξ G Λ ↔ ∀ y ∈ Λ, ∃ k : ℤ, EFf ξ G x y = k := Iff.rfl
+
+theorem traceFormDual_eq {ξ : E} (hξ : ξ ≠ 0) :
+    traceFormDual ξ G Λ =
+      (((FractionalIdeal.spanSingleton (𝓞 E)⁰ ξ *
+        (differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)))⁻¹ : FractionalIdeal (𝓞 E)⁰ E) :
+          Submodule (𝓞 E) E) • hermDual G Λ := by
+  have hs : FractionalIdeal.spanSingleton (𝓞 E)⁰ ξ ≠ 0 :=
+    FractionalIdeal.spanSingleton_ne_zero_iff.2 hξ
+  have key : ∀ t : E, t ∈ (FractionalIdeal.spanSingleton (𝓞 E)⁰ ξ *
+        (differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)))⁻¹ ↔
+      ∀ a : E, IsIntegral ℤ a → ∃ k : ℤ, Algebra.trace ℚ E (-ξ * (a * t)) = k := by
+    intro t
+    rw [mul_inv, FractionalIdeal.spanSingleton_inv, FractionalIdeal.mem_singleton_mul]
+    have e : ∀ a : E, -ξ * (a * t) = ξ * t * -a := fun a => by ring
+    constructor
+    · rintro ⟨y, hy, rfl⟩ a ha
+      rw [e, mul_inv_cancel_left₀ hξ]
+      exact mem_inv_different_iff.1 hy _ ha.neg
+    · intro h
+      refine ⟨ξ * t, mem_inv_different_iff.2 fun a ha => ?_, (inv_mul_cancel_left₀ hξ t).symm⟩
+      have := h _ ha.neg
+      rwa [e, neg_neg] at this
+  ext x
+  rw [mem_smul_hermDual_iff (inv_ne_zero (mul_ne_zero hs coe_different_ne_zero)),
+    mem_traceFormDual]
+  constructor
+  · intro h y hy
+    rw [key]
+    intro a ha
+    have := h _ (smul_mem_of_isIntegral Λ (isIntegral_cc ha) hy)
+    rwa [EFf, herm_smul_right, cc_cc] at this
+  · intro h y hy
+    have := (key _).1 (h y hy) 1 isIntegral_one
+    rwa [one_mul] at this
+
+theorem hermDual_eq_smul_traceFormDual {ξ : E} (hξ : ξ ≠ 0) :
+    hermDual G Λ =
+      ((FractionalIdeal.spanSingleton (𝓞 E)⁰ ξ *
+        (differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E) :
+          Submodule (𝓞 E) E) • traceFormDual ξ G Λ := by
+  rw [traceFormDual_eq hξ, fractionalIdeal_smul_inv_smul
+    (mul_ne_zero (FractionalIdeal.spanSingleton_ne_zero_iff.2 hξ) coe_different_ne_zero)]
+
+omit [IsCMField E] in
+
+theorem exists_rat_basis_of_isLattice (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ) :
+    ∃ (n : ℕ) (b : Module.Basis (Fin n) ℚ (Fin r → E)),
+      Submodule.span ℤ (Set.range b) = Λ.restrictScalars ℤ := by
+  have : (Λ.restrictScalars ℤ).IsLattice ℚ := by
+    constructor
+    · have : Module.Finite (𝓞 E) Λ := Module.Finite.iff_fg.2 hΛ.1
+      have : Module.Finite ℤ Λ := Module.Finite.trans (𝓞 E) Λ
+      exact Module.Finite.iff_fg.1 this
+    · rw [eq_top_iff]
+      intro x _
+      obtain ⟨d, hd, hdx⟩ := exists_smul_mem (F := E) Λ (x := x) (hΛ.2 ▸ Submodule.mem_top)
+      obtain ⟨e, he⟩ : ∃ e : 𝓞 E, e * d = (Algebra.norm ℤ d : 𝓞 E) := by
+        have := Ideal.absNorm_mem (Ideal.span {d})
+        rw [Ideal.absNorm_span_singleton, Ideal.mem_span_singleton'] at this
+        obtain ⟨e, he⟩ := this
+        rcases Int.natAbs_eq (Algebra.norm ℤ d) with h | h
+        · exact ⟨e, by rw [he, h]; simp⟩
+        · exact ⟨-e, by rw [neg_mul, he, h]; simp⟩
+      have hn : (Algebra.norm ℤ d : ℚ) ≠ 0 := by
+        exact_mod_cast Algebra.norm_ne_zero_iff.2 hd
+      have h1 : (Algebra.norm ℤ d : ℚ) • x ∈ Λ := by
+        have := Λ.smul_mem e hdx
+        rwa [smul_smul, he, Int.cast_smul_eq_zsmul, ← Int.cast_smul_eq_zsmul ℚ] at this
+      rw [← inv_smul_smul₀ hn x]
+      exact Submodule.smul_mem _ _ (Submodule.subset_span h1)
+  let b := Module.finBasis ℤ (Λ.restrictScalars ℤ)
+  refine ⟨_, b.extendOfIsLattice ℚ, ?_⟩
+  have h1 : Set.range (b.extendOfIsLattice ℚ) = (Λ.restrictScalars ℤ).subtype '' Set.range b := by
+    rw [← Set.range_comp]
+    congr 1
+    exact funext fun i => b.extendOfIsLattice_apply ℚ i
+  rw [h1, ← Submodule.map_span, b.span_eq, Submodule.map_top, Submodule.range_subtype]
+
+theorem exists_traceFormDual_eq {ξ : E} (hξ : ξ ≠ 0) (hG : G.det ≠ 0)
+    (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ) (φ : Λ →+ ℤ) :
+    ∃ x ∈ traceFormDual ξ G Λ, ∀ y : Λ, (φ y : ℚ) = EFf ξ G x y := by
+  obtain ⟨n, b, hb⟩ := exists_rat_basis_of_isLattice hΛ
+  have hbm : ∀ i, b i ∈ Λ := fun i => by
+    have : b i ∈ Λ.restrictScalars ℤ := hb ▸ Submodule.subset_span ⟨i, rfl⟩
+    exact this
+  let f : Module.Dual ℚ (Fin r → E) := b.constr ℚ fun i => (φ ⟨b i, hbm i⟩ : ℚ)
+  have hf : ∀ y : Λ, (φ y : ℚ) = f y := by
+    rintro ⟨y, hy⟩
+    have hy' : y ∈ Submodule.span ℤ (Set.range b) := hb ▸ hy
+    obtain ⟨c, rfl⟩ := (Submodule.mem_span_range_iff_exists_fun ℤ).1 hy'
+    have : (⟨∑ i, c i • b i, hy⟩ : Λ) = ∑ i, c i • (⟨b i, hbm i⟩ : Λ) := by
+      ext1; simp
+    rw [this, map_sum, Submodule.coe_sum, map_sum, Int.cast_sum]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [map_zsmul, Submodule.coe_smul_of_tower, map_zsmul, Module.Basis.constr_basis,
+      smul_eq_mul, Int.cast_mul, zsmul_eq_mul]
+  let x := ((traceFormBilin ξ G).toDual (traceFormBilin_nondegenerate hξ hG)).symm f
+  have hx : ∀ y, EFf ξ G x y = f y := fun y =>
+    LinearMap.BilinForm.apply_toDual_symm_apply (B := traceFormBilin ξ G) f y
+  exact ⟨x, fun y hy => ⟨φ ⟨y, hy⟩, by rw [hx, hf]⟩, fun y => by rw [hx, hf]⟩
+
+theorem eq_of_EFf_eq {ξ : E} (hξ : ξ ≠ 0) (hG : G.det ≠ 0) (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ)
+    {x x' : Fin r → E} (h : ∀ y ∈ Λ, EFf ξ G x y = EFf ξ G x' y) : x = x' := by
+  obtain ⟨n, b, hb⟩ := exists_rat_basis_of_isLattice hΛ
+  apply LinearMap.ker_eq_bot.1 (traceFormBilin_nondegenerate hξ hG).ker_eq_bot
+  refine b.ext fun i => h _ ?_
+  have : b i ∈ Λ.restrictScalars ℤ := hb ▸ Submodule.subset_span ⟨i, rfl⟩
+  exact this
+
+theorem perfect_iff_traceFormDual_eq {ξ : E} (hξ : ξ ≠ 0) (hG : G.det ≠ 0)
+    (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ) :
+    ((∀ x ∈ Λ, ∀ y ∈ Λ, ∃ k : ℤ, EFf ξ G x y = k) ∧
+      ∀ φ : Λ →+ ℤ, ∃ x ∈ Λ, ∀ y : Λ, (φ y : ℚ) = EFf ξ G x y) ↔
+    traceFormDual ξ G Λ = Λ := by
+  constructor
+  · rintro ⟨hint, hperf⟩
+    refine le_antisymm (fun x hx => ?_) hint
+    choose k hk using hx
+    let φ : Λ →+ ℤ := AddMonoidHom.mk' (fun y => k y y.2) fun y y' => by
+      apply Int.cast_injective (α := ℚ)
+      rw [Int.cast_add, ← hk, ← hk, ← hk]
+      exact map_add (traceFormBilin ξ G x) _ _
+    obtain ⟨x', hx', h⟩ := hperf φ
+    rw [eq_of_EFf_eq hξ hG hΛ (x := x) (x' := x') fun y hy => (hk y hy).trans (h ⟨y, hy⟩)]
+    exact hx'
+  · intro h
+    refine ⟨fun x hx => ?_, fun φ => ?_⟩
+    · rw [← h] at hx; exact hx
+    · obtain ⟨x, hx, hφ⟩ := exists_traceFormDual_eq hξ hG hΛ φ
+      exact ⟨x, h ▸ hx, hφ⟩
+
+theorem perfect_iff_hermDual_eq {ξ : E} (hξ : ξ ≠ 0) (hG : G.det ≠ 0)
+    (hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice Λ) :
+    ((∀ x ∈ Λ, ∀ y ∈ Λ, ∃ k : ℤ, EFf ξ G x y = k) ∧
+      ∀ φ : Λ →+ ℤ, ∃ x ∈ Λ, ∀ y : Λ, (φ y : ℚ) = EFf ξ G x y) ↔
+    hermDual G Λ =
+      ((FractionalIdeal.spanSingleton (𝓞 E)⁰ ξ *
+        (differentIdeal ℤ (𝓞 E) : Ideal (𝓞 E)) : FractionalIdeal (𝓞 E)⁰ E) :
+          Submodule (𝓞 E) E) • Λ := by
+  rw [perfect_iff_traceFormDual_eq hξ hG hΛ]
+  constructor
+  · intro h
+    rw [hermDual_eq_smul_traceFormDual hξ, h]
+  · intro h
+    rw [traceFormDual_eq hξ, h, fractionalIdeal_inv_smul_smul
+      (mul_ne_zero (FractionalIdeal.spanSingleton_ne_zero_iff.2 hξ) coe_different_ne_zero)]
+
+theorem hermDual_eq_self_iff :
+    hermDual G Λ = Λ ↔ (∀ x ∈ Λ, ∀ y ∈ Λ, IsIntegral ℤ (herm G x y)) ∧
+      ∀ x, (∀ y ∈ Λ, IsIntegral ℤ (herm G x y)) → x ∈ Λ :=
+  ⟨fun h => ⟨fun _ hx => (h.ge hx :), fun _ hx => h.le hx⟩, fun h => le_antisymm h.2 h.1⟩
+
+end
+
+end GlobalTheory
+
+
+[PCL_SRC_COMPLETE_DATAX_PRODUCER] Literal exists_dataX_of_perfect_traceForm and positive integral denominators
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/ExistsPosNatMemFractionalIdeal.lean#L10-L81
+
+theorem exists_pos_nat_mem_fractionalIdeal {E : Type} [Field E] [NumberField E]
+    {a : FractionalIdeal (nonZeroDivisors (𝓞 E)) E} (ha : a ≠ 0) :
+    ∃ n : ℕ, 0 < n ∧ (n : E) ∈ a := by
+  obtain ⟨x, hx0, hx⟩ := FractionalIdeal.exists_ne_zero_mem_isInteger ha
+  have hI : (Ideal.span {x} : Ideal (𝓞 E)) ≠ ⊥ := by simpa using hx0
+  obtain ⟨e, he⟩ := Ideal.mem_span_singleton'.1 (Ideal.absNorm_mem (Ideal.span {x}))
+  refine ⟨Ideal.absNorm (Ideal.span {x}),
+    Nat.pos_of_ne_zero fun h => hI (Ideal.absNorm_eq_zero_iff.1 h), ?_⟩
+  have h := (a : Submodule (𝓞 E) E).smul_mem e hx
+  rw [Algebra.smul_def, ← map_mul, he, map_natCast] at h
+  exact h
+
+theorem fractionalIdeal_smul_eq_span {E : Type} [Field E] [NumberField E] {r : ℕ}
+    (a : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (L : Submodule (𝓞 E) (Fin r → E)) :
+    (a : Submodule (𝓞 E) E) • L =
+      Submodule.span (𝓞 E) {v | ∃ α ∈ a, ∃ u ∈ L, v = α • u} := by
+  refine le_antisymm (Submodule.smul_le.2 fun α hα u hu => Submodule.subset_span ⟨α, hα, u, hu, rfl⟩)
+    (Submodule.span_le.2 ?_)
+  rintro _ ⟨α, hα, u, hu, rfl⟩
+  exact Submodule.smul_mem_smul hα hu
+
+theorem exists_dataX_of_perfect_traceForm : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (r : ℕ) (X : Data E r) (𝔄 𝔄b : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) (k : ℝ) (g : ℕ), (∀ a : E, a ∈ 𝔄b ↔ cc a ∈ 𝔄) → FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 E)) X.ξ0 * 𝔄 * 𝔄b * (differentIdeal ℤ (𝓞 E) : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) = 1 → (∀ τ : E →+* ℂ, ‖τ X.ξ0‖ = k) → k ≤ 1 → (∀ x ∈ X.Λ, ∀ y ∈ X.Λ, ∃ n : ℤ, EFf X.ξ0 X.Gm x y = n) → (∀ φ : X.Λ →+ ℤ, ∃ x ∈ X.Λ, ∀ y : X.Λ, (φ y : ℚ) = EFf X.ξ0 X.Gm x y) → 0 < g → (∀ γ : GL (Fin r) E, IsUStab X.Gm X.Λ γ → (∀ x ∈ X.Λ, ∃ y ∈ X.Λ, Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) x - x = (g : E) • y) → γ ∈ X.Γ) → ∃ Xx : DataX E r, Xx.toData = X ∧ Xx.g = g ∧ Xx.Λ = Submodule.span (𝓞 E) {v | ∃ a ∈ 𝔄, ∃ u ∈ Xx.L', v = a • u} := by
+  intro E _ _ _ r X 𝔄 𝔄b k g hb hone habs hk hint hperf hg hcong
+  have hbc : 𝔄b = conjFrac 𝔄 := by
+    ext a; rw [mem_conjFrac]; exact hb a
+  subst hbc
+  have hA : 𝔄 ≠ 0 := by
+    rintro rfl
+    simp at hone
+  have hΛ : ReciprocityTheory.MultiplicativeHeights.IsLattice X.Λ := ⟨X.Λ_fg, X.Λ_span⟩
+  have hd := (perfect_iff_hermDual_eq X.ξ0_ne X.Gm_det hΛ).1 ⟨hint, hperf⟩
+  have hself : hermDual X.Gm (((𝔄⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) :
+      Submodule (𝓞 E) E) • X.Λ) =
+      ((𝔄⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) • X.Λ := by
+    rw [hermDual_smul (inv_ne_zero hA), conjFrac_inv, inv_inv, hd, ← fractionalIdeal_mul_smul]
+    congr 2
+    refine eq_inv_of_mul_eq_one_left ?_
+    rw [← hone]; ring
+  obtain ⟨hi, hdual⟩ := hermDual_eq_self_iff.1 hself
+  obtain ⟨NA, hNA, hNA'⟩ := exists_pos_nat_mem_fractionalIdeal (inv_ne_zero hA)
+  obtain ⟨NC, hNC, hNC'⟩ := exists_pos_nat_mem_fractionalIdeal hA
+  have hk0 : 0 < k := by
+    obtain ⟨τ⟩ : Nonempty (E →+* ℂ) := inferInstance
+    rw [← habs τ, norm_pos_iff]
+    exact (map_ne_zero τ).2 X.ξ0_ne
+  refine ⟨{ toData := X
+            k0 := 2 * k
+            minWeight_pos := by positivity
+            k0_le := by linarith
+            ξ0_abs := fun τ => by rw [habs]; ring
+            EF_int := hint
+            EF_perf := hperf
+            L' := ((𝔄⁻¹ : FractionalIdeal (nonZeroDivisors (𝓞 E)) E) : Submodule (𝓞 E) E) • X.Λ
+            L'_fg := (isLattice_fractionalIdeal_smul (inv_ne_zero hA) hΛ).1
+            L'_int := hi
+            L'_dual := hdual
+            NA := NA
+            NC := NC
+            NA_pos := hNA
+            NC_pos := hNC
+            NA_sub := fun x hx => Submodule.smul_mem_smul hNA' hx
+            NC_sub := fun x hx => ?_
+            g := g
+            g_pos := hg
+            cong := hcong }, rfl, rfl, ?_⟩
+  · have h := Submodule.smul_mem_smul (show (NC : E) ∈ (𝔄 : Submodule (𝓞 E) E) from hNC') hx
+    rwa [fractionalIdeal_smul_inv_smul hA] at h
+  · change X.Λ = _
+    rw [← fractionalIdeal_smul_eq_span, fractionalIdeal_smul_inv_smul hA]
+
+end GlobalTheory
+
+
+[PCL_SRC_ORIGINAL_ISUNF] Original Unf, IsUnf, and same-component integral lattice/trace dictionary
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/UnFree.lean#L15-L95
+structure Unf (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) : Type 1 where
+
+  Comp : Type
+  [fin : Fintype Comp]
+
+  X : Comp → Data E r
+
+  un : ∀ k, (X k).dom → FrPt Xo c (CAt σ)
+
+attribute [instance] Unf.fin
+
+variable {Xo : Moduli Dw l} {c : Coeff l} {σ : c.F →+* ℂ} {r : ℕ}
+
+def gxFst {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) : Gx x ⟶ Xo.univ.t.G.left :=
+  (CartesianMonoidalCategory.snd (Over.mk x) Xo.univ.t.G).left
+
+def gxSnd {S : Type} [CommRing S] (x : Sp S ⟶ Xo.X) : Gx x ⟶ Sp S :=
+  (CartesianMonoidalCategory.fst (Over.mk x) Xo.univ.t.G).left
+
+def toC {K : Type} [Field K] {σ : K →+* ℂ} (z : CAt σ) : ℂ := z
+
+open Classical in
+
+def rdU (U : Unf Xo c σ r) : Rul Xo c →ₛₗ[σ] FDSec U.X where
+  toFun f := fun k x => if h : x ∈ (U.X k).dom then toC (evR Xo c f (U.un k ⟨x, h⟩)) else 0
+  map_add' f g := by
+    funext k x
+    simp only [Pi.add_apply]
+    split_ifs with h
+    · have e := evalAt_add (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) f g (U.un k ⟨x, h⟩)
+      exact e
+    · simp
+  map_smul' a f := by
+    funext k x
+    simp only [Pi.smul_apply, smul_eq_mul]
+    split_ifs with h
+    · have e := evalAt_smul (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) a f (U.un k ⟨x, h⟩)
+      exact e
+    · simp
+
+def relab (c : Coeff l) (σ : c.F →+* ℂ) (τ : E →+* ℂ) : E →+* ℂ := σ.comp (embF c τ)
+
+def GoodEmb (c : Coeff l) (σ : c.F →+* ℂ) : Prop :=
+  (σ.comp (IntermediateField.inclusion c.le).toRingHom) (baseKA l).ρ = H.rt0
+
+open Classical in
+
+def laU (U : Unf Xo c σ r) (a : (E →+* ℂ) × ℕ → ℕ) (n : ℕ) (k : U.Comp) : Wt (U.X k).Ψ r :=
+  fun τ j => if (U.X k).p0 ≤ (j : ℕ) then
+      (a (Function.invFun (relab c σ) τ.1, (j : ℕ) - (U.X k).p0) : ℤ) + ((n / 2 : ℕ) : ℤ)
+    else -(a (Function.invFun (relab c σ) (conjEmb τ.1), (U.X k).p0 - 1 - (j : ℕ)) : ℤ) - ((n / 2 : ℕ) : ℤ)
+
+open Classical in
+
+def perFr (X : Data E r) (x : Frame X.Ψ r) (v : Fin r → E) (τ : E →+* ℂ) (i : ℕ) : ℂ :=
+  if h : τ ∈ X.Ψ then
+    (if hi : X.p0 + i < r then ((mat x ⟨τ, h⟩)⁻¹.mulVec (Data.emb τ v)) ⟨X.p0 + i, hi⟩ else 0)
+  else if h' : conjEmb τ ∈ X.Ψ then
+    (if hj : X.p0 - 1 - i < r then
+      hermC (conjEmb τ) X.Gm (col (mat x ⟨conjEmb τ, h'⟩) ⟨X.p0 - 1 - i, hj⟩) (Data.emb (conjEmb τ) v) else 0)
+  else 0
+
+def IsUnf (U : Unf Xo c σ r) : Prop :=
+  r = Dw.p + Dw.q ∧ (∀ k, (U.X k).p0 = Dw.q ∧ ∀ τ : E →+* ℂ, τ ∈ (U.X k).Ψ ↔ τ (H.rt : E) = H.rt0) ∧
+    (∀ y : FrPt Xo c (CAt σ), ∃ k, ∃ x : (U.X k).dom, ∃ t : Ix Dw → (CAt σ)ˣ, FrBor t (U.un k x) y) ∧
+    (∀ k k' (x : (U.X k).dom) (x' : (U.X k').dom), (∃ t : Ix Dw → (CAt σ)ˣ, FrBor t (U.un k x) (U.un k' x')) ↔
+      ∃ γ ∈ (U.X k).Γ, ∃ b ∈ Bor (U.X k).Ψ r,
+        (⟨k', x'.1⟩ : Σ k, Frame (U.X k).Ψ r) = ⟨k, rmul (lact γ x.1) b⟩) ∧
+    (∀ a n, Dom a n → ∀ f ∈ sec Xo c a n, ∀ k, (U.X k).IsSec (laU U a n k) (rdU U f k)) ∧
+    ∃ (g : ℕ) (e : Fin g ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ))
+      (F : FamilyUnif Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) (fun j => relab c σ (e j).1))
+      (ik : U.Comp → Fin F.n) (φ : ∀ k, (F.Di (ik k)).La ≃ₗ[𝓞 E] (U.X k).Λ),
+      (∀ k a b, (((F.Di (ik k)).EF a b : ℤ) : ℚ) =
+        Algebra.trace ℚ E (-(U.X k).ξ0 * herm (U.X k).Gm (φ k a : Fin r → E) (φ k b))) ∧
+      ∀ k (x : (U.X k).dom), ∃ Pm : (F.Di (ik k)).La →+ (Fin g → ℂ),
+        (∀ a j, Pm a j = perFr (U.X k) x.1 (φ k a : Fin r → E) (relab c σ (e j).1) (e j).2) ∧
+        IsPeriod (F.Di (ik k)) (fun j => relab c σ (e j).1) Pm ∧ (U.un k x).x = F.u (ik k) Pm ∧
+        (∀ τ (i : Fin (Dw.mult τ)), IsDerivAt0 (fun z => (F.ex (ik k) Pm z).left) (Pi.single (e.symm ⟨τ, i⟩) 1)
+          ((U.un k x).u τ i)) ∧
+        ((∀ τ' i', ‖dmin (U.X k).Gm x.1 τ' i'‖ = 1) →
+          ∃ (Hm : Matrix (Fin g) (Fin g) ℂ) (χl : (Fin g → ℂ) → ℂ) (fr : Xo.univ.t.PP.L.ι → (Fin g → ℂ) → ℂ)
+
+
+[PCL_SRC_TRACE_PERFECTION_ON_UNF] Whole original traceForm_integral_perfect_of_isUnf endpoint
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/TraceFormIntegralPerfectOfIsUnf.lean#L9-L23
+theorem traceForm_integral_perfect_of_isUnf : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l) (σ : c.F →+* ℂ) (r : ℕ) (U : Formalism.L2.PjFree.Unf Xo c σ r), Formalism.L2.PjFree.IsUnf U → ∀ k, (∀ x ∈ (U.X k).Λ, ∀ y ∈ (U.X k).Λ, ∃ n : ℤ, EFf (U.X k).ξ0 (U.X k).Gm x y = n) ∧ ∀ φ : (U.X k).Λ →+ ℤ, ∃ x ∈ (U.X k).Λ, ∀ y : (U.X k).Λ, (φ y : ℚ) = EFf (U.X k).ξ0 (U.X k).Gm x y := by
+  intro E _ _ _ H Dw l Xo c σ r U hU k
+  obtain ⟨-, -, -, -, -, g, e, F, ik, φ, hφ, -⟩ := hU
+  refine ⟨fun x hx y hy => ?_, fun ψ => ?_⟩
+  · refine ⟨(F.Di (ik k)).EF ((φ k).symm ⟨x, hx⟩) ((φ k).symm ⟨y, hy⟩), ?_⟩
+    rw [hφ k]
+    simp only [LinearEquiv.apply_symm_apply, EFf]
+  · obtain ⟨a, ha⟩ := (F.Di (ik k)).unimod.2
+      (ψ.comp (φ k).toLinearMap.toAddMonoidHom).toIntLinearMap
+    refine ⟨φ k a, (φ k a).2, fun y => ?_⟩
+    have h := hφ k a ((φ k).symm y)
+    rw [ha] at h
+    simpa [EFf] using h
+
+end GlobalTheory
+
+
+[PCL_SRC_HOST_PRIME_CONGRUENCE] Actual d prime and d congruent 7 modulo 16
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/FrobeniusOrbits/Statement.lean#L13-L25
+def HostHyp (q d : ℕ) : Prop :=
+  q.Prime ∧ d.Prime ∧ q % 8 = 3 ∧ d % 16 = 7 ∧ jacobiSym (-(d : ℤ)) q = 1
+
+theorem HostHyp.toHypQD {q d : ℕ} (h : HostHyp q d) : HypQD q d := by
+  obtain ⟨h1, h2, h3, h4, -⟩ := h
+  exact ⟨h1, h2, h3, by omega⟩
+
+theorem HostHyp.toHypOdd {q d : ℕ} (h : HostHyp q d) : HypOdd q d := by
+  obtain ⟨h1, h2, h3, h4, -⟩ := h
+  exact ⟨h1, h2, by omega, by omega, by omega⟩
+
+abbrev HGrp (e : ℕ) : Type :=
+  (ZMod (2 ^ (e + 2)))ˣ ⧸ Subgroup.zpowers (-1 : (ZMod (2 ^ (e + 2)))ˣ)
+
+
+[PCL_SRC_ACTUAL_HOST_FIELDS] Actual host half-different, ccK and fixed embedding fields
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/DataHost.lean#L40-L95
+
+  flPS : toHostRaw.PsQ
+  sqq : E
+  sqq_sq : sqq ^ 2 = -(q : E)
+  gal_sqq : ∀ σ : E ≃ₐ[ℚ] E, σ sqq = ((((gal σ).1.1 : ℤˣ) : ℤ) : E) * sqq
+
+  QS_exact : toHostRaw.Exact
+
+  QS_le : QS ≤ R.n ^ 2
+
+  o_pow : R.toFrame.o ^ 64 ≤ 2 ^ R.e
+
+  q_ne_three : q ≠ 3
+
+  qd_big : 4 * R.t * R.r + 1 < q ∧ 4 * R.t * R.r + 1 < d
+
+  splitBound : ℕ
+  split_small : ∀ p : ℕ, p.Prime → p ≠ 2 → p ≤ splitBound → jacobiSym (-(d : ℤ)) p = 1
+
+  small_le : ∀ l : ℕ, l.Prime → l ≠ 2 → l ∣ QS → 4 * l ≤ splitBound
+
+  φ₀ : E →+* ℂ
+  φ₀_mem : φ₀ ∈ toHostRaw.cmType
+
+  𝔟 : Ideal (𝓞 E)
+  𝔟_spec : differentIdeal (𝓞 toHostRaw.K) (𝓞 E) = 𝔟 * (toHostRaw.conj • 𝔟) ∧ 𝔟 ⊔ toHostRaw.conj • 𝔟 = ⊤
+
+  𝔟_stable : ∀ σ : E ≃ₐ[ℚ] E, gal σ ∈ R.Psi → σ • 𝔟 = 𝔟
+
+  levelPrimes : Finset ℕ
+
+  g : Fin 2 → ℕ
+  g_prime : ∀ i, (g i).Prime
+  g_ne : g 0 ≠ g 1
+  g_level : ∀ i, g i ∈ levelPrimes
+
+  pde : ℕ
+  pde' : ℕ
+  pde_prime : pde.Prime
+  pde'_prime : pde'.Prime
+  pde_ne : pde ≠ pde'
+  pde_level : pde ∈ levelPrimes ∧ pde' ∈ levelPrimes
+
+  pde_mod : pde % 15 = 1 ∧ pde' % 15 = 1
+  pde_ne_g : ∀ i, pde ≠ g i ∧ pde' ≠ g i
+
+  ccK : Ideal (𝓞 toHostRaw.K)
+  ccK_ne_bot : ccK ≠ ⊥
+
+  ccK_primitive : ∀ m : ℕ, 1 < m → ¬ ccK ≤ Ideal.span {(m : 𝓞 toHostRaw.K)}
+
+  ccK_split : ∀ P : Ideal (𝓞 toHostRaw.K), P.IsPrime → ccK ≤ P →
+    (Ideal.absNorm P).Prime ∧ jacobiSym (-(d : ℤ)) (Ideal.absNorm P) = 1
+
+  ccK_coprime : ∀ p ∈ insert 2 (insert 3 (insert 5 (insert q (insert d levelPrimes)))), Nat.Coprime (Ideal.absNorm ccK) p
+
+
+
+[PCL_SRC_ACTUAL_HOST_DEFINITIONS] Original xi0, ccE, AA, AAbar and absolute different
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/DataHost.lean#L145-L166
+noncomputable def ka : ℝ := Real.pi / H.v
+
+def sqrtMinusD : H.E := H.sqd
+
+noncomputable def xi0 : H.E := -1 / ((Ideal.absNorm H.ccK : H.E) * H.sqrtMinusD)
+
+noncomputable def ccE : Ideal (𝓞 H.E) := Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) H.ccK
+
+noncomputable def AA0 : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E :=
+  ((H.𝔟 : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E))⁻¹
+
+noncomputable def AA : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E :=
+  (H.ccE : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) * H.AA0
+
+noncomputable def AAbar : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E :=
+  ((H.conj • H.ccE : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) *
+    ((H.conj • H.𝔟 : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E)⁻¹
+
+noncomputable def ddE : Ideal (𝓞 H.E) := differentIdeal ℤ (𝓞 H.E)
+
+def secondSet_card_lower_bound : Prop :=
+  (R.n0 : ℝ) * Real.exp (-(H.CT2 * Real.sqrt (Real.log (R.n0 : ℝ) * Real.log H.Lw))) / H.Lw ≤ H.T2.card
+
+
+[PCL_SRC_HOST_STAR_IDENTIFICATION] Host conjugation equals the CM involution by its embedding law
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/RankBoundMonotoneInDimension.lean#L507-L513
+theorem bridge_star_holds : bridge_star := by
+  intro R H x
+  have := H.isCMField_hostE
+  apply H.φ₀.injective
+  change H.φ₀ (NumberField.IsCMField.complexConj H.E x) = H.φ₀ (H.conj x)
+  rw [NumberField.IsCMField.complexEmbedding_complexConj, H.conjE_apply]
+
+
+
+[PCL_SRC_QUADRATIC_DIFFERENT] Exact quadratic different and actual host DiffKH producer
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/GlobalSchurBounds/GlobalRankLatticeProofs/EqOfLeOfAbsNormEq.lean#L103-L225
+    (h4 : a % 4 = 1) (h1 : a ≠ 1) (x' : 𝓞 K) (hx' : (x' : K) = x) :
+    differentIdeal ℤ (𝓞 K) = Ideal.span {x'} := by
+  have hdisc : discr K = a := Formalism.HF.quadDiscr K a x hx hadj hsf h4
+  have ha0 : a ≠ 0 := hsf.ne_zero
+  have hirr : Irreducible (X ^ 2 - C (a : ℚ)) :=
+    X_pow_sub_C_irreducible_of_prime Nat.prime_two (Formalism.HF.P.quad_not_sq_rat a hsf h1)
+  have hmon : (X ^ 2 - C (a : ℚ)).Monic := monic_X_pow_sub_C _ two_ne_zero
+  have hev : aeval x (X ^ 2 - C (a : ℚ)) = 0 := by simp [hx]
+  have hmin : minpoly ℚ x = X ^ 2 - C (a : ℚ) :=
+    (minpoly.eq_of_irreducible_of_monic hirr hev hmon).symm
+  have hrank : Module.finrank ℚ K = 2 := by
+    have := IntermediateField.adjoin.finrank (K := ℚ) (x := x) (.of_finite ℚ x)
+    rw [hmin, natDegree_X_pow_sub_C, hadj, IntermediateField.finrank_top'] at this
+    exact this
+  obtain ⟨c, hc⟩ : ∃ c : ℤ, a = 4 * c + 1 := ⟨a / 4, by omega⟩
+  have hcK : (a : K) = 4 * c + 1 := by rw [hc]; push_cast; ring
+  obtain ⟨ω, hω⟩ : ∃ ω : K, ω = (1 + x) / 2 := ⟨_, rfl⟩
+  have hrelK : ω ^ 2 - ω - (c : K) = 0 := by
+    rw [hω]
+    linear_combination (1 / 4 : K) * hx + (1 / 4 : K) * hcK
+  have hωint : IsIntegral ℤ ω := by
+    refine ⟨X ^ 2 - X - C c, by monicity!, ?_⟩
+    rw [eval₂_sub, eval₂_sub, eval₂_X_pow, eval₂_X, eval₂_C, algebraMap_int_eq, eq_intCast]
+    exact hrelK
+  obtain ⟨ω', hω'⟩ : ∃ ω' : 𝓞 K, algebraMap (𝓞 K) K ω' = ω := ⟨⟨ω, hωint⟩, rfl⟩
+  have hxω : x = 2 * ω - 1 := by rw [hω]; ring
+  have hadjω : IntermediateField.adjoin ℚ {ω} = ⊤ := by
+    rw [eq_top_iff, ← hadj, IntermediateField.adjoin_simple_le_iff, hxω]
+    have hm := IntermediateField.mem_adjoin_simple_self ℚ ω
+    exact sub_mem (mul_mem (ofNat_mem _ 2) hm) (one_mem _)
+  have hdeg : (minpoly ℚ ω).natDegree = 2 := by
+    have := IntermediateField.adjoin.finrank (K := ℚ) (x := ω) (.of_finite ℚ ω)
+    rw [hadjω, IntermediateField.finrank_top', hrank] at this
+    exact this.symm
+  have hint' : IsIntegral ℤ ω' := RingOfIntegers.isIntegral ω'
+  have hdegZ : (minpoly ℤ ω').natDegree = 2 := by
+    have hmap := minpoly.isIntegrallyClosed_eq_field_fractions ℚ K hint'
+    rw [hω'] at hmap
+    rw [← (minpoly.monic hint').natDegree_map (algebraMap ℤ ℚ), ← hmap]
+    exact hdeg
+  have hPmon : (X ^ 2 - X - C c : ℤ[X]).Monic := by monicity!
+  have hPdeg : (X ^ 2 - X - C c : ℤ[X]).natDegree = 2 := by compute_degree!
+  have hrel : ω' ^ 2 - ω' - (c : 𝓞 K) = 0 := by
+    apply RingOfIntegers.coe_injective
+    simp only [map_sub, map_pow, map_intCast, map_zero, hω']
+    exact hrelK
+  have hP : (X ^ 2 - X - C c : ℤ[X]) = minpoly ℤ ω' := by
+    refine minpoly.IsIntegrallyClosed.unique_of_degree_le_degree_minpoly hPmon ?_ ?_
+    · simpa using hrel
+    · rw [degree_eq_natDegree hPmon.ne_zero, degree_eq_natDegree (minpoly.ne_zero hint'), hPdeg,
+        hdegZ]
+  have hAdj : Algebra.adjoin ℚ {algebraMap (𝓞 K) K ω'} = ⊤ := by
+    have := IntermediateField.adjoin_simple_toSubalgebra_of_isAlgebraic (F := ℚ) (α := ω)
+      (Algebra.IsAlgebraic.isAlgebraic ω)
+    rw [hadjω, IntermediateField.top_toSubalgebra] at this
+    rw [hω']
+    exact this.symm
+  have hmem := aeval_derivative_mem_differentIdeal ℤ ℚ K ω' hAdj
+  rw [← hP] at hmem
+  have hder : derivative (X ^ 2 - X - C c : ℤ[X]) = C 2 * X - 1 := by
+    rw [derivative_sub, derivative_sub, derivative_X_pow, derivative_X, derivative_C, sub_zero]
+    norm_num
+  have hx'' : x' = 2 * ω' - 1 := by
+    apply RingOfIntegers.coe_injective
+    show algebraMap (𝓞 K) K x' = algebraMap (𝓞 K) K (2 * ω' - 1)
+    rw [map_sub, map_mul, map_one, hω', map_ofNat]
+    exact hx'.trans hxω
+  have hval : aeval ω' (derivative (X ^ 2 - X - C c : ℤ[X])) = x' := by
+    rw [hder, hx'', map_sub, map_mul, aeval_C, aeval_X, map_one]
+    simp
+  rw [hval] at hmem
+  have hle : Ideal.span {x'} ≤ differentIdeal ℤ (𝓞 K) :=
+    (Ideal.span_singleton_le_iff_mem _).2 hmem
+  have hn : (Algebra.norm ℤ x') ^ 2 = a ^ 2 := by
+    have : ((Algebra.norm ℤ x' : ℤ) : ℚ) ^ 2 = (a : ℚ) ^ 2 := by
+      rw [Algebra.coe_norm_int, hx', ← map_pow, hx, show ((a : ℤ) : K) = algebraMap ℚ K a by simp,
+        Algebra.norm_algebraMap, hrank]
+    exact_mod_cast this
+  have hN1 : Ideal.absNorm (Ideal.span {x'}) = a.natAbs := by
+    rw [Ideal.absNorm_span_singleton]
+    exact Int.natAbs_eq_iff_sq_eq.2 hn
+  have hN2 : Ideal.absNorm (differentIdeal ℤ (𝓞 K)) = a.natAbs := by
+    rw [NumberField.absNorm_differentIdeal K (𝓞 K), hdisc]
+  exact (eq_of_le_of_absNorm_eq hle (by rw [hN1]; exact Int.natAbs_ne_zero.2 ha0)
+    (hN1.trans hN2.symm)).symm
+
+theorem gen_top (H : Host R) (x : H.K) (hx : (x : H.E) = H.sqd) :
+    IntermediateField.adjoin ℚ {x} = ⊤ := by
+  apply IntermediateField.map_injective (IsScalarTower.toAlgHom ℚ H.K H.E)
+  rw [IntermediateField.adjoin_map, Set.image_singleton]
+  first
+  | rw [IntermediateField.map_top]
+  | rw [← AlgHom.fieldRange_eq_map]
+  ext z
+  rw [AlgHom.mem_fieldRange]
+  have h1 : IsScalarTower.toAlgHom ℚ H.K H.E x = H.sqd := hx
+  rw [h1]
+  constructor
+  · intro hz
+    exact ⟨⟨z, hz⟩, rfl⟩
+  · rintro ⟨y, rfl⟩
+    exact y.2
+
+theorem diffK_holds (H : Host R) : DiffKH H := by
+  obtain ⟨-, hd, -, hd16, -⟩ := H.hyp
+  have hmem : H.sqd ∈ H.K := IntermediateField.mem_adjoin_simple_self ℚ H.sqd
+  have hx2 : (⟨H.sqd, hmem⟩ : H.K) ^ 2 = -(H.d : H.K) := by
+    apply Subtype.ext
+    simp [H.sqd_sq]
+  have hint : IsIntegral ℤ (⟨H.sqd, hmem⟩ : H.K) := by
+    refine ⟨Polynomial.X ^ 2 + Polynomial.C (H.d : ℤ), Polynomial.monic_X_pow_add_C _ two_ne_zero, ?_⟩
+    rw [Polynomial.eval₂_add, Polynomial.eval₂_X_pow, Polynomial.eval₂_C, hx2]
+    simp
+  have hint' : (⟨H.sqd, hmem⟩ : H.K) ∈ integralClosure ℤ H.K := (mem_integralClosure_iff ℤ _).2 hint
+  have hdiff := Formalism.MainNotions.UnusedSlot33.HK.different_quad H.K (-(H.d : ℤ)) ⟨H.sqd, hmem⟩ (by rw [hx2]; simp)
+    (Formalism.MainNotions.UnusedSlot33.HK.gen_top H _ rfl)
+    (Int.squarefree_natAbs.1 (by simpa using Irreducible.squarefree hd)) (by omega) (by omega)
+    ⟨⟨H.sqd, hmem⟩, hint'⟩ rfl
+  refine ⟨algebraMap (𝓞 H.K) (𝓞 H.E) ⟨⟨H.sqd, hmem⟩, hint'⟩, rfl, ?_⟩
+  rw [hdiff, Ideal.map_span]
+  exact congrArg Ideal.span Set.image_singleton
+
+theorem cases_K (σ : H.E ≃ₐ[ℚ] H.E) :
+
+
+[PCL_SRC_QUADRATIC_NORM] Actual norm_K and NormKH ideal identity
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/GlobalSchurBounds/GlobalRankLatticeProofs/EqOfLeOfAbsNormEq.lean#L249-L370
+
+theorem norm_K (x : H.K) :
+    algebraMap ℚ H.E (Algebra.norm ℚ x) = (x : H.E) * H.conj (x : H.E) := by
+  classical
+  have hG := isGalK H
+  have hE := H.hostE_isGalois
+  obtain ⟨cK, hcK⟩ : ∃ cK : Gal(H.K/ℚ), cK = H.conj.restrictNormal H.K := ⟨_, rfl⟩
+  have hcK' : ∀ y : H.K, ((cK y : H.K) : H.E) = H.conj (y : H.E) := by
+    intro y
+    rw [hcK]
+    exact AlgEquiv.restrictNormal_commutes H.conj H.K y
+  have hne : (1 : Gal(H.K/ℚ)) ≠ cK := by
+    intro h1
+    have h2 := hcK' ⟨_, bE_mem H⟩
+    rw [← h1] at h2
+    change H.sqd = _ at h2
+    rw [show H.conj (H.sqd) = - H.sqd from conj_b H] at h2
+    have h3 : (2 : H.E) * H.sqd = 0 := by linear_combination h2
+    rcases mul_eq_zero.1 h3 with h4 | h4
+    · exact two_ne_zero h4
+    · exact b_ne_zero H h4
+  have huniv : (Finset.univ : Finset Gal(H.K/ℚ)) = {1, cK} := by
+    symm
+    rw [Finset.eq_univ_iff_forall]
+    intro τ
+    obtain ⟨σ, rfl⟩ := AlgEquiv.restrictNormalHom_surjective H.E τ
+    rw [Finset.mem_insert, Finset.mem_singleton]
+    rcases cases_K H σ with h | h
+    · left
+      apply AlgEquiv.ext
+      intro y
+      apply Subtype.ext
+      have := AlgEquiv.restrictNormal_commutes σ H.K y
+      exact this.trans (h _ y.2)
+    · right
+      apply AlgEquiv.ext
+      intro y
+      apply Subtype.ext
+      have := AlgEquiv.restrictNormal_commutes σ H.K y
+      exact (this.trans (h _ y.2)).trans (hcK' y).symm
+  have h := Algebra.norm_eq_prod_automorphisms ℚ x
+  rw [huniv, Finset.prod_pair hne] at h
+  have h2 := congrArg (fun z : H.K => (z : H.E)) h
+  rw [← hcK' x]
+  exact h2
+
+theorem norm_int (x : 𝓞 H.K) :
+    ((Algebra.intNorm ℤ (𝓞 H.K) x : ℤ) : H.E) =
+      ((x : H.K) : H.E) * H.conj ((x : H.K) : H.E) := by
+  rw [← norm_K H (x : H.K), ← Algebra.coe_norm_int, Algebra.intNorm_eq_norm, map_intCast]
+
+theorem span_le (cc : Ideal (𝓞 H.K)) :
+    Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)} ≤
+      Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc *
+        (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc) := by
+  rw [Ideal.span_singleton_le_iff_mem]
+  have h1 : Ideal.relNorm ℤ cc ≤ Ideal.comap (algebraMap ℤ (𝓞 H.E))
+      (Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc *
+        (H.conj • Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) cc)) := by
+    rw [Ideal.relNorm_apply, Ideal.span_le]
+    rintro _ ⟨x, hx, rfl⟩
+    refine Ideal.mem_comap.2 ?_
+    have h2 : algebraMap ℤ (𝓞 H.E) (Algebra.intNorm ℤ (𝓞 H.K) x) =
+        algebraMap (𝓞 H.K) (𝓞 H.E) x *
+          (H.conj • algebraMap (𝓞 H.K) (𝓞 H.E) x) := by
+      apply RingOfIntegers.coe_injective
+      have h3 := norm_int H x
+      rw [eq_intCast]
+      push_cast
+      exact h3
+    rw [h2]
+    exact Ideal.mul_mem_mul (Ideal.mem_map_of_mem _ hx)
+      (Ideal.smul_mem_pointwise_smul _ _ _ (Ideal.mem_map_of_mem _ hx))
+  have h3 : ((Ideal.absNorm cc : ℕ) : ℤ) ∈ Ideal.relNorm ℤ cc := by
+    rw [Ideal.relNorm_int]
+    exact Ideal.mem_span_singleton_self _
+  have h4 := h1 h3
+  rw [Ideal.mem_comap] at h4
+  simpa using h4
+
+theorem absNorm_smul (I : Ideal (𝓞 H.E)) :
+    Ideal.absNorm (H.conj • I) = Ideal.absNorm I := by
+  rw [Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply, Submodule.cardQuot_apply]
+  exact Nat.card_congr (Ideal.quotientEquiv I (H.conj • I)
+    (MulSemiringAction.toRingEquiv _ (𝓞 H.E) H.conj) rfl).toEquiv.symm
+
+theorem absNorm_natK (N : ℕ) : Ideal.absNorm (Ideal.span {(N : 𝓞 H.K)}) = N ^ 2 := by
+  rw [Ideal.absNorm_span_singleton]
+  have h : (Algebra.norm ℤ (N : 𝓞 H.K) : ℤ) = (N : ℤ) ^ 2 := by
+    have h1 := norm_int H (N : 𝓞 H.K)
+    rw [Algebra.intNorm_eq_norm] at h1
+    simp only [map_natCast] at h1
+    have h2 : ((Algebra.norm ℤ (N : 𝓞 H.K) : ℤ) : H.E) = (((N : ℤ) ^ 2 : ℤ) : H.E) := by
+      rw [h1]
+      push_cast
+      rw [map_natCast]
+      ring
+    exact_mod_cast h2
+  rw [h, Int.natAbs_pow, Int.natAbs_natCast]
+
+theorem normK_holds (H : Host R) : NormKH H := by
+  intro cc hcc
+  have hN : Ideal.absNorm cc ≠ 0 := by
+    rw [Ne, Ideal.absNorm_eq_zero_iff]
+    exact hcc
+  have e1 : Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)} =
+      Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E))
+        (Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.K)}) := by
+    rw [Ideal.map_span, Set.image_singleton, map_natCast]
+  have e2 : Ideal.absNorm (Ideal.span {((Ideal.absNorm cc : ℕ) : 𝓞 H.E)}) =
+      (Ideal.absNorm cc ^ 2) ^ Module.finrank (𝓞 H.K) (𝓞 H.E) := by
+    rw [e1, Ideal.absNorm_algebraMap, absNorm_natK]
+  symm
+  apply eq_of_le_of_absNorm_eq (span_le H cc)
+  · rw [e2]
+    exact pow_ne_zero _ (pow_ne_zero _ hN)
+  · rw [e2, map_mul, absNorm_smul, Ideal.absNorm_algebraMap]
+    ring
+
+end Formalism.MainNotions.UnusedSlot33.HK
+
+end
+
+
+[PCL_SRC_PRINCIPAL_IDEAL_IDENTITY] Literal DiffKPrincipal/CcNorm and exact factPrincipalDatum product
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/RankBoundMonotoneInDimension.lean#L1311-L1359
+def DiffKPrincipal : Prop := ∀ (R : Ranks) (H : Host R),
+  (((differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) : Ideal (𝓞 H.E)) :
+    FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) =
+    spanSingleton (nonZeroDivisors (𝓞 H.E)) H.sqrtMinusD
+
+def CcNorm : Prop := ∀ (R : Ranks) (H : Host R),
+  ((H.ccE : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) *
+    ((H.conj • H.ccE : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) =
+    spanSingleton (nonZeroDivisors (𝓞 H.E)) ((Ideal.absNorm H.ccK : ℕ) : H.E)
+
+theorem factPrincipalDatum_of (h1 : DiffKPrincipal) (h2 : CcNorm) : FactPrincipalDatum := by
+  intro R H
+  have ht : H.ddE = differentIdeal (𝓞 H.K) (𝓞 H.E) *
+      (differentIdeal ℤ (𝓞 H.K)).map (algebraMap (𝓞 H.K) (𝓞 H.E)) :=
+    differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 H.K) (𝓞 H.E)
+  have hne : differentIdeal (𝓞 H.K) (𝓞 H.E) ≠ ⊥ := differentIdeal_ne_bot
+  have hspec : differentIdeal (𝓞 H.K) (𝓞 H.E) = H.𝔟 * (H.conj • H.𝔟) := H.𝔟_spec.1
+  rw [hspec] at hne ht
+  have hB : ((H.𝔟 : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) ≠ 0 := by
+    rw [Ne, coeIdeal_eq_zero]
+    rintro h
+    exact hne (by rw [h]; simp)
+  have hB' : ((H.conj • H.𝔟 : Ideal (𝓞 H.E)) : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E) ≠ 0 := by
+    rw [Ne, coeIdeal_eq_zero]
+    rintro h
+    exact hne (by rw [h]; simp)
+  have hN : ((Ideal.absNorm H.ccK : ℕ) : H.E) ≠ 0 := by
+    rw [Nat.cast_ne_zero, Ne, Ideal.absNorm_eq_zero_iff]
+    exact H.ccK_ne_bot
+  have hd : H.sqrtMinusD ≠ 0 := H.sqd_ne_zero
+  rw [ht, coeIdeal_mul, coeIdeal_mul, h1 R H]
+  unfold Host.AA Host.AAbar Host.AA0
+  have hcalc : ∀ (s C C' B B' D : FractionalIdeal (nonZeroDivisors (𝓞 H.E)) H.E),
+      s * (C * B⁻¹) * (C' * B'⁻¹) * (B * B' * D) = s * (C * C') * D * (B⁻¹ * B) * (B'⁻¹ * B') := by
+    intro s C C' B B' D
+    ring
+  rw [hcalc, inv_mul_cancel₀ hB, inv_mul_cancel₀ hB', h2 R H, mul_one, mul_one,
+    spanSingleton_mul_spanSingleton, spanSingleton_mul_spanSingleton]
+  have hval : H.xi0 * ((Ideal.absNorm H.ccK : ℕ) : H.E) * H.sqrtMinusD = -1 := by
+    unfold Host.xi0
+    field_simp
+  rw [hval, ← spanSingleton_one, spanSingleton_eq_spanSingleton]
+  exact ⟨-1, by simp⟩
+
+end principal
+
+end Formalism.BasicNotions
+
+end
+
+
+[PCL_SRC_ORIGINAL_PRINCIPAL_SUPPLIER] Original formal FactPrincipalDatum assembly, reconstructed in PCL7-PCL8
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/IndefiniteReal/FinitePlaces/FactPrincipalDatum.lean#L10-L27
+theorem diffKPrincipal : Formalism.BasicNotions.DiffKPrincipal := by
+  intro R H
+  obtain ⟨β, hβ, heq⟩ := Formalism.MainNotions.UnusedSlot33.HK.diffK_holds H
+  rw [heq, coeIdeal_span_singleton]
+  congr 1
+
+theorem ccNorm : Formalism.BasicNotions.CcNorm := by
+  intro R H
+  rw [← coeIdeal_mul]
+  have h := Formalism.MainNotions.UnusedSlot33.HK.normK_holds H H.ccK H.ccK_ne_bot
+  rw [show (H.ccE : Ideal (𝓞 H.E)) = Ideal.map (algebraMap (𝓞 H.K) (𝓞 H.E)) H.ccK from rfl, h,
+    coeIdeal_span_singleton, map_natCast]
+
+theorem factPrincipalDatum : Formalism.BasicNotions.FactPrincipalDatum :=
+  Formalism.BasicNotions.factPrincipalDatum_of diffKPrincipal ccNorm
+
+end Formalism.IndefR.Fin
+
+
+
+[PCL_SRC_ACTUAL_SCALAR_NORM] Exact xiR=1/(Norm(ccK)*sqrt(d)) and numerical bound
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/PullbackSections/HolomorphicFamilies/ModelDataX.lean#L12-L45
+
+lemma xiR_facts (D : D7) : xiR D = 1 / ((Ideal.absNorm D.host.ccK : ℝ) * Real.sqrt D.host.d) ∧
+    1 ≤ (Ideal.absNorm D.host.ccK : ℝ) ∧ 1 ≤ Real.sqrt D.host.d := by
+  have e1 : D.host.φ₀ D.host.xi0 =
+      -1 / ((Ideal.absNorm D.host.ccK : ℂ) * D.host.φ₀ D.host.sqrtMinusD) := by
+    unfold Host.xi0; simp [map_div₀, map_mul, map_neg, map_natCast]
+  have e2 : ‖D.host.φ₀ D.host.sqrtMinusD‖ = Real.sqrt D.host.d := by
+    have h0 : (D.host.φ₀ D.host.sqrtMinusD) ^ 2 = -(D.host.d : ℂ) := by
+      rw [← map_pow, Formalism.BasicNotions.Host.sqrtMinusD_sq D.host, map_neg, map_natCast]
+    rw [← Real.sqrt_sq (norm_nonneg (D.host.φ₀ D.host.sqrtMinusD)), ← norm_pow, h0, norm_neg,
+      Complex.norm_natCast]
+  refine ⟨?_, ?_, ?_⟩
+  · unfold xiR; rw [e1, norm_div, norm_neg, norm_one, norm_mul, Complex.norm_natCast, e2]
+  · have h : Ideal.absNorm D.host.ccK ≠ 0 := fun h0 => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 h0)
+    exact_mod_cast Nat.one_le_iff_ne_zero.2 h
+  · have hd : 1 ≤ D.host.d := by have := D.host.qd_big.2; omega
+    rw [show (1 : ℝ) = Real.sqrt 1 by simp]
+    exact Real.sqrt_le_sqrt (by exact_mod_cast hd)
+
+lemma xiR_le_half (D : D7) : xiR D ≤ 1 / 2 := by
+  obtain ⟨hxi, hN1, hd1⟩ := xiR_facts D
+  have ht : 1 ≤ D.R.t := D.R.t_odd.pos
+  have hr : 1 ≤ D.R.r := (PfTies1.dimPos_fr D).2
+  have h4 : 4 ≤ 4 * D.R.t * D.R.r := by nlinarith
+  have hd : 4 ≤ D.host.d := by have := D.host.qd_big.2; omega
+  have hsd : 2 ≤ Real.sqrt D.host.d := by
+    rw [show (2 : ℝ) = Real.sqrt 4 by rw [show (4 : ℝ) = 2 ^ 2 by norm_num, Real.sqrt_sq (by norm_num)]]
+    exact Real.sqrt_le_sqrt (by exact_mod_cast hd)
+  rw [hxi]
+  have hpos : 0 < (Ideal.absNorm D.host.ccK : ℝ) * Real.sqrt D.host.d := by positivity
+  rw [div_le_div_iff₀ hpos (by norm_num)]
+  nlinarith
+
+end ReciprocityTheory.ChartRestriction.G.PullbackSections.PfModelDataX
+
+
+[PCL_SRC_HALF_DIFFERENT_NORM] Exact HalfDiffNormSt and norm-square discriminant bound
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/PullbackSections/HolomorphicFamilies/ModelLatIn.lean#L12-L91
+theorem absNorm_smul_eq {E : Type} [Field E] [NumberField E] (σ : E ≃ₐ[ℚ] E) (I : Ideal (𝓞 E)) :
+    Ideal.absNorm (σ • I) = Ideal.absNorm I := by
+  rw [Ideal.absNorm_apply, Ideal.absNorm_apply, Submodule.cardQuot_apply, Submodule.cardQuot_apply]
+  exact (Nat.card_congr (Ideal.quotientEquiv I (σ • I) (MulSemiringAction.toRingEquiv _ _ σ)
+    (by rw [Ideal.pointwise_smul_def]; rfl)).toEquiv).symm
+
+theorem halfDiffNorm : HalfDiffNormSt := by
+  intro D
+  obtain ⟨hspec, -⟩ := D.host.𝔟_spec
+
+  have hN : Ideal.absNorm (differentIdeal (𝓞 ↥D.host.K) (𝓞 D.host.E)) =
+      Ideal.absNorm D.host.𝔟 ^ 2 := by
+    rw [hspec, map_mul, absNorm_smul_eq, sq]
+
+  have htow := differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 ↥D.host.K) (𝓞 D.host.E)
+  have hne : differentIdeal ℤ (𝓞 D.host.E) ≠ ⊥ := differentIdeal_ne_bot
+  have hdisc : Ideal.absNorm (differentIdeal ℤ (𝓞 D.host.E)) = (discr D.host.E).natAbs :=
+    NumberField.absNorm_differentIdeal D.host.E (𝓞 D.host.E)
+  have hrel0 : differentIdeal (𝓞 ↥D.host.K) (𝓞 D.host.E) ≠ ⊥ := by
+    intro h
+    apply hne
+    rw [htow, h]
+    simp
+  have hle : Ideal.absNorm (differentIdeal (𝓞 ↥D.host.K) (𝓞 D.host.E)) ≤ (discr D.host.E).natAbs := by
+    rw [← hdisc, htow, map_mul]
+    apply Nat.le_mul_of_pos_right
+    rw [Nat.pos_iff_ne_zero, Ne, Ideal.absNorm_eq_zero_iff]
+    intro h
+    apply hne
+    rw [htow, h]
+    simp
+  have hpos2 : 0 < Ideal.absNorm D.host.𝔟 ^ 2 := by
+    rw [← hN, Nat.pos_iff_ne_zero, Ne, Ideal.absNorm_eq_zero_iff]
+    exact hrel0
+  have hpos : 0 < Ideal.absNorm D.host.𝔟 := pos_of_ne_zero fun h => by simp [h] at hpos2
+  refine ⟨hpos, ?_⟩
+  have hsq : ((Ideal.absNorm D.host.𝔟 : ℕ) : ℝ) ^ 2 ≤ |((discr D.host.E : ℤ) : ℝ)| := by
+    rw [← Int.cast_abs, ← Int.natCast_natAbs]
+    exact_mod_cast hN ▸ hle
+  have hlog := Real.log_pow ((Ideal.absNorm D.host.𝔟 : ℕ) : ℝ) 2
+  push_cast at hlog
+  rw [← hlog]
+  exact Real.log_le_log (by positivity) hsq
+
+theorem bb_ne_bot (D : D7) : D.host.𝔟 ≠ ⊥ := by
+  intro h
+  have h0 := (halfDiffNorm D).1
+  rw [h, Ideal.absNorm_bot] at h0
+  exact lt_irrefl 0 h0
+
+theorem absNorm_bb_sq_le (D : D7) : Ideal.absNorm D.host.𝔟 ^ 2 ≤ (discr D.host.E).natAbs := by
+  obtain ⟨h0, hl⟩ := halfDiffNorm D
+  have hd : (0 : ℝ) < |((discr D.host.E : ℤ) : ℝ)| := by
+    rw [abs_pos]
+    exact_mod_cast NumberField.discr_ne_zero D.host.E
+  have hN : (0 : ℝ) < (Ideal.absNorm D.host.𝔟 : ℝ) := by exact_mod_cast h0
+  have key : (Ideal.absNorm D.host.𝔟 : ℝ) ^ 2 ≤ |((discr D.host.E : ℤ) : ℝ)| := by
+    rw [← Real.log_le_log_iff (by positivity) hd, Real.log_pow]
+    push_cast
+    linarith
+  have h2 : ((discr D.host.E).natAbs : ℝ) = |((discr D.host.E : ℤ) : ℝ)| := by
+    rw [Nat.cast_natAbs, Int.cast_abs]
+  have h3 : ((Ideal.absNorm D.host.𝔟 ^ 2 : ℕ) : ℝ) ≤ ((discr D.host.E).natAbs : ℝ) := by
+    rw [h2]
+    push_cast
+    exact key
+  exact_mod_cast h3
+
+theorem finrank_E (D : D7) : Module.finrank ℚ D.host.E = 2 * D.R.f := by
+  haveI := D.host.galois
+  rw [← IsGalois.card_aut_eq_finrank, Nat.card_congr D.host.gal.toEquiv]
+  simp only [Formalism.BasicNotions.Ranks.f, Formalism.BasicNotions.Ranks.n, Formalism.HC.Frame.GG, Nat.card_prod]
+  have h2 : Nat.card ℤˣ = 2 := by
+    first
+      | rw [Nat.card_eq_fintype_card, Int.card_units_eq_two]
+      | simp
+      | (rw [Nat.card_eq_fintype_card]; rfl)
+      | (rw [Nat.card_eq_fintype_card]; decide)
+  have hA : Nat.card D.R.MA = D.R.ord := by
+    unfold Formalism.HC.Frame.MA
+
+
+[PCL_SRC_QUANTITATIVE_DATAX_ENDPOINT] All exact fields of exists_dataX_of_hasPrinc, original NA/NC and scalar normalization
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/ExistsRankOneCuspLatticeDataOfPrincipal.lean#L14-L106
+
+namespace GlobalTheory.LatticeData
+
+theorem cc_eq_conj (D : D7) (x : D.host.E) : ReciprocityTheory.ChartRestriction.G.FD.cc x = D.host.conj x :=
+  bridge_star_holds D.R D.host x
+
+theorem flagDomainConj_hostXi_eq_neg (D : D7) : ReciprocityTheory.ChartRestriction.G.FD.cc D.host.xi0 = -D.host.xi0 :=
+  conj_xi0_alt D
+
+theorem halfDifferent_ne_bot (D : D7) : D.host.𝔟 ≠ ⊥ := by
+  intro h
+  exact (bB_ne D).1 (by rw [h]; simp)
+
+theorem absNorm_halfDifferent_le (D : D7) :
+    (Ideal.absNorm D.host.𝔟 : ℝ) ≤ |(NumberField.discr D.host.E : ℝ)| := by
+  have ht : differentIdeal ℤ (𝓞 D.host.E) = differentIdeal (𝓞 D.host.K) (𝓞 D.host.E) *
+      (differentIdeal ℤ (𝓞 D.host.K)).map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) :=
+    differentIdeal_eq_differentIdeal_mul_differentIdeal ℤ (𝓞 D.host.K) (𝓞 D.host.E)
+  have hdvd : D.host.𝔟 ∣ differentIdeal ℤ (𝓞 D.host.E) := by
+    rw [ht, D.host.𝔟_spec.1, mul_assoc]
+    exact dvd_mul_right _ _
+  have h1 := map_dvd Ideal.absNorm hdvd
+  rw [NumberField.absNorm_differentIdeal D.host.E (𝓞 D.host.E)] at h1
+  have h2 := Nat.le_of_dvd (Int.natAbs_pos.2 (NumberField.discr_ne_zero D.host.E)) h1
+  rw [← Int.cast_abs, ← Nat.cast_natAbs]
+  exact_mod_cast h2
+
+theorem absNorm_mul_mem_one (D : D7) {a : D.host.E} (ha : a ∈ D.host.AA) :
+    ∃ z : 𝓞 D.host.E, algebraMap (𝓞 D.host.E) D.host.E z = (Ideal.absNorm D.host.𝔟 : D.host.E) * a := by
+  unfold Formalism.BasicNotions.Host.AA Formalism.BasicNotions.Host.AA0 at ha
+  rw [← div_eq_mul_inv, FractionalIdeal.mem_div_iff_of_ne_zero (bB_ne D).1] at ha
+  obtain ⟨w, -, hw⟩ := (FractionalIdeal.mem_coeIdeal _).1
+    (ha _ ((FractionalIdeal.mem_coeIdeal _).2 ⟨_, Ideal.absNorm_mem D.host.𝔟, rfl⟩))
+  exact ⟨w, by rw [hw, map_natCast, mul_comm]⟩
+
+theorem absNorm_ccK_mem (D : D7) : (Ideal.absNorm D.host.ccK : D.host.E) ∈ D.host.AA := by
+  unfold Formalism.BasicNotions.Host.AA Formalism.BasicNotions.Host.AA0
+  rw [← div_eq_mul_inv, FractionalIdeal.mem_div_iff_of_ne_zero (bB_ne D).1]
+  intro y hy
+  obtain ⟨z, -, rfl⟩ := (FractionalIdeal.mem_coeIdeal _).1 hy
+  have h : ((Ideal.absNorm D.host.ccK : ℕ) : 𝓞 D.host.E) ∈ D.host.ccE := by
+    have := Ideal.mem_map_of_mem (algebraMap (𝓞 D.host.K) (𝓞 D.host.E)) (Ideal.absNorm_mem D.host.ccK)
+    rwa [map_natCast] at this
+  exact (FractionalIdeal.mem_coeIdeal _).2 ⟨_, Ideal.mul_mem_right z _ h, by rw [map_mul, map_natCast]⟩
+
+theorem exists_dataX_of_hasPrinc : ∀ (D : D7) (T : Core D) (h : LawsCore T) (j : ℕ) (hj : InR D j), ∀ σ, GoodEmb T.Q.c σ → GlobalTheory.FrameNorm.HasPrinc (Formalism.L2.PjFree.Unf.ofPj (T.U j σ)) T.Q.l.M → ∀ k : (T.U j σ).Comp, ∃ Xx : ReciprocityTheory.ChartRestriction.G.FD.DataX D.host.E D.R.r, Xx.toData = (T.U j σ).X k ∧ Xx.g = T.Q.l.M ∧ Xx.Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ Xx.L', v = a • u} ∧ Xx.k0 = 2 * xiR D ∧ (Xx.NA : ℝ) ≤ |(NumberField.discr D.host.E : ℝ)| ∧ Xx.NC ≤ Ideal.absNorm D.host.ccK := by
+  intro D T h j hj σ hσ hP k
+  obtain ⟨-, -, -, hx0, hx1, -⟩ := GlobalTheory.PinNum.numerics_of_pins D T.Q h.pins
+  have habs := h.xiAbs j hj σ hσ k
+  have hperf := GlobalTheory.traceForm_integral_perfect_of_isUnf _ _ _ _ _ _ σ _ (Formalism.L2.PjFree.Unf.ofPj (T.U j σ))
+    ((Formalism.L2.PjFree.isUnf_ofPj _).2 (h.unf j hj σ hσ)) k
+  have hξ := GlobalTheory.eq_or_eq_neg_of_purelyImaginary_of_norm_eq _ D.host.xi0 ((T.U j σ).X k).ξ0 D.host.φ₀
+    (flagDomainConj_hostXi_eq_neg D) ((T.U j σ).X k).ξ0_im (habs _).symm
+  have hone : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 D.host.E)) ((T.U j σ).X k).ξ0 * D.host.AA *
+      D.host.AAbar * (differentIdeal ℤ (𝓞 D.host.E) : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) = 1 := by
+    have h1 := Formalism.IndefR.Fin.factPrincipalDatum D.R D.host
+    rcases hξ with e | e
+    · rw [e]; exact h1
+    · rw [e, show -D.host.xi0 = (-1 : (𝓞 D.host.E)ˣ) • D.host.xi0 by simp,
+        ← (FractionalIdeal.spanSingleton_eq_spanSingleton.2 ⟨-1, rfl⟩)]
+      exact h1
+  have hM : 0 < T.Q.l.M := by have := T.Q.l.three_le; omega
+  obtain ⟨Xx, h1, h2, h3⟩ := GlobalTheory.exists_dataX_of_perfect_traceForm _ _ ((T.U j σ).X k) D.host.AA D.host.AAbar
+    (xiR D) T.Q.l.M
+    (fun a => by
+      rw [cc_eq_conj]
+      exact ⟨conj_mem_AA D, fun ha => by simpa only [conj_conj] using conj_mem_AAbar D ha⟩)
+    hone habs hx1 hperf.1 hperf.2 hM (hP k)
+  refine ⟨{ Xx with
+    k0 := 2 * xiR D
+    minWeight_pos := by positivity
+    k0_le := by linarith
+    ξ0_abs := fun τ => by rw [show Xx.ξ0 = ((T.U j σ).X k).ξ0 from congrArg _ h1, habs]; ring
+    NA := Ideal.absNorm D.host.𝔟
+    NC := Ideal.absNorm D.host.ccK
+    NA_pos := Nat.pos_of_ne_zero fun e => halfDifferent_ne_bot D (Ideal.absNorm_eq_zero_iff.1 e)
+    NC_pos := Nat.pos_of_ne_zero fun e => D.host.ccK_ne_bot (Ideal.absNorm_eq_zero_iff.1 e)
+    NA_sub := fun x hx => ?_
+    NC_sub := fun x hx => ?_ }, h1, h2, h3, rfl, absNorm_halfDifferent_le D, le_rfl⟩
+  · rw [h3] at hx
+    induction hx using Submodule.span_induction with
+    | mem v hv =>
+      obtain ⟨a, ha, u, hu, rfl⟩ := hv
+      obtain ⟨z, hz⟩ := absNorm_mul_mem_one D ha
+      rw [smul_smul, ← hz, algebraMap_smul]
+      exact Xx.L'.smul_mem z hu
+    | zero => simp
+    | add v w _ _ hv hw => rw [smul_add]; exact add_mem hv hw
+    | smul c v _ hv => rw [smul_comm]; exact Xx.L'.smul_mem c hv
+  · rw [h3]
+    exact Submodule.subset_span ⟨_, absNorm_ccK_mem D, x, hx, rfl⟩
+
+end GlobalTheory.LatticeData
+
+
+[PCL_SRC_LAWSCORE_FIELDS] Actual LawsM/LawsCore: every original row, good embedding and component; unf/xiAbs retained
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/CuspidalL2Subspace.lean#L93-L139
+structure LawsM (T : Core D) : Prop where
+
+  pins : T.Q.Pins
+
+  half : (∀ k, ((D.host.g k : ℕ) : 𝓞 D.host.K) ∈ (T.pb k).asIdeal) ∧
+    T.Q.l.Mb = ∏ k, (T.pb k).asIdeal.map (algebraMap (𝓞 D.host.K) (𝓞 D.host.E))
+
+  evalWD : ∀ j, InR D j → EvalWD (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z)
+
+  unf : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → IsUnf (T.U j σ)
+
+  unTest : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → ∀ k x,
+    FromTest (K := T.Q.c.F) (fun S _ _ => FrPt (T.Q.Xo j) T.Q.c S) (fun φ y z => FrMap φ y z) ((T.U j σ).un k x)
+  chiTriv : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → ∀ a n, Dom a n → ∀ k, ∀ γ ∈ ((T.U j σ).X k).Γ,
+    ((T.U j σ).X k).χ (laU (T.U j σ) a n k) γ = 1
+
+  dictU : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → ∃ th hr, (∀ k τ, Formalism.MainNotions.StandardLattice.IsInfEmb τ.1 (th k τ)) ∧
+    DictIsUnif (T.V j σ) (T.dict j σ) (T.Kf j σ) th hr
+
+  spaceW : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → T.V j σ = D.sp.W j
+  levelK : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → IsLevelK (T.V j σ) (D.host.g 0 * D.host.g 1) (T.Kf j σ)
+
+  xiAbs : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → ∀ k (τ : D.host.E →+* ℂ), ‖τ ((T.U j σ).X k).ξ0‖ = xiR D
+  muUnit : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → MuUnit (T.V j σ) (T.dict j σ) (T.mu j σ)
+  muCont : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → Continuous (T.mu j σ)
+  finVol : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → FinVol (T.V j σ)
+
+  cuspFD : ∀ j, InR D j → CuspFD (T.Q.Xo j) T.Q.c (T.U j)
+
+  supDef : ∀ j, InR D j → SupDef (T.Q.Xo j) T.Q.c (T.U j)
+
+  cuspidalL2Subspace : ∀ j, InR D j → ∀ σ, GoodEmb T.Q.c σ → CuspL2 (T.U j) σ (T.V j σ) (T.dict j σ) (T.mu j σ)
+  l2Def : ∀ j (hj : InR D j) σ (hσ : GoodEmb T.Q.c σ),
+    L2DefiniteCuspForms (T.U j) σ (T.V j σ) (T.dict j σ) (T.mu j σ) (cuspidalL2Subspace j hj σ hσ)
+
+  unitIndep : ∀ j, InR D j → UnitIndep (T.Q.Xo j) T.Q.c
+  ptNe : ∀ j, InR D j → IntFrNe (T.Q.Xo j) T.Q.c (algCls (T.Q.Xo j) T.Q.c)
+
+structure LawsCore (T : Core D) : Prop extends LawsM T where
+
+  cuspMul : ∀ j, InR D j → CuspMul (T.Q.Xo j) T.Q.c (T.U j)
+
+  latZ : ∀ j, InR D j → FJ.LatZ (T.X₀ j) (WeightFamilies.rho D j)
+  cuNe : ∀ j, InR D j → FJ.CuNeF (T.X₀ j) (WeightFamilies.rho D j)
+  expo : ∀ j, InR D j → FJ.ExpoMatch (T.X₀ j) T.frI (WeightFamilies.rho D j) (D.host.g 0 * D.host.g 1)
+
+end Formalism.L2.Pj
+
+
+[PCL_SRC_HASPRINC] Original principal-congruence inclusion on the same Unf
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/RegularCharts/BaseNorm.lean#L31-L36
+def HasPrinc {σ : c.F →+* ℂ} {r : ℕ} (U : Formalism.L2.PjFree.Unf Xo c σ r) (M : ℕ) : Prop :=
+  ∀ k (γ : GL (Fin r) E), IsUStab (U.X k).Gm (U.X k).Λ γ →
+    (∀ x ∈ (U.X k).Λ, ∃ y ∈ (U.X k).Λ, Matrix.mulVec (γ : Matrix (Fin r) (Fin r) E) x - x = (M : E) • y) →
+      γ ∈ (U.X k).Γ
+
+end GlobalTheory.FrameNorm
+
+
+[PCL_SRC_CORE_GAMAT] Literal core GamAt quantified over every original row and good embedding
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/ThetaValues/GamAt.lean#L10-L17
+def GamAt {D : D7} (T : Core D) : Prop :=
+  ∀ j, InR D j → ∀ σ : T.Q.c.F →+* ℂ, GoodEmb T.Q.c σ → ∀ (k : (T.U j σ).Comp) (γ : GL (Fin D.R.r) D.host.E),
+    IsUStab ((T.U j σ).X k).Gm ((T.U j σ).X k).Λ γ →
+    (∀ x ∈ ((T.U j σ).X k).Λ, ∃ y ∈ ((T.U j σ).X k).Λ,
+      Matrix.mulVec (γ : Matrix (Fin D.R.r) (Fin D.R.r) D.host.E) x - x = (T.Q.l.M : D.host.E) • y) →
+    γ ∈ ((T.U j σ).X k).Γ
+
+def l1At {K : Type} [Field K] {ι : Type} (σ : K →+* ℂ) (P : MvPolynomial ι K) : ℝ :=
+
+
+[PCL_SRC_MODEL_GAMAT_AND_HALFDIFF] Original top GamAt and full HalfDiffNormSt
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/PullbackSections/ModelLat.lean#L10-L23
+def GamAt {D : D7} (T : Top D) : Prop :=
+  ∀ (j : ℕ) (_hj : InR D j) (σ : T.Q.c.F →+* ℂ), GoodEmb T.Q.c σ → ∀ (k : (T.U j σ).Comp)
+    (γ : GL (Fin D.R.r) D.host.E), IsUStab ((T.U j σ).X k).Gm ((T.U j σ).X k).Λ γ →
+    (∀ x ∈ ((T.U j σ).X k).Λ, ∃ y ∈ ((T.U j σ).X k).Λ,
+      Matrix.mulVec (γ : Matrix (Fin D.R.r) (Fin D.R.r) D.host.E) x - x = (T.Q.l.M : D.host.E) • y) →
+    γ ∈ ((T.U j σ).X k).Γ
+
+def ModelGamSt : Prop := ∀ (D : D7) (T : Full D), LawsFull T → GamAt T.toTop
+
+def HalfDiffNormSt : Prop :=
+  ∀ D : D7, 0 < Ideal.absNorm D.host.𝔟 ∧
+    2 * Real.log (Ideal.absNorm D.host.𝔟 : ℝ) ≤ Real.log |((NumberField.discr D.host.E : ℤ) : ℝ)|
+
+def ShortInvSt : Prop :=
+
+
+[PCL_SRC_CORE_DATAX_MODEL_ENDPOINT] Whole dataXOfModel_of_gamAt endpoint
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/CubicalLineBundles/DataXOfModelOfGamAt.lean#L17-L23
+theorem dataXOfModel_of_gamAt : ∀ (D : D7) (T : Core D), GamAt T → ∀ j, ∀ (_h : LawsCore T), InR D j → ∀ (σ₀ : T.Q.c.F →+* ℂ), GoodEmb T.Q.c σ₀ → ∀ (k : (T.U j σ₀).Comp), ∃ Xx : DataX D.host.E D.R.r, Xx.toData = (T.U j σ₀).X k ∧ Xx.g = T.Q.l.M ∧ Xx.Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ Xx.L', v = a • u} := by
+  intro D T hG j h hj σ hσ k
+  obtain ⟨Xx, h1, h2, h3, -⟩ :=
+    exists_dataX_of_hasPrinc D T h j hj σ hσ (fun k γ => hG j hj σ hσ k γ) k
+  exact ⟨Xx, h1, h2, h3⟩
+
+end GlobalTheory.LatticeData
+
+
+[PCL_SRC_PAGE_SIZE_PREDICATE] Full SupBoundPageRows with exact fourth ccK logarithmic bound
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/PullbackSections/SupBoundPageRows.lean#L9-L18
+def SupBoundPageRows (D : D7) (large₂ : SizeData₂ D) {j : ℕ} (ka : WeightFamilies.Wt D j) : Prop :=
+  (∀ i, Real.log (D.host.g i) ≤ 9 * large₂.sc.L + 1) ∧
+  lrd D ≤ 2 * large₂.sc.L ∧
+  Real.log D.host.d ≤ 2 * large₂.sc.L ∧
+  Real.log (Ideal.absNorm D.host.ccK) ≤ 2 * large₂.sc.L ∧
+  Real.log D.R.f ≤ 2 * large₂.sc.L ∧
+  Real.log D.host.pde ≤ large₂.sc.L ∧
+  Real.log D.host.pde' ≤ large₂.sc.L ∧
+  Real.log (1 + DF ka) ≤ 2 * large₂.sc.L ∧
+  Real.log ka.n ≤ large₂.sc.L
+
+
+[PCL_SRC_DATAXOFMODELST] Literal all-row model endpoint including both logarithmic bounds
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/ProjectiveLattices/ArchimedeanQuadraticData/ArcWitnessExistence/DataXOfModel.lean#L13-L18
+def DataXOfModelSt (T : Top D) (j : ℕ) : Prop :=
+  ∀ (_h : LawsCore T.toCore), ReciprocityTheory.ChartRestriction.G.PullbackSections.GamAt T → InR D j → ∀ (large₂ : SizeData₂ D) (w : WeightFamilies.Wt D j), SupBoundPageRows D large₂ w → 2 ≤ large₂.sc.L →
+    ∀ (σ₀ : T.Q.c.F →+* ℂ), GoodEmb T.Q.c σ₀ → ∀ (k : (T.U j σ₀).Comp),
+    ∃ Xx : DataX D.host.E D.R.r, Xx.toData = (T.U j σ₀).X k ∧ Xx.g = T.Q.l.M ∧
+      Real.log Xx.NA ≤ (fdeg D.host.E : ℝ) * Real.log (rdE D.host.E) ∧ Real.log Xx.NC ≤ 2 * large₂.sc.L ∧
+      Xx.Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ D.host.AA, ∃ u ∈ Xx.L', v = a • u}
+
+
+[PCL_SRC_PRINCIPAL_CHART_BOUNDARY] Stronger exists_unf_hasPrinc producer, explicitly not supplied by PCL
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/UnitaryExistence/CongrOfDvdModulus.lean#L36-L57
+theorem exists_unf_hasPrinc : ∀ (E : Type) [Field E] [NumberField E] [IsCMField E] (H : ReciprocityTheory.ChartRestriction.G.Geo.Tor.Host E) (Dw : Datum H) (l : Level H) (Xo : Moduli Dw l) (c : Coeff l), ∀ (σ : c.F →+* ℂ) (r : ℕ) (ξ₀ : E) (Gm : Matrix (Fin r) (Fin r) E) (φ : Dw.La →ₗ[𝓞 E] (Fin r → E)), 1 ≤ Dw.p + Dw.q → GoodEmb c σ → cc ξ₀ = -ξ₀ → (∀ τ : E →+* ℂ, τ (H.rt : E) = H.rt0 → (τ ξ₀).im < 0) → (Function.Injective φ ∧ Submodule.span E (Set.range φ) = ⊤ ∧ (∀ a b, cc (Gm a b) = Gm b a) ∧ Gm.det ≠ 0 ∧ ∀ x y, ((Dw.EF x y : ℤ) : ℚ) = Algebra.trace ℚ E (-ξ₀ * herm Gm (φ x) (φ y))) → ∃ U : Unf Xo c σ r, IsUnf U ∧ HasPrinc U l.M' ∧ Nonempty U.Comp ∧ (∀ k la γ, (U.X k).χ la γ = 1) ∧ (∀ k, (U.X k).Gm = Gm ∧ (U.X k).ξ0 = ξ₀) ∧ (∀ k x, FromTest (K := c.F) (fun S _ _ => FrPt Xo c S) (fun φ y z => FrMap φ y z) (U.un k x)) ∧ ∀ ρ, FJ.LatZ U.X ρ ∧ (l.A = 1 → FJ.ExpoMatch U.X 1 ρ l.M) := by
+  intro E _ _ _ H Dw l Xo c σ r ξ₀ Gm φ hpq hσ hξ hneg hφ
+  have hN : N1c := GlobalTheory.T.cmModuli_consequence_of_abelianSchemeLaws
+  have hH := GlobalTheory.T.hasse_norm_theorem_quadratic_extension
+  have hB : Out.SecBaseChangeSt := GlobalTheory.lawsFieldsSeparately.2.1
+  have hT : Out.SecTwistSt := GlobalTheory.lawsFieldsSeparately.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
+  classical
+  let e : Fin (Fintype.card (Σ τ : E →+* ℂ, Fin (Dw.mult τ))) ≃ Σ τ : E →+* ℂ, Fin (Dw.mult τ) :=
+    (Fintype.equivFin _).symm
+  obtain ⟨F⟩ := hN E H Dw l Xo (σ.comp (IntermediateField.inclusion c.le).toRingHom) _
+    (fun j => relab c σ (e j).1) hpq hσ ((GlobalTheory.T.relabelEmbeddings_good_bijective_conj_compat E H l c σ hσ).2.2.2 Dw _ e)
+  obtain ⟨M, hM, hX, hG⟩ := GlobalTheory.T.exists_flagDomainModels_of_familyUniformisation hH E H Dw l Xo _ _ _ F r ξ₀ Gm φ hξ hneg hφ
+  obtain ⟨un, hun⟩ := GlobalTheory.T.exists_framedPoints_all_normalisations_familyUnif hB hT E H Dw l Xo c σ _ e F r M hσ hM hX
+  have hred : IsReduced (CAt σ) := inferInstanceAs (IsReduced ℂ)
+  refine ⟨unfOf e F M un, GlobalTheory.T.familyUniformisation_isComplexUniformisation hB E H Dw l Xo c σ _ e F r M un hσ hM hX hun, fun k γ hγ h => ?_,
+    ⟨⟨0, F.n_pos⟩⟩, hM.chi, hG,
+    fun k x => GlobalTheory.T.framedPoint_reduced_from_testRing hB E H Dw l Xo c (CAt σ) _, fun ρ => ⟨GlobalTheory.T.arithmeticGroup_cuspCentre_lattice E r ρ _ _, fun hA => ?_⟩⟩
+  · exact (hM.gam k γ).2 ⟨hγ, fun a _ => congr_of_dvd_modulus _ (M.φ k) _ (Nat.dvd_lcm_left _ _) h a,
+      fun a => congr_of_dvd_modulus _ (M.φ k) _ (Nat.dvd_lcm_right _ _) h a⟩
+  · exact GlobalTheory.T.flagDomainModels_exponents_levelM E H Dw l Xo _ _ _ F r M ρ hM hA
+
+end GlobalTheory.FrameUnif
+
+
+[PCL_SRC_ICL_ORIGINAL_CHART_USE] Original existence of common-Gram principal charts and DataX use; full chart supplier not inferred
+https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsSmulNonnegOfPow.lean#L87-L137
+      ∀ k, ∃ (Xx : DataX D.host.E D.R.r) (𝔄 : FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E),
+        Xx.toData = U.X k ∧ 𝔄 ≠ 0 ∧
+        Xx.Λ = Submodule.span (𝓞 D.host.E) {v | ∃ a ∈ 𝔄, ∃ u ∈ Xx.L', v = a • u} := by
+  obtain ⟨-, -, hM', -, hx1, -, hnum⟩ := GlobalTheory.PinNum.numerics_of_pins D Q hQ
+  obtain ⟨hr, hr1, -⟩ := hnum j hj
+  have hP := Formalism.IndefR.Fin.factPrincipalDatum
+  have hξ : cc (-D.host.xi0) = -(-D.host.xi0) := by
+    have : cc (-D.host.xi0) = -cc D.host.xi0 := by simp [cc]
+    rw [this, GlobalTheory.LatticeData.flagDomainConj_hostXi_eq_neg D]
+  have hneg : ∀ τ : D.host.E →+* ℂ, τ (Q.H.rt : D.host.E) = Q.H.rt0 → (τ (-D.host.xi0)).im < 0 := by
+    intro τ hτ
+    rw [hQ.1.2.1, hQ.1.2.2.1] at hτ
+    have h := xi0_embedding_im_pos D τ ((mem_cm_type_iff D τ).2 hτ)
+    have h0 : D.host.φ₀ D.host.sqrtMinusD = Complex.I * (Real.sqrt D.host.d : ℂ) := D.host.φ₀_mem
+    have hpos : 0 < (D.host.φ₀ D.host.sqrtMinusD).im := by
+      rw [h0]
+      simpa using d_pos D
+    rw [if_pos hpos, Int.cast_one, one_mul] at h
+    simpa using h
+  obtain ⟨Gm, φ, hφ⟩ := GlobalTheory.exists_herm_coord_of_datum _ Q.H (Q.Dw j) (-(-D.host.xi0))
+    (by rw [neg_neg, GlobalTheory.LatticeData.flagDomainConj_hostXi_eq_neg D]) (by rw [neg_neg]; exact cmHost_imaginaryGenerator_ne_zero hP D) _ hr.symm
+  obtain ⟨U, hU, hPr, -, hχ, hG, -⟩ := GlobalTheory.FrameUnif.exists_unf_hasPrinc _ Q.H (Q.Dw j) Q.l (Q.Xo j) Q.c
+    Q.c.F.val.toRingHom D.R.r (-D.host.xi0) Gm φ (by omega) rfl hξ hneg hφ
+  rw [hM'] at hPr
+  refine ⟨U, hU, fun k k' => ⟨(hG k).1.trans (hG k').1.symm, (hG k).2.trans (hG k').2.symm⟩,
+    fun k ga hga h => ?_, hχ, fun k => ?_⟩
+  · refine hPr k ga hga fun x hx => ?_
+    obtain ⟨u, hu, e⟩ := h x hx
+    exact ⟨u, hu, by rw [e, add_sub_cancel_left, Nat.cast_smul_eq_nsmul]⟩
+  · have hperf := GlobalTheory.traceForm_integral_perfect_of_isUnf _ _ _ _ _ _ _ _ U hU k
+    have hone : FractionalIdeal.spanSingleton (nonZeroDivisors (𝓞 D.host.E)) (U.X k).ξ0 * D.host.AA *
+        D.host.AAbar * (differentIdeal ℤ (𝓞 D.host.E) :
+          FractionalIdeal (nonZeroDivisors (𝓞 D.host.E)) D.host.E) = 1 := by
+      rw [(hG k).2, show -D.host.xi0 = (-1 : (𝓞 D.host.E)ˣ) • D.host.xi0 by simp,
+        ← (FractionalIdeal.spanSingleton_eq_spanSingleton.2 ⟨-1, rfl⟩)]
+      exact hP D.R D.host
+    have hM : 0 < Q.l.M := by have := Q.l.three_le; omega
+    obtain ⟨Xx, h1, -, h3⟩ := GlobalTheory.exists_dataX_of_perfect_traceForm _ _ (U.X k) D.host.AA D.host.AAbar
+      (xiR D) Q.l.M
+      (fun a => by
+        rw [GlobalTheory.LatticeData.cc_eq_conj]
+        exact ⟨conj_mem_AA D, fun ha => by simpa only [conj_conj] using conj_mem_AAbar D ha⟩)
+      hone (fun τ => by rw [(hG k).2, map_neg, norm_neg]; exact xiConst_holds D τ) hx1 hperf.1 hperf.2 hM (hPr k)
+    exact ⟨Xx, _, h1, AA_ne_zero hP D, h3⟩
+
+set_option synthInstance.maxHeartbeats 400000 in
+set_option maxHeartbeats 1000000 in
+
+theorem fullAt_of_pins (D : D7) (T : Core D) (hQ : T.Q.Pins) (j : ℕ) (hj : InR D j)
+    (hU : IsUnf (T.U j T.σ₀)) (w : WeightFamilies.Wt D j) (hn : 0 < w.n) : FullAt T j w := by
+  obtain ⟨-, hA, -, -, -, -, hnum⟩ := GlobalTheory.PinNum.numerics_of_pins D T.Q hQ

@@ -1,0 +1,3457 @@
+[FLC_collision_contract_01] src/Formalism/PadicSubsetSums/CentralIdempotents/GaloisIrreducibility.lean:14-16
+SHA256 c3f273821e8457b7029265e92a0ee7a77161738a27bf1720408e39614a68b6af
+
+def BB (g N : ℕ) : Finset ℕ :=
+  insert g ((Finset.range (g ^ N + 1)).filter (fun l =>
+
+
+[FLC_collision_contract_02] src/Formalism/PadicSubsetSums/CentralIdempotents/GaloisIrreducibility.lean:51-77
+SHA256 131953fd15555624c2a64ad497e73165b802d9768779287a1986544e3c4717c2
+
+def primeToPart {M : Type*} [Monoid M] (l : ℕ) (x : M) : M :=
+  x ^ ((ordProj[l] (orderOf x)) ^ Nat.totient (ordCompl[l] (orderOf x)))
+
+def PrimeToPartSpec : Prop :=
+  ∀ (M : Type) [Monoid M] (l : ℕ) (x : M), l.Prime → IsOfFinOrder x →
+    orderOf (primeToPart l x) = ordCompl[l] (orderOf x) ∧
+      ∃ a : ℕ, x ^ (l ^ a) = primeToPart l x ^ (l ^ a)
+
+def PrimeToPartEqIff : Prop :=
+  ∀ (M : Type) [Monoid M] (l : ℕ) (x y : M), l.Prime → IsOfFinOrder x → IsOfFinOrder y →
+    (primeToPart l x = primeToPart l y ↔ ∃ a : ℕ, x ^ (l ^ a) = y ^ (l ^ a))
+
+def GoodAt (K L : Type) [Field K] [Fintype K] [Field L] [Algebra K L] {ι J : Type} (N : ℕ)
+    (f : ι → K[X]) (χ : ι → J → Kˣ) : Prop :=
+  (∀ v, (f v).Monic ∧ (f v).natDegree = N ∧ (f v).coeff 0 ≠ 0) ∧
+  (∀ v, Squarefree (f v)) ∧
+  (∀ l : ℕ, l.Prime → l ∉ BB (Fintype.card K) N →
+    ∀ v, Set.InjOn (primeToPart l) ((f v).rootSet L)) ∧
+  (∀ l : ℕ, l.Prime → l ≠ Fintype.card K → ∀ v j, ∀ x ∈ (f v).rootSet L,
+    primeToPart l x ≠ primeToPart l (algebraMap K L (χ v j : K)) ∧
+    primeToPart l x ≠ primeToPart l (algebraMap K L ((χ v j)⁻¹ : Kˣ))) ∧
+  (∀ a : ℕ, 1 ≤ a → 2 * a ≤ N → ∃ v, ¬ ∃ h : K[X], h ∣ f v ∧ h.natDegree = a) ∧
+  (∃ v, ∃ P : K[X], Irreducible P ∧ P ∣ f v ∧ P.natDegree.Prime ∧
+    N < 2 * P.natDegree ∧ P.natDegree + 3 ≤ N)
+
+def Good (K₁ L₁ K₂ L₂ : Type) [Field K₁] [Fintype K₁] [Field L₁] [Algebra K₁ L₁]
+
+
+[FLC_collision_contract_03] src/Formalism/PadicSubsetSums/CentralIdempotents/EigenbasisOfDistinctRoots.lean:291-319
+SHA256 36ebd05c31a5965f9c186df1d81808a3e264bf8a4b7dabd4ac356ff5e583b0d4
+def sqWeight {K : Type} [Field K] [Fintype K] (f : K[X]) : ℝ :=
+  ((UniqueFactorizationMonoid.normalizedFactors f).map
+    (fun P => ((Fintype.card K : ℝ) ^ P.natDegree - 1)⁻¹)).prod
+
+open Classical in
+
+def sqSet (K : Type) [Field K] [Fintype K] (N : ℕ) : Finset (Fin N → K) :=
+  Finset.univ.filter (fun c => Squarefree (monicOf c) ∧ (monicOf c).coeff 0 ≠ 0)
+
+open Classical in
+
+def degType {K : Type} [Field K] (f : K[X]) : Multiset ℕ :=
+  (UniqueFactorizationMonoid.normalizedFactors f).map Polynomial.natDegree
+
+def SqMassLeOne : Prop :=
+  ∀ (K : Type) [Field K] [Fintype K] (M : ℕ), ∑ c ∈ sqSet K M, sqWeight (monicOf c) ≤ 1
+
+def SqMassLower : Prop :=
+  ∀ (K : Type) [Field K] [Fintype K] (N : ℕ), 1 ≤ N →
+    1 - 2 / (Fintype.card K : ℝ) ≤ ∑ c ∈ sqSet K N, sqWeight (monicOf c)
+
+open Classical in
+
+def DivisorBound : Prop :=
+  ∀ (K : Type) [Field K] [Fintype K] (N : ℕ) (h : K[X]), h.Monic → Squarefree h →
+    h.coeff 0 ≠ 0 → h.natDegree ≤ N →
+    ∑ c ∈ (sqSet K N).filter (fun c => h ∣ monicOf c), sqWeight (monicOf c) ≤ sqWeight h
+
+open Classical in
+
+
+[FLC_collision_contract_04] src/Formalism/PadicSubsetSums/CentralIdempotents/EigenbasisOfDistinctRoots.lean:338-375
+SHA256 32d44a32893c13090420bf286710daef10a983ecd17d925892d406c904e60f24
+def PrimeFactorsLogTwo : Prop :=
+  ∀ g δ : ℕ, 2 ≤ g → 1 ≤ δ →
+    (((g ^ δ - 1).primeFactors.card : ℕ) : ℝ) ≤ (δ : ℝ) * Real.logb 2 g
+
+open Classical in
+
+def SameFactorCount : Prop :=
+  ∀ (K L : Type) [Field K] [Fintype K] [Field L] [Algebra K L] [IsAlgClosed L] (δ l : ℕ),
+    l.Prime → 2 ≤ δ →
+    l ^ (4 * padicValNat l (Fintype.card K ^ δ - 1)) ≤ Fintype.card K ^ δ →
+    (((Finset.univ : Finset (Fin δ → K)).filter (fun c => Irreducible (monicOf c) ∧
+      ¬ Set.InjOn (primeToPart l) ((monicOf c).rootSet L))).card : ℝ) ≤
+      (Fintype.card K : ℝ) ^ (3 * (δ : ℝ) / 4)
+
+open Classical in
+
+def CrossFactorCount : Prop :=
+  ∀ (K L : Type) [Field K] [Fintype K] [Field L] [Algebra K L] [IsAlgClosed L] (δ l : ℕ)
+    (P' : K[X]), l.Prime → 1 ≤ δ → Irreducible P' → P'.coeff 0 ≠ 0 →
+    l ^ (4 * padicValNat l (Fintype.card K ^ δ - 1)) ≤ Fintype.card K ^ δ →
+    (((Finset.univ : Finset (Fin δ → K)).filter (fun c => Irreducible (monicOf c) ∧
+      (monicOf c).coeff 0 ≠ 0 ∧ ∃ x ∈ (monicOf c).rootSet L, ∃ y ∈ P'.rootSet L,
+        primeToPart l x = primeToPart l y)).card : ℝ) ≤
+      (Fintype.card K : ℝ) ^ ((δ : ℝ) / 4)
+
+def SeriesBounds : Prop :=
+  ∀ (u : ℝ) (N : ℕ), 0 ≤ u → u ≤ 1 / 8 →
+    ∑ δ ∈ Finset.Icc 2 N, (δ : ℝ) * u ^ δ ≤ 6 * u ^ 2 ∧
+      ∑ δ ∈ Finset.Icc 1 N, (δ : ℝ) ^ 2 * u ^ δ ≤ 17 / 10 * u
+
+open Classical in
+
+def LocalEstimateII : Prop :=
+  ∀ (K L : Type) [Field K] [Fintype K] [Field L] [Algebra K L] [IsAlgClosed L] (N : ℕ),
+    2 ^ 12 ≤ Fintype.card K →
+    ∑ c ∈ (sqSet K N).filter (fun c => ∃ l : ℕ, l.Prime ∧ l ∉ BB (Fintype.card K) N ∧
+        ¬ Set.InjOn (primeToPart l) ((monicOf c).rootSet L)), sqWeight (monicOf c) ≤
+      23 * Real.log (Fintype.card K) / Real.sqrt (Fintype.card K)
+
+
+[FLC_root_fibers_01] src/Formalism/PadicSubsetSums/StableGradedCounts/CoeffZeroNeZeroOfIrreducible.lean:15-139
+SHA256 b4995c7baeef79086d321ea02ef39d7adaf7072372954a53ae24d051f1625283
+theorem root_frob {f : K[X]} (n : ℕ) {x : L} (hx : aeval x f = 0) :
+    aeval (x ^ Fintype.card K ^ n) f = 0 := by
+  have key : ∀ y : L, aeval y f = 0 → aeval (y ^ Fintype.card K) f = 0 := by
+    intro y hy
+    rw [← Polynomial.expand_aeval, FiniteField.expand_card, map_pow, hy, zero_pow Fintype.card_ne_zero]
+  induction n with
+  | zero => simpa using hx
+  | succ n ih =>
+    rw [pow_succ, pow_mul]
+    exact key _ ih
+
+theorem root_conj {f : K[X]} (hm : f.Monic) (hi : Irreducible f) {x y : L} (hx : aeval x f = 0)
+    (hy : aeval y f = 0) : ∃ n : ℕ, y = x ^ Fintype.card K ^ n := by
+  classical
+  have h := (frobenius_orbit_irreducible K L f hm hi).1.2
+  have mem : ∀ z : L, aeval z f = 0 → z ∈ (f.aroots L).toFinset := by
+    intro z hz
+    rw [Multiset.mem_toFinset, mem_aroots]
+    exact ⟨hi.ne_zero, hz⟩
+  obtain ⟨n, hn⟩ := h x (by convert mem x hx) y (by convert mem y hy)
+  refine ⟨n, ?_⟩
+  rw [← hn, pow_iterate]
+
+theorem root_pow_card {f : K[X]} (hi : Irreducible f) {x : L} (hx : aeval x f = 0) :
+    x ^ Fintype.card K ^ f.natDegree = x := by
+  classical
+  have hxi : IsIntegral K x := (show IsAlgebraic K x from ⟨f, hi.ne_zero, hx⟩).isIntegral
+  have hass := (minpoly.irreducible hxi).associated_of_dvd hi (minpoly.dvd K x hx)
+  have hdeg : (minpoly K x).natDegree = f.natDegree :=
+    Polynomial.natDegree_eq_of_degree_eq (Polynomial.degree_eq_degree_of_associated hass)
+  haveI : FiniteDimensional K (IntermediateField.adjoin K {x}) := IntermediateField.adjoin.finiteDimensional hxi
+  haveI : Finite (IntermediateField.adjoin K {x}) := Module.finite_of_finite K
+  letI : Fintype (IntermediateField.adjoin K {x}) := Fintype.ofFinite _
+  have hcard : Fintype.card (IntermediateField.adjoin K {x}) = Fintype.card K ^ f.natDegree := by
+    rw [Module.card_eq_pow_finrank (K := K) (V := IntermediateField.adjoin K {x}),
+      IntermediateField.adjoin.finrank hxi, hdeg]
+  have h := FiniteField.pow_card
+    (⟨x, IntermediateField.mem_adjoin_simple_self K x⟩ : IntermediateField.adjoin K {x})
+  rw [hcard] at h
+  simpa using congrArg Subtype.val h
+
+theorem root_pow_card_mul {f : K[X]} (hi : Irreducible f) {x : L} (hx : aeval x f = 0) (k : ℕ) :
+    x ^ Fintype.card K ^ (f.natDegree * k) = x := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    rw [Nat.mul_succ, pow_add, pow_mul, ih, root_pow_card hi hx]
+
+theorem root_ne_zero {f : K[X]} (h0 : f.coeff 0 ≠ 0) {x : L} (hx : aeval x f = 0) : x ≠ 0 := by
+  intro h
+  rw [h, ← Polynomial.coeff_zero_eq_aeval_zero'] at hx
+  exact h0 ((map_eq_zero_iff _ (algebraMap K L).injective).1 hx)
+
+theorem coeff_zero_ne_zero_of_irreducible {f : K[X]} (hi : Irreducible f) (hd : 2 ≤ f.natDegree) :
+    f.coeff 0 ≠ 0 := by
+  intro h0
+  have hX : (X : K[X]) ∣ f := Polynomial.X_dvd_iff.2 h0
+  have hass := Polynomial.irreducible_X.associated_of_dvd hi hX
+  have hdeg := Polynomial.degree_eq_degree_of_associated hass
+  rw [Polynomial.degree_X] at hdeg
+  have : f.natDegree = 1 := Polynomial.natDegree_eq_of_degree_eq_some hdeg.symm
+  omega
+
+theorem root_pow_sub_one {f : K[X]} (hi : Irreducible f) (h0 : f.coeff 0 ≠ 0) {x : L}
+    (hx : aeval x f = 0) : x ^ (Fintype.card K ^ f.natDegree - 1) = 1 := by
+  have hx0 : x ≠ 0 := root_ne_zero h0 hx
+  have h1 := root_pow_card hi hx
+  have hpos : 1 ≤ Fintype.card K ^ f.natDegree := Nat.one_le_pow _ _ Fintype.card_pos
+  have e : x ^ Fintype.card K ^ f.natDegree = x ^ (Fintype.card K ^ f.natDegree - 1) * x := by
+    rw [← pow_succ, Nat.sub_add_cancel hpos]
+  rw [e] at h1
+  have := mul_right_cancel₀ hx0 (h1.trans (one_mul x).symm)
+  exact this
+
+theorem eq_of_common_root {δ : ℕ} {a b : Fin δ → K} (ha : Irreducible (monicOf a))
+    (hb : Irreducible (monicOf b)) {x : L} (hxa : aeval x (monicOf a) = 0)
+    (hxb : aeval x (monicOf b) = 0) : a = b := by
+  apply monicOf_injective
+  rw [minpoly.eq_of_irreducible_of_monic ha hxa (monicOf_monic a),
+    minpoly.eq_of_irreducible_of_monic hb hxb (monicOf_monic b)]
+
+theorem card_le_of_root_mem {δ : ℕ} (F : Finset (Fin δ → K))
+    (hF : ∀ c ∈ F, Irreducible (monicOf c)) (S : Finset L)
+    (h : ∀ c ∈ F, ∃ x ∈ S, aeval x (monicOf c) = 0) : F.card ≤ S.card := by
+  classical
+  choose! r hrS hr using h
+  refine Finset.card_le_card_of_injOn r (fun c hc => hrS c hc) ?_
+  intro a ha b hb hab
+  exact eq_of_common_root (hF a ha) (hF b hb) (hr a ha) (hab ▸ hr b hb)
+
+theorem mul_card_le_of_roots_mem {δ : ℕ} (F : Finset (Fin δ → K))
+    (hF : ∀ c ∈ F, Irreducible (monicOf c)) (S : Finset L)
+    (h : ∀ c ∈ F, ∀ x : L, aeval x (monicOf c) = 0 → x ∈ S) : δ * F.card ≤ S.card := by
+  classical
+  have hsub : F.biUnion (fun c => ((monicOf c).aroots L).toFinset) ⊆ S := by
+    intro x hx
+    obtain ⟨c, hc, hxc⟩ := Finset.mem_biUnion.mp hx
+    rw [Multiset.mem_toFinset, mem_aroots] at hxc
+    exact h c hc x hxc.2
+  have hdisj : (F : Set (Fin δ → K)).PairwiseDisjoint
+      (fun c => ((monicOf c).aroots L).toFinset) := by
+    intro a ha b hb hab
+    rw [Function.onFun, Finset.disjoint_left]
+    intro x hxa hxb
+    rw [Multiset.mem_toFinset, mem_aroots] at hxa hxb
+    exact hab (eq_of_common_root (hF a ha) (hF b hb) hxa.2 hxb.2)
+  have hcard : ∀ c ∈ F, (((monicOf c).aroots L).toFinset).card = δ := by
+    intro c hc
+    have := (frobenius_orbit_irreducible K L (monicOf c) (monicOf_monic c) (hF c hc)).2
+    rw [monicOf_natDegree] at this
+    convert this
+  calc δ * F.card = ∑ c ∈ F, (((monicOf c).aroots L).toFinset).card := by
+        rw [Finset.sum_congr rfl hcard, Finset.sum_const, smul_eq_mul, mul_comm]
+    _ = (F.biUnion (fun c => ((monicOf c).aroots L).toFinset)).card :=
+        (Finset.card_biUnion hdisj).symm
+    _ ≤ S.card := Finset.card_le_card hsub
+
+theorem card_nthRootsFinset_le (m : ℕ) : (nthRootsFinset m (1 : L)).card ≤ m := by
+  classical
+  calc (nthRootsFinset m (1 : L)).card ≤ (nthRoots m (1 : L)).card := by
+        unfold Polynomial.nthRootsFinset
+        convert Multiset.toFinset_card_le (nthRoots m (1 : L))
+    _ ≤ m := Polynomial.card_nthRoots m 1
+
+end roots
+
+
+[FLC_root_fibers_02] src/Formalism/PadicSubsetSums/StableGradedCounts/CrossFactorCount.lean:11-48
+SHA256 4c2f1bc9237e4a713f7f4528873a91e71c3da65b451e755ae5429cb6bcc8ba8b
+theorem root_conj' {f : K[X]} (hi : Irreducible f) {x y : L} (hx : aeval x f = 0)
+    (hy : aeval y f = 0) : ∃ n : ℕ, y = x ^ Fintype.card K ^ n := by
+  have hf0 : f ≠ 0 := hi.ne_zero
+  have hu : IsUnit (C f.leadingCoeff⁻¹ : K[X]) :=
+    Polynomial.isUnit_C.mpr (IsUnit.mk0 _ (inv_ne_zero (leadingCoeff_ne_zero.mpr hf0)))
+  have hm : (f * C f.leadingCoeff⁻¹).Monic := monic_mul_leadingCoeff_inv hf0
+  have hi' : Irreducible (f * C f.leadingCoeff⁻¹) := (irreducible_mul_isUnit hu).mpr hi
+  have hx' : aeval x (f * C f.leadingCoeff⁻¹) = 0 := by rw [map_mul, hx, zero_mul]
+  have hy' : aeval y (f * C f.leadingCoeff⁻¹) = 0 := by rw [map_mul, hy, zero_mul]
+  exact root_conj hm hi' hx' hy'
+
+theorem card_samePart_le {l n : ℕ} (hl : l.Prime) (hn : n ≠ 0) (w : L) (S : Finset L)
+    (hS : ∀ x ∈ S, x ^ n = 1 ∧ primeToPart l x = w) : S.card ≤ l ^ padicValNat l n := by
+  classical
+  rcases S.eq_empty_or_nonempty with hS0 | ⟨x0, hx0⟩
+  · simp [hS0]
+  obtain ⟨hx0n, hx0w⟩ := hS x0 hx0
+  have hx0ne : x0 ≠ 0 := by
+    rintro rfl
+    rw [zero_pow hn] at hx0n
+    exact zero_ne_one hx0n
+  have hfin : ∀ x : L, x ^ n = 1 → IsOfFinOrder x := fun x hx =>
+    isOfFinOrder_iff_pow_eq_one.mpr ⟨n, Nat.pos_of_ne_zero hn, hx⟩
+  have hmap : ∀ x ∈ S, x * x0⁻¹ ∈ nthRootsFinset (l ^ padicValNat l n) (1 : L) := by
+    intro x hx
+    obtain ⟨hxn, hxw⟩ := hS x hx
+    obtain ⟨a, ha⟩ := (prime_to_part_eq_iff L l x x0 hl (hfin x hxn) (hfin x0 hx0n)).mp
+      (hxw.trans hx0w.symm)
+    have hz : (x * x0⁻¹) ^ n = 1 := by rw [mul_pow, inv_pow, hxn, hx0n, inv_one, mul_one]
+    have hza : (x * x0⁻¹) ^ (l ^ a) = 1 := by
+      rw [mul_pow, inv_pow, ha, mul_inv_cancel₀ (pow_ne_zero _ hx0ne)]
+    rw [mem_nthRootsFinset (pow_pos hl.pos _)]
+    exact (lpow_order_iff hl hn _ hz).mp ⟨a, hza⟩
+  calc S.card ≤ (nthRootsFinset (l ^ padicValNat l n) (1 : L)).card :=
+        Finset.card_le_card_of_injOn (fun x => x * x0⁻¹) (fun x hx => hmap x hx)
+          (fun a _ b _ h => mul_right_cancel₀ (inv_ne_zero hx0ne) h)
+    _ ≤ l ^ padicValNat l n := card_nthRootsFinset_le _
+
+
+
+[FLC_same_factor_01] src/Formalism/PadicSubsetSums/StableGradedCounts/CoeffZeroNeZeroOfIrreducible.lean:141-289
+SHA256 5677d4b02cf19e2272e52018413fe0e0f185c141f517d55fc9c0dbd0ec00ea7c
+theorem lpow_le_rpow_quarter {l v g d : ℕ} (hBB : l ^ (4 * v) ≤ g ^ d) :
+    ((l ^ v : ℕ) : ℝ) ≤ (g : ℝ) ^ ((d : ℝ) / 4) := by
+  have hg0 : (0 : ℝ) ≤ g := Nat.cast_nonneg g
+  have h1 : ((l ^ v : ℕ) : ℝ) ^ 4 ≤ ((g : ℝ) ^ ((d : ℝ) / 4)) ^ 4 := by
+    rw [← Real.rpow_natCast ((g : ℝ) ^ ((d : ℝ) / 4)) 4, ← Real.rpow_mul hg0]
+    have e : (d : ℝ) / 4 * ((4 : ℕ) : ℝ) = d := by push_cast; ring
+    rw [e, Real.rpow_natCast]
+    have h2 : (l ^ v) ^ 4 ≤ g ^ d := by rw [← pow_mul, mul_comm]; exact hBB
+    exact_mod_cast h2
+  exact (pow_le_pow_iff_left₀ (by positivity) (by positivity) (by norm_num)).1 h1
+
+theorem same_factor_count : SameFactorCount := by
+  classical
+  intro K L _ _ _ _ _ δ l hl hδ hBB
+  have : Fact l.Prime := ⟨hl⟩
+  set g := Fintype.card K with hgdef
+  have hg : 2 ≤ g := Fintype.one_lt_card
+  set n := g ^ δ - 1 with hn
+  set v := padicValNat l n with hv
+  have hgd : 2 ≤ g ^ δ := hg.trans (Nat.le_self_pow (by omega) g)
+  have hn0 : n ≠ 0 := by omega
+  have hg1 : (1 : ℝ) ≤ g := by exact_mod_cast (by omega : 1 ≤ g)
+  have hlv : ((l ^ v : ℕ) : ℝ) ≤ (g : ℝ) ^ ((δ : ℝ) / 4) := lpow_le_rpow_quarter hBB
+  set B : ℝ := (g : ℝ) ^ ((δ : ℝ) / 2) * (g : ℝ) ^ ((δ : ℝ) / 4) with hB
+  set I := (Finset.range δ).filter (fun e => e ∣ δ) with hI
+  set T : ℕ → Finset L := fun e => nthRootsFinset ((g ^ e - 1) * l ^ v) (1 : L) with hT
+  have hmpos : ∀ e ∈ I, 0 < (g ^ e - 1) * l ^ v := by
+    intro e he
+    simp only [hI, Finset.mem_filter, Finset.mem_range] at he
+    have he1 : 1 ≤ e := by
+      rcases Nat.eq_zero_or_pos e with h0 | h0
+      · subst h0; have := Nat.eq_zero_of_zero_dvd he.2; omega
+      · exact h0
+    have hge : 2 ≤ g ^ e := hg.trans (Nat.le_self_pow (by omega) g)
+    exact Nat.mul_pos (by omega) (pow_pos hl.pos _)
+  have hTe : ∀ e ∈ I, ((T e).card : ℝ) ≤ B := by
+    intro e he
+    simp only [hI, Finset.mem_filter, Finset.mem_range] at he
+    obtain ⟨hed, k, hk⟩ := he
+    have h2e : 2 * e ≤ δ := by
+      have hk2 : 2 ≤ k := by
+        by_contra hlt
+        have : k = 0 ∨ k = 1 := by omega
+        rcases this with rfl | rfl <;> omega
+      calc 2 * e = e * 2 := by ring
+        _ ≤ e * k := Nat.mul_le_mul_left e hk2
+        _ = δ := hk.symm
+    have hc1 : (T e).card ≤ (g ^ e - 1) * l ^ v := card_nthRootsFinset_le _
+    have hc2 : ((g ^ e - 1 : ℕ) : ℝ) ≤ (g : ℝ) ^ ((δ : ℝ) / 2) := by
+      have h4 : ((g ^ e - 1 : ℕ) : ℝ) ≤ (g : ℝ) ^ e := by
+        have : g ^ e - 1 ≤ g ^ e := Nat.sub_le _ _
+        exact_mod_cast this
+      refine h4.trans ?_
+      rw [← Real.rpow_natCast]
+      apply Real.rpow_le_rpow_of_exponent_le hg1
+      have : ((2 * e : ℕ) : ℝ) ≤ (δ : ℝ) := by exact_mod_cast h2e
+      push_cast at this
+      linarith
+    calc ((T e).card : ℝ) ≤ (((g ^ e - 1) * l ^ v : ℕ) : ℝ) := by exact_mod_cast hc1
+      _ = ((g ^ e - 1 : ℕ) : ℝ) * ((l ^ v : ℕ) : ℝ) := by push_cast; ring
+      _ ≤ B := mul_le_mul hc2 hlv (by positivity) (by positivity)
+  set F := (Finset.univ : Finset (Fin δ → K)).filter (fun c => Irreducible (monicOf c) ∧
+      ¬ Set.InjOn (primeToPart l) ((monicOf c).rootSet L)) with hF
+  have hFirr : ∀ c ∈ F, Irreducible (monicOf c) := fun c hc => (Finset.mem_filter.mp hc).2.1
+  have hroots : ∀ c ∈ F, ∀ x : L, aeval x (monicOf c) = 0 → x ∈ I.biUnion T := by
+    intro c hc x' hx'
+    obtain ⟨-, hirr, hninj⟩ := Finset.mem_filter.mp hc
+    have hmon := monicOf_monic c
+    have hdeg : (monicOf c).natDegree = δ := monicOf_natDegree c
+    have hc0 : (monicOf c).coeff 0 ≠ 0 :=
+      coeff_zero_ne_zero_of_irreducible hirr (by rw [hdeg]; exact hδ)
+    simp only [Set.InjOn, not_forall] at hninj
+    obtain ⟨x, hx, y, hy, hxy, hne⟩ := hninj
+    have hx := (mem_rootSet.mp hx).2
+    have hy := (mem_rootSet.mp hy).2
+    obtain ⟨i, hi⟩ := root_conj hmon hirr hx hy
+    obtain ⟨j, hj⟩ := root_conj hmon hirr hx hx'
+    have hxn : x ^ n = 1 := by
+      have := root_pow_sub_one hirr hc0 hx
+      rwa [hdeg] at this
+    have hxfin : IsOfFinOrder x := isOfFinOrder_iff_pow_eq_one.mpr ⟨n, Nat.pos_of_ne_zero hn0, hxn⟩
+    set z := primeToPart l x with hz
+    have hzi : z ^ g ^ i = z := by
+      have := (prime_to_part_endomorphism L L l x x (powMonoidHom (g ^ i)) hl hxfin hxfin).2
+      simp only [powMonoidHom_apply] at this
+      rw [hz, this, ← hi, ← hxy]
+    have hzn : z ^ n = 1 := by
+      rw [hz, primeToPart, ← pow_mul, mul_comm, pow_mul, hxn, one_pow]
+    have hz0 : z ≠ 0 := by
+      intro h0
+      rw [h0, zero_pow hn0] at hzn
+      exact zero_ne_one hzn
+    have hzi1 : z ^ (g ^ i - 1) = 1 := by
+      have hpos : 0 < g ^ i := pow_pos (by omega) _
+      have : z ^ (g ^ i - 1) * z = 1 * z := by
+        rw [← pow_succ, Nat.sub_add_cancel hpos, hzi, one_mul]
+      exact mul_right_cancel₀ hz0 this
+    set e := Nat.gcd i δ with he
+    have hze : z ^ (g ^ e - 1) = 1 := by
+      rw [he, ← Nat.pow_sub_one_gcd_pow_sub_one]
+      exact pow_gcd_eq_one.mpr ⟨hzi1, hzn⟩
+    have heδ : e ∣ δ := Nat.gcd_dvd_right i δ
+    have helt : e < δ := by
+      refine lt_of_le_of_ne (Nat.le_of_dvd (by omega) heδ) ?_
+      intro h
+      have hdi : δ ∣ i := h ▸ Nat.gcd_dvd_left i δ
+      obtain ⟨k, hk⟩ := hdi
+      apply hne
+      have := root_pow_card_mul hirr hx k
+      rw [hdeg, ← hk, ← hi] at this
+      exact this.symm
+    have heI : e ∈ I := by
+      simp only [hI, Finset.mem_filter, Finset.mem_range]; exact ⟨helt, heδ⟩
+    obtain ⟨_, a, ha⟩ := prime_to_part_spec L l x hl hxfin
+    have h1 : (x ^ (g ^ e - 1)) ^ (l ^ a) = 1 := by
+      rw [← pow_mul, mul_comm, pow_mul, ha, ← pow_mul, mul_comm, pow_mul, hze, one_pow]
+    have h2 : (x ^ (g ^ e - 1)) ^ n = 1 := by
+      rw [← pow_mul, mul_comm, pow_mul, hxn, one_pow]
+    have h3 := (lpow_order_iff hl hn0 _ h2).mp ⟨a, h1⟩
+    rw [Finset.mem_biUnion]
+    refine ⟨e, heI, ?_⟩
+    rw [hT]
+    simp only
+    rw [mem_nthRootsFinset (hmpos e heI), hj, ← pow_mul, mul_comm, pow_mul, pow_mul, h3, one_pow]
+  have hcount := mul_card_le_of_roots_mem F hFirr (I.biUnion T) hroots
+  have hB0 : 0 ≤ B := by positivity
+  have hIcard : (I.card : ℝ) ≤ δ := by
+    have : I.card ≤ δ := (Finset.card_filter_le _ _).trans (by simp)
+    exact_mod_cast this
+  have hS : ((I.biUnion T).card : ℝ) ≤ δ * B := by
+    calc ((I.biUnion T).card : ℝ) ≤ ((∑ e ∈ I, (T e).card : ℕ) : ℝ) := by
+          exact_mod_cast Finset.card_biUnion_le
+      _ = ∑ e ∈ I, ((T e).card : ℝ) := by push_cast; rfl
+      _ ≤ ∑ _e ∈ I, B := Finset.sum_le_sum hTe
+      _ = (I.card : ℝ) * B := by rw [Finset.sum_const, nsmul_eq_mul]
+      _ ≤ δ * B := mul_le_mul_of_nonneg_right hIcard hB0
+  have hδR : (0 : ℝ) < δ := by exact_mod_cast (by omega : 0 < δ)
+  have hfin : (δ : ℝ) * (F.card : ℝ) ≤ δ * B := by
+    refine le_trans ?_ hS
+    exact_mod_cast hcount
+  have hFB : (F.card : ℝ) ≤ B := le_of_mul_le_mul_left hfin hδR
+  have hBeq : B = (g : ℝ) ^ (3 * (δ : ℝ) / 4) := by
+    rw [hB, ← Real.rpow_add (by linarith)]
+    congr 1
+    ring
+  rw [← hBeq]
+  exact hFB
+
+end Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
+
+
+[FLC_cross_factor_01] src/Formalism/PadicSubsetSums/StableGradedCounts/CrossFactorCount.lean:51-104
+SHA256 3ea39c95f3821a5788e2d73507bfa92a83141cee4fc927a4164ee7c1aa595984
+theorem cross_factor_count : CrossFactorCount := by
+  intro K L _ _ _ _ _ δ l P' hl hδ hP' hP'0 hBB
+  classical
+  have hq : 1 < Fintype.card K := Fintype.one_lt_card
+  have hn : Fintype.card K ^ δ - 1 ≠ 0 :=
+    Nat.sub_ne_zero_of_lt (Nat.one_lt_pow (by omega) hq)
+  have hfin : ∀ (z : L) (m : ℕ), 0 < m → z ^ m = 1 → IsOfFinOrder z := fun z m hm h =>
+    isOfFinOrder_iff_pow_eq_one.mpr ⟨m, hm, h⟩
+  rcases (P'.rootSet L).eq_empty_or_nonempty with h0 | ⟨y0, hy0⟩
+  · convert (by positivity : (0 : ℝ) ≤ (Fintype.card K : ℝ) ^ ((δ : ℝ) / 4))
+    norm_cast
+    rw [Finset.card_eq_zero, Finset.filter_eq_empty_iff]
+    rintro c - ⟨-, -, x, -, y, hy, -⟩
+    rw [h0] at hy
+    exact hy
+  have hy0r : aeval y0 P' = 0 := (mem_rootSet.mp hy0).2
+  have hm' : 0 < Fintype.card K ^ P'.natDegree - 1 :=
+    Nat.sub_pos_of_lt (Nat.one_lt_pow (Irreducible.natDegree_pos hP').ne' hq)
+  let S := (nthRootsFinset (Fintype.card K ^ δ - 1) (1 : L)).filter
+    (fun x => primeToPart l x = primeToPart l y0)
+  have hSprop : ∀ x ∈ S, x ^ (Fintype.card K ^ δ - 1) = 1 ∧ primeToPart l x = primeToPart l y0 := by
+    intro x hx
+    rw [Finset.mem_filter, mem_nthRootsFinset (Nat.pos_of_ne_zero hn)] at hx
+    exact hx
+  refine le_trans (Nat.cast_le.mpr (card_le_of_root_mem _ ?_ S ?_)) ?_
+  · intro c hc
+    exact (Finset.mem_filter.mp hc).2.1
+  · intro c hc
+    obtain ⟨hirr, hc0, x, hx, y, hy, hxy⟩ := (Finset.mem_filter.mp hc).2
+    have hxr : aeval x (monicOf c) = 0 := (mem_rootSet.mp hx).2
+    have hyr : aeval y P' = 0 := (mem_rootSet.mp hy).2
+    obtain ⟨k, hk⟩ := root_conj' hP' hyr hy0r
+    have hx'r := root_frob (f := monicOf c) k hxr
+    refine ⟨x ^ Fintype.card K ^ k, ?_, hx'r⟩
+    have hpow : ∀ {z : L}, aeval z (monicOf c) = 0 → z ^ (Fintype.card K ^ δ - 1) = 1 := by
+      intro z hz
+      have := root_pow_sub_one hirr hc0 hz
+      rwa [monicOf_natDegree] at this
+    have hyn : y ^ (Fintype.card K ^ P'.natDegree - 1) = 1 := root_pow_sub_one hP' hP'0 hyr
+    have hyk : (y ^ Fintype.card K ^ k) ^ (Fintype.card K ^ P'.natDegree - 1) = 1 := by
+      rw [← pow_mul, mul_comm, pow_mul, hyn, one_pow]
+    rw [Finset.mem_filter, mem_nthRootsFinset (Nat.pos_of_ne_zero hn)]
+    refine ⟨hpow hx'r, ?_⟩
+    obtain ⟨a, ha⟩ := (prime_to_part_eq_iff L l x y hl
+      (hfin x _ (Nat.pos_of_ne_zero hn) (hpow hxr)) (hfin y _ hm' hyn)).mp hxy
+    rw [hk]
+    refine (prime_to_part_eq_iff L l _ _ hl
+      (hfin _ _ (Nat.pos_of_ne_zero hn) (hpow hx'r)) (hfin _ _ hm' hyk)).mpr ⟨a, ?_⟩
+    have hsw : ∀ z : L, (z ^ Fintype.card K ^ k) ^ l ^ a = (z ^ l ^ a) ^ Fintype.card K ^ k :=
+      fun z => by rw [← pow_mul, ← pow_mul, mul_comm]
+    rw [hsw, hsw, ha]
+  · exact le_trans (Nat.cast_le.mpr (card_samePart_le hl hn _ S hSprop)) (lpow_le_rpow_quarter hBB)
+
+end Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
+
+
+[FLC_collision_union_01] src/Formalism/PadicSubsetSums/StableGradedCounts/SquareSetMemExceptionalUnion.lean:7-349
+SHA256 fc8519030918c0593a341f783b002bc5176101c6a97ca494319bf92803fd03ca
+theorem primeToPart_eq_self_of_not_dvd {M : Type} [Monoid M] {l n : ℕ} (hl : l.Prime) (hn : n ≠ 0)
+    {x : M} (hx : x ^ n = 1) (hln : ¬ l ∣ n) : primeToPart l x = x := by
+  have hdvd : orderOf x ∣ n := orderOf_dvd_of_pow_eq_one hx
+  have hnd : ¬ l ∣ orderOf x := fun h => hln (h.trans hdvd)
+  have h0 : (orderOf x).factorization l = 0 := Nat.factorization_eq_zero_of_not_dvd hnd
+  simp only [primeToPart, h0, pow_zero, one_pow, pow_one]
+
+theorem sqWeight_irreducible {K : Type} [Field K] [Fintype K] (P : K[X]) (hP : Irreducible P)
+    (hm : P.Monic) : sqWeight P = ((Fintype.card K : ℝ) ^ P.natDegree - 1)⁻¹ := by
+  unfold sqWeight
+  classical
+  have h1 := UniqueFactorizationMonoid.normalizedFactors_irreducible hP
+  rw [hm.normalize_eq_self] at h1
+  have h2 : (Multiset.map (fun P : K[X] => ((Fintype.card K : ℝ) ^ P.natDegree - 1)⁻¹)
+      (UniqueFactorizationMonoid.normalizedFactors P)).prod =
+      ((Fintype.card K : ℝ) ^ P.natDegree - 1)⁻¹ := by
+    rw [h1]; simp
+  convert h2
+
+section sets
+
+variable (K L : Type) [Field K] [Fintype K] [Field L] [Algebra K L] [IsAlgClosed L]
+
+open Classical in
+
+noncomputable def e3A (δ l : ℕ) : Finset (Fin δ → K) :=
+  (Finset.univ : Finset (Fin δ → K)).filter (fun c => Irreducible (monicOf c) ∧
+      ¬ Set.InjOn (primeToPart l) ((monicOf c).rootSet L))
+
+open Classical in
+
+noncomputable def e3I (δ : ℕ) : Finset (Fin δ → K) :=
+  (Finset.univ : Finset (Fin δ → K)).filter
+      (fun c => Irreducible (monicOf c) ∧ (monicOf c).coeff 0 ≠ 0)
+
+open Classical in
+
+noncomputable def e3C (δ l : ℕ) (P' : K[X]) : Finset (Fin δ → K) :=
+  (Finset.univ : Finset (Fin δ → K)).filter (fun c => Irreducible (monicOf c) ∧
+      (monicOf c).coeff 0 ≠ 0 ∧ ∃ x ∈ (monicOf c).rootSet L, ∃ y ∈ P'.rootSet L,
+        primeToPart l x = primeToPart l y)
+
+def e3D (N : ℕ) (h : K[X]) : Set (Fin N → K) := {c | c ∈ sqSet K N ∧ h ∣ monicOf c}
+
+noncomputable def e3μ (N : ℕ) : (Fin N → K) → ℝ := fun c => sqWeight (monicOf c)
+
+def e3PA (g δ : ℕ) : Finset ℕ :=
+  (g ^ δ - 1).primeFactors.filter (fun l => l ^ (4 * padicValNat l (g ^ δ - 1)) ≤ g ^ δ)
+
+def e3PB (g δ δ' : ℕ) : Finset ℕ :=
+  ((g ^ δ - 1).primeFactors ∪ (g ^ δ' - 1).primeFactors).filter
+    (fun l => l ^ (4 * padicValNat l (g ^ δ - 1)) ≤ g ^ δ)
+
+def e3SA (N : ℕ) : Set (Fin N → K) :=
+  ⋃ δ ∈ Finset.Icc 2 N, ⋃ l ∈ e3PA (Fintype.card K) δ, ⋃ c' ∈ e3A K L δ l, e3D K N (monicOf c')
+
+def e3SB (N : ℕ) : Set (Fin N → K) :=
+  ⋃ δ ∈ Finset.Icc 1 N, ⋃ δ' ∈ Finset.Icc 1 δ, ⋃ l ∈ e3PB (Fintype.card K) δ δ',
+    ⋃ c'' ∈ e3I K δ', ⋃ c' ∈ e3C K L δ l (monicOf c''), e3D K N (monicOf c' * monicOf c'')
+
+variable {K} in
+theorem mem_e3A {δ l : ℕ} {c : Fin δ → K} : c ∈ e3A K L δ l ↔ Irreducible (monicOf c) ∧
+    ¬ Set.InjOn (primeToPart l) ((monicOf c).rootSet L) := by
+  simp only [e3A, Finset.mem_filter, Finset.mem_univ, true_and]
+
+variable {K} in
+theorem mem_e3I {δ : ℕ} {c : Fin δ → K} : c ∈ e3I K δ ↔ Irreducible (monicOf c) ∧
+    (monicOf c).coeff 0 ≠ 0 := by
+  simp only [e3I, Finset.mem_filter, Finset.mem_univ, true_and]
+
+variable {K} in
+theorem mem_e3C {δ l : ℕ} {P' : K[X]} {c : Fin δ → K} : c ∈ e3C K L δ l P' ↔
+    Irreducible (monicOf c) ∧ (monicOf c).coeff 0 ≠ 0 ∧ ∃ x ∈ (monicOf c).rootSet L,
+      ∃ y ∈ P'.rootSet L, primeToPart l x = primeToPart l y := by
+  simp only [e3C, Finset.mem_filter, Finset.mem_univ, true_and]
+
+theorem e3μ_nonneg (N : ℕ) (c : Fin N → K) : 0 ≤ e3μ K N c := by
+  unfold e3μ
+  exact sqWeight_nonneg _
+
+theorem wt_e3D_le (N : ℕ) (h : K[X]) (hm : h.Monic) :
+    wtOf (e3μ K N) (e3D K N h) ≤ sqWeight h := by
+  classical
+  unfold e3D
+  rw [wtOf_eq_filter']
+  by_cases hd : h.natDegree ≤ N
+  · exact divisor_square_weight_sum_le square_mass_le_one K N h hm hd _ (fun c hc => by
+      simpa only [Finset.mem_filter] using hc)
+  · rw [Finset.filter_eq_empty_iff.mpr, Finset.sum_empty]
+    · exact sqWeight_nonneg h
+    · intro c _ hdiv
+      apply hd
+      have := natDegree_le_of_dvd hdiv (monicOf_monic c).ne_zero
+      rwa [monicOf_natDegree] at this
+
+theorem card_pow_sub_one_pos (δ : ℕ) (hδ : 1 ≤ δ) : (0 : ℝ) < (Fintype.card K : ℝ) ^ δ - 1 := by
+  have h1 : (1 : ℝ) < (Fintype.card K : ℝ) := by exact_mod_cast Fintype.one_lt_card
+  have h2 : (1 : ℝ) < (Fintype.card K : ℝ) ^ δ := one_lt_pow₀ h1 (by omega)
+  linarith
+
+theorem wt_caseA (N δ l : ℕ) (hl : l.Prime) (hδ : 2 ≤ δ)
+    (hBB : l ^ (4 * padicValNat l (Fintype.card K ^ δ - 1)) ≤ Fintype.card K ^ δ) :
+    wtOf (e3μ K N) (⋃ c' ∈ e3A K L δ l, e3D K N (monicOf c')) ≤
+      (Fintype.card K : ℝ) ^ (3 * (δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := by
+  have hpos := card_pow_sub_one_pos K δ (by omega)
+  calc wtOf (e3μ K N) (⋃ c' ∈ e3A K L δ l, e3D K N (monicOf c'))
+      ≤ ∑ c' ∈ e3A K L δ l, wtOf (e3μ K N) (e3D K N (monicOf c')) :=
+        wtOf_biUnion_le _ (e3μ_nonneg K N) _ _
+    _ ≤ ∑ _c' ∈ e3A K L δ l, ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := by
+        refine Finset.sum_le_sum (fun c' hc' => ?_)
+        have hirr : Irreducible (monicOf c') := ((mem_e3A L).mp hc').1
+        refine (wt_e3D_le K N _ (monicOf_monic c')).trans_eq ?_
+        rw [sqWeight_irreducible _ hirr (monicOf_monic c'), monicOf_natDegree]
+    _ = ((e3A K L δ l).card : ℝ) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := by
+        rw [Finset.sum_const, nsmul_eq_mul]
+    _ ≤ _ := mul_le_mul_of_nonneg_right (same_factor_count K L δ l hl hδ hBB)
+        (inv_nonneg.mpr hpos.le)
+
+theorem wt_caseB (N δ δ' l : ℕ) (hl : l.Prime) (hδ : 1 ≤ δ) (hδ' : 1 ≤ δ')
+    (hBB : l ^ (4 * padicValNat l (Fintype.card K ^ δ - 1)) ≤ Fintype.card K ^ δ) :
+    wtOf (e3μ K N) (⋃ c'' ∈ e3I K δ', ⋃ c' ∈ e3C K L δ l (monicOf c''),
+        e3D K N (monicOf c' * monicOf c'')) ≤
+      (Fintype.card K : ℝ) ^ ((δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := by
+  have hpos := card_pow_sub_one_pos K δ hδ
+  have hpos' := card_pow_sub_one_pos K δ' hδ'
+  set G : ℝ := (Fintype.card K : ℝ) with hG
+  have hG0 : 0 ≤ G := by positivity
+  have hinner : ∀ c'' ∈ e3I K δ', wtOf (e3μ K N) (⋃ c' ∈ e3C K L δ l (monicOf c''),
+      e3D K N (monicOf c' * monicOf c'')) ≤ G ^ ((δ : ℝ) / 4) * ((G ^ δ - 1)⁻¹ * (G ^ δ' - 1)⁻¹) := by
+    intro c'' hc''
+    obtain ⟨hirr'', h0''⟩ := mem_e3I.mp hc''
+    calc wtOf (e3μ K N) (⋃ c' ∈ e3C K L δ l (monicOf c''), e3D K N (monicOf c' * monicOf c''))
+        ≤ ∑ c' ∈ e3C K L δ l (monicOf c''), wtOf (e3μ K N) (e3D K N (monicOf c' * monicOf c'')) :=
+          wtOf_biUnion_le _ (e3μ_nonneg K N) _ _
+      _ ≤ ∑ _c' ∈ e3C K L δ l (monicOf c''), ((G ^ δ - 1)⁻¹ * (G ^ δ' - 1)⁻¹) := by
+          refine Finset.sum_le_sum (fun c' hc' => ?_)
+          have hirr : Irreducible (monicOf c') := ((mem_e3C L).mp hc').1
+          refine (wt_e3D_le K N _ ((monicOf_monic c').mul (monicOf_monic c''))).trans_eq ?_
+          rw [sqWeight_mul _ _ (monicOf_monic c').ne_zero (monicOf_monic c'').ne_zero,
+            sqWeight_irreducible _ hirr (monicOf_monic c'),
+            sqWeight_irreducible _ hirr'' (monicOf_monic c''), monicOf_natDegree,
+            monicOf_natDegree]
+      _ = ((e3C K L δ l (monicOf c'')).card : ℝ) * ((G ^ δ - 1)⁻¹ * (G ^ δ' - 1)⁻¹) := by
+          rw [Finset.sum_const, nsmul_eq_mul]
+      _ ≤ _ := mul_le_mul_of_nonneg_right
+          (cross_factor_count K L δ l (monicOf c'') hl hδ hirr'' h0'' hBB)
+          (mul_nonneg (inv_nonneg.mpr hpos.le) (inv_nonneg.mpr hpos'.le))
+  have hI : ((e3I K δ').card : ℝ) ≤ G ^ δ' - 1 := by
+    have h1 := irreducible_count_upper_unit K δ' hδ'
+    have h2 : (e3I K δ').card ≤ Fintype.card K ^ δ' - 1 := by
+      refine le_trans ?_ h1
+      exact Nat.le_mul_of_pos_left _ (by omega)
+    have h3 : 1 ≤ Fintype.card K ^ δ' := Nat.one_le_pow _ _ Fintype.card_pos
+    have h4 : ((e3I K δ').card : ℝ) ≤ ((Fintype.card K ^ δ' - 1 : ℕ) : ℝ) := by exact_mod_cast h2
+    rw [Nat.cast_sub h3] at h4
+    push_cast at h4
+    exact h4
+  have hr0 : 0 ≤ G ^ ((δ : ℝ) / 4) := Real.rpow_nonneg hG0 _
+  calc wtOf (e3μ K N) (⋃ c'' ∈ e3I K δ', ⋃ c' ∈ e3C K L δ l (monicOf c''),
+        e3D K N (monicOf c' * monicOf c''))
+      ≤ ∑ c'' ∈ e3I K δ', wtOf (e3μ K N) (⋃ c' ∈ e3C K L δ l (monicOf c''),
+        e3D K N (monicOf c' * monicOf c'')) := wtOf_biUnion_le _ (e3μ_nonneg K N) _ _
+    _ ≤ ∑ _c'' ∈ e3I K δ', G ^ ((δ : ℝ) / 4) * ((G ^ δ - 1)⁻¹ * (G ^ δ' - 1)⁻¹) :=
+        Finset.sum_le_sum hinner
+    _ = ((e3I K δ').card : ℝ) * (G ^ ((δ : ℝ) / 4) * ((G ^ δ - 1)⁻¹ * (G ^ δ' - 1)⁻¹)) := by
+        rw [Finset.sum_const, nsmul_eq_mul]
+    _ ≤ (G ^ δ' - 1) * (G ^ ((δ : ℝ) / 4) * ((G ^ δ - 1)⁻¹ * (G ^ δ' - 1)⁻¹)) :=
+        mul_le_mul_of_nonneg_right hI (mul_nonneg hr0
+          (mul_nonneg (inv_nonneg.mpr hpos.le) (inv_nonneg.mpr hpos'.le)))
+    _ = G ^ ((δ : ℝ) / 4) * (G ^ δ - 1)⁻¹ := by
+        field_simp
+
+variable {K L}
+
+private theorem monicOf_coeff_eq_of_monic {F : Type} [Field F] (P : F[X]) (hP : P.Monic) :
+    monicOf (fun i : Fin P.natDegree => P.coeff (i : ℕ)) = P := by
+  unfold monicOf
+  rw [Fin.sum_univ_eq_sum_range (fun i => C (P.coeff i) * X ^ i) P.natDegree]
+  exact hP.as_sum.symm
+
+private theorem ne_zero_of_aeval_eq_zero_of_coeff_zero_ne_zero {F E : Type} [Field F] [Field E] [Algebra F E] {f : F[X]}
+    (h0 : f.coeff 0 ≠ 0) {x : E} (hx : aeval x f = 0) : x ≠ 0 := by
+  rintro rfl
+  apply h0
+  rw [← coeff_zero_eq_aeval_zero'] at hx
+  exact (algebraMap F E).injective (hx.trans (map_zero _).symm)
+
+theorem exists_irr_factor {f : K[X]} (hf : f ≠ 0) (h0 : f.coeff 0 ≠ 0) {x : L}
+    (hx : aeval x f = 0) :
+    ∃ δ, 1 ≤ δ ∧ δ ≤ f.natDegree ∧ ∃ c' : Fin δ → K, Irreducible (monicOf c') ∧
+      (monicOf c').coeff 0 ≠ 0 ∧ monicOf c' ∣ f ∧ aeval x (monicOf c') = 0 := by
+  have hxne : x ≠ 0 := ne_zero_of_aeval_eq_zero_of_coeff_zero_ne_zero h0 hx
+  have hint : IsIntegral K x := IsAlgebraic.isIntegral ⟨f, hf, hx⟩
+  have hPm : (minpoly K x).Monic := minpoly.monic hint
+  have hPd : minpoly K x ∣ f := minpoly.dvd K x hx
+  refine ⟨(minpoly K x).natDegree, minpoly.natDegree_pos hint, natDegree_le_of_dvd hPd hf,
+    fun i => (minpoly K x).coeff (i : ℕ), ?_⟩
+  rw [monicOf_coeff_eq_of_monic _ hPm]
+  exact ⟨minpoly.irreducible hint, minpoly.coeff_zero_ne_zero hint hxne, hPd, minpoly.aeval K x⟩
+
+private theorem pow_card_pow_eq_self_of_aeval_monicOf_irreducible {F E : Type} [Field F] [Fintype F] [Field E] [Algebra F E]
+    {δ : ℕ} {c : Fin δ → F} (hi : Irreducible (monicOf c)) {x : E}
+    (hx : aeval x (monicOf c) = 0) : x ^ (Fintype.card F ^ δ) = x := by
+  have hint : IsIntegral F x := ⟨monicOf c, monicOf_monic c, by rwa [← aeval_def]⟩
+  have hmin : minpoly F x = monicOf c :=
+    (minpoly.eq_of_irreducible_of_monic hi hx (monicOf_monic c)).symm
+  haveI : FiniteDimensional F (IntermediateField.adjoin F ({x} : Set E)) :=
+    IntermediateField.adjoin.finiteDimensional hint
+  have hfr : Module.finrank F (IntermediateField.adjoin F ({x} : Set E)) = δ := by
+    rw [IntermediateField.adjoin.finrank hint, hmin, monicOf_natDegree]
+  haveI : Finite (IntermediateField.adjoin F ({x} : Set E)) := Module.finite_of_finite F
+  letI : Fintype (IntermediateField.adjoin F ({x} : Set E)) := Fintype.ofFinite _
+  have hcard : Fintype.card (IntermediateField.adjoin F ({x} : Set E)) = Fintype.card F ^ δ := by
+    rw [Module.card_eq_pow_finrank (K := F), hfr]
+  have key := FiniteField.pow_card
+    (⟨x, IntermediateField.mem_adjoin_simple_self F x⟩ : IntermediateField.adjoin F ({x} : Set E))
+  rw [hcard] at key
+  simpa using congrArg (fun y : IntermediateField.adjoin F ({x} : Set E) => (y : E)) key
+
+private theorem pow_card_pow_sub_one_eq_one_of_aeval_monicOf {F E : Type} [Field F] [Fintype F] [Field E] [Algebra F E]
+    {δ : ℕ} {c : Fin δ → F} (hi : Irreducible (monicOf c)) (h0 : (monicOf c).coeff 0 ≠ 0)
+    {x : E} (hx : aeval x (monicOf c) = 0) : x ^ (Fintype.card F ^ δ - 1) = 1 := by
+  have hx0 : x ≠ 0 := ne_zero_of_aeval_eq_zero_of_coeff_zero_ne_zero h0 hx
+  have hq : 1 ≤ Fintype.card F ^ δ := Nat.one_le_pow _ _ Fintype.card_pos
+  have h := pow_card_pow_eq_self_of_aeval_monicOf_irreducible hi hx
+  rw [← Nat.sub_add_cancel hq, pow_succ] at h
+  exact mul_right_cancel₀ hx0 (h.trans (one_mul x).symm)
+
+theorem mem_e3SB {N : ℕ} {c : Fin N → K} (hc : c ∈ sqSet K N) {l : ℕ} (hl : l.Prime)
+    (hcond : ∀ d ∈ Finset.Icc 1 N,
+      l ^ (4 * padicValNat l (Fintype.card K ^ d - 1)) ≤ Fintype.card K ^ d)
+    {δ δ' : ℕ} (hδ' : 1 ≤ δ') (hδδ' : δ' ≤ δ) (hδN : δ ≤ N) {c' : Fin δ → K} {c'' : Fin δ' → K}
+    (hi' : Irreducible (monicOf c')) (hi'' : Irreducible (monicOf c''))
+    (h0' : (monicOf c').coeff 0 ≠ 0) (h0'' : (monicOf c'').coeff 0 ≠ 0)
+    (hd' : monicOf c' ∣ monicOf c) (hd'' : monicOf c'' ∣ monicOf c) {x y : L}
+    (hx : aeval x (monicOf c') = 0) (hy : aeval y (monicOf c'') = 0)
+    (hxy : primeToPart l x = primeToPart l y) (hne : x ≠ y)
+    (hPne : monicOf c' ≠ monicOf c'') : c ∈ e3SB K L N := by
+  have hq : 1 < Fintype.card K := Fintype.one_lt_card
+  have hδ1 : 1 ≤ δ := hδ'.trans hδδ'
+  have hn : ∀ d, 1 ≤ d → Fintype.card K ^ d - 1 ≠ 0 := fun d hd => by
+    have : Fintype.card K ^ 1 ≤ Fintype.card K ^ d := Nat.pow_le_pow_right (by omega) hd
+    rw [pow_one] at this
+    omega
+  have hxp := pow_card_pow_sub_one_eq_one_of_aeval_monicOf hi' h0' hx
+  have hyp := pow_card_pow_sub_one_eq_one_of_aeval_monicOf hi'' h0'' hy
+  have hldiv : l ∣ Fintype.card K ^ δ - 1 ∨ l ∣ Fintype.card K ^ δ' - 1 := by
+    by_contra hcon
+    push_neg at hcon
+    apply hne
+    calc x = primeToPart l x := (primeToPart_eq_self_of_not_dvd hl (hn δ hδ1) hxp hcon.1).symm
+      _ = primeToPart l y := hxy
+      _ = y := primeToPart_eq_self_of_not_dvd hl (hn δ' hδ') hyp hcon.2
+  have hcop : IsCoprime (monicOf c') (monicOf c'') := by
+    rw [hi'.coprime_iff_not_dvd]
+    intro hdvd
+    exact hPne (eq_of_monic_of_associated (monicOf_monic _) (monicOf_monic _)
+      (hi'.associated_of_dvd hi'' hdvd))
+  simp only [e3SB, Set.mem_iUnion]
+  refine ⟨δ, Finset.mem_Icc.2 ⟨hδ1, hδN⟩, δ', Finset.mem_Icc.2 ⟨hδ', hδδ'⟩, l, ?_, c'',
+    mem_e3I.2 ⟨hi'', h0''⟩, c', (mem_e3C L).2 ⟨hi', h0', x,
+      mem_rootSet.2 ⟨(monicOf_monic _).ne_zero, hx⟩, y,
+      mem_rootSet.2 ⟨(monicOf_monic _).ne_zero, hy⟩, hxy⟩, hc, hcop.mul_dvd hd' hd''⟩
+  rw [e3PB, Finset.mem_filter, Finset.mem_union, Nat.mem_primeFactors, Nat.mem_primeFactors]
+  refine ⟨?_, hcond δ (Finset.mem_Icc.2 ⟨hδ1, hδN⟩)⟩
+  rcases hldiv with h | h
+  · exact Or.inl ⟨hl, h, hn δ hδ1⟩
+  · exact Or.inr ⟨hl, h, hn δ' hδ'⟩
+
+theorem square_set_mem_exceptional_union {N : ℕ} {c : Fin N → K} (hc : c ∈ sqSet K N) {l : ℕ} (hl : l.Prime)
+    (hlBB : l ∉ BB (Fintype.card K) N)
+    (hninj : ¬ Set.InjOn (primeToPart l) ((monicOf c).rootSet L)) :
+    c ∈ e3SA K L N ∪ e3SB K L N := by
+  have hq : 1 < Fintype.card K := Fintype.one_lt_card
+  have hcs : Squarefree (monicOf c) ∧ (monicOf c).coeff 0 ≠ 0 := by
+    simpa [sqSet] using hc
+  have hf0 : monicOf c ≠ 0 := (monicOf_monic c).ne_zero
+  have hcond : ∀ d ∈ Finset.Icc 1 N,
+      l ^ (4 * padicValNat l (Fintype.card K ^ d - 1)) ≤ Fintype.card K ^ d := by
+    intro d hd
+    have hd' := Finset.mem_Icc.1 hd
+    by_contra hlt
+    push_neg at hlt
+    have hqd : 1 ≤ Fintype.card K ^ d := Nat.one_le_pow _ _ (by omega)
+    have hv : padicValNat l (Fintype.card K ^ d - 1) ≠ 0 := by
+      intro hv
+      rw [hv, mul_zero, pow_zero] at hlt
+      omega
+    have hpos : Fintype.card K ^ d - 1 ≠ 0 := by
+      intro h
+      rw [h, padicValNat.zero] at hv
+      exact hv rfl
+    have hldvd : l ∣ Fintype.card K ^ d - 1 := dvd_of_one_le_padicValNat (Nat.one_le_iff_ne_zero.2 hv)
+    have hle : l ≤ Fintype.card K ^ d - 1 := Nat.le_of_dvd (by omega) hldvd
+    have hdN : Fintype.card K ^ d ≤ Fintype.card K ^ N := Nat.pow_le_pow_right (by omega) hd'.2
+    apply hlBB
+    apply Finset.mem_insert_of_mem
+    have hmem : l ∈ (Finset.range (Fintype.card K ^ N + 1)).filter (fun l => l.Prime ∧
+        ∃ d ∈ Finset.Icc 1 N, Fintype.card K ^ d < l ^ (4 * padicValNat l (Fintype.card K ^ d - 1))) :=
+      Finset.mem_filter.2 ⟨Finset.mem_range.2 (by omega), hl, d, hd, hlt⟩
+    convert hmem
+  simp only [Set.InjOn] at hninj
+  push_neg at hninj
+  obtain ⟨x, hxr, y, hyr, hxy, hne⟩ := hninj
+  have hxa : aeval x (monicOf c) = 0 := (mem_rootSet.1 hxr).2
+  have hya : aeval y (monicOf c) = 0 := (mem_rootSet.1 hyr).2
+  obtain ⟨δ1, h1δ1, hδ1N, c1, hi1, h01, hd1, hx1⟩ := exists_irr_factor hf0 hcs.2 hxa
+  obtain ⟨δ2, h1δ2, hδ2N, c2, hi2, h02, hd2, hy2⟩ := exists_irr_factor hf0 hcs.2 hya
+  rw [monicOf_natDegree] at hδ1N hδ2N
+  by_cases heq : monicOf c1 = monicOf c2
+  · left
+    have hy1 : aeval y (monicOf c1) = 0 := by rw [heq]; exact hy2
+    have hn : Fintype.card K ^ δ1 - 1 ≠ 0 := by
+      have : Fintype.card K ^ 1 ≤ Fintype.card K ^ δ1 := Nat.pow_le_pow_right (by omega) h1δ1
+      rw [pow_one] at this
+      omega
+    have hldvd : l ∣ Fintype.card K ^ δ1 - 1 := by
+      by_contra hcon
+      apply hne
+      calc x = primeToPart l x :=
+            (primeToPart_eq_self_of_not_dvd hl hn (pow_card_pow_sub_one_eq_one_of_aeval_monicOf hi1 h01 hx1) hcon).symm
+        _ = primeToPart l y := hxy
+        _ = y := primeToPart_eq_self_of_not_dvd hl hn (pow_card_pow_sub_one_eq_one_of_aeval_monicOf hi1 h01 hy1) hcon
+    have h2δ1 : 2 ≤ δ1 := by
+      by_contra hlt
+      obtain rfl : δ1 = 1 := by omega
+      apply hne
+      simp [monicOf] at hx1 hy1
+      linear_combination hx1 - hy1
+    simp only [e3SA, Set.mem_iUnion]
+    refine ⟨δ1, Finset.mem_Icc.2 ⟨h2δ1, hδ1N⟩, l, ?_, c1, (mem_e3A L).2 ⟨hi1, ?_⟩, hc, hd1⟩
+    · rw [e3PA, Finset.mem_filter, Nat.mem_primeFactors]
+      exact ⟨⟨hl, hldvd, hn⟩, hcond δ1 (Finset.mem_Icc.2 ⟨h1δ1, hδ1N⟩)⟩
+    · intro hinj
+      exact hne (hinj (mem_rootSet.2 ⟨(monicOf_monic _).ne_zero, hx1⟩)
+        (mem_rootSet.2 ⟨(monicOf_monic _).ne_zero, hy1⟩) hxy)
+  · right
+    rcases le_total δ2 δ1 with h21 | h12
+    · exact mem_e3SB hc hl hcond h1δ2 h21 hδ1N hi1 hi2 h01 h02 hd1 hd2 hx1 hy2 hxy hne heq
+    · exact mem_e3SB hc hl hcond h1δ1 h12 hδ2N hi2 hi1 h02 h01 hd2 hd1 hy2 hx1 hxy.symm
+        (Ne.symm hne) (Ne.symm heq)
+
+end sets
+
+
+[FLC_collision_union_02] src/Formalism/PadicSubsetSums/StableGradedCounts/SquareSetMemExceptionalUnion.lean:429-585
+SHA256 07983ef4827275e3e60fc8dc53be538a97b892345822f40e7540cca4d619021c
+theorem local_estimate_second : LocalEstimateII := by
+  unfold LocalEstimateII
+  intro K L _ _ _ _ _ N hq
+  classical
+  have hq' : 4096 ≤ Fintype.card K := by norm_num at hq; exact hq
+  have hQ : (4096 : ℝ) ≤ (Fintype.card K : ℝ) := by exact_mod_cast hq'
+  have hQ0 : (0 : ℝ) ≤ (Fintype.card K : ℝ) := by linarith
+  have hLQ : 0 ≤ Real.log (Fintype.card K : ℝ) := Real.log_nonneg (by linarith)
+  have hμ : ∀ c, 0 ≤ e3μ K N c := e3μ_nonneg K N
+  obtain ⟨s, hsdef⟩ : ∃ s : ℝ, s = (Fintype.card K : ℝ) ^ (4 : ℝ)⁻¹ := ⟨_, rfl⟩
+  have hs0 : 0 ≤ s := by rw [hsdef]; positivity
+  have hs4 : s ^ 4 = (Fintype.card K : ℝ) := by
+    rw [hsdef, show (4 : ℝ)⁻¹ = ((4 : ℕ) : ℝ)⁻¹ by norm_num]
+    exact Real.rpow_inv_natCast_pow hQ0 (by norm_num)
+  have hs8 : 8 ≤ s := by
+    by_contra h
+    push_neg at h
+    have h2 : s ^ 2 < 64 := by nlinarith
+    have h4 : s ^ 4 < 4096 := by
+      nlinarith [mul_pos (by linarith : (0 : ℝ) < 64 - s ^ 2) (by positivity : (0 : ℝ) < 64 + s ^ 2)]
+    linarith
+  have hsδ : ∀ δ : ℕ, 1 ≤ δ → 2 ≤ s ^ δ := fun δ hδ => by
+    calc (2 : ℝ) ≤ s ^ 1 := by rw [pow_one]; linarith
+      _ ≤ s ^ δ := pow_le_pow_right₀ (by linarith) hδ
+  obtain ⟨x, hxdef⟩ : ∃ x : ℝ, x = s⁻¹ := ⟨_, rfl⟩
+  have hx0 : 0 ≤ x := by rw [hxdef]; exact inv_nonneg.2 hs0
+  have hxs : x * s = 1 := by rw [hxdef, inv_mul_cancel₀ (ne_of_gt (by linarith))]
+  have hx8 : x ≤ 1 / 8 := by nlinarith [mul_le_mul_of_nonneg_left hs8 hx0]
+  have hx512 : x ^ 3 ≤ 1 / 512 := by
+    calc x ^ 3 ≤ (1 / 8) ^ 3 := pow_le_pow_left₀ hx0 hx8 3
+      _ = 1 / 512 := by norm_num
+  have hpowA : ∀ δ : ℕ, (Fintype.card K : ℝ) ^ (3 * (δ : ℝ) / 4) = (s ^ δ) ^ 3 := fun δ => by
+    rw [show 3 * (δ : ℝ) / 4 = (4 : ℝ)⁻¹ * ((3 * δ : ℕ) : ℝ) by push_cast; ring,
+      Real.rpow_mul hQ0, ← hsdef, Real.rpow_natCast]
+    ring
+  have hpowB : ∀ δ : ℕ, (Fintype.card K : ℝ) ^ ((δ : ℝ) / 4) = s ^ δ := fun δ => by
+    rw [show (δ : ℝ) / 4 = (4 : ℝ)⁻¹ * ((δ : ℕ) : ℝ) by ring,
+      Real.rpow_mul hQ0, ← hsdef, Real.rpow_natCast]
+  have hpowQ : ∀ δ : ℕ, (Fintype.card K : ℝ) ^ δ = (s ^ δ) ^ 4 := fun δ => by
+    rw [← hs4]; ring
+  have hQδ : ∀ δ : ℕ, (1 : ℝ) ≤ (Fintype.card K : ℝ) ^ δ := fun δ => one_le_pow₀ (by linarith)
+  have htA : ∀ δ : ℕ, 2 ≤ δ →
+      (Fintype.card K : ℝ) ^ (3 * (δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ ≤ 2 * x ^ δ := fun δ hδ => by
+    rw [hpowA δ, hpowQ δ]
+    calc (s ^ δ) ^ 3 * ((s ^ δ) ^ 4 - 1)⁻¹ ≤ 2 * (1 / s ^ δ) := cube_div_fourth_sub_one_le (s ^ δ) (hsδ δ (by omega))
+      _ = 2 * x ^ δ := by rw [hxdef]; ring
+  have htB : ∀ δ : ℕ, 1 ≤ δ →
+      (Fintype.card K : ℝ) ^ ((δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ ≤ 2 * (x ^ 3) ^ δ := fun δ hδ => by
+    rw [hpowB δ, hpowQ δ]
+    calc s ^ δ * ((s ^ δ) ^ 4 - 1)⁻¹ ≤ 2 * (1 / (s ^ δ) ^ 3) := div_fourth_sub_one_le (s ^ δ) (hsδ δ hδ)
+      _ = 2 * (x ^ 3) ^ δ := by rw [hxdef]; ring
+  have hfA0 : ∀ δ : ℕ, 0 ≤ (Fintype.card K : ℝ) ^ (3 * (δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := fun δ =>
+    mul_nonneg (by positivity) (inv_nonneg.2 (by linarith [hQδ δ]))
+  have hfB0 : ∀ δ : ℕ, 0 ≤ (Fintype.card K : ℝ) ^ ((δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := fun δ =>
+    mul_nonneg (by positivity) (inv_nonneg.2 (by linarith [hQδ δ]))
+  have hω : ∀ d : ℕ, ((Fintype.card K ^ d - 1).primeFactors.card : ℝ) ≤ 3 / 2 * d * Real.log (Fintype.card K : ℝ) := by
+    intro d
+    have hpos : 1 ≤ Fintype.card K ^ d := Nat.one_le_pow _ _ Fintype.card_pos
+    have h1 : 2 ^ (Fintype.card K ^ d - 1).primeFactors.card ≤ Fintype.card K ^ d :=
+      (two_pow_card_primeFactors_le_add_one _).trans (Nat.sub_add_cancel hpos).le
+    have h2 : (2 : ℝ) ^ (Fintype.card K ^ d - 1).primeFactors.card ≤ (Fintype.card K : ℝ) ^ d := by
+      exact_mod_cast h1
+    have h3 := Real.log_le_log (by positivity) h2
+    rw [Real.log_pow, Real.log_pow] at h3
+    have hl2 := Real.log_two_gt_d9
+    nlinarith [mul_nonneg (Nat.cast_nonneg (α := ℝ) (Fintype.card K ^ d - 1).primeFactors.card)
+      (by linarith : (0 : ℝ) ≤ Real.log 2 - 2 / 3)]
+  refine le_trans (sum_le_wtOf_of_subset (e3μ K N) hμ _ (e3SA K L N ∪ e3SB K L N) ?_) ?_
+  · intro c hc
+    obtain ⟨hc1, l, hl, hlBB, hninj⟩ := Finset.mem_filter.1 hc
+    exact square_set_mem_exceptional_union hc1 hl hlBB hninj
+  refine (wtOf_union_le _ hμ _ _).trans ?_
+  have hA : wtOf (e3μ K N) (e3SA K L N) ≤ 3 * Real.log (Fintype.card K : ℝ) * (16 / 3 * x ^ 2) := by
+    unfold e3SA
+    refine (wtOf_biUnion_le _ hμ _ _).trans ?_
+    calc _ ≤ ∑ δ ∈ Finset.Icc 2 N, 3 * Real.log (Fintype.card K : ℝ) * ((δ : ℝ) * x ^ δ) := by
+          apply Finset.sum_le_sum
+          intro δ hδ
+          have hδ2 := (Finset.mem_Icc.1 hδ).1
+          refine (wtOf_biUnion_le _ hμ _ _).trans ?_
+          calc _ ≤ ∑ l ∈ e3PA (Fintype.card K) δ,
+                (Fintype.card K : ℝ) ^ (3 * (δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := by
+                apply Finset.sum_le_sum
+                intro l hl
+                rw [e3PA, Finset.mem_filter, Nat.mem_primeFactors] at hl
+                exact wt_caseA K L N δ l hl.1.1 hδ2 hl.2
+            _ = ((e3PA (Fintype.card K) δ).card : ℝ) *
+                ((Fintype.card K : ℝ) ^ (3 * (δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹) := by
+                rw [Finset.sum_const, nsmul_eq_mul]
+            _ ≤ (3 / 2 * δ * Real.log (Fintype.card K : ℝ)) * (2 * x ^ δ) := by
+                apply mul_le_mul _ (htA δ hδ2) (hfA0 δ) (mul_nonneg (by positivity) hLQ)
+                calc ((e3PA (Fintype.card K) δ).card : ℝ)
+                    ≤ ((Fintype.card K ^ δ - 1).primeFactors.card : ℝ) := by
+                      exact_mod_cast Finset.card_filter_le _ _
+                  _ ≤ 3 / 2 * δ * Real.log (Fintype.card K : ℝ) := hω δ
+            _ = 3 * Real.log (Fintype.card K : ℝ) * ((δ : ℝ) * x ^ δ) := by ring
+      _ = 3 * Real.log (Fintype.card K : ℝ) * ∑ δ ∈ Finset.Icc 2 N, (δ : ℝ) * x ^ δ := by rw [Finset.mul_sum]
+      _ ≤ 3 * Real.log (Fintype.card K : ℝ) * (16 / 3 * x ^ 2) :=
+          mul_le_mul_of_nonneg_left (sum_Icc_two_mul_pow_le_sixteen_thirds_mul_sq x hx0 hx8 N) (mul_nonneg (by norm_num) hLQ)
+  have hB : wtOf (e3μ K N) (e3SB K L N) ≤ 6 * Real.log (Fintype.card K : ℝ) * (5 * x ^ 3) := by
+    unfold e3SB
+    refine (wtOf_biUnion_le _ hμ _ _).trans ?_
+    calc _ ≤ ∑ δ ∈ Finset.Icc 1 N, 6 * Real.log (Fintype.card K : ℝ) * ((δ : ℝ) ^ 2 * (x ^ 3) ^ δ) := by
+          apply Finset.sum_le_sum
+          intro δ hδ
+          have hδ1 := (Finset.mem_Icc.1 hδ).1
+          refine (wtOf_biUnion_le _ hμ _ _).trans ?_
+          calc _ ≤ ∑ δ' ∈ Finset.Icc 1 δ, 6 * Real.log (Fintype.card K : ℝ) * ((δ : ℝ) * (x ^ 3) ^ δ) := by
+                apply Finset.sum_le_sum
+                intro δ' hδ'
+                have hδ'1 := (Finset.mem_Icc.1 hδ').1
+                have hδ'δ := (Finset.mem_Icc.1 hδ').2
+                refine (wtOf_biUnion_le _ hμ _ _).trans ?_
+                calc _ ≤ ∑ l ∈ e3PB (Fintype.card K) δ δ',
+                      (Fintype.card K : ℝ) ^ ((δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹ := by
+                      apply Finset.sum_le_sum
+                      intro l hl
+                      rw [e3PB, Finset.mem_filter, Finset.mem_union, Nat.mem_primeFactors,
+                        Nat.mem_primeFactors] at hl
+                      have hlp : l.Prime := by
+                        rcases hl.1 with h | h
+                        · exact h.1
+                        · exact h.1
+                      exact wt_caseB K L N δ δ' l hlp hδ1 hδ'1 hl.2
+                  _ = ((e3PB (Fintype.card K) δ δ').card : ℝ) *
+                      ((Fintype.card K : ℝ) ^ ((δ : ℝ) / 4) * ((Fintype.card K : ℝ) ^ δ - 1)⁻¹) := by
+                      rw [Finset.sum_const, nsmul_eq_mul]
+                  _ ≤ (3 * δ * Real.log (Fintype.card K : ℝ)) * (2 * (x ^ 3) ^ δ) := by
+                      apply mul_le_mul _ (htB δ hδ1) (hfB0 δ) (mul_nonneg (by positivity) hLQ)
+                      calc ((e3PB (Fintype.card K) δ δ').card : ℝ)
+                          ≤ ((Fintype.card K ^ δ - 1).primeFactors.card : ℝ) +
+                            ((Fintype.card K ^ δ' - 1).primeFactors.card : ℝ) := by
+                            exact_mod_cast (Finset.card_filter_le _ _).trans (Finset.card_union_le _ _)
+                        _ ≤ 3 / 2 * δ * Real.log (Fintype.card K : ℝ) + 3 / 2 * δ' * Real.log (Fintype.card K : ℝ) := add_le_add (hω δ) (hω δ')
+                        _ ≤ 3 * δ * Real.log (Fintype.card K : ℝ) := by
+                            have : (δ' : ℝ) ≤ δ := by exact_mod_cast hδ'δ
+                            nlinarith [mul_nonneg (sub_nonneg.2 this) hLQ]
+                  _ = 6 * Real.log (Fintype.card K : ℝ) * ((δ : ℝ) * (x ^ 3) ^ δ) := by ring
+            _ = 6 * Real.log (Fintype.card K : ℝ) * ((δ : ℝ) ^ 2 * (x ^ 3) ^ δ) := by
+                rw [Finset.sum_const, nsmul_eq_mul, Nat.card_Icc, Nat.add_sub_cancel]
+                ring
+      _ = 6 * Real.log (Fintype.card K : ℝ) * ∑ δ ∈ Finset.Icc 1 N, (δ : ℝ) ^ 2 * (x ^ 3) ^ δ := by rw [Finset.mul_sum]
+      _ ≤ 6 * Real.log (Fintype.card K : ℝ) * (5 * x ^ 3) :=
+          mul_le_mul_of_nonneg_left (sum_Icc_one_sq_mul_pow_le_five_mul (x ^ 3) (by positivity) hx512 N)
+            (mul_nonneg (by norm_num) hLQ)
+  have hsq : Real.sqrt (Fintype.card K : ℝ) = s ^ 2 := by
+    rw [← hs4, show s ^ 4 = (s ^ 2) ^ 2 by ring, Real.sqrt_sq (by positivity)]
+  have hx2 : x ^ 2 = 1 / s ^ 2 := by rw [hxdef, inv_pow, one_div]
+  have hx3 : x ^ 3 ≤ x ^ 2 / 8 := by nlinarith [mul_le_mul_of_nonneg_left hx8 (sq_nonneg x)]
+  rw [hsq]
+  calc wtOf (e3μ K N) (e3SA K L N) + wtOf (e3μ K N) (e3SB K L N)
+      ≤ 3 * Real.log (Fintype.card K : ℝ) * (16 / 3 * x ^ 2) + 6 * Real.log (Fintype.card K : ℝ) * (5 * x ^ 3) := add_le_add hA hB
+    _ ≤ 23 * Real.log (Fintype.card K : ℝ) * x ^ 2 := by
+        nlinarith [mul_le_mul_of_nonneg_left hx3 hLQ, mul_nonneg hLQ (sq_nonneg x)]
+    _ = 23 * Real.log (Fintype.card K : ℝ) / s ^ 2 := by rw [hx2]; ring
+
+end Formalism.IrreducibleCountingLemmas.GaloisIrreducibility
+
+
+[FLC_finite_characters_01] src/Development/AbelianVarietyTheory/Definitions/NonGaloisDescent/LabelDatum.lean:15-79
+SHA256 a68a0ba66b9aacb214c45740ca3b2aab5118eceb6be4e6a56f2db098207e4618
+def IsClass {G : Type} [Group G] (χ : G → ℂ) : Prop := ∀ x y : G, χ (y * x * y⁻¹) = χ x
+
+def IsChar {G : Type} [Group G] (χ : G → ℂ) : Prop := ∃ V : FDRep ℂ G, ∀ x, V.character x = χ x
+
+def IsIrr {G : Type} [Group G] (χ : G → ℂ) : Prop :=
+  ∃ V : FDRep ℂ G, CategoryTheory.Simple V ∧ ∀ x, V.character x = χ x
+
+def ip {G : Type} [Group G] [Fintype G] (α β : G → ℂ) : ℂ :=
+  (Fintype.card G : ℂ)⁻¹ * ∑ x, α x * β x⁻¹
+
+def tr {G : Type} [Group G] [Fintype G] (a : MonoidAlgebra ℂ G) (χ : G → ℂ) : ℂ := ∑ x, a.coeff x * χ x
+
+def zOf {G : Type} [Group G] [Fintype G] (χ : G → ℂ) : MonoidAlgebra ℂ G :=
+  ∑ x, MonoidAlgebra.single x (χ 1 / (Fintype.card G : ℂ) * χ x⁻¹)
+
+variable {g : ℕ} [Fact g.Prime]
+
+def tl (a : ℕ) {n : ℕ} (M : Mt g n) : Mt g a := fun i j => entN M i j
+
+def br (a b : ℕ) {n : ℕ} (M : Mt g n) : Mt g b := fun i j => entN M (a + i) (a + j)
+
+def InPar (a : ℕ) {n : ℕ} (M : Mt g n) : Prop := ∀ i j : Fin n, (j : ℕ) < a → a ≤ (i : ℕ) → M i j = 0
+
+def toG {n : ℕ} (M : Mt g n) : Gn g n := if h : IsUnit M then h.unit else 1
+
+def hcT (a b : ℕ) (Φ : Gn g a → Gn g b → ℂ) (n : ℕ) : Gn g n → ℂ := fun x =>
+  ((Finset.univ.filter fun p : Gn g n => InPar a (p : Mt g n)).card : ℂ)⁻¹ *
+    ∑ y : Gn g n, if InPar a ((y⁻¹ * x * y : Gn g n) : Mt g n) then
+      Φ (toG (tl a ((y⁻¹ * x * y : Gn g n) : Mt g n))) (toG (br a b ((y⁻¹ * x * y : Gn g n) : Mt g n))) else 0
+
+def hc (a b : ℕ) (α : Gn g a → ℂ) (β : Gn g b → ℂ) (n : ℕ) : Gn g n → ℂ := hcT a b (fun x y => α x * β y) n
+
+def res (a b : ℕ) {n : ℕ} (χ : Gn g n → ℂ) : Gn g a → Gn g b → ℂ := fun h₁ h₂ =>
+  ((g : ℂ) ^ (a * b))⁻¹ * ∑ x : Gn g n,
+    if InPar a (x : Mt g n) ∧ tl a (x : Mt g n) = (h₁ : Mt g a) ∧ br a b (x : Mt g n) = (h₂ : Mt g b) then χ x else 0
+
+abbrev Pc (g : ℕ) : Type := Σ d : ℕ, Gn g d → ℂ
+
+def degL (L : List (Pc g)) : ℕ := (L.map fun p => p.1).sum
+
+def hcL (L : List (Pc g)) : (n : ℕ) → Gn g n → ℂ :=
+  List.rec (motive := fun _ => (n : ℕ) → Gn g n → ℂ) (fun _ _ => 1)
+    (fun p L ih n => hc p.1 (degL L) p.2 (ih (degL L)) n) L
+
+theorem hcL_nil (n : ℕ) : hcL ([] : List (Pc g)) n = fun _ => 1 := rfl
+
+theorem hcL_cons (p : Pc g) (L : List (Pc g)) (n : ℕ) :
+    hcL (p :: L) n = hc p.1 (degL L) p.2 (hcL L (degL L)) n := rfl
+
+def IsCusp {d : ℕ} (χ : Gn g d → ℂ) : Prop :=
+  0 < d ∧ IsIrr χ ∧ ∀ a, 0 < a → a < d → res a (d - a) χ 1 1 = 0
+
+def wh (ψ₀ : AddChar (ZMod g) ℂ) {n : ℕ} (χ : Gn g n → ℂ) : ℂ := tr (eU g n ψ₀) χ
+
+def der (ψ₀ : AddChar (ZMod g) ℂ) (m : ℕ) {n : ℕ} (χ : Gn g n → ℂ) : Gn g m → ℂ := fun h =>
+  wh ψ₀ (res m (n - m) χ h)
+
+def gg (ψ₀ : AddChar (ZMod g) ℂ) (n : ℕ) : Gn g n → ℂ := fun x =>
+  ((Finset.univ.filter fun u : Gn g n => IsUniUp (u : Mt g n)).card : ℂ)⁻¹ *
+    ∑ y : Gn g n, if IsUniUp ((y⁻¹ * x * y : Gn g n) : Mt g n) then
+      ψ₀ (∑ i ∈ Finset.range (n - 1), entN ((y⁻¹ * x * y : Gn g n) : Mt g n) i (i + 1)) else 0
+
+def eJ' (g N : ℕ) [NeZero g] (k : ℕ) (ψ₀ : AddChar (ZMod g) ℂ) : MonoidAlgebra ℂ (GL (Fin N) (ZMod g)) :=
+  eDat g N (fun M => IsUniUp M ∧ ∀ a, a < k → entN M a k = 0)
+    (fun M => ∑ i ∈ Finset.range (N - 1), entN M i (i + 1)) ψ₀
+
+
+[FLC_finite_characters_02] src/Formalism/SharpRestriction/LevelLetterCocycles/ArithmeticCylinders.lean:298-354
+SHA256 75b23000408dcf090ec9e7aedf6853f5a5510f342e8c8b4c7efd180f3444c33f
+def eDat (g N : ℕ) [NeZero g] (P : Matrix (Fin N) (Fin N) (ZMod g) → Prop)
+    (φ : Matrix (Fin N) (Fin N) (ZMod g) → ZMod g) (ψ₀ : AddChar (ZMod g) ℂ) :
+    MonoidAlgebra ℂ (GL (Fin N) (ZMod g)) := by
+  classical
+  exact ((Finset.univ.filter fun u : GL (Fin N) (ZMod g) => P (u : Matrix (Fin N) (Fin N) (ZMod g))).card : ℂ)⁻¹ •
+    ∑ u ∈ Finset.univ.filter (fun u : GL (Fin N) (ZMod g) => P (u : Matrix (Fin N) (Fin N) (ZMod g))),
+      MonoidAlgebra.single u (ψ₀ (φ (u : Matrix (Fin N) (Fin N) (ZMod g))))⁻¹
+
+def eU (g N : ℕ) [NeZero g] (ψ₀ : AddChar (ZMod g) ℂ) : MonoidAlgebra ℂ (GL (Fin N) (ZMod g)) :=
+  eDat g N IsUniUp (fun M => ∑ i ∈ Finset.range (N - 1), entN M i (i + 1)) ψ₀
+
+def phiJ {g : ℕ} (kk s : ℕ) {N : ℕ} (M : Matrix (Fin N) (Fin N) (ZMod g)) : ZMod g :=
+  (∑ i ∈ Finset.range (s - 1), entN M i (i + 1)) +
+    (if 1 ≤ s then entN M (s - 1) (s + kk) + entN M (s + kk) (s + kk + 1) else 0) +
+    (∑ i ∈ Finset.range (s - 1), entN M (s + kk + 1 + i) (s + kk + 2 + i)) +
+    ∑ a ∈ Finset.range (kk - 1), entN M (s + a) (s + a + 1)
+
+def eJ (g N : ℕ) [NeZero g] (kk s : ℕ) (ψ₀ : AddChar (ZMod g) ℂ) : MonoidAlgebra ℂ (GL (Fin N) (ZMod g)) :=
+  eDat g N (fun M => IsUniUp M ∧ ∀ a, s ≤ a → a < s + kk → entN M a (s + kk) = 0) (phiJ kk s) ψ₀
+
+def lawAt (k : Fin 2) (a : MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k)))) (CL : ℝ) : Prop :=
+  (∀ f, 0 ≤ wtOf D k a f) ∧
+  (∀ f, IsLabel D k f → Squarefree f →
+    (1 - 1 / (D.host.g k : ℝ)) / (D.host.g k : ℝ) ^ D.R.r ≤ wtOf D k a f ∧
+    wtOf D k a f ≤ (1 + CL * D.R.r / (D.host.g k : ℝ)) / (D.host.g k : ℝ) ^ D.R.r) ∧
+  ∀ S : Finset (ZMod (D.host.g k))[X], (∀ f ∈ S, ¬ Squarefree f) →
+    ∑ f ∈ S, wtOf D k a f ≤ 3 / (D.host.g k : ℝ)
+
+def eUk (k : Fin 2) (ψ₀ : AddChar (ZMod (D.host.g k)) ℂ) :
+    MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k))) :=
+  haveI : NeZero (D.host.g k) := ⟨(D.host.g_prime k).ne_zero⟩
+  eU (D.host.g k) D.R.r ψ₀
+
+def eJk (k : Fin 2) (ψ₀ : AddChar (ZMod (D.host.g k)) ℂ) :
+    MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k))) :=
+  haveI : NeZero (D.host.g k) := ⟨(D.host.g_prime k).ne_zero⟩
+  eJ (D.host.g k) D.R.r D.R.k (D.R.m / 2 - 1) ψ₀
+
+def ConclusionL : Prop :=
+  ∀ (k : Fin 2) (ψ₀ : AddChar (ZMod (D.host.g k)) ℂ), ψ₀ ≠ 1 → 2 * D.R.r ≤ D.host.g k →
+    lawAt D k (eUk D k ψ₀) 6 ∧ lawAt D k (eJk D k ψ₀) 6
+
+def admLq : Prop :=
+  ∀ (k : Fin 2) (ψ₀ : AddChar (ZMod (D.host.g k)) ℂ), ψ₀ ≠ 1 →
+    haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    (∀ f, 0 ≤ wtOf D k (eUk D k ψ₀) f ∧ 0 ≤ wtOf D k (eJk D k ψ₀) f) ∧
+    (∀ f, IsLabel D k f → Squarefree f →
+      wtOf D k (eUk D k ψ₀) f =
+        1 / ((UniqueFactorizationMonoid.normalizedFactors f).map
+          (fun P => (D.host.g k : ℝ) ^ P.natDegree - 1)).prod) ∧
+    (∀ f, IsLabel D k f → (1 - 1 / (D.host.g k : ℝ)) * wtOf D k (eUk D k ψ₀) f ≤ wtOf D k (eJk D k ψ₀) f) ∧
+    (∀ f, IsLabel D k f → Squarefree f →
+      wtOf D k (eJk D k ψ₀) f ≤
+        (1 + 1 / (D.host.g k : ℝ)) ^ D.R.r * wtOf D k (eUk D k ψ₀) f)
+
+def LiftingLemmasStatement : Prop := admLq D → ConclusionL D
+
+
+
+[FLC_gelfand_mirabolic_01] src/Development/AbelianVarietyTheory/Definitions/SemilocalFrames/IsMirClass.lean:1-73
+SHA256 f050bb4335b628ba4a3934a04521310779f825c46f9392b6273476de5a3d2346
+import Mathlib
+import Development.AbelianVarietyTheory.Definitions.NonGaloisDescent.LabelDatum
+
+noncomputable section
+
+namespace GlobalTheory.GLm
+
+open Formalism.MainNotions.ArithmeticCylinders GlobalTheory.GLq
+open scoped Classical
+
+variable {g : ℕ} [Fact g.Prime]
+
+def InMir {n : ℕ} (M : Mt g n) : Prop := ∀ i j : Fin n, (i : ℕ) + 1 = n → M i j = (1 : Mt g n) i j
+
+def IsMirClass {n : ℕ} (F : Gn g n → ℂ) : Prop :=
+  ∀ p x : Gn g n, InMir (p : Mt g n) → InMir (x : Mt g n) → F (p * x * p⁻¹) = F x
+
+def InR (i : ℕ) {n : ℕ} (M : Mt g n) : Prop := InPar i M ∧ IsUniUp (br i (n - i) M)
+
+def supFrom (i : ℕ) {n : ℕ} (M : Mt g n) : ZMod g := ∑ j ∈ Finset.Ico i (n - 1), entN M j (j + 1)
+
+def diag1 {k : ℕ} (h : Gn g k) (n : ℕ) : Gn g n :=
+  toG fun i j : Fin n => if (i : ℕ) < k ∧ (j : ℕ) < k then entN (h : Mt g k) i j else (1 : Mt g n) i j
+
+def tail (ψ₀ : AddChar (ZMod g) ℂ) (m : ℕ) {n : ℕ} (F : Gn g n → ℂ) : Gn g m → ℂ := fun p =>
+  ((g : ℂ) ^ (m * (n - m) + (n - m) * (n - m - 1) / 2))⁻¹ * ∑ x : Gn g n,
+    if InR m (x : Mt g n) ∧ tl m (x : Mt g n) = (p : Mt g m) then
+      F x * (ψ₀ (supFrom (m - 1) (x : Mt g n)))⁻¹ else 0
+
+def indR (ψ₀ : AddChar (ZMod g) ℂ) (i n : ℕ) (ρ : Gn g i → ℂ) : Gn g n → ℂ := fun x =>
+  ((Finset.univ.filter fun p : Gn g n => InR i (p : Mt g n)).card : ℂ)⁻¹ *
+    ∑ y : Gn g n, if InMir (y : Mt g n) ∧ InR i ((y⁻¹ * x * y : Gn g n) : Mt g n) then
+      ρ (toG (tl i ((y⁻¹ * x * y : Gn g n) : Mt g n))) * ψ₀ (supFrom i ((y⁻¹ * x * y : Gn g n) : Mt g n)) else 0
+
+def indV (ψ₀ : AddChar (ZMod g) ℂ) (m : ℕ) (f : Gn g m → ℂ) : Gn g (m + 1) → ℂ := fun x =>
+  ((Finset.univ.filter fun p : Gn g (m + 1) =>
+      InMir (p : Mt g (m + 1)) ∧ InMir (tl m (p : Mt g (m + 1)))).card : ℂ)⁻¹ *
+    ∑ y : Gn g (m + 1), if InMir (y : Mt g (m + 1)) ∧ InMir ((y⁻¹ * x * y : Gn g (m + 1)) : Mt g (m + 1)) ∧
+        InMir (tl m ((y⁻¹ * x * y : Gn g (m + 1)) : Mt g (m + 1))) then
+      f (toG (tl m ((y⁻¹ * x * y : Gn g (m + 1)) : Mt g (m + 1)))) *
+        ψ₀ (entN ((y⁻¹ * x * y : Gn g (m + 1)) : Mt g (m + 1)) (m - 1) m) else 0
+
+def InPat {N : ℕ} (Φ : Fin N → Fin N → Prop) (M : Mt g N) : Prop := ∀ a b, ¬ Φ a b → M a b = (1 : Mt g N) a b
+
+def sumAt {N : ℕ} (E : Fin N → Fin N → Prop) (M : Mt g N) : ZMod g := ∑ a, ∑ b, if E a b then M a b else 0
+
+def ePat (g N : ℕ) [Fact g.Prime] (Φ E : Fin N → Fin N → Prop) (ψ₀ : AddChar (ZMod g) ℂ) :
+    MonoidAlgebra ℂ (Gn g N) :=
+  eDat g N (InPat Φ) (sumAt E) ψ₀
+
+def IsW (k s a : ℕ) : Prop := s ≤ a ∧ a < s + k
+
+def phI (k s i : ℕ) {N : ℕ} (a b : Fin N) : Prop :=
+  (IsW k s a ∧ IsW k s b ∧ a < b) ∨ (¬ IsW k s a ∧ ¬ IsW k s b ∧ a < b) ∨ ((a : ℕ) < i ∧ IsW k s b) ∨
+    (IsW k s a ∧ ((i < (b : ℕ) ∧ (b : ℕ) < s) ∨ ((b : ℕ) = s + k ∧ i < s) ∨ s + k < (b : ℕ)))
+
+def eeI (k s : ℕ) {N : ℕ} (a b : Fin N) : Prop :=
+  ((b : ℕ) = a + 1 ∧ (b : ℕ) < s) ∨ ((a : ℕ) + 1 = s ∧ (b : ℕ) = s + k) ∨ ((b : ℕ) = a + 1 ∧ s + k ≤ (a : ℕ)) ∨
+    ((b : ℕ) = a + 1 ∧ IsW k s a ∧ IsW k s b)
+
+def pm (g : ℕ) [Fact g.Prime] {n : ℕ} (σ : Equiv.Perm (Fin n)) : Gn g n :=
+  toG fun r j : Fin n => if r = σ j then 1 else 0
+
+def sigI (a c i j : ℕ) : ℕ := if j < i then j else if j < a then c + (j - i) else if j < a + (c - i) then i + (j - a) else j
+
+def wI (g : ℕ) [Fact g.Prime] (a c i n : ℕ) : Gn g n :=
+  toG fun r j : Fin n => if (r : ℕ) = sigI a c i j then 1 else 0
+
+def mean {G : Type} [Fintype G] (f : G → ℂ) : ℂ := (Fintype.card G : ℂ)⁻¹ * ∑ x, f x
+
+theorem inMir_one (n : ℕ) : InMir (1 : Mt g n) := fun _ _ _ => rfl
+
+end GlobalTheory.GLm
+
+
+[FLC_gelfand_mirabolic_02] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/GelfandGraevCharacterGLnNormAndReciprocity.lean:47-93
+SHA256 aef5d04ea8920b7a0799e7b9082cf3fc04667521773525cadbd8424b9b71f601
+theorem ip_gg (ψ : AddChar (ZMod g) ℂ) (n : ℕ) (χ : Gn g n → ℂ) (hχ : IsClass χ) :
+    ip χ (gg ψ n) = wh ψ χ := by
+  set c : ℂ := ((Finset.univ.filter fun u : Gn g n => IsUniUp (u : Mt g n)).card : ℂ)⁻¹ with hc
+  set F : Gn g n → ℂ := fun z => if IsUniUp (z : Mt g n) then
+    ψ (∑ i ∈ Finset.range (n - 1), entN (z : Mt g n) i (i + 1)) else 0 with hF
+  have hgg : ∀ x, gg ψ n x = c * ∑ y : Gn g n, F (y⁻¹ * x * y) := fun x => rfl
+  have hinner : ∀ y : Gn g n, ∑ x : Gn g n, χ x * F (y⁻¹ * x⁻¹ * y) = ∑ u : Gn g n, χ u * F u⁻¹ := by
+    intro y
+    let e : Gn g n ≃ Gn g n :=
+      ⟨fun x => y⁻¹ * x * y, fun u => y * u * y⁻¹, fun x => by group, fun u => by group⟩
+    refine Fintype.sum_equiv e _ _ fun x => ?_
+    have h1 : χ (y⁻¹ * x * y) = χ x := by
+      have := hχ x y⁻¹
+      rwa [inv_inv] at this
+    have h2 : y⁻¹ * x⁻¹ * y = (y⁻¹ * x * y)⁻¹ := by group
+    change χ x * F (y⁻¹ * x⁻¹ * y) = χ (y⁻¹ * x * y) * F (y⁻¹ * x * y)⁻¹
+    rw [h1, h2]
+  have hG : (Fintype.card (Gn g n) : ℂ) ≠ 0 := Nat.cast_ne_zero.2 Fintype.card_ne_zero
+  have e1 : ∑ x : Gn g n, χ x * gg ψ n x⁻¹ = c * ∑ y : Gn g n, ∑ x : Gn g n, χ x * F (y⁻¹ * x⁻¹ * y) := by
+    simp only [hgg, Finset.mul_sum]
+    rw [Finset.sum_comm]
+    refine Finset.sum_congr rfl fun y _ => Finset.sum_congr rfl fun x _ => by ring
+  have e2 : wh ψ χ = c * ∑ u : Gn g n, χ u * F u⁻¹ := by
+    rw [wh_formula]
+    congr 1
+    refine Finset.sum_congr rfl fun u _ => ?_
+    rw [mul_comm]
+    congr 1
+    exact (gg_term_inv ψ u).symm
+  unfold ip
+  rw [e1, e2, Finset.sum_congr rfl fun y _ => hinner y, Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+  rw [mul_left_comm, ← mul_assoc, ← mul_assoc, mul_assoc c, inv_mul_cancel₀ hG, mul_one]
+
+theorem wh_gg (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1) (n : ℕ) (hn : 0 < n) :
+    wh ψ (gg ψ n) = (g : ℂ) ^ n - (g : ℂ) ^ (n - 1) := by
+  have h1 := GlobalTheory.GLm.GGSum.sum_wh_gg g ψ hψ n
+  have h2 := GlobalTheory.GLm.GGSum.sum_wh_gg g ψ hψ (n - 1)
+  rw [Nat.sub_add_cancel hn] at h2
+  rw [Finset.sum_range_succ, h2] at h1
+  linear_combination h1
+
+theorem gg_norm : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ n : ℕ, 0 < n →
+    wh ψ (gg ψ n) = (g : ℂ) ^ n - (g : ℂ) ^ (n - 1) ∧
+      ∀ χ : Gn g n → ℂ, IsClass χ → ip χ (gg ψ n) = wh ψ χ :=
+  fun _ _ ψ hψ n hn => ⟨wh_gg ψ hψ n hn, fun χ hχ => ip_gg ψ n χ hχ⟩
+
+end GlobalTheory.GLq.GGNorm
+
+
+[FLC_gelfand_mirabolic_03] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/MirabolicTraceGeWhittakerDimensionGLn.lean:112-147
+SHA256 7260157516d5faa11a005938b02e013140661c9a4edeacdbb897d632829588a8
+theorem mirabolic_comparison : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ (N k s : ℕ),
+    N = k + 2 * s + 1 → 1 ≤ k → ∀ χ : Gn g N → ℂ, IsChar χ →
+      ((g : ℝ) ^ k - (g : ℝ) ^ (k - 1)) * (wh ψ χ).re ≤ (tr (eJ g N k s ψ) χ).re := by
+  intro g _ ψ hψ N k s hN hk χ hχ
+  have hcl := isClass_of_isChar hχ
+  rw [GlobalTheory.T.groupAlgebraTrace_patternIdempotent_exchange g ψ hψ N k s hN χ hcl, GlobalTheory.T.trace_unitriangularColumnVanishingIdempotent_eq_sum_derivatives g ψ hψ N k hk (by omega) χ hcl]
+  have hg1 : (1 : ℝ) ≤ g := by exact_mod_cast (Fact.out : g.Prime).one_lt.le
+  have hterm : ∀ i a b, (wh ψ (der ψ i χ) * ((g : ℂ) ^ a - (g : ℂ) ^ b)).re =
+      (wh ψ (der ψ i χ)).re * ((g : ℝ) ^ a - (g : ℝ) ^ b) := by
+    intro i a b
+    rw [show ((g : ℂ) ^ a - (g : ℂ) ^ b) = (((g : ℝ) ^ a - (g : ℝ) ^ b : ℝ) : ℂ) by push_cast; ring]
+    exact Complex.re_mul_ofReal _ _
+  have hnn : ∀ i, i ≤ N → 0 ≤ (wh ψ (der ψ i χ)).re := by
+    intro i hi
+    obtain ⟨n, hn⟩ := wh_der_nat g ψ N i hi χ hχ
+    rw [hn]
+    simp
+  obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by omega⟩
+  rw [Finset.sum_range_succ', Complex.add_re, Complex.add_re, Complex.re_sum, hterm 0, wh_der_zero]
+  have hrest : 0 ≤ ∑ i ∈ Finset.range k', (wh ψ (der ψ (i + 1) χ) *
+      ((g : ℂ) ^ (k' + 1 - (i + 1)) - (g : ℂ) ^ (k' + 1 - (i + 1) - 1))).re := by
+    apply Finset.sum_nonneg
+    intro i hi
+    rw [Finset.mem_range] at hi
+    rw [hterm]
+    apply mul_nonneg (hnn _ (by omega))
+    rw [sub_nonneg]
+    exact pow_le_pow_right₀ hg1 (by omega)
+  have hlast := hnn (k' + 1) (by omega)
+  have h0 : (wh ψ χ).re * ((g : ℝ) ^ (k' + 1 - 0) - (g : ℝ) ^ (k' + 1 - 0 - 1)) =
+      ((g : ℝ) ^ (k' + 1) - (g : ℝ) ^ (k' + 1 - 1)) * (wh ψ χ).re := by
+    simp only [Nat.sub_zero]
+    ring
+  linarith
+
+end GlobalTheory.GLq.MirabolicComparison
+
+
+[FLC_root_exchange_01] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/IsotypicTraceEqOfOneDoubleCoset.lean:11-100
+SHA256 d74112435dd936639e7ab862992fae697e602d240e1cea6c2753edce30eca082
+theorem isClass_mul_comm {φ : G → ℂ} (hφ : IsClass φ) (x y : G) : φ (x * y) = φ (y * x) := by
+  have := hφ (y * x) x
+  rw [← this]; congr 1; group
+
+theorem coset_sum_mem (K : Subgroup G) (l : K →* ℂˣ) (φ : G → ℂ) (b : K) :
+    ∑ a : K, (((l a)⁻¹ : ℂˣ) : ℂ) * φ (a * b) =
+      (l b : ℂ) * ∑ a : K, (((l a)⁻¹ : ℂˣ) : ℂ) * φ a := by
+  rw [Finset.mul_sum, ← Equiv.sum_comp (Equiv.mulRight b⁻¹)]
+  refine Finset.sum_congr rfl fun a _ => ?_
+  simp only [Equiv.coe_mulRight, map_mul, map_inv, mul_inv_rev, inv_inv, Units.val_mul,
+    Subgroup.coe_mul, Subgroup.coe_inv, mul_assoc, inv_mul_cancel, mul_one]
+
+theorem coset_sum_eq_zero (K : Subgroup G) (l : K →* ℂˣ) {φ : G → ℂ} (hφ : IsClass φ) (h : G)
+    (a₀ a₁ : K) (e : (a₁ : G) = h⁻¹ * a₀ * h) (ne : l a₁ ≠ l a₀) :
+    ∑ a : K, (((l a)⁻¹ : ℂˣ) : ℂ) * φ (a * h) = 0 := by
+  set F := ∑ a : K, (((l a)⁻¹ : ℂˣ) : ℂ) * φ (a * h) with hF
+  have key : F = ((l a₁ * (l a₀)⁻¹ : ℂˣ) : ℂ) * F := by
+    conv_lhs => rw [hF, ← Equiv.sum_comp ((Equiv.mulRight a₀).trans (Equiv.mulLeft a₁⁻¹))]
+    rw [hF, Finset.mul_sum]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    have h1 : φ (((a₁⁻¹ * (c * a₀) : K) : G) * h) = φ (c * h) := by
+      rw [← hφ (c * h) (a₁ : G)⁻¹]
+      congr 1
+      simp only [Subgroup.coe_mul, Subgroup.coe_inv, inv_inv]
+      rw [mul_assoc, mul_assoc, mul_assoc, mul_assoc]
+      congr 2
+      rw [e]; group
+    simp only [Equiv.trans_apply, Equiv.coe_mulRight, Equiv.coe_mulLeft]
+    rw [h1]
+    simp only [map_mul, map_inv, mul_inv_rev, inv_inv, Units.val_mul]
+    ring
+  by_contra hne
+  apply ne
+  have : ((l a₁ * (l a₀)⁻¹ : ℂˣ) : ℂ) = 1 := by
+    have h2 : (((l a₁ * (l a₀)⁻¹ : ℂˣ) : ℂ) - 1) * F = 0 := by rw [sub_mul, ← key]; ring
+    exact sub_eq_zero.1 ((mul_eq_zero.1 h2).resolve_right hne)
+  exact mul_inv_eq_one.1 (Units.val_eq_one.1 this)
+
+theorem sum_indicator (H₁ H₂ : Subgroup G) :
+    ∑ b : H₂, (if (b : G) ∈ H₁ then (1 : ℂ) else 0) =
+      ((Finset.univ.filter fun g : G => g ∈ H₁ ∧ g ∈ H₂).card : ℂ) := by
+  rw [Finset.sum_boole]
+  congr 1
+  refine Finset.card_bij (fun b _ => (b : G)) ?_ ?_ ?_
+  · intro b hb
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hb ⊢
+    exact ⟨hb, b.2⟩
+  · intro a _ b _ h
+    exact Subtype.ext h
+  · intro g hg
+    simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hg
+    exact ⟨⟨g, hg.2⟩, by simpa using hg.1, rfl⟩
+
+theorem double_sum (H₁ H₂ : Subgroup G) (l₁ : H₁ →* ℂˣ) (l₂ : H₂ →* ℂˣ)
+    (hag : ∀ (a : H₁) (b : H₂), (a : G) = b → l₁ a = l₂ b)
+    (hM : ∀ h ∈ H₂, h ∉ H₁ → ∃ a a' : H₁, (a' : G) = h⁻¹ * a * h ∧ l₁ a' ≠ l₁ a)
+    {φ : G → ℂ} (hφ : IsClass φ) :
+    ∑ b : H₂, ∑ a : H₁, (((l₂ b)⁻¹ : ℂˣ) : ℂ) * ((((l₁ a)⁻¹ : ℂˣ) : ℂ) * φ (a * b)) =
+      ((Finset.univ.filter fun g : G => g ∈ H₁ ∧ g ∈ H₂).card : ℂ) *
+        ∑ a : H₁, (((l₁ a)⁻¹ : ℂˣ) : ℂ) * φ a := by
+  rw [← sum_indicator, Finset.sum_mul]
+  refine Finset.sum_congr rfl fun b _ => ?_
+  rw [← Finset.mul_sum]
+  split_ifs with hb
+  · have := coset_sum_mem H₁ l₁ φ ⟨b, hb⟩
+    simp only at this
+    rw [this, hag ⟨b, hb⟩ b rfl, ← mul_assoc, Units.inv_mul]
+  · obtain ⟨a₀, a₁, e, ne⟩ := hM b b.2 hb
+    rw [coset_sum_eq_zero H₁ l₁ hφ b a₀ a₁ e ne]; simp
+
+theorem isotypic_trace_eq : ∀ (G : Type) [Group G] [Fintype G] (H H₁ H₂ : Subgroup G) (l₁ : H₁ →* ℂˣ) (l₂ : H₂ →* ℂˣ), H₁ ≤ H → H₂ ≤ H → Nat.card H₁ = Nat.card H₂ → (∀ (a : H₁) (b : H₂), (a : G) = b → l₁ a = l₂ b) → (∀ h ∈ H, h ∉ H₁ → ∃ a a' : H₁, (a' : G) = h⁻¹ * a * h ∧ l₁ a' ≠ l₁ a) → (∀ h ∈ H, h ∉ H₂ → ∃ b b' : H₂, (b' : G) = h⁻¹ * b * h ∧ l₂ b' ≠ l₂ b) → ∀ φ : G → ℂ, IsClass φ → (Nat.card H₁ : ℂ)⁻¹ * ∑ a : H₁, ((l₁ a)⁻¹ : ℂˣ) * φ a = (Nat.card H₂ : ℂ)⁻¹ * ∑ b : H₂, ((l₂ b)⁻¹ : ℂˣ) * φ b := by
+  intro G _ _ H H₁ H₂ l₁ l₂ h1 h2 hc hag hM1 hM2 φ hφ
+  have e1 := double_sum H₁ H₂ l₁ l₂ hag (fun h hh => hM1 h (h2 hh)) hφ
+  have e2 := double_sum H₂ H₁ l₂ l₁ (fun b a e => (hag a b e.symm).symm)
+    (fun h hh => hM2 h (h1 hh)) hφ
+  have hf : (Finset.univ.filter fun g : G => g ∈ H₂ ∧ g ∈ H₁) =
+      (Finset.univ.filter fun g : G => g ∈ H₁ ∧ g ∈ H₂) :=
+    Finset.filter_congr fun g _ => and_comm
+  rw [hf, Finset.sum_comm] at e2
+  have hN : ((Finset.univ.filter fun g : G => g ∈ H₁ ∧ g ∈ H₂).card : ℂ) ≠ 0 := by
+    rw [Nat.cast_ne_zero, Finset.card_ne_zero]
+    exact ⟨1, by simp⟩
+  rw [hc]
+  congr 1
+  apply mul_left_cancel₀ hN
+  rw [← e1, ← e2]
+  refine Finset.sum_congr rfl fun b _ => Finset.sum_congr rfl fun a _ => ?_
+  rw [isClass_mul_comm hφ (a : G) b]; ring
+
+end GlobalTheory.GLm.OneDoubleCoset
+
+
+[FLC_root_exchange_02] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/PhIUnionTrans.lean:184-356
+SHA256 4a638daabb4151457c88c900233fc75a40beadd0ba8503db9bc6045ef5d1c2d9
+theorem exchange (ψ : AddChar (ZMod g) ℂ) (hψ : ψ ≠ 1) (Φ₁ Φ₂ E : Fin N → Fin N → Prop) (W : Fin N → Prop)
+    (p q : Fin N) (hE : ∀ a, ¬ E a a) (hpq : E p q) (hp : ¬ W p) (hq : ¬ W q)
+    (i1 : ∀ a, ¬ Φ₁ a a) (i2 : ∀ a, ¬ Φ₂ a a)
+    (t1 : ∀ a b c, Φ₁ a b → Φ₁ b c → Φ₁ a c) (t2 : ∀ a b c, Φ₂ a b → Φ₂ b c → Φ₂ a c)
+    (t0 : ∀ a b c, (Φ₁ a b ∨ Φ₂ a b) → (Φ₁ b c ∨ Φ₂ b c) → (Φ₁ a c ∨ Φ₂ a c))
+    (e1 : ∀ a b c, Φ₁ a b → Φ₁ b c → ¬ E a c) (e2 : ∀ a b c, Φ₂ a b → Φ₂ b c → ¬ E a c)
+    (d1 : ∀ a b, (Φ₁ a b ∧ ¬ Φ₂ a b) ↔ (a = p ∧ W b)) (d2 : ∀ a b, (Φ₂ a b ∧ ¬ Φ₁ a b) ↔ (W a ∧ b = q))
+    (c1 : ∀ w, W w → ∀ x y, (x = p ∨ (Φ₁ x p ∨ Φ₂ x p)) → (w = y ∨ (Φ₁ w y ∨ Φ₂ w y)) →
+      Φ₁ x y ∧ (E x y → x = p ∧ y = q))
+    (c2 : ∀ w, W w → ∀ x y, (x = w ∨ (Φ₁ x w ∨ Φ₂ x w)) → (q = y ∨ (Φ₁ q y ∨ Φ₂ q y)) →
+      Φ₂ x y ∧ (E x y → x = p ∧ y = q))
+    (χ : Gn g N → ℂ) (hχ : IsClass χ) : tr (ePat g N Φ₁ E ψ) χ = tr (ePat g N Φ₂ E ψ) χ := by
+  obtain ⟨⟨H₁, hH₁, hc₁⟩, hu₁, ha₁⟩ := GlobalTheory.T.patternGroup_subgroup_order_character g N Φ₁ i1 t1
+  obtain ⟨⟨H₂, hH₂, hc₂⟩, hu₂, ha₂⟩ := GlobalTheory.T.patternGroup_subgroup_order_character g N Φ₂ i2 t2
+  obtain ⟨⟨H, hH, -⟩, -, -⟩ :=
+    GlobalTheory.T.patternGroup_subgroup_order_character g N (fun a b => Φ₁ a b ∨ Φ₂ a b) (fun a h => h.elim (i1 a) (i2 a)) t0
+  have hm₁ : ∀ x y : H₁, sumAt E (((x : Gn g N) : Mt g N) * ((y : Gn g N) : Mt g N)) =
+      sumAt E ((x : Gn g N) : Mt g N) + sumAt E ((y : Gn g N) : Mt g N) :=
+    fun x y => ha₁ E e1 hE _ _ ((hH₁ _).1 x.2) ((hH₁ _).1 y.2)
+  have hm₂ : ∀ x y : H₂, sumAt E (((x : Gn g N) : Mt g N) * ((y : Gn g N) : Mt g N)) =
+      sumAt E ((x : Gn g N) : Mt g N) + sumAt E ((y : Gn g N) : Mt g N) :=
+    fun x y => ha₂ E e2 hE _ _ ((hH₂ _).1 x.2) ((hH₂ _).1 y.2)
+  have hle₁ : H₁ ≤ H := fun x hx => (hH x).2 fun a b hab => (hH₁ x).1 hx a b fun h' => hab (Or.inl h')
+  have hle₂ : H₂ ≤ H := fun x hx => (hH x).2 fun a b hab => (hH₂ x).1 hx a b fun h' => hab (Or.inr h')
+  have hsplit : ∀ A B : Fin N → Fin N → Prop,
+      (Finset.univ.filter fun r : Fin N × Fin N => A r.1 r.2).card =
+        (Finset.univ.filter fun r : Fin N × Fin N => A r.1 r.2 ∧ B r.1 r.2).card +
+          (Finset.univ.filter fun r : Fin N × Fin N => A r.1 r.2 ∧ ¬ B r.1 r.2).card := by
+    intro A B
+    rw [← Finset.card_filter_add_card_filter_not (s := Finset.univ.filter fun r : Fin N × Fin N => A r.1 r.2)
+      (fun r : Fin N × Fin N => B r.1 r.2), Finset.filter_filter, Finset.filter_filter]
+  have hcount : (Finset.univ.filter fun r : Fin N × Fin N => Φ₁ r.1 r.2).card =
+      (Finset.univ.filter fun r : Fin N × Fin N => Φ₂ r.1 r.2).card := by
+    rw [hsplit Φ₁ Φ₂, hsplit Φ₂ Φ₁]
+    congr 1
+    · congr 1
+      ext r
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+      exact and_comm
+    · have e₁ : (Finset.univ.filter fun r : Fin N × Fin N => Φ₁ r.1 r.2 ∧ ¬ Φ₂ r.1 r.2) =
+          Finset.univ.filter fun r : Fin N × Fin N => r.1 = p ∧ W r.2 :=
+        Finset.filter_congr fun r _ => d1 r.1 r.2
+      have e₂ : (Finset.univ.filter fun r : Fin N × Fin N => Φ₂ r.1 r.2 ∧ ¬ Φ₁ r.1 r.2) =
+          Finset.univ.filter fun r : Fin N × Fin N => W r.1 ∧ r.2 = q :=
+        Finset.filter_congr fun r _ => d2 r.1 r.2
+      rw [e₁, e₂, card_filter_fst_eq_and_snd, card_filter_fst_and_snd_eq]
+  have hcard : Nat.card H₁ = Nat.card H₂ := by rw [hc₁, hc₂, hcount]
+  have heq : ∀ (a : H₁) (b : H₂), (a : Gn g N) = b → patChar ψ E hE H₁ hm₁ a = patChar ψ E hE H₂ hm₂ b :=
+    fun a b hab => Units.ext (by rw [patChar_val, patChar_val, hab])
+  have hx₁ : ∀ h ∈ H, h ∉ H₁ → ∃ a a' : H₁, (a' : Gn g N) = h⁻¹ * a * h ∧
+      patChar ψ E hE H₁ hm₁ a' ≠ patChar ψ E hE H₁ hm₁ a := by
+    intro h hh hh₁
+    have hB := (hH h).1 hh
+    have hA := (hH h⁻¹).1 (H.inv_mem hh)
+    obtain ⟨w, hw, hwq⟩ : ∃ w, W w ∧ (h : Mt g N) w q ≠ 0 := by
+      by_contra hc
+      push Not at hc
+      apply hh₁
+      rw [hH₁]
+      intro a b hab
+      by_cases h2 : Φ₂ a b
+      · obtain ⟨ha, rfl⟩ := (d2 a b).1 ⟨h2, hab⟩
+        rw [hc a ha, Matrix.one_apply_ne fun e => hq (by rw [← e]; exact ha)]
+      · exact hB a b fun h' => h'.elim hab h2
+    have hpp : ((h⁻¹ : Gn g N) : Mt g N) p p = 1 := by
+      rw [hA p p fun h' => h'.elim (i1 p) (i2 p), Matrix.one_apply_eq]
+    exact exists_conj (Φ := fun a b => Φ₁ a b ∨ Φ₂ a b) ψ hψ hE hpq (c1 w hw) hu₁
+      (Or.inr fun e => hq (by rw [← e]; exact hw)) H₁ hH₁ hm₁ h hA hB (by rw [hpp, one_mul]; exact hwq)
+  have hx₂ : ∀ h ∈ H, h ∉ H₂ → ∃ b b' : H₂, (b' : Gn g N) = h⁻¹ * b * h ∧
+      patChar ψ E hE H₂ hm₂ b' ≠ patChar ψ E hE H₂ hm₂ b := by
+    intro h hh hh₂
+    have hB := (hH h).1 hh
+    have hA := (hH h⁻¹).1 (H.inv_mem hh)
+    obtain ⟨w, hw, hpw⟩ : ∃ w, W w ∧ ((h⁻¹ : Gn g N) : Mt g N) p w ≠ 0 := by
+      by_contra hc
+      push Not at hc
+      apply hh₂
+      rw [← inv_mem_iff, hH₂]
+      intro a b hab
+      by_cases h1 : Φ₁ a b
+      · obtain ⟨rfl, hb⟩ := (d1 a b).1 ⟨h1, hab⟩
+        rw [hc b hb, Matrix.one_apply_ne fun e => hp (by rw [e]; exact hb)]
+      · exact hA a b fun h' => h'.elim h1 hab
+    have hqq : (h : Mt g N) q q = 1 := by
+      rw [hB q q fun h' => h'.elim (i1 q) (i2 q), Matrix.one_apply_eq]
+    exact exists_conj (Φ := fun a b => Φ₁ a b ∨ Φ₂ a b) ψ hψ hE hpq (c2 w hw) hu₂
+      (Or.inl fun e => hp (by rw [e]; exact hw)) H₂ hH₂ hm₂ h hA hB (by rw [hqq, mul_one]; exact hpw)
+  rw [tr_ePat ψ Φ₁ E H₁ hH₁ χ, tr_ePat ψ Φ₂ E H₂ hH₂ χ]
+  have key := GlobalTheory.T.isotypic_trace_eq_of_one_double_coset (Gn g N) H H₁ H₂ (patChar ψ E hE H₁ hm₁) (patChar ψ E hE H₂ hm₂)
+    hle₁ hle₂ hcard heq hx₁ hx₂ χ hχ
+  simpa only [Units.val_inv_eq_inv_val, patChar_val] using key
+
+section Combinatorics
+
+variable {k s i : ℕ}
+
+theorem phI_trans (hs : i ≤ s) (a b c : Fin N) (h : phI k s i a b) (h' : phI k s i b c) : phI k s i a c := by
+  simp only [phI, IsW, Fin.lt_def] at *
+  omega
+
+theorem phI_free (hs : i ≤ s) (a b c : Fin N) (h : phI k s i a b) (h' : phI k s i b c) : ¬ eeI k s a c := by
+  simp only [phI, eeI, IsW, Fin.lt_def] at *
+  omega
+
+theorem phI_irrefl (hs : i ≤ s) (a : Fin N) : ¬ phI k s i a a := by
+  simp only [phI, IsW, Fin.lt_def] at *
+  omega
+
+theorem phI_union (h1 : 1 ≤ i) (hs : i ≤ s) (a b : Fin N) : (phI k s i a b ∨ phI k s (i - 1) a b) ↔
+    (IsW k s a ∧ IsW k s b ∧ a < b) ∨ (¬ IsW k s a ∧ ¬ IsW k s b ∧ a < b) ∨ ((a : ℕ) < i ∧ IsW k s b) ∨
+      (IsW k s a ∧ ¬ IsW k s b ∧ i ≤ (b : ℕ)) := by
+  simp only [phI, IsW, Fin.lt_def]
+  constructor <;> intro h <;> omega
+
+theorem phI_union_trans (h1 : 1 ≤ i) (hs : i ≤ s) (a b c : Fin N) (h : (phI k s i a b ∨ phI k s (i - 1) a b))
+    (h' : (phI k s i b c ∨ phI k s (i - 1) b c)) : (phI k s i a c ∨ phI k s (i - 1) a c) := by
+  rw [phI_union h1 hs] at h h' ⊢
+  simp only [IsW, Fin.lt_def] at h h' ⊢
+  omega
+
+theorem phI_diff₁ (h1 : 1 ≤ i) (hs : i ≤ s) {p : Fin N} (hp : (p : ℕ) = i - 1) (a b : Fin N) :
+    (phI k s i a b ∧ ¬ phI k s (i - 1) a b) ↔ (a = p ∧ IsW k s b) := by
+  simp only [phI, IsW, Fin.lt_def, Fin.ext_iff] at *
+  constructor <;> intro h <;> omega
+
+theorem phI_diff₂ (h1 : 1 ≤ i) {q : Fin N} (hq : (i < s ∧ (q : ℕ) = i) ∨ (i = s ∧ (q : ℕ) = s + k))
+    (a b : Fin N) : (phI k s (i - 1) a b ∧ ¬ phI k s i a b) ↔ (IsW k s a ∧ b = q) := by
+  simp only [phI, IsW, Fin.lt_def, Fin.ext_iff] at *
+  constructor <;> intro h <;> omega
+
+theorem phI_conj₁ (h1 : 1 ≤ i) (hs : i ≤ s) {p q : Fin N} (hp : (p : ℕ) = i - 1)
+    (hq : (i < s ∧ (q : ℕ) = i) ∨ (i = s ∧ (q : ℕ) = s + k)) (w : Fin N) (hw : IsW k s w) (x y : Fin N)
+    (h : x = p ∨ (phI k s i x p ∨ phI k s (i - 1) x p)) (h' : w = y ∨ (phI k s i w y ∨ phI k s (i - 1) w y)) :
+    phI k s i x y ∧ (eeI k s x y → x = p ∧ y = q) := by
+  rw [phI_union h1 hs] at h h'
+  simp only [phI, eeI, IsW, Fin.lt_def, Fin.ext_iff] at h h' hp hq hw ⊢
+  refine ⟨?_, fun he => ?_⟩ <;> omega
+
+theorem phI_conj₂ (h1 : 1 ≤ i) (hs : i ≤ s) {p q : Fin N} (hp : (p : ℕ) = i - 1)
+    (hq : (i < s ∧ (q : ℕ) = i) ∨ (i = s ∧ (q : ℕ) = s + k)) (w : Fin N) (hw : IsW k s w) (x y : Fin N)
+    (h : x = w ∨ (phI k s i x w ∨ phI k s (i - 1) x w)) (h' : q = y ∨ (phI k s i q y ∨ phI k s (i - 1) q y)) :
+    phI k s (i - 1) x y ∧ (eeI k s x y → x = p ∧ y = q) := by
+  rw [phI_union h1 hs] at h h'
+  simp only [phI, eeI, IsW, Fin.lt_def, Fin.ext_iff] at h h' hp hq hw ⊢
+  refine ⟨?_, fun he => ?_⟩ <;> omega
+
+end Combinatorics
+
+theorem step : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) , ψ ≠ 1 → ∀ (N k s i : ℕ), N = k + 2 * s + 1 → 1 ≤ i → i ≤ s → ∀ χ : Gn g N → ℂ, IsClass χ → tr (ePat g N (phI k s i) (eeI k s) ψ) χ = tr (ePat g N (phI k s (i - 1)) (eeI k s) ψ) χ := by
+  intro g hg ψ hψ N k s i hN h1 hs χ hχ
+  obtain ⟨p, hp'⟩ : ∃ p : Fin N, (p : ℕ) = i - 1 := ⟨⟨i - 1, by omega⟩, rfl⟩
+  obtain ⟨q, hq'⟩ : ∃ q : Fin N, (i < s ∧ (q : ℕ) = i) ∨ (i = s ∧ (q : ℕ) = s + k) := by
+    by_cases hi : i < s
+    · exact ⟨⟨i, by omega⟩, Or.inl ⟨hi, rfl⟩⟩
+    · exact ⟨⟨s + k, by omega⟩, Or.inr ⟨by omega, rfl⟩⟩
+  have hs' : i - 1 ≤ s := by omega
+  refine exchange ψ hψ (phI k s i) (phI k s (i - 1)) (eeI k s) (fun a => IsW k s a) p q ?_ ?_ ?_ ?_
+    (fun a => phI_irrefl hs a) (fun a => phI_irrefl hs' a) (phI_trans hs) (phI_trans hs')
+    (phI_union_trans h1 hs) (phI_free hs) (phI_free hs') (phI_diff₁ h1 hs hp') (phI_diff₂ h1 hq')
+    (fun w hw => phI_conj₁ h1 hs hp' hq' w hw) (fun w hw => phI_conj₂ h1 hs hp' hq' w hw) χ hχ
+  · intro a ha
+    simp only [eeI, IsW] at ha
+    omega
+  · simp only [eeI, IsW]
+    omega
+  · intro ha
+    simp only [IsW] at ha
+    omega
+  · intro ha
+    simp only [IsW] at ha
+    omega
+
+end GlobalTheory.RootExch
+
+
+[FLC_root_exchange_03] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/TrFirstPattern.lean:12-123
+SHA256 34715708e28b122be7c3ffa2ba6535cbb01eff15bfd1e63faf1b019ad00274d8
+def front (N k s : ℕ) (h : k + s ≤ N) : Equiv.Perm (Fin N) where
+  toFun a := ⟨if (a : ℕ) < k then s + a else if (a : ℕ) < k + s then a - k else a, by
+    have := a.2; split_ifs <;> omega⟩
+  invFun a := ⟨if (a : ℕ) < s then k + a else if (a : ℕ) < k + s then a - s else a, by
+    have := a.2; split_ifs <;> omega⟩
+  left_inv a := by
+    apply Fin.ext
+    simp only
+    split_ifs <;> omega
+  right_inv a := by
+    apply Fin.ext
+    simp only
+    split_ifs <;> omega
+
+theorem front_val (N k s : ℕ) (h : k + s ≤ N) (a : Fin N) :
+    ((front N k s h a : Fin N) : ℕ) = if (a : ℕ) < k then s + a else if (a : ℕ) < k + s then a - k else a := rfl
+
+theorem phI_front (N k s : ℕ) (h : k + s ≤ N) (a b : Fin N) :
+    phI k s 0 (front N k s h a) (front N k s h b) ↔ (a : ℕ) < b ∧ ¬ ((a : ℕ) < k ∧ (b : ℕ) = k) := by
+  simp only [phI, IsW, Fin.lt_def, front_val]
+  split_ifs <;> omega
+
+theorem eeI_front (N k s : ℕ) (h : k + s ≤ N) (a b : Fin N) :
+    eeI k s (front N k s h a) (front N k s h b) ↔ (b : ℕ) = a + 1 ∧ (b : ℕ) ≠ k := by
+  simp only [eeI, IsW, front_val]
+  split_ifs <;> omega
+
+theorem eDat_congr (g N : ℕ) [NeZero g] (P P' : Mt g N → Prop) (φ φ' : Mt g N → ZMod g)
+    (ψ : AddChar (ZMod g) ℂ) (hP : ∀ M, P M ↔ P' M) (hφ : ∀ M, P' M → φ M = φ' M) :
+    eDat g N P φ ψ = eDat g N P' φ' ψ := by
+  obtain rfl : P = P' := funext fun M => propext (hP M)
+  unfold eDat
+  congr 1
+  refine Finset.sum_congr rfl fun u hu => ?_
+  rw [hφ _ (Finset.mem_filter.1 hu).2]
+
+theorem inPat_iff {g : ℕ} [Fact g.Prime] (N k : ℕ) (hk : k < N) (M : Mt g N) :
+    InPat (fun a b : Fin N => (a : ℕ) < b ∧ ¬ ((a : ℕ) < k ∧ (b : ℕ) = k)) M ↔
+      IsUniUp M ∧ ∀ a, a < k → entN M a k = 0 := by
+  constructor
+  · intro h
+    refine ⟨fun a b => ⟨fun hab => ?_, fun hab => ?_⟩, fun a ha => ?_⟩
+    · have hab' : (b : ℕ) < a := hab
+      rw [h a b (by omega), Matrix.one_apply_ne hab.ne']
+    · subst hab
+      rw [h a a (by omega), Matrix.one_apply_eq]
+    · have haN : a < N := by omega
+      rw [entN, dif_pos ⟨haN, hk⟩, h _ _ (by simp [ha]), Matrix.one_apply_ne]
+      intro e
+      have := congrArg Fin.val e
+      simp only at this
+      omega
+  · rintro ⟨hU, hz⟩ a b hab
+    rcases lt_trichotomy a b with h | h | h
+    · have h' : (a : ℕ) < b := h
+      have h2 : (a : ℕ) < k ∧ (b : ℕ) = k := by
+        by_contra hh
+        exact hab ⟨h', hh⟩
+      have := hz a h2.1
+      rw [entN, dif_pos ⟨a.2, hk⟩] at this
+      have hb : b = ⟨k, hk⟩ := Fin.ext h2.2
+      rw [Matrix.one_apply_ne h.ne, hb]
+      exact this
+    · rw [(hU a b).2 h, h, Matrix.one_apply_eq]
+    · rw [(hU a b).1 h, Matrix.one_apply_ne h.ne']
+
+theorem sumAt_eq {g : ℕ} [Fact g.Prime] (N k : ℕ) (M : Mt g N) (hz : ∀ a, a < k → entN M a k = 0) :
+    sumAt (fun a b : Fin N => (b : ℕ) = a + 1 ∧ (b : ℕ) ≠ k) M =
+      ∑ i ∈ Finset.range (N - 1), entN M i (i + 1) := by
+  have h1 : ∀ a : Fin N, (∑ b : Fin N, if ((b : ℕ) = a + 1 ∧ (b : ℕ) ≠ k) then M a b else 0) =
+      entN M a (a + 1) := by
+    intro a
+    by_cases ha : (a : ℕ) + 1 < N
+    · rw [Finset.sum_eq_single (⟨a + 1, ha⟩ : Fin N)]
+      · by_cases hk : (a : ℕ) + 1 = k
+        · rw [if_neg (by simp [hk]), hk, hz a (by omega)]
+        · rw [if_pos (by simp [hk]), entN, dif_pos ⟨a.2, ha⟩]
+      · intro b _ hb
+        rw [if_neg]
+        rintro ⟨e, -⟩
+        exact hb (Fin.ext e)
+      · simp
+    · rw [entN, dif_neg (by omega)]
+      refine Finset.sum_eq_zero fun b _ => if_neg ?_
+      have := b.2
+      omega
+  have h2 : ∑ i ∈ Finset.range (N - 1), entN M i (i + 1) = ∑ i ∈ Finset.range N, entN M i (i + 1) := by
+    refine Finset.sum_subset (Finset.range_subset_range.2 (Nat.sub_le _ _)) fun i _ hi => ?_
+    rw [Finset.mem_range] at hi
+    rw [entN, dif_neg (by omega)]
+  rw [h2, Finset.sum_range, sumAt]
+  refine Finset.sum_congr rfl fun a _ => ?_
+  rw [← h1 a]
+  refine Finset.sum_congr rfl fun b _ => ?_
+  congr
+
+theorem tr_first_pattern : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (N k s : ℕ), N = k + 2 * s + 1 →
+    ∀ χ : Gn g N → ℂ, IsClass χ → tr (ePat g N (phI k s 0) (eeI k s) ψ) χ = tr (eJ' g N k ψ) χ := by
+  intro g _ ψ N k s hN χ hχ
+  have h : k + s ≤ N := by omega
+  rw [← GlobalTheory.GLm.tr_ePat_renumber g ψ N (phI k s 0) (eeI k s) (front N k s h) χ hχ]
+  congr 1
+  have e1 : (fun a b => phI k s 0 (front N k s h a) (front N k s h b)) =
+      fun a b : Fin N => (a : ℕ) < b ∧ ¬ ((a : ℕ) < k ∧ (b : ℕ) = k) :=
+    funext fun a => funext fun b => propext (phI_front N k s h a b)
+  have e2 : (fun a b => eeI k s (front N k s h a) (front N k s h b)) =
+      fun a b : Fin N => (b : ℕ) = a + 1 ∧ (b : ℕ) ≠ k :=
+    funext fun a => funext fun b => propext (eeI_front N k s h a b)
+  rw [e1, e2, ePat, eJ']
+  exact eDat_congr g N _ _ _ _ ψ (inPat_iff N k (by omega)) fun M hM => sumAt_eq N k M hM.2
+
+end GlobalTheory.GLm.FirstPattern
+
+
+[FLC_root_exchange_04] src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/SumGraphEqSumEntN.lean:52-195
+SHA256 6541c2103342a10e168ed42fd5b06509b4ee0f135770470cc892dbc62fe64252
+theorem phI_last_iff {N : ℕ} (k s : ℕ) (a b : Fin N) :
+    phI k s s a b ↔ (a : ℕ) < b ∧ ¬ (s ≤ (a : ℕ) ∧ (a : ℕ) < s + k ∧ (b : ℕ) = s + k) := by
+  simp only [phI, IsW, Fin.lt_iff_val_lt_val]
+  constructor <;> intro h <;> omega
+
+variable {g : ℕ} [Fact g.Prime]
+
+theorem inPat_phI_last_iff {N : ℕ} (k s : ℕ) (M : Mt g N) :
+    InPat (phI k s s) M ↔ IsUniUp M ∧ ∀ a, s ≤ a → a < s + k → entN M a (s + k) = 0 := by
+  unfold InPat IsUniUp
+  constructor
+  · intro h
+    refine ⟨fun a b => ⟨fun hba => ?_, fun hab => ?_⟩, fun a h1 h2 => ?_⟩
+    · have hv := Fin.lt_iff_val_lt_val.mp hba
+      have hn : ¬ phI k s s a b := by
+        rw [phI_last_iff]
+        omega
+      rw [h a b hn, Matrix.one_apply_ne]
+      intro e
+      rw [e] at hv
+      omega
+    · subst hab
+      have hn : ¬ phI k s s a a := by
+        rw [phI_last_iff]
+        omega
+      rw [h a a hn, Matrix.one_apply_eq]
+    · unfold entN
+      split_ifs with hh
+      · have hn : ¬ phI k s s (⟨a, hh.1⟩ : Fin N) ⟨s + k, hh.2⟩ := by
+          rw [phI_last_iff]
+          exact fun h' => h'.2 ⟨h1, h2, rfl⟩
+        rw [h _ _ hn, Matrix.one_apply_ne]
+        intro e
+        simp only [Fin.mk.injEq] at e
+        omega
+      · rfl
+  · rintro ⟨hU, hz⟩ ⟨a, ha⟩ ⟨b, hb⟩ hn
+    rw [phI_last_iff] at hn
+    rcases lt_trichotomy a b with hab | hab | hab
+    · have hw : s ≤ a ∧ a < s + k ∧ b = s + k := by
+        by_contra hc
+        exact hn ⟨hab, hc⟩
+      obtain ⟨hw1, hw2, rfl⟩ := hw
+      have h0 := hz a hw1 hw2
+      unfold entN at h0
+      rw [dif_pos ⟨ha, hb⟩] at h0
+      rw [Matrix.one_apply_ne]
+      · exact h0
+      · intro e
+        simp only [Fin.mk.injEq] at e
+        omega
+    · subst hab
+      rw [(hU _ _).2 rfl, Matrix.one_apply_eq]
+    · rw [(hU _ _).1 (Fin.mk_lt_mk.mpr hab), Matrix.one_apply_ne]
+      intro e
+      simp only [Fin.mk.injEq] at e
+      omega
+
+private theorem sum_sum_ite_eq_sum_entN_of_iff {A : Type} [AddCommMonoid A] {N : ℕ} (M : Matrix (Fin N) (Fin N) A)
+    (P : ℕ → ℕ → Prop) [∀ a b, Decidable (P a b)] (S : Finset ℕ) (f : ℕ → ℕ)
+    (h : ∀ a b : ℕ, b < N → (P a b ↔ a ∈ S ∧ b = f a)) :
+    (∑ a : Fin N, ∑ b : Fin N, if P (a : ℕ) (b : ℕ) then M a b else 0) = ∑ a ∈ S, entN M a (f a) := by
+  rw [← sum_graph_eq_sum_entN]
+  refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
+  by_cases hp : P a b
+  · rw [if_pos hp, if_pos ((h a b b.isLt).1 hp)]
+  · rw [if_neg hp, if_neg (fun hq => hp ((h a b b.isLt).2 hq))]
+
+theorem sumAt_eeI_eq_phiJ {N : ℕ} (k s : ℕ) (hN : N = k + 2 * s + 1) (M : Mt g N) :
+    sumAt (eeI k s) M = phiJ k s M := by
+  subst hN
+  have hsplit : sumAt (eeI k s) M =
+      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+        if (b : ℕ) = a + 1 ∧ (b : ℕ) < s then M a b else 0) +
+      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+        if (a : ℕ) + 1 = s ∧ (b : ℕ) = s + k then M a b else 0) +
+      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+        if (b : ℕ) = a + 1 ∧ s + k ≤ (a : ℕ) then M a b else 0) +
+      (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+        if (b : ℕ) = a + 1 ∧ s ≤ (a : ℕ) ∧ (b : ℕ) < s + k then M a b else 0) := by
+    unfold sumAt
+    simp only [← Finset.sum_add_distrib]
+    refine Finset.sum_congr rfl (fun a _ => Finset.sum_congr rfl (fun b _ => ?_))
+    have hb := b.isLt
+    unfold eeI IsW
+    split_ifs <;> first | omega | simp
+  have h1 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+      if (b : ℕ) = a + 1 ∧ (b : ℕ) < s then M a b else 0) =
+      ∑ a ∈ Finset.range (s - 1), entN M a (a + 1) :=
+    sum_sum_ite_eq_sum_entN_of_iff M (fun a b => b = a + 1 ∧ b < s) _ (fun a => a + 1)
+      (fun a b _ => by simp only [Finset.mem_range]; constructor <;> intro h <;> omega)
+  have h2 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+      if (a : ℕ) + 1 = s ∧ (b : ℕ) = s + k then M a b else 0) =
+      ∑ a ∈ (Finset.range s).filter (fun a => a + 1 = s), entN M a (s + k) :=
+    sum_sum_ite_eq_sum_entN_of_iff M (fun a b => a + 1 = s ∧ b = s + k) _ (fun _ => s + k)
+      (fun a b _ => by simp only [Finset.mem_filter, Finset.mem_range]; constructor <;> intro h <;> omega)
+  have h3 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+      if (b : ℕ) = a + 1 ∧ s + k ≤ (a : ℕ) then M a b else 0) =
+      ∑ i ∈ Finset.range s, entN M (s + k + i) (s + k + i + 1) := by
+    rw [sum_sum_ite_eq_sum_entN_of_iff M (fun a b => b = a + 1 ∧ s + k ≤ a) (Finset.Ico (s + k) (s + k + s)) (fun a => a + 1)
+      (fun a b hb => by simp only [Finset.mem_Ico]; constructor <;> intro h <;> omega)]
+    rw [Finset.sum_Ico_eq_sum_range, Nat.add_sub_cancel_left]
+  have h4 : (∑ a : Fin (k + 2 * s + 1), ∑ b : Fin (k + 2 * s + 1),
+      if (b : ℕ) = a + 1 ∧ s ≤ (a : ℕ) ∧ (b : ℕ) < s + k then M a b else 0) =
+      ∑ a ∈ Finset.range (k - 1), entN M (s + a) (s + a + 1) := by
+    rw [sum_sum_ite_eq_sum_entN_of_iff M (fun a b => b = a + 1 ∧ s ≤ a ∧ b < s + k) (Finset.Ico s (s + (k - 1))) (fun a => a + 1)
+      (fun a b _ => by simp only [Finset.mem_Ico]; constructor <;> intro h <;> omega)]
+    rw [Finset.sum_Ico_eq_sum_range, Nat.add_sub_cancel_left]
+  have key : (∑ a ∈ (Finset.range s).filter (fun a => a + 1 = s), entN M a (s + k)) +
+      (∑ i ∈ Finset.range s, entN M (s + k + i) (s + k + i + 1)) =
+      (if 1 ≤ s then entN M (s - 1) (s + k) + entN M (s + k) (s + k + 1) else 0) +
+      ∑ i ∈ Finset.range (s - 1), entN M (s + k + 1 + i) (s + k + 2 + i) := by
+    rcases Nat.eq_zero_or_pos s with hs | hs
+    · subst hs
+      simp
+    · obtain ⟨t, rfl⟩ : ∃ t, s = t + 1 := ⟨s - 1, by omega⟩
+      have hB : (Finset.range (t + 1)).filter (fun a => a + 1 = t + 1) = {t} := by
+        ext a
+        simp only [Finset.mem_filter, Finset.mem_range, Finset.mem_singleton]
+        omega
+      have hC : (∑ i ∈ Finset.range (t + 1), entN M (t + 1 + k + i) (t + 1 + k + i + 1)) =
+          (∑ i ∈ Finset.range (t + 1 - 1), entN M (t + 1 + k + 1 + i) (t + 1 + k + 2 + i)) +
+            entN M (t + 1 + k) (t + 1 + k + 1) := by
+        rw [Finset.sum_range_succ', Nat.add_sub_cancel]
+        simp only [add_zero]
+        congr 1
+        exact Finset.sum_congr rfl (fun i _ => by congr 1 <;> omega)
+      rw [hB, Finset.sum_singleton, hC, if_pos (show 1 ≤ t + 1 by omega), Nat.add_sub_cancel]
+      ring
+  rw [hsplit, h1, h2, h3, h4]
+  unfold phiJ
+  linear_combination key
+
+theorem ePat_last_eq_eJ : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ) (N k s : ℕ), N = k + 2 * s + 1 →
+    ePat g N (phI k s s) (eeI k s) ψ = eJ g N k s ψ := by
+  intro g _ ψ N k s hN
+  have hP : (InPat (phI k s s) : Mt g N → Prop) =
+      fun M => IsUniUp M ∧ ∀ a, s ≤ a → a < s + k → entN M a (s + k) = 0 :=
+    funext fun M => propext (inPat_phI_last_iff k s M)
+  have hφ : (sumAt (eeI k s) : Mt g N → ZMod g) = phiJ k s := funext fun M => sumAt_eeI_eq_phiJ k s hN M
+  unfold ePat eJ
+  rw [hP, hφ]
+
+end GlobalTheory.GLm
+
+
+[FLC_root_exchange_05] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/GroupAlgebraTracePatternIdempotentExchange.lean:13-29
+SHA256 1fb065f920c66e4f57b2e94429ed8757c377f72d1e98473b6e2a0d085f0855e5
+theorem tr_eJ_eq_tr_eJ' : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 →
+    ∀ (N k s : ℕ), N = k + 2 * s + 1 → ∀ χ : Gn g N → ℂ, IsClass χ →
+      tr (eJ g N k s ψ) χ = tr (eJ' g N k ψ) χ := by
+  intro g _ ψ hψ N k s hN χ hχ
+  have key : ∀ i, i ≤ s →
+      tr (GlobalTheory.GLm.ePat g N (GlobalTheory.GLm.phI k s i) (GlobalTheory.GLm.eeI k s) ψ) χ = tr (eJ' g N k ψ) χ := by
+    intro i
+    induction i with
+    | zero => intro _; exact GlobalTheory.GLm.FirstPattern.tr_first_pattern g ψ N k s hN χ hχ
+    | succ n ih =>
+      intro hn
+      rw [GlobalTheory.RootExch.step g ψ hψ N k s (n + 1) hN (by omega) hn χ hχ]
+      exact ih (by omega)
+  rw [← GlobalTheory.GLm.ePat_last_eq_eJ g ψ N k s hN]
+  exact key s le_rfl
+
+end GlobalTheory.GLq
+
+
+[FLC_lower_weight_01] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/HarishChandraSeriesWeightLowerComparison.lean:13-98
+SHA256 43276f808ecb517f3318059381e6432bc6bd1f481a3e526732a2b7ef2ed99457
+theorem coeff_mul_eSerC {g : ℕ} [Fact g.Prime] (L : LabelDatum g) {N : ℕ} (f : (ZMod g)[X])
+    (a : MonoidAlgebra ℂ (Gn g N))
+    (hfin : {χ : Gn g N → ℂ | IsIrr χ ∧ HasLabel L χ f}.Finite) :
+    (a * eSerC L N f).coeff 1 = ∑ χ ∈ hfin.toFinset, χ 1 / (Fintype.card (Gn g N) : ℂ) * tr a χ := by
+  unfold eSerC
+  rw [finsum_mem_eq_finite_toFinset_sum _ hfin, Finset.mul_sum]
+  simp only [MonoidAlgebra.coeff_sum, Finsupp.finset_sum_apply]
+  refine Finset.sum_congr rfl fun χ _ => ?_
+  exact ((GlobalTheory.GLq.trIdem (Gn g N) a χ).2.2)
+
+theorem re_coeff_mul_eSerC {g : ℕ} [Fact g.Prime] (L : LabelDatum g) {N : ℕ} (f : (ZMod g)[X])
+    (a : MonoidAlgebra ℂ (Gn g N))
+    (hfin : {χ : Gn g N → ℂ | IsIrr χ ∧ HasLabel L χ f}.Finite) :
+    ((a * eSerC L N f).coeff 1).re =
+      ∑ χ ∈ hfin.toFinset, (χ 1).re / (Fintype.card (Gn g N) : ℝ) * (tr a χ).re := by
+  rw [coeff_mul_eSerC L f a hfin, Complex.re_sum]
+  refine Finset.sum_congr rfl fun χ hχ => ?_
+  have hI : IsIrr χ := ((Set.Finite.mem_toFinset hfin).1 hχ).1
+  obtain ⟨d, -, hd⟩ := (GlobalTheory.GLq.trIdem (Gn g N) a χ).2.1 hI
+  rw [hd]
+  have : (d : ℂ) / (Fintype.card (Gn g N) : ℂ) = (((d : ℝ) / (Fintype.card (Gn g N) : ℝ) : ℝ) : ℂ) := by
+    push_cast; rfl
+  rw [this, Complex.re_ofReal_mul]
+  simp
+
+theorem weight_nonneg {g : ℕ} [Fact g.Prime] (L : LabelDatum g) {N : ℕ} (f : (ZMod g)[X])
+    (hfin : {χ : Gn g N → ℂ | IsIrr χ ∧ HasLabel L χ f}.Finite) (χ : Gn g N → ℂ) (hχ : χ ∈ hfin.toFinset) :
+    0 ≤ (χ 1).re / (Fintype.card (Gn g N) : ℝ) := by
+  have hI : IsIrr χ := ((Set.Finite.mem_toFinset hfin).1 hχ).1
+  obtain ⟨d, -, hd⟩ := (GlobalTheory.GLq.trIdem (Gn g N) (1 : MonoidAlgebra ℂ (Gn g N)) χ).2.1 hI
+  rw [hd]
+  simp only [Complex.natCast_re]
+  positivity
+
+end GlobalTheory.GLq.LowerWt
+
+theorem GlobalTheory.GLq.lowerWtComparison : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g) (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 →
+    ∀ (N k s : ℕ), N = k + 2 * s + 1 → 1 ≤ k →
+      ∀ f, (1 - 1 / (g : ℝ)) * wtC L (eU g N ψ) f ≤ wtC L (eJ g N k s ψ) f := by
+  intro g _ L ψ hψ N k s hN hk f
+  have hL8 := GlobalTheory.T.mirabolic_trace_ge_whittakerDimension_GLn g ψ hψ N k s hN hk
+  obtain ⟨-, hU1, hJ, -⟩ := GlobalTheory.T.whittakerJacquetIdempotents_properties_primeField g N k s ψ
+  obtain ⟨-, hJ1⟩ := hJ hN
+  have hfin : {χ : Gn g N → ℂ | IsIrr χ ∧ HasLabel L χ f}.Finite :=
+    (irr_finite_and_finsum_zOf_eq_one (Gn g N)).1.subset fun χ h => h.1
+  set T := hfin.toFinset
+  set c : (Gn g N → ℂ) → ℝ := fun χ => (χ 1).re / (Fintype.card (Gn g N) : ℝ) with hc
+  set A := ∑ χ ∈ T, c χ * (tr (eU g N ψ) χ).re with hA
+  set B := ∑ χ ∈ T, c χ * (tr (eJ g N k s ψ) χ).re with hB
+  have hAeq : ((eU g N ψ * eSerC L N f).coeff 1).re = A := LowerWt.re_coeff_mul_eSerC L f _ hfin
+  have hBeq : ((eJ g N k s ψ * eSerC L N f).coeff 1).re = B := LowerWt.re_coeff_mul_eSerC L f _ hfin
+  have hG : (0 : ℝ) < g := by exact_mod_cast (Fact.out : g.Prime).pos
+  set M := N * (N - 1) / 2
+  have hU1r : ((eU g N ψ).coeff 1).re = ((g : ℝ) ^ M)⁻¹ := by
+    rw [hU1]
+    have : ((g : ℂ) ^ M)⁻¹ = ((((g : ℝ) ^ M)⁻¹ : ℝ) : ℂ) := by push_cast; rfl
+    rw [this, Complex.ofReal_re]
+  have hJ1r : ((eJ g N k s ψ).coeff 1).re = (g : ℝ) ^ k * ((g : ℝ) ^ M)⁻¹ := by
+    rw [hJ1]
+    have : (g : ℂ) ^ k * ((g : ℂ) ^ M)⁻¹ = ((((g : ℝ) ^ k * ((g : ℝ) ^ M)⁻¹) : ℝ) : ℂ) := by push_cast; rfl
+    rw [this, Complex.ofReal_re]
+  have hBA : ((g : ℝ) ^ k - (g : ℝ) ^ (k - 1)) * A ≤ B := by
+    rw [hA, hB, Finset.mul_sum]
+    refine Finset.sum_le_sum fun χ hχ => ?_
+    have h0 : 0 ≤ c χ := LowerWt.weight_nonneg L f hfin χ hχ
+    have hI : IsIrr χ := ((Set.Finite.mem_toFinset hfin).1 hχ).1
+    have hC : IsChar χ := by obtain ⟨V, -, hV⟩ := hI; exact ⟨V, hV⟩
+    have h8 := hL8 χ hC
+    unfold wh at h8
+    calc ((g : ℝ) ^ k - (g : ℝ) ^ (k - 1)) * (c χ * (tr (eU g N ψ) χ).re)
+        = c χ * (((g : ℝ) ^ k - (g : ℝ) ^ (k - 1)) * (tr (eU g N ψ) χ).re) := by ring
+      _ ≤ c χ * (tr (eJ g N k s ψ) χ).re := mul_le_mul_of_nonneg_left h8 h0
+  have hpow : (g : ℝ) ^ k - (g : ℝ) ^ (k - 1) = (g : ℝ) ^ k * (1 - 1 / (g : ℝ)) := by
+    obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
+    simp only [Nat.add_sub_cancel, pow_succ]
+    field_simp
+  unfold wtC
+  rw [hAeq, hBeq, hU1r, hJ1r]
+  have hgk : (0 : ℝ) < (g : ℝ) ^ k := pow_pos hG k
+  have hgM : (0 : ℝ) < (g : ℝ) ^ M := pow_pos hG M
+  rw [hpow] at hBA
+  rw [div_inv_eq_mul, le_div_iff₀ (mul_pos hgk (inv_pos.2 hgM))]
+  calc (1 - 1 / (g : ℝ)) * (A * (g : ℝ) ^ M) * ((g : ℝ) ^ k * ((g : ℝ) ^ M)⁻¹)
+      = (g : ℝ) ^ k * (1 - 1 / (g : ℝ)) * A * ((g : ℝ) ^ M * ((g : ℝ) ^ M)⁻¹) := by ring
+    _ = (g : ℝ) ^ k * (1 - 1 / (g : ℝ)) * A := by rw [mul_inv_cancel₀ hgM.ne', mul_one]
+    _ ≤ B := hBA
+
+
+[FLC_cuspidal_support_01] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/WhittakerDimensionCuspidalGreenDegreeEqOne.lean:48-81
+SHA256 a759fc439d6ff2e3a9aba52f63e67ea8b508584fd142a7095846471693fb62e8
+theorem der_cusp_eq_zero (ψ : AddChar (ZMod g) ℂ) {d m : ℕ} {χ : Gn g d → ℂ} (hχ : IsCusp χ)
+    (h0 : 0 < m) (hm : m < d) (h : Gn g m) : der ψ m χ h = 0 := by
+  unfold der wh tr
+  have : res m (d - m) χ h = fun _ => 0 := funext fun y => res_cusp_eq_zero g d m χ hχ h0 hm h y
+  rw [this]
+  simp
+
+theorem green_deg_ne_zero (d : ℕ) : ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i - 1) ≠ 0 := by
+  rw [Finset.prod_ne_zero_iff]
+  intro i hi
+  have hi1 : i ≠ 0 := by simp at hi; omega
+  have hg : 1 < g := (Fact.out : g.Prime).one_lt
+  have hlt : 1 < g ^ i := Nat.one_lt_pow hi1 hg
+  intro h
+  have h' : ((g ^ i : ℕ) : ℂ) = ((1 : ℕ) : ℂ) := by push_cast; exact sub_eq_zero.mp h
+  have := Nat.cast_injective h'
+  omega
+
+theorem wh_cusp_eq_one : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ (d : ℕ)
+    (χ : Gn g d → ℂ), IsCusp χ → χ 1 = ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i - 1) → wh ψ χ = 1 := by
+  intro g _ ψ hψ d χ hχ hdeg
+  have hd : 0 < d := hχ.1
+  have hform := GlobalTheory.T.classFunction_degree_eq_sum_derivatives g ψ hψ d χ hd (isClass_of_isIrr hχ.2.1)
+  rw [Finset.sum_eq_single 0] at hform
+  · rw [der_zero_one, zero_add, hdeg] at hform
+    have hne := green_deg_ne_zero (g := g) d
+    have : (wh ψ χ - 1) * ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i - 1) = 0 := by
+      rw [sub_mul, ← hform]; ring
+    exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_right hne)
+  · intro m hm hm0
+    rw [der_cusp_eq_zero ψ hχ (Nat.pos_of_ne_zero hm0) (Finset.mem_range.mp hm), zero_mul]
+  · intro h; exact absurd (Finset.mem_range.mpr hd) h
+
+end GlobalTheory.GLq
+
+
+[FLC_cuspidal_support_02] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/CharacterPairingHarishChandraCuspidalMackey.lean:259-265
+SHA256 e15a46e4f4948d63dd0c9d80eef02c835a419a268e701ea3499c4328f4504f91
+theorem ip_hcL_cusp : ∀ (g : ℕ) [Fact g.Prime] (L L' : List (Pc g)) (n : ℕ), degL L = n → degL L' = n →
+    (∀ p ∈ L, IsCusp p.2) → (∀ p ∈ L', IsCusp p.2) →
+    (¬ L.Perm L' → ip (hcL L n) (hcL L' n) = 0) ∧ (L.Nodup → ip (hcL L n) (hcL L n) = 1) := by
+  intro g _ L L' n hL hL' hc hc'
+  exact ⟨(finiteRing_sq_sub_mul_sq_eq_of_card L' L n hL hL' hc hc').1, fun hnd => (finiteRing_sq_sub_mul_sq_eq_of_card L L n hL hL hc hc).2 (List.Perm.refl _) hnd⟩
+
+end GlobalTheory.GLq.IpCuspProd
+
+
+[FLC_cuspidal_support_03] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/HarishChandraSeriesLabelExistsUniqueGLn.lean:129-269
+SHA256 363b0713e0e2619a872ee10e25f03fa796034b0a685783f8a635f642d5156a8f
+theorem label_unique (L : LabelDatum g) (hg : 5 ≤ g) {n : ℕ} (χ : Gn g n → ℂ) (hχ : IsIrr χ)
+    (f f' : (ZMod g)[X]) (h : HasLabel L χ f) (h' : HasLabel L χ f') : f = f' := by
+  obtain ⟨Q, hQ, hdQ, rfl, hχQ⟩ := h
+  obtain ⟨Q', hQ', hdQ', rfl, hχQ'⟩ := h'
+  have hc := GlobalTheory.T.harishChandraProductList_isCharacter_and_perm_invariant g (Q.map Prod.snd) (Q.map Prod.snd) n hdQ.symm (char_snd L Q hQ)
+  have hc' := GlobalTheory.T.harishChandraProductList_isCharacter_and_perm_invariant g (Q'.map Prod.snd) (Q'.map Prod.snd) n hdQ'.symm (char_snd L Q' hQ')
+  have hne := ip_ne_zero_of_common χ _ _ hχ hc.1 hc'.1 hχQ hχQ'
+  have hperm : (Q.map Prod.snd).Perm (Q'.map Prod.snd) := by
+    by_contra hp
+    exact hne ((GlobalTheory.T.characterPairing_harishChandra_cuspidal_mackey g _ _ n hdQ hdQ' (cusp_snd L Q hQ) (cusp_snd L Q' hQ')).1 hp)
+  rw [map_fst_eq L hg Q hQ, map_fst_eq L hg Q' hQ']
+  exact (hperm.map (lab L)).prod_eq
+
+theorem label_exists (L : LabelDatum g) (hg : 5 ≤ g) (hG : Green) {n : ℕ} (χ : Gn g n → ℂ)
+    (hχ : IsIrr χ) : ∃ f, HasLabel L χ f := by
+  obtain ⟨C, hC, hdC, hip⟩ := GlobalTheory.T.exists_cuspidal_list_harishChandra_pairing_ne_zero g n χ hχ
+  have hex : ∀ c ∈ C, ∃ P, IsCuspOf L P c.2 := by
+    intro c hc
+    obtain ⟨τ, hτ, -, hall⟩ := hG g L c.1 (hC c hc).1
+    obtain ⟨P, hP, he⟩ := hall c.2 (hC c hc)
+    refine ⟨P, ?_⟩
+    rw [he]
+    exact (hτ P hP).1
+  have hmap : (C.map fun c => (lab L c, c)).map Prod.snd = C := by
+    rw [List.map_map]
+    exact List.map_id'' (fun _ => rfl) C
+  refine ⟨((C.map fun c => (lab L c, c)).map Prod.fst).prod, C.map fun c => (lab L c, c), ?_, ?_, rfl, ?_⟩
+  · intro p hp
+    obtain ⟨c, hc, rfl⟩ := List.mem_map.1 hp
+    have hc' := hex c hc
+    show IsCuspOf L (lab L c) c.2
+    unfold lab
+    rw [dif_pos hc']
+    exact hc'.choose_spec
+  · rw [hmap]
+    exact hdC
+  · rw [hmap]
+    exact hip
+
+theorem exists_section (L : LabelDatum g) (hG : Green) : ∃ t : (P : (ZMod g)[X]) → Gn g P.natDegree → ℂ,
+    ∀ P, IsPrimeLab P.natDegree P →
+      IsCuspOf L P (t P) ∧ t P 1 = ∏ i ∈ Finset.Ico 1 P.natDegree, ((g : ℂ) ^ i - 1) := by
+  refine ⟨fun P => if h : 0 < P.natDegree then (hG g L P.natDegree h).choose P else 0, ?_⟩
+  intro P hP
+  have hpos : 0 < P.natDegree :=
+    Polynomial.natDegree_pos_iff_degree_pos.2 (Polynomial.degree_pos_of_irreducible hP.2.1)
+  simp only [dif_pos hpos]
+  exact (hG g L P.natDegree hpos).choose_spec.1 P hP
+
+theorem squarefree_series (L : LabelDatum g) (hg : 5 ≤ g) (hG : Green) (n : ℕ) (f : (ZMod g)[X])
+    (hm : f.Monic) (hn : f.natDegree = n) (h0 : f.coeff 0 ≠ 0) (hs : Squarefree f) :
+    ∃ Q : List ((ZMod g)[X] × Pc g),
+      (∀ p ∈ Q, IsCuspOf L p.1 p.2.2 ∧ p.2.2 1 = ∏ i ∈ Finset.Ico 1 p.2.1, ((g : ℂ) ^ i - 1)) ∧
+      ((Q.map Prod.fst : List _) : Multiset _) = UniqueFactorizationMonoid.normalizedFactors f ∧
+      degL (Q.map Prod.snd) = n ∧
+      {χ : Gn g n → ℂ | IsIrr χ ∧ HasLabel L χ f} = {hcL (Q.map Prod.snd) n} := by
+  obtain ⟨t, ht⟩ := exists_section L hG
+  have hf0 : f ≠ 0 := hm.ne_zero
+  set l := (UniqueFactorizationMonoid.normalizedFactors f).toList with hl
+  have hmem : ∀ P ∈ l, IsPrimeLab P.natDegree P := by
+    intro P hP
+    rw [hl, Multiset.mem_toList] at hP
+    have hirr := UniqueFactorizationMonoid.irreducible_of_normalized_factor P hP
+    have hnorm := UniqueFactorizationMonoid.normalize_normalized_factor P hP
+    obtain ⟨q, hq⟩ := UniqueFactorizationMonoid.dvd_of_mem_normalizedFactors hP
+    refine ⟨?_, hirr, ?_, rfl⟩
+    · rw [← hnorm]
+      exact Polynomial.monic_normalize hirr.ne_zero
+    · intro hP0
+      apply h0
+      rw [hq, Polynomial.mul_coeff_zero, hP0, zero_mul]
+  let s : (ZMod g)[X] → Pc g := fun P => ⟨P.natDegree, t P⟩
+  set Q : List ((ZMod g)[X] × Pc g) := l.map fun P => (P, s P) with hQdef
+  have hQ : ∀ p ∈ Q, IsCuspOf L p.1 p.2.2 ∧ p.2.2 1 = ∏ i ∈ Finset.Ico 1 p.2.1, ((g : ℂ) ^ i - 1) := by
+    intro p hp
+    obtain ⟨P, hP, rfl⟩ := List.mem_map.1 hp
+    exact ht P (hmem P hP)
+  have hQc : ∀ p ∈ Q, IsCuspOf L p.1 p.2.2 := fun p hp => (hQ p hp).1
+  have hQfst : Q.map Prod.fst = l := by
+    rw [hQdef, List.map_map]
+    exact List.map_id'' (fun _ => rfl) l
+  have hQsnd : Q.map Prod.snd = (Q.map Prod.fst).map s := by
+    simp only [hQdef, List.map_map]
+    rfl
+  have hcoe : ((Q.map Prod.fst : List _) : Multiset _) = UniqueFactorizationMonoid.normalizedFactors f := by
+    rw [hQfst, hl, Multiset.coe_toList]
+  obtain ⟨hpm, hpd, -⟩ := prod_props L Q hQc
+  have hprod : (Q.map Prod.fst).prod = f := by
+    have hassoc := UniqueFactorizationMonoid.prod_normalizedFactors hf0
+    rw [← hcoe, Multiset.prod_coe] at hassoc
+    exact Polynomial.eq_of_monic_of_associated hpm hm hassoc
+  have hdeg : degL (Q.map Prod.snd) = n := by
+    rw [← hpd, hprod, hn]
+  have hlnd : l.Nodup := by
+    have : (l : Multiset (ZMod g)[X]).Nodup := by
+      rw [hl, Multiset.coe_toList]
+      exact (UniqueFactorizationMonoid.squarefree_iff_nodup_normalizedFactors hf0).1 hs
+    exact Multiset.coe_nodup.1 this
+  have hnd : (Q.map Prod.snd).Nodup := by
+    rw [hQsnd, hQfst]
+    refine List.Nodup.map_on ?_ hlnd
+    intro P hP P' hP' he
+    have e1 := lab_eq L hg (s P) P (ht P (hmem P hP)).1
+    have e2 := lab_eq L hg (s P') P' (ht P' (hmem P' hP')).1
+    rw [← e1, ← e2, he]
+  have hcusps := cusp_snd L Q hQc
+  have hchar := (GlobalTheory.T.harishChandraProductList_isCharacter_and_perm_invariant g (Q.map Prod.snd) (Q.map Prod.snd) n hdeg.symm (char_snd L Q hQc)).1
+  have hnorm1 := (GlobalTheory.T.characterPairing_harishChandra_cuspidal_mackey g _ _ n hdeg hdeg hcusps hcusps).2 hnd
+  have hirr : IsIrr (hcL (Q.map Prod.snd) n) := (GlobalTheory.T.character_decomposition_and_classFunction_expansion _ _).2.2.2.1 hchar hnorm1
+  refine ⟨Q, hQ, hcoe, hdeg, ?_⟩
+  ext χ
+  simp only [Set.mem_setOf_eq, Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hχ, Q', hQ', hd', hf', hip'⟩
+    have key : ∀ p ∈ Q', p.2 = s p.1 := by
+      rintro ⟨P, d, χ'⟩ hp
+      have hc := hQ' _ hp
+      have hd : P.natDegree = d := hc.1.2.2.2
+      subst hd
+      have e := (GlobalTheory.T.cuspidalCharacter_label_unique_GLn g L hg P.natDegree P P (t P) χ' (ht P hc.1).1).2 hG hc
+      show (⟨P.natDegree, χ'⟩ : Pc g) = ⟨P.natDegree, t P⟩
+      rw [e]
+    have hsnd' : Q'.map Prod.snd = (Q'.map Prod.fst).map s := by
+      rw [List.map_map]
+      exact List.map_congr_left key
+    have hperm : (Q'.map Prod.fst).Perm (Q.map Prod.fst) := by
+      apply Multiset.coe_eq_coe.1
+      rw [factors_prod L Q' hQ', ← hf', hcoe]
+    have hperm2 : (Q'.map Prod.snd).Perm (Q.map Prod.snd) := by
+      rw [hsnd', hQsnd]
+      exact hperm.map s
+    have hhc := (GlobalTheory.T.harishChandraProductList_isCharacter_and_perm_invariant g (Q'.map Prod.snd) (Q.map Prod.snd) n hd'.symm
+      (char_snd L Q' hQ')).2 hperm2
+    rw [hhc] at hip'
+    by_contra hne
+    rw [(GlobalTheory.T.centralIdempotentOfIrrCharacter_orthogonal_central _ χ _ hχ hirr).2.2, if_neg hne] at hip'
+    exact hip' rfl
+  · rintro rfl
+    refine ⟨hirr, Q, hQc, hdeg, hprod.symm, ?_⟩
+    rw [hnorm1]
+    exact one_ne_zero
+
+
+[FLC_cuspidal_support_04] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/WhittakerDimensionHarishChandraInductionMul.lean:65-186
+SHA256 b445de891149506ff75adab407c206e43d848c99e5c5855f27776a2aa81f1b9f
+theorem wh_hcT : ∀ (g : ℕ) [Fact g.Prime] (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ (a b n : ℕ), n = a + b →
+    ∀ Φ : Gn g a → Gn g b → ℂ, (∀ y, IsClass fun x => Φ x y) → (∀ x, IsClass (Φ x)) →
+      wh ψ (hcT a b Φ n) = wh ψ (fun x => wh ψ (Φ x)) := by
+  intro g _ ψ hψ a b n hn Φ hΦ1 hΦ2
+  obtain ⟨⟨P, hP⟩, ⟨U, hU⟩, -, -, -, -⟩ := ParBasic.par_basic g a b n hn
+  subst hn
+
+  have hl : ∀ h ∈ U, ∀ x ∈ U, (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹) (h * x * h⁻¹) =
+      (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹) x := by
+    intro h hh x hx
+    have hh' := (hU h).1 hh
+    have hx' := (hU x).1 hx
+    have hi' := (hU h⁻¹).1 (U.inv_mem hh)
+    have e1 : supFrom 0 ((h : Mt g (a + b)) * ((h⁻¹ : Gn g (a + b)) : Mt g (a + b))) = 0 := by
+      rw [← Units.val_mul, mul_inv_cancel, Units.val_one, supFrom_one]
+    rw [supFrom_mul _ _ hh' hi'] at e1
+    have hxh := ParBasic.isUniUp_mul _ _ hh' hx'
+    simp only [Units.val_mul]
+    rw [supFrom_mul _ _ hxh hi', supFrom_mul _ _ hh' hx']
+    congr 2
+    linear_combination e1
+
+  have hφ : ∀ k ∈ P, ∀ x ∈ P,
+      (fun z : Gn g (a + b) => Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b))))) (k * x * k⁻¹) =
+      (fun z : Gn g (a + b) => Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b))))) x := by
+    intro k hk x hx
+    have hk' := (hP k).1 hk
+    have hx' := (hP x).1 hx
+    have hi' := (hP k⁻¹).1 (P.inv_mem hk)
+    have hkx := (hP (k * x)).1 (P.mul_mem hk hx)
+    obtain ⟨uk, vk⟩ := ParBasic.isUnit_blocks k hk'
+    obtain ⟨ux, vx⟩ := ParBasic.isUnit_blocks x hx'
+    have m1 := ParBasic.blocks_mul _ _ hk' hi'
+    have m2 := ParBasic.blocks_mul _ _ hk' hx'
+    have m3 := ParBasic.blocks_mul _ _ hkx hi'
+    have hkxk := (hP (k * x * k⁻¹)).1 (P.mul_mem (P.mul_mem hk hx) (P.inv_mem hk))
+    obtain ⟨uc, vc⟩ := ParBasic.isUnit_blocks _ hkxk
+    have e1 : ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b)) = (k : Mt g (a + b)) * (x : Mt g (a + b)) * ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
+      simp only [Units.val_mul]
+    have e0 : (k : Mt g (a + b)) * ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) = 1 := by
+      rw [← Units.val_mul, mul_inv_cancel, Units.val_one]
+    have iA : (((toG (tl a (k : Mt g (a + b))))⁻¹ : Gn g a) : Mt g a) = tl a ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
+      apply Units.inv_eq_of_mul_eq_one_right
+      rw [OpenCell.coe_toG uk, ← m1.2.1, e0, tl_one]
+    have iB : (((toG (br a b (k : Mt g (a + b))))⁻¹ : Gn g b) : Mt g b) = br a b ((k⁻¹ : Gn g (a + b)) : Mt g (a + b)) := by
+      apply Units.inv_eq_of_mul_eq_one_right
+      rw [OpenCell.coe_toG vk, ← m1.2.2, e0, br_one]
+    have cA : toG (tl a ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b))) =
+        toG (tl a (k : Mt g (a + b))) * toG (tl a (x : Mt g (a + b))) * (toG (tl a (k : Mt g (a + b))))⁻¹ := by
+      apply Units.ext
+      rw [OpenCell.coe_toG uc]
+      simp only [Units.val_mul] at m3 ⊢
+      rw [iA, OpenCell.coe_toG uk, OpenCell.coe_toG ux, m3.2.1, m2.2.1]
+    have cB : toG (br a b ((k * x * k⁻¹ : Gn g (a + b)) : Mt g (a + b))) =
+        toG (br a b (k : Mt g (a + b))) * toG (br a b (x : Mt g (a + b))) * (toG (br a b (k : Mt g (a + b))))⁻¹ := by
+      apply Units.ext
+      rw [OpenCell.coe_toG vc]
+      simp only [Units.val_mul] at m3 ⊢
+      rw [iB, OpenCell.coe_toG vk, OpenCell.coe_toG vx, m3.2.2, m2.2.2]
+    show Φ _ _ = Φ _ _
+    rw [cA, cB]
+    have h1 := hΦ1 (toG (br a b (k : Mt g (a + b))) * toG (br a b (x : Mt g (a + b))) * (toG (br a b (k : Mt g (a + b))))⁻¹)
+      (toG (tl a (x : Mt g (a + b)))) (toG (tl a (k : Mt g (a + b))))
+    have h2 := hΦ2 (toG (tl a (x : Mt g (a + b)))) (toG (br a b (x : Mt g (a + b)))) (toG (br a b (k : Mt g (a + b))))
+    simp only at h1 h2
+    rw [h1, h2]
+  set R : Finset (Equiv.Perm (Fin (a + b))) := Finset.univ.filter fun σ =>
+    ∀ i j : Fin (a + b), i < j → ((j : ℕ) < a ∨ a ≤ (i : ℕ)) → σ i < σ j with hR
+  have hRu : ∀ x : Gn g (a + b), ∃! σ, σ ∈ R ∧ ∃ h ∈ U, ∃ k ∈ P, x = h * pm g σ * k := by
+    intro x
+    obtain ⟨σ, ⟨hσ, u, p, hu, hp, hx⟩, huniq⟩ :=
+      Shuffle.existsUnique_shuffle g a (a + b) (Nat.le_add_right a b) x
+    refine ⟨σ, ⟨by simpa [hR] using hσ, u, (hU u).2 hu, p, (hP p).2 hp, hx⟩, ?_⟩
+    rintro τ ⟨hτ, u', hu', p', hp', hx'⟩
+    exact huniq τ ⟨by simpa [hR] using hτ, u', p', (hU u').1 hu', (hP p').1 hp', hx'⟩
+  have M := mackey_doubleCoset_pairing (Gn g (a + b)) U P _ R (pm g) hRu
+    (fun x : Gn g (a + b) => (ψ (supFrom 0 (x : Mt g (a + b))))⁻¹)
+    (fun z : Gn g (a + b) => Φ (toG (tl a (z : Mt g (a + b)))) (toG (br a b (z : Mt g (a + b))))) hl hφ
+  have cU : (Nat.card U : ℂ) = ((Finset.univ.filter fun u : Gn g (a + b) => IsUniUp (u : Mt g (a + b))).card : ℂ) := by
+    rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+    simp only [hU]
+  have cP : (Nat.card P : ℂ) = ((Finset.univ.filter fun p : Gn g (a + b) => InPar a (p : Mt g (a + b))).card : ℂ) := by
+    rw [Nat.card_eq_fintype_card, Fintype.card_subtype]
+    simp only [hP]
+  refine Eq.trans ?_ (M.trans ?_)
+  · rw [OpenCell.wh_eq, cU, cP, ← Finset.sum_filter]
+    simp only [hU, hP]
+    rfl
+  obtain ⟨σ₀, h0⟩ : ∃ σ₀ : Equiv.Perm (Fin (a + b)),
+      ∀ j : Fin (a + b), (σ₀ j : ℕ) = if (j : ℕ) < a then b + j else j - a := by
+    let f : Fin (a + b) → Fin (a + b) := fun j =>
+      ⟨if (j : ℕ) < a then b + j else j - a, by have := j.2; split_ifs <;> omega⟩
+    have hf : Function.Injective f := by
+      intro i j h
+      have := i.2
+      have := j.2
+      simp only [f, Fin.mk.injEq] at h
+      ext
+      split_ifs at h <;> omega
+    exact ⟨Equiv.ofBijective f hf.bijective_of_finite, fun j => rfl⟩
+  have h0R : σ₀ ∈ R := by
+    simp only [hR, Finset.mem_filter, Finset.mem_univ, true_and]
+    intro i j hij hb
+    rw [Fin.lt_def] at hij ⊢
+    rw [h0, h0]
+    split_ifs <;> omega
+  rw [Finset.sum_eq_single_of_mem σ₀ h0R]
+  · simp only [hU, hP]
+    exact OpenCell.openCell g ψ a b (a + b) σ₀ Φ rfl h0
+  · intro σ hσ hne
+    have hσ' : ∀ i j : Fin (a + b), i < j → ((j : ℕ) < a ∨ a ≤ (i : ℕ)) → σ i < σ j := by
+      simpa [hR] using hσ
+    have hnd : ¬ ∀ i j : Fin (a + b), (i : ℕ) < a → a ≤ (j : ℕ) → (σ j : ℕ) ≠ σ i + 1 := by
+      intro h
+      apply hne
+      exact Equiv.ext fun j => Fin.ext (by rw [(shuffle_noDescent_iff_open a b (a + b) σ rfl hσ').1 h j, h0 j])
+    push Not at hnd
+    obtain ⟨i, j, hi, hj, hij⟩ := hnd
+    simp only [hU, hP]
+    rw [NonOpenCell.whittaker_term_eq_zero g ψ hψ a b (a + b) σ Φ i j rfl hi hj hij, mul_zero]
+
+end GlobalTheory.GLq.WhMul
+
+
+[FLC_green_label_01] src/Development/AbelianVarietyTheory/Definitions/NonGaloisDescent/LabelDatum.lean:81-118
+SHA256 0285d17ebb436701569358311b3d43faf6607d80216d6a8cd8cefddc81c834e0
+structure LabelDatum (g : ℕ) [Fact g.Prime] where
+  teich : Formalism.CyclotomicNorms.Fbar g →* ℂ
+  teich_inj : ∀ x y, x ≠ 0 → y ≠ 0 → teich x = teich y → x = y
+  gen : ℕ → Formalism.CyclotomicNorms.Fbar g
+  gen_order : ∀ d, 0 < d → orderOf (gen d) = g ^ d - 1
+  gen_norm : ∀ d e, 0 < d → 0 < e → gen (d * e) ^ ((g ^ (d * e) - 1) / (g ^ d - 1)) = gen d
+
+def thetaOf (L : LabelDatum g) (d : ℕ) (x z : Formalism.CyclotomicNorms.Fbar g) : ℂ :=
+  if h : ∃ n : ℕ, z = L.gen d ^ n then L.teich x ^ h.choose else 0
+
+def IsPrimeLab (d : ℕ) (P : (ZMod g)[X]) : Prop := P.Monic ∧ Irreducible P ∧ P.coeff 0 ≠ 0 ∧ P.natDegree = d
+
+def IsCuspOf (L : LabelDatum g) (P : (ZMod g)[X]) {d : ℕ} (χ : Gn g d → ℂ) : Prop :=
+  IsPrimeLab d P ∧ IsCusp χ ∧ ∀ x ∈ Formalism.CyclotomicNorms.rootsBar P, ∀ y : Gn g d, Irreducible (y : Mt g d).charpoly →
+    ∀ z ∈ Formalism.CyclotomicNorms.rootsBar (y : Mt g d).charpoly,
+      χ y = (-1) ^ (d - 1) * ∑ i ∈ Finset.range d, thetaOf L d x (z ^ (g ^ i))
+
+def HasLabel (L : LabelDatum g) {n : ℕ} (χ : Gn g n → ℂ) (f : (ZMod g)[X]) : Prop :=
+  ∃ Q : List ((ZMod g)[X] × Pc g), (∀ p ∈ Q, IsCuspOf L p.1 p.2.2) ∧ degL (Q.map Prod.snd) = n ∧
+    f = (Q.map Prod.fst).prod ∧ ip χ (hcL (Q.map Prod.snd) n) ≠ 0
+
+def eSerC (L : LabelDatum g) (n : ℕ) (f : (ZMod g)[X]) : MonoidAlgebra ℂ (Gn g n) :=
+  ∑ᶠ χ ∈ {χ : Gn g n → ℂ | IsIrr χ ∧ HasLabel L χ f}, zOf χ
+
+def wtC (L : LabelDatum g) {n : ℕ} (a : MonoidAlgebra ℂ (Gn g n)) (f : (ZMod g)[X]) : ℝ :=
+  ((a * eSerC L n f).coeff 1).re / (a.coeff 1).re
+
+def Green : Prop :=
+  ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g) (d : ℕ), 0 < d → ∃ τ : (ZMod g)[X] → Gn g d → ℂ,
+    (∀ P, IsPrimeLab d P → IsCuspOf L P (τ P) ∧ τ P 1 = ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i - 1)) ∧
+    (∀ P P', IsPrimeLab d P → IsPrimeLab d P' → τ P = τ P' → P = P') ∧
+    ∀ χ : Gn g d → ℂ, IsCusp χ → ∃ P, IsPrimeLab d P ∧ χ = τ P
+
+def ESerTie (D : Formalism.BasicNotions.D7) : Prop :=
+  ∀ k : Fin 2, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    ∃ L : LabelDatum (D.host.g k), L.teich = D.ntypes.teichC k ∧ ∀ f, D.ntypes.eSer k f = eSerC L D.R.r f
+
+end GlobalTheory.GLq
+
+
+[FLC_green_label_02] src/Development/AbelianVarietyTheory/PublishedTheorems/GaloisCohomology₂/GreenRegularCharacters.lean:10-24
+SHA256 1332941ae98206bfd7e424f0fdb657652fc6e58eb3f926304113ce9f2f2054f2
+def IsRegularChar (g d : ℕ) {K : Type} [Field K] (θ : Kˣ →* ℂˣ) : Prop :=
+  ∀ i j, i < d → j < d → θ ^ g ^ i = θ ^ g ^ j → i = j
+
+def GreenRegularCharacters : Prop :=
+  ∀ (g : ℕ) [Fact g.Prime] (d : ℕ), 0 < d → ∀ (K : Type) [Field K] [Algebra (ZMod g) K], Module.finrank (ZMod g) K = d →
+    ∃ τ : (Kˣ →* ℂˣ) → Gn g d → ℂ,
+      (∀ θ, IsRegularChar g d θ → IsCusp (τ θ) ∧ τ θ 1 = ∏ i ∈ Finset.Ico 1 d, ((g : ℂ) ^ i - 1) ∧
+        ∀ y : Gn g d, Irreducible (y : Mt g d).charpoly → ∀ z : Kˣ, aeval (z : K) (y : Mt g d).charpoly = 0 →
+          τ θ y = (-1) ^ (d - 1) * ∑ i ∈ Finset.range d, ((θ (z ^ g ^ i) : ℂˣ) : ℂ)) ∧
+      (∀ θ θ', IsRegularChar g d θ → IsRegularChar g d θ' → (τ θ = τ θ' ↔ ∃ i < d, θ' = θ ^ g ^ i)) ∧
+      ∀ χ : Gn g d → ℂ, IsCusp χ → ∃ θ, IsRegularChar g d θ ∧ χ = τ θ
+
+end GlobalTheory.Published
+
+end
+
+
+[FLC_green_label_03] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/CuspidalCharacterLabelUniqueGLn.lean:28-115
+SHA256 788e5172866efe761eb5368dd7242967ac107a79cea82bf1821fb813d93ddea8
+theorem exists_eq_of_sum_eq {m d : ℕ} [NeZero m] (hm : 1 < m) (ζ ζ' : ℕ → ℂ)
+    (hu : ∀ i, ζ i ^ m = 1) (hu' : ∀ i, ζ' i ^ m = 1) (hd : 0 < d) (B : Finset (ZMod m))
+    (hB : 2 * d * B.card < m)
+    (h : ∀ k : ZMod m, k ∉ B → ∑ i ∈ Finset.range d, ζ i ^ k.val = ∑ i ∈ Finset.range d, ζ' i ^ k.val) :
+    ∃ i < d, ζ' 0 = ζ i := by
+  have hm0 : m ≠ 0 := by omega
+  haveI : Fact (1 < m) := ⟨hm⟩
+  let u : ℕ → ℂˣ := fun i => Units.mk0 (ζ i) (ne_zero_of_pow hm0 (hu i))
+  let u' : ℕ → ℂˣ := fun i => Units.mk0 (ζ' i) (ne_zero_of_pow hm0 (hu' i))
+  have huu : ∀ i, u i ^ m = 1 := fun i => Units.ext (by simp [u, hu i])
+  have huu' : ∀ i, u' i ^ m = 1 := fun i => Units.ext (by simp [u', hu' i])
+  let θ : ℕ → (Multiplicative (ZMod m) →* ℂˣ) := fun i => chr m (u i) (huu i)
+  let θ' : ℕ → (Multiplicative (ZMod m) →* ℂˣ) := fun i => chr m (u' i) (huu' i)
+  have hθ : ∀ i z, ((θ i z : ℂˣ) : ℂ) = ζ i ^ (Multiplicative.toAdd z).val := fun i z => by
+    simp [θ, chr, u]
+  have hθ' : ∀ i z, ((θ' i z : ℂˣ) : ℂ) = ζ' i ^ (Multiplicative.toAdd z).val := fun i z => by
+    simp [θ', chr, u']
+  let S := (Finset.range d).image θ ∪ (Finset.range d).image θ'
+  let c : (Multiplicative (ZMod m) →* ℂˣ) → ℂ := fun φ =>
+    (((Finset.range d).filter (fun i => θ i = φ)).card : ℂ) -
+      (((Finset.range d).filter (fun i => θ' i = φ)).card : ℂ)
+  have fib : ∀ (t : ℕ → (Multiplicative (ZMod m) →* ℂˣ)), (∀ i ∈ Finset.range d, t i ∈ S) → ∀ z,
+      ∑ φ ∈ S, (((Finset.range d).filter (fun i => t i = φ)).card : ℂ) * (φ z : ℂ) =
+        ∑ i ∈ Finset.range d, ((t i z : ℂˣ) : ℂ) := by
+    intro t ht z
+    rw [← Finset.sum_fiberwise_of_maps_to ht]
+    refine Finset.sum_congr rfl fun φ _ => ?_
+    rw [Finset.sum_congr rfl (fun i hi => by rw [(Finset.mem_filter.1 hi).2]), Finset.sum_const,
+      nsmul_eq_mul]
+  have hsum : ∀ z, ∑ φ ∈ S, c φ * (φ z : ℂ) =
+      ∑ i ∈ Finset.range d, ζ i ^ (Multiplicative.toAdd z).val -
+        ∑ i ∈ Finset.range d, ζ' i ^ (Multiplicative.toAdd z).val := by
+    intro z
+    simp only [c, sub_mul, Finset.sum_sub_distrib]
+    rw [fib θ (fun i hi => Finset.mem_union_left _ (Finset.mem_image_of_mem _ hi)) z,
+      fib θ' (fun i hi => Finset.mem_union_right _ (Finset.mem_image_of_mem _ hi)) z]
+    simp only [hθ, hθ']
+  have hS : S.card ≤ 2 * d := by
+    refine (Finset.card_union_le _ _).trans ?_
+    have h1 := (Finset.card_image_le (s := Finset.range d) (f := θ))
+    have h2 := (Finset.card_image_le (s := Finset.range d) (f := θ'))
+    simp only [Finset.card_range] at h1 h2
+    omega
+  have hzero : ∀ z, ∑ φ ∈ S, c φ * (φ z : ℂ) = 0 := by
+    by_contra hne
+    push_neg at hne
+    have key := GlobalTheory.GLm.card_le_card_mul_card_support (Multiplicative (ZMod m)) S c hne
+    have hcard : Fintype.card (Multiplicative (ZMod m)) = m := by
+      simp [ZMod.card]
+    have hsupp : (Finset.univ.filter fun z : Multiplicative (ZMod m) =>
+        ∑ θ ∈ S, c θ * (θ z : ℂ) ≠ 0).card ≤ B.card := by
+      refine Finset.card_le_card_of_injOn (fun z => Multiplicative.toAdd z) ?_ ?_
+      · intro z hz
+        have hz' := (Finset.mem_filter.1 hz).2
+        by_contra hB'
+        apply hz'
+        rw [hsum z, h _ hB', sub_self]
+      · intro a _ b _ hab; exact hab
+    rw [hcard] at key
+    have : S.card * (Finset.univ.filter fun z : Multiplicative (ZMod m) =>
+        ∑ θ ∈ S, c θ * (θ z : ℂ) ≠ 0).card ≤ 2 * d * B.card := Nat.mul_le_mul hS hsupp
+    omega
+  have hinj : Function.Injective (fun φ : Multiplicative (ZMod m) →* ℂˣ => (Units.coeHom ℂ).comp φ) := by
+    intro φ ψ hφψ
+    exact MonoidHom.ext fun z => Units.ext (DFunLike.congr_fun hφψ z)
+  have hli := (linearIndependent_monoidHom (Multiplicative (ZMod m)) ℂ).comp _ hinj
+  rw [linearIndependent_iff'] at hli
+  have hmem : θ' 0 ∈ S := Finset.mem_union_right _ (Finset.mem_image_of_mem _ (by simpa using hd))
+  have hc0 := hli S c (by
+    funext z
+    rw [Finset.sum_apply]
+    simpa [smul_eq_mul] using hzero z) (θ' 0) hmem
+  simp only [c, sub_eq_zero, Nat.cast_inj] at hc0
+  have hpos : 0 < ((Finset.range d).filter (fun i => θ' i = θ' 0)).card :=
+    Finset.card_pos.2 ⟨0, Finset.mem_filter.2 ⟨by simpa using hd, rfl⟩⟩
+  rw [← hc0] at hpos
+  obtain ⟨i, hi⟩ := Finset.card_pos.1 hpos
+  obtain ⟨hi1, hi2⟩ := Finset.mem_filter.1 hi
+  refine ⟨i, by simpa using hi1, ?_⟩
+  have := congrArg (fun φ : Multiplicative (ZMod m) →* ℂˣ => ((φ (Multiplicative.ofAdd 1) : ℂˣ) : ℂ)) hi2
+  simp only [hθ, hθ', toAdd_ofAdd, ZMod.val_one, pow_one] at this
+  exact this.symm
+
+end GlobalTheory.GLq.LabelUnique
+
+namespace GlobalTheory.GLq.LabelUnique
+
+variable {g : ℕ} [Fact g.Prime]
+
+
+[FLC_green_label_04] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/CuspidalCharacterLabelUniqueGLn.lean:161-275
+SHA256 5b366e11982f041bb66575ba591ad7302f4ee173d7a0bf7957ab4965f17f270c
+theorem thetaOf_gen_pow (L : LabelDatum g) (d : ℕ) (hd : 0 < d) (w : Formalism.CyclotomicNorms.Fbar g)
+    (hw : L.teich w ^ (g ^ d - 1) = 1) (n : ℕ) :
+    thetaOf L d w (L.gen d ^ n) = L.teich w ^ n := by
+  have hex : ∃ n' : ℕ, L.gen d ^ n = L.gen d ^ n' := ⟨n, rfl⟩
+  unfold thetaOf
+  rw [dif_pos hex]
+  have hs := hex.choose_spec
+  have h1 : 1 < g ^ d := Nat.one_lt_pow hd.ne' (Fact.out : g.Prime).one_lt
+  have hfo : IsOfFinOrder (L.gen d) := orderOf_pos_iff.mp (by rw [L.gen_order d hd]; omega)
+  rw [hfo.pow_eq_pow_iff_modEq, L.gen_order d hd] at hs
+  rw [← pow_mod_eq hw n, ← pow_mod_eq hw hex.choose]
+  exact congrArg _ hs.symm
+
+theorem label_eq (L : LabelDatum g) (hg : 5 ≤ g) (d : ℕ) (P P' : (ZMod g)[X]) (χ : Gn g d → ℂ)
+    (h : IsCuspOf L P χ) (h' : IsCuspOf L P' χ) : P = P' := by
+  obtain ⟨hPl, hc, hval⟩ := h
+  obtain ⟨hPl', -, hval'⟩ := h'
+  have hd : 0 < d := hc.1
+  set m := g ^ d - 1 with hmdef
+  have hgd : 5 ≤ g ^ d := le_trans hg (Nat.le_self_pow hd.ne' g)
+  have hm : 1 < m := by omega
+  haveI : NeZero m := ⟨by omega⟩
+  obtain ⟨x, hx⟩ := exists_mem hd hPl
+  obtain ⟨x', hx'⟩ := exists_mem hd hPl'
+  have hx1 := pow_sub_one_eq_one hPl hx
+  have hx1' := pow_sub_one_eq_one hPl' hx'
+  let γ := L.gen d
+  have hord : orderOf γ = m := L.gen_order d hd
+  have hγm : γ ^ m = 1 := by rw [← hord]; exact pow_orderOf_eq_one _
+  have hfo : IsOfFinOrder γ := orderOf_pos_iff.mp (by rw [hord]; omega)
+  have hγ0 : γ ≠ 0 := by
+    intro h0; rw [h0, zero_pow (by omega)] at hγm; exact zero_ne_one hγm
+  have hteich : ∀ w : Formalism.CyclotomicNorms.Fbar g, w ^ m = 1 → ∀ i, L.teich (w ^ (g ^ i)) ^ m = 1 := by
+    intro w hw i
+    rw [← map_pow, ← pow_mul, mul_comm, pow_mul, hw, one_pow, map_one]
+
+  let B : Finset (ZMod m) := Finset.univ.filter fun k => (minpoly (ZMod g) (γ ^ k.val)).natDegree ≠ d
+  have hB : 2 * d * B.card < m := by
+    refine lt_of_le_of_lt (Nat.mul_le_mul_left _ ?_) (GlobalTheory.GLm.card_proper_subfield_elements_lt g d hg hd)
+    let S0 : Set (Formalism.CyclotomicNorms.Fbar g) := {z | z ≠ 0 ∧ z ^ (g ^ d) = z ∧ (minpoly (ZMod g) z).natDegree ≠ d}
+    have hfin : S0.Finite := by
+      refine (nthRoots m (1 : Formalism.CyclotomicNorms.Fbar g)).toFinset.finite_toSet.subset ?_
+      rintro z ⟨hz0, hz, -⟩
+      simp only [Finset.mem_coe, Multiset.mem_toFinset]
+      rw [mem_nthRoots (by omega)]
+      apply mul_right_cancel₀ hz0
+      rw [← pow_succ, one_mul, hmdef, Nat.sub_add_cancel (by omega), hz]
+    have hinj : Set.InjOn (fun k : ZMod m => γ ^ k.val) B := by
+      intro a _ b _ hab
+      have hab' : γ ^ a.val = γ ^ b.val := hab
+      have := (hfo.pow_eq_pow_iff_modEq.1 hab')
+      rw [hord] at this
+      apply ZMod.val_injective
+      have ha := ZMod.val_lt a
+      have hb := ZMod.val_lt b
+      unfold Nat.ModEq at this
+      rwa [Nat.mod_eq_of_lt ha, Nat.mod_eq_of_lt hb] at this
+    calc B.card = (B.image fun k : ZMod m => γ ^ k.val).card := (Finset.card_image_of_injOn hinj).symm
+      _ = Set.ncard ((B.image fun k : ZMod m => γ ^ k.val : Finset _) : Set (Formalism.CyclotomicNorms.Fbar g)) :=
+          (Set.ncard_coe_finset _).symm
+      _ ≤ S0.ncard := by
+          refine Set.ncard_le_ncard ?_ hfin
+          intro z hz
+          simp only [Finset.coe_image, Set.mem_image, Finset.mem_coe] at hz
+          obtain ⟨k, hk, rfl⟩ := hz
+          refine ⟨pow_ne_zero _ hγ0, ?_, (Finset.mem_filter.1 hk).2⟩
+          rw [← pow_mul, mul_comm, pow_mul, show g ^ d = m + 1 by omega, pow_succ, hγm, one_mul]
+      _ = _ := rfl
+  have hsums : ∀ k : ZMod m, k ∉ B →
+      ∑ i ∈ Finset.range d, L.teich (x ^ (g ^ i)) ^ k.val =
+        ∑ i ∈ Finset.range d, L.teich (x' ^ (g ^ i)) ^ k.val := by
+    intro k hk
+    have hdeg : (minpoly (ZMod g) (γ ^ k.val)).natDegree = d := by
+      by_contra hne; exact hk (Finset.mem_filter.2 ⟨Finset.mem_univ _, hne⟩)
+    obtain ⟨y, hy, hz⟩ := GlobalTheory.GLm.exists_irreducible_charpoly_mem_rootsBar g d (γ ^ k.val)
+      (pow_ne_zero _ hγ0) hdeg
+    have e1 := hval x hx y hy _ hz
+    have e2 := hval' x' hx' y hy _ hz
+    rw [e1] at e2
+    have hsgn : ((-1 : ℂ) ^ (d - 1)) ≠ 0 := pow_ne_zero _ (by norm_num)
+    have e3 := mul_left_cancel₀ hsgn e2
+    have conv : ∀ w : Formalism.CyclotomicNorms.Fbar g, w ^ m = 1 → ∀ i,
+        thetaOf L d w ((γ ^ k.val) ^ (g ^ i)) = L.teich (w ^ (g ^ i)) ^ k.val := by
+      intro w hw i
+      have hw' : L.teich w ^ m = 1 := by simpa using hteich w hw 0
+      rw [← pow_mul, thetaOf_gen_pow L d hd w hw', map_pow, ← pow_mul, mul_comm]
+    simp only [conv x hx1, conv x' hx1'] at e3
+    exact e3
+  obtain ⟨i, hi, hieq⟩ := exists_eq_of_sum_eq hm (fun i => L.teich (x ^ (g ^ i)))
+    (fun i => L.teich (x' ^ (g ^ i))) (hteich x hx1) (hteich x' hx1') hd B hB hsums
+  simp only [pow_zero, pow_one] at hieq
+  have hxe : x' = x ^ (g ^ i) :=
+    L.teich_inj _ _ (ne_zero_of_mem hPl' hx') (pow_ne_zero _ (ne_zero_of_mem hPl hx)) hieq
+  have h1 : aeval x' P = 0 := by
+    rw [hxe]; exact aeval_pow_eq_zero (aeval_eq_zero_of_mem hPl.1.ne_zero hx) i
+  have h2 := minpoly.eq_of_irreducible_of_monic hPl.2.1 h1 hPl.1
+  rw [h2, minpoly_eq_of_mem hPl' hx']
+
+end GlobalTheory.GLq.LabelUnique
+
+namespace GlobalTheory.GLq
+
+theorem isCuspOf_label_unique : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g), 5 ≤ g → ∀ (d : ℕ)
+    (P P' : (ZMod g)[X]) (χ χ' : Gn g d → ℂ), IsCuspOf L P χ →
+      (IsCuspOf L P' χ → P = P') ∧ (Green → IsCuspOf L P χ' → χ = χ') := by
+  intro g _ L hg d P P' χ χ' h
+  refine ⟨fun h' => LabelUnique.label_eq L hg d P P' χ h h', fun hG h' => ?_⟩
+  obtain ⟨τ, hτ, -, hall⟩ := hG g L d h.2.1.1
+  obtain ⟨Q, hQ, rfl⟩ := hall χ h.2.1
+  obtain ⟨Q', hQ', rfl⟩ := hall χ' h'.2.1
+  have e1 := LabelUnique.label_eq L hg d P Q _ h (hτ Q hQ).1
+  have e2 := LabelUnique.label_eq L hg d P Q' _ h' (hτ Q' hQ').1
+  rw [← e1, ← e2]
+
+end GlobalTheory.GLq
+
+
+[FLC_green_label_05] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/HarishChandraSeriesWeightSquarefreeLabelGelfandG.lean:238-304
+SHA256 1e391914d3d7a1c3d2d6c6d4b48fda10b4e069a9d245914f2b58414fd3f7c45f
+theorem CompanionTheory.Member.harishChandraSeriesWeight_squarefree_label_unipotent : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g), 5 ≤ g → Green → ∀ (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ (n : ℕ) (f : (ZMod g)[X]), f.Monic → f.natDegree = n → f.coeff 0 ≠ 0 → Squarefree f → wtC L (eU g n ψ) f = 1 / ((UniqueFactorizationMonoid.normalizedFactors f).map (fun P => (g : ℝ) ^ P.natDegree - 1)).prod := by
+  intro g _ L hg hG ψ hψ n f hm hn h0 hs
+  obtain ⟨Q, hQ, hfac, hdeg, hset⟩ := (GlobalTheory.GLq.Label.label_main g L hg hG n).2.2 f hm hn h0 hs
+  subst hdeg
+  set C := hcL (Q.map Prod.snd) (degL (Q.map Prod.snd)) with hC
+  have hcusp : ∀ c ∈ Q.map Prod.snd,
+      IsCusp c.2 ∧ c.2 1 = ∏ i ∈ Finset.Ico 1 c.1, ((g : ℂ) ^ i - 1) := by
+    intro c hc
+    obtain ⟨q, hq, rfl⟩ := List.mem_map.1 hc
+    exact ⟨(hQ q hq).1.2.1, (hQ q hq).2⟩
+  have hwh : wh ψ C = 1 := wh_hcL ψ hψ _ fun c hc =>
+    ⟨isChar_of_irr (hcusp c hc).1.2.1,
+      GlobalTheory.GLq.wh_cusp_eq_one g ψ hψ c.1 c.2 (hcusp c hc).1 (hcusp c hc).2⟩
+  have hser : eSerC L (degL (Q.map Prod.snd)) f = zOf C := by
+    unfold eSerC
+    rw [hset, finsum_mem_singleton]
+  have hcoef : (eU g _ ψ * zOf C).coeff 1 = C 1 / (Fintype.card (Gn g (degL (Q.map Prod.snd))) : ℂ) * wh ψ C :=
+    (GlobalTheory.GLq.trIdem (Gn g _) (eU g _ ψ) C).2.2
+  have hdeg1 := GlobalTheory.GLq.HcDeg.hc_degree g (Q.map Prod.snd) _ rfl
+  rw [list_prod_split _ fun c hc => ⟨(hcusp c hc).1.1, (hcusp c hc).2⟩] at hdeg1
+  have hA : ((Q.map Prod.snd).map fun p => p.2 1).prod ≠ 0 := by
+    refine List.prod_ne_zero ?_
+    intro h0'
+    obtain ⟨c, hc, hc0⟩ := List.mem_map.1 h0'
+    rw [(hcusp c hc).2] at hc0
+    exact GlobalTheory.GLq.green_deg_ne_zero (g := g) c.1 hc0
+  have hI : ∏ i ∈ Finset.Icc 1 (degL (Q.map Prod.snd)), ((g : ℂ) ^ i - 1) ≠ 0 := prod_Icc_ne _
+  have hBR := prod_pow_natDegree_sub_one_cast_eq Q fun q hq => (hQ q hq).1.1.2.2.2
+  set B := ((Q.map Prod.snd).map fun p => (g : ℂ) ^ p.1 - 1).prod with hBdef
+  have hB : B ≠ 0 := by
+    intro h
+    rw [h, mul_zero, mul_zero] at hdeg1
+    exact mul_ne_zero hI hA hdeg1.symm
+  have hC1 : C 1 = (∏ i ∈ Finset.Icc 1 (degL (Q.map Prod.snd)), ((g : ℂ) ^ i - 1)) / B := by
+    rw [eq_div_iff hB]
+    apply mul_right_cancel₀ hA
+    linear_combination hdeg1
+  unfold wtC
+  rw [hser, hcoef, hwh, eU_coeff_one, card_Gn, hC1, ← hBR, ← hfac, Multiset.map_coe, Multiset.prod_coe]
+  set R := ((Q.map Prod.fst).map fun P => (g : ℝ) ^ P.natDegree - 1).prod with hRdef
+  have hR : R ≠ 0 := by
+    intro h
+    apply hB
+    rw [← hBR, h, Complex.ofReal_zero]
+  have hg0 : (g : ℝ) ≠ 0 := by exact_mod_cast (Fact.out : g.Prime).ne_zero
+  set k := degL (Q.map Prod.snd) * (degL (Q.map Prod.snd) - 1) / 2
+  have key : (∏ i ∈ Finset.Icc 1 (degL (Q.map Prod.snd)), ((g : ℂ) ^ i - 1)) / (R : ℂ) /
+      ((g : ℂ) ^ k * ∏ i ∈ Finset.Icc 1 (degL (Q.map Prod.snd)), ((g : ℂ) ^ i - 1)) * 1 =
+        ((1 / ((g : ℝ) ^ k * R) : ℝ) : ℂ) := by
+    have hR' : (R : ℂ) ≠ 0 := by exact_mod_cast hR
+    have hg' : (g : ℂ) ≠ 0 := by exact_mod_cast hg0
+    push_cast
+    field_simp
+  have key2 : ((g : ℂ) ^ k)⁻¹ = ((((g : ℝ) ^ k)⁻¹ : ℝ) : ℂ) := by push_cast; rfl
+  rw [key, key2, Complex.ofReal_re, Complex.ofReal_re]
+  field_simp
+
+end
+
+end ProductIntervalSplit
+section
+open GlobalTheory.GLq Formalism.MainNotions.ArithmeticCylinders Polynomial
+open scoped Classical
+theorem _root_.GlobalTheory.Adopt.harishChandraSeriesWeight_squarefree_label_gelfandGraev : ∀ (g : ℕ) [Fact g.Prime] (L : LabelDatum g), 5 ≤ g → Green → ∀ (ψ : AddChar (ZMod g) ℂ), ψ ≠ 1 → ∀ (n : ℕ) (f : (ZMod g)[X]), f.Monic → f.natDegree = n → f.coeff 0 ≠ 0 → Squarefree f → wtC L (eU g n ψ) f = 1 / ((UniqueFactorizationMonoid.normalizedFactors f).map (fun P => (g : ℝ) ^ P.natDegree - 1)).prod := by
+  exact ProductIntervalSplit.CompanionTheory.Member.harishChandraSeriesWeight_squarefree_label_unipotent
+
+end
+
+
+[FLC_normalized_bridge_01] src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/LemmaLSeriesWeightsOfGreenCuspidalParametrisatio.lean:15-30
+SHA256 bc7592b8574c48855e140e7b185f7a36bf9c62e2ca3df2873798d67fc8f5ad15
+theorem five_le_typePrime (D : Formalism.BasicNotions.D7) (k : Fin 2) : 5 ≤ D.host.g k := by
+  have hc := D.ntypes.g_cond k
+  have h4 : D.host.g k % 4 = 1 := by
+    rw [← Nat.mod_mod_of_dvd (D.host.g k)
+      (show 4 ∣ D.host.QS * D.host.q * D.host.d from
+        (((pow_dvd_pow 2 (Nat.le_add_left 2 _)).trans D.host.tower_dvd).mul_right _).mul_right _), hc]
+  have := (D.host.g_prime k).two_le
+  omega
+
+theorem rank_eq_k_add_two_mul (R : Formalism.BasicNotions.Ranks) : R.r = R.k + 2 * (R.m / 2 - 1) + 1 := by
+  obtain ⟨a, ha⟩ := R.m_even
+  have := R.two_le_m
+  unfold Formalism.BasicNotions.Ranks.r
+  omega
+
+theorem lemmaL_series_weights_of_greenCuspidalParametrisation : Green → ∀ D : Formalism.BasicNotions.D7, ESerTie D → admLq D := by
+
+
+[FLC_normalized_bridge_02] src/Formalism/PadicSubsetSums/CentralIdempotents/GaloisConjCentralIdempotent.lean:25-68
+SHA256 de9e75da365d9355b4b89a527498df401cadc0d9e0639c50a631944a309dc3de
+structure LabelMap (C : LabelConv K) where
+  lab : ∀ d : ℕ, FDRep ℂ (GL (Fin d) K) → K[X]
+  lab_iso : ∀ (d : ℕ) (τ τ' : FDRep ℂ (GL (Fin d) K)), Nonempty (τ ≅ τ') → lab d τ = lab d τ'
+  lab_spec : ∀ (d : ℕ) (τ : FDRep ℂ (GL (Fin d) K)), 1 ≤ d → Simple τ → IsCuspidal K τ →
+    (lab d τ).Monic ∧ Irreducible (lab d τ) ∧ lab d τ ≠ X ∧ (lab d τ).natDegree = d
+  lab_inj : ∀ (d : ℕ) (τ τ' : FDRep ℂ (GL (Fin d) K)), 1 ≤ d → Simple τ → IsCuspidal K τ →
+    Simple τ' → IsCuspidal K τ' → lab d τ = lab d τ' → Nonempty (τ ≅ τ')
+  lab_one : ∀ (τ : FDRep ℂ (GL (Fin 1) K)) (x : K), Simple τ → x ≠ 0 →
+    (∀ (γ : GL (Fin 1) K) (m : ℕ),
+      C.gen 1 ^ m = algebraMap K (AlgebraicClosure K) (Matrix.det (γ : Matrix (Fin 1) (Fin 1) K)) →
+      LinearMap.trace ℂ τ (τ.ρ γ) = C.ι (algebraMap K (AlgebraicClosure K) x) ^ m) →
+    lab 1 τ = X - Polynomial.C x
+
+variable {K} in
+
+def LabelMapEquivariant {C : LabelConv K} (O : LabelMap K C) : Prop :=
+  (∀ (d : ℕ) (α : ℂ ≃+* ℂ) (a : ℕ),
+    (∀ ζ : ℂ, ζ ^ (∏ e ∈ Finset.Icc 1 d, (q K ^ e - 1)) = 1 → α ζ = ζ ^ a) →
+    ∀ τ τ' : FDRep ℂ (GL (Fin d) K), 1 ≤ d → Simple τ → IsCuspidal K τ → Simple τ' → IsCuspidal K τ' →
+      (∀ γ, LinearMap.trace ℂ τ' (τ'.ρ γ) = α (LinearMap.trace ℂ τ (τ.ρ γ))) →
+      rootsBar K (O.lab d τ') = (rootsBar K (O.lab d τ)).map (· ^ a)) ∧
+  ∀ (d : ℕ) (τ τ' : FDRep ℂ (GL (Fin d) K)), 1 ≤ d → Simple τ → IsCuspidal K τ →
+    Simple τ' → IsCuspidal K τ' →
+    (∀ γ, LinearMap.trace ℂ τ' (τ'.ρ γ) = LinearMap.trace ℂ τ (τ.ρ γ⁻¹)) →
+    rootsBar K (O.lab d τ') = (rootsBar K (O.lab d τ)).map (·⁻¹)
+
+def LabelMapExists : Prop := ∀ C : LabelConv K, Nonempty (LabelMap K C)
+
+variable {K} {C : LabelConv K}
+
+def labO (O : LabelMap K C) {κ : Type} [Fintype κ] [DecidableEq κ] (σ : FDRep ℂ (GL κ K)) : K[X] :=
+  O.lab (Fintype.card κ) (transp (Fintype.equivFin κ) σ)
+
+def HasLabelO (O : LabelMap K C) {ι : Type} [Fintype ι] [DecidableEq ι] (τ : FDRep ℂ (GL ι K))
+    (f : K[X]) : Prop :=
+  ∃ (s : ℕ) (b : ι → Fin s) (lam : ∀ c : Fin s, FDRep ℂ (GL {i // b i = c} K)),
+    Function.Surjective b ∧ (∀ c, Simple (lam c) ∧ IsCuspidal K (lam c)) ∧
+    IsConstituent τ (hcRep K b lam) ∧ f = ∏ c, labO O (lam c)
+
+def CuspParamO (O : LabelMap K C) : Prop :=
+  ∀ d : ℕ, 1 ≤ d →
+    (∀ P : K[X], P.Monic → Irreducible P → P ≠ X → P.natDegree = d →
+      ∃ τ : FDRep ℂ (GL (Fin d) K), Simple τ ∧ IsCuspidal K τ ∧ O.lab d τ = P) ∧
+    ∀ τ : FDRep ℂ (GL (Fin d) K), Simple τ → IsCuspidal K τ →
+
+
+[FLC_normalized_bridge_03] src/Formalism/LocalToGlobal/NormalizedHeckeFactors/GlobalDatumRegularityOfTypesCompatibility.lean:63-90
+SHA256 59fd28e79e119fca4e1dc9af2d06de6257ee0fb0f121470d92e765e3720f30f4
+structure NormalizedTypesCompatibility (jE : D.host.E →+* Qb) where
+
+  eM : D.ntypes.Mray ≃+* MrayC D jE
+  eM_K : ∀ x : D.host.K, ((eM (algebraMap D.host.K D.ntypes.Mray x) : MrayC D jE) : Qb) = jE x
+
+  tA : Fin 2 → ValuationSubring ℂ
+  tκ : ∀ k, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    IsLocalRing.ResidueField (tA k) ≃+* Formalism.CyclotomicNorms.Fbar (D.host.g k)
+  teichC_def : ∀ k, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    IsTeich (tA k) (tκ k) (D.ntypes.teichC k)
+
+  iota_loc : ∀ i : D.nd.Loc, haveI : Fact (D.what₂.places.resChar (D.nd.w i)).Prime :=
+      ⟨D.what₂.places.resChar_prime (D.nd.w i)⟩
+    ∃ (B : ValuationSubring ℂ) (κ : IsLocalRing.ResidueField B ≃+* Formalism.CyclotomicNorms.Fbar (D.what₂.places.resChar (D.nd.w i))),
+      (∀ y : D.nd.O i, ∃ h : D.naut.iotaQC i (D.naut.iotaQ i (algebraMap (D.nd.O i) (FractionRing (D.nd.O i)) y)) ∈ B,
+        fbCast (D.nd.w_l i) (D.what₂.places.resChar_prime (D.nd.w i)) (D.nd.lPrime i).out
+          (κ (IsLocalRing.residue B ⟨_, h⟩)) = D.naut.kFbar i (IsLocalRing.residue (D.nd.O i) y)) ∧
+      ∀ k v x, D.ntypes.iota k v (D.nd.w i) x = redThrough B κ (D.ntypes.teichC k x)
+
+  ζ : ∀ k, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    ℕ → Formalism.CyclotomicNorms.Fbar (D.host.g k)
+  ζ_gen : ∀ k, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    IsGenSys (ζ k)
+
+  O : ∀ k, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    Formalism.IrreducibleCountingLemmas.TYPES.LabelMap (ZMod (D.host.g k)) (convC (D.ntypes.teichC k) (D.ntypes.teichC_inj k) (ζ k) (ζ_gen k))
+  eSer_def : ∀ k f, haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+    D.ntypes.eSer k f = eSerO (O k) D.R.r f
+
+
+[FLC_normalized_bridge_04] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/AdmissibleLabelWeightsOfGreenCuspidalParametrisa.lean:26-104
+SHA256 2a389b23aafde962b27b306472129373457a1aa1eee968f8ee260e0491ade578
+  haveI : Finite (Polynomial.degreeLT (ZMod g) (d + 1)) :=
+    Finite.of_equiv _ (Polynomial.degreeLTEquiv (ZMod g) (d + 1)).symm.toEquiv
+  refine (Set.toFinite (Polynomial.degreeLT (ZMod g) (d + 1) : Set (ZMod g)[X])).subset fun P hP => ?_
+  have h := Polynomial.degree_eq_natDegree hP.1.ne_zero
+  rw [SetLike.mem_coe, Polynomial.mem_degreeLT, h, hP.2.2.2]
+  exact_mod_cast Nat.lt_succ_self d
+
+theorem iso_of_char {d : ℕ} (V W : FDRep ℂ (GL (Fin d) (ZMod g))) [Simple V] [Simple W]
+    (h : ∀ x, V.character x = W.character x) : Nonempty (V ≅ W) := by
+  haveI : NeZero g := ⟨(Fact.out : g.Prime).ne_zero⟩
+  haveI : Invertible (Fintype.card (GL (Fin d) (ZMod g)) : ℂ) := invertibleOfNonzero (by exact_mod_cast Fintype.card_ne_zero)
+  have h1 := FDRep.char_orthonormal V W
+  have h2 := FDRep.char_orthonormal V V
+  have e : W.character = V.character := (funext h).symm
+  rw [e, h2, if_pos ⟨Iso.refl V⟩] at h1
+  by_contra hn
+  rw [if_neg hn] at h1
+  exact one_ne_zero h1
+
+theorem primeLab_lab {C : LabelConv (ZMod g)} (O : LabelMap (ZMod g) C) {d : ℕ} (V : FDRep ℂ (GL (Fin d) (ZMod g)))
+    (hd : 1 ≤ d) (hs : Simple V) (hc : IsCuspidal (ZMod g) V) : IsPrimeLab d (O.lab d V) := by
+  obtain ⟨a, b, c, e⟩ := O.lab_spec d V hd hs hc
+  exact ⟨a, b, Formalism.L2.NT.coeff_zero_ne_of_monic_irr a b c, e⟩
+
+theorem exists_perm_deg (hG : Green) (L : LabelDatum g) {C : LabelConv (ZMod g)} (O : LabelMap (ZMod g) C) (d : ℕ) :
+    ∃ σ π : (ZMod g)[X] → (ZMod g)[X], (∀ P, IsPrimeLab d P → IsPrimeLab d (σ P) ∧ π (σ P) = P) ∧
+      ∀ V : FDRep ℂ (GL (Fin d) (ZMod g)), 1 ≤ d → Simple V → IsCuspidal (ZMod g) V →
+        IsCuspOf L (σ (O.lab d V)) (fun x => V.character x) := by
+  rcases Nat.eq_zero_or_pos d with h0 | hd
+  · exact ⟨id, id, fun P hP => ⟨hP, rfl⟩, fun V h => by omega⟩
+  obtain ⟨τ, h1, h2, h3⟩ := hG g L d hd
+  have hV : ∀ P : {P : (ZMod g)[X] // IsPrimeLab d P}, ∃ V : FDRep ℂ (GL (Fin d) (ZMod g)), Simple V ∧
+      IsCuspidal (ZMod g) V ∧ ∀ x, V.character x = τ P.1 x := fun P => by
+    have hc := (h1 P.1 P.2).1.2.1
+    obtain ⟨V, hs, hx⟩ := hc.2.1
+    have e : (fun x => V.character x) = τ P.1 := funext hx
+    exact ⟨V, hs, (GlobalTheory.T.isCuspidalCharacter_iff_isCuspidal_GLnFiniteField g d V hd hs).1 (e ▸ hc), hx⟩
+  choose W hWs hWc hWx using hV
+  let p : {P : (ZMod g)[X] // IsPrimeLab d P} → {P : (ZMod g)[X] // IsPrimeLab d P} :=
+    fun P => ⟨O.lab d (W P), primeLab_lab O _ hd (hWs P) (hWc P)⟩
+  have hinj : Function.Injective p := fun P Q h => by
+    obtain ⟨i⟩ := O.lab_inj d (W P) (W Q) hd (hWs P) (hWc P) (hWs Q) (hWc Q) (congrArg Subtype.val h)
+    refine Subtype.ext (h2 _ _ P.2 Q.2 (funext fun x => ?_))
+    rw [← hWx, ← hWx, FDRep.char_iso i]
+  haveI : Finite {P : (ZMod g)[X] // IsPrimeLab d P} := (finite_primeLab d).to_subtype
+  let e := Equiv.ofBijective p (Finite.injective_iff_bijective.1 hinj)
+  refine ⟨fun P => if h : IsPrimeLab d P then (e.symm ⟨P, h⟩).1 else P,
+    fun P => if h : IsPrimeLab d P then (e ⟨P, h⟩).1 else P, fun P hP => ?_, fun V _ hs hc => ?_⟩
+  · simp only [dif_pos hP]
+    refine ⟨(e.symm ⟨P, hP⟩).2, ?_⟩
+    rw [dif_pos (e.symm ⟨P, hP⟩).2]
+    simp
+  · obtain ⟨P, hP, hχ⟩ := h3 _ ((GlobalTheory.T.isCuspidalCharacter_iff_isCuspidal_GLnFiniteField g d V hd hs).2 hc)
+    haveI := hs
+    haveI := hWs ⟨P, hP⟩
+    have hi := iso_of_char V (W ⟨P, hP⟩) fun x => by rw [hWx]; exact congrFun hχ x
+    have hl : O.lab d V = O.lab d (W ⟨P, hP⟩) := O.lab_iso d _ _ hi
+    have hp := primeLab_lab O V hd hs hc
+    have e1 : (⟨O.lab d V, hp⟩ : {P : (ZMod g)[X] // IsPrimeLab d P}) = e ⟨P, hP⟩ := Subtype.ext hl
+    simp only [dif_pos hp]
+    rw [e1, Equiv.symm_apply_apply, hχ]
+    exact (h1 P hP).1
+
+theorem exists_perm (hG : Green) (L : LabelDatum g) {C : LabelConv (ZMod g)} (O : LabelMap (ZMod g) C) :
+    ∃ σ π : (ZMod g)[X] → (ZMod g)[X], (∀ d P, IsPrimeLab d P → IsPrimeLab d (σ P) ∧ π (σ P) = P) ∧
+      ∀ (d : ℕ) (V : FDRep ℂ (GL (Fin d) (ZMod g))), 1 ≤ d → Simple V → IsCuspidal (ZMod g) V →
+        IsCuspOf L (σ (O.lab d V)) (fun x => V.character x) := by
+  choose σ π h1 h2 using exists_perm_deg hG L O
+  refine ⟨fun P => σ P.natDegree P, fun P => π P.natDegree P, fun d P hP => ?_, fun d V hd hs hc => ?_⟩
+  · have e := hP.2.2.2
+    have a := h1 d P hP
+    simp only [e, a.1.2.2.2]
+    exact a
+  · simp only [(primeLab_lab O V hd hs hc).2.2.2]
+    exact h2 d V hd hs hc
+
+theorem nf_prod (M : Multiset (ZMod g)[X]) (h : ∀ P ∈ M, ∃ d, IsPrimeLab d P) : normalizedFactors M.prod = M := by
+  rw [normalizedFactors_prod_eq M fun P hP => (h P hP).choose_spec.2.1]
+  conv_rhs => rw [← Multiset.map_id M]
+
+
+[FLC_normalized_bridge_05] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/AdmissibleLabelWeightsOfGreenCuspidalParametrisa.lean:107-251
+SHA256 61e2364c793986d1b6ae20f75701f2b152d9be153ed0c34a4c4ee25f228d5d2f
+theorem nf_lab {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0) :
+    (∀ P ∈ normalizedFactors f, IsPrimeLab P.natDegree P) ∧ (normalizedFactors f).prod = f := by
+  refine ⟨fun P hP => ?_, ?_⟩
+  · obtain ⟨a, b, c, hc⟩ := (Polynomial.mem_normalizedFactors_iff hm.ne_zero).1 hP
+    refine ⟨b, a, fun h => h0 ?_, rfl⟩
+    rw [hc, mul_coeff_zero, h, zero_mul]
+  · have := Polynomial.leadingCoeff_mul_prod_normalizedFactors f
+    rwa [hm.leadingCoeff, C_1, one_mul] at this
+
+def ext (σ : (ZMod g)[X] → (ZMod g)[X]) (f : (ZMod g)[X]) : (ZMod g)[X] := ((normalizedFactors f).map σ).prod
+
+section Ext
+
+variable {σ π : (ZMod g)[X] → (ZMod g)[X]} (hσ : ∀ d P, IsPrimeLab d P → IsPrimeLab d (σ P) ∧ π (σ P) = P)
+include hσ
+
+theorem nf_ext {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0) :
+    normalizedFactors (ext σ f) = (normalizedFactors f).map σ :=
+  nf_prod _ fun P hP => by
+    obtain ⟨Q, hQ, rfl⟩ := Multiset.mem_map.1 hP
+    exact ⟨_, (hσ _ _ ((nf_lab hm h0).1 Q hQ)).1⟩
+
+theorem ext_back {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0) : ext π (ext σ f) = f := by
+  rw [ext, nf_ext hσ hm h0, Multiset.map_map]
+  conv_rhs => rw [← (nf_lab hm h0).2, ← Multiset.map_id (normalizedFactors f)]
+  congr 1
+  exact Multiset.map_congr rfl fun P hP => (hσ _ _ ((nf_lab hm h0).1 P hP)).2
+
+theorem ext_lab {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0) :
+    (ext σ f).Monic ∧ (ext σ f).natDegree = f.natDegree ∧ (ext σ f).coeff 0 ≠ 0 ∧ (Squarefree f → Squarefree (ext σ f)) := by
+  have hP := (nf_lab hm h0).1
+  have hM : (ext σ f).Monic := monic_multiset_prod_of_monic _ _ fun P h => (hσ _ _ (hP P h)).1.1
+  refine ⟨hM, ?_, ?_, fun hs => ?_⟩
+  · conv_rhs => rw [← (nf_lab hm h0).2]
+    rw [ext, natDegree_multiset_prod_of_monic _ fun P h => by
+        obtain ⟨Q, hQ, rfl⟩ := Multiset.mem_map.1 h
+        exact (hσ _ _ (hP Q hQ)).1.1,
+      natDegree_multiset_prod_of_monic _ fun P h => (hP P h).1, Multiset.map_map]
+    congr 1
+    exact Multiset.map_congr rfl fun P h => (hσ _ _ (hP P h)).1.2.2.2
+  · rw [ext, coeff_zero_multiset_prod]
+    refine Multiset.prod_ne_zero fun h => ?_
+    rw [Multiset.map_map] at h
+    obtain ⟨Q, hQ, e⟩ := Multiset.mem_map.1 h
+    exact (hσ _ _ (hP Q hQ)).1.2.2.1 e
+  · rw [squarefree_iff_nodup_normalizedFactors hM.ne_zero, nf_ext hσ hm h0]
+    refine Multiset.Nodup.map_on (fun P h Q h' e => ?_) ((squarefree_iff_nodup_normalizedFactors hm.ne_zero).1 hs)
+    rw [← (hσ _ _ (hP P h)).2, e, (hσ _ _ (hP Q h')).2]
+
+end Ext
+
+theorem ext_list (σ : (ZMod g)[X] → (ZMod g)[X]) (M : List (ZMod g)[X]) (h : ∀ P ∈ M, ∃ d, IsPrimeLab d P) :
+    ext σ M.prod = (M.map σ).prod := by
+  rw [ext, ← Multiset.prod_coe, nf_prod _ fun P hP => h P (Multiset.mem_coe.1 hP), Multiset.map_coe, Multiset.prod_coe]
+
+section Dict
+
+variable (L : LabelDatum g) {C : LabelConv (ZMod g)} (O : LabelMap (ZMod g) C) {σ π : (ZMod g)[X] → (ZMod g)[X]}
+  (hσ : ∀ d P, IsPrimeLab d P → IsPrimeLab d (σ P) ∧ π (σ P) = P)
+  (h1 : ∀ (d : ℕ) (V : FDRep ℂ (GL (Fin d) (ZMod g))), 1 ≤ d → Simple V → IsCuspidal (ZMod g) V →
+        IsCuspOf L (σ (O.lab d V)) (fun x => V.character x))
+include h1
+
+theorem hasLabel_of {r : ℕ} (τ : FDRep ℂ (GL (Fin r) (ZMod g))) (f : (ZMod g)[X]) (hτ : Simple τ) (hL : HasLabelO O τ f) :
+    HasLabel L (fun x => τ.character x) (ext σ f) := by
+  obtain ⟨s, b, lam, hb, hl, hcon, rfl⟩ := hL
+  have hc : ∀ c, 1 ≤ Fintype.card {i // b i = c} := fun c => by
+    obtain ⟨i, hi⟩ := hb c
+    exact Fintype.card_pos_iff.mpr ⟨⟨i, hi⟩⟩
+  let Q : List ((ZMod g)[X] × Pc g) := (List.finRange s).map fun c =>
+    (σ (labO O (lam c)), ⟨Fintype.card {i // b i = c},
+      fun x => (transp (Fintype.equivFin {i // b i = c}) (lam c)).character x⟩)
+  have hQ : Q.map Prod.snd = canonList b lam := by
+    simp only [Q, canonList, List.map_map]
+    rfl
+  refine ⟨Q, ?_, ?_, ?_, ?_⟩
+  · intro p hp
+    simp only [Q, List.mem_map] at hp
+    obtain ⟨c, -, rfl⟩ := hp
+    exact h1 _ _ (hc c) (Formalism.L2.PT.simple_transp _ (hl c).1) (Formalism.L2.PT.isCuspidal_transp _ (hl c).2)
+  · rw [hQ]
+    unfold degL canonList
+    rw [List.map_map]
+    have e : ((List.finRange s).map ((fun p : Pc g => p.1) ∘ fun c : Fin s =>
+        (⟨Fintype.card {i // b i = c},
+          fun x => (transp (Fintype.equivFin {i // b i = c}) (lam c)).character x⟩ : Pc g))).sum =
+        ∑ c : Fin s, Fintype.card {i // b i = c} := by
+      rw [Fin.sum_univ_def]
+      rfl
+    rw [e, ← Fintype.card_sigma, Fintype.card_congr (Equiv.sigmaFiberEquiv b), Fintype.card_fin]
+  · rw [Fin.prod_univ_def, ext_list σ _ fun P hP => by
+      obtain ⟨c, -, rfl⟩ := List.mem_map.1 hP
+      exact ⟨_, primeLab_lab O _ (hc c) (Formalism.L2.PT.simple_transp _ (hl c).1) (Formalism.L2.PT.isCuspidal_transp _ (hl c).2)⟩]
+    simp only [Q, List.map_map]
+    rfl
+  · rw [hQ]
+    have ht : (fun x => LinearMap.trace ℂ (hcSpace (ZMod g) b lam) (hcRep (ZMod g) b lam x)) =
+        hcL (canonList b lam) r := funext (GlobalTheory.T.trace_harishChandra_induced_eq_product_characters g r s b lam hb)
+    have := (GlobalTheory.T.isConstituent_harishChandraRep_iff_pairing_ne_zero g r s b lam τ hτ).1 hcon
+    rw [ht] at this
+    exact this
+
+omit h1 in
+theorem exists_labelO {r : ℕ} (τ : FDRep ℂ (GL (Fin r) (ZMod g))) (f : (ZMod g)[X]) (hτ : Simple τ)
+    (hl : HasLabel L (fun x => τ.character x) f) : ∃ f', f'.Monic ∧ f'.coeff 0 ≠ 0 ∧ HasLabelO O τ f' := by
+  obtain ⟨Q', hQ, hdeg, hf, hip⟩ := hl
+  subst hdeg
+  obtain ⟨b, lam, hb, hlam, hcan⟩ := GlobalTheory.T.exists_blocks_of_cuspidal_character_list g (Q'.map Prod.snd) (by
+    intro p hp
+    obtain ⟨p', hp', rfl⟩ := List.mem_map.1 hp
+    have hχ := (hQ p' hp').2.1
+    obtain ⟨V, hV, hVχ⟩ := hχ.2.1
+    have hχV : (fun x => V.character x) = p'.2.2 := funext hVχ
+    exact ⟨hχ.1, V, hV, (GlobalTheory.T.isCuspidalCharacter_iff_isCuspidal_GLnFiniteField g _ V hχ.1 hV).1 (hχV ▸ hχ), hVχ⟩)
+  have hp : ∀ c, IsPrimeLab _ (labO O (lam c)) := fun c =>
+    primeLab_lab O _ (by obtain ⟨i, hi⟩ := hb c; exact Fintype.card_pos_iff.mpr ⟨⟨i, hi⟩⟩)
+      (Formalism.L2.PT.simple_transp _ (hlam c).1) (Formalism.L2.PT.isCuspidal_transp _ (hlam c).2)
+  refine ⟨∏ c, labO O (lam c), monic_prod_of_monic _ _ fun c _ => (hp c).1, ?_, _, b, lam, hb, hlam, ?_, rfl⟩
+  · rw [coeff_zero_prod]
+    exact Finset.prod_ne_zero_iff.2 fun c _ => (hp c).2.2.1
+  · refine (GlobalTheory.T.isConstituent_harishChandraRep_iff_pairing_ne_zero g _ _ b lam τ hτ).2 ?_
+    have e := funext (GlobalTheory.T.trace_harishChandra_induced_eq_product_characters g _ _ b lam hb)
+    rw [e, hcan]
+    exact hip
+
+include hσ in
+theorem eSer_eq (h5 : 5 ≤ g) (hG : Green) (r : ℕ) {f : (ZMod g)[X]} (hm : f.Monic) (h0 : f.coeff 0 ≠ 0) :
+    Formalism.L2.NT.eSerO O r f = eSerC L r (ext σ f) := by
+  have hB : ∀ τ : FDRep ℂ (GL (Fin r) (ZMod g)), Simple τ →
+      (HasLabel L (fun x => τ.character x) (ext σ f) ↔ HasLabelO O τ f) := fun τ hτ => by
+    refine ⟨fun h => ?_, hasLabel_of L O h1 τ f hτ⟩
+    obtain ⟨f', a, b, c⟩ := exists_labelO L O τ _ hτ h
+    have e := ((GlobalTheory.T.harishChandraSeriesLabel_exists_unique_GLn g L h5 hG r).1 _ ⟨τ, hτ, fun _ => rfl⟩).unique h (hasLabel_of L O h1 τ f' hτ c)
+    have e' : f = f' := by rw [← ext_back hσ hm h0, e, ext_back hσ a b]
+    exact e' ▸ c
+  unfold eSerC Formalism.L2.NT.eSerO
+  rw [GlobalTheory.T.finsum_centralIdempotentOfIrrCharacter_eq_simple]
+  refine finsum_congr fun z => finsum_congr_Prop (propext ?_) fun _ => rfl
+  constructor
+  · rintro ⟨τ, hτ, hz, hl⟩
+    exact ⟨τ, hτ, hz, (hB τ hτ).2 hl⟩
+  · rintro ⟨τ, hτ, hz, hl⟩
+    exact ⟨τ, hτ, hz, (hB τ hτ).1 hl⟩
+
+end Dict
+
+
+[FLC_normalized_bridge_06] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/AdmissibleLabelWeightsOfGreenCuspidalParametrisa.lean:254-301
+SHA256 920f63100827af75a9289def339efaf7045e286a2ea8da48fd85266e0a0596aa
+
+theorem admissibleLabelWeights_of_greenCuspidalParametrisation : Green → ∀ (D : D7) (jE : D.host.E →+* Formalism.L2.Host.Qb) (T : Formalism.L2.NormalizedTypesCompatibility D jE), admLq D := by
+  intro hG D jE T k ψ hψ
+  haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+  let L : LabelDatum (D.host.g k) :=
+    ⟨D.ntypes.teichC k, D.ntypes.teichC_inj k, T.ζ k, fun d hd => (T.ζ_gen k d hd).1, fun d e hd he => (T.ζ_gen k d hd).2 _ (dvd_mul_right d e) (Nat.mul_pos hd he)⟩
+  obtain ⟨σ, π, hσ, h1⟩ := exists_perm hG L (T.O k)
+  have h5 := five_le_typePrime D k
+  have hr := rank_eq_k_add_two_mul D.R
+  have hk : 1 ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
+  have hw : ∀ a f, IsLabel D k f → wtOf D k a f = wtC L a (ext σ f) := by
+    intro a f hf
+    unfold wtOf wtC
+    rw [T.eSer_def, eSer_eq L (T.O k) hσ h1 h5 hG _ hf.1 hf.2.2]
+  have hz : ∀ a f, ¬ IsLabel D k f → wtOf D k a f = 0 := by
+    intro a f hf
+    unfold wtOf
+    rw [Formalism.L2.eSer_zero_of_tie T k f hf]
+    simp
+  obtain ⟨hU, hU1, hJ, -⟩ := GlobalTheory.T.whittakerJacquetIdempotents_properties_primeField (D.host.g k) D.R.r D.R.k (D.R.m / 2 - 1) ψ
+  obtain ⟨hJ, hJ1⟩ := hJ hr
+  refine ⟨fun f => ?_, fun f hf hs => ?_, fun f hf => ?_, fun f hf hs => ?_⟩
+  · by_cases hf : IsLabel D k f
+    · rw [hw _ _ hf, hw _ _ hf]
+      refine ⟨GlobalTheory.T.harishChandraSeriesWeight_nonneg_of_idempotent_glnPrime _ L _ _ hU ?_ _, GlobalTheory.T.harishChandraSeriesWeight_nonneg_of_idempotent_glnPrime _ L _ _ hJ ?_ _⟩
+      · change 0 ≤ ((eU (D.host.g k) D.R.r ψ).coeff 1).re
+        rw [hU1, ← Nat.cast_pow, ← Complex.ofReal_natCast, ← Complex.ofReal_inv, Complex.ofReal_re]
+        positivity
+      · change 0 ≤ ((eJ (D.host.g k) D.R.r D.R.k (D.R.m / 2 - 1) ψ).coeff 1).re
+        rw [hJ1, ← Nat.cast_pow, ← Nat.cast_pow, ← Complex.ofReal_natCast, ← Complex.ofReal_natCast,
+          ← Complex.ofReal_inv, ← Complex.ofReal_mul, Complex.ofReal_re]
+        positivity
+    · rw [hz _ _ hf, hz _ _ hf]
+      exact ⟨le_rfl, le_rfl⟩
+  · obtain ⟨a, b, c, e⟩ := ext_lab hσ hf.1 hf.2.2
+    rw [hw _ _ hf]
+    refine (GlobalTheory.T.harishChandraSeriesWeight_squarefree_label_gelfandGraev _ L h5 hG ψ hψ _ _ a (b.trans hf.2.1) c (e hs)).trans ?_
+    rw [nf_ext hσ hf.1 hf.2.2, Multiset.map_map]
+    congr 2
+    exact Multiset.map_congr rfl fun P h => by
+      simp only [Function.comp, (hσ _ _ ((nf_lab hf.1 hf.2.2).1 P h)).1.2.2.2]
+  · rw [hw _ _ hf, hw _ _ hf]
+    exact GlobalTheory.T.harishChandraSeriesWeight_lower_comparison _ L ψ hψ _ _ _ hr hk _
+  · obtain ⟨a, b, c, e⟩ := ext_lab hσ hf.1 hf.2.2
+    rw [hw _ _ hf, hw _ _ hf]
+    exact GlobalTheory.T.harishChandraSeriesWeight_le_squarefree _ L h5 hG ψ hψ _ _ _ hr hk _ a (b.trans hf.2.1) c (e hs)
+
+end GlobalTheory.Top.Lq
+
+
+[FLC_literal_consumer_01] src/Formalism/SharpRestriction/LevelLetterCocycles/ArithmeticCylinders.lean:235-275
+SHA256 c35c614a547a72eb0d7d9ac4e1ac6f2b37aab139f9713ebbbca0932433d52725
+
+abbrev Tup2 : Type := ∀ k : Fin 2, D.nd.PlG k → (ZMod (D.host.g k))[X]
+
+def cyl (k : Fin 2) (S : Set (Tup D k)) : Set (Tup2 D) := {t | t k ∈ S}
+
+def wtOf (k : Fin 2) (a : MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k))))
+    (f : (ZMod (D.host.g k))[X]) : ℝ :=
+  ((a * D.ntypes.eSer k f).coeff 1).re / (a.coeff 1).re
+
+structure AllRows (D : D7) : Type 1 where
+  B : Formalism.MainNotions.S.RowsAut
+  n_eq : B.I.n = D.R.r
+  f_eq : B.I.f = D.R.f
+  labAll : ∀ k, Fin D.what₂.Dall → D.nd.PlG k → (ZMod (D.host.g k))[X]
+  labAll_label : ∀ k σ v, IsLabel D k (labAll k σ v)
+  inc : Fin D.what₂.Drows → Fin D.what₂.Dall
+  eVec : ∀ k, D.nd.PlG k → MonoidAlgebra ℂ (GL (Fin D.R.r) (ZMod (D.host.g k)))
+  eVec_idem : ∀ k v, eVec k v * eVec k v = eVec k v
+  eT : Set (Tup2 D) → B.I.Gf → ℂ
+  ReT : Set (Tup2 D) → (B.I.L2 B.μf B.fund →L[ℂ] B.I.L2 B.μf B.fund)
+  ReT_spec : ∀ S, B.I.IsRConvF B.μf B.fund B.R (eT S) (ReT S)
+  eT_univ : eT Set.univ = B.e
+  ReT_univ : ReT Set.univ = B.Re
+  eT_one : ∀ (k : Fin 2) (S : Finset (Tup D k)),
+    (eT (cyl D k (S : Set (Tup D k))) 1).re =
+      (B.e 1).re * ∑ t ∈ S, ∏ v, wtOf D k (eVec k v) (t v)
+
+variable {D}
+
+def AllRows.dimT (A : AllRows D) (S : Set (Tup2 D)) : ℕ :=
+  A.B.I.Dcount A.B.σs A.B.μf A.B.fund A.B.R (A.ReT S)
+
+def DimEqTotalCount (A : AllRows D) : Prop := D.what₂.Dall = A.B.D
+
+def DimEqGoodCount (A : AllRows D) : Prop := D.what₂.Drows = A.dimT {t | D.ntypes.goodTuple t}
+
+def LabelCountGoodInjective (A : AllRows D) : Prop :=
+  (∀ S : Set (Tup2 D), A.dimT S = Nat.card {τ : Fin D.what₂.Dall // (fun k => A.labAll k τ) ∈ S}) ∧
+    Function.Injective A.inc ∧ (∀ k σ, A.labAll k (A.inc σ) = D.nd.lab k (D.what₂.ft σ)) ∧
+    ∀ τ : Fin D.what₂.Dall, D.ntypes.goodTuple (fun k => A.labAll k τ) ↔ τ ∈ Set.range A.inc
+
+
+
+[FLC_literal_consumer_02] src/Formalism/SharpRestriction/LevelLetterCocycles/ArithmeticCylinders.lean:355-361
+SHA256 e2067384368b92c0e3d099c65aa6c7cb18b84cccc0e449a974c64a2b91dd5d1e
+def goodAt (k : Fin 2) (t : Tup D k) : Prop :=
+  haveI : Fact (D.host.g k).Prime := ⟨D.host.g_prime k⟩
+  Formalism.CyclotomicNorms.IsGood D.R.r (D.host.g k) t (D.nd.chiT k) ∧
+    Formalism.CyclotomicNorms.IsGood D.R.r (D.host.g k) t (fun v j => (D.nd.chiT k v j)⁻¹)
+
+def locShare (eV : VecAt D) (k : Fin 2) (S : Finset (Tup D k)) : ℝ :=
+  ∑ t ∈ S, ∏ v, wtOf D k (eV k v) (t v)
+
+
+[FLC_literal_consumer_03] src/Formalism/LocalToGlobal/GlobalTheory/ConcNWeight.lean:17-25
+SHA256 7f7dced615b42959dc00446c5f6c708e368a6380e12b3481852be6fc3979ae7f
+def TieVecW {D : D7} (A : AllRows D) : Prop :=
+  ∃ ψ₀ : ∀ k : Fin 2, AddChar (ZMod (D.host.g k)) ℂ, (∀ k, ψ₀ k ≠ 1) ∧
+    ∀ (k : Fin 2) (v : D.nd.PlG k), A.eVec k v = eUk D k (ψ₀ k) ∨ A.eVec k v = eJk D k (ψ₀ k)
+
+def RangeW (D : D7) : Prop := 100 ≤ D.R.r ∧ ∀ k : Fin 2, 2 ^ 12 ≤ D.host.g k
+
+section Weights
+
+variable {D : D7}
+
+
+[FLC_literal_consumer_04] src/Formalism/LocalToGlobal/GlobalTheory/ConcNWeight.lean:168-219
+SHA256 3938b2b9e495d8b269cc7c37b64345a50e9b311bbb4e21e1a7c2281133b4b47b
+theorem host_facts (hA : TieAdmG D) (k : Fin 2) :
+    D.host.q.Prime ∧ D.host.d.Prime ∧ D.host.q ≠ D.host.d ∧ D.host.q ≠ 2 ∧ D.host.d ≠ 2 ∧
+      16 ≤ max D.host.q D.host.d ∧ 16 ∣ D.host.g k - 1 ∧ D.host.q ∣ D.host.g k - 1 ∧
+      D.host.d ∣ D.host.g k - 1 := by
+  have hadm := hA k
+  unfold Formalism.BasicNotions.NTypes.admissible at hadm
+  have hmod : D.host.g k % (D.host.QS * D.host.q * D.host.d) = 1 := hadm.2.2.2
+  have hM : D.host.QS * D.host.q * D.host.d ∣ D.host.g k - 1 := by
+    have h := Nat.dvd_sub_mod (n := D.host.QS * D.host.q * D.host.d) (D.host.g k)
+    rwa [hmod] at h
+  have h16 : 16 ∣ D.host.QS := by
+    have h := (Nat.pow_dvd_pow 2 (show 4 ≤ D.R.toFrame.e + 2 by have := D.host.two_le_e; omega)).trans
+      D.host.tower_dvd
+    simpa using h
+  have h2 : 2 ∣ D.host.QS := (show 2 ∣ 16 by norm_num).trans h16
+  have hc : Nat.Coprime 2 (D.host.q * D.host.d) := Nat.Coprime.coprime_dvd_left h2 D.host.QS_coprime
+  have hq2 : D.host.q ≠ 2 := by
+    intro h
+    have := Nat.Coprime.coprime_dvd_right (dvd_mul_right D.host.q D.host.d) hc
+    rw [h] at this
+    exact absurd this (by decide)
+  have hd2 : D.host.d ≠ 2 := by
+    intro h
+    have := Nat.Coprime.coprime_dvd_right (dvd_mul_left D.host.d D.host.q) hc
+    rw [h] at this
+    exact absurd this (by decide)
+  have hbig : 16 ≤ max D.host.q D.host.d := by
+    have hq := D.host.qd_big.1
+    have hr : 6 ≤ D.R.r := by
+      have e1 : D.R.r = D.R.k + D.R.m - 1 := rfl
+      have := D.R.two_le_m
+      have := D.R.m_add_three_le_k
+      omega
+    have ht : 11 ≤ D.R.t := by
+      have := D.R.two_le_m
+      have := D.R.m_add_three_le_k
+      have := D.R.rank_add_five_le
+      omega
+    have hTR : 11 * 6 ≤ D.R.t * D.R.r := Nat.mul_le_mul ht hr
+    have e2 : 4 * D.R.t * D.R.r = 4 * (D.R.t * D.R.r) := Nat.mul_assoc _ _ _
+    rw [e2] at hq
+    exact le_max_of_le_left (by omega)
+  refine ⟨?_, ?_, ?_, hq2, hd2, hbig, (h16.trans (dvd_mul_of_dvd_left (dvd_mul_right _ _) _)).trans hM,
+    (dvd_mul_of_dvd_left (dvd_mul_left _ _) _).trans hM, (dvd_mul_left _ _).trans hM⟩
+  · obtain ⟨x1, -, -⟩ := D.host.hyp
+    exact x1
+  · obtain ⟨-, x2, -⟩ := D.host.hyp
+    exact x2
+  · obtain ⟨-, -, x3, x4, -⟩ := D.host.hyp
+    intro h
+    rw [h] at x3
+    omega
+
+
+[FLC_literal_consumer_05] src/Formalism/LocalToGlobal/GlobalTheory/ConcNWeight.lean:238-357
+SHA256 2be193c7b8e056de89167ec842959ef65d41a1004023de6d95c38319b3eb7c74
+theorem locShare_le_Wg (A : AllRows D) (hL : admLq D) (hA : TieAdmG D) (hR : RangeW D) (hV : TieVecW A)
+    (k : Fin 2) (S : Finset (Tup D k)) (hS : ∀ t ∈ S, ¬ goodAt D k t) :
+    locShare D A.eVec k S ≤ Wg D.R.f D.R.m D.R.r (D.host.g k) D.host.q D.host.d := by
+  classical
+  obtain ⟨ψ₀, hψ, hv⟩ := hV
+  obtain ⟨hnn, hsq, hcmp, -⟩ := hL k (ψ₀ k) (hψ k)
+  obtain ⟨hq, hd, hqd, hq2, hd2, h16m, h16, hqg, hdg⟩ := host_facts hA k
+  let wJ : D.nd.PlG k → (Fin D.R.r → ZMod (D.host.g k)) → ℝ :=
+    fun v c => wtOf D k (A.eVec k v) (Formalism.CyclotomicNorms.monicOf c)
+  let P : (Fin D.R.r → ZMod (D.host.g k)) → ℝ := fun c => wtOf D k (eUk D k (ψ₀ k)) (Formalism.CyclotomicNorms.monicOf c)
+  have hJnn : ∀ v f, 0 ≤ wtOf D k (A.eVec k v) f := by
+    intro v f
+    rcases hv k v with h | h <;> rw [h]
+    · exact (hnn f).1
+    · exact (hnn f).2
+  have hPnn : ∀ c, 0 ≤ P c := fun c => (hnn _).1
+  have hJsum : ∀ v, ∑ c, wJ v c = 1 := by
+    intro v
+    rcases hv k v with h | h
+    · simp only [wJ]; rw [h]; exact sum_wtOf k _ (eUk_coeff_one_re_pos k _).ne'
+    · simp only [wJ]; rw [h]; exact sum_wtOf k _ (eJk_coeff_one_re_pos k _).ne'
+  have hPsum : ∑ c, P c = 1 := sum_wtOf k _ (eUk_coeff_one_re_pos k _).ne'
+  have hg1 : (1 : ℝ) ≤ (D.host.g k : ℝ) := by exact_mod_cast (D.host.g_prime k).one_lt.le
+  have hcmpv : ∀ v c, (1 - 1 / (D.host.g k : ℝ)) * P c ≤ wJ v c := by
+    intro v c
+    have hle : 1 - 1 / (D.host.g k : ℝ) ≤ 1 := sub_le_self _ (by positivity)
+    rcases hv k v with h | h
+    · have : wJ v c = P c := by simp only [wJ, P]; rw [h]
+      rw [this]
+      exact mul_le_of_le_one_left (hPnn c) hle
+    · have : wJ v c = wtOf D k (eJk D k (ψ₀ k)) (Formalism.CyclotomicNorms.monicOf c) := by simp only [wJ]; rw [h]
+      rw [this]
+      by_cases hlab : IsLabel D k (Formalism.CyclotomicNorms.monicOf c)
+      · exact hcmp _ hlab
+      · simp only [P]
+        rw [wtOf_eq_zero_of_not_label _ hlab, wtOf_eq_zero_of_not_label _ hlab, mul_zero]
+
+  have hred : locShare D A.eVec k S ≤
+      ∑ x ∈ (Finset.univ : Finset (D.nd.PlG k → Fin D.R.r → ZMod (D.host.g k))).filter
+        (fun x => ¬ Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.GoodAt (ZMod (D.host.g k)) (Formalism.CyclotomicNorms.Fbar (D.host.g k)) D.R.r
+          (fun v => Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.monicOf (x v)) (D.nd.chiT k)), ∏ v, wJ v (x v) := by
+    unfold locShare
+    let cv : Tup D k → (D.nd.PlG k → Fin D.R.r → ZMod (D.host.g k)) := fun t v i => (t v).coeff i
+    have hS' : ∑ t ∈ S, ∏ v, wtOf D k (A.eVec k v) (t v) =
+        ∑ t ∈ S.filter (fun t => ∀ v, IsLabel D k (t v)), ∏ v, wtOf D k (A.eVec k v) (t v) := by
+      rw [Finset.sum_filter_of_ne]
+      intro t _ hne v
+      by_contra hv'
+      exact hne (Finset.prod_eq_zero (Finset.mem_univ v) (wtOf_eq_zero_of_not_label _ hv'))
+    have hcv : ∀ t : Tup D k, (∀ v, IsLabel D k (t v)) → ∀ v, Formalism.CyclotomicNorms.monicOf (cv t v) = t v :=
+      fun t ht v => Formalism.CyclotomicNorms.Sqf.monicOf_coeffs (t v) (ht v).1 (ht v).2.1
+    rw [hS']
+    calc ∑ t ∈ S.filter (fun t => ∀ v, IsLabel D k (t v)), ∏ v, wtOf D k (A.eVec k v) (t v)
+        = ∑ t ∈ S.filter (fun t => ∀ v, IsLabel D k (t v)), ∏ v, wJ v (cv t v) := by
+          refine Finset.sum_congr rfl fun t ht => ?_
+          have ht := (Finset.mem_filter.1 ht).2
+          refine Finset.prod_congr rfl fun v _ => ?_
+          simp only [wJ]
+          rw [hcv t ht v]
+      _ = ∑ x ∈ (S.filter (fun t => ∀ v, IsLabel D k (t v))).image cv, ∏ v, wJ v (x v) := by
+          rw [Finset.sum_image]
+          intro t ht t' ht' h
+          have ht := (Finset.mem_filter.1 ht).2
+          have ht' := (Finset.mem_filter.1 ht').2
+          funext v
+          rw [← hcv t ht v, ← hcv t' ht' v]
+          exact congrArg Formalism.CyclotomicNorms.monicOf (congrFun h v)
+      _ ≤ _ := by
+          refine Finset.sum_le_sum_of_subset_of_nonneg ?_
+            fun x _ _ => Finset.prod_nonneg fun v _ => hJnn v _
+          intro x hx
+          obtain ⟨t, ht, rfl⟩ := Finset.mem_image.1 hx
+          obtain ⟨htS, htl⟩ := Finset.mem_filter.1 ht
+          refine Finset.mem_filter.2 ⟨Finset.mem_univ _, fun hgood => hS t htS ?_⟩
+          have hfun : (fun v => Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.monicOf (cv t v)) = t := funext fun v => hcv t htl v
+          rw [hfun] at hgood
+          exact Formalism.MainNotions.N.PlaceLabelTeichmuller.good_of D.R.r t (D.nd.chiT k) hgood
+
+  have hT := Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.comparison_transfer_holds (D.nd.PlG k) (fun _ => Fin D.R.r → ZMod (D.host.g k))
+    (fun _ => P) wJ (D.host.g k : ℝ)
+    ((Finset.univ : Finset (D.nd.PlG k → Fin D.R.r → ZMod (D.host.g k))).filter
+        (fun x => ¬ Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.GoodAt (ZMod (D.host.g k)) (Formalism.CyclotomicNorms.Fbar (D.host.g k)) D.R.r
+          (fun v => Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.monicOf (x v)) (D.nd.chiT k)))
+    hg1 (fun _ => hPnn) (fun _ => hPsum) hJsum hcmpv
+  have hW := Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.property_W_of_estimates (ZMod (D.host.g k)) (Formalism.CyclotomicNorms.Fbar (D.host.g k)) (D.nd.PlG k)
+    (Fin D.R.m) D.R.r D.host.q D.host.d (D.nd.chiT k) P hR.1 (by rw [ZMod.card]; exact hR.2 k) hq hd hqd hq2
+    hd2 h16m (by rw [ZMod.card]; exact h16) (by rw [ZMod.card]; exact hqg) (by rw [ZMod.card]; exact hdg)
+    hPnn hPsum (by
+      intro c hc
+      have hc' : c ∈ (Finset.univ : Finset (Fin D.R.r → ZMod (D.host.g k))).filter
+          (fun c => Squarefree (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.monicOf c) ∧ (Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.monicOf c).coeff 0 ≠ 0) := by
+        unfold Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.sqSet at hc
+        convert hc
+      obtain ⟨-, hsqf, h0⟩ := Finset.mem_filter.1 hc'
+      have hlab : IsLabel D k (Formalism.CyclotomicNorms.monicOf c) :=
+        ⟨Formalism.CyclotomicNorms.Sqf.monic_monicOf c, Formalism.CyclotomicNorms.Sqf.natDegree_monicOf c, h0⟩
+      show wtOf D k (eUk D k (ψ₀ k)) (Formalism.CyclotomicNorms.monicOf c) = _
+      rw [hsq _ hlab hsqf, Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.sqWeight, ZMod.card, one_div, ← Multiset.prod_map_inv]
+      convert rfl <;> rfl)
+  refine le_trans hred (le_trans hT ?_)
+  refine le_trans (add_le_add hW le_rfl) (le_of_eq ?_)
+  rw [ZMod.card, D.nd.card_PlG k, Fintype.card_fin]
+  unfold Wg
+  ring
+
+end PropWRec
+
+theorem weightAllRows_of {D : D7} (A : AllRows D) (hL : admLq D) (hA : TieAdmG D) (hR : RangeW D)
+    (hV : TieVecW A) : WeightAllRows A := by
+  unfold WeightAllRows
+  refine ⟨fun k v f => ?_, fun k S hS => locShare_le_Wg A hL hA hR hV k S hS⟩
+  obtain ⟨ψ₀, hne, hv⟩ := hV
+  unfold admLq at hL
+  rcases hv k v with h | h
+  · rw [h]
+    exact ((hL k (ψ₀ k) (hne k)).1 f).1
+  · rw [h]
+    exact ((hL k (ψ₀ k) (hne k)).1 f).2
+
+end Formalism.L2.GlobalTheoryTheory.ConcNWeight
+
+
+[FLC_literal_consumer_06] src/Formalism/LocalToGlobal/HilbertRowConditions/AllJoin.lean:14-24
+SHA256 6bd68b38c57202deede6cd4b477d11e0113385ac7dd4187f211a67c0d115ddcb
+def LevelSharp (A : AllRows D) : Prop :=
+  ∃ ψ₀ : ∀ k : Fin 2, AddChar (ZMod (D.host.g k)) ℂ, (∀ k, ψ₀ k ≠ 1) ∧
+    ∀ (k : Fin 2) (v : D.nd.PlG k), A.eVec k v = eJk D k (ψ₀ k)
+
+structure AllJoinA (A : AllRows D) : Prop where
+
+  bundle : Formalism.MainNotions.PlaceDegreeData.RowsTie D A.B
+
+  level : LevelSharp A
+
+end Formalism.L2.GlobalTheoryTheory.AllJoin
+
+
+[FLC_literal_consumer_07] src/Formalism/LocalToGlobal/HilbertRowConditions/AllJoinP.lean:18-25
+SHA256 94a1345a1e0f2944727e4500972327aeb56b0a807b6f7e359c3790a9edaad981
+theorem tieVecW_of_join {A : AllRows D} (hJ : AllJoinA A) : TieVecW A := by
+  obtain ⟨ψ₀, hψ, h⟩ := hJ.level
+  exact ⟨ψ₀, hψ, fun k v => Or.inr (h k v)⟩
+
+theorem weight_of_join {A : AllRows D} (hL : admLq D) (hA : TieAdmG D) (hR : RangeW D) (hJ : AllJoinA A) :
+    WeightAllRows A :=
+  weightAllRows_of A hL hA hR (tieVecW_of_join hJ)
+
+
+
+[FLC_literal_consumer_08] src/Formalism/LocalToGlobal/GlobalTheory/IrreducibleOfCountSizes.lean:56-78
+SHA256 54e18eae60f6b8cfd6d6db9c316aa672ecbfc68e72f4397b0053ac3382447193
+
+def Wg (f m N g q₁ d : ℕ) : ℝ :=
+  3 * (f : ℝ) / (g : ℝ) +
+    23 * (f : ℝ) * Real.log (g : ℝ) / Real.sqrt (g : ℝ) +
+    2 * (f : ℝ) * (m : ℝ) * (1 / (4 * ((min q₁ d : ℕ) : ℝ)) + (1 + Real.log (N : ℝ)) / ((g : ℝ) - 1)) +
+    (N : ℝ) / 2 * (7 / 8 : ℝ) ^ f +
+    Real.exp (-(f : ℝ) / (5 * Real.log (N : ℝ)))
+
+def epsC (c : ℝ) (N f : ℕ) : ℝ := Real.exp (-(c * (N : ℝ) * (f : ℝ) * Real.log (N : ℝ)))
+
+def SizesAt (x ε Cs : ℝ) (f m N g q₁ d : ℕ) : Prop :=
+  Real.exp (8 * x ^ ε) ≤ (g : ℝ) ∧ x ^ 2 ≤ (f : ℝ) ∧ (f : ℝ) ≤ x ^ Cs ∧ (m : ℝ) ≤ x ^ Cs ∧
+    100 ≤ N ∧ (N : ℝ) ≤ x ^ Cs ∧ Real.exp (x ^ (ε / 6)) ≤ ((min q₁ d : ℕ) : ℝ)
+
+def WeightNumbersBound : Prop :=
+  ∀ ε Cs : ℝ, 0 < ε → ε ≤ 1 → ∀ᶠ x : ℝ in Filter.atTop, ∀ f m N g q₁ d : ℕ,
+    SizesAt x ε Cs f m N g q₁ d → Wg f m N g q₁ d ≤ x ^ (3 * Cs + 3) * Real.exp (-(x ^ (ε / 6)))
+
+def EpsilonBoundLargeX : Prop :=
+  ∀ c : ℝ, 0 < c → ∀ᶠ x : ℝ in Filter.atTop, ∀ N f : ℕ, 100 ≤ N → x ^ 2 ≤ (f : ℝ) → epsC c N f ≤ 1 / 2
+
+def IrreducibleOfCountSizes : Prop :=
+  Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.ShareFromCount → Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.StretchedExponentialDominance →
+
+
+[FLC_literal_consumer_09] src/Formalism/LocalToGlobal/GlobalTheory/IrreducibleOfCountSizes.lean:180-199
+SHA256 a1ba2379817189970e31c5a2985599792f31dd6becadd50f98cbd7607efa3fe9
+def DstarE {D : D7} (A : AllRows D) (e : A.B.I.Gf → ℂ) : ℝ :=
+  A.B.I.Dstar (Formalism.MainNotions.PlaceDegreeData.fdegAll A.B.I A.B.σ A.B.w) A.B.μf A.B.fund e
+
+def CountAllRows {D : D7} (A : AllRows D) (εC : ℝ) : Prop :=
+  0 ≤ εC ∧ εC < 1 ∧ 0 < DstarE A A.B.e ∧
+    ∀ (k : Fin 2) (S : Set (Tup D k)),
+      |(A.dimT (cyl D k S) : ℝ) - DstarE A (A.eT (cyl D k S))| ≤ εC * DstarE A (A.eT (cyl D k S))
+
+def WeightAllRows {D : D7} (A : AllRows D) : Prop :=
+  (∀ (k : Fin 2) v f, 0 ≤ wtOf D k (A.eVec k v) f) ∧
+    ∀ (k : Fin 2) (S : Finset (Tup D k)), (∀ t ∈ S, ¬ goodAt D k t) →
+      locShare D A.eVec k S ≤ Wg D.R.f D.R.m D.R.r (D.host.g k) D.host.q D.host.d
+
+def FamilyIrreducibleOfCountWeightSizes : Prop :=
+  Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.ShareFromCount → Formalism.IrreducibleCountingLemmas.GaloisIrreducibility.StretchedExponentialDominance →
+  ∀ (eps Cs c : ℝ), 0 < eps → eps ≤ 1 → 0 < c → ∀ (Fm : FamP eps),
+    (∃ x0 : ℝ, ∀ x ≥ x0, ∀ i : Fm.Ix x, ∃ A : AllRows (Fm.D x i),
+      LabelCountGoodInjective A ∧
+      CountAllRows A (epsC c (Fm.D x i).R.r (Fm.D x i).R.f) ∧
+      WeightAllRows A ∧
+
+
+[FLC_literal_consumer_10] src/Formalism/LocalRingCardinality/Params.lean:6-34
+SHA256 b60308533660b45fd6311c26ece63e0a15d4bb5da8399307a6629145e613f929
+structure Ranks extends Formalism.HC.Frame where
+  k : ℕ
+  m : ℕ
+  t : ℕ
+  k_even : Even k
+  m_even : Even m
+  t_odd : Odd t
+  two_le_m : 2 ≤ m
+  m_add_three_le_k : m + 3 ≤ k
+
+  rank_add_five_le : k + m - 1 + 5 ≤ t
+  three_m_lt_t : 3 * m < t
+
+  m_le_f : m ≤ 2 * ord
+  f_le_k : 2 * ord ≤ k
+
+  m_sq_le_N : m ^ 2 ≤ k + m * (t + 1)
+
+namespace Ranks
+
+variable (R : Ranks)
+
+def n : ℕ := R.ord
+
+def f : ℕ := 2 * R.n
+
+def r : ℕ := R.k + R.m - 1
+
+def nV : ℕ := R.r + R.t
+
+
+[FLC_literal_consumer_11] src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkIRROfJoinEx.lean:41-140
+SHA256 db2440af9edd89434b91d1aa17b7433d7200aee6bacd1175278c49687438fccb
+  obtain ⟨hN, -, hK, -, -, -, hQD, -, -, -, -, -, -, -, -, -, -, -, -, -, hG, -, -⟩ := Fm.sizes x hx i
+  have hLx : (Fm.L x i).sc.x = x := Fm.L_x x i hx
+  have hLe : (Fm.L x i).sc.eps = eps := Fm.L_eps x i
+  have hε0 : 0 < eps := hLe ▸ (Fm.L x i).sc.eps_pos
+  have hε1 : eps < 1 / 52 := hLe ▸ (Fm.L x i).sc.eps_lt
+  have hx1 : (1 : ℝ) ≤ x := by linarith
+  have hx0 : (0 : ℝ) < x := by linarith
+  have hLz : (Fm.L x i).sc.ez = Fm.ez := Fm.toFamCore.L_ez x i
+  have hz0 : 0 < Fm.ez := div_pos hε0 (lt_of_lt_of_le one_pos Fm.toFamCore.one_le_J)
+  have hzle : Fm.ez ≤ eps := div_le_self hε0.le Fm.toFamCore.one_le_J
+  simp only [SizeN, SizeK, SizeQD, SizeG, szTh, hLx, hLe, hLz] at hN hK hQD hG
+
+  have hf : ((Fm.D x i).R.f : ℝ) = 2 * ((Fm.D x i).R.n : ℝ) := by simp [Ranks.f]
+  have hfk : (Fm.D x i).R.f ≤ (Fm.D x i).R.k := by
+    have := (Fm.D x i).R.f_le_k
+    simpa [Ranks.f, Ranks.n] using this
+  have hmf : (Fm.D x i).R.m ≤ (Fm.D x i).R.f := by
+    have := (Fm.D x i).R.m_le_f
+    simpa [Ranks.f, Ranks.n] using this
+  have hm2 : 2 ≤ (Fm.D x i).R.m := (Fm.D x i).R.two_le_m
+  have hrk : (Fm.D x i).R.k ≤ (Fm.D x i).R.r := by unfold Ranks.r; omega
+  have hr2k : (Fm.D x i).R.r ≤ 2 * (Fm.D x i).R.k := by unfold Ranks.r; omega
+
+  have h5 : x ^ (9 / 2 + 10 * eps + eps / 100) ≤ x ^ (5 : ℝ) :=
+    Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
+  have h56 : x ^ (5 : ℝ) ≤ x ^ Cs := Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
+  have h6 : x ^ (6 : ℝ) ≤ x ^ Cs := Real.rpow_le_rpow_of_exponent_le hx1 hCs
+  have h4 : x ^ (4 : ℝ) ≤ x ^ (9 / 2 + 10 * eps - eps / 100) :=
+    Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
+  have h2 : x ^ (2 : ℝ) ≤ x ^ (2 + 8 * eps - eps / 100) :=
+    Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
+  have hx4p : (256 : ℝ) ≤ x ^ (4 : ℝ) := by
+    rw [show (4 : ℝ) = ((4 : ℕ) : ℝ) by norm_num, Real.rpow_natCast]
+    have : (4 : ℝ) ^ 4 ≤ x ^ 4 := pow_le_pow_left₀ (by norm_num) hx4 4
+    norm_num at this ⊢; linarith
+  have hx65 : 2 * x ^ (5 : ℝ) ≤ x ^ (6 : ℝ) := by
+    rw [show (6 : ℝ) = 5 + 1 by norm_num, Real.rpow_add hx0, Real.rpow_one]
+    have h0 : 0 ≤ x ^ (5 : ℝ) := Real.rpow_nonneg hx0.le _
+    have := mul_le_mul_of_nonneg_left (show (2 : ℝ) ≤ x by linarith) h0
+    linarith
+  have hkx : ((Fm.D x i).R.k : ℝ) ≤ x ^ (5 : ℝ) := le_trans hK.2 h5
+  have hkl : (256 : ℝ) ≤ (Fm.D x i).R.k := le_trans (le_trans hx4p h4) hK.1
+  have hfkR : ((Fm.D x i).R.f : ℝ) ≤ (Fm.D x i).R.k := by exact_mod_cast hfk
+  have hmfR : ((Fm.D x i).R.m : ℝ) ≤ (Fm.D x i).R.f := by exact_mod_cast hmf
+  have hr2kR : ((Fm.D x i).R.r : ℝ) ≤ 2 * (Fm.D x i).R.k := by exact_mod_cast hr2k
+  have hrkR : ((Fm.D x i).R.k : ℝ) ≤ (Fm.D x i).R.r := by exact_mod_cast hrk
+
+  have hεq : x ^ (Fm.ez / 6) ≤ x ^ (Fm.ez / 5 - Fm.ez / 100) :=
+    Real.rpow_le_rpow_of_exponent_le hx1 (by linarith)
+  have hpos6 : 0 < x ^ (Fm.ez / 6) := Real.rpow_pos_of_pos hx0 _
+  have hq : Real.exp (x ^ (Fm.ez / 6)) ≤ ((Fm.D x i).host.q : ℝ) := by
+    have hl := hQD.1
+    have hq0 : (0 : ℝ) < (Fm.D x i).host.q := by
+      rcases Nat.eq_zero_or_pos (Fm.D x i).host.q with h0 | h0
+      · rw [h0] at hl; simp at hl; linarith
+      · exact_mod_cast h0
+    calc Real.exp (x ^ (Fm.ez / 6)) ≤ Real.exp (Real.log (Fm.D x i).host.q) := Real.exp_le_exp.2 hl
+      _ = (Fm.D x i).host.q := Real.exp_log hq0
+  have hd : Real.exp (x ^ (Fm.ez / 6)) ≤ ((Fm.D x i).host.d : ℝ) := by
+    have hl : x ^ (Fm.ez / 6) ≤ Real.log (Fm.D x i).host.d := le_trans hεq hQD.2.2.2.1
+    have hd0 : (0 : ℝ) < (Fm.D x i).host.d := by
+      rcases Nat.eq_zero_or_pos (Fm.D x i).host.d with h0 | h0
+      · rw [h0] at hl; simp at hl; linarith
+      · exact_mod_cast h0
+    calc Real.exp (x ^ (Fm.ez / 6)) ≤ Real.exp (Real.log (Fm.D x i).host.d) := Real.exp_le_exp.2 hl
+      _ = (Fm.D x i).host.d := Real.exp_log hd0
+  intro j
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  ·
+    have hg := (hG j j).1
+    have hb : Real.exp (8 * x ^ eps) = (Real.exp (x ^ eps)) ^ 8 := by
+      rw [← Real.exp_nat_mul]; norm_num
+    have hb0 : 0 ≤ Real.exp (x ^ eps) := (Real.exp_pos _).le
+    have hkb : Real.exp (x ^ eps) ≤ ((Fm.D x i).R.k : ℝ) * Real.exp (x ^ eps) := by
+      have : (1 : ℝ) ≤ (Fm.D x i).R.k := by linarith
+      nlinarith
+    have hsc : (Fm.L x i).sc.b = Real.exp (x ^ eps) := by
+      rw [show (Fm.L x i).sc.b = Real.exp ((Fm.L x i).sc.x ^ (Fm.L x i).sc.eps) from rfl, hLx, hLe]
+    rw [hsc] at hg
+    have hze : x ^ Fm.ez ≤ x ^ eps := Real.rpow_le_rpow_of_exponent_le hx1 hzle
+    refine le_trans (Real.exp_le_exp.2 (by linarith : 8 * x ^ Fm.ez ≤ 8 * x ^ eps)) ?_
+    rw [hb]
+    exact le_trans (pow_le_pow_left₀ hb0 hkb 8) hg
+  ·
+    rw [← Real.rpow_two]
+    have hn0 : (0 : ℝ) ≤ (Fm.D x i).R.n := Nat.cast_nonneg _
+    have hnf : ((Fm.D x i).R.n : ℝ) ≤ (Fm.D x i).R.f := by rw [hf]; linarith
+    exact le_trans h2 (le_trans hN.1 hnf)
+  · exact le_trans hfkR (le_trans hkx h56)
+  · exact le_trans hmfR (le_trans hfkR (le_trans hkx h56))
+  ·
+    have h256 : 256 ≤ (Fm.D x i).R.k := by exact_mod_cast hkl
+    omega
+  · have h2k : 2 * ((Fm.D x i).R.k : ℝ) ≤ 2 * x ^ (5 : ℝ) := mul_le_mul_of_nonneg_left hkx (by norm_num)
+    exact le_trans hr2kR (le_trans h2k (le_trans hx65 h6))
+  · rw [Nat.cast_min]
+    exact le_min hq hd
+
+end
+
+

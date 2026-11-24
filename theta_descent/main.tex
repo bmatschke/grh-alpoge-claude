@@ -1,0 +1,558 @@
+\section{Rational theta images, level cuts, and the common target metric}\label{sec:theta-descent}
+
+\status{This section expands the linear algebra behind the remaining theta comparison. It constructs the rational adjoint cuts, common row and lift matrices, and their exact metrics from explicit tests, equivariance and positive operator identities. It also proves the normalization that turns the source's finite period tests into the required rational tests. Existence of the actual convergent tests, their period formula, and the positive theta operator identities remains a separate analytic and arithmetic input. No common-image assertion is inferred from dimensions alone.}
+
+Fix the literal coefficient field $K$, its distinguished embedding
+$\sigma:K\hookrightarrow\mathbb C$, the source tuple set $T$ and base
+$t_0$. All scalar extensions use this embedding unless another infinite
+place is displayed. Inner products are conjugate-linear in their first
+argument. The notation $j:F\to V$ denotes a $\sigma$-semilinear
+coefficient form: some $K$-basis of $F$ maps to a complex basis of the
+finite-dimensional Hermitian space $V$. It follows, by coordinates,
+that $j$ is injective and its image spans $V$. This condition is stronger
+than injectivity of $j$ alone.
+
+\paragraph{TD1: finite separating tests recover rational coordinates.}
+Let $f:\mathbb C^d\to E$ be injective and complex-linear, and let
+$\psi_1,\ldots,\psi_N:E\to\mathbb C$ be complex-linear maps with
+$\bigcap_a\ker\psi_a=0$. Suppose all
+$\psi_a(f(e_i))$ lie in $\sigma(K)$. If $f(c)$ also has all its test
+values in $\sigma(K)$, then $c\in\sigma(K)^d$.
+Indeed choose $A\in M_{N,d}(K)$ and $b\in K^N$ with
+\[
+ \sigma(A)_{ai}=\psi_a(f(e_i)),\qquad
+ \sigma(b)_a=\psi_a(f(c)).
+\]
+Linearity gives $\sigma(A)c=\sigma(b)$. If $Ax=0$ for $x\in K^d$,
+then all tests annihilate $f(\sigma(x))$, so $x=0$. Choose a
+$K$-linear left inverse $B$ of $A$, by extending a basis of its image.
+Then $BA=1$ and
+\[
+ c=\sigma(B)\sigma(A)c=\sigma(Bb).
+\]
+This proves every coordinate assertion, including the empty-dimensional
+case. It uses neither continuity of $\sigma$ nor any conjugacy of analytic
+functions. The separating tests and their values on the \emph{same}
+basis are indispensable. This is the exact mechanism of
+\texttt{coord\_rat}.
+
+\paragraph{TD2: the tested theta kernel descends over the fixed field.}
+Let $\Theta:V\to E$ be complex-linear and suppose a separating test
+family on $E$ has
+$\psi_a(\Theta(jx))\in\sigma(K)$ for every $x\in F$.
+In the chosen basis $b_i$ of $F$, write
+$\psi_a(\Theta(jb_i))=\sigma(A_{ai})$. The common complex kernel of
+the tests after $\Theta$ is $\ker\Theta$, so its coordinate equation is
+$\sigma(A)c=0$. Gaussian elimination over $K$ gives a basis of
+$\ker A$; the same pivot columns and equations remain valid after the
+injective field map $\sigma$. Therefore
+\[
+ \ker\Theta
+ =\operatorname{span}_{\mathbb C}
+   \{jx:x\in F,\ \Theta(jx)=0\}.
+\]
+No uniform degree bound on the coefficients was needed. The statement
+uses actual membership in $\sigma(K)$, rather than algebraicity over
+$\mathbb Q$. The same elimination also proves preservation of rank,
+intersection and finite sums under this scalar extension whenever the
+maps or subspaces are defined over $K$.
+
+\paragraph{TD3: the actual adjoint image is rational.}
+Equip $E$ with its supplied positive Hermitian inner product.
+Suppose in addition that $F$ has a $K$-valued sesquilinear form $h$,
+with its given involution $*$, satisfying
+\[
+ \langle jx,jy\rangle=\sigma(h(x,y)).
+\]
+If $F\ne0$, choose $x$ with $jx\ne0$ and compare this identity for
+$(ax,x)$ and $(x,x)$. Cancellation of $\|jx\|^2$ proves
+$\sigma(a^*)=\overline{\sigma(a)}$ for every $a\in K$.
+Thus star compatibility is proved from the supplied metric, not added as
+an unrecorded premise. If $F=0$, the adjoint-image assertion is immediate.
+
+The finite separating test family embeds $E$ into $\mathbb C^N$, so
+$E$ is finite-dimensional. For each test $\psi_a$, let $e_a\in E$ be its Riesz vector:
+$\psi_a(e)=\langle e_a,e\rangle$. These vectors span $E$, since a
+vector orthogonal to all of them is killed by all tests. For
+$y_a=\Theta^*e_a$, the Gram tests on $V$ give
+\[
+ \langle jb_i,y_a\rangle
+ =\langle\Theta(jb_i),e_a\rangle
+ =\overline{\psi_a(\Theta(jb_i))}\in\sigma(K).
+\]
+The matrix $G_{ik}=h(b_i,b_k)$ is invertible: its embedded matrix is the
+positive Gram matrix of the complex basis $jb_i$. Solving the displayed
+linear equations with $G^{-1}$ shows $y_a=jx_a$ for some $x_a\in F$.
+Every such $y_a$ belongs to $\operatorname{im}\Theta^*$; their complex
+span is the whole image. Consequently, for the actual preimage
+$Z=j^{-1}(\operatorname{im}\Theta^*)$,
+\[
+ \operatorname{span}_{\mathbb C}j(Z)=\operatorname{im}\Theta^*.
+ \tag{TD.1}
+\]
+This proves \texttt{range\_adjoint\_rat}. Applying the argument to each
+literal $\Theta_t$ and each single lift $\theta'_{j,t}$ gives both
+clauses of \texttt{RatZ} from \texttt{RowTest}, \texttt{LiftTest},
+the coefficient-basis conditions and their metric identities.
+
+\paragraph{TD4: adjoint closure makes the cut stable.}
+For every linear map between finite-dimensional Hermitian spaces,
+\[
+ \operatorname{im}\Theta^*=(\ker\Theta)^\perp.
+ \tag{TD.2}
+\]
+One inclusion follows from the adjoint identity; the other follows by
+orthogonal decomposition, or by rank--nullity. In particular,
+$\Theta$ is injective on $\operatorname{im}\Theta^*$: if
+$y=\Theta^*z$ and $\Theta y=0$, then
+$\|y\|^2=\langle z,\Theta y\rangle=0$.
+Suppose an operator $A$ has adjoint $A'$ and $A'$ preserves
+$\ker\Theta$. For $y\in\operatorname{im}\Theta^*$ and
+$k\in\ker\Theta$,
+$\langle k,Ay\rangle=\langle A'k,y\rangle=0$.
+Hence $Ay\in\operatorname{im}\Theta^*$.
+
+An operator on $F$ extends uniquely to $V$ by its values on $jb_i$;
+expanding $x$ in the basis proves that extension sends $jx$ to $j(Ax)$.
+Thus, when the source operator family is closed under adjoints and
+preserves $\ker\Theta$, its rational preimage $Z$ is stable under every
+operator. Applying this separately to the row and lift families proves
+\texttt{cutStable}. An arbitrary invariant kernel without adjoint
+closure would not suffice for this step.
+
+\paragraph{TD5: finite group actions and their adjoints extend exactly.}
+Let $G$ be finite, $r$ a $K$-representation on $F$, $\rho(g)$ the
+complex extensions on $V$, and $\tau$ a unitary representation on $E$.
+Assume the rational metric is $r(G)$-invariant and
+\[
+ \Theta(j(r(g)x))=\tau(g)\Theta(jx).
+\]
+Because $j(F)$ spans, these equations prove
+$\rho(gh)=\rho(g)\rho(h)$, $\rho(1)=1$,
+$\Theta\rho(g)=\tau(g)\Theta$, and unitarity of $\rho(g)$.
+For unitarity, first extend the inner-product equation in its second
+variable by complex linearity, then in its first by conjugate linearity.
+Taking adjoints and using the inverse group element yields
+\[
+ \rho(g)\Theta^*=\Theta^*\tau(g).
+ \tag{TD.3}
+\]
+For $a=\sum_g a_g g\in K[G]$, define
+$r(a)=\sum_g a_g r(g)$ and
+$\rho_\sigma(a)=\sum_g\sigma(a_g)\rho(g)$, and likewise for $\tau$.
+Finite sums give
+\[
+ j r(a)=\rho_\sigma(a)j,\quad
+ \Theta\rho_\sigma(a)=\tau_\sigma(a)\Theta,\quad
+ \rho_\sigma(a)\Theta^*=\Theta^*\tau_\sigma(a).
+ \tag{TD.4}
+\]
+The last formula is extended from (TD.3); it is \emph{not} obtained by
+mistakenly taking an adjoint without conjugating the coefficients.
+These are exactly the five \texttt{LevelOperators.Hyp} fields and their
+finite-group-algebra consequences.
+
+\paragraph{TD6: rationality survives an actual idempotent level cut.}
+Let $e\in K[G]$ act idempotently on $F$. Then $P=\rho_\sigma(e)$
+is idempotent on $V$ and
+$\operatorname{im}P=\operatorname{span}_{\mathbb C}j(\operatorname{im}r(e))$.
+Put $R=\operatorname{im}\Theta^*$ and retain (TD.1).
+Equation (TD.4) shows $P(R)\subset R$. If $v\in R\cap\operatorname{im}P$,
+write $v=\sum_i c_i jz_i$ with $z_i\in Z$. Since $Pv=v$,
+\[
+ v=\sum_i c_i j(r(e)z_i),\qquad
+ r(e)z_i\in Z\cap\operatorname{im}r(e).
+\]
+The reverse inclusion is immediate, proving the exact \texttt{RatLev}
+intersection formula.
+
+Moreover every $u\in\operatorname{im}P$ has the same theta image as
+some $u'\in R\cap\operatorname{im}P$. Decompose $u=p+k$ with
+$p\in R$, $k\in\ker\Theta$, and set $u'=Pp$. Then
+$Pu=u$, $Pk\in\ker\Theta$ by (TD.4), and
+$\Theta u'=\Theta u$. This proves the actual \texttt{Hyp.dn}
+statement. Self-adjointness of $P$ is unnecessary; its idempotence,
+coefficient-field definition and the two invariant subspaces are the
+properties used.
+
+\paragraph{TD7: the level character and its inverse are kept distinct.}
+For a subgroup $H\le G$ and a character $\chi:H\to K^\times$, the
+level projector is
+\[
+ e_{H,\chi}=\frac1{|H|}\sum_{h\in H}\chi(h)^{-1}h.
+\]
+Its square is itself: the coefficient of $k\in H$ in the square is
+$|H|^{-2}\sum_h\chi(h)^{-1}\chi(h^{-1}k)^{-1}
+=|H|^{-1}\chi(k)^{-1}$. Reindexing also proves
+$h_0 e_{H,\chi}=\chi(h_0)e_{H,\chi}$.
+A vector has character $\sigma\chi$ precisely when this projector
+fixes it. If $e_X$ is the actual central idempotent for the supplied
+finite set of absolutely irreducible characters, then
+$e_Xe_{H,\chi}$ is idempotent and its image is the intersection of the
+selected block and character subspaces. Here the finite-character
+idempotent assertion is the usual finite-group character orthogonality
+statement; the present argument uses its explicit centrality and
+idempotence, already present in the source's \texttt{goodAt} hypotheses.
+
+If $v\in E$ is fixed by $\tau_\sigma(e_X)$ and has character
+$\sigma\chi$, (TD.4) implies
+$\Theta^*v\in\operatorname{im}\rho_\sigma(e_Xe_{H,\chi})$.
+This is \texttt{Hyp.up}. A character equation on rational vectors
+extends to their complex span and then through $\Theta$, which proves
+\texttt{Hyp.type}. The literal definitions use $\chi=\psi$ on the row
+side and $\chi=\psi^{-1}$ on \texttt{lvlA}, the lift side. These two
+choices are not interchanged during transport. The principal level
+$H=\{1\}$ gives $e_{H,1}=1$ exactly.
+
+\paragraph{TD8: positive theta operators give the common image and its metric.}
+For each tuple $t$, let $S_t\subset V_t$ be the actual complex level
+space and let
+$U_t:\mathbb C^{d_t}\to V_t$ be the extension of the supplied rational
+row coordinates. Assume, as in \texttt{CutRows},
+\[
+ \operatorname{im}U_t=\operatorname{im}\Theta_t^*\cap S_t,
+ \quad \Theta_t S_t\subset E_0,
+ \quad \Theta_t^*E_0\subset S_t,
+ \tag{TD.5}
+\]
+and $U_t$ is injective with Gram matrix $n_P H_{Q,t}$, where $n_P>0$
+and $H_{Q,t}$ is the actual positive quotient metric. Suppose the fixed
+finite orthogonal family $E_p$ spans $E_0$ and
+\[
+ \Theta_t\Theta_t^*e=c_{t,p}e\quad(e\in E_p),\qquad
+ c_{t,p}=\kappa_{v_0}\prod_j\lambda_{j,t,p,v_0}>0.
+ \tag{TD.6}
+\]
+The map $I_t=\Theta_t U_t$ is injective by TD4. It takes values in
+$E_0$. Conversely, for $e\in E_p$, (TD.5) puts $\Theta_t^*e$ in
+$\operatorname{im}U_t$. If $U_t a=\Theta_t^*e$, then
+$I_t(c_{t,p}^{-1}a)=e$. Since the $E_p$ span, every $I_t$ has image
+\emph{exactly} $E_0$. This proves all clauses of \texttt{H2} and
+$d_t=\dim_{\mathbb C}E_0$ for every $t$.
+
+For the metric, let $x=U_t a$ and suppose $\Theta_t x\in E_p$.
+Both $\Theta_t^*\Theta_t x$ and $c_{t,p}x$ lie in
+$\operatorname{im}\Theta_t^*$, and (TD.6) gives the same theta image
+for them. TD4 implies equality. Consequently, for every $b$,
+\[
+ \langle I_t a,I_t b\rangle
+   =n_P c_{t,p}\langle a,b\rangle_{Q,t}.
+ \tag{TD.7}
+\]
+The scalar is real, so conjugate linearity causes no extra phase.
+This proves the literal \texttt{H4} identity, not only a norm bound.
+If all row spaces are zero the argument remains valid; no positive
+row dimension is deduced. In the actual implementation (TD.5) is
+\texttt{RatLev}, \texttt{DnLev}, \texttt{UpLev}, and (TD.6) is
+\texttt{ThmBop} with \texttt{PartsE}. Their primitive theta-theoretic
+suppliers remain explicit.
+
+\paragraph{TD9: the common row identifications are rational and coherent.}
+Retain TD8 and one \emph{common} \texttt{RowTest} on the target $E$,
+with rational values on every $\Theta_t(j_t x)$. The columns of $I_t$
+therefore have rational test values. Apply TD1 with $f=I_{t_0}$ to the
+unique preimage of each column of $I_t$. The resulting matrix
+$M_t\in M_{d_0,d_t}(K)$ satisfies
+\[
+ I_{t_0}\sigma(M_t)=I_t. \tag{TD.8}
+\]
+It is exactly the source's \texttt{rowMat}: the \texttt{solve} choice
+is unique because $I_{t_0}$ is injective, and the entrywise
+\texttt{kOf} fallback is never used after rationality is proved.
+The common image and injectivity make $\sigma(M_t)$ bijective;
+rank invariance from TD2 makes $M_t$ bijective over $K$.
+At the base tuple, uniqueness gives $M_{t_0}=1$.
+
+For any two tuples the matrix $M_s^{-1}M_t$ is the unique rational
+comparison through the same target. Thus
+$(M_r^{-1}M_s)(M_s^{-1}M_t)=M_r^{-1}M_t$ exactly; no choice of a new
+isomorphism is involved. In particular the rational common-image
+hypothesis in PL6 is now derived from the specified tests and the
+operator/type inputs of TD8. Equal dimensions alone would not give
+(TD.8), and unrelated rational test systems for different tuples
+would not prove it over this fixed $K$.
+
+\paragraph{TD10: the single lifts have the same exact descent.}
+For a fixed step $j$, replace $\Theta_t$ by $\theta'_{j,t}$,
+$S_t$ by the actual lift level, and $E_0$ by
+$\operatorname{im}w_{0,j}$. The \texttt{CutLifts} assumptions give
+\[
+ \theta'_{j,t}(\theta'_{j,t})^*w=\lambda_{j,t,p,v_0}w
+ \quad\text{on }W_{j,p}\cap\operatorname{im}w_{0,j},
+\]
+with positive scalar, and these subspaces span that image. The proof of
+TD8 gives injectivity of $T_{j,t}$, equality
+$\operatorname{im}T_{j,t}=\operatorname{im}w_{0,j}$, and
+\[
+ \langle T_{j,t}a,T_{j,t}b\rangle
+   =n_P\lambda_{j,t,p,v_0}\langle a,b\rangle_{T,j,t}
+\]
+when $T_{j,t}a$ lies in the $p$-part. These are \texttt{H5} and
+\texttt{ThmA}. The principal map $w_{0,j}=e_{W,j}\operatorname{lin}(b_{W,j})$
+is injective: $b_{W,j}$ is a complex basis and
+$\langle e_{W,j}x,e_{W,j}y\rangle=n_P\langle x,y\rangle$ with $n_P>0$.
+
+The \texttt{LiftTestB} premise supplies one separating test family
+whose values are rational both on all $T_{j,t}$ columns and on the
+\emph{chosen principal basis} $w_{0,j}e_i$. TD1 now proves that the
+actual \texttt{liftMat} $L_{j,t}$ is over $K$, with
+\[
+ w_{0,j}\sigma(L_{j,t})=T_{j,t},
+\]
+and that it is bijective. The extra principal-basis clause in
+\texttt{LiftTestB} cannot be deleted. This constructs the matrix; it
+does not identify its image lattice integrally without the separate
+lattice statements.
+
+\paragraph{TD11: the base-lift computation needs only image containment.}
+The source's theorem
+\texttt{baseLevelLiftMatrix\_solves\_relation\_extendedData}
+uses a weaker local argument than a full common-image theorem. For the
+same $R,F,j$ at the base tuple, it suffices that each column
+$T_{j,t_0}e_k$ belongs to $\operatorname{im}w_{0,j}$, that $w_{0,j}$
+is injective, and that the \texttt{LiftTestB} values on both column
+families are rational. TD1 then proves the chosen solution matrix
+rational, and linearity gives
+\[
+ w_{0,j}\sigma(L_{j,t_0}x)=T_{j,t_0}\sigma(x)
+ \quad(x\in K^{d_{j,t_0}}). \tag{TD.9}
+\]
+No surjectivity of $T_{j,t_0}$ is used here.
+
+For completeness, the source's \texttt{tC\_single\_mem} obtains that
+containment as follows. The lower-level source is cut by
+$e_Xe_{H,\psi^{-1}}$, whose image lies in that of $e_X$. TD6 replaces
+its vectors, without changing the lift, by vectors in the rational
+adjoint image at principal level. Those coordinates lie in the
+principal forms span, defined as the span of the corresponding principal
+images over all tuples. TD7 supplies their lower-level character.
+The supplied \texttt{PLevW} identity identifies the intersection of
+these two conditions with $\operatorname{im}w_{0,j}$. This is precisely
+the \texttt{DnLevL} containment used in the source proof.
+
+Thus \texttt{WeakCharacterisation.base.models} and the specified
+\texttt{HoldsL} fields supply (TD.9) on the original realization. The
+large outer statement also lists published representation-theory and
+base-enlargement inputs, but its local proof does not use them after
+these model fields and \texttt{HoldsL} are supplied. This observation
+removes an unused detour from the human proof; it neither constructs
+\texttt{HoldsL} nor asserts its analytic prerequisites.
+
+\paragraph{TD12: distinct spectral parts are orthogonal at every place.}
+Here are the exact linear-algebra requirements behind
+\texttt{majAt\_eq\_zero\_of\_mem\_Qp\_of\_ne}. At an infinite
+place $v$, use the actual positive matrix $H_v$ on the finite class
+space. The rational Hecke and inertia operators commute, are closed
+under $H_v$-adjoints, and commute with the finite level action. The
+source obtains these assertions by transporting its \texttt{OkH} and
+\texttt{InertRationalAdjoint} matrix identities. Their entries, and the
+original metric entries, lie in the specified maximal CM subfield;
+conjugate transpose therefore transports correctly to every $v$.
+This is a place-by-place algebraic statement, not continuity of an
+arbitrary field embedding.
+
+Every operator in the commuting adjoint-closed family is normal. A
+normal operator has orthogonal eigenspaces: if $Ax=\alpha x$, then
+$A^*x=\bar\alpha x$, since the squared norms of
+$(A-\alpha)x$ and $(A^*-\bar\alpha)x$ agree. If also $Ay=\beta y$,
+the adjoint identity gives
+$(\beta-\alpha)\langle x,y\rangle=0$.
+Existence of a complex eigenvalue and induction on the invariant
+orthogonal complement give diagonalizability. Repeating on joint
+eigenspaces gives simultaneous diagonalization; an infinite indexing
+set causes no problem, since a finite subset spans its finite-dimensional
+operator algebra. Hence the generalized eigenspaces occurring in the
+source equal the ordinary eigenspaces.
+
+The actual invariant level and adjoint-image subspaces are stable
+under the whole family and its adjoints, so their restrictions remain
+normal. Disjoint conditions on the joint eigenvalue systems therefore
+give orthogonal sums at $v$. The source's residue labels $p\ne q$
+have disjoint systems by \texttt{diffAt\_of\_mem\_ixFin3} and
+\texttt{excl3}. The passage to the source's quotient metric needs a further check.
+Let $P$ denote the actual surjective coordinate map $Pq$, with $PzE=1$.
+The identity $PA=\bar A P$ for every operator and its adjoint makes
+$\ker P$ invariant under the whole adjoint-closed family. Its orthogonal
+complement is therefore invariant too. The quotient metric is exactly
+the metric of the unique orthogonal lift: in matrix coordinates it is
+$(PH_v^{-1}P^*)^{-1}$, and the lift of $y$ is
+$H_v^{-1}P^*(PH_v^{-1}P^*)^{-1}y$. This follows by direct multiplication
+and the condition of orthogonality to $\ker P$. Orthogonal projection
+onto $(\ker P)^\perp$ commutes with the operators, so it preserves every
+joint eigenspace. The supplied $zE x$ and $zE y$ lie in their respective
+spectral sums; replacing them by their orthogonal lifts preserves those
+sums. Their quotient inner product consequently vanishes. Thus
+$\langle x,y\rangle_{Q,v}=0$ for $x\in Q_p$, $y\in Q_q$.
+This proves \texttt{PartsOrth} for all places (and thus for the
+source's required places $v\ne v_0$), with the stated rational-adjoint
+and label-separation suppliers retained.
+
+\paragraph{TD13: construct the exact weighted target metric.}
+Let $Q=\bigoplus_p Q_p$ be the actual rational direct sum and let
+$P_p$ be its coordinate projections. Directness gives
+$P_pP_q=0$ for $p\ne q$ and $\sum_pP_p=1$. At $v\ne v_0$ set
+\[
+ c_{p,v}=\kappa_v\prod_j\lambda_{j,t_0,p,v}>0,\qquad
+ H_{E,v}=\sum_p c_{p,v}\,v(P_p)^*H_{Q,v}v(P_p).
+ \tag{TD.10}
+\]
+The matrix is positive definite: its quadratic form is a sum of
+nonnegative terms, and if all vanish, each $v(P_p)z=0$, whence $z=0$.
+Choose the positive square root and frame $X_{E,v}=H_{E,v}^{-1/2}$;
+then $(X_{E,v}^{-1})^*X_{E,v}^{-1}=H_{E,v}$. This is the metric
+specified by the source's \texttt{weightFrame}; uniqueness of a
+particular matrix square-root choice is unnecessary for equality of
+its norm.
+
+At the distinguished place set
+\[
+ H_{E,v_0}=n_P^{-1}\operatorname{Gram}(I_{t_0}e_i),
+ \tag{TD.11}
+\]
+which is positive definite by TD8. Splice this frame into (TD.10)
+exactly at $v_0$, as \texttt{rowXE} does. TD7's level conventions and
+TD8's factor $n_P$ give (TD.7) at the base; at other places TD12 and
+$\sum_qP_q=1$ give
+\[
+ \langle x,y\rangle_{E,v}=c_{p,v}\langle x,y\rangle_{Q,v}
+ \quad(x\in Q_p).
+ \tag{TD.12}
+\]
+If the finite part index is nonempty, orthogonality implies the exact
+lower bound needed by PL11:
+\[
+ \|z\|_{E,v}^2\ge
+  \left(\kappa_v\min_p\prod_j\lambda_{j,t_0,p,v}\right)
+  \|z\|_{Q,v}^2.
+ \tag{TD.13}
+\]
+The corresponding base-place bound uses the actual spectral-part
+coordinate identification (\texttt{H3}) and (TD.7). If the index set is
+empty its spanning condition forces $Q=0$; do not assign a minimum to
+an empty set. No quantitative lower bound on the positive
+$\lambda$'s, or bound on their logarithms, has been proved here.
+
+\paragraph{TD14: these matrices give the literal principal lattice.}
+Let $M_t$ be the source's full projected row lattice and let
+$\mu(w)=t_0$ outside the finite twist set. With the matrices of TD9,
+put $L_w=M_{\mu(w)}^{\rm cmp}M_{\mu(w)}$, where the superscript
+$\mathrm{cmp}$ distinguishes the comparison matrix $M_t^{\rm cmp}$
+from the lattice. Equivalently $L_w$ is the actual
+\texttt{matLat(rowMat(mu(w)),abelian2(mu(w)))}.
+The comparison matrices are bijective, so these are full lattices;
+$M_{t_0}^{\rm cmp}=1$ makes them equal to the base lattice off the
+finite twist set. PL9 therefore constructs exactly
+\[
+ R=\bigcap_w(L_w)_w,\qquad R_w=(L_w)_w.
+\]
+For any $y\in K^{d_0}$, (TD.8) and injectivity give the stronger
+identification
+\[
+ y\in M_t^{\rm cmp}M_t
+ \quad\Longleftrightarrow\quad
+ I_{t_0}\sigma(y)\in\{I_t\sigma(z):z\in M_t\}.
+\]
+Membership in $R$ is thus precisely the source's condition that, for
+every $w$, some $d\in\mathcal O_K\setminus w$ makes
+$d y$ belong to this image lattice. The same target carries the frames
+of TD13, hence is the literal \texttt{principalHermitianLattice} with
+its \texttt{Good} fields. This step does not infer local divisibility
+of periods or an integral isometry from mere rational bijectivity.
+It supplies the exact object to which PL9--PL11 apply.
+
+\paragraph{TD15: one normalization makes all row tests rational.}
+The source's row-test construction starts with complex-linear tests
+$p_a$ on its Hilbert model $E$, separating all of $E$. The integral
+definitions become linear only after their stated convergence
+hypothesis \texttt{LinK}; retain that hypothesis. Let the actual finite
+period identity be
+\[
+ \sigma(z_t)c_t\,p_a(\Theta_t j_t x)
+       =\kappa\,w_{t,x,a},
+ \tag{TD.14}
+\]
+for vectors in the selected good block, with $z_t\in K$ a root of
+unity, $c_t\ne0$, $w_{t,x,a}\in\sigma(K)$ and
+$c_t/c_{t_0}\in\sigma(K)$. The same identity extends to all source
+vectors after replacing $x$ by its actual central-block projection:
+TD5 and the identity action of $e_X$ on the Hilbert target show that
+this replacement preserves $\Theta_tj_tx$. The rational right side
+may change to $w_{t,x',a}$; no equality of the two finite sums is
+needed.
+
+If $\kappa\ne0$, use the \emph{single} scalar
+$k=c_{t_0}\kappa^{-1}$. Writing
+$w_{t,x',a}=\sigma(b)$ and $c_t/c_{t_0}=\sigma(r)$, (TD.14) gives
+\[
+ k\,p_a(\Theta_tj_tx)=\sigma\!\left(\frac{b}{z_t r}\right).
+ \tag{TD.15}
+\]
+The denominators are nonzero because $z_t$ is a root of unity and
+both $c_t,c_{t_0}$ are nonzero. Multiplying every $p_a$ by $k$ retains
+separation. If $\kappa=0$, the nonzero left prefactor in (TD.14) forces
+all $p_a(\Theta_tj_tx)=0$; choose $k=1$. These tests are still
+separating on $E$ and have rational values on every theta image,
+which in this branch is zero. Thus no unjustified nonvanishing premise
+for the global scalar is introduced.
+
+In the literal source $c_t=\prod_{i,j}c_{i,j,t}$ and
+$c_t/c_{t_0}=\prod_{i,j}\texttt{sqRatio}_{i,j,t}$.
+\texttt{ConstK} supplies each nonzero factor, \texttt{RatioK} each
+ratio in the same field, \texttt{Formula2K} (TD.14), and
+\texttt{SumRatK} the rational right side. This proves
+\texttt{rowTest\_of\_choice} from those exact premises. Finite sums
+and products preserve the coefficient field; their convergence,
+period formula and actual coefficient-field assertions are not proved
+merely by this closure observation.
+
+\paragraph{TD16: conjugation, uniformity and the remaining test boundary.}
+The Hilbert model and the complex side may differ by the source's
+Boolean conjugation twist. Write $c_s$ for either the identity or
+complex conjugation, and give $\operatorname{Tw}_s E$ the scalar action
+for which its map to $E$ sends $a\cdot x$ to $c_s(a)x$.
+If $\sigma'=c_s\circ\sigma$, transport a test by
+\[
+ \psi^{(s)}(x)=c_s\bigl(\psi(\operatorname{out}x)\bigr).
+\]
+It is complex-linear, because the two applications of $c_s$ cancel
+on scalars. The test values transform from $\sigma(K)$ to
+$\sigma'(K)$ and separation is preserved. Applying the same operation
+twice is the inverse. This proves \texttt{test\_tw\_iff} and the
+literal \texttt{rowTest\_toCx3}, using $R.\texttt{emb0}$ for the
+specified embeddings; no arbitrary automorphism is treated as
+continuous.
+
+Each global test input has the order
+\[
+ \exists C_{F,0}\in\mathbb R\quad
+ \forall\varepsilon\in\mathbb R\quad \forall C_F\ge C_{F,0}\quad
+ \exists x_0\in\mathbb R\quad
+ \forall D,\mathrm{large}_2,R,F,\mathrm{ch},\ldots .
+\]
+The implication for these final variables retains
+$\mathrm{large}_2.\mathrm{sc}.\varepsilon=\varepsilon$,
+$x_0\le\mathrm{large}_2.\mathrm{sc}.x$, the exact
+\texttt{HidaSetting}, $\mathrm{ch}.\mathrm{Is}$ and
+$\mathrm{ch}.\mathrm{AtScale}(C_F,\mathrm{large}_2.\mathrm{sc}.b)$.
+For finitely many inputs take their maximum $C_{F,0}$ first, then,
+\emph{after} fixing $\varepsilon,C_F$, the maximum of their $x_0$'s.
+TD15 and the conjugation transport then prove the conditional
+\texttt{rowTest\_realisation} with the same $D,L,R,F,\mathrm{ch}$ and
+all original setting predicates. The proof of this assembly does not
+use \texttt{SumOKK} once \texttt{SumRatK} is supplied; the former is
+retained by the literal outer theorem and may be needed to establish
+the latter.
+
+There is a sharp obstruction to dropping the common fixed-field input.
+In $E=\mathbb C$ and $K=\mathbb Q$, no separating family of
+complex-linear tests takes rational values on both $1$ and $i$:
+a test has $\psi(i)=i\psi(1)$, so rationality of both values forces
+$\psi(1)=0$; all tests would annihilate $1$. Both input numbers are
+algebraic. Hence the algebraic vacuum and jet results of VI/CA alone
+do not imply the prescribed \texttt{RowTest}. The exact remaining
+suppliers are the compatible test choice and \texttt{FieldOK},
+convergent separating functionals, the unfolded period formula and
+rational normalization ratios, together with the actual theta
+operator/type identities and their positive eigenvalues in TD8--TD10.
+The spectral kernel bounds, dimension balance, congruence denominators
+and global prime estimates remain independent frontiers.

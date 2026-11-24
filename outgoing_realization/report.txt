@@ -1,0 +1,447 @@
+OUTGOING ONE-SIDED REALIZATION — v0.8
+Pinned source: https://github.com/CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Owner: /root/lean_audit
+Main fragment: outgoing_realization_section.tex
+
+SCOPE AND STATUS
+
+This note proves the actual outgoing one-sided realization used by the
+Type-II cloud test. It is an additional step after the ordinary
+SymbolRealisableAt argument: its input is the literal monPh family, whose
+segment factors have a positive plane/normal gap and a minimum plane
+weight. We first extract the required determinant powers from those
+factors. We then prove the exact RestPh identity and apply the already
+reconstructed SY finite correction.
+
+The determinant lemma is proved over every field, and its integral
+version over every integral domain. It is not assumed as
+LargePrimeLengthVanishing or FieldMultidegreeDivisibility. The actual
+one-sided numerical extraction is proved with C>=100 from the explicit
+Type-II inequalities below; there is no unknown threshold in this
+application. We do not claim a new Lean proof or replay its kernel.
+
+Previously reconstructed inputs are used with their exact scope:
+FG supplies the actual Valid frame, strict span and cardinality bounds.
+IP3--IP4 supply the integral path basis; IP6 and IP11 prove
+GeneratorSpanInclusion and GeneratorImageIsSymbol.
+SY4 proves the label-monomial key decomposition RestMon, and SY5 proves
+the finite determinant-budget correction. CP supplies the actual global
+choice of the numerical data used here, not the determinant extraction.
+All extra local algebra needed between these inputs is proved below.
+
+We retain the source's coefficient setup: p>=13 is prime, n'>0 even,
+r>=2, k=r+K, K>0; O is the specified mixed-characteristic DVR with w^2=p
+and the Witt-frame algebra and chart hypotheses OHyp/IsGLW. These are
+supplied local data, not claims of global existence. The source's
+CommonHypotheses and the complete Ctx are recorded in provenance.
+
+OR1. GENERIC PREFIX ORDER AND THE COST OF ONE DETERMINANT
+
+Let I be a finite set of signed letters: vector rows u_i and covector
+columns v_i, each with r coordinates. For S subset I and a generic
+invertible r-by-r matrix g, put
+
+        P_g(t)=g diag(1,...,1,t) g^{-1}.
+
+On letters in S, substitute u_i P_g(t) and P_g(t)^{-1} v_i; leave other
+letters unchanged. The minimum exponent in the resulting Laurent
+polynomial is v_S(F), with v_S(0)=+infinity. This is exactly ObjPol.valS,
+including its generic GL coordinate ring and its last-coordinate choice.
+It is a minimum of actual Laurent support, not a minimum of numerical
+specializations. A lower bound v_S(F)>=theta remains true on any
+specialization of g to an invertible matrix over an extension field.
+
+Fix r distinct vector letters a_1,...,a_r and D=det(u_{a_i,b}).
+For an arbitrary S', some selected rows transform by P_g(t), the others
+remain fixed. Since P_g(t)=I+(t-1)ab^t for a column a and row b^t, the
+new selected matrix is
+
+        M+(t-1) diag(epsilon_i) M a b^t.
+
+The perturbation has rank at most one. In the determinant's multilinear
+expansion, every term using two perturbation rows vanishes. Thus the
+determinant is affine in t. Its value at t=1 is the nonzero polynomial D.
+Its minimum exponent is therefore either 0 or 1. The ambient generic
+coordinate ring with all letter variables is a domain. The lowest
+nonzero Laurent coefficients multiply without cancellation, so
+
+        v_S'(D^m H)=m v_S'(D)+v_S'(H)<=m+v_S'(H).       (OR1.1)
+
+For H=0 both sides are +infinity, which gives the same conclusion.
+This proves the second clause of FieldMultidegreeDivisibility for every
+S', including subsets unrelated to the subset used for division.
+
+OR2. FORCED DIVISIBILITY AND INTEGRAL QUOTIENTS
+
+Let F be multihomogeneous in the letters, of degrees d_i, and suppose all
+a_i lie in S. Define the integer
+
+        B=sum_{i in S, i vector, i not one of the a_j} d_i.
+
+Claim: if theta is an integer and v_S(F)>=theta>B, then
+D^(theta-B) divides F.
+
+First prove one copy of D. The generic determinant D is irreducible over
+every field. Here is an elementary justification, including finite
+characteristic. Induct on r. For r=1 it is a variable. For r>1, regard D
+as a polynomial in the bottom-right entry:
+
+        D=Delta x_rr+E,
+
+where Delta is the upper-left (r-1)-minor. In the polynomial UFD in the
+other entries Delta is prime by induction. It does not divide E: set the
+upper-left block to diag(1,...,1,0), the two adjacent off-block entries
+x_(r-1,r) and x_(r,r-1) to 1 and all other off-block entries to zero.
+Then Delta=0 but E=-1. Thus this linear polynomial is primitive and
+irreducible over the fraction field, and hence irreducible in the
+polynomial ring. Adjoining the other letter variables preserves
+primality.
+
+Work now in the fraction field L of the polynomial ring modulo (D).
+The selected matrix M has rank exactly r-1: its upper-left (r-1)-minor
+is nonzero in this domain. Choose an invertible matrix g over L whose
+last column spans the right kernel of M. Then
+
+        M g diag(1,...,1,t) g^{-1}=M.
+
+The selected vector letters do not change. Every other vector letter in
+S contributes a polynomial of t-degree at most its own degree d_i.
+Each covector letter in S contributes only exponents <=0. Letters
+outside S remain unchanged. Consequently the specialized twisted
+polynomial has no exponent greater than B. The original minimum-order
+hypothesis says it has no exponent below theta. Since theta>B, it is
+identically zero. At t=1 the substitution is the identity, so F is zero
+modulo D. Hence D divides F. No point-counting or infinite-base-field
+argument is used.
+
+For nonzero F, the quotient is multihomogeneous of degrees d_i-1 on the
+selected letters and d_i elsewhere. This follows by decomposing the
+quotient by multidegree and using injectivity of multiplication by D.
+If some required degree is negative, the nonzero case cannot occur.
+The number B is unchanged, and (OR1.1) gives v_S(F/D)>=theta-1.
+Repeat until theta-B copies have been extracted. F=0 is immediate.
+
+Over an integral domain O, embed into its fraction field. The injection
+of polynomial rings induces an injection of the generic GL localizations
+(the determinant being localized stays nonzero), and hence of the
+Laurent coefficient rings. Thus generic minimum orders are unchanged
+by this base extension.
+
+Every nonzero coefficient of a generic determinant is +1 or -1 because
+the selected rows are distinct. In particular its leading coefficient
+for any monomial order is a unit, as is that of D^m. Divide F by D^m
+over O using this unit coefficient. The division algorithm terminates
+and returns F=D^m Q+R, where no monomial of R is divisible by the leading
+monomial of D^m. Over Frac(O), the divisibility just proved implies that
+R is a multiple of D^m. If R were nonzero, its leading monomial would be
+divisible by that of D^m, a contradiction. Therefore R=0 and Q is
+integral. This does not assume that O itself is a UFD.
+
+The exact conclusion used below is: a multihomogeneous F with
+v_S(F)>=B+n has an integral factorization F=D^n Q; the quotient's
+degrees weakly decrease, and every prefix lower bound t becomes at
+least t-n. This proves dv_div_one, including the arbitrary-prefix
+part, by the preceding arguments rather than by its hE premise.
+
+OR3. A FINITE LIST OF EXTRACTIONS AND THE LITERAL Dv
+
+Suppose we have tasks (S_t,A_t,n_t), with n_t nonnegative, r distinct
+vector letters A_t inside S_t, and total cost T=sum_t n_t. If the initial
+polynomial F of degrees d satisfies
+
+        v_(S_t)(F)>=other_t(d)+T                 for every task t,
+
+we may extract all determinant powers. After cost c_done has been
+removed, OR1 leaves each pending prefix at least its original minimum
+minus c_done. Its other-vector degree is no greater than before,
+because all multidegrees have weakly decreased. Thus the remaining
+task still has at least its required exponent above its other-vector
+degree. Induction gives the full product divisor and loses at most T
+in every prefix. This is exactly dv_div_list; the proof handles repeated
+determinants and arbitrary overlap of the task subsets.
+
+For a valid frame F, order the finite segment letters increasingly.
+Its old block consists exactly of the r preceding-frame positions:
+there are no selected positions between consecutive entries of one
+frame. Its late block is all selected positions after the last old
+entry through z_j=f_(j,r-1), inclusive.
+
+For a late x, the r most recent even selected predecessors are precisely
+Arow(x,0),...,Arow(x,r-1). They exist because the old block already
+contains r even predecessors. They are distinct, lie in the segment,
+and are strictly before x. The source's finite search over [x-rn',x)
+finds them because periodicity and one nonempty even frame per period
+give enough predecessors; those closest r already lie in this segment.
+The default branch in Arow is therefore not used.
+
+Take one task for each late x: its strict prefix, those r predecessor
+rows, exponent m1. Add one task of exponent m2 for the old-frame rows
+at the strict prefix preceding the first late letter. That final prefix
+contains exactly the old frame, so its other-vector degree is zero.
+The determinant product is literally
+
+ Dv_j=(product over late x of Dseg_x^m1) Wseg_j^m2,
+
+with the same row order as the source. No sign is changed by changing
+the order of the independent tasks.
+
+Its cost is (#late)m1+m2<=|letters_j|m1+m2. Let
+
+ m1=(2Q+3)c+kQ+c,
+ m2=c alpha_*+2c,
+ m*=(N1+1)((2Q+3)c+kQ+c alpha_*+3c).
+
+Since |letters_j|<=N1, the cost is <=m*. For example, the bracket
+defining m* is m1+c alpha_*+2c, and multiplying by N1+1 certainly
+bounds N1 m1+c alpha_*+2c. This is the exact
+segment_divisions_le_bound estimate, with no asymptotic notation.
+
+In a literal MGen generator, write the polynomial as A G, with A in
+the plane block and G in the normal block. The defining CondM gap
+m* says:
+
+ vector cut i: lambda_max(prefix <=i of G)<=M_i,
+               v_(prefix <i)(A)>=M_i+m*;
+ covector cut i: lambda_max(prefix <i of G)<=M_i,
+                 v_(prefix <=i)(A)>=M_i+m*.
+
+The extraction affects only A and loses at most m* in every prefix.
+G, its old-block zero degrees and its maximum bounds are unchanged.
+The quotient pair therefore satisfies precisely CondM with gap zero,
+hence defines an MGen0 generator. The independent strict-prefix
+minimum at every late x is what permits the tasks themselves; OR4--OR5
+check that minimum from the actual one-sided hypotheses.
+
+OR4. THE ONE-SIDED GEOMETRIC OTHER-DEGREE ESTIMATE
+
+Assume p>=13, n' even, r>=2, the valid frame, and
+a<=deg_s<=2a for selected residues s. Write
+levDeg_j(y)=deg_(bar y)/p^(z_j-y) on segment letters. Let o_x be the
+oldest of the r most recent even predecessors of a late x, and set
+
+        B_o=levDeg_j(o_x).
+
+Every even predecessor y<x outside these r has y<o_x. Moreover it lies
+in the old frame or the intermediate letter set. If it were at or after
+the first current-frame entry, all selected positions between it and x
+would be current-frame entries, of which there are fewer than r; it
+would be one of the r nearest predecessors. This proves the exact
+ge_older implication and explains why no degree assumption on the
+terminal frame is needed.
+
+The outgoing hypothesis gives only
+d_y<=1.01 levDeg_j(y) on the old/intermediate sets. Because both y and
+o_x are even, o_x-y=2h with h>=1. Different y give distinct h. Also
+
+ d_y<=2.02 a p^(-(z_j-y))
+     <=2.02 B_o p^(-2h).
+
+Summing this over any finite subset and then the full geometric series
+proves
+
+ B_other<=2.02 B_o/(p^2-1)<=B_o/80,
+
+since 2.02*80=161.6<=168<=p^2-1. If a=0, all relevant degrees vanish
+and the same estimate is immediate. For the actual application a>0.
+The plane-component degrees in MGen are bounded by the total degrees
+d_y, so this controls exactly the otherVectorDegree required in OR3.
+
+OR5. EXPLICIT NUMERICAL MARGIN AND RestDivMU IN THE ACTUAL SETTING
+
+Here c=cP=cStar+rNc0+2rn'c'', N=|TT|>=1, Q=p^G'>=1.
+The actual Type-II data give
+
+ r,k>=2, Y>=r, N1<=k, c>=1,
+ alpha_*<=1+rkQ,
+ a>=C k^3 r^2 N Q^5 c Y,  C>=100.
+
+The alpha bound follows directly from
+alpha_j=1_(j=0)+r(k-r)(Q_j-1) and Q_j<=Q.
+The frame span bounds z_j-o_x<=G', so B_o>=a/Q.
+
+Keeping the source definition of m*, not an estimated replacement:
+
+ m* <=(N1+1)((2Q+7)c+kQ+rkQc)
+     <=2k(9+k+rk)Qc
+     <=8rk^2Qc.
+
+For the second line use Q,c>=1 and N1+1<=2k. For the last use
+9+k+rk<=4rk, valid for r,k>=2: 3rk-k-9>=5k-9>=1.
+Thus
+
+ m*/B_o <=8/(CkrNQ^3Y)<=1/100,
+
+because krNYQ^3>=8. The exact slack s=floor(B_o/(Yk^2))
+satisfies s<=B_o/8 since Y>=2,k>=2. Therefore
+
+ B_o/2-s>=3B_o/8
+          >=B_o/80+B_o/100
+          >=B_other+m*.
+
+The finite valuation of a nonzero plane polynomial is an integer; its
+real lower bound by the left side therefore implies the integral
+lower bound B_other+m*. A zero polynomial is automatic.
+This proves every task hypothesis from OR3. No estimate of the form
+m*<=s is needed, and no floor is silently removed.
+
+Consequently every actual MGen generator factors integrally as Dv_j
+times an MGen0 generator. This is the full RestDivMU conclusion in
+the actual Type-II setting. It uses the one-sided outgoing degree
+condition, not the stronger absolute-error condition of RestDivM.
+The above C>=100 is a proved application threshold; we do not infer an
+optimized universal triple of constants for the bare OneSidedLemma4
+interface beyond this explicitly supplied setting.
+
+OR6. RestModel AND THE WHOLE OUTGOING FAMILY
+
+By definition XX' is the span of plane/normal products A G satisfying
+the prefix inequalities and support restrictions, intersected with a
+normal-order monomial-support bound. To prove inclusion in the span of
+MGen, we may forget the final intersection.
+
+Assume xi has fixed total degree d_y in every segment letter. Expand
+its finite expression in the defining product span and project to
+those total degrees. Each A and G splits into finitely many
+multihomogeneous pieces A_(d') and G_(d''). The selected whole-letter
+projection keeps exactly d'+d''=d. Generic substitutions act within
+each letter, so they preserve this grading. Projecting cannot introduce
+a Laurent exponent outside the original minimum/maximum support.
+The old-frame degree of G remains zero. Thus every surviving
+A_(d') G_(d'') satisfies the same auxiliary M_y, CondM gap and strict
+prefix lower bounds, and is an actual MGen generator after increasing
+enumeration of the segment letters. This proves RestModel directly.
+There is no claim that the final support intersection itself factors
+termwise; it was only forgotten in an inclusion.
+
+Apply OR5 to each summand, and combine the resulting quotients with
+their integral coefficients. For every xi_(i,j) there is integral
+xi'_(i,j) with xi_(i,j)=Dv_j xi'_(i,j). By IP6 each MGen0 quotient
+lies in the integral span of actual joined path products; by IP11 their
+Frobenius images are key symbols of the correct normal order.
+The additive/multiplicative symbol algebra S is closed under integral
+scalar multiplication, since an integral scalar is a normal-degree-zero
+tangential coefficient. Therefore
+
+        phi_j(xi'_(i,j)) in S.
+
+This is the exact conclusion of good_of_span. It does not require
+dividing by a determinant after applying phi_j.
+
+OR7. PROOF OF RestPh WITH THE SOURCE'S EXPONENTS
+
+Everything in this paragraph is already after the chart substitution.
+Let T_s be the r-by-r matrix with entries
+X_(bar Arow(s,l),b)^(p^(s-Arow(s,l))) for b<r.
+Write D_s=det T_s. Let Delta_j be the determinant with entries
+X_(bar f_(j,l),b)^(p^(z_j-f_(j,l))). These all use even selected
+positions and first-block coordinates, so belong to the integral
+tangential algebra T. Periodicity gives D_(s+n')=D_s and
+Delta_(j+J)=Delta_j.
+
+For a late x of segment j, Arow is periodic under x->x+n'. Adding the
+exponents shows that phi_j(Dseg_x) is det of the matrix T_(bar x)
+with every entry raised to p^(z_j-x). Similarly phi_j(Wseg_j) is the
+entrywise p^(z_j-z_(j-1)) power of the Delta_(j-1) matrix.
+
+For any matrix M over any commutative ring and any e>=0,
+
+        det(M^[p^e])=(det M)^(p^e)+p E.
+
+One proof writes the universal identity in integer variables: modulo p,
+the iterated Frobenius is a ring endomorphism and commutes with the
+determinant, so every coefficient of the difference is divisible by p.
+Then specialize. If all entries lie in T, E also lies in T. This is
+valid for arbitrary O coefficients and does not assert that arbitrary
+coefficients are fixed by Frobenius.
+
+Next, for P>=1 and m>=c, expand (D^P+pE)^m. Terms using at least c
+copies of pE are multiples of p^c. A remaining term uses h<c copies,
+so its D exponent P(m-h) is at least m-c. Hence
+
+        (D^P+pE)^m = D^(m-c) H+p^c Y,   H,Y in T.
+
+The weaker exponent m-c matches the source exactly. (If m<c, the
+version with truncated exponent zero is trivial.) Such factorizations
+multiply: the product of two main factors has the product divisor,
+and every other term stays divisible by p^c. This is the whole
+Spl_pow/Spl_mul/Spl_prod mechanism.
+
+Apply it with m1 at every late letter and m2 at every old frame.
+The late intervals (z_(j-1),z_j] for j=0,...,J-1 partition
+(z_(-1),z_(-1)+n']; reduction modulo n' maps their selected letters
+bijectively onto TT. Therefore each D_s occurs once in their product.
+Periodicity reindexes the old-frame factors Delta_(j-1) to Delta_j.
+Since
+
+ m1-c=(2Q+3)c+kQ,
+ m2-c=c(alpha_*+1),
+
+the resulting divisor factors exactly as
+
+ F_c Dcal product_j Delta_j^(c(alpha_*-alpha_j)),
+
+where
+ F_c=R0^c (product_j Delta_j^c)(product_s D_s^((2Q+3)c)),
+ R0=product_j Delta_j^alpha_j,
+ Dcal=product_s D_s^(kQ).
+
+The residual exponents are nonnegative by the definition of alpha_*.
+Absorb them into H. We have proved
+
+        product_j phi_j(Dv_j)=F_c Dcal H+p^cY,             (OR7.1)
+
+with H tangential integral and Y integral (indeed also tangential in
+this proof). This is precisely RestPh, including its p^c coefficient.
+No unproved identity between ordinary SPtrue and the outgoing family
+has been substituted for this argument.
+
+OR8. ASSEMBLY INTO THE EXACT Realisable CONCLUSION
+
+Take the actual fine label X^mu, supported on TT, and the family xi.
+The definition is
+ sigma=monPh=X^mu sum_i product_(0<=j<J) phi_j(xi_(i,j)).
+Using OR6, put
+ G=sum_i product_j phi_j(xi'_(i,j)).
+Then G is integral and lies in the symbol algebra S. Equation OR7.1
+gives the exact identity
+
+        sigma=Z F_c+p^cY',
+ Z=X^mu Dcal G H,        Y'=X^mu G Y.                     (OR8.1)
+
+SY4 applies to this actual fine label: its per-position digits are
+less than p^dist<=Q, so X^mu Dcal lies in S. Since H is tangential
+integral, Z lies in S; Y' is integral.
+
+Suppose sigma has normal degree o, as required by OneSidedLemma4.
+F_c is tangential, hence has normal degree zero. Taking the
+degree-o component of OR8.1 and multiplying by w^o yields
+
+ w^o sigma = w^o (Z)_o F_c + w^(o+2c)(Y')_o.
+
+For each summand of (Z)_o, its definition as a key symbol says that
+w^o times it is a finite integral sum of actual order-o key products
+with tangential coefficients. SY5's already proved finite correction,
+with determinant budgets (2Q+3)c and c, gives integral F_o whose own
+chart substitution differs from the first term by a multiple of
+w^(o+c), and whose every other-plane substitution is a multiple of
+w^(o+c). The remaining term above is divisible by w^(o+2c), since
+w^2=p, and hence does not alter this precision.
+
+If sigma has a prescribed position multidegree d, project F_o to
+that component. Every chart substitution preserves position degrees,
+and coefficient divisibility is preserved by the projection, so all
+congruences and off-plane bounds remain true. If sigma=0 take F_o=0.
+These checks prove all clauses of Realisable: integrality, any
+multidegree forced by sigma, the own-chart order o+c, and order o+c
+at every chart with different rational residue plane.
+
+This is the actual outgoing one-sided theorem. Unlike Conclusion6,
+it never needed a lower approximation bound for the degrees of xi.
+The numerical work added here is valid for C>=100; the whole cloud's
+larger C>=4129 already satisfies it. The universal generic determinant
+lemma, actual task extraction, geometric estimate, RestModel and
+RestPh are all reconstructed in this note. The only reused specialized
+proofs are named completed components FG, IP and SY. Global orbit
+abundance, the separate Type-I route and later global RH/GRH inputs
+are outside this local theorem.

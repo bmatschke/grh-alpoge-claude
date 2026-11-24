@@ -1,0 +1,669 @@
+RH AND UNRESTRICTED DIRICHLET GRH
+FINDING THE REMAINING PROOFS MORE EFFICIENTLY
+Addendum after v0.52 — 23 November 2026
+
+PURPOSE AND SCOPE
+
+This note answers how to identify and discharge the remaining human-proof
+obligations more efficiently. It preserves the detailed, step-by-step
+exposition of the existing proof notes. The user explicitly prefers that
+approach to the recent restart PDF. That preference governs the proposed
+continuation: maintain explanations, intermediate arguments and readable
+mathematical notation.
+
+The accepted formal proof is treated as correct. Its role here is to
+specify a working construction and its dependencies. The unresolved
+obligations discussed below belong to the human reconstruction, not to
+the accepted formal proof.
+
+This is a source-based planning addendum, not a new proof release. No
+whole obligation has been marked closed, no new claim count is asserted,
+and the frozen v0.52 notes and metadata have not been changed. The
+source checks are selective inspections of actual declaration bodies;
+they are not an exhaustive elaborated dependency extraction.
+
+Source repository:
+https://github.com/CocoSgt/riemann-hypothesis-lean
+Accepted pin:
+7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+The source-reference appendix gives precise paths and ranges. The
+existing v0.52 roadmap and its four next-source handoffs remain the
+starting inventory, subject to the route clarifications below.
+
+1. DIRECT ANSWER
+
+Yes, there is a concrete opportunity to work more efficiently while
+retaining the old detailed proof-writing approach.
+
+In the branches inspected, the main obstacle is not that nobody knows
+which global object could possibly satisfy all the conditions. Lean
+already supplies an order of construction, shared choices, and the
+theorems that justify each step. The human task is to recover that
+mathematical construction, distinguish its substantive ingredients from
+formal packaging, and explain those ingredients at the exact scope
+used later.
+
+Some constructions really must be simultaneous. However, there are two
+different sources of difficulty:
+
+  (a) proving a substantial theorem about the chosen objects;
+  (b) making sure several uses refer to the same objects, or to objects
+      linked by a sufficiently precise comparison.
+
+A long record can contain both. Calling the entire record a single
+"missing global object" conceals which kind of work remains. Conversely,
+splitting it into many independent existential assertions can create an
+extra compatibility problem that the source avoids.
+
+The useful improvement is to identify one actual later use, recover
+its actual upstream construction, and then assign the first substantial
+missing mathematical ingredient on that route. The proof of that
+ingredient should remain fully developed and human-readable.
+
+We should also distinguish different senses of "missing":
+
+  - Not yet located: the formal theorem proving the required result
+    has not been identified precisely.
+  - Located but not reconstructed: the exact producer is known, but its
+    mathematical proof has not been written in human form.
+  - Proved conditionally: the human argument is complete given one or
+    more explicitly retained substantive inputs.
+  - Proved on the wrong or unrelated data: an identification or transport
+    is still needed before the actual consumer can use it.
+  - Stronger than needed here: an unused part of an interface is being
+    pursued even though a checked specialization would suffice.
+
+Only the last two sometimes disappear by changing the work assignment.
+The second and third usually require real mathematics. A better map
+makes that work more focused; it does not make it vanish.
+
+2. WHAT "THE SAME GLOBAL OBJECT" REALLY REQUIRES
+
+A typical target has the shape
+
+  for every initial datum D, there exists X such that
+  P(D,X), Q(D,X), and R(D,X) all hold.
+
+Separate proofs of "there exists X with P" and "there exists Y with Q"
+do not supply that target. The efficient approach is to identify the
+common construction first, and prove its properties in parallel.
+
+The correct granularity of the common data is essential. Not every
+auxiliary choice has to agree. Often one field, frame or coefficient
+map is shared, while auxiliary primes, ideals or bases may differ.
+Requiring unnecessary equalities makes the task harder. Omitting
+required equalities leaves a gap.
+
+There are three familiar ways to assemble compatible data.
+
+  1. Construct all properties on one fixed object. The finite coefficient
+     ring in Section 3 is an example.
+  2. Pass to a common refinement, such as a coefficient extension that
+     contains the data required by both representations. Prove the
+     necessary properties survive that refinement.
+  3. Transport along a specified comparison, proving that it preserves
+     all structures used later: maps, pairings, labels, measures,
+     characters and normalizations as applicable.
+
+An abstract isomorphism of underlying spaces need not preserve all
+those structures. On the other hand, once the required transport lemma
+has been proved, every later use should reuse it.
+
+Uniformity is another compatibility condition. A bound of the form
+
+  for each family Fm, there exist C and x0 such that
+  for every x >= x0 and every member i in I_Fm(x), E(Fm,x,i) <= C B(x)
+
+does not follow from a separately chosen C for every x and i. The
+dependency of a constant should be stated when it is chosen. Some
+constants can depend on the family or its outer numerical data; others
+must work before that family is chosen. The source and the actual
+consumer determine which order is necessary.
+
+A short working record of these choices should answer four questions:
+what is chosen, what may it depend on, which later arguments reuse it,
+and what comparison is available if its presentation changes. This is
+an aid to constructing the proof. The exposition should explain the
+choices in normal mathematical prose, rather than making the reader
+navigate a large bookkeeping table.
+
+3. GEOMETRY: THE COMMON COEFFICIENT RING IS ALREADY SPECIFIED
+
+The section-complex route is a particularly clear example.
+
+The required statement chooses one complex and one map to the actual
+section Cech complex, and proves that the map remains a
+quasi-isomorphism after every allowed coefficient-ring change. The
+original ring can be arbitrary; target rings can be nonflat,
+nonreduced and non-Noetherian. The model may depend on the original
+geometric data. One model is not required for all schemes at once. [G1]
+
+The formal construction proceeds as follows.
+
+First fix the scheme, the very ample presentation, its finitely many
+sections s_i, and the line bundle M. Form the graded module of the
+actual twisted sections. The operators given by multiplication by
+s_i are therefore fixed. The affine charts and their section modules
+come from these same data.
+
+Next choose a finite homogeneous presentation matrix Phi which gives
+the correct module after the relevant chart localizations. The source
+does not demand finite generation of the entire graded section module
+as a preliminary step. It obtains a presentation sufficient on the
+charts. [G2]
+
+Then choose finite algebraic certificates for all chart properties:
+defining equations, smoothness witnesses, splitting and annihilator
+matrices, and the presentation identities. Let T be the finite union
+of every coefficient occurring in these certificates and in Phi.
+Set
+
+  R0 = the subring of R generated by T.
+
+This is the explicit choice in the source. Since it is finitely
+generated over the prime subring, R0 is Noetherian. All the polynomial
+data lift to R0. Injectivity of R0 -> R allows their polynomial
+identities to be verified over R0. [G3]
+
+The important point is that one includes the CERTIFICATES, not just
+the entries of Phi. Flatness over R does not automatically descend
+to an arbitrary coefficient subring. The descended smoothness and
+projectivity certificates provide the actual flatness argument.
+
+Finally the localization cube and its comparison maps are induced
+from that same presentation. After extending scalars from R0 back
+to R, division by powers of the fixed s_i and restriction identify
+the resulting cube with the actual geometric sections. Compatibility
+is established by these formulas. [G4]
+
+Thus there is a definite answer to "which common coefficient ring
+should we choose?" The substantial remaining human work is to prove:
+
+  - the localization and extension statements for twisted sections;
+  - finite homogeneous presentation up to chart-localization torsion;
+  - descent of the finite smoothness/projectivity certificates;
+  - flatness on the nonempty cube vertices;
+  - finite graded Cech cohomology and the stated comparison maps.
+
+The already reconstructed GSL algebra then consumes this model.
+Separate geometric H1-vanishing, rank, polarization and translation
+inputs remain separate obligations.
+
+A useful next chapter is therefore "One finite coefficient ring
+preserving every flat chart." Its output is the original homogeneous
+matrix flat-chart descent theorem. Its proof should display the
+certificates, the common ring, the identities, and the retract proving
+flatness. This is a well-defined mathematical assignment, not a search
+over arbitrary models.
+
+Some inspected later callers use only n=1, or the identity translate
+with q=1. That suggests possible specialization, but it does not show
+that every consumer on the terminal proof route can use a weaker
+law. No wholesale n=1 replacement has been established. Moreover,
+specializing a line bundle need not simplify the finite-presentation
+argument. Any narrower result must earn its place by a proved
+application to all selected consumers. [G5]
+
+4. WACH COMPARISON: CHOOSE COMPLETE DATA AT THE RIGHT LEVEL
+
+The remaining HW/Fon/Cmp comparison also has an explicit constructor.
+
+For each permitted layer, the source builds, in order:
+
+  Gamma data;
+  the series ring;
+  the embeddings and their compatibility;
+  the etale module;
+  the Wach lattice;
+  the Herr class maps;
+  the period comparison.
+
+Later objects are defined relative to the earlier choices. For
+example, the Wach lattice belongs to the chosen etale module, and the
+comparison belongs to that chosen lattice. The source packages them
+as one complete Layers record. [W1]
+
+The assembly theorem asks for a nonempty complete record for each
+allowed (K,s,L). It then chooses one complete record at each such
+index and constructs HW, Fon and Cmp from its corresponding fields.
+Together with the stated uniformizer inputs, this is exactly the
+requested output. The assembly statement does not add an unspecified
+compatibility law between different indices. [W2]
+
+This yields a precise distinction:
+
+  - Choosing a COMPLETE Layers record independently at each allowed
+    outer index is sufficient for this assembly theorem.
+  - Choosing unrelated modules, lattices and comparisons inside one
+    record is not sufficient.
+  - The internal functoriality over lattices and their maps remains
+    part of the record and must be proved.
+
+Thus "coherent global Wach object" should not become an invitation
+to invent extra transition conditions. The proof should explain the
+actual internal compatibility and then use ordinary choice at the
+outer level where the source permits it.
+
+The difficult ingredients are faithful cyclotomic-kernel invariants,
+the etale basis construction, the actual Wach lattice from the
+integral comparison input, Herr class maps, and the quantitative
+de Rham filtration comparison. The word "choose" does not supply
+these arguments. The source already tells us which ones to reconstruct
+and how they fit together. The v0.52 Wach handoff records their exact
+entry points; its completed Selmer-signature argument remains reusable.
+
+5. ARITHMETIC: FOLLOW THE ENDPOINT THE FINAL PROOF ACTUALLY USES
+
+There is a concrete route clarification here.
+
+Tracing declaration bodies backward from src/Main.lean reaches the
+window-bound theorem in WindowBoundOfLiteratureLevel.lean. That proof
+calls ends0_alt. It sends its GdEndAlt output through the Alt
+coefficient theorem to CountI, and its ThmS6Core_s output to CountV.
+This is an actual call chain, not an inference from imported files. [A1]
+
+The distinction from the original GdEnd is transparent after unfolding
+the definitions:
+
+  - The original rank-three conclusion says that the specified
+    representation is attached to an appropriate automorphic form.
+  - The Alt conclusion includes that assertion and the additional
+    conditional WitA property.
+  - The original rank-two conclusion gives an attached newform.
+  - The Alt conclusion also supplies WitAQ.
+  - The common g1, Marks and FinEnd data are preserved. [A2]
+
+Consequently GdEndAlt implies the original GdEnd by projecting
+conjunctions on the SAME g1. That forgetful implication is not a deep
+missing mathematical bridge. Conversely, the original weaker
+statement alone does not supply WitA or WitAQ. The actual terminal
+route keeps those stronger properties.
+
+The remaining work should therefore retain the Alt payload while
+reusing the original-route algebra already proved. Merely relabeling
+an endpoint would be invalid; the correct relation is now explicit.
+This diagnosis does not prove the Alt supplier in human form.
+
+The construction of the common arithmetic data is also specified.
+
+  1. Fix the given field L, frame Phi, marking g1 and link data.
+  2. Choose one coefficient extension c1 and residue map f that
+     accommodate both ranks.
+  3. Obtain the rank-two and rank-three seeds on that same field.
+  4. Construct their respective modularity realizations and ideals.
+  5. For each rank, construct another realization at a different
+     auxiliary place.
+  6. Combine the two conclusions to remove that rank's omitted place.
+  7. Return the finite-point result and both automorphic conclusions
+     to the same original frame. [A3]
+
+The two ranks need not have equal seed weights or equal modularity
+ideals. There is no requirement that their auxiliary primes be one
+common prime. Each rank needs two different omitted places for the
+specified gluing argument. Requiring stronger equalities would create
+unnecessary work.
+
+The genuine missing mathematics includes actual automorphic seeds,
+modularity/patching, component propagation, arithmetic-point
+classicality, and descent preserving the additional properties.
+
+A bounded next chapter can target the rank-two/rank-three component
+propagation at the supplied realizations, through AbsMain and FinPtOf.
+Its finite-point conclusion must retain the original coefficient-ring
+and point quantifiers. AFE's completed FinPt-to-FinEnd argument then
+applies. A more specialized modularity supplier may be sufficient on
+these constructed realizations, but the application has to be written
+before any general scope is discarded. Both Dat and Host entries,
+including the permitted Host ell=3 case, remain in view. [A4]
+
+6. ANALYSIS: SEPARATE DEPENDENCIES THAT DO NOT HAVE TO WAIT
+
+The analytic trace identifies three practical distinctions.
+
+First, constructing the core global setting does not use every field
+of the full Forms0 family. The actual lattice-existence step uses only
+the distinguished word, and its isotropic-vector proof uses two pieces
+of that data: a Gram factorization and a norm identity for the chosen
+uniformizer. The full family is used later for transport. [S1]
+
+The mathematical construction is simple to explain once those inputs
+are isolated. A Gram factorization supplies a vector x of norm one.
+If pi has norm T, then its image v has norm T. The construction already
+has an orthogonal vector z of norm -T. Therefore
+
+  w = v + z
+
+is isotropic, since its norm is T-T. It is nonzero, since its pairing
+with z is -T, with T nonzero. The required orthogonality to the existing
+hyperbolic pairs follows from the stated orthogonality of v and z.
+
+This does not remove the full Forms0 requirement for later transport.
+It shows why the elementary isotropic step and the full family
+construction should not be assigned as one indivisible task.
+
+Second, the source has a true-column constructor that supplies one
+common family and explicit later-stage transports. Actual consumers
+in LevelThreeToFour pass this family's forms into the spectral-package
+construction. One should follow that route when the incoming data is
+the actual ColT, instead of independently reconstructing every
+alternative general column constructor. The remaining SRest/SAt
+construction, common selection and spectral estimates are not
+discharged by this observation. [S2]
+
+Third, counting is a parallel branch. The count-constant theorem goes
+from the Siegel-Weil premise to the volume step and counting theorem,
+with constants chosen before the relevant family members. It has no
+Forms0 or chosen-global-setting premise. Counting work therefore does
+not have to wait for the full Forms0 construction. [S3]
+
+For the measure branch, the next focused target is full RescaleStep3
+on the actual supplied setting. Its source chooses one standard
+global additive character before all words and auxiliary tuples,
+then constructs the compatible measure data while retaining the
+prescribed archimedean measures and bridge. Its human proof should
+explain why all quotient and product normalizations coexist. The
+precise Siegel-Weil premise remains explicit until justified at
+its required scope. [S4]
+
+Some analytic questions remain genuinely substantial: local densities,
+the convergent Siegel-Weil formula, uniqueness, the exact archimedean
+orbit-to-fiber measure scalar, counting estimates and the normalized
+kernel bounds. Invariant-measure uniqueness alone does not determine
+a required scalar. Bessel nonvanishing alone does not imply uniqueness.
+Those distinctions are mathematical obligations, not naming issues.
+
+7. A SMALL CHANGE TO HOW EACH PROOF ASSIGNMENT STARTS
+
+Keep the existing detailed proof packets. Precede each new assignment
+by a concise source check with the following output.
+
+A. Write the next theorem in ordinary mathematics.
+
+State the original data, assumptions, conclusion and quantifier order.
+Make explicit which quantities are fixed, and which may vary later.
+Avoid making a large Lean record name stand in for this statement.
+
+B. Find one actual later use.
+
+Record the theorem that will use the result and the actual arguments
+at that call. Check definitions, instances, fields and normalizations.
+A plausible theorem name or an import relation is not enough.
+
+C. Find the actual producer and its construction.
+
+Read its proof body. Identify the common choices in their real order.
+Mark the first unproved human mathematical ingredients. Reuse already
+proved results at matching scope. A short wrapper that invokes a large
+theorem is not a proof of that theorem.
+
+When a definition selects an object by Classical.choose, follow the
+existence theorem supplied to that choice. Its proof is where the
+construction or sufficient existence argument must be recovered.
+
+D. Distinguish substantive ingredients from repackaging.
+
+Substantive mathematics includes existence, finiteness, convergence,
+uniform estimates, nonvanishing, functoriality and normalized comparison.
+Projection of a conjunction or assembling already proved fields may
+be immediate. Maps still need enough explanation for a reader to
+understand what is being identified.
+
+E. Test any proposed simplification at the later use.
+
+Write the implication "specialized result -> this exact required input."
+If the implication needs extra hypotheses, those become explicit
+obligations. Preserve arbitrary-ring targets, family uniformity and
+common-object conditions whenever the consumer uses them.
+
+A general lemma may be clearer and easier to prove than several narrow
+versions. The objective is manageable total mathematical work and a
+readable argument, not the weakest syntactically possible statement.
+
+F. Write the full human proof and its application.
+
+Explain why the construction is natural, construct it, establish its
+properties, and show how the next theorem uses it. Retain useful
+intermediate lemmas. End with a precise account of remaining
+substantive inputs. This is the existing approach, with a better
+starting assignment.
+
+A useful guard against unproductive expansion is to require one of
+two outcomes from a substantial packet: a new original mathematical
+supplier that can actually be used, or a complete bounded subtheorem
+with its next use already identified. Another omnibus implication
+that merely assumes the same difficult input under a new name is
+not the intended endpoint.
+
+8. WHAT TO AUTOMATE, AND WHAT TO LEAVE TO MATHEMATICS
+
+Small navigation tools can help retrieve declarations, list their
+uses, collect source excerpts and retain the correspondence to
+completed human lemmas. This should be limited initially to one
+active route, rather than becoming a new project to index the entire
+repository before further proof writing.
+
+Where a compatible compiled Lean environment is already available,
+its elaborated declarations are preferable for dependency inspection:
+elaboration resolves implicit arguments and type-class instances,
+and its information trees can associate elaborated expressions and
+proof states with source positions. The Lean language reference
+describes these mechanisms. [T1]
+
+The inspected checkout has no compiled environment established for
+this analysis. No full semantic extractor has been built or run here.
+Source-level call checks therefore remain explicitly labeled as
+such. A text-search index is useful navigation, but cannot certify
+all hidden premises or instance choices. Replaying the entire
+accepted proof is not a prerequisite to the present reconstruction.
+
+Even an exact formal dependency list would not automatically identify
+the shortest or clearest human proof. It can expose used theorems and
+arguments. Mathematical judgment must decide which small steps to
+group, which conventional theorem to invoke with checked hypotheses,
+which specialization really suffices, and where explanation is needed.
+
+The best automation target is repeated navigation and bookkeeping.
+The difficult proofs and the readable explanations remain the main
+work. Retain reviewed source-to-lemma correspondences; revisit them
+when a dependency or formulation changes. Keep routine release
+administration proportionate to the mathematical change.
+
+9. PARALLEL WORK THAT FITS THE EXISTING APPROACH
+
+The current four-way arrangement remains appropriate, with one owner
+for each shared construction.
+
+Geometry worker:
+  Prove one coefficient ring preserving all flat-chart certificates.
+  Explain the retract and the comparison to the fixed actual section
+  Cech complex.
+  Retain arbitrary base rings and all original charts.
+
+Arithmetic worker:
+  Reconstruct component propagation and the finite-point output on
+  the common rank-two/rank-three frame. Preserve the Alt properties
+  in the subsequent seed, classicality and descent work. Apply the
+  completed frame and finite-end transport results directly.
+
+Analysis worker:
+  Prove the exact measure-rescaling supplier on the fixed setting.
+  Track one global character and all normalization identities.
+  The count/volume route is independently available for a separate
+  bounded packet; it need not wait for Forms0 transport.
+
+Coordinator / Wach work:
+  Reconstruct a substantive missing Layers supplier at its exact
+  internal scope, then assemble the complete HW/Fon/Cmp triple.
+  Coordinate shared-data joins and independently check the actual
+  applications of the three workers' outputs.
+
+This is a schedule of mathematical roles, not four unrelated searches
+for existence witnesses. When two tasks need the same underlying
+object, the responsible owner supplies its definition and comparison
+maps before the tasks use it. Conditional sublemmas can still be
+proved in parallel with that construction.
+
+The useful review question is: "Can the next theorem now use this
+result on its actual data?" Separate review of the shared choices
+and normalization is particularly valuable. Source range checks and
+claim inventory remain supporting evidence.
+
+10. READABILITY AND PROGRESS
+
+The established proof-note style is the standard for the continuation.
+Each section should tell the reader what is being proved, why it is
+needed, how the construction works, and why its properties follow.
+Definitions should precede their use. Long but explanatory intermediate
+arguments should remain. Conventional mathematical notation should
+carry the main exposition; source names belong primarily in the
+cross-reference material.
+
+Readability is not measured by a lower word count, fewer lemmas or
+a shorter PDF. A concise skeleton can be harder to understand than
+a detailed proof. Simplification is helpful when it removes
+unnecessary mathematical work or makes the reason for an argument
+clearer, while retaining the required conclusion.
+
+The current count of open whole obligations describes the selected
+decomposition. It does not measure remaining difficulty or prove
+that the selected route is minimal. Better progress questions are:
+
+  - Which exact later theorem has gained a human-proved input?
+  - Which substantive retained premise has disappeared?
+  - Which shared-object or normalization join has been completed?
+  - Which hard hypotheses remain on this route?
+  - Did a proposed specialization actually apply?
+  - Did the new explanation make the construction understandable
+    without requiring the reader to decode its Lean record?
+
+The diagnosis here establishes several concrete navigation gains:
+the common coefficient ring is explicit; outer Wach choices do not
+require invented compatibility; the terminal arithmetic route retains
+the Alt payload; and counting can be pursued independently of Forms0.
+It does not establish a numerical speedup or complete any of the
+remaining whole proof obligations. The next progress should be the
+full mathematical proofs selected using these observations.
+
+SOURCE-REFERENCE APPENDIX
+
+All repository references below are at the accepted pin above.
+Ranges are navigation pointers into the source, not substitutes for
+the mathematical proof.
+
+Prefixes:
+  G = src/Development/AbelianVarietyTheory/Proofs/
+  N = src/Development/AbelianVarietyTheory/Definitions/NonGaloisDescent/
+  A = src/Development/AutomorphicArithmetic/AutomorphicVarieties/
+  D = A/ModularityArgument/ThresholdArguments/DenseThresholdCases/
+  F = src/Development/AutomorphicArithmetic/Foundations/GaloisRepresentations/
+
+[G1] G/CoherentCohomologyProofs/
+     ExistsFiniteProjectiveCechComplexLineBundle.lean:19–43.
+     The one-complex, actual-map, universal coefficient-change contract.
+     G/AbelianSchemeLawProofs/SecBaseChangeOfPerf.lean:333–401;
+     FinrankOfIsSecBasis.lean:372–421: exact later uses.
+
+[G2] G/CoherentCohomologyProofs/
+     ExistsGradedPresentationSaturating.lean:11–47.
+     Finite homogeneous presentation sufficient on charts.
+
+[G3] G/CoherentCohomologyProofs/
+     ExistsNoetherianSubringHomogeneousMatrixFlatChar.lean:186–287,
+     especially 190–208 for the finite union of coefficients and R0.
+     FlatQuotSMulTopCokerOfMatrixWitnesses.lean:10–117:
+     explicit retract proving flatness.
+
+[G4] G/CoherentCohomologyProofs/
+     DehomogenisingCompOfSaturating.lean:44–114;
+     ExistsDehomogenisationTwistedChart.lean:127–189;
+     TwistedSectionsLocaliseToCharts.lean:24–50;
+     ExistsTwistedSectionsCubeBijective.lean:45–63;
+     FiniteHomologyCubeComplexGradedModule.lean:16–46.
+     Actual localization cube, maps, and finite Cech cohomology.
+
+[G5] G/UnitaryExistence/ExistsNonvanishing.lean:97–116.
+     src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/
+     BirationalGeometry/ToroidalCompactification/
+     BCRing.lean:145–156 and ThetaCore.lean:259–267.
+     Inspected restricted calls; no all-consumer replacement asserted.
+
+[W1] G/InertiaEigenvalues/ExistsLocalWachFunctor.lean:16–28.
+     Exact dependent order of construction.
+
+[W2] N/ExistsOfLayers.lean:311–331.
+     Complete Layers record and the precise choice/assembly statement.
+     The v0.52 selmer_signature_comparison_v52/wach_next_handoff.txt
+     records the remaining substantive suppliers and their scopes.
+
+[A1] src/Main.lean:4–12;
+     src/Supplements/Kernels/MainTheorems.lean:7–16;
+     src/Development/AutomorphicArithmetic/CharacterBoxes/
+     MainConclusion.lean:7–11;
+     D/VwinOfRow.lean:4–5;
+     D/TopMainZj.lean:55–58,71–74;
+     D/WindowBoundOfLiteratureLevel.lean:25–34;
+     D/DnEndsTop.lean:15–16;
+     D/CohInp.lean:18;
+     D/LinkedUnlE.lean:49–61.
+     Actual exported-theorem route and the Alt/CountI/CountV junction.
+
+[A2] A/AutomorphicForms/BlochKatoSelmerVanishes.lean:84–85;
+     F/AdmissibleResidues/IsAutomorphicOverImagQuad.lean:35–36;
+     A/ModularityArgument/AutomorphyLifting/IsAutCsdA.lean:11–12;
+     WeakOfAtt.lean:27–30 and AAcrossOf.lean:17–20 in that directory;
+     A/CurveDVRSpecialization/RatTorsionFree.lean:38–68;
+     D/AutEnd3AltAlt.lean:20–40;
+     A/ModularityArgument/AutomorphyLifting/AutomorphyDescent/
+     AutEnd2Ao.lean:18–25.
+     The original and strengthened conclusions and their common data.
+
+[A3] D/LinkedEndE.lean:20–67;
+     D/TwoRuns.lean:80–109;
+     F/PlainTorsionPairs/IrrArithPointsAutomorphicAway.lean:34–49.
+     Shared frame/coefficient extension, separate auxiliary choices,
+     and two-place gluing.
+
+[A4] A/CurveDVRSpecialization/AbsMain.lean:12–30;
+     PropagationTheoremGL2.lean:74–84 in that directory;
+     D/PlDefs.lean:12–20;
+     D/GdEndOf.lean:22–23,32,73–95;
+     D/PrLinkedEnd.lean:22–37;
+     D/PointTheoremBaseObject.lean:44–48;
+     D/DnEnds.lean:35–39.
+     Component propagation, full finite-point scope, and return to g1.
+
+[S1] G/FlagMeasures/ExistsGlobalSetting.lean:32–69;
+     LatExistsOfForms0.lean:13–18 and
+     ExistsIsotropicOrthHyp.lean:47–89 in that directory.
+     Distinguished-word use, two projections, and the explicit vector.
+
+[S2] G/IwasawaDecomposition/
+     ExistsStandardColumnComparisonsTrueColumns.lean:20–72;
+     ColumnLayerConditionsTrueColumnsLaterStages.lean:65–73;
+     LevelThreeToFour.lean:103–126,160–163;
+     ExistsSPackIntegrable.lean:14–23.
+     src/Development/AbelianVarietyTheory/Definitions/
+     AutomorphicMembership/SameDegreeZeroFormsSelf.lean:18–59.
+     True-column construction and actual spectral-package consumers.
+     Remaining SRest/SAt and common-selection work is not omitted.
+
+[S3] G/FlagMeasures/CountConstantsOfSiegelWeil.lean:11–24;
+     CountTypedOfVolumeStep.lean:12–22.
+     Independent counting branch with uniform constant order.
+
+[S4] G/FlagMeasures/RescaleStep3.lean:22–97.
+     src/Formalism/LocalToGlobal/SiegelLatticeTheory/
+     FlagStabilizerTensors/SettingExistsAdapted.lean:38–49.
+     Same character, bridge and prescribed measure normalizations.
+     G/FlagMeasures/ExistsGlobalSetting.lean:65–69 applies the result.
+
+[T1] Lean Language Reference, "Elaboration and Compilation",
+     especially "Macro Expansion and Elaboration" and "Info Trees":
+     https://lean-lang.org/doc/reference/latest/Elaboration-and-Compilation/
+     Lean Environment API:
+     https://lean-lang.org/doc/api/Lean/Environment.html
+     These describe the general tooling opportunity. They do not
+     certify that a compatible compiled environment or extractor has
+     been run for this repository.
+

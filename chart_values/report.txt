@@ -1,0 +1,600 @@
+CHART VALUES: COMPLEX MEMBERSHIP, RATIONAL FORMS AND EXACT INTEGRAL LATTICES
+Version 0.14. Component chart_values. Stable claims CV1-CV10.
+Pinned source commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+1. RESULT AND PRECISE SCOPE
+
+The main result reconstructed here is
+GlobalTheory.Mem.Col2.TC.val_tied in
+Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/
+HermitianChartComplexRationalIntegralForms.lean.
+The exported theorem hermitianChart_complex_rational_integral_forms is
+only a wrapper around that result.
+
+For the actual step of the true column family, the theorem proves the
+three fields of ValuationCompatibleChart:
+
+(Fi) A tuple is in the original complex member space if and only if its
+restriction, via the supplied identity-on-matrices frame equivalence, is
+an adelic polynomial automorphic function on every supplied chart.
+
+(rat) Such a complex tuple comes from the actual coefficient-field forms
+space if and only if every class value is represented by a polynomial in
+the exact RatSpan of the integral Weyl generators.
+
+(lat) At EVERY coefficient prime w, a rational form belongs to the actual
+localized integral lattice S_i(w) if and only if, for every class c and
+every rational p_w-local basis b of the Hermitian dual of its class
+lattice, all its frame values are represented by one polynomial in
+IntSpan_w, evaluated through b^{-1}, with the exact determinant twist.
+The word every is literal: the output uses okW = (fun _ => True).
+
+This is considerably more than observing that a record could be filled.
+The proof explicitly extends class functions to adelic points, constructs
+the coefficient-field preimage using injectivity of polynomial evaluation,
+identifies the actual integral coefficient lattice, and clears one common
+denominator over all the finite classes. The intermediate local polynomial
+lattice is recovered from its full family of local models by LP2.
+
+The theorem takes TC.Ok, TC.Pins, a witness l : I.Laws, Z : TC.Later,
+the index i <= m, a family of LevelChart objects, ReadsK, and IdY.
+The simultaneous source charts and their carrier/reading data are the
+subject of the FC component. They are not inferred in this component just
+because their record types have names.
+
+CV10 additionally proves the ptC, rat and lat portions of the source's
+clsP_tie, for the terminal row space of dimension N_m - 1. It takes the
+actual row class chart and its ReadsP identities. It does not claim the
+separate ipP or NormPTie clauses of that theorem.
+
+Neither ValuationCompatibleChart nor these value clauses contain any
+Hermitian norm identity, Petersson identity, period identity, diamond
+equivariance or archimedean estimate. The exact lattice equality does not
+by itself imply those statements. FC handles its specified metric and
+carrier suppliers separately.
+
+2. NOTATION DICTIONARY AND WHICH OBJECTS ARE ACTUALLY THE SAME
+
+The main note uses L for the coefficient number field. In the source this
+is B.LL and also B.fields.K. The CM field is E = B.host.E = B.fields.E,
+with maximal real subfield F. We use sigma for the chosen coefficient
+embedding L -> C; the source name is B.embLL. The finite family j_tau is
+B.fields.emb. The complex field embeddings used by the chart record are
+literally iota_tau = sigma o j_tau:
+
+  Formalism.L2.Forms.embT (I.rec7 l Z)
+    = embAt B.embLL B.fields.emb.
+
+The proof obtains this equality from B.embE_phi0. It is an exact equality
+of ring homomorphisms, not merely a field isomorphism or a freely changed
+complex place.
+
+The level is i, the dimension n = B.R.N i, and the unshifted polynomial
+weight mu is (I.fm l u a).lam i. The weight used by the actual frame
+functions is
+
+  lambda = mu - c_i * (1,...,1),  c_i = i(t+1)/2.
+
+The t in the source is odd. If t = 2k+1, then
+
+  (t+1)/2 = k+1,  i(t+1)/2 = i(k+1).
+
+Thus the natural-number divisions in the two source weight definitions
+have exactly the same integer value. One source shW subtracts its scalar;
+GlobalTheory.Mem.Col2.shW adds its scalar. The latter is called with
+-i((t+1)/2), and the two resulting weights are equal.
+
+Adding the same integer to every component does not change natW, the
+partition obtained by subtracting the terminal component. It does change
+detShift and hence the determinant factor of the frame function. All
+formulas use d_tau = lambda_tau.detShift, including the source's empty
+matrix convention when n = 0.
+
+SF has already shown that the actual positive spaces, in their designated
+global frame coordinates, have gramN = 1 and integral standard lattice.
+Moreover
+
+  latCrd (I.rec7 l Z) i hi (I.latAt u a i c)
+    = ((I.stp u a i).rep c).deco.L.
+
+The Hermitian dual of this lattice for h(x,y) = conjugate(x)^t y is
+exactly the source's deco.Lsh. This is the equality used in val_tied.
+It is an equality of sets/modules in E^n in the fixed coordinates.
+
+The symbol b in CV6-CV9 denotes a rational p-local basis of a particular
+class's dual lattice, chosen or quantified separately for that lattice.
+It is NOT the common global matrix B of SF. The common global coordinate
+system remains fixed, while b describes a lattice within that system.
+
+The frame equivalence e_Y has (e_Y z).val = z.val for every z. Its inverse
+has the same property. The parameter G attached to Frames G does not
+impose an orthonormality condition: Frames G is the subtype of tuples of
+invertible matrices. The separate predicate Frames.IsON is not required
+in this value proof. This distinction lets polynomial injectivity be
+proved using all invertible matrices, with no unitary-density argument.
+
+3. CV1: FRAME EVALUATION AND THE ACTION CONVENTION
+
+For a polynomial P in the blocks X_tau, and an invertible matrix tuple A,
+write
+
+  E_{lambda,A}(P)(z)
+    = product_tau det(A_tau z_tau)^{d_tau}
+        times P((A_tau z_tau)_tau).
+
+This is the source fnOf. It matters that the determinant is taken of
+A_tau z_tau, not only of z_tau. This convention keeps the determinant
+factor in every change-of-basis formula.
+
+If E_{lambda,A}(P) = 0, its determinant multiplier can be cancelled on
+every invertible tuple. Since left multiplication by A permutes these
+tuples, P vanishes on all of them. To prove that P itself is zero, fix
+an arbitrary tuple X and consider
+
+  Q(s_tau) = P((X_tau + s_tau I)_tau).
+
+For each tau, det(X_tau + s_tau I) is a monic polynomial in s_tau, so only
+finitely many s_tau are forbidden. Q vanishes on the product of the
+remaining infinite sets. Successive one-variable polynomial uniqueness
+gives Q = 0, hence P(X) = Q(0) = 0. Since X was arbitrary, P = 0.
+Mapping coefficients through the injective field embedding sigma preserves
+this injectivity. This proof is also valid for n=0, where determinants are
+one and the matrix-variable set is empty.
+
+The source's action on polynomials is
+
+  rho_lambda(g)P(X)
+    = product det(g_tau)^{d_tau} P((g_tau^t X_tau)_tau).
+
+The transpose makes rho a homomorphism: applying rho(h) inside rho(g)
+substitutes h^t g^t X = (gh)^t X. The determinant factors multiply.
+Direct evaluation gives
+
+  E_{lambda,1}(sigma(rho_lambda(g)P))
+    = E_{lambda,sigma(g)^t}(sigma P).
+
+For the group element gamma acting on the class step, its polynomial
+action is eta * rho_lambda((j_tau(gamma)^{-t})_tau). Its evaluation is
+
+  sigma(eta) E_{lambda,1}(sigma P)(iota(gamma^{-1}) z).
+
+This is exactly the source trFr, with its inverse on the frame argument.
+The determinant and transpose orientations agree throughout.
+
+The complex polynomial representation is stable under arbitrary invertible
+left substitutions. Equivalently it is the dual-Weyl coefficient space:
+the column degree and the right upper-unipotent identities are unchanged
+by left substitution. The source proves the corresponding valC_tr using
+cspan_eq and blockAct preservation. No claim of integral stability for
+arbitrary nonintegral matrices is made here.
+
+4. CV2: EXACT COEFFICIENT-FIELD IMAGE AND EXACT INTEGER LOCALIZATION
+
+For each weight partition nu_tau, Delta_nu(Z) is the Z-module generated by
+all integral divided-power words on the highest polynomial. The operators
+and their highest polynomial commute with coefficient extension. Therefore
+the integral coefficient tensor lattice is the O_L-span of products of
+these same integer polynomials. This identifies the source delStd exactly.
+
+The characteristic-zero polynomial space VV is initially expressed using
+the dual-Weyl space nablaSq. Over L, nablaSq = delSq. The equality can be
+seen either from the preceding IW3 rational-span argument or from the
+source's standard-monomial proof: every integer bideterminant has a
+nonzero integer multiple in the integral Weyl module; this integer is
+invertible in the characteristic-zero field. This argument proves a field
+equality only. It does not show that the integer coefficient lattices
+Delta and nabla are equal.
+
+Tensoring the field equality gives
+
+  V_lambda = L * Delta_std.
+
+RatPol in HermitianChartComplexRationalIntegralForms, and RatSpan in
+TiedStep, are additive closures of the finite sums sigma(r) times tensor
+products of integer Delta generators, for r in L. An additive subgroup
+closure means finite additions and negatives; no topological closure is
+involved. Distributing tensor products shows
+
+  RatSpan = sigma(V_lambda).
+
+The source proves the two directions separately as
+exists_VV_of_mem_RatPol and map_mem_RatPol. The latter direction is where
+characteristic zero is used to replace the field dual-Weyl space by the
+field span of the Weyl words.
+
+For the integer statement, put R_w = O_{L,w}. The source's condition
+r in intW is equivalent to |r|_w <= 1 and hence r in R_w. If
+
+  Q = sum_{j=1}^r sigma(a_j) sigma(F_j), a_j in R_w,
+
+and each F_j is an integer Weyl tensor, choose a common denominator
+s in O_L outside w for the finitely many a_j. Then
+s sum a_j F_j belongs to Delta_std, so the lifted polynomial belongs
+to Delta_std,w. Conversely, given P in Delta_std,w, choose s outside w
+with sP in Delta_std; expand sP into the integer tensors and divide by s.
+Every resulting coefficient remains in R_w. Thus
+
+  IntSpan_w = sigma(Delta_std,w).
+
+This equality is independent of the positive ramification normalization of
+the additive valuation, because the source retains its exact nonnegative
+valuation ring. We do not change numerical valuation values or assert a
+norm equality. There is no passage through the larger integral nabla
+lattice and no bound of the form p^k Delta in place of the exact lattice.
+
+5. CV3: CONSTRUCTING THE RATIONAL FORM, WITHOUT AVERAGING
+
+For a generic step S, its classes are pairs consisting of a finite index
+and an orbit of decorated points. Its rational form space is the subspace
+of tuples v_c in VV L lambda fixed by each class stabilizer under the
+character-twisted polynomial action. Its complex member space Fi is
+defined by the corresponding frame-value invariance.
+
+Suppose a complex tuple phi lies in Fi and each phi_c has a RatSpan
+polynomial representation. By section 4 choose v_c over L. For each
+stabilizer element s, the complex invariance equation says the evaluation
+of rho_S(s) v_c equals the evaluation of v_c. The intertwining formula
+from section 3 and injectivity of evaluation imply rho_S(s)v_c = v_c
+over L. Hence the tuple v is an element of the source FormsK, and its
+actual embedding is phi.
+
+The forward implication is its defining evaluation formula together with
+the same intertwining identity. This proves exists_embF_iff constructively
+at the level of chosen finite polynomial representatives. The proof does
+not divide by a stabilizer order. It does not use a dimension comparison,
+nor assume that the stabilizers are trivial. Pointwise choice of v_c
+would even work for an infinite class set; class finiteness is only needed
+later for the common integral denominator.
+
+6. CV4: ADELIC EXTENSION WITH REPRESENTATIVE INDEPENDENCE
+
+The chart supplies a bijection from its class index set to the double
+quotient Gamma \ G(A_f) / U. It is important that this is a bijection:
+surjectivity provides decompositions, and injectivity identifies two
+representative class labels when a point admits two decompositions.
+
+Let y_c be the representatives. For y = gamma y_c kappa, define
+
+  f(y,z) = chi(kappa) phi_c(iota(gamma^{-1})z).
+
+Suppose also y = gamma' y_{c'} kappa'. The class bijection gives c=c'.
+Put delta = gamma'^{-1} gamma and v = kappa kappa'^{-1}. Then
+
+  y_c = delta y_c v,
+  iota(gamma'^{-1}) z = iota(delta) iota(gamma^{-1}) z.
+
+The assumed self-relation phi_c(iota(delta)z0)=chi(v)phi_c(z0)
+therefore identifies the two values after multiplication by chi(kappa').
+This proves representative independence with precisely the source's
+right-character convention.
+
+The same calculation after multiplying y on the left by a rational
+unitary element and on the right by a level element proves
+
+  f(gamma0 y kappa0, iota(gamma0) z) = chi(kappa0) f(y,z).
+
+At each fixed y, the dependence on z is an invertible left translate of
+phi_c times a scalar, so it remains in ValC by section 3. Restriction to
+the representatives recovers phi. This proves both directions of
+mem_fiC_iff and explains why just matching dimensions of complex spaces
+would not supply the required theorem.
+
+7. CV5: WHY THE SOURCE'S TWO CHARACTERS ARE IDENTICAL
+
+The main chart proof must relate the character of the concrete decorated
+point stabilizer to the character of the actual adelic level group.
+An abstract stabilizer isomorphism would not suffice.
+
+ReadsK supplies k_beta and says that y_c k_beta represents the decorated
+point at c after extending its rational frames to the common twist set
+SQ. The representation predicate IsPtOf carries all of the following:
+
+  (1) the adelic matrix is unitary;
+  (2) it carries the standard completed/global lattice to the designated
+      full lattice N;
+  (3) its inverse pullback has the prescribed last-coordinate residues
+      at the type primes ST;
+  (4) its inverse pullback has all the prescribed auxiliary-coordinate
+      residues at SG;
+  (5) at each twist prime Q, its entries are exactly the entries of the
+      designated rational frame, embedded in that completion.
+
+The source theorem isPtOf_ratAd transports every one of these fields.
+For a rational unitary gamma,
+
+  pullV(gamma g, x) = pullV(g, gamma^{-1}x).
+
+Thus the represented lattice is gamma N, and the transformed f and be
+functionals are the original functionals evaluated at gamma^{-1}x.
+The rational frame at Q becomes gamma times its old frame, exactly
+because the Q-component of the rational adelic diagonal is the coefficient
+embedding of gamma. The unitary equation is stable under multiplication.
+
+Restricting a representation from SQ to Q_a preserves its rational-frame
+clauses. ReadsK has Q_a subset SQ, and I.Ok supplies that SQ, hence Q_a,
+is disjoint from SG. In the source, membership in SQ identifies a
+selected good twist prime lying over a prime outside I.S, whereas every
+SG prime lies over one of the auxiliary rational primes contained in I.S.
+This proves the disjointness used by IsPtOf.of_extTo. No arbitrary
+replacement of a prescribed residue or prime is made.
+
+Now let s=(gamma_s,ell_s) stabilize p_c, where ell_s is its pair of level
+components. The product action gives
+
+  (1,ell_s)p_c = (gamma_s^{-1},1)p_c.
+
+If the adelic level element kappa satisfies y_c=gamma_s y_c kappa, then
+
+  gamma_s^{-1}(y_c k_beta) = y_c kappa k_beta.
+
+The previous transport result identifies this latter matrix as a
+representative of (1,ell_s)p_c. The ReadsK.chr clause applies because
+the rational component of (1,ell_s) is the identity. It yields
+
+  chi(kappa) = sigma(chr_S(1,ell_s)).
+
+The actual stepY character is a product of the two level characters;
+by its formula it ignores the rational unitary component. Therefore
+chr_S(1,ell_s)=chr_S(s), proving the desired equality with its exact
+orientation.
+
+Finally LevelChart.stabI_range identifies rational gamma in y_c U y_c^-1
+with the image of a point stabilizer. A relation y_c=gamma y_c kappa
+puts gamma in that range using kappa^-1. Conversely any stabilizer-image
+gamma supplies an inverse level element giving such a relation. Combining
+this with the character identity identifies the original fixed-vector
+condition with the self-relation needed in section 6. Thus the actual Fi
+clause follows chart by chart.
+
+8. CV6: SEMILOCAL RATIONAL BASES AND COEFFICIENT-PLACE BASE CHANGE
+
+Let p be a rational prime and H a full O_E-lattice in E^n.
+The source IsLocBasis p H b is stated with natural integers s satisfying
+p does not divide s. It is exactly the statement that
+
+  H tensor O_{E,(p)} = b O_{E,(p)}^n.
+
+For q over p, every such s is outside q: Bezout gives a linear combination
+of p and s equal to one. Further localization gives a q-local basis.
+In explicit coordinates both inclusions are verified by multiplying the
+finitely many denominators of the coordinates or lattice-membership
+witnesses. This is isBasisAt_of_isLocBasis.
+
+The existence of b is the earlier rational semilocal basis construction.
+A full lattice is a finite projective module over the Dedekind integer
+ring. After localizing at the finitely many primes over p, each ideal
+summand is principal: choose an element with its prescribed ideal
+valuations at those primes by the CRT/approximation argument. The
+resulting free basis consists of elements of E^n and is therefore one
+matrix in GL_n(E), simultaneously at every prime above p. The basis does
+not vary independently with tau or with a chosen complex embedding.
+
+For each prescribed j_tau:E->L, let q_tau be the contraction of w.
+The rational residue characteristic p_w belongs to q_tau because its
+image is the same integer p_w in w. This is the source hbel calculation.
+Define M_tau as the O_L-span of j_tau(H). A denominator outside q_tau
+maps outside w, so
+
+  M_tau,w = j_tau(b) R_w^n.
+
+The ordinary dual is M_tau^vee={a:a^t x in O_L for all x in M_tau}.
+For any finite full M_tau, localization of this dual equals the local
+dual. One inclusion follows by clearing the denominator of an element
+of M_tau^vee; for the other, clear the finitely many denominators of
+a^t m_j on a finite generating set m_j. Therefore
+
+  (M_tau^vee)_w = j_tau(b)^-t R_w^n.
+
+This ordinary dual must not be confused with the preceding Hermitian
+dual H_c^#. The source delAtr first takes H=H_c^#, extends it along
+j_tau, and THEN takes the ordinary linear dual of that extended lattice.
+The two dual operations and all coefficient embeddings are preserved.
+
+9. CV7: WHY THE GLOBAL POLYNOMIAL LATTICE LOCALIZES TO ONE EXACT MODEL
+
+The source definition transLat intersects the local conditions at every
+coefficient prime and every local basis. For the integral Weyl tensor
+Delta_std and the lattices M_tau^vee, denote this global lattice by
+D_lambda(H).
+
+At a fixed w, choose a tuple of bases g_tau,w of M_tau^vee,w and put
+
+  A_w = rho_lambda(g_w) Delta_std,w.
+
+First prove independence from the chosen bases. Another tuple is g_w h
+for h_tau in GL_n(R_w). The ordinary polynomial Weyl lattice is preserved
+integrally by h_tau^t. Over the local ring, an invertible matrix can be
+reduced using a unit pivot, so it factors into elementary matrices,
+permutations and diagonal units. Elementary substitutions are finite sums
+of integral divided powers. Diagonal units preserve the weight components,
+and permutations preserve the integral divided-power module. The
+determinant twist is a unit because det(h_tau) is a unit, even when its
+exponent is negative. Applying the same argument to the inverse proves
+equality. This is the basis-independence content of nb_indep for Delta.
+
+The definition of transLat therefore becomes simply
+
+  D_lambda(H) = intersection_w A_w
+
+inside the fixed vector space V_lambda. Localizing an infinite intersection
+is not an unrestricted algebra rule, so a separate justification is needed.
+The readable proof uses LP2, with a finite-support argument:
+
+  * M_tau^vee is a finite full O_L-lattice for each of the finitely many
+    tau. Choose d != 0 with
+       d O_L^n subset M_tau^vee subset d^-1 O_L^n
+    for all tau. Away from the finitely many prime divisors of d,
+    M_tau^vee,w = R_w^n and hence A_w = Delta_std,w.
+  * At each remaining prime, A_w is the image of a finite full standard
+    lattice under an invertible L-linear map, hence is itself finite and
+    full. A nonzero a_w in O_L can be chosen with a_w Delta_std subset A_w.
+  * Multiply those finitely many a_w. If x belongs to V_lambda, clear a
+    further denominator so that rx belongs to Delta_std. The resulting
+    common nonzero multiple belongs to every A_w.
+  * Every A_w is an R_w-module, hence is local at w. LP2 now gives
+       (intersection_v A_v)_w = A_w.
+
+This proves the exact localization statement. The source nb_loc proves
+the same conclusion by a uniform commensurability bound with nabStd and
+localized_iInf. The finite-support/LP2 presentation is a mathematical
+simplification of that argument. It uses the same actual polynomial
+space and Delta lattice and does not enlarge the lattice or invoke an
+unproved commutation of localization with arbitrary intersections.
+
+Using g_tau,w = j_tau(b)^-t gives
+
+  F in D_lambda(H)_w
+    iff F = rho_lambda((j_tau(b)^-t)_tau) F0
+        for some F0 in Delta_std,w.
+
+Evaluation transforms the transpose of j_tau(b)^-t into j_tau(b)^-1.
+Combining the exact integral image from section 4 with the evaluation
+identity from section 3 gives
+
+  E_{lambda,1}(sigma F)
+    = E_{lambda,iota(b^-1)}(Q), Q in IntSpan_w.
+
+For the converse, evaluation injectivity recovers the underlying
+coefficient-field polynomial equation and hence membership in the local
+Delta lattice. This proves both directions of
+mem_localization_delAtr_fn with every determinant factor included.
+
+10. CV8-CV9: THE FINITE CLASS PRODUCT AND THE ACTUAL val_tied
+
+The actual global integer lattice is the fixed-vector subspace intersected
+with the product of D_lambda(H_c^#) over all class labels. At a fixed w,
+local coordinate membership for each class gives a denominator s_c
+outside w. The class set is finite because each step has finite orbit
+set and the index set beta is finite. Its product s=product_c s_c remains
+outside w. Multiplication by s preserves the fixed-vector equations and
+makes every coordinate integral, so the resulting vector belongs to the
+actual global lattice. This proves
+
+  x in L_w iff every x_c in D_lambda(H_c^#)_w.
+
+The source mem_locW_iff identifies its valuation-defined S_i(w) with this
+ordinary coefficient-prime localization. There is no change of residue
+prime, ramification scale or embedding in making that identification.
+
+Apply the previous paragraph to every rational p_w-local basis b of
+H_c^#. The forward direction supplies an IntSpan polynomial for each b.
+For the reverse direction, choose at least one such b by the semilocal
+basis construction. This last existence step is necessary: a universally
+quantified implication over a nonexistent basis would otherwise be
+vacuous. The field of coefficients is still L, and the all-frame equality
+uses the same e_Y on underlying matrices.
+
+The three resulting clauses coincide with the literal fields Fi, rat,
+and lat of ValuationCompatibleChart. The val_tied proof also retains:
+
+  - the actual class carrier from I.stp;
+  - the same GStep stabilizer matrices and level characters;
+  - the class lattice H_c and its actual Hermitian dual Lsh;
+  - the original coefficient prime w and its residue characteristic p_w;
+  - the prescribed embeddings embT = sigma o j_tau;
+  - the actual determinant-shifted weight lambda;
+  - every local integer condition, with okW identically true.
+
+The proof is conditional on the supplied compatible charts and the listed
+true column data, but the three value conditions themselves have now been
+proved. In particular, neither rational surjectivity nor integral lattice
+membership is taken from the name of a chart record.
+
+11. CV10: TERMINAL ROW APPLICATION AND ITS METRIC BOUNDARY
+
+In clsP_tie the row dimension is N_m-1. The row step has empty type-prime
+decoration set. From the definition of L, all its type-prime equations
+are absent, so L=N. The decorated ambient lattice N is self-dual by its
+Ok condition, hence Lsh=dual(L)=N. This is the exact proof of Lsh_empty.
+It is stronger than an identification only after tensoring with E.
+
+The untwisted row weight is sgW and the actual frame weight is
+sgW - m(t+1)/2. Their natW values agree. The source VV_shW and
+delStd_shW are therefore exact equalities, while its frame determinant
+shift remains that of sgT. The class frame equivalence eW is the identity
+on matrix entries.
+
+For the row chart produced by exists_cls, its supplied stabilizer range
+and character identity give ptC by section 6. The rational descent of
+section 5 gives rat. Applying section 9 at every coefficient prime and
+then intersecting the local lattices gives lat. This global intersection
+uses the elementary denominator-ideal argument: if x is outside an
+O_L-module, the proper ideal {r:r x is in the module} is contained in
+a maximal ideal at which x fails local membership.
+
+The full source clsP_tie also proves an inverse-stabilizer-weighted
+Petersson formula and NormPTie. Those invoke the separate
+MetricTie.ipVal_step and MetricTie.norm_step theorems, compatibility of
+conjugation at all embeddings (FOk), and the normalized Fock form. They
+do not follow from the value statements here. In particular, CV10 is a
+corollary for ptC/rat/lat, not a claim that the entire ValPTied record has
+been reconstructed without those metric arguments.
+
+12. SOURCE DEPENDENCIES, SIMPLIFICATIONS AND REMAINING WORK
+
+Main direct source:
+  HermitianChartComplexRationalIntegralForms.lean
+    RatPol, exists_VV_of_mem_RatPol, map_mem_RatPol;
+    mem_fiC_iff, exists_embF_iff, stab_inv_iff, dualSet_std;
+    lev_part_smul, val_tied.
+
+Substantive underlying algebra:
+  IsBasisAtOfIsLocBasis.lean
+    isBasisAt_of_isLocBasis, mem_localization_delAtr_fn,
+    mem_localization_latticeOf, fnOf_eq.
+  GlobalInterpolation/MemClosureIff.lean
+    mem_closure_iff, mem_localization_delAtr.
+  SatakeParameters/SmulMemLocPOfVal.lean
+    integer Weyl tensor generation and coefficient localization.
+  Columns/CoefficientsModP/NablaIndependenceHolds.lean
+    exact integral basis independence and nablaDeltaLocal_holds.
+  Columns/CoefficientsModP/BaseCh.lean and PairBDual.lean
+    localized scalar extension and the exact ordinary-dual basis.
+
+Actual decorated-point/stabilizer joins:
+  ReferenceCharactersFactorTame.lean: IsPtOf and of_extTo.
+  IsPointOfRationalUnitaryAdelicMul.lean: isPtOf_ratAd.
+  LevOkTwists.lean: the actual disjoint prime support.
+  PredMemGamRanks.lean: stepY's character, FormsK, Fi and hlat.
+  ExtUHInjective.lean: evaluation intertwining and Lsh_empty.
+
+Terminal reuse:
+  ExistsEmbFIff.lean:
+    exists_embF_iff, mem_Fi_iff, rat_iff, lat_iff;
+    constant-weight-shift identities;
+    clsP_tie's ptC/rat/lat constructions.
+
+Dependencies already reconstructed in earlier versions:
+  IW3: characteristic-zero rational span of the integral Weyl module.
+  CS2: integral generators and their exact matrix stability.
+  CS3/SF: rational semilocal bases and actual standard coordinates.
+  LP2: localization of a family intersection with a common denominator.
+
+The main text shortens two arguments without weakening their conclusions:
+
+  (a) Polynomial injectivity uses the elementary X+sI argument, avoiding
+      a larger unitary-density development that is unnecessary for all
+      invertible frames.
+  (b) Exact local-to-global polynomial-lattice recovery uses finite bad
+      support plus LP2, instead of the source's more quantitative uniform
+      scaling estimates. This component requires exact equality, not an
+      explicit common-denominator exponent, so the simpler argument has
+      exactly the needed content.
+
+This is a source-guided mathematical reconstruction. There is no Lean
+compilation or kernel replay and no PDF rendering in this version's CV
+workflow. The provenance builder checks the actual pinned Git bytes,
+declaration ranges and SHA256 hashes. That establishes source identity,
+not independent formal correctness of the whole source repository.
+
+The remaining inputs are compatible true column/chain/period data and
+the chart supplier, as precisely stated above. At source level, I.Laws is
+not an additional unproved axiom: LawsOfOk.laws_of_ok constructs it from
+I.Ok by combining concrete chain, level, period, zero-class and forms-law
+theorems. The readable proof of those upstream suppliers remains a
+separate task unless discharged by the other current components.
+
+The exact next-target list records narrow upstream suppliers, with
+declaration ranges and hashes. These are human reconstruction targets;
+their inclusion does not claim a new RH or GRH endpoint or a new global
+existence theorem in this component.

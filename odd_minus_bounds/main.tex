@@ -1,0 +1,832 @@
+\section{The complete odd-minus estimate from the character-length bound}
+\label{sec:odd-minus-bounds}
+
+\status{OB1--OB8 reconstruct the full quantitative supplier
+\texttt{ThmBcFree} from OS1 and \texttt{PsiBound}, with the explicit
+constant $240$.  The proof includes the exceptional primes, the
+original-field and local-data comparisons, the negative cyclotomic
+twist, and all finite prime and twist sums.  The bespoke dependencies
+are the literal \texttt{PsiBound} proved in OS9 and the finite Jacobi
+annihilation proved in OS1.  The classical inputs listed below are
+standard theorems, not new project-specific hypotheses.  In particular,
+\texttt{killPow}, \texttt{gen}, \texttt{prodVal}, \texttt{atPrime} and
+\texttt{deg} are proved here in the scope needed by the endpoint, rather
+than retained as names for unresolved arguments.}
+
+Fix a CM number field $E$, its given algebraic closure $\Omega$, a
+prime $\ell$, and the source's local-data record $D$.  Thus $D$ lists
+exactly the primes of $E$ above $\ell$, chooses a place of $\Omega$
+above each, and realizes the cyclotomic character on the quotient
+$G_{E,S}$ unramified outside those primes.  Put
+\[
+ A_\ell(e)=(\mathbb Q_\ell/\mathbb Z_\ell)(-e),\qquad
+ \mathcal S_\ell(E,e;D)
+ =\ker\!\left(H^1(G_{E,S},A_\ell(e))
+       \longrightarrow\prod_{v\mid\ell}H^1(E_v,A_\ell(e))\right).
+ \tag{OB.1}
+\]
+All cochains are continuous and the coefficients are discrete.  This is
+the literal \texttt{Sha D e}, since \texttt{qzTw D e} has action
+$\chi_{\rm cyc}^{-e}$.  Complex conjugation acts on this cohomology by
+conjugation on the group and the same negative twist on coefficients.
+For $e\ge1$ write
+\[
+ \mathcal S_\ell^-(E,e;D)
+ =\{x\in\mathcal S_\ell(E,e;D):cx=(-1)^{e+1}x\},\qquad
+ m_\ell(E,e;D)=\operatorname{length}_{\mathbb Z_\ell}
+                       \mathcal S_\ell^-(E,e;D).
+ \tag{OB.2}
+\]
+Initially lengths take values in $\mathbb N\cup\{\infty\}$; we prove
+finiteness before treating them as real numbers.  The notation agrees
+with \texttt{ShaMinus} and \texttt{minusLen}.  Write $n=[E:\mathbb Q]$,
+and let $N\ge1$ be any modulus equipped with a rational embedding
+$E\hookrightarrow\mathbb Q(\zeta_N)$.
+
+\subsection{Classical inputs and the exact remaining interface}
+\label{sec:ob-classical}
+
+The following classical theorems are used in the precise forms stated.
+They are recorded separately so that their use cannot be mistaken for
+a reconstruction of a deeper project-specific supplier.
+\begin{description}[style=nextline,leftmargin=0pt,labelwidth=0pt,labelsep=0pt]
+\item[OB-CF: unramified class-field reciprocity.]
+\label{ob-ref-classfield}
+For a totally complex number field $K$, its maximal everywhere
+unramified abelian extension has Galois group canonically isomorphic
+to $\operatorname{Cl}(K)$ by the Artin map.  This isomorphism respects
+automorphisms of $K$.  See J.~S.~Milne, \emph{Class Field Theory},
+version 4.03, V, Theorem 3.6, Corollary 3.7 and Example 3.9,
+pp.~158--159, \url{https://www.jmilne.org/math/CourseNotes/CFT.pdf}.
+The equivariance also follows directly by conjugating Frobenius at
+unramified primes.
+
+\item[OB-KU: Kummer theory and the unit theorem.]
+\label{ob-ref-kummer}
+If $K$ contains $\mu_\ell$, then
+$H^1(G_K,\mu_\ell)=K^\times/K^{\times\ell}$, with the usual
+valuation criterion away from $\ell$.  The group of $S$-units has
+rank $r_1+r_2-1+|S|$ and finite cyclic torsion.  See Milne,
+\emph{Class Field Theory}, VII, Appendix A, Theorem A.3 and
+Proposition A.5, pp.~226--227, and \emph{Algebraic Number Theory},
+version 3.08, Theorem 5.11, p.~90,
+\url{https://www.jmilne.org/math/CourseNotes/ANT.pdf}.
+The Selmer cardinality bound used below is derived from these facts.
+
+\item[OB-MD: ideal representatives and abelian discriminants.]
+\label{ob-ref-minkowski}
+Every ideal class of a number field of degree $r$ and discriminant
+$\Delta$ has an integral representative of norm at most
+$(4/\pi)^{r_2}r!r^{-r}\sqrt{|\Delta|}$ (Milne,
+\emph{Algebraic Number Theory}, Theorem 4.3, p.~70).
+For an abelian field, $|\Delta|$ is the product of the conductors of
+its characters (R.~Sharifi, \emph{Iwasawa Theory}, equation (4.2.1),
+\url{https://math.ucla.edu/~sharifi/notes/iwasawa-ch04.html}).
+
+\item[OB-BC: Bernoulli denominators.]
+\label{ob-ref-bernoulli}
+For positive even $j$, von Staudt--Clausen implies that the
+denominator of $B_j$ divides $\prod_{p-1\mid j}p$; also
+$B_1=-1/2$ and odd $B_j$ vanish for $j>1$.
+See T.~Ciurca, \emph{Arithmetic of cyclotomic fields},
+Theorem 6.1.5, p.~111,
+\url{https://sites.pitt.edu/~caw203/pdfs/Ciurca--Arithmetic_of_cyclotomic_fields--UROP2018.pdf}.
+
+\item[OB-LF: finite extensions of local fields.]
+\label{ob-ref-local}
+The integers of a finite extension of $\mathbb Q_\ell$ form a finite
+free $\mathbb Z_\ell$-module and a complete DVR, with the unique
+extended absolute value.  See Milne, \emph{Algebraic Number Theory},
+Theorem 7.38, Corollaries 7.39 and 7.42, and Remark 7.43,
+pp.~123--124.  The length and norm formulas needed here are proved
+explicitly below.
+\end{description}
+
+The main project-specific interface is the theorem supplied by OS9.  Let
+$\rho:(\mathbb Z/N)^\times\twoheadrightarrow G=\operatorname{Gal}(E/\mathbb Q)$
+be the actual cyclotomic restriction map.  For a finite DVR
+$O\subset\overline{\mathbb Q}_\ell$, finite over $\mathbb Z_\ell$,
+and a character $\psi:G\to O^\times$, put
+$\chi=\psi\circ\rho$, extended by zero on nonunits.  For $k\ge2$ put
+\[
+ P_k=\prod_{p\le k+1}p,\qquad d(N,k)=NP_k,\qquad
+ \alpha_{N,k}(\chi)=d(N,k)B_{k,\chi^*},\qquad
+ B(N,k)=16N^{k+1}k!,                         \tag{OB.3}
+\]
+where $\chi^*$ is the primitive inducing character.  These are the
+source's \texttt{den}, \texttt{alN}, \texttt{Bprim}, and \texttt{bnd}.
+Let $\mathcal S_{O}(E,e)$ be the absolute-Galois version of (OB.1)
+with coefficients $(\operatorname{Frac}O/O)(-e)$, and let
+$\mathcal S_O(E,e)^\psi$ be its $\psi$-eigenspace for the actual
+$G$-action.  This is the source's \texttt{shaEig} in
+\texttt{psiLen}; the comparison is proved in OB3.
+
+The hypothesis \textbf{PB} is the literal \texttt{PsiBound}:
+for every such original $E,\Omega,N,\rho$, every odd prime
+$\ell\nmid n$, every such $O$, every $e\ge1$, every $\psi$ with
+$\chi(-1)=(-1)^{e+1}$, and every $a\in O$ whose image is
+$\alpha_{N,e+1}(\chi)$,
+\[
+       \operatorname{length}_O\mathcal S_O(E,e)^\psi
+                         \le v_O(a).                \tag{OB.4}
+\]
+Here $v_O$ is the DVR valuation with value $1$ on a uniformizer and
+$v_O(0)=\infty$.  The interface is not replaced by an estimate over
+a different field or an unspecified isomorphic coefficient module.
+
+\paragraph{OB1: cyclotomic actions, character count, and the exceptional set.}
+\label{claim:OB1}
+The given embedding into a cyclotomic field produces a surjective
+$\rho$ with
+\[
+ G\simeq(\mathbb Z/N)^\times/\ker\rho,
+ \qquad |G|=[E:\mathbb Q]=n,
+ \qquad \rho(-1)=c\ne1.                         \tag{OB.5}
+\]
+Its lift to a multiple of $N$ is obtained by reduction of units.
+For any prescribed parity, the number of complex characters of
+$(\mathbb Z/N)^\times$ trivial on $\ker\rho$ is at most $n$.
+If $E$ satisfies \texttt{IsCompField}$(M,s,q,d;E)$, with
+$o=M.\mathrm{deg}$ and the stated \texttt{PrimePair} hypotheses,
+then every odd prime divisor of $n$ divides $o$:
+\[
+                 \ell\mid n,\quad\ell\ne2
+                       \quad\Longrightarrow\quad\ell\mid o.
+ \tag{OB.6}
+\]
+
+\begin{proof}
+The cyclotomic Galois group is $(\mathbb Z/N)^\times$.
+All of its subgroups are normal, so the image of the given embedding
+of $E$ is Galois over $\mathbb Q$, and restriction is surjective.
+Choose an embedding of this cyclotomic overfield into the already
+given $\Omega$ extending the original embedding of $E$.  An
+automorphism of $\Omega$ acting as the $b$th power on $\mu_N$
+therefore restricts to this very $\rho(b)$ on $E$.  This is
+\texttt{IsCycAct}.  Restriction at a larger modulus commutes with
+reduction of units.  Complex conjugation sends every root of unity
+to its inverse, giving (OB.5); its restriction is nontrivial because
+$E$ is CM.  Distinct characters of a finite abelian group are linearly
+independent as functions, by the usual orthogonality sum, so any
+subset of the character group has size at most $|G|$.
+
+For (OB.6), work in the actual cyclotomic overfield supplied by
+\texttt{IsCompField}.  Its fixing condition says that an exponent
+$b$ fixes $E$ precisely when it is $\pm1$ modulo $2^{s+2}$,
+belongs to the kernel specifying the abelian base $M$, and has
+Jacobi symbol $1$ at $q$ and $d$.  Every cyclotomic automorphism
+raised to $R=2^{s+1}o$ meets all these conditions: Euler's theorem
+handles $2^{s+2}$, the finite base quotient has order $o$, and the
+even exponent makes both Jacobi symbols $1$.  Thus the exponent of
+$\operatorname{Gal}(E/\mathbb Q)$ divides $R$.  Cauchy's theorem
+gives an element of order $\ell$ if $\ell\mid n$, so
+$\ell\mid2^{s+1}o$; an odd $\ell$ must divide $o$.
+This argument uses the original fixing subgroup and degree.
+\end{proof}
+
+\paragraph{OB2: the integral Bernoulli product and its prime valuation budget.}
+\label{claim:OB2}
+For $k\ge2$, fix a set $P$ of subgroups of $(\mathbb Z/N)^\times$
+and let $\mathcal C$ consist of all characters with $\ker\chi\in P$
+and $\chi(-1)=(-1)^k$.  There is a nonzero integer $J_{N,k,\mathcal C}$
+such that, in every characteristic-zero splitting field,
+\[
+ \prod_{\chi\in\mathcal C}\alpha_{N,k}(\chi)
+     =J_{N,k,\mathcal C},\qquad
+ \log|J_{N,k,\mathcal C}|\le|\mathcal C|\log B(N,k).
+ \tag{OB.7}
+\]
+Put $w_\ell=v_\ell(J_{N,k,\mathcal C})$.  For any finite set
+$T_\ell$ of the corresponding $\ell$-adic characters and any finite
+set $S$ of primes,
+\[
+ \sum_{\chi\in T_\ell}-\log|\alpha_{N,k}(\chi)|_\ell
+       \le w_\ell\log\ell,\qquad
+ \sum_{\ell\in S}w_\ell\log\ell
+       \le |\mathcal C|\log B(N,k).                 \tag{OB.8}
+\]
+
+\begin{proof}
+For a character $\eta$ of modulus $f$, the generalized Bernoulli
+number is
+\[
+ B_{k,\eta}=f^{k-1}\sum_{a=1}^{f}\eta(a)B_k(a/f),\qquad
+ B_k(X)=\sum_{j=0}^k\binom kj B_jX^{k-j}.          \tag{OB.9}
+\]
+OB-BC shows that $P_kB_j$ is integral for $0\le j\le k$.
+Multiplication of (OB.9) by $fP_k$ consequently yields an integer
+linear combination of the values of $\eta$.  If $f\mid N$, the
+same is true after multiplication by $NP_k$.  The values of the
+primitive inducer occur among those of the original character:
+reduction $(\mathbb Z/N)^\times\to(\mathbb Z/f)^\times$ is
+surjective, as follows by choosing lifts avoiding the additional
+prime divisors of $N$.  Therefore $\alpha_{N,k}(\chi)$ belongs
+to the ring generated by the values of $\chi$, and is an algebraic
+integer.  In particular it lies in the actual $O$ whenever those
+values lie in $O$.
+
+Here are elementary bounds with the source's constant.  Integration
+by parts in the Fourier coefficients of $B_k$, using
+$B_k'=kB_{k-1}$ and $B_k(1)=B_k(0)$ for $k\ge2$, gives
+\[
+ B_k(x)=-\frac{k!}{(2\pi i)^k}
+             \sum_{r\ne0}\frac{e^{2\pi irx}}{r^k}.
+\]
+For $k\ge2$ this converges absolutely and
+$\zeta(k)\le1+\int_1^\infty u^{-k}du\le2$.
+Thus $|B_{k,\eta}|\le4f^kk!/(2\pi)^k$.
+The elementary inequality $\prod_{p\le h}p\le4^h$ follows by
+induction: primes in $(m,2m]$ divide $\binom{2m}{m}$; primes in
+$(m+1,2m+1]$ divide $\binom{2m+1}{m}\le4^m$, since the two
+central binomial coefficients are equal.  Applying the induction
+hypothesis to $m$ or $m+1$ proves the claim.  Since $4<2\pi$,
+\[
+ |\alpha_{N,k}(\chi)|
+ \le N4^{k+1}\frac{4N^kk!}{(2\pi)^k}
+ \le16N^{k+1}k!=B(N,k).                          \tag{OB.10}
+\]
+
+Nonvanishing here requires no result at $s=1$.  For primitive
+$\eta$ of parity $(-1)^k$, insert the Fourier series into (OB.9).
+The finite Gauss-sum identity gives
+\[
+ B_{k,\eta}
+   =-\frac{2k!f^{k-1}\tau(\eta)}{(2\pi i)^k}
+                              L(k,\overline\eta).
+\]
+The Gauss sum is nonzero: character orthogonality gives
+$|\tau(\eta)|^2=f$; for the trivial conductor-one character its
+value is $1$.  The absolutely convergent Euler product at $k>1$
+is nonzero.  One can verify the Gauss identity for all integer
+frequencies by substitution when the frequency is coprime to $f$;
+otherwise primitivity supplies a unit that fixes the additive
+character and has nontrivial multiplicative value, forcing its
+sum to vanish.  Parseval on the finite cyclic group then gives
+the stated squared norm.  Thus every factor in (OB.7) is nonzero.
+
+Place the character values in one finite cyclotomic field.
+Its Galois automorphisms raise these values to powers coprime to
+their order, preserving their kernels and the parity.  They
+therefore permute the factors of (OB.7).  The product is rational
+and integral, hence an integer; it is nonzero by the preceding
+paragraph.  The construction uses rational polynomials in the
+roots of unity, so the same integer is obtained in every splitting
+field.  Taking the product of (OB.10) gives its logarithmic bound.
+
+In an $\ell$-adic splitting field each factor is integral, so its
+absolute value is at most $1$.  The negative logarithms are
+nonnegative, and their sum over the full set is
+$-\log|J|_\ell=v_\ell(J)\log\ell$.  A partial sum is no larger.
+Unique factorization of the nonzero integer $J$ gives
+$\sum_{\ell\in S}v_\ell(J)\log\ell\le\log|J|$.
+These prove (OB.8), including finiteness of the prime budget.
+\end{proof}
+
+\paragraph{OB3: the tame-prime length bound on the original local data.}
+\label{claim:OB3}
+Assume PB.  For every odd prime $\ell\nmid n$ and every $e\ge1$,
+$m_\ell(E,e;D)$ is finite.  With
+\[
+ \mathcal C=\{\chi:\ker\rho\subseteq\ker\chi,
+                          \ \chi(-1)=(-1)^{e+1}\},
+\]
+one has, for every finite set $S$ of odd primes not dividing $n$,
+\[
+ \sum_{\ell\in S}\log\ell\,m_\ell(E,e;D_\ell)
+                \le n\log B(N,e+1).                 \tag{OB.11}
+\]
+The local-data system $D_\ell$ is arbitrary, and the same $E$ and
+$\Omega$ occur in all terms.
+
+\begin{proof}
+First identify (OB.1) with the strict Selmer subgroup in absolute
+Galois cohomology: its classes vanish on decomposition groups above
+$\ell$ and on all inertia groups.  Away from $\ell$, inertia acts
+trivially on $A_\ell(e)$; vanishing of its cohomology class is
+therefore literal vanishing of a representative cocycle there.
+Such a cocycle vanishes on the closed normal subgroup generated
+by these inertia groups, so factors through $G_{E,S}$.
+Conversely an inflated cocycle is unramified there.  The conditions
+at $\ell$ are exactly the local coboundary conditions in (OB.1).
+Changing the chosen place above a prime conjugates its decomposition
+group and preserves this condition.  This proves the comparison
+for the actual $D$, without choosing another host field.
+
+Choose a finite extension of $\mathbb Q_\ell$ inside
+$\overline{\mathbb Q}_\ell$ containing the $|G|$th roots of unity,
+and let $O$ be its integer ring.  Write
+$h=v_O(\ell)=\operatorname{length}_O(O/\ell O)$; this is a positive
+finite integer.  Since $O$ is finite free over $\mathbb Z_\ell$,
+tensoring continuous cochains with $O$ is the same as taking a
+finite direct sum of their coordinate cochains.  It commutes with
+cocycles, coboundaries and all local restriction kernels, including
+the full family of inertia conditions.  Also
+$O\otimes_{\mathbb Z_\ell}(\mathbb Q_\ell/\mathbb Z_\ell)
+=\operatorname{Frac}(O)/O$.  Hence
+\[
+ O\otimes\mathcal S_\ell(E,e;D)=\mathcal S_O(E,e),
+ \quad
+ \operatorname{length}_O(O\otimes X)
+             =h\operatorname{length}_{\mathbb Z_\ell}X.
+ \tag{OB.12}
+\]
+For finite length the second formula follows by tensoring a
+composition series and using the length of $O/\ell O$.
+For arbitrary torsion modules it follows by taking the supremum
+over finitely generated submodules.  All cohomology classes here
+are $\ell$-power torsion, since a continuous cocycle from a compact
+group into the discrete torsion module has finite image.
+
+Conjugation and coefficient action commute with the comparison in
+(OB.12).  Inner automorphisms act trivially on cohomology, as the
+cocycle identity expresses their difference from the identity by
+a coboundary.  Thus the action factors through the original
+$G=\operatorname{Gal}(E/\mathbb Q)$, with exactly the sign in (OB.2).
+Since $\ell\nmid |G|$, the elements
+\[
+ e_\psi=|G|^{-1}\sum_{g\in G}\psi(g)^{-1}[g]\in O[G]
+\]
+are mutually orthogonal projectors summing to $1$.
+This follows by summing finite characters on $G$; the character
+set has $|G|$ elements, by decomposing $G$ into cyclic factors.
+The $(-1)^{e+1}$ eigenspace of $c$ is therefore the direct sum of
+$\mathcal S_O(E,e)^\psi$ for
+$\psi(c)=(-1)^{e+1}$.  These are exactly the \texttt{psiLen}
+objects in PB, obtained from \texttt{shaEig} by factoring out the
+inner action, not different cohomology groups selected by dimension.
+
+OB2 supplies $a_\psi\in O$ representing
+$\alpha_{N,e+1}(\psi\circ\rho)$ and proves $a_\psi\ne0$.
+PB and (OB.12) give
+\[
+ h\,m_\ell(E,e;D)
+  =\sum_{\psi(c)=(-1)^{e+1}}
+                  \operatorname{length}_O\mathcal S_O(E,e)^\psi
+  \le\sum_{\psi(c)=(-1)^{e+1}}v_O(a_\psi)<\infty.
+ \tag{OB.13}
+\]
+Writing $\ell=u\varpi^h$ and $a=v\varpi^{v_O(a)}$ shows
+\[
+            v_O(a)\log\ell=-h\log|a|_\ell.
+\]
+Indeed units have absolute value $1$, because both the unit and
+its inverse are integral, and $|\ell|_\ell=\ell^{-1}$.
+Multiplying (OB.13) by $\log\ell$ and canceling the positive $h$
+gives a sum of the logarithms in (OB.8).  Surjectivity of $\rho$
+makes $\psi\mapsto\psi\circ\rho$ injective, so no character is
+counted twice.  Finally OB2 and $|\mathcal C|\le n$ from OB1
+prove (OB.11).  Its integer product depends on $E,N,e$, not on
+the varying prime or the choices of $D_\ell$ and $O$.
+\end{proof}
+
+\paragraph{OB4: a uniform bound on the number of cohomology generators.}
+\label{claim:OB4}
+For any number field $E\hookrightarrow\mathbb Q(\zeta_N)$,
+any prime $\ell$, any integer $e$, and any original $D$, the
+$\ell$-torsion of $H^1(G_{E,S},A_\ell(e))$ has finite length $g$ and
+\[
+                    g\le8\ell n\log(\ell N).
+ \tag{OB.14}
+\]
+
+\begin{proof}
+Set $K=E(\mu_\ell)$ inside the given $\Omega$.  Then
+$[K:E]\mid\ell-1$, $K$ contains $\mu_\ell$, and the given
+cyclotomic embedding extends to
+$K\hookrightarrow\mathbb Q(\zeta_{\ell N})$.
+Put $r=[K:\mathbb Q]\le\ell n$.
+An $\ell$-torsion class has a representative cocycle taking values
+in $A_\ell(e)[\ell]$: if $\ell f=\delta b$, choose $b'$ with
+$\ell b'=b$ and replace $f$ by $f-\delta b'$.
+The action on these values becomes trivial over $K$, so restriction
+is an additive character $G_K\to\mathbb F_\ell$, unramified
+outside the primes over $\ell$.
+
+Choosing one such representative for each class gives an injective
+map into this set of characters.  To see injectivity, if two
+restrictions agree, the difference cocycle vanishes on $G_K$.
+It descends to $\operatorname{Gal}(K/E)$ with values in the
+$G_K$-invariants.  Its order is prime to $\ell$; averaging a
+cocycle over this finite group writes it as a coboundary, since
+division by the group order is available on every
+$\mathbb Z_\ell$-module.  The original two classes are equal.
+This argument asserts a set injection, and does not incorrectly
+assume that the chosen representatives define a canonical linear map.
+
+By Kummer theory, the target injects into
+\[
+ \operatorname{Sel}_S(K,\ell)
+ =\{a\in K^\times:v_{\mathfrak p}(a)\in\ell\mathbb Z
+                  \ (\mathfrak p\notin S)\}/K^{\times\ell}.
+\]
+The valuation condition follows by taking the valuation of
+$\beta^\ell=a$ in an unramified local extension away from $\ell$.
+Factoring the principal ideal outside $S$ gives the exact sequence
+\[
+ 0\longrightarrow O_{K,S}^\times/(O_{K,S}^\times)^\ell
+ \longrightarrow\operatorname{Sel}_S(K,\ell)
+ \longrightarrow\operatorname{Cl}_S(K)[\ell]
+ \longrightarrow0.
+ \tag{OB.15}
+\]
+The last map sends $a$ to the class of the ideal whose $\ell$th
+power is $(a)$ away from $S$.  Its kernel and surjectivity are
+immediate from this construction.  There are at most $r$ primes
+over $\ell$.  OB-KU therefore bounds the first term in (OB.15)
+by $\ell^{2r}$, and the second class-group term by $h_K$.
+Consequently the original $\ell$-torsion group has at most
+$\ell^{2r}h_K$ elements.  Being killed by $\ell$, it is an
+$\mathbb F_\ell$-vector space of dimension and length $g$, so
+\[
+                    g\log\ell\le2r\log\ell+\log h_K.
+ \tag{OB.16}
+\]
+
+We record the class-number bound with its constants.  If
+$K\hookrightarrow\mathbb Q(\zeta_L)$ and $L\ge2$, OB-MD gives
+$|\Delta_K|\le L^r$ and $r\le\varphi(L)\le L$.
+Minkowski's constant is at most $1$: for $r\ge2$, use
+$r!\le((r+1)/2)^r$ and $(r+1)/(2r)\le3/4$; the degree-one
+case is immediate.  Each class has a representative of norm at
+most $X=\sqrt{|\Delta_K|}$.
+The number of ideals of norm at most $X$ is at most
+$X(1+\log X)^{r-1}$: at every rational prime the ideal-counting
+Euler factor is coefficientwise at most $(1-T)^{-r}$, and the
+sum of the $r$-fold divisor function up to $X$ is bounded by
+$X(1+\log X)^{r-1}$ by induction using the harmonic sum.
+It follows that
+\[
+ \log h_K\le\tfrac12\log|\Delta_K|
+       +(r-1)\log(1+\tfrac12\log|\Delta_K|)
+                       \le3r\log L.                 \tag{OB.17}
+\]
+For the last inequality use $\log|\Delta_K|\le r\log L$ and
+$1+\tfrac12r\log L\le L^2$, which follows from
+$r\le L$ and $\log L\le L-1$.
+Apply (OB.17) with $L=\ell N$.  Then (OB.16) is at most
+$5r\log(\ell N)$.  Since $\log\ell\ge\log2>5/8$,
+$g\le8r\log(\ell N)\le8\ell n\log(\ell N)$, as claimed.
+\end{proof}
+
+\paragraph{OB5: an actual annihilator of the negatively twisted minus group.}
+\label{claim:OB5}
+For an odd prime $\ell$ and $e\ge1$, put $R=N\ell$,
+$a=2R+1$, $k=e+1$, and let
+$\pi:(\mathbb Z/R)^\times\twoheadrightarrow G$
+be the lift of the original restriction map.  In $\mathbb Q[G]$
+define
+\[
+ \begin{split}
+ E_{L,k}(b)&=\frac{L^{k-1}}{k}B_k(b/L),\\
+ y&=(1-a^k[\pi(a)])
+                  \left(-\sum_{b\in(\mathbb Z/R)^\times}
+                                  E_{R,k}(b)[\pi(b)]\right).
+ \end{split}                                                   \tag{OB.18}
+\]
+Then $y$ has coefficients in $\mathbb Z_\ell$, and its resulting
+element $z\in\mathbb Z_\ell[G]$ satisfies
+\[
+                 z\,\varphi(R)x=0
+                 \qquad(x\in\mathcal S_\ell(E,e;D)).
+ \tag{OB.19}
+\]
+The source writes this element as
+\texttt{yEl (e+1) a (piQ rho)\^{}(-1)}: the inverse in that
+argument compensates for the inverse used in \texttt{sumEl},
+leaving exactly the group elements $[\pi(b)]$ in (OB.18).
+
+\begin{proof}
+For $L=R\ell^m$, let $b$ denote a unit representative in $[0,L)$,
+let $b'$ represent $a^{-1}b$ modulo $L$, and set
+\[
+ j_L(b)=\frac{ab'-b}{L}\in\mathbb Z,\qquad
+ E_1(L,a,b)=\frac{a-1}{2}-j_L(b)\in\mathbb Z,
+ \qquad
+ z_m=-\sum_{b\in(\mathbb Z/L)^\times}
+                  b^e E_1(L,a,b)[\pi(b)].             \tag{OB.20}
+\]
+Here $a$ is odd and coprime to every $L$.
+We first prove $z_m\to y$ coefficientwise $\ell$-adically.
+The first two terms of the Bernoulli polynomial give
+\[
+ E_{L,k}(b)=\frac{b^k}{kL}-\frac{b^{k-1}}2
+                      +\frac{L}{kP_k}u_b,
+                  \qquad u_b\in\mathbb Z.
+\]
+Indeed all remaining terms have a factor $L$ after their
+denominators are multiplied by $kP_k$.
+Since $ab'=b+Lj_L(b)$, the binomial theorem, first modulo $L^2$
+for the $k$th powers and then modulo $L$ for the $(k-1)$st powers,
+shows
+\[
+ E_{L,k}(b)-a^kE_{L,k}(b')
+      =b^eE_1(L,a,b)+\frac{L}{2kP_k}v_b,
+                         \qquad v_b\in\mathbb Z.
+ \tag{OB.21}
+\]
+Thus the error has arbitrarily large $\ell$-adic valuation as
+$m\to\infty$, uniformly over its finitely many coefficients.
+The distribution identity
+$\sum_{j=0}^{h-1}B_k((x+j)/h)=h^{1-k}B_k(x)$
+follows at once by summing the defining generating function.
+Since $\ell\mid R$, every lift of a unit modulo $R$ to $R\ell^m$
+is a unit.  This identity proves that the higher-level element in
+(OB.18), projected to $G$, is the same $y$.  Reindexing multiplication
+by $a$ gives the coefficient difference in (OB.21).  Summing
+(OB.21) therefore proves that $y-z_m$ belongs to
+$\ell^r\mathbb Z_\ell[G]$ once
+$m\ge r+v_\ell(2kP_k)$.  In particular $y$ is integral at $\ell$;
+its $\ell$-adic realization is $z$.
+
+We now prove the cohomological annihilation, including the twist.
+Pull a cocycle $f$ representing $x\in\mathcal S_\ell(E,e;D)$
+back to $G_E$.  Its image is finite, hence killed by some
+$\ell^u$.  At each of the finitely many primes of $E$ over
+$\ell$, its restriction is $\delta b_v$ for an element $b_v$
+of $A_\ell(e)$.  Increase $u$ so that all $b_v$ are killed by
+$\ell^u$.  For $m$ large enough, cyclotomic values on
+$G_{K_m}$, where $K_m=\mathbb Q(\zeta_{R\ell^m})\subset\Omega$,
+are $1$ modulo $\ell^u$.  Consequently
+$f|_{G_{K_m}}$ is an additive character and vanishes on the
+decomposition groups over $\ell$.  It is unramified at every
+other finite prime because the original cocycle factors through
+$G_{E,S}$.  These assertions hold at every conjugate place:
+the cocycle conjugation identity adds only a term
+$(1-\chi_{\rm cyc}(g)^{-e})f(h)$, which is zero on this level.
+Since $K_m$ is totally complex, OB-CF makes this restriction an
+ordinary class-group character.
+
+We use the finite Jacobi annihilator proved in OS1, keeping its
+group-ring orientation.  Increase $m$ so that $a<L$.  For a unit
+$t$ modulo $L$, represented in $(0,L)$, its coefficient there is
+\[
+ \theta_{L,a}(t)
+ =\left\lfloor\frac{at}{L}\right\rfloor
+       -\left\lfloor\frac{a(L-t)}{L}\right\rfloor
+ =2\left\lfloor\frac{at}{L}\right\rfloor-(a-1).
+\]
+The last equality holds because $at/L$ is not an integer.  Put
+$b\equiv at\pmod L$, so $b'=t$ and
+$j_L(b)=\lfloor at/L\rfloor$.  Reindexing gives the exact identity
+\[
+ 2\sum_bE_1(L,a,b)\sigma_b^{-1}
+       =-\sigma_a^{-1}
+               \sum_t\theta_{L,a}(t)\sigma_t^{-1}.
+\]
+OS1 constructs a principal ideal for the right-hand sum applied to
+every ideal, so that sum annihilates $\operatorname{Cl}(K_m)$.
+The values of the class-group character $f|_{G_{K_m}}$ have
+odd $\ell$-power order; multiplication by $2$ is invertible on
+them.  Artin equivariance therefore gives, for $v\in G_{K_m}$
+and lifts $\sigma_b$ of the cyclotomic automorphisms,
+\[
+              \sum_b E_1(L,a,b)f(\sigma_b^{-1}v\sigma_b)=0.
+ \tag{OB.22}
+\]
+For comparison only, the source's classical Stickelberger route is
+the integral identity
+$\sum_bj_L(b)\sigma_b^{-1}=-\sigma_a^{-1}(\sigma_a-a)\theta_L$,
+with $\theta_L=L^{-1}\sum_b b\sigma_b^{-1}$.
+Its classical annihilation theorem is Sharifi,
+\emph{Iwasawa Theory}, Definition 4.5.1, Lemma 4.5.2 and
+Theorem 4.5.6.  It is not a retained input: the OS1 argument just
+given proves exactly the odd-primary consequence needed here.
+
+Let $U=G_{E(\mu_{\ell^\infty})}$ and let
+$v\in U\cap G_{\mathbb Q(\mu_R)}$.  Such $v$ belongs to every
+$G_{K_m}$.  On restriction to $U$, the action on a cohomology class is
+\[
+ \operatorname{res}(\pi(b)x)(v)
+   =\chi_{\rm cyc}(\sigma_b)^{-e}
+                       f(\sigma_b^{-1}v\sigma_b).
+ \tag{OB.23}
+\]
+The lift satisfies $\chi_{\rm cyc}(\sigma_b)\equiv b\pmod{\ell^m}$.
+Because its values are units and the displayed cocycle values are
+killed by $\ell^u$, multiplication by
+$b^e\chi_{\rm cyc}(\sigma_b)^{-e}$ acts as $1$ for $m\ge u$.
+Equations (OB.20), (OB.22), and (OB.23) now give
+$\operatorname{res}(z_mx)(v)=0$.  The coefficient congruence
+$z-z_m\in\ell^u\mathbb Z_\ell[G]$ allows $z_m$ to be replaced
+by $z$.  This explicitly accounts for the negative twist.
+
+Finally restriction to $U$ is injective on the original $H^1$.
+Indeed its kernel is represented by cocycles descending to
+$\operatorname{Gal}(E(\mu_{\ell^\infty})/E)$, an infinite open
+subgroup of $\mathbb Z_\ell^\times$.  For odd $\ell$ it is
+procyclic: its torsion part has order prime to $\ell$ and its
+principal-unit part is a copy of $\mathbb Z_\ell$.
+If $\gamma$ is a topological generator, then
+$\chi_{\rm cyc}(\gamma)^{-e}-1\ne0$, because $e\ge1$ and
+$\gamma$ has infinite order.  Multiplication by this nonzero
+$\ell$-adic integer is surjective on
+$\mathbb Q_\ell/\mathbb Z_\ell$.  Subtract a coboundary agreeing
+with the cocycle at $\gamma$; the remaining cocycle is zero on
+the dense cyclic subgroup and hence everywhere by continuity.
+This proves injectivity.  The homomorphism
+$\operatorname{res}(zx):U\to A_\ell(e)$ vanishes on
+$U\cap G_{\mathbb Q(\mu_R)}$.  Its quotient is a subgroup of
+$(\mathbb Z/R)^\times$, so its exponent divides $\varphi(R)$.
+Thus $\varphi(R)\operatorname{res}(zx)=0$, and injectivity gives
+(OB.19).  No infinite-level finiteness assertion or implicit change
+of the local-data system has been used.
+\end{proof}
+
+\paragraph{OB6: a determinant gives an explicit annihilating power.}
+\label{claim:OB6}
+For every odd $\ell$, every $e\ge1$, and every original $D$, there
+is $r\ge0$ such that
+\[
+ \ell^r\mathcal S_\ell^-(E,e;D)=0,\qquad
+      r\log\ell\le30n(e+1)\log(e\ell N).
+ \tag{OB.24}
+\]
+
+\begin{proof}
+Keep $R,a,k,G,z,y$ from OB5 and put $\varepsilon=(-1)^k$.
+Because $c\in G$ is a nonidentity involution,
+\[
+       Q=\mathbb Z_\ell[G]/([c]-\varepsilon)
+\]
+is free of rank $n/2$: choose one representative from each pair
+$\{g,cg\}$, replacing the other by $\varepsilon g$.
+Let $\delta$ be the determinant of multiplication by $z$ on $Q$.
+The adjugate identity, applied to $1\in Q$, gives
+$\delta\in(z,[c]-\varepsilon)$ in $\mathbb Z_\ell[G]$.
+Together with (OB.19) and $cx=\varepsilon x$, it follows that
+$\delta\varphi(R)x=0$ for every $x$ in the minus group.
+
+Put
+\[
+ D_{R,k}=Rk(k+1)!,\quad
+ S_{R,a,k}=2a^kR^kk!,\quad
+ X_{R,a,k}=D_{R,k}S_{R,a,k}.                    \tag{OB.25}
+\]
+Multiplying $y$ by $D_{R,k}$ gives an integral group-ring element:
+the Bernoulli polynomial expansion and OB-BC clear every coefficient.
+The determinant on the integral signed quotient is therefore a
+rational integer $J$, and
+\[
+      J=D_{R,k}^{\,n/2}\delta,\qquad
+      0<|J|\le X_{R,a,k}^{\,n/2}.                  \tag{OB.26}
+\]
+Here is a proof of nonvanishing and the bound.  Over $\mathbb C$ the
+signed quotient diagonalizes into the $n/2$ characters $\eta$ of
+$G$ with $\eta(c)=\varepsilon$.  The eigenvalue of $y$ is
+\[
+       (1-a^k\chi(a))\frac{-B_{k,\chi}}{k},
+               \qquad \chi=\eta\circ\pi.
+ \tag{OB.27}
+\]
+The smoothing factor is nonzero, since $a>1$ and $|\chi(a)|=1$.
+For an imprimitive character of level $R$, the distribution formula
+in (OB.9), excluding the extra nonunits prime by prime, gives
+\[
+ B_{k,\chi}=B_{k,\chi^*}
+       \prod_{p\mid R,\ p\nmid\operatorname{cond}\chi}
+                         (1-\chi^*(p)p^{k-1}).
+\]
+Each extra factor is nonzero for $k\ge2$, and the primitive factor
+is nonzero by OB2.  Thus (OB.27) is nonzero.  The same Fourier bound
+as in OB2 gives $|B_{k,\chi}|\le R^kk!$, because
+$4/(2\pi)^k\le1$.  Also
+$|1-a^k\chi(a)|\le2a^k$ and $k\ge1$.
+This proves the bound $S_{R,a,k}$ for each eigenvalue, hence (OB.26).
+
+Set $r_0=v_\ell(J)$ and $r_1=v_\ell(\varphi(R))$.
+Since $\delta\mid J$ in $\mathbb Z_\ell$, it divides
+$\ell^{r_0}$ there; similarly $\varphi(R)\mid\ell^{r_1}$.
+Thus $r=r_0+r_1$ kills the minus group.  Moreover
+\[
+ r\log\ell\le n\log X_{R,a,k}+\log R
+                    \le n\log(X_{R,a,k}R).          \tag{OB.28}
+\]
+The first inequality even permits $n/2$ in place of $n$ in its
+first term; the weaker form is the one used by the source.
+
+For completeness, its numerical constant is explicit.  Put
+$U=e\ell N\ge2$ and $T=3U$.  Then
+$R\le T$, $a=2R+1\le T^3$, $k=e+1\le T$,
+$k+1\le T^2$, and $k\ge2$.  Hence
+\[
+ \begin{split}
+ X_{R,a,k}R
+ &=Rk(k+1)!\,2a^kR^kk!\,R\\
+ &\le T^{7k+6}\le T^{10k}.
+ \end{split}
+\]
+We used $(k+1)!\le(T^2)^{k+1}$ and $k!\le T^k$.
+Since $3\le U^2$, $\log T\le3\log U$.
+Substituting in (OB.28) proves (OB.24) with $30$.
+The construction fixes $r$ before $x$ varies; it is not a
+pointwise collection of unrelated annihilating exponents.
+\end{proof}
+
+\paragraph{OB7: exponent times generators gives the exceptional-prime bound.}
+\label{claim:OB7}
+For every odd prime $\ell$, every $e\ge1$, and every $D$,
+\[
+ m_\ell(E,e;D)<\infty,\qquad
+ m_\ell(E,e;D)\log\ell
+       \le240\ell n^2(e+1)\log(e\ell N)^2.
+ \tag{OB.29}
+\]
+
+\begin{proof}
+For an endomorphism $f$ of any module, the map induced by $f$ from
+$\ker f^{j+1}$ to $\ker f^j$ has kernel $\ker f$.
+The length inequality for this exact sequence proves inductively
+that $\operatorname{length}\ker f^r\le
+r\operatorname{length}\ker f$.
+Apply this to multiplication by $\ell$ on the ambient $H^1$.
+OB6 puts the minus group inside $\ker\ell^r$, while OB4 bounds
+the length $g$ of $\ker\ell$.  Thus its length is finite and at
+most $rg$.  Multiplication by $\log\ell$ and (OB.14), (OB.24)
+give
+\[
+ m_\ell\log\ell
+   \le240\ell n^2(e+1)\log(e\ell N)\log(\ell N)
+   \le240\ell n^2(e+1)\log(e\ell N)^2.
+\]
+Both logarithms are nonnegative and $e\ge1$.  This is precisely
+the odd-prime portion of \texttt{StickBound 240} needed below.
+No claim about its unused $\ell=2$ extension is required.
+\end{proof}
+
+\paragraph{OB8: the full uniform \texttt{ThmBcFree} supplier.}
+\label{claim:OB8}
+Use PB from OS9, the Jacobi annihilator from OS1, and the explicitly
+listed classical theorems.  Let
+$M=(m,H)$ be any \texttt{AbF}, put $o=[(\mathbb Z/m)^\times:H]$,
+let $s,t\ge2$, and let $q,d$ satisfy \texttt{PrimePair}$(m,q,d)$.
+For every original CM number field $E$ satisfying
+\texttt{IsCompField}$(M,s,q,d;E)$, put
+$n=[E:\mathbb Q]$ and $F=\operatorname{condF}(E)$.
+Then for every given algebraic closure $\Omega$, every family of
+local data $(D_\ell)$ on that same $E,\Omega$, and every finite
+set $S$ of odd primes,
+\[
+ \begin{split}
+ &m_\ell(E,e;D_\ell)<\infty
+                 \qquad(\ell\text{ odd},\ 1\le e<t),\\
+ &\sum_{\ell\in S}\log\ell\sum_{e=1}^{t-1}
+                         m_\ell(E,e;D_\ell)\\
+ &\qquad\le3nt^2\log(tF)
+       +240\sum_{\substack{\ell\mid o\\\ell\text{ odd prime}}}
+                       \ell n^2t^2\log(t\ell F)^2.
+ \end{split}                                                   \tag{OB.30}
+\]
+Thus the literal \texttt{ThmBcFree} holds with $C=240$, and it
+supplies VW.13--VW.17 with that same constant.
+
+\begin{proof}
+The set defining $F$ is nonempty by \texttt{IsCompField}.  Its
+least element is positive and itself supplies an embedding of the
+original $E$ into $\mathbb Q(\zeta_F)$.  Apply OB3 and OB7 with
+this $N=F$.  They prove all asserted individual finiteness
+statements before any real-valued lengths are summed.
+
+Split $S$ into $S_0=\{\ell\in S:\ell\nmid n\}$ and its complement.
+For $1\le e<t$, (OB.11) bounds the sum over $S_0$ by
+$n\log B(F,e+1)$.  The source's elementary numerical bound is
+\[
+        B(F,e+1)=16F^{e+2}(e+1)!
+                       \le(tF)^{2t+5}.              \tag{OB.31}
+\]
+Indeed $16\le(tF)^4$, $F^{e+2}\le(tF)^{t+1}$, and
+$(e+1)!\le t^t\le(tF)^t$.  Interchanging the two finite sums and
+using $(t-1)(2t+5)\le3t^2$ for integers $t\ge2$ gives
+\[
+       \sum_{\ell\in S_0}\log\ell
+                    \sum_{e=1}^{t-1}m_\ell
+                        \le3nt^2\log(tF).           \tag{OB.32}
+\]
+For a prime in the complementary set, (OB.29) and
+$e+1\le t$, $\log(e\ell F)\le\log(t\ell F)$ give
+\[
+      \log\ell\sum_{e=1}^{t-1}m_\ell
+              \le240\ell n^2t^2\log(t\ell F)^2.
+ \tag{OB.33}
+\]
+All summands are nonnegative.  OB1 puts every prime in this
+complementary set among the odd prime divisors of the fixed
+base degree $o$, so (OB.33) may be summed over that full set.
+Combining it with (OB.32) gives (OB.30).  The same calculation works
+for every $S$, with no need to assert beforehand that only finitely
+many prime contributions are nonzero.  The resulting right side
+is exactly \texttt{minusBound 240 o n F t}, and the universal
+quantifiers are exactly those of \texttt{VVminusLe} and
+\texttt{ThmBcFree}.
+\end{proof}
+
+\paragraph{Dependency consequence.}
+OB1--OB8 close the full odd-minus supplier from the literal PB
+interface proved in OS9, the Jacobi annihilation proved in OS1,
+and the named classical theorems.  Together these replace
+\texttt{ThmBcFree} in the structural boundary of VW4; no additional
+bespoke odd-minus arithmetic or quantitative interface remains
+in this branch.  The resulting uniform
+constant is independent of the abelian base, conductor, host primes,
+height, twist range, algebraic closure and local-data choices.
+This statement leaves the other VW4 suppliers, and the later
+lattice-gain/character-balance inputs, as separate obligations.

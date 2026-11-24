@@ -1,0 +1,467 @@
+ARITHMETIC CHOICE: EXPANDED PROOF AND INTERFACE REPORT
+Version 0.17. Claims NC1–NC17.
+Pinned source commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+Outcome
+=======
+
+The section proves the actual finite discrete-valuation-ring extension,
+valuation embedding, semilinear basis comparison and exact integral-span
+comparison used by NChoice. It then constructs all five NChTie fields
+under their same-character local compatibility hypothesis, and all twelve
+TupTied fields under the exact MuIsW and prime-set hypotheses. The
+normalized packet is recovered literally, including the original character.
+
+The construction no longer assumes exists_formsIso, nonempty_reading, or
+the stronger NChoice record as an unexplained interface. RankTie remains
+explicit. MuIsW remains explicit. The fields of D7, including its global
+row form and local coefficient modules, remain supplied. A separately
+selected common Galois character must still satisfy LocsCarry at the
+existing local objects. A Hecke character and a Galois character are not
+identified merely because each is called psi in its own source namespace.
+
+The proved record audit comprises 49 fields:
+  Reading: 11;
+  NChoice: 21;
+  NChTie: 5;
+  TupTied: 12.
+These are four different records. MuIsW's ten retained fields are described
+explicitly but are not counted as newly constructed fields.
+
+The exact source locators and both whole-blob and inclusive-range SHA256
+hashes are generated in provenance.json, source_manifest.json and
+source_locators.txt. The script build_provenance.py reads the pinned Git
+objects and does not modify the checkout. No Lean or PDF build is performed.
+
+1. Objects and conventions
+==========================
+
+Write L=D.what₂.LL and L0=D.LL0. D7 supplies that L is a number field,
+Galois over Q, its complex embedding, its conjugation, its genuine prime
+indexing, and the additive valuation equality. L0 is an intermediate
+field. Its being Galois over Q is NOT automatic and is separately
+retained when conjugating readings or making an orbit-consistent
+character family.
+
+The additive valuation is nonnegative on the valuation ring, positive on
+its maximal ideal, and +infinity at zero. The multiplicative valuation
+in the prime-ideal library has the equivalent conditions <=1 and <1.
+The Reading record asserts equivalence of valuation rings, not equality
+of numerical valuations after passage to a ramified DVR extension.
+
+For a side b, the base-field embedding is emb0 on true and emb0b on false.
+The character convention psiAt is psi on true and psi^{-1} on false.
+It is an involution at a fixed side. These two conventions are checked
+separately in their literal source definitions.
+
+The nonreference support is Wtw={w | muAt(w) != mu0}. Every local index
+a:D.nd.Loc has a specified w(a) in Wtw. This fact is part of the supplied
+local record; NC does not create new such indices.
+
+2. NC1: the complete DVR extension is proved, not assumed
+=======================================================
+
+The source's generic integral-closure theorem is more general than needed.
+Our coefficient fraction field contains the number field L0, so it has
+characteristic zero. NC1 proves precisely that specialization.
+
+Let A be a complete DVR and K'/Frac(A) finite. Separability provides a
+primitive element alpha. Multiplication by a sufficiently divisible
+nonzero element of A makes alpha integral: after writing a monic minimal
+polynomial over Frac(A), multiplying alpha by a common denominator makes
+every transformed coefficient integral. The algebra C=A[alpha] has the
+power basis up to the field degree.
+
+For the integral closure B, Tr(xC) is in A for all x in B. To justify
+the trace assertion, every conjugate of an integral element is integral,
+so their sum is integral; the trace lies in Frac(A), and A is integrally
+closed. Nondegeneracy of the separable trace matrix identifies the trace
+dual C^vee with a finite free A-lattice. Thus
+                  C subset B subset C^vee.
+Over a DVR, submodules of a finite free module are finite free. This
+establishes finiteness of B and Frac(B)=K'. It is a concrete trace-dual
+bound, not an appeal to an unexplained excellence theorem.
+
+For locality, the finite A-algebra B/pi B is Artinian. Two or more local
+factors would give a nontrivial idempotent modulo pi. The Newton iteration
+ e -> e - (e^2-e)/(2e-1)
+doubles the pi-adic error. The denominator is a unit because its square
+is 1+4(e^2-e), and 1+pi b has a geometric-series inverse. This argument
+also works at residue characteristic two: it never divides by 2.
+The finite free A-module B is complete, so the idempotent lifts. Since
+B is a domain, the lift must be 0 or 1, a contradiction.
+
+B is therefore a normal Noetherian local domain of dimension one. The
+text proves the DVR criterion rather than leaving it as a black box:
+choose a nonzero socle element u modulo a nonzero a in the maximal ideal,
+put t=u/a, and observe t*m subset B. If t*m subset m, the determinant
+trick makes t integral, impossible. Hence t*m=B and m is principal.
+The pi-adic and m-adic filtrations are cofinal, giving both separatedness
+and completeness. Their cofinality follows from the Artinian quotient,
+not from an assumed unramified extension.
+
+Classical algebra used here is explicitly limited to finite separable
+primitive elements, trace nondegeneracy, the PID submodule theorem,
+finite-dimensional Artinian algebras, and the determinant trick. The
+application does not require a finite residue field or local compactness.
+In particular NTw.O(i), whose residue field is algebraically closed,
+is allowed.
+
+3. NC2–NC3: selecting the exact place and preserving the base field
+=================================================================
+
+Every number-field integer maps into the integrally closed DVR inside
+the target fraction field: the image of Z lies in that DVR, so the same
+monic polynomial over Z proves integrality.
+This produces the unique integral map on O_L.
+
+Suppose its maximal ideal contracts to a prescribed prime p of O_L.
+Localization then proves the full valuation-ring equivalence. A fraction
+a/s with s outside p has integral image. If x has negative valuation,
+its inverse is a fraction a/s with a in p and s outside p; its image is
+in the DVR maximal ideal, so x cannot also have integral image.
+This treats all elements of L rather than merely its global integers.
+
+To make the contraction equal the requested prime, start with any
+extension of L0 -> Frac(A) to L in an algebraic closure. It lands in a
+finite extension because L/L0 is finite; one root of the mapped
+minimal polynomial suffices. NC1 gives a finite complete integral DVR
+extension B. The initial embedding contracts m_B to a prime q above the
+correct prime of L0, but it need not yet read the requested p.
+
+The proof of Galois transitivity on primes is given explicitly. If q is
+outside the orbit of p, the Chinese remainder theorem produces an
+integer a which is 0 modulo q and 1 modulo every conjugate of p.
+Its Galois norm lies in the contracted prime and hence in p, while
+every factor avoids p. This contradicts primality. Choose sigma with
+sigma^{-1}(q)=p and replace e1 by e1 composed with sigma.
+This orientation is essential: the prime pulled back by e1*sigma is
+sigma^{-1}(q). Sigma fixes L0, so the specified base-field embedding
+is unchanged.
+
+The resulting denominator identity is stronger than the later NChTie
+field: if i(x)z=y in Frac(A), then e(x)j(z)=j(y), even when z=0.
+This is compatibility with the actual coefficient maps, not just an
+abstract isomorphism of fraction fields.
+
+The source invokes a finite-extension constructor which also adjoins a
+square root, using a=1 in this application. NC explains why it can be
+omitted here. No square-root existence or extra sign choice is hidden.
+
+4. NC4: all Reading fields and residue-characteristic equality
+============================================================
+
+NTw supplies O0(i), O(i), Ok(i,k), their injections, completeness of O(i),
+and finiteness of Ok(i,k) over O(i). Its O_l field places ell(i) in the
+maximal ideal of O(i).
+
+The map O0(i)->O(i) is local for a substantive reason. If a nonunit
+became a unit, a uniformizer of O0(i) would become a unit. The nonzero
+integer ell(i), a unit times a uniformizer power, would then become a
+unit, contradicting O_l. The injection O(i)->Ok(i,k) is finite integral
+between local domains and is local. The composite phiK is therefore
+injective and local.
+
+Ok(i,k) is finite torsion free, hence free over O(i), so complete for
+the base-adic topology. Its unique maximal ideal has a power contained
+in the extended base ideal; therefore its own adic topology is the same.
+NC3 applies to the composite side embedding and constructs Reading:
+
+  Oe                         the integral closure B;
+  cr, dom, dvr               its commutative ring, domain and DVR data;
+  alg                        the actual Ok-algebra map;
+  inj, fin, loc              injective, module finite and local;
+  emb                        the aligned embedding of L;
+  emb_w                      nonnegative valuation iff membership in B;
+  emb_side                   the exact denominator identity through phiK.
+
+The reading prime contains ell(i), so ell(i)=resChar(w). Distinct rational
+primes cannot both belong to a proper ideal, by Bezout. NC also proves
+TwCover -> ReadElsewhere by contracting each w to L0. It does not provide
+the actual family of coefficient indices required for TwCover itself.
+
+5. NC5–NC8: actual integral matching of the Mt spaces
+===================================================
+
+The global source lattice is OLat, a finite set of complex generators
+spanning the complex space. It should not be silently replaced by an
+arbitrary rational basis. The exact left-hand set is
+        S={x in MtL(mu,j) | jMt(x) in MtLat(mu,j).gen}.
+
+NC5 proves that S is finite and spans over L. The supplied jMt_basis
+turns an L-basis into a complex basis, so the basis is finite and jMt
+is injective. The pullback of a finite generator set is therefore
+finite. If S failed to span, choose an L-linear functional annihilating
+it and extend that functional to the complex basis. The extension
+annihilates every complex lattice generator, hence the whole complex
+space; injectivity of L->C contradicts the original nonzero functional.
+This is a full rational-span proof using the actual MtLat_sub premise.
+
+NC6 constructs the local lattice after coefficient extension:
+  V'=Frac(B) tensor_A V,
+  Lambda'=span_B {1 tensor lambda | lambda in Lambda}.
+The injection A->B extends to the fraction fields. Localizing the
+tensor product identifies V' with Frac(B) tensor_Frac(A) V, which
+preserves dimension. Images of any finite generating set of Lambda
+generate Lambda'. Clearing denominators proves it spans V': if d*v
+lies in Lambda, a tensor v=(a/d)*(1 tensor d*v). No flatness assumption
+is being used without proof; field extension and this tensor identity
+are enough.
+
+NC7 supplies the comparison map. Pick an L-basis and embed its
+coordinates into Frac(B)^r. The B-span of the embedded S is a full
+finite lattice. Match a B-basis of that lattice to a B-basis of
+Lambda', then extend linearly over Frac(B). Composing gives the desired
+semilinear map f. It carries every L-basis to a Frac(B)-basis because
+an invertible change-of-basis matrix stays invertible under a field
+embedding. The integral span of f(S) is exactly Lambda', by construction.
+
+The text gives the elementary least-valuation proof of the free-module
+fact: choose a minimal finite generating family, take a nontrivial
+relation, divide by a coefficient with least valuation, cancel by
+torsion freeness, and eliminate the generator with unit coefficient.
+This contradicts minimality.
+
+NC8 combines these arguments and preserves the source's proposition c.
+If c is false, the zero map suffices. If c is true, the supplied rank
+equality and NC5–NC7 produce both basis and integral-span conclusions.
+For NChoice, c is exactly w nonreference and 1<=j<=m. No comparison
+property is claimed at other indices.
+
+Scope of the map:
+  - The scalar extension of f is a vector-space isomorphism.
+  - f maps the specified generator span exactly to the local lattice.
+  - f need not be surjective as a set map over the smaller field L.
+  - No Hecke equivariance, metric preservation, compatibility among
+    different j, or canonical choice is asserted.
+These are limits of the literal record, not additional assumptions.
+
+6. NC9: normalized NChoice and all 21 fields
+==========================================
+
+For packet (i,Q,a,chi) and side b, set psi'=chi^[b], where false means
+inverse. The actual local MtV uses psi' composed with art. RankTie is
+exactly equality of its fraction-field dimension with the global MtL
+dimension, for each 1<=j<=m at nonreference places.
+
+The comparison maps are chosen from NC8 for every w,j. Oe and the
+coefficient embedding are the Reading objects selected before this
+choice. algOOe is the composite O(i)->Ok(i,a)->Oe, so towOe is the
+literal tower and not an independently selected algebra structure.
+
+NChoice field supply:
+  twI                   packet index;
+  twI_l                 NC4 residue-characteristic equality;
+  sd                    prescribed side;
+  Q                     packet prime set;
+  k'                    packet coefficient index;
+  psi'                  side-normalized packet character;
+  Oe                    Reading.Oe;
+  crOe                  Reading.cr;
+  domOe                 Reading.dom;
+  dvrOe                 Reading.dvr;
+  algOe                 Reading.alg;
+  algOOe                composite O(i)-algebra structure;
+  towOe                 equality of those composites;
+  Oe_inj                Reading.inj;
+  Oe_fin                Reading.fin;
+  Oe_loc                Reading.loc;
+  embW                  Reading.emb;
+  embW_w                Reading.emb_w;
+  eMt                   NC8 chosen map;
+  eMt_basis             NC8 for every basis, at required w,j;
+  eMt_lat               NC8 exact B-span equality, at required w,j.
+
+NChoicePack applies psiAt once again, so its character is
+(chi^[b])^[b]=chi. All other packet coordinates were unchanged.
+Thus the extracted packet equals the original one, with no lost sign.
+
+7. NC10–NC11: the common character and conjugation
+================================================
+
+If L contains a primitive nth root and a K'-valued character has exponent
+n, every value lies in the image of L. The powers of the embedded
+primitive root are n distinct roots of X^n-1, hence exhaust its roots.
+The unique lifts preserve multiplication because the embedding is
+injective. This proves actual character descent.
+
+ValuesIn is exactly the needed primitive-root and exponent hypothesis.
+It applies to the side-normalized character too. NC4 and this descent
+give HasReading for the chosen packet.
+
+For the conjugate reading, retain L0/Q Galois. Conjugation then preserves
+L0 and its integers, so the given relation between emb0 and emb0b is
+applicable at every base-field element. Keep Oe and compose emb with
+conjugation. The prescribed valuation relation gives emb_w, and the
+side-embedding relation gives emb_side.
+
+Every character value pulled from the finite ring-class group is a root
+of unity. Complex conjugation sends it to its inverse. The opposite
+side inverts the local character, so the conjugate reading pulls the
+same Galois character psi0. In particular the coherence condition is
+psi0(conj w)=psi0(w), not psi0(conj w)=conjugate(psi0(w)).
+
+Choose one representative of each conjugation orbit. Descend once on
+each twisted representative and use the conjugate reading on its
+partner. Fixed places require no side switch. Set psi0=1 on untwisted
+orbits. This proves exists_isCharOf under the precise hypotheses.
+It does not prove LocsCarry for any separately prescribed local family.
+
+8. NC12–NC13: exact tied construction and necessity checks
+========================================================
+
+The fixed IsCharOf family supplies an actual reading at each twisted
+place pulling that same psi0. At an untwisted place, ReadElsewhere
+provides an index and side; choose the packet (i,empty,0,1), and NC4
+supplies its reading. It pulls psi0=1 automatically. Use NC9 on this
+family. No rank condition is used away from the required support/range.
+
+All five NChTie fields:
+  twOf_eq: local index i equals the packet index at the specified w(a);
+  twSide_eq: local side equals its packet side;
+  Q_eq: local selected primes equal its packet Q;
+  psi_eq: the existing common psi0 is conjugation invariant, is pulled
+          by each chosen reading, and agrees through embK with psiL;
+  embedding_baseField_condition: emb_side, restricted to nonzero
+          denominators and written through the same coefficient tower.
+LocsCarry is exactly the first three same-object equalities plus the
+embK/psiL equality used in the fourth field.
+
+Records preserves all packet and side coordinates on twisted places.
+If GoodData was supplied, substitution transports its conjugation and
+Hecke-goodness properties to TwConjAt and TwGoodAt. The proof does not
+manufacture GoodTw, aux3, or a finite exceptional-prime avoidance theorem.
+Those stronger selectors remain separate suppliers.
+
+NC13 proves that the rank premise is not an artifact of this construction:
+any NChoice already implies RankTie for its extracted packet, by counting
+its two bases and applying NC6. A tied choice also implies ReadsAt:
+its base-field condition with denominator 1 identifies an integer's
+image; local coefficient maps reflect nonunits, and embW_w applied to
+the inverse detects strictly positive valuation. This includes zero
+separately. Two tied choices consequently have the same i,b,Q at each
+existing local index. The proofs do not claim uniqueness of the chosen
+DVR, embedding or lattice map.
+
+These converse assertions cannot be used to make RankTie from a
+not-yet-constructed choice. The dependency graph records them after
+NC9 and NC12.
+
+9. NC14–NC16: the literal TupTied supplier
+========================================
+
+TwDat is supplied. Its character set is
+ {1,delta,delta'} union range(w -> delta_at_resChar(w)*T.psi(w)).
+The IsDelta and IsTwist clauses imply each character has finite order,
+is trivial on F, and is tame everywhere. Products preserve those
+properties, using the product of two positive exponents.
+
+Every displayed twisted character is nontrivial. The distinguished
+delta at p has nontrivial inertia of exact exponent 15 above p.
+T.psi(w) is unramified at every prime above p, because otherwise
+IsTwist would force its rational norm prime p outside offSet, although
+offSet contains both distinguished primes. A product with an unramified
+character cannot cancel delta on local units.
+
+The existence of a prime above p is supplied by the elementary finite
+quotient O_E/p: it is nonzero because the rational number 1/p is not
+an algebraic integer, and every nonzero finite ring has a maximal
+ideal. This replaces an opaque call to an isolated prime-above theorem.
+Finiteness of places over the finite rational-prime set T.pl follows
+from the same finite quotient. Outside that set the twisting character
+is 1, so the complete displayed character set is finite. Conjugation
+preserves resChar, and TwDat.conj preserves psi and k.
+
+MuIsW remains a ten-field hypothesis on the same X,f,T,W,xi. Its on/off
+fields and the nontriviality just proved give
+        muAt(w) != mu0 iff w in W.
+Its sub field and prime finiteness give W finite. The supplied row
+muAt_conj field gives conjugation stability. The set W is not enlarged
+to all places above T.pl.
+
+For any NChoice C with C.Q(w)=T.Q(w) on W, choose TupTied.xi=xi and
+TupTied.psi=T.psi. Its twelve fields are:
+  xi, xi_inj, xi_fin, xi_triv, xi_tame, psi;
+  trueColumnChoices_heckeChar_reference_eq_one;
+  xi_star, xi_star', xi_tw, psi_is, psi_un.
+Finite/trivial/tame follow from the range and NC14. The four named
+tuple identities are the literal MuIsW identities. psi_is follows
+from TwDat.psi_is after the exact Q equality on W. psi_un follows
+from MuIsW.supp and the support equivalence.
+No coefficient-index equality k'=T.k is required for this endpoint.
+
+10. NC17: joint output and remaining actual suppliers
+===================================================
+
+If the packets in NC12 have Q=T.Q on W, their exact recovery supplies
+the premise of NC16. The resulting NChoice, NChTie and TupTied refer
+to one and the same C, with tp.xi=xi and tp.psi=T.psi.
+
+For TX16, keep the exact frame equality I.cf=Fr.at(X,f) and xi=I.xi.
+Then tp.xi=I.xi follows literally, and the newly constructed records
+can be passed to that already reconstructed geometry. Its other
+geometric/ambient/stage premises remain exactly as before.
+No additional period, theta or Hecke compatibility has been inferred
+from the arbitrary full-lattice match.
+
+The current frontier has five component-local interface families:
+
+(A) Actual row/local models carried by D7.
+    jMt_basis/MtLat_sub and finite full local Mt lattices are retained
+    object fields. The parent stage-existence component may construct
+    instances, but this section does not claim that entire supplier.
+
+(B) Simultaneous twist packets/sides, ReadsAt, RankTie and off-twist
+    coverage. NC4 constructs a Reading once ReadsAt holds; it does not
+    select all coefficient indices. RankTie remains the exact global/
+    local dimension equality for those same packet choices.
+
+(C) A common Galois-character family satisfying IsCharOf and LocsCarry.
+    NC11 constructs IsCharOf under ValuesIn, conjugation coherence and
+    L0/Q Galois. Its resulting family still must agree with the local
+    psiL through embK. In a supplied model with empty Loc, LocsCarry's
+    conditions are vacuous, but this does not remove the separate
+    Hecke/Galois compatibility needed by stronger choice-side results.
+
+(D) MuIsW and exact selected Q, frame and xi identifications.
+    NC15–NC16 derive finite support and TupTied from these data. They
+    do not select a new tuple family and claim it is the existing one.
+
+(E) Optional GoodData/GoodTw and larger global export.
+    Records preserves supplied goodness, but aux3, analytic avoidance,
+    Later, Pins, host/window existence and final global branches are
+    not consequences of this section.
+
+Precise adjacent source frontiers
+--------------------------------
+
+StatementCOfCasselmanWallach.lean contains:
+  LevCmp.rank_of_levEq: rank equality from a supplied MtReal, NExpTied
+  cell, level/character equivalence and matching coefficient weight,
+  together with algebraic modular-form complexification.
+  LevCmp.exists_choice: a stronger simultaneous choice-side constructor,
+  using a finite-order Hecke-to-Galois character, ring-class descent,
+  complex embeddings of Reading fraction fields, and the preceding
+  rank comparison. Its local-index set is assumed empty.
+  muIsW: assembly from an actual ColW/Pre2/St with specified xi range
+  and on/off/support assignments.
+
+Those are identified as concrete next interfaces, not as already proved
+by NC. The source NChoice existence theorem itself is discharged under
+its literal hypotheses; the next targets move upstream to suppliers
+of these precise hypotheses.
+
+Validation and limits
+=====================
+
+Every source locator is generated from the pinned Git blob. Present
+checkout files, if any, are compared byte-for-byte with that blob.
+Claim paragraph hashes, whole TeX/report hashes, record field lists,
+dependency order and next-target scopes are regenerated reproducibly.
+The metadata distinguishes proved conditional constructor conclusions
+from retained simultaneous object supply.
+
+No compilation of the Lean repository is claimed. No PDF was requested
+for this continuation. The mathematical reconstruction is conditional
+on exactly the retained interfaces above and does not announce a
+completed proof of RH or GRH.

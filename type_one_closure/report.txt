@@ -1,0 +1,370 @@
+TC1–TC6. THE COMPLETE SUPPLIED-DATA LOCAL TYPE-I THEOREM
+=====================================================
+Human reconstruction, version 0.10, 2026-11-21.
+Source: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4.
+
+Scope and conventions
+---------------------
+This component proves the source Conclusion2 / projection_lemma_base_level
+for the actual local polynomial representations, with explicit sufficient
+constants. It consumes the proved RU, RD, HM and NP components and earlier
+CB/IW/EL/SW/RL, not an unproved AdmB or AdmT record. It does not assert that
+the simultaneous global arithmetic data satisfying HypI have been supplied.
+The full RH and all-Dirichlet-GRH reconstructions remain incomplete.
+
+Let O be the source complete DVR, F its fraction field, w its uniformizer,
+and w^2=p. Write v_p(w)=1/2. A weight lambda has normalized edge pairing
+  be_lambda(x,y)=p^{A_lambda}y(x), A_lambda=Ar(1,lambda).
+The midpoint lattices R_e,R'_e are exactly dual for this pairing (HM8).
+CCL_lambda(t,c,e) is the intersection of w^{-t}HL(source), R_e, and
+w^c R_f for all other same-source rank-one edges f. Its dual analogue
+CCL'_lambda uses w^{-t}HL(target)^*, R'_e and the other same-target edges.
+A FactorsLE certificate of n factors at depth D consists of n vectors
+and n dual vectors in the named lattices whose pairing matrix becomes
+z I_n after an integral column operation, with z!=0 and v_p(z)<=D.
+The zero certificate is always allowed. RhoL means such certificates
+on every edge with n at least a specified real lower bound.
+
+Put q=p^{n'}, k=m+1, G=(q^k-1)/(q-1), and
+  d(lambda)=dim_F V(lambda)/G.
+HM5 counts G incoming or outgoing rank-one edges at each lattice and
+transports certificates between any two edges. The one-sided upper bound
+also proved there is: n factors between CCL_lambda(t,c,e) and R'_e at
+depth D>=0 imply n<=d(lambda) if 2D<c. Dual cleaning is not needed for
+that upper bound. This distinction is used in TC1.
+
+1. TC1: PRIMITIVE RETRACTION, SMITH SPLITTING, AND CLOUD COUNT
+------------------------------------------------------------
+Use the actual maps of HM11, for weights H,H+,lambda:
+  io:V(H)->V(H+), U_b:V(H)->V(lambda), L_a:V(lambda)->V(H+),
+  L_a U_b=delta_ab p^{kappa_b}io, 0<=kappa_b<=K,
+with b in a set of cardinality B. They preserve the source cleaned
+lattices at height t and conductor c2. The normalized pullback
+  g |-> p^{A_H+-A_lambda}(g composed with L_a)
+preserves the dual cleaned lattice at height t and conductor c3<=c2.
+HM11 also gives io^{-1}(R_H+,e)=R_H,e.
+
+This exact preimage supplies an integral retraction. Indeed io is
+injective: if a nonzero v belonged to its kernel, some scalar multiple
+of v would not belong to the full lattice R_H,e, but its image 0 would
+belong to R_H+,e. Its lattice image is primitive: if w y=io(x), with
+y integral, then io(x/w)=y implies x/w integral. Thus the quotient of
+R_H+,e by io(R_H,e) is finite free over the DVR. Extend a basis of the
+image to a basis of R_H+,e, project onto the image and invert io there.
+Extending scalars gives ret with ret io=1 and ret(R_H+,e) subset R_H,e.
+This is the actual LatRetract assertion, with no denominator loss.
+
+Suppose H and H+ have respectively n1,n2 factors at depth D>=0,
+where 4D<c2. Absorb their integral column matrices to arrange
+  be_H(x_i,y_j)=z1 delta_ij, be_H+(x'_i,y'_j)=z2 delta_ij,
+where v_p(z1),v_p(z2)<=D. Transfer y_j by
+  t_j=p^{A_H-A_H+}(y_j composed with ret).
+The exponent is required: then be_H+(v,t_j)=be_H(ret v,y_j).
+Perfect normalized duality shows t_j in R'_H+,e. Let
+  N_ij=be_H+(io(x_i),y'_j), B_ji=be_H+(x'_j,t_i).
+Both matrices are integral.
+
+Smith-reduce N and let r be the number of its nonzero invariant
+factors dividing z=z1 z2. The other s=n1-r rows are z times a
+matrix E with entries in wO. The same integral row changes, with
+inverse changes on the t_i, retain their z1 I_s diagonal. In the
+good rows one obtains integral P,Q with P N Q=z I_r. In the bad
+rows, the combined pairing against t_i and y'_j has matrix
+               M0=[ z1 I_s    z E ]
+                  [ C        z2 I_n2 ].
+Set U=I-EC and V=I-CE. Both are identity modulo w, so are invertible
+over O. Direct multiplication gives
+  M0 [ z2 U^{-1}   -z E V^{-1} ] = z I_(s+n2).
+     [ -C U^{-1}    z1 V^{-1}  ]
+Thus there are s+n2 factors at depth 2D between the source-cleaned
+lattice for H+ and its full midpoint dual. HM5 applies because
+2(2D)<c2, giving s+n2<=d(H+), hence
+                         r>=n1+n2-d(H+).               (TC1.1)
+
+The good rows give F_i in CCL_H and g_j in CCL'_H+ with
+be_H+(io(F_i),g_j)=z delta_ij. Apply U_b to F_i and the normalized
+pullbacks through L_a to g_j. Multiply the latter by the integral
+scalar p^{K-kappa_a}. Their pairing is exactly
+                 p^K z delta_ab delta_ij.
+Their source membership at c3 follows by weakening c2 to c3.
+We have therefore proved
+  FactorsLE_lambda(t,c3, B r, 2D+K),
+  r>=n1+n2-d(H+).                                     (TC1.2)
+This is CloudCount.cloud_count, with the source pivot induction
+shortened to Smith normal form and the displayed finite block inverse.
+All operations remain over O; the retraction is used only for its
+midpoint dual, never falsely asserted to preserve a cleaned dual.
+
+2. TC2: THE GENERAL-WEIGHT DIMENSION COMPARISON
+---------------------------------------------
+Let the selected set TT have N elements and let c=ccl. At a selected
+position the weight is
+                 (A+c, beta_1,...,beta_(k-2), -B-c),
+where |beta_i|<=c. Put H=(A,0,...,0,-B) at each position,
+H+=(A+2c,0,...,0,-B-2c), and let Cl be the product of Weyl dimensions
+of the middle (k-2)-coordinate weights. Off TT the current weight is
+zero. Odd positions use the reversed dual, which has the same dimension.
+
+Assume A,B>=b'/3>0 and set u=6c/b'. In the Weyl product, middle-middle
+factors form Cl; the other 2(k-2)+1 factors are the flat H factors
+multiplied by numbers in [1,1+u]. For example their numerator increments
+are c-beta_i, c+beta_i and 2c, each between 0 and 2c; their denominators
+are at least A, B or A+B. For H+ the increments are 2c,2c,4c,
+and the same upper bound holds. Thus, with
+                 E=(1+u)^{N(2k-3)},
+  Cl dim H <= dim lambda <= E Cl dim H,
+  dim H+ <= E dim H.                                  (TC2.1)
+If epsilon=12Nkc/b'<=1/9, then E<=exp(epsilon),
+(1-epsilon)E<=1 and E<=2. The first uses log(1+u)<=u
+and 6(2k-3)<=12k; the second follows from
+log(1-epsilon)<=-epsilon. The last follows, for example, by the
+power series exp(epsilon)<=1/(1-epsilon)<=9/8.
+
+Suppose H,H+ have fractions at least 1-kappa1 and 1-kappa2 at the
+same height, conductor c2 and depth D, where 0<=kappa1<=1,
+kappa2>=0, 4D<c2 and 2Nc<=c2. HM11 supplies TC1 with
+  B=Cl, K=N ceil(kappaOneExponent(p,a,m)), c3=c2-2Nc,
+provided 2c<=8a. The retained mass is at least
+             Cl[(1-kappa1)d(H)-kappa2 d(H+)].
+Divide (TC2.1) by the same G. Since 1-kappa1>=0,
+this mass is at least
+             (1-kappa1-2kappa2-epsilon)d(lambda).        (TC2.2)
+Indeed Cl d(H)>=(1-epsilon)d(lambda) and
+Cl d(H+)<=2d(lambda); the extra kappa1*epsilon is nonnegative.
+Thus CloudWeightLowerBound holds with depth 2D+K and conductor
+c2-2Nc. A negative lower mass is harmless; there is no multiplication
+of a lower bound by a possibly negative retained fraction.
+
+3. TC3: RESTORING THE SMALL WEIGHTS OUTSIDE TT
+--------------------------------------------
+Decompose lambda=lambda_T+lambda_O, with disjoint support TT and
+its complement. Multiplication of polynomials in disjoint letter
+variables gives an integral tensor isomorphism for every ordinary
+lattice family and for the midpoint lattices. An explicit inverse
+sends variables indexed by TT to X tensor 1 and all other variables
+to 1 tensor X. Zero-weight factors are the constants by the monic
+CB2 basis. This proves RestTensor, both HL/HLe equalities, the dual
+evaluation product and
+                 dim V(lambda)=dim V(lambda_T)dim V(lambda_O).
+The integer A_lambda is additive. Hence normalized be is also the
+tensor product of the two normalized pairings.
+
+All coordinates of lambda_O have absolute value <=c. Write
+E_last=sum_s lamAt(lambda_O,s,last). Then
+        A_lambda_O-E_last
+          =sum_s[lamAt(lambda_O,s,0)-lamAt(lambda_O,s,last)]
+          <=2n'c=:h.                                  (TC3.1)
+In the elementary-divisor frame for an edge, every tableau has
+nonnegative row degree. The signed determinant twist therefore gives
+  w^{-E_last}H_mid(lambda_O) subset HL_src(lambda_O),
+  w^{-E_last}HL_tgt(lambda_O) subset H_mid(lambda_O).
+Multiplication by the remaining nonnegative power
+w^{h-(A_lambda_O-E_last)} and evaluation duality yield
+  R_O,e subset w^{-h}HL_O,src,
+  R'_O,e subset w^{-h}HL_O,tgt^*.                      (TC3.2)
+This is RestOrdBound, not a postulated small-weight norm estimate.
+
+Take the actual HM8 dual bases r_a in R_O,e and rho_b in R'_O,e,
+with be_O(r_a,rho_b)=delta_ab. Tensor them with the cleaned factors
+for lambda_T. Equation (TC3.2) increases the height by h.
+On a different same-source edge, HL_O,src subset R_O,f (HM8), so
+r_a is in w^{-h}R_O,f. On a different same-target edge the dual
+inclusion is identical. Consequently the other-edge conductor
+decreases by h. The chosen-edge conditions remain exact tensor
+conditions. Pairing becomes the old matrix tensor I, so depth is
+unchanged and rank multiplies by dim V(lambda_O).
+
+For c3>=h this proves, with the same fractional loss kappa,
+  RhoL(lambda_T,t,c3,D,(1-kappa)d(lambda_T))
+    => RhoL(lambda,t+h,c3-h,D,(1-kappa)d(lambda)).        (TC3.3)
+This is the literal ResidueClassCount. The argument also covers
+empty complementary support and zero retained rank.
+
+4. TC4: FROM EVERY EDGE TO LPprime AT EVERY TARGET LATTICE
+---------------------------------------------------------
+Fix a target lattice L. Its G incoming rank-one edges are the
+inverse images of hyperplanes in L/pL; each is an actual edge,
+and distinct hyperplanes give distinct sources. Suppose every
+edge has n_e>=(1-kappa)d(lambda) factors at height t, depth
+D in N and conductor c, with 8D<c and 4(D+1)<=c.
+Absorb each certificate's integral matrix to get diagonal z_e I,
+where z_e divides p^D. The vectors lie in Nsrc, the duals in Ntgt:
+cleaning by w^c on the other edges implies the unscaled membership.
+For distinct edges e,f with the same target, the f-dual is
+w^c-integral on R_e; hence all cross pairings are in w^cO.
+
+For T=sum_e n_e, the combined T-square pairing matrix B has
+diagonal blocks z_e I and off-diagonal entries in w^cO. Let
+Q be diagonal with entries p^D/z_e, all integral. Then
+                     B Q=p^D(I+E), E in wO,
+because c>2D and p^D=w^{2D}. The determinant of I+E is a unit,
+so its inverse is integral. This supplies the actual GoodRankK
+identity, by using the Q-scaled target dual vectors and multiplying
+the testing rows by (I+E)^{-1}. The rank is at least
+                     T>=(1-kappa)dim V(lambda)
+when kappa<1. If kappa>=1, the required rank is nonpositive and
+the zero certificate suffices. The source vectors retain their
+individual other-edge cleaning conditions under this construction.
+This proves RhoLowerBoundLargeConductor and every clause of LPprime.
+The proof only needs c>2D for the inverse, but keeps the source's
+stronger 8D<c and 4(D+1)<=c as stated.
+
+5. TC5: INFIMUM ATTAINMENT AND THE ACTUAL EXCEPTIONAL FUNCTION
+------------------------------------------------------------
+Let K be the fixed constant package and X the literal data, with
+the definitions in NP and HM6. For each flat weight set
+  kF(A,B)=inf {kappa>=0 : RhoL(flatW(A,B),tStar(A,B),c4,D1,
+                                      (1-kappa)d(flatW(A,B)))}.
+The set contains 1, so 0<=kF<=1. Its infimum is admissible.
+Here is the finite-rank reason. At any fixed edge, if
+T=(1-kF)d>0, choose an admissible kappa sufficiently close to kF
+that (1-kappa)d>ceil(T)-1. Its integer rank is at least ceil(T),
+and hence at least T. For T<=0 use rank zero. Repeat for each
+edge; the definition does not require a common choice of vectors.
+Thus the infimum causes no missing limiting or compactness argument.
+
+For degree families aw,bw put epsilon=12Nkc/b' and
+  kText(aw,bw)=
+    [kF(aw-c,bw-c) if aw-c>=a and bw-c>=bl coordinatewise;
+     1 otherwise]
+       +2 kF(aw+c,bw+c)+epsilon.                       (TC5.1)
+All kF arguments mean coordinatewise natural values; in the
+nontrivial case the displayed lower bounds make truncation exact.
+This is exactly Dat.kText, including its outside-window branch.
+
+Assume the literal FactsLP, proved by NP8. If kText>=1, LPprime
+is witnessed by rank zero and 4(Dp+1)<=cStar. Otherwise the inside
+condition holds. Set A=aw-c, B=bw-c and enlarge the height of the
+first flat certificate to tStar(aw+c,bw+c). This is legitimate:
+t0 depends on the degrees only through its monotone minima, and
+the ceiling preserves monotonicity. The second flat certificate
+already has that height. Apply TC2 with kappa1=kF(A,B),
+kappa2=kF(A+2c,B+2c), conductor c4 and depth D1. Its degree,
+dimension, small-epsilon and conductor hypotheses are precisely
+the fields of FactsLP plus c4=cStar+2Nc+2n'c.
+
+It gives lambda_T a retained fraction 1-kText, depth
+  2D1+N ceil(kappaOneExponent)<=Dp
+and conductor c4-2Nc. TC3 then restores lambda_O at the exact
+conductor cStar, with height
+                  tStar(aw+c,bw+c)+2n'c.
+NP7 gives this height <=tI(C0,C), and hence <=the requested t.
+Increase depth to Dp, height to t, and use TC4; the conductor
+field 8(Dp+1)<=cStar supplies both of its strict inequalities.
+This proves MidLP directly for the actual source objects.
+
+6. TC6: EXPLICIT CONSTANTS AND THE COMPLETE LOCAL CONCLUSION
+-----------------------------------------------------------
+Choose
+  C0>=880, CE1=CE2=Cm=17, Ckap=3, Ct=30, Cc=4,
+  CA=50000, Cs=351, CH_inner=700000.                   (TC6.1)
+These constants do not depend on any prime, period, weights or
+coefficient ring. NP2 with H=4 has threshold
+  1000(CE1+CE2+1)(Cc+1)H=700000.
+This supplies Std(H=4), and consequently Std(H=1), for all the
+extended local data at the inner threshold. RU8 uses no further
+constant, RD9 requires C0>=880, and RL11 requires exactly
+CE1,CE2,Cm>=17 and Ct>=30. RU9 needs Ckap>=3.
+SW9's sufficient coefficient is
+  max{56,2(31exp(3)+5)exp(3),1}.
+Since exp(1)<3, it is <45468<50000. NP9 gives
+  Cs=Ckap(Cm+4CE1+CE2+15)=3(17+68+17+15)=351.
+
+There is no hidden GoodShare premise in the final application.
+RU10 proves that each actual segment lattice L is finite free.
+The ranks of saturated GoodSub sublattices form a nonempty subset
+of {0,...,rank L}, so a largest rank g is attained. The actual
+definition badShare is 1-g/rank L when rank L>0. When rank L=0
+its definition gives 0 and the zero sublattice still supplies the
+required GoodShare. Thus each literal kapTI gives GoodShare
+pointwise, with no new error. Choose every segment depth DjI.
+By the literal definitions,
+  sum_j DjI+4kap0I=totalDegreeBudget=D0,
+  kappa_P+sum_j kapTI=Dat.kx.                           (TC6.2)
+NP5 gives 4D0<c4. RU11 therefore supplies exactly HM6.1 at
+D0 and loss kx. No field of the source's bundled K.admitted record
+is used here. HM1–HM7, NP4–NP6 and RD11–RD14 now give KeyIneq,
+the short-box average and MeanX for these actual quantities.
+RD15 consequently proves
+  meanKap(kText)<=Cmean N N1/Y,
+  Cmean=6(CA+Cs)+8=302114.                              (TC6.3)
+
+For the fixed package (TC6.1), the remaining numerical thresholds
+are completely explicit:
+  TLP=max{108,8CA+93,1,C0^{-2}}=400093,
+  TM=max{TLP,4CH_inner+1,2Cm+24}=2800001,
+  Tdensity=max{TLP,400}=400093.
+The height coefficient needs C>=4Ct+4=124. Thus take
+               CH>=2800001, C=302114.                 (TC6.4)
+All thresholds are selected before the data. Enlarging C also
+preserves the conclusion, since its height and mean upper bound
+increase under the positive hypotheses.
+
+Here is the full supplied-data hypothesis, for unambiguous reuse.
+Put N=|TT|, k=m+1, Q=p^{G'}, lambda=C0 N1^2 log(a_r), and
+delta=CH*N1*lambda/k+2(bu-bl)/b'. The radius a_r is real;
+the internal integer radius is a=ceil(a_r). Assume:
+ (a) Y>=1, k^2Y^2<=p; TT contains an even position; it has at
+     least two even-start segments; each has length <=G' and at
+     most N1 selected odd interior points; N1>=1, 2N1+2<=m.
+ (b) 8log(NY)<=lambda; b'>0, bl<=b'<=bu;
+     Yb*N*lambda*b'/k<=bu-bl<=b'/2;
+     CH<=Yb and 2Yb*N*lambda<k.
+ (c) kY^2Yb*N*lambda*log(a_r)<=a_r/b'; delta<1/6;
+     p<a_r/b'; CH*N*lambda^2<=k; no odd d in N satisfies
+     (a_r/b')(1-2delta)<=p^d<=(a_r/b')(1+2delta).
+ (d) c<=lambda*b'/k;
+     CH*N*Y^2*(N1^5+k^3)*log_p(a_r)<=Dp;
+     8(Dp+1)<=cStar;
+     CH*k^3*N*Q^4*(cStar+Nc+n'c)*Y<=b'.
+These are exactly HypI; numerical positivity not separately stated
+in that source record is derived in NP4.
+
+Then there is a nonnegative function kappa of the two integer degree
+families on TT, independent of the local coefficient-ring setting,
+whose uniform mean on
+  aw_s in [ceil(a_r),floor(a_r+a_r/(kY))],
+  bw_s in [ceil(bl),floor(bu)]
+is at most C*N*N1/Y. For every allowed RS setting, every dominant
+weight with extremes aw_s,-bw_s and middle coordinates of absolute
+value <=c on TT, and all coordinates <=c in absolute value off TT,
+the following holds. At every target lattice there are actual
+source sections and target dual sections, with other-edge vanishing
+to order cStar, and at least
+                    (1-kappa(aw,bw))dim V(lambda)
+integral factors dividing p^{Dp}, at every integer height
+                    t>=tI(C0,C).
+In the literal matrix convention, those factors give GoodRankK,
+not merely a rationally independent family. This is Conclusion2.
+
+For clarity the exact height is
+  S + C*N*N1*[a_r/p^2+b'/p+lambda*a_r/(pk)+lambda*b'/k]
+    + C*N*[ Q(cStar+C*N*k*log_p(a_r)+4Nc+2n'c)
+                          +kQ+k*log_p(a_r)+c ] +2n'c,
+where
+  S=sum_(selected odd y) min(bw_y, aw_(previous selected even y)/p^d_y).
+The previous even point and positive cyclic distance d_y are the
+literal dPrev/yPrev of NP7, including the wrap.
+
+To obtain one kappa for all rings, choose one RS setting R0 if one
+exists and take kappa=kText_R0. RD15 gives its mean, TC5 its LPprime
+conclusion, and HM12 transports that exact conclusion to every other
+RS setting with the same p,n'. We do not assert equality of kText
+computed in two rings, since it is unnecessary. If no RS setting
+exists, choose kappa=0; the universally conditional local assertion
+is then vacuous. This is the same logically correct choice as the
+source, without adding a hidden existence hypothesis.
+
+Conclusion and provenance boundary
+-----------------------------------
+TC6 closes the complete supplied-data Type-I Conclusion2, and therefore
+its ClosedP quantifier statement, with sufficient constants (TC6.4).
+Together with EA9, both local Type-I and Type-II constructions are
+now reconstructed. The full global hypotheses, theta/spectral identities,
+metric transport, cohomological windows and simultaneous prime selection
+are not consequences of this local theorem and remain in the frontier.
+The direct constants, Smith compression and finite-rank infimum argument
+are human proofs and simplifications, not newly compiled Lean claims.
+The ledger records exact source definitions and parallel proofs; byte
+verification is not a kernel replay or independent certification of RH.

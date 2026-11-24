@@ -1,0 +1,973 @@
+\section{Constructing one marked arithmetic frame and its two strict classes}
+\label{sec:marked-frame-construction}
+
+\paragraph{The result and its precise boundary.}
+This chapter constructs the actual auxiliary field, marked element,
+profinite quotient, local groups and two nonzero strict cohomology
+classes used by \texttt{frame\_ex}.  It proves the complete source
+suppliers \texttt{exists\_\allowbreak twistCharacter\_\allowbreak continuousCohomology},
+\texttt{hlay}, \texttt{l15}, \texttt{ufacts}, \texttt{b0},
+\texttt{link\_ex}, \texttt{ok\_basic}, \texttt{strict} and
+\texttt{frobenius\_\allowbreak galoisField\_\allowbreak four\_\allowbreak compatibility}.
+The construction uses one field and one marked element throughout.
+The real quadratic auxiliary field admits a useful elementary
+simplification: a Chinese-remainder construction replaces the
+source's prime in a prescribed progression.
+
+The entry premise is the \emph{full} original \texttt{Gen} record,
+not just its seed-relevant subset from CAF.  The strict-class step
+retains exactly the original \(P:\texttt{GC.Hypotheses}_{2}\).
+Its finite local and global cohomology laws and Greenberg--Wiles
+identity are the laws used below.  The uniform class-rank step
+uses the already reconstructed TW1 and its named classical inputs.
+No automorphic rank-two or rank-three seed is assumed or produced
+by this construction.
+
+At the end, the resulting frame has \texttt{Big}, both strict
+classes, and twenty-one of the twenty-eight literal \texttt{Ok}
+fields.  The seven remaining fields are named explicitly at the
+end of the chapter.  Thus the chapter produces several complete
+upstream theorems and an actual shared frame, but does not yet
+claim the complete \texttt{HasFrameW}, \texttt{GdFrameEx},
+\texttt{HostFrameEx} or \texttt{GdEnd} endpoints.
+
+\subsection{Notation and the exact arithmetic input}
+
+Let \(\Omega\) be the specified algebraic closure of \(\mathbb Q\)
+and \(G=\operatorname{Gal}(\Omega/\mathbb Q)\).  Fix an odd prime
+\(\ell\), a commutative local ring \(O\) with finite residue field
+\(k\) of characteristic \(\ell\), and characters
+\[
+ \eta:G\longrightarrow\{\pm1\},\qquad
+ \Psi:G\longrightarrow O^\times,\qquad
+ \alpha=\overline\Psi:G\longrightarrow k^\times.
+\]
+Write \(\epsilon:G\to\mathbb Z_\ell^\times\) for the actual
+cyclotomic character, \(\epsilon_r\) for its reduction modulo
+\(\ell^r\), and \(\omega\) for its reduction in \(k^\times\).
+The prime-field map is injective, so
+\(\ker\omega=\ker\epsilon_1\).
+For a valuation subring \(A\subset\Omega\), write \(D_A,I_A\)
+for its decomposition and inertia groups, and write \(A\mid n\)
+for \(A(n)<1\), with the source's multiplicative valuation.
+
+We fix \(\sigma,B,M,H_b\) satisfying the original \texttt{Gen}:
+\(M>0\), \(2\ell\mid M\), \(\sigma\) is a complex conjugation,
+\(B\mid\ell\), and there are \(D>0,\delta\in\Omega\) with
+\[
+ \delta^2=-D,\qquad s\delta=\eta(s)\delta,
+ \qquad p\mid D\Longrightarrow p\mid M
+ \quad\text{for every rational prime }p.                  \tag{MFC.1}
+\]
+The characters \(\eta,\alpha\) factor through the action on
+\(\mu_{M^a}\) for some \(a\); \(\eta\) is unramified at
+\(\ell\); \(\alpha(\sigma)=1\); and one integer \(j\ge0\)
+satisfies \(\alpha|_{I_A}=\omega^j|_{I_A}\) for every
+\(A\mid\ell\).  The two separation hypotheses are
+\[
+ \ker\omega\cap\ker\alpha\not\subseteq\ker\eta,
+ \qquad
+ \exists t\in D_B\cap\ker\eta:\ \alpha(t)^2\ne1.          \tag{MFC.2}
+\]
+Finally \(H_b\) is open, contains \([G,G]\), has index
+\(\ell^b\) for some \(b\ge0\), contains every \(I_A\) with
+\(A\mid\ell\), and satisfies the exact lifting condition
+\[
+ A\nmid\ell,\quad s\in I_A\cap H_b,\quad\alpha(s)=1
+                  \quad\Longrightarrow\quad\Psi(s)=1.      \tag{MFC.3}
+\]
+These are all nineteen source fields, with the finite residue-field
+and odd-prime conditions included.  In particular (MFC.2)'s second
+condition and (MFC.3) are not inferred from the weaker CAF entry
+conditions.
+
+The subgroup \(H_\theta=H_\theta(w)\) is the inverse image of
+the \(\ell\)-th powers in \((\mathbb Z/w\mathbb Z)^\times\).
+CAF4 proved the literal source \texttt{Hth} identification and its
+open, abelian, index-\(\ell\), unramified and inertia properties.
+A witness prime \(w\) means exactly
+\[
+ w\text{ prime},\quad w\nmid M,\quad w\equiv1\pmod\ell,
+ \quad D_A\subseteq\ker\eta\cap\ker\alpha\cap\ker\omega
+                     \quad(A\mid w).                       \tag{MFC.4}
+\]
+CAF5 supplies such a prime with \(w\equiv1\pmod Q\), for every
+already prescribed positive \(Q\).
+
+\subsection{The real quadratic subgroup and the entire tower}
+
+% BEGIN MFC1
+\paragraph{MFC1. An elementary real quadratic auxiliary subgroup.}
+\label{claim:MFC1}
+There is an open subgroup \(H_0\subset G\) of index two such that
+every complex conjugation belongs to \(H_0\),
+\[
+ D_A\cap H_0=D_A\cap\ker\eta\quad(A\mid M),                \tag{MFC.5}
+\]
+and some valuation \(A\nmid M\) has \(I_A\not\subseteq H_0\).
+These are all fields of \texttt{FrobeniusSplitPrimeDatum}.
+
+\begin{proof}
+Choose an odd prime \(p\nmid2DM\).  Such a prime exists by
+Euclid's argument.  The Chinese remainder theorem gives a positive
+integer \(n\) with
+\[
+                  n\equiv-1\pmod{4M},\qquad
+                  n\equiv p\pmod{p^2}.                    \tag{MFC.6}
+\]
+Choose \(x\in\Omega\) with \(x^2=-n\), put \(z=\delta x\),
+and let \(H_0\) be the stabilizer of \(z\).  Since
+\(z^2=Dn>0\) and \(v_p(Dn)=1\), \(Dn\) is not a rational
+square.  Hence \(\mathbb Q(z)/\mathbb Q\) is quadratic and
+\(H_0\) is open of index two.  Every complex embedding sends
+\(z\) to one of the real roots of \(X^2-Dn\), so every complex
+conjugation fixes \(z\).
+
+Write \(-n=1+4Mt\) with \(t\in\mathbb Z\).  We claim that
+every \(s\in D_A\), with \(A\mid M\), fixes \(x\).
+It sends \(x\) to \(x\) or \(-x\).  In the latter case put
+\(y=(1+x)/2\).  Then \(sy=1-y\) and
+\(y(1-y)=-Mt\).  Decomposition-group invariance makes the
+valuations of \(y\) and \(1-y\) equal, while their product
+has valuation less than one because integers have valuation at
+most one.  Both valuations are therefore less than one.
+Their sum is one, contradicting the nonarchimedean inequality.
+Thus \(sx=x\).  Since \(z\ne0\), (MFC.1) now gives
+\(sz=z\) if and only if \(\eta(s)=1\), proving (MFC.5).
+
+At the prime \(p\), the polynomial \(X^2-Dn\) is Eisenstein.
+The quadratic extension is totally ramified there, so its inertia
+group has a nonidentity image and sends \(z\) to \(-z\).
+For any corresponding extension \(A\) of the \(p\)-adic
+valuation, \(I_A\not\subseteq H_0\) and \(A\nmid M\).
+This proves the final field.  No requirement that the auxiliary
+integer \(n\) itself be prime was needed.
+\end{proof}
+% END MFC1
+
+% BEGIN MFC2
+\paragraph{MFC2. Exact cyclotomic layers and their local indices.}
+\label{claim:MFC2}
+For \(m\ge0\), define the literal source subgroup
+\[
+ H_m=\ker(\epsilon_{m+1}^{\ell-1}).                         \tag{MFC.7}
+\]
+It is open, contains \([G,G]\), has index \(\ell^m\), and
+\[
+ H_m\cap\ker\epsilon_1=\ker\epsilon_{m+1}.                \tag{MFC.8}
+\]
+It contains inertia at every valuation not above \(\ell\).
+For every \(A\mid\ell\),
+\[
+ [I_A:I_A\cap H_m]=\ell^m,
+ \qquad\epsilon_r(I_A)=(\mathbb Z/\ell^r\mathbb Z)^\times
+                         \quad(r\ge0).                    \tag{MFC.9}
+\]
+These are the full conclusions of \texttt{hlay}.
+
+\begin{proof}
+For \(r\ge1\), \(\Phi_{\ell^r}(1+T)\) is Eisenstein at
+\(\ell\): its reduction is a power of \(T\) and its constant
+term is \(\ell\).  Thus \(\mathbb Q_\ell(\mu_{\ell^r})\)
+is totally ramified of its full degree.  The inertia action on
+these roots is consequently the whole unit group, at every
+prolongation of the valuation.  The assertion at \(r=0\) is
+trivial.  This also proves global surjectivity of \(\epsilon_r\).
+
+For odd \(\ell\), the units modulo \(\ell^{m+1}\) have a
+subgroup of order \(\ell-1\) consisting of the unique lifts
+of the nonzero residues satisfying \(u^{\ell-1}=1\).
+Existence and uniqueness follow from Hensel's lemma, since the
+derivative \((\ell-1)u^{\ell-2}\) is a unit.  Its complement
+is the subgroup \(1+\ell\mathbb Z/\ell^{m+1}\mathbb Z\),
+of order \(\ell^m\).  Raising to \(\ell-1\) kills the first
+factor and is an automorphism of the second.  Hence its image
+has order \(\ell^m\), proving the index assertion and (MFC.9).
+If a unit is also one modulo \(\ell\), its order is an
+\(\ell\)-power.  If its \((\ell-1)\)-st power is one, its
+order is one.  This proves (MFC.8).
+
+The kernel of the finite cyclotomic action is open, so \(H_m\)
+is open.  Its quotient is abelian.  Away from \(\ell\), all
+\(\ell\)-power roots are unramified: their defining polynomials
+have invertible derivative over the residue field, and Hensel
+lifts their roots from an unramified extension.  Hence such
+inertia is contained even in \(\ker\epsilon\), as asserted.
+\end{proof}
+% END MFC2
+
+% BEGIN MFC3
+\paragraph{MFC3. Residual-character identities cannot appear only in the tower.}
+\label{claim:MFC3}
+Fix \(H_0\) as in MFC1 and a witness prime \(w\).  Put
+\[
+ U_m=H_0\cap H_\theta(w)\cap H_b\cap H_m.                 \tag{MFC.10}
+\]
+For every \(i,j\in\mathbb Z\), the character
+\(\chi=\omega^i\alpha^j\) has the following properties:
+an identity \(\chi=1\) on \(U_m\) holds on \(G\);
+an identity \(\chi=\eta_k\) on \(U_m\) holds on \(G\);
+and an identity \(\chi=1\) on \(U_m\cap\ker\eta\) holds
+on \(\ker\eta\).  Here \(\eta_k\) is the same quadratic
+character viewed in \(k^\times\).  This is the full
+\texttt{l15} conclusion.
+
+\begin{proof}
+Let \([G:H_b]=\ell^b\).  Each of \(H_\theta,H_b,H_m\)
+is normal, with abelian quotient of order respectively
+\(\ell,\ell^b,\ell^m\).  Lagrange's theorem gives
+\[
+ s^{\ell^{1+b+m}}\in U_m\qquad(s\in H_0).                 \tag{MFC.11}
+\]
+An element of \(k^\times\) whose \(\ell^N\)-th power is one
+is one: \((u-1)^{\ell^N}=u^{\ell^N}-1=0\) in a field.
+Therefore a character trivial on \(U_m\) is trivial on
+\(H_0\), and the same argument applies on intersections with
+any subgroup.
+
+Choose \(A\nmid M\) and \(t\in I_A\setminus H_0\) from
+MFC1.  The cyclotomic conductor hypotheses imply
+\(\eta(t)=\alpha(t)=1\): inertia away from \(M\) fixes
+\(\mu_{M^a}\).  Since \(\ell\mid M\), also
+\(\omega(t)=1\).  Thus \(\chi(t)=\eta_k(t)=1\).
+Every element outside the index-two subgroup \(H_0\) is the
+product of an element in \(H_0\) with \(t\), or its inverse.
+This extends the first identity to all of \(G\).  Apply the
+same argument to \(\chi\eta_k^{-1}\) for the second identity.
+For the third, note that \(t\in\ker\eta\) and apply the
+identical coset argument inside \(\ker\eta\).
+\end{proof}
+% END MFC3
+
+% BEGIN MFC4
+\paragraph{MFC4. All twelve fields of the original \texttt{UFacts}.}
+\label{claim:MFC4}
+For every \(m\ge0\), \(U=U_m\) satisfies the following
+complete source record:
+\begin{enumerate}
+\item \(U\) is open and contains \([G,G]\).
+\item Every complex conjugation lies in \(U\).
+\item \(I_A\cap U\subseteq\ker\eta\) for every valuation \(A\).
+\item \(D_A\cap U\subseteq\ker\eta\) whenever \(A\mid M\).
+\item If \(A\nmid\ell\), \(s\in I_A\cap U\), and
+      \(\alpha(s)=1\), then \(\Psi(s)=1\).
+\item If \(A\mid\ell\), some \(s\in I_A\cap U\) has
+      \(\epsilon_1(s)\ne1\).
+\item If \(A\mid\ell\), \([D_A:D_A\cap U]\ge\ell^m\).
+\item For \(j=1,-1\), some \(s\in U\cap\ker\eta\) has
+      \(\omega(s)\alpha(s)^j\ne1\).
+\item The same assertion holds for \(j=2,-2\).
+\item At every \(A\mid\ell\), some \(s\in D_A\cap U\)
+      has \(\alpha(s)^2\ne1\).
+\item There is no \(j\in\mathbb Z\) with
+      \(\omega(s)=\alpha(s)^j\) for every
+      \(s\in U\cap\ker\eta\).
+\end{enumerate}
+The first item contains the two separate fields
+\texttt{isOpen} and \texttt{ab}; the remaining items are
+\texttt{real}, \texttt{unr}, \texttt{split}, \texttt{teich},
+\texttt{mu}, \texttt{deg}, \texttt{f2b}, \texttt{f2c},
+\texttt{f3} and \texttt{f5}.
+
+\begin{proof}
+Intersections of finitely many open subgroups are open.
+Every index-two subgroup contains the commutator, as do the other
+three factors in (MFC.10).  A complex conjugation has order two.
+Its image in a group of odd order is trivial.  Hence it lies in
+the three \(\ell\)-power-index factors and, by MFC1, in \(H_0\).
+
+At a valuation above \(M\), (MFC.5) gives both the inertia and
+decomposition assertions.  At every other valuation, \(\eta\)
+is already trivial on inertia by its cyclotomic conductor.
+The lifting assertion follows from \(U\subseteq H_b\) and
+(MFC.3).
+
+For \(A\mid\ell\), choose \(s\in I_A\) with
+\(\epsilon_{m+1}(s)=-1\), using MFC2.  It belongs to \(H_m\)
+because \(\ell-1\) is even.  Since \(\eta\) is unramified
+at \(\ell\), (MFC.5) puts it in \(H_0\); here \(A\mid M\)
+because \(\ell\mid M\).  It lies in \(H_b\) by hypothesis
+and in \(H_\theta\) because \(w\ne\ell\).  Thus \(s\in U\)
+and \(\epsilon_1(s)=-1\ne1\).  The index estimate follows
+from \(I_A\subseteq D_A\), \(U\subseteq H_m\), and
+\([I_A:I_A\cap H_m]=\ell^m\).
+
+By (MFC.1), \(\eta(\sigma)=-1\), since a complex conjugation
+negates a nonzero square root of a negative rational number.
+Choose \(t\in\ker\omega\cap\ker\alpha\) with
+\(\eta(t)=-1\) from (MFC.2).  Then
+\[
+ s_*=t\sigma\in\ker\eta,\qquad
+                  \omega(s_*)=-1,\quad\alpha(s_*)=1.       \tag{MFC.12}
+\]
+If \(\omega\alpha^j=1\) throughout \(U\cap\ker\eta\),
+MFC3 extends this identity to \(\ker\eta\), contradicting
+(MFC.12).  In fact this proves the stated \texttt{f2b} and
+\texttt{f2c} assertions for every integer \(j\).  Applying it
+to \(\omega\alpha^{-j}\) also proves \texttt{f5}.
+
+Finally take the element in the second assertion of (MFC.2).
+Conjugate it so that its decomposition group is \(D_A\) for
+the requested \(A\mid\ell\).  Characters into abelian groups
+are invariant under conjugation, so it still has \(\eta=1\)
+and \(\alpha^2\ne1\).  Equation (MFC.5) puts it in \(H_0\).
+Raise it to \(\ell^{1+b+m}\).  Equation (MFC.11) puts the
+result in \(U\), without leaving \(D_A\).  Its residual
+square is still nonidentity by the characteristic-\(\ell\)
+argument following (MFC.11).  This proves \texttt{f3} at every
+prolongation, completing the record.
+\end{proof}
+% END MFC4
+
+% BEGIN MFC5
+\paragraph{MFC5. One class-rank bound before the layer is chosen.}
+\label{claim:MFC5}
+For the fixed \(H_0,w,H_b\), there is \(C_0\in\mathbb N\)
+such that, for every \(m\ge0\),
+\[
+ \operatorname{clRk}_\ell
+  (U_m\cap\ker\eta\cap\ker\alpha\cap\ker\epsilon_1)
+                         \le C_0.                         \tag{MFC.13}
+\]
+Here \(\operatorname{clRk}\) is exactly \texttt{GC.clRk}:
+the \(\mathbb F_\ell\)-rank of the locally constant additive
+characters of the indicated subgroup which vanish on every
+intersection with inertia.  This is the full \texttt{b0}
+supplier, with \(C_0\) chosen before \(m\).
+
+\begin{proof}
+Set
+\[
+ V=H_0\cap H_\theta\cap H_b\cap\ker\eta\cap\ker\alpha
+                                      \cap\ker\epsilon_1.
+\]
+This subgroup is open: the two character kernels contain the
+kernel of a finite cyclotomic action.  It contains \([G,G]\).
+Thus \(E=\Omega^V\) is a finite abelian number field, and it
+contains \(\mu_\ell\).  By (MFC.8),
+\[
+ U_m\cap\ker\eta\cap\ker\alpha\cap\ker\epsilon_1
+                 =V\cap\ker\epsilon_{m+1}
+                 =G_{E(\mu_{\ell^{m+1}})}.                \tag{MFC.14}
+\]
+These are equal subgroups of the original \(G\), not merely
+abstractly isomorphic Galois groups.
+
+The final decomposition condition in the source's
+\(\texttt{Kum.XDual}\ 1\) is vacuous because no valuation
+has \(A(1)<1\).  Its inertia intersections are the inertia
+groups for the actual fixed field in (MFC.14).  Finite class-field
+reciprocity therefore identifies its additive character space with
+\[
+ \operatorname{Hom}(\operatorname{Cl}(E(\mu_{\ell^{m+1}})),
+                    \mathbb F_\ell).
+\]
+There is no real-place qualification: \(E\) contains
+\(\mu_\ell\) for odd \(\ell\), hence is totally complex.
+This Hom space has dimension
+\(\log_\ell|\operatorname{Cl}(E(\mu_{\ell^{m+1}}))/\ell|\),
+by elementary finite abelian group theory.  TW1 gives one bound
+\(\ell^{C_0}\) for these class-group quotients at all levels,
+including repetitions at the beginning of the tower.  This proves
+(MFC.13) at its exact fixed-field and coefficient scope.
+\end{proof}
+% END MFC5
+
+% BEGIN MFC6
+\paragraph{MFC6. The field and the marked local element are chosen together.}
+\label{claim:MFC6}
+After MFC5 choose \(m=3C_0+7\), put \(U=U_m\), and take
+the actual field
+\[
+                  L=\Omega^{U\cap\ker\eta},\qquad F=L^+.
+                                                               \tag{MFC.15}
+\]
+Then \(L/\mathbb Q\) is finite abelian CM,
+\(G_F=U\), \(G_L=U\cap\ker\eta\), and there is
+\[
+              g_1\in D_B\cap G_L,\qquad\alpha(g_1)^2\ne1.
+                                                               \tag{MFC.16}
+\]
+Moreover \(\ell^m>3C_0+7\).
+
+\begin{proof}
+MFC4 supplies precisely the \texttt{UFacts} input to CAF8.
+That theorem gives (MFC.15), including its literal Galois-group
+equalities and maximal real subfield.  Use MFC4's \texttt{f3}
+at the original \(B\) to choose \(g_1\in D_B\cap U\) with
+the required residual square.  Since \(B\mid M\), the
+\texttt{split} field gives \(\eta(g_1)=1\), proving (MFC.16).
+Finally \(m\ge7\), and \(\ell^m>m\) follows by induction
+from \(\ell\ge3\).  No constant has been chosen after its
+own layer: the order is \(H_0,w,C_0,m,L,g_1\).
+\end{proof}
+% END MFC6
+
+\subsection{The literal global quotient and local frame}
+
+% BEGIN MFC7
+\paragraph{MFC7. All local places, embeddings and degrees on the same field.}
+\label{claim:MFC7}
+Let \(L,F,U,g_1\) satisfy MFC6; the same assertions below hold
+for any original \(L\) and \(g_1\) satisfying the hypotheses
+of \texttt{link\_ex}.  Let \(\mathcal V\) be the set of primes
+of \(F\) above \(\ell\).  One may choose prolongations
+\(A_v\) and elements \(\gamma_v\in\ker\eta\) with
+\[
+ A_v=\gamma_v B,\qquad
+ G_v=D_{A_v}\cap U,\qquad I_v=I_{A_v}\cap U.              \tag{MFC.17}
+\]
+The set \(\mathcal V\) is finite and nonempty.  Every valuation
+above \(\ell\) is \(U\)-conjugate to exactly one \(A_v\),
+and, with the natural embeddings \(j_v:G_v\hookrightarrow U\),
+\[
+ d_v=[F_v:\mathbb Q_\ell]=[D_{A_v}:D_{A_v}\cap U],
+ \qquad \sum_vd_v=[F:\mathbb Q].                           \tag{MFC.18}
+\]
+There are also complex conjugations \(c_\nu\in G_F\) at
+every real place \(\nu\) of \(F\).
+
+\begin{proof}
+Primes above a fixed nonzero rational prime are finite and nonempty
+in a number field.  Choose an extension \(A\) of each.  All
+prolongations of the rational \(\ell\)-adic valuation to the
+normal algebraic closure are conjugate, so \(A=\gamma B\)
+for some \(\gamma\in G\).  If \(\eta(\gamma)=-1\), replace
+\(\gamma\) by \(\sigma\gamma\) and \(A\) by \(\sigma A\).
+Here \(\sigma\in U=G_F\), so the prime of \(F\) is unchanged,
+and \(\eta(\sigma\gamma)=1\).  This gives the required choices.
+
+Prolongations of one valuation of \(F\) are conjugate by \(G_F\).
+Conversely a member of \(G_F\) cannot change the restricted
+valuation on \(F\).  This proves both existence and uniqueness
+of the index \(v\) in the asserted orbit description.  Restriction
+identifies the decomposition and inertia groups over \(F\) with
+the intersections in (MFC.17).  Completion of the finite extension
+\(F/\mathbb Q\) identifies its local Galois degree with the
+decomposition quotient in (MFC.18).  Summing the local degrees
+gives the global degree, for example by the decomposition of
+\(F\otimes_\mathbb Q\mathbb Q_\ell\) into its finite local
+factors.
+
+For a real embedding \(F\hookrightarrow\mathbb R\), extend
+it to \(\Omega\hookrightarrow\mathbb C\).  Conjugation on
+the image preserves the algebraic closure and fixes \(F\),
+so it pulls back to the required \(c_\nu\in G_F\).  This
+also records the exact real place at which it is a conjugation.
+\end{proof}
+% END MFC7
+
+% BEGIN MFC8
+\paragraph{MFC8. The complete original \texttt{Linked} frame.}
+\label{claim:MFC8}
+Under the full hypotheses of \texttt{link\_ex}, there is an
+actual \(\Phi:\texttt{Frame}\ \ell\ k\) satisfying
+\(\texttt{Linked}\ \ell\ \eta\ \Psi\ \sigma\ g_1\ B\ M\ L\ \Phi\).
+In particular it contains every \texttt{GalLink} and
+\texttt{GC.FLink} field, with the same marked \(g_1\), field,
+characters and local maps.
+
+\begin{proof}
+Identify \(G_F\) with \(U=\operatorname{upl}(\Omega,L)\)
+by restriction to the same \(\Omega\); this is a topological
+group isomorphism.  Its inverse merely regards an automorphism
+fixing the embedded \(F\) as an \(F\)-automorphism.  Define
+\[
+ K_0=U\cap\ker\eta\cap\ker\alpha,
+ \qquad
+ J=\overline{\langle\!\langle
+       I_A\cap K_0:\ A\nmid\ell
+                   \rangle\!\rangle}_{,U},\qquad
+                         \Gamma=U/J.                      \tag{MFC.19}
+\]
+The normal closure and closure are taken in this particular \(U\).
+In the \(G_F\) notation, this is exactly
+\(\texttt{tameN}(S,K_0)\), with \(S\) the full finite set
+of primes above \(\ell\).  Every nontrivial valuation restricts
+to a finite prime of \(F\); the trivial valuation has trivial
+inertia and adds only the identity to the generating set.
+Thus the two descriptions have equal normal closures, including
+the valuation quantifier in \texttt{GalLink.p\_ker}.
+
+The subgroup \(K_0\) is open and normal in \(U\).  Its index there divides
+\(2|k^\times|\), which is prime to \(\ell\), since its
+quotient is the image of \((\eta,\alpha)\).  Because \(K_0\)
+is closed and normal, \(J\subseteq K_0\).  Also
+\(J\subseteq\ker\epsilon\), since \(\epsilon\) is
+unramified away from \(\ell\).  Consequently \(\eta,\alpha\)
+and \(\epsilon\) descend to characters
+\[
+ \delta_\Phi:\Gamma\to\{\pm1\},\quad
+ \psi_\Phi:\Gamma\to k^\times,\quad
+ \epsilon_\Phi:\Gamma\to\mathbb Z_\ell^\times.            \tag{MFC.20}
+\]
+Let \(p:U\twoheadrightarrow\Gamma\) be the canonical quotient.
+It is continuous and onto.  The quotient is profinite: a closed
+normal subgroup of a profinite group is the intersection of its
+open normal overgroups, and the quotient is their inverse limit
+of finite quotients.  This supplies its compactness, Hausdorff
+property and total disconnectedness.
+
+Use MFC7's local groups, with \(\operatorname{loc}_v=pj_v\),
+the indicated \(I_v\), degrees \(d_v\), real-place index set,
+and \(c_w=p(c_\nu)\).  Since \(\ell\mid M\), \texttt{UFacts.split}
+says \(\eta=1\) on each \(G_v\).  Hence the source's
+\(\operatorname{loc0}_v:G_v\to\ker\delta_\Phi\) is well
+defined.  Set
+\[
+                    c=p(\sigma),\qquad g_0=p(g_1).
+                                                               \tag{MFC.21}
+\]
+The latter is regarded as an element of \(\ker\delta_\Phi\),
+since \(g_1\in G_L\).  Together (MFC.17)--(MFC.21) specify
+every field of the original \texttt{Frame} record.
+
+We verify the full linking records, to retain the actual maps.
+The field is abelian and \(G_L=U\cap\ker\eta\) by hypothesis.
+The \texttt{unr}, \texttt{split} and \texttt{teich} fields are
+the corresponding \texttt{UFacts} fields.  The map \(p\), its
+continuity, surjectivity and exact kernel are (MFC.19).  Its three
+character identities are precisely
+\[
+ \delta_\Phi(pu)=\eta(u),\quad
+ \epsilon_\Phi(pu)=\epsilon(u),\quad
+ \psi_\Phi(pu)=\alpha(u).                                 \tag{MFC.22}
+\]
+The \texttt{c} and \texttt{g0} equations are (MFC.21).
+The chosen \(A_v,\gamma_v\) give \texttt{pl}, \texttt{pl\_conj}
+and \texttt{pl\_all}.  Inclusion gives continuous injective
+\(j_v\), its exact decomposition-group range, the equality
+\(\operatorname{loc}_v=pj_v\), and the exact inertia preimage.
+Equation (MFC.18) gives \texttt{dv}.  Finally
+\texttt{UFacts.mu} produces an element in \(I_{A_v}\cap U\)
+whose residual cyclotomic character is nontrivial.  Viewed in
+\(G_v\), it gives \texttt{GalLink.mu}.
+
+For \texttt{FLink}, take \(S=\mathcal V\), the original
+\(G_F\)-version of \(K_0\), the canonical quotient map
+\(\pi:G_F\to\Gamma\), and the decomposition inclusions
+\(\iota_v:G_v\hookrightarrow G_F\).  Take the prime map
+\(v\mapsto v\), the identity real-place equivalence, and the
+actual \(c_\nu\) from MFC7.  The \texttt{GLink} fields are:
+odd \(\ell\), all primes above \(\ell\), normal open
+\(K_0\) of prime-to-\(\ell\) index, continuous surjective
+\(\pi\), and kernel exactly \texttt{tameN}.  All have just
+been verified.  The \texttt{LLink} fields are MFC7's place,
+range and inclusion statements.  Its remaining equations are
+the definitions of \(I_v,d_v,\epsilon_\Phi,c_w\).
+The quadratic kernel is open because its inverse image under
+the quotient map is open; \(\delta_\Phi(c)=-1\) follows
+from \(\eta(\sigma)=-1\).  Finally both \(\delta_\Phi\)
+and \(\psi_\Phi\) kill \(\pi(K_0)\).
+The two final comparison equations in \texttt{Linked} say
+that \(\pi\) and \(p\), and \(\iota_v\) and \(j_v\),
+are these same maps under the fixed topological identification
+\(G_F=U\).  They hold by construction.  This proves the full
+source endpoint without an additional linking assumption.
+\end{proof}
+% END MFC8
+
+% BEGIN MFC9
+\paragraph{MFC9. All original basic frame conclusions and the size bound.}
+\label{claim:MFC9}
+For any linked frame in MFC8 and any marked
+\(g_1\) with \(\alpha(g_1)^2\ne1\), all conclusions of
+\texttt{ok\_basic} hold.  They include the nineteen
+\texttt{Ok} fields other than \texttt{f4}, \texttt{f4'}
+and the seven generic cohomological fields listed below.
+They also give \(d_v\ge\ell^m\) for every \(v\) and
+\(\mathcal V\ne\varnothing\).  With MFC6's \(m\),
+\[
+       3C_0+7<d=\sum_vd_v,\qquad5<d_v\quad\text{for all }v,
+                                                               \tag{MFC.23}
+\]
+which is exactly \texttt{Big}\(\ C_0\).
+
+\begin{proof}
+For an arbitrary linked frame, each equality used here is one
+of its \texttt{GalLink} or \texttt{FLink} fields; the argument
+does not require that its underlying type be the particular
+quotient model constructed in MFC8.
+The characters \(\delta_\Phi,\psi_\Phi\) have open kernel
+because their pullbacks in (MFC.22) have open kernel and \(p\)
+is a quotient map.  The same quotient property gives continuity
+of \(\epsilon_\Phi\); the local maps are continuous by their
+definitions.  Complex conjugation has square one, giving
+\(c^2=1\), \(c_w^2=1\).  Its action on \(\delta\) gives
+\(\delta_\Phi(c)=\delta_\Phi(c_w)=-1\), and the original
+evenness gives \(\psi_\Phi(c)=1\).  The marked equation is
+\(\psi_\Phi(g_0)^2=\alpha(g_1)^2\ne1\).
+Oddness of \(\ell\) and finiteness of \(k\) are the input
+\texttt{Gen} fields.  Since \(F\) is totally real, MFC7 gives
+\(\#\operatorname{Inf}=[F:\mathbb Q]=\sum_vd_v\).
+
+Reduction of (MFC.22)'s cyclotomic identity gives
+\(\operatorname{om}_\Phi(pu)=\omega(u)\).  This is the
+source's exact residual character: the two maps
+\(\mathbb Z_\ell\to k\) reduce through the same prime field.
+An element of \(I_B\cap U\) supplied by \texttt{UFacts.mu}
+also lies in \(\ker\eta\), so its image in
+\(G_0=\ker\delta_\Phi\) proves \texttt{f2a}.
+Push the \texttt{UFacts.f2b} witnesses to \(G_0\) to prove
+\texttt{f2b}.  Push the \texttt{f2c} witnesses to \(\Gamma\);
+their \(\delta_\Phi\)-value is one, so the additional
+\(\delta_{\Phi,k}\) factor in the source is also one.
+Every local witness in \texttt{UFacts.f3} lifts uniquely into
+the indicated local decomposition group, proving \texttt{f3}.
+An identity \(\operatorname{om}_\Phi=\psi_\Phi^j\) on
+\(G_0\) would pull back to the identity forbidden by
+\texttt{UFacts.f5}; this proves \texttt{f5}.
+
+The source's
+\(N_v=I_v\cap\ker(\epsilon_\Phi\circ\operatorname{loc}_v)\)
+has \(\omega=1\).  On inertia above \(\ell\), the original
+relation \(\alpha=\omega^j\) then makes \(\alpha=1\).
+Equation (MFC.22) proves exactly \texttt{Psi\_N}.
+These are all the asserted basic fields, including the actual
+marked element and local residual character.
+
+By MFC7 and \texttt{UFacts.deg}, \(d_v\ge\ell^m\).
+There is at least one prime above \(\ell\), hence
+\(d\ge\ell^m\).  MFC6's strict inequality now gives both
+inequalities (MFC.23), since \(3C_0+7\ge7>5\).
+\end{proof}
+% END MFC9
+
+\subsection{Two strict classes on this same quotient}
+
+% BEGIN MFC10
+\paragraph{MFC10. A nonzero residual Selmer class with one allowed prime.}
+\label{claim:MFC10}
+Assume the finite local and global laws and the Greenberg--Wiles
+identity contained in \(P:\texttt{GC.Hypotheses}_{2}\).
+Let \(\kappa:G\to k^\times\) have open kernel,
+\(\kappa(\sigma)\ne1\), and \(\kappa\ne\omega\).
+Let \(S\) be a finite set of rational primes containing
+\(\ell\) and every ramified prime of \(\kappa\).
+Suppose \(w\in S\), \(w\ne\ell\),
+\(\kappa|_{D_A}=\omega|_{D_A}=1\) for \(A\mid w\),
+and \(\kappa|_{D_A}\ne1\) at every other place in \(S\).
+Then there is a locally constant cocycle
+\[
+ y(st)=y(s)+\kappa(s)y(t)                                  \tag{MFC.24}
+\]
+which is not a global coboundary, vanishes on inertia outside
+\(S\), and is a coboundary on every decomposition group above
+\(S\setminus\{w\}\).  This gives the full
+\texttt{st\_sel} conclusion, including every prolongation.
+
+\begin{proof}
+Descend \(\kappa\) to \(G_{\mathbb Q,S}\): its kernel
+contains each excluded inertia group and hence their closed
+normal closure.  Regard \(k(\kappa)\) as a finite
+\(\mathbb F_\ell\)-module.  Its global invariants vanish
+because \(\kappa(\sigma)\ne1\).  Its cyclotomic twisted
+dual has no global invariants either.  Indeed an invariant
+\(\mathbb F_\ell\)-linear functional \(f:k\to\mathbb F_\ell\)
+would satisfy \(f(\kappa(s)x)=\omega(s)f(x)\).
+Choose \(s\) with \(\kappa(s)\ne\omega(s)\).  Multiplication
+by their nonzero difference is bijective on \(k\), forcing
+\(f=0\).  The real-place invariant group also vanishes.
+At every \(v\in S\setminus\{w\}\), the assumed local
+nontriviality gives zero local invariants by the same scalar
+argument.
+
+Impose local condition zero at those places and the full
+\(H^1\) at \(w\).  Let \(\mathcal S\) and
+\(\mathcal S^\perp\) be the resulting finite Selmer groups
+and their dual conditions.  At \(w\), both the representation
+and the residual cyclotomic character are trivial.  Local Tate
+duality gives \(|H^2(\mathbb Q_w,k)|=|k|\), while
+\(|H^0(\mathbb Q_w,k)|=|k|\).  The local Euler characteristic
+away from \(\ell\) gives
+\(|H^1(\mathbb Q_w,k)|=|k|^2\).
+In the Greenberg--Wiles identity every global and real invariant
+factor is one, and every local factor other than \(w\) is
+one.  Its remaining equality is therefore
+\[
+                      |\mathcal S|=|k|\,|\mathcal S^\perp|.
+                                                               \tag{MFC.25}
+\]
+The dual group contains zero, so its cardinality is at least
+one, and \(|k|>1\).  Thus \(\mathcal S\) has a nonzero
+class.  Choose a continuous representative and inflate it to
+\(G\), obtaining \(y\).  Surjectivity of
+\(G\to G_{\mathbb Q,S}\) ensures that this inflated cocycle
+cannot be a global coboundary.  It is zero on excluded inertia,
+and membership in the zero local conditions supplies the required
+local primitives.
+
+These primitives hold for every prolongation.  If
+\(A'=\gamma A\) and \(y(s)=(\kappa(s)-1)b\) on \(D_A\),
+the cocycle identity gives
+\[
+ y(\gamma s\gamma^{-1})
+       =(\kappa(s)-1)(\kappa(\gamma)b-y(\gamma)).
+\]
+Thus the primitive at \(A'\) is
+\(\kappa(\gamma)b-y(\gamma)\).  This verifies the exact
+valuation scope, without a new independent local choice.
+\end{proof}
+% END MFC10
+
+% BEGIN MFC11
+\paragraph{MFC11. Restriction preserves nontriviality, and the auxiliary inertia is killed.}
+\label{claim:MFC11}
+Two elementary facts will be used.  First, if a subgroup
+\(U\subseteq G\) contains \([G,G]\) and
+\(\kappa|_U\ne1\), a \(\kappa\)-cocycle which is a
+coboundary on \(U\) is already a coboundary on \(G\).
+Second, at a rational prime \(p\ne\ell\), if an open
+normal subgroup \(H\) has index \(\ell\) and
+\(I_A\not\subseteq H\), then every locally constant additive
+homomorphism \(y:I_A\to k\) vanishes on \(I_A\cap H\).
+
+\begin{proof}
+For the first assertion, subtract the supplied coboundary and
+assume \(y|_U=0\).  The subgroup \(U\) is normal because it
+contains the commutator.  Choose \(u\in U\) with
+\(\kappa(u)\ne1\).  Comparing the two expressions
+\(su=(sus^{-1})s\) in the cocycle identity gives
+\(y(s)=\kappa(u)y(s)\).  The nonzero scalar
+\(\kappa(u)-1\) is invertible, so \(y(s)=0\) for every
+\(s\), as required.
+
+For the second assertion, the quotient map
+\(G\to G/H\simeq\mathbb F_\ell\) restricts to a nonzero
+additive character \(\varphi\) of \(I_A\), with kernel
+\(I_A\cap H\).  The maximal pro-\(\ell\) abelian quotient
+of inertia at \(p\ne\ell\) is \(\mathbb Z_\ell\): the
+wild inertia is pro-\(p\), and the tame inertia quotient has
+one \(\mathbb Z_\ell\) factor.  Hence its continuous
+\(\mathbb F_\ell\)-valued character space has dimension one.
+Every coordinate of the additive map \(y\), in an
+\(\mathbb F_\ell\)-basis of \(k\), is a multiple of
+\(\varphi\).  It therefore vanishes on the same kernel.
+All coordinates vanish there, giving the assertion for \(k\).
+This is the source's \texttt{st\_tame} mechanism.  A trivial
+valuation has trivial inertia and causes no exception.
+\end{proof}
+% END MFC11
+
+% BEGIN MFC12
+\paragraph{MFC12. Both complete \texttt{StrictCl} suppliers on one \(U_m\).}
+\label{claim:MFC12}
+For each \(a\in\{1,2\}\), put
+\(\kappa_a=\alpha^{-a}\eta_k\).  Under \(P\), there is
+a locally constant \(\kappa_a\)-cocycle \(y_a:G\to k\)
+such that
+\begin{align}
+ &y_a|_{U_m}\text{ is not a coboundary};\notag\\
+ &\forall A\mid\ell\ \exists b_A\quad
+       y_a(s)=(\kappa_a(s)-1)b_A\quad(s\in D_A);\notag\\
+ &A\nmid\ell,\quad s\in I_A\cap U_m,\quad
+       \eta(s)=\alpha(s)=1\quad\Longrightarrow\quad y_a(s)=0.
+                                                               \tag{MFC.26}
+\end{align}
+This is the full original \texttt{strict} theorem for each
+\(m\) and each of its two allowed characters.  The two choices
+are made on the same \(H_0,w,U_m\).
+
+\begin{proof}
+The character \(\kappa_a\) factors through \(\mu_{M^b}\)
+for some \(b\), so its kernel is open and it is unramified
+away from \(M\).  It is odd:
+\(\kappa_a(\sigma)=-1\), since \(\alpha(\sigma)=1\).
+It differs from \(\omega\): otherwise, on
+\(U_m\cap\ker\eta\), one would have
+\(\omega\alpha^a=1\), contradicting MFC4's appropriate
+\texttt{f2b} or \texttt{f2c} witness.
+
+At every \(A\mid\ell\), MFC4 gives \(s\in D_A\cap U_m\)
+with \(\alpha(s)^2\ne1\).  Its \(\eta\)-value is one,
+so \(\kappa_a(s)=\alpha(s)^{-a}\ne1\) for both \(a=1,2\).
+At \(w\), the entire decomposition group kills
+\(\eta,\alpha,\omega\) by (MFC.4).  Apply MFC10 with
+\(S=\{\ell,w\}\) together with the ramified primes of
+\(\kappa_a\).  At a ramified prime, the character is
+nontrivial on inertia, and therefore on decomposition.  All
+the hypotheses of MFC10 hold.  It yields a global noncoboundary
+\(y_a\) with the indicated local primitives above \(\ell\).
+
+At any prime other than \(w\), if
+\(s\in I_A\) and \(\kappa_a(s)=1\), the cocycle is zero:
+outside \(S\) it vanishes on inertia, while in
+\(S\setminus\{w\}\) it is a local coboundary.
+At \(w\), \(\kappa_a\) is trivial on decomposition, so
+\(y_a|_{I_A}\) is additive.  The subgroup \(H_\theta(w)\)
+has index \(\ell\), and inertia at \(w\) maps onto its
+quotient, by CAF4.  MFC11 makes \(y_a\) vanish on
+\(I_A\cap H_\theta(w)\), hence on \(I_A\cap U_m\).
+This proves the last clause of (MFC.26) also at \(w\),
+because \(\eta=\alpha=1\) implies \(\kappa_a=1\).
+
+Finally \(\kappa_a\) is nontrivial on \(U_m\), witnessed
+by the same local element used above.  Since \(U_m\) contains
+the commutator, MFC11 says that a coboundary restriction to
+\(U_m\) would make \(y_a\) a global coboundary.  This is
+impossible.  All assertions of \texttt{StrictCl} are now verified.
+Nothing in choosing \(y_1,y_2\) changes the already chosen
+subgroup, field, local groups or marked element.
+\end{proof}
+% END MFC12
+
+% BEGIN MFC13
+\paragraph{MFC13. Exact descent of each strict class to the frame cone.}
+\label{claim:MFC13}
+Let \(\Phi\) be any actual linked frame as in MFC8, and let
+\(y_a\) satisfy \texttt{StrictCl} for \(U=\operatorname{upl}(\Omega,L)\).
+Then
+\[
+ H^1_C\!\left(\Phi.\operatorname{loc},
+    k(\psi_\Phi^{-a}\delta_{\Phi,k}),\,b_v=0\right)
+                         \ne0\qquad(a=1,2).               \tag{MFC.27}
+\]
+These are exactly the two source \texttt{Ok} fields
+\texttt{f4} and \texttt{f4'}; the quotient and all local
+maps are the same ones used in MFC8.
+
+\begin{proof}
+Write \(\chi_a=\psi_\Phi^{-a}\delta_{\Phi,k}\).
+Equation (MFC.22) gives \(\chi_a\circ p=\kappa_a|_U\).
+The strict inertia clause makes \(y_a\) zero on every
+generator of the exact kernel \(J\) in (MFC.19).
+To justify passage to its closed normal closure, consider
+\[
+                    H=\{u\in U:p(u)=1,\ y_a(u)=0\}.
+\]
+The cocycle identity makes \(H\) a subgroup.  If \(h\in H\),
+then \(\kappa_a(h)=1\), and the same identity gives
+\(y_a(uhu^{-1})=\kappa_a(u)y_a(h)=0\); hence it is normal.
+It is closed because \(p\) is continuous and \(y_a\) is
+locally constant.  It contains the kernel generators, so it
+contains \(J\).  Thus \(y_a\) is constant on fibers of
+\(p\), and defines \(\varphi_a:\Gamma\to k\).
+The quotient-map property of \(p\) shows that
+\(\varphi_a\) is locally constant.  Its cocycle identity
+follows by lifting two elements of \(\Gamma\) to \(U\).
+
+For each \(v\), the chosen \(A_v\) lies above \(\ell\).
+Choose its local primitive \(b_v\) from (MFC.26).  Under
+the exact inclusion \(j_v\), this gives
+\[
+ \varphi_a(\operatorname{loc}_v(s))
+      =(\chi_a(\operatorname{loc}_v(s))-1)b_v
+                                  \quad(s\in G_v).        \tag{MFC.28}
+\]
+By the literal source definition, the pair
+\((\varphi_a,(b_v)_v)\) is therefore a member of
+\(Z^1_C\) with all \(b_v\)-subspaces equal to zero.
+If its class in \(H^1_C\) were zero, the source's
+\texttt{continuousCoboundaries1} condition would supply one
+\(b\in k\) with
+\(\varphi_a(g)=(\chi_a(g)-1)b\) for every \(g\).
+Pulling back by \(p\) would make \(y_a|_U\) a coboundary,
+contrary to MFC12.  Thus the class is nonzero, proving (MFC.27).
+The argument applies to both characters without changing any
+frame data.
+\end{proof}
+% END MFC13
+
+% BEGIN MFC14
+\paragraph{MFC14. The actual shared marked construction, with an exact remaining boundary.}
+\label{claim:MFC14}
+Fix the full original \texttt{Gen}, the original \(P\), and
+any prescribed \(Q>0\).  There exist one
+\[
+                  L,\quad g_1,\quad\Phi,\quad C_0,\quad w
+\]
+with the complete original \texttt{Linked} relation,
+\texttt{Big}\(\ C_0\), the witness-prime conditions
+(MFC.4), \(w\equiv1\pmod Q\),
+\(\operatorname{upl}(\Omega,L)\subseteq H_\theta(w)\),
+and all the twenty-one \texttt{Ok} fields proved in MFC9
+and MFC13.  The bound (MFC.13) holds at the selected layer.
+When \(O=c.O\) is the original coefficient DVR, choose
+\(Q\) first by CAF7.  This same constructed \(L\) then
+has the full original \texttt{SeedClause}, with the same
+marked square witness \(g_1\).
+
+\begin{proof}
+Choose \(H_0\) by MFC1 and choose \(w\) by CAF5 for the
+already fixed \(Q\).  Choose \(C_0\) by MFC5, before
+selecting \(m=3C_0+7\).  MFC4 and MFC6 give the actual
+embedded CM field and marked \(g_1\).  MFC8 constructs
+\(\Phi\) with every linking field.  MFC9 proves the basic
+fields and \texttt{Big}; MFC12 and MFC13 prove the two
+remaining strict-class fields on this very quotient.
+The subgroup inclusion follows from the definition of \(U_m\),
+and the class-rank bound is the selected instance of MFC5.
+
+For the coefficient-DVR assertion, the full \texttt{Gen}
+implies the seed input used by CAF7.  Make its choice of
+\(Q\) before the preceding construction.  The resulting
+\(L,w\) satisfy all its field, splitting and congruence
+hypotheses.  Equation (MFC.16) supplies
+\(g_1\in G_L\) with \(\alpha(g_1)^2\ne1\), so CAF7
+returns the original \texttt{SeedClause}.  Its character
+triple is installed on this field; it does not replace the
+field, marked element, quotient, local maps or either strict class.
+This completes the claimed construction at its stated boundary.
+\end{proof}
+% END MFC14
+
+\subsection{The seven remaining \texttt{Ok} fields, and the original exits}
+
+The seven fields still needed on the \emph{same} \(\Phi,C_0\)
+are \texttt{phi}, \texttt{gen}, \texttt{cl}, \texttt{ec},
+\texttt{b1p}, \texttt{b1} and \texttt{h1}.
+Their source scopes remain unchanged: \texttt{phi} is the
+global \texttt{PhiCond}; \texttt{gen} chooses \(d_v\) local
+inertia generators with the prescribed exceptional index and
+character restrictions, uniformly for every finite abelian
+\(\ell\)-group character; \texttt{cl} gives one exponent
+annihilating every everywhere-unramified finite abelian
+\(\ell\)-group character of \(\Phi.G0\); and \texttt{ec}
+is the full cone Euler inequality for every finite coefficient
+field, finite representation and stable collection of local
+subspaces satisfying its stated dual-invariant condition.
+
+The last three retain their exact coefficient modules and local
+conditions:
+\begin{align}
+ \operatorname{rank}_k H^1_C(\operatorname{loc},
+       k(\psi_\Phi^{-2}\delta_{\Phi,k}),0)&\le C_0,
+          &&\texttt{b1p},\notag\\
+ \operatorname{rank}_k H^1_C(\operatorname{loc2},
+       k(\psi_\Phi^{-1}|_{\Phi.G0}),0)&\le C_0,
+          &&\texttt{b1},\notag\\
+ \operatorname{rank}_k H^1_C(\operatorname{loc},k,\top)
+                                                &\le1+C_0,
+          &&\texttt{h1}.                                  \tag{MFC.29}
+\end{align}
+The bare uniform unramified character bound in MFC5 is not
+silently identified with these twisted cone bounds.  Their
+restriction, coefficient and local-condition comparisons still
+have to be supplied.  Filling these seven fields in the same
+constructed record gives the literal \texttt{HasFrameW};
+MFC14's seed installation then gives the literal
+\texttt{HasFrame}.
+
+To obtain the original \texttt{GdFrameEx} and
+\texttt{HostFrameEx}, their full entry suppliers
+\texttt{gen\_gd} and \texttt{gen\_host} must also be connected
+at their original scopes.  CAF9--CAF10 supply their seed subset,
+not every \texttt{Gen} field.  In particular the host's
+\(H_b=\ker\kappa_B\), its index, local lifting property
+and nonquadratic decomposition witness must be retained; a
+\(\top\) subgroup or the Dat numerical restriction cannot
+be substituted.  The rank-two/rank-three automorphic seeds,
+common coefficient extension and original/alternative endpoint
+matching remain further work beyond these arithmetic frames.
+
+\paragraph{Pinned correspondence.}
+The immutable primary sources are the \texttt{FrobeniusSmoothVectors}
+files named in this chapter, the literal frame and linking definitions
+in \texttt{Continuous\allowbreak Coboundaries2}, \texttt{HostFrameEx} and
+\texttt{GLinkQuot}, and the exact class-character definition
+\texttt{Kum.XDual}.  Complete file snapshots, statement ranges,
+source hashes and claim-block hashes accompany this chapter.
+The elementary CRT choice in MFC1 is an intentional human
+simplification with the same complete output record.  No changed
+field model, local identification or order of choices is hidden
+in that simplification.

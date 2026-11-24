@@ -1,0 +1,894 @@
+\section{The original coefficient space and the exact minor weights}
+\label{sec:coefficient-fock-bridge}
+
+\status{CFB1--CFB13 reconstruct the two finite coefficient interfaces
+used by the simultaneous construction of the original
+\texttt{JointHarm.\allowbreak exists\_ioP}.  They prove the literal
+\texttt{CoefReal.\allowbreak exists\_poly\_model}, the unitary cyclicity of its
+original extremal polynomial, the complete arithmetic
+\texttt{ArithAt}, and \texttt{weights\_of\_minors}.
+The maps are built from the supplied \texttt{c0L}, \texttt{cV} and
+\texttt{BV} of one original datum.  Their coefficient image is exactly
+\(\mathrm{VV}_{\mathbb C}(\lambda)\), and their covariance uses the
+original real action.  All three integer character exponents, both
+signed weight identities and the original choice of
+\texttt{lamLdef} are identified.  These are conditional implications
+on the original family and model predicates; this chapter does not
+construct that common datum or assert the analytic theta extension.}
+
+All indices below start at zero, as in the source, except that
+\texttt{IndefiniteWeightData.WeightData} explicitly uses one-based
+arguments.  The source pin is
+\begin{center}
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+\end{center}
+The formal proof is assumed correct.  Each displayed source contract
+is accompanied by its human argument, rather than used as a proof of
+itself.
+
+\subsection*{The literal polynomial representation}
+
+Let \(I\) be a finite index set, let \(n\ge0\), and let
+\(\lambda_\tau=(\lambda_{\tau,0},\ldots,
+\lambda_{\tau,n-1})\) be integral dominant weights.
+Put \(d_\tau=\lambda_\tau.\mathrm{detShift}\) and
+\(\nu_\tau=\lambda_\tau.\mathrm{natW}\).  Thus for \(n>0\),
+\(d_\tau=\lambda_{\tau,n-1}\) and
+\(\nu_{\tau,a}=\lambda_{\tau,a}-d_\tau\); at rank zero use the
+source's zero shift and constant polynomial.  In separate square
+matrix variables \(X_\tau\), the space
+\(\mathrm{VV}_K(\lambda)\) is the image of the tensor product of the
+literal \(\mathrm{nablaSq}_K(n,\lambda_\tau)\) spaces under
+multiplication.  HP1 identifies it with the corresponding finite
+polynomial kernel, including its rational structure.
+
+For a tuple of invertible matrices write
+\[
+ \begin{split}
+ (\rho_K(g)F)(X)&=
+       \left(\prod_{\tau\in I}\det(g_\tau)^{d_\tau}\right)
+             F((g_\tau^{\mathsf t}X_\tau)_\tau),\\
+ (\mathrm{vact}_\lambda(u)F)(X)&=
+       \left(\prod_{\tau\in I}\det(u_\tau)^{-d_\tau}\right)
+             F((u_\tau^{-1}X_\tau)_\tau),\\
+ T(g)_\tau&=(g_\tau^{-1})^{\mathsf t}.
+ \end{split}                                                    \tag{CFB.1}
+\]
+These are exactly \texttt{rhoK}, \texttt{vact} and
+\texttt{invTrK}.  The first two expressions act on the full polynomial
+ring, and \(\rho_K\) restricts to \(\mathrm{VV}_K\).
+All determinant powers are integer powers, including negative ones.
+
+% BEGIN CFB1
+\paragraph{CFB1: base change and the exact inverse-transpose action.}
+\label{claim:CFB1}
+For every field embedding \(\phi:K\hookrightarrow\mathbb C\),
+coefficientwise base change induces the source semilinear map
+\[
+ b_\phi=\mathrm{mapVV}(\phi,\lambda):
+        \mathrm{VV}_K(\lambda)\longrightarrow
+        \mathrm{VV}_{\mathbb C}(\lambda).
+                                                               \tag{CFB.2}
+\]
+The images under \(b_\phi\) of the original basis
+\(\mathrm{bVV}_K(\lambda)\) form a complex basis, and
+\[
+ b_\phi(\rho_K(g)v)=\rho_{\mathbb C}(\phi(g))b_\phi(v),
+ \qquad
+ \mathrm{vact}_\lambda(u)=\mathrm{actP}_\lambda(T(u)).
+                                                               \tag{CFB.3}
+\]
+The latter identity holds on the full polynomial ring and hence on
+the unchanged subspace \(\mathrm{VV}_{\mathbb C}(\lambda)\).
+
+\emph{Proof.}
+The embedding into \(\mathbb C\) makes \(K\) characteristic zero.
+By HP1, each factor and then the tensor polynomial space is the
+solution of finite linear equations with rational coefficients in
+its prescribed finite multidegree space.  Gaussian elimination over
+\(\mathbb Q\) commutes with extension to \(K\) and then to
+\(\mathbb C\).  Thus coefficientwise base change of any \(K\)-basis
+is a complex basis of the same literal polynomial kernel.
+This applies in particular to \(\mathrm{bVV}_K\), without replacing
+it by the row-reduction basis.  Equivalently, a nonzero maximal
+coefficient minor of that basis stays nonzero under \(\phi\), and
+the kernel dimensions agree by the same elimination.  The separate
+variable blocks make the tensor multiplication map injective, so
+the conclusion concerns its exact polynomial image.
+
+Coefficientwise application of \(\phi\) commutes with finite sums,
+products, determinants, inverses of nonzero determinants and matrix
+substitution.  This proves the first identity in (CFB.3).
+For the second, transpose twice in (CFB.1) and use
+\(\det T(u_\tau)=\det(u_\tau)^{-1}\).
+Finally \(T(gh)=T(g)T(h)\): inverse and transpose each reverse
+order, and their composition preserves it.  Consequently both
+actions in (CFB.1) are group representations on the stated space.
+These calculations also prove that every coefficient of
+\(\mathrm{actP}_\lambda(g)F\), for fixed \(F\), is a finite sum
+of products of matrix entries and integer powers of nonzero
+determinants.  It is continuous for a continuous tuple of invertible
+matrices.  The arguments include \(n=0\) and an empty \(I\), where
+the polynomial space is the one-dimensional constant space.
+% END CFB1
+
+% BEGIN CFB2
+\paragraph{CFB2: the complex extension determined by the supplied coefficient map.}
+\label{claim:CFB2}
+Let \(W\) be a complex vector space and let
+\(c_0:\mathrm{VV}_K(\lambda)\to W\) be \(\phi\)-semilinear.
+Assume that the vectors
+\(c_0(\mathrm{bVV}_K(\lambda)_a)\) are complex-linearly independent
+and span \(W\).  There is a unique complex linear isomorphism
+\[
+ e:\mathrm{VV}_{\mathbb C}(\lambda)\xrightarrow{\ \sim\ }W,
+ \qquad e(b_\phi(v))=c_0(v).                                  \tag{CFB.4}
+\]
+In particular this is the exact \texttt{exists\_scalarExt} interface.
+
+\emph{Proof.}
+Write \(b_a=\mathrm{bVV}_K(\lambda)_a\).  CFB1 makes
+\((b_\phi(b_a))_a\) a complex basis.  Define
+\[
+ e\left(\sum_a z_a b_\phi(b_a)\right)=\sum_a z_a c_0(b_a).
+                                                               \tag{CFB.5}
+\]
+The assumed independence and spanning give its inverse by the same
+coordinate formula.  For \(v=\sum_a k_a b_a\), semilinearity gives
+both sides of (CFB.4) as \(\sum_a\phi(k_a)c_0(b_a)\).
+Any other complex linear map with (CFB.4) agrees on a basis, so is
+equal to \(e\).  This is also the elementary extension mechanism of
+SE1, applied to the specified basis.  There is no density assumption
+on the coefficient field and no choice of a scalar or an invariant
+inner product in this construction.
+% END CFB2
+
+% BEGIN CFB3
+\paragraph{CFB3: rational points with the original finite part removed.}
+\label{claim:CFB3}
+Let \(V\) be the original Hermitian space over the original CM
+extension \(E/F\), and retain \(\theta:\mathrm{InfFam}(D)\)
+with its \(\mathrm{IsInfFam}\) condition.  For every
+\(u\in G_\infty(V)=\ker(\mathrm{finHom})\) and every open
+neighborhood \(\mathcal U\) of \(u\) in the adelic unitary group,
+there exist \(\gamma\in G_{\mathbb Q}(V)\) and
+\(k\in G_f(V)=\ker(\mathrm{infHom})\) such that
+\[
+             \gamma k\in\mathcal U\cap G_\infty(V).             \tag{CFB.6}
+\]
+These are the literal subgroups and topology of
+\texttt{weak\_approx\_real}.
+
+\emph{Proof.}
+HCU14 identifies the original infinite subgroup continuously, with
+continuous inverse, with the product of the unitary groups of the
+original \(\mathrm{gramAt}(D,V,\tau)\).  Its proof identifies the
+given \(\theta\) entry by entry; it does not choose replacement
+embeddings.  Rational unitary matrices are dense in this finite
+product by the Cayley proof in MF3.  To recall why the density uses
+only weak approximation, the skew-adjoint matrices for the fixed
+Hermitian form are an \(F\)-vector space.  The rational map
+\(Z\mapsto(1-Z)(1+Z)^{-1}\) is an isomorphism between its open
+chart and the chart \(\det(1+g)\ne0\) of the unitary group.
+At each real place a norm-one scalar arbitrarily close to \(1\)
+avoids the finitely many values for which the latter determinant
+vanishes.  The one-dimensional norm-one Cayley parametrization and
+weak approximation choose these scalars simultaneously.  Weak
+approximation in the skew-adjoint vector coordinates then gives
+rational matrices arbitrarily close to all the prescribed local
+matrices.  The coordinate approximation itself follows from density
+of \(F\) in its real embedding product: the embedding matrix of a
+rational basis is invertible by separability, and
+\(\mathbb Q^{[F:\mathbb Q]}\) is dense in its real vector space.
+
+Choose such a rational \(\gamma\) sufficiently close to the
+archimedean tuple of \(u\).  In the product of finite and infinite
+adelic rings, take \(k\) to have finite component
+\(\gamma_f^{-1}\) and infinite component \(1\).  It satisfies
+the same unitary equation componentwise, so belongs to the original
+\(G_f(V)\).  The product \(\gamma k\) has tuple
+\((\gamma_\infty,1_f)\).  The continuous inverse in HCU14 makes
+this tuple belong to \(\mathcal U\) once the archimedean
+approximation is sufficiently close.  Its finite component is
+exactly the identity, proving (CFB.6).  Nothing here requires the
+rational points themselves to approximate the finite component.
+% END CFB3
+
+% BEGIN CFB4
+\paragraph{CFB4: the same coefficient map intertwines every original real point.}
+\label{claim:CFB4}
+Fix the original \(D,V,\theta,c,\lambda,c_0\), where
+\(c:\mathrm{CoefA}(V)\), and assume
+\[
+ \mathrm{IsInfFam}(\theta),\qquad c.\mathrm{Is},\qquad
+ \mathrm{CoefMapTie}\bigl(V,c.\mathrm{coef},c_0,
+                  \rho_{Vr}(\mathrm{labLL}(D),\lambda)\bigr).
+                                                               \tag{CFB.7}
+\]
+Here \(K=D.\mathrm{what}_2.\mathrm{LL}\) and
+\(\phi=D.\mathrm{what}_2.\mathrm{embLL}\).
+The unique \(e\) of CFB2 satisfies, for every original
+\(u\in G_\infty(V)\) and \(v\in\mathrm{VV}_{\mathbb C}(\lambda)\),
+\[
+       c.\rho(u)e(v)
+       =e\bigl(\rho_{\mathbb C}(T(R(u)))v\bigr),\qquad
+ R(u)_\tau=\mathrm{realGL}(\theta,V,u)_\tau.
+                                                               \tag{CFB.8}
+\]
+This proves the whole \texttt{exists\_real\_model} output, with
+the additional uniqueness of its coefficient extension.
+
+\emph{Proof.}
+The last two clauses of the given \texttt{CoefMapTie} are precisely
+the basis independence and spanning in CFB2.  For a rational
+\(\gamma\in G_{\mathbb Q}(V)\), take its actual matrix
+\(\gamma_E\) satisfying \texttt{IsRatMat}; existence is part of
+the definition of that rational subgroup.  The original field tie
+gives, for every \(\tau\),
+\[
+        \phi\circ\mathrm{labLL}(D,\tau)
+                           =\mathrm{tauE}(D,\tau).             \tag{CFB.9}
+\]
+Indeed both sides evaluate \(x\) as
+\(\phi_0(\mathrm{sigmaOf}(D.eTau(\tau))(x))\), by
+\(D.\mathrm{embE}_{\phi_0}\).
+The \(\mathrm{IsInfFam}\) condition says that evaluation of the
+diagonal rational matrix by \(\theta_\tau\) is this same
+\(\mathrm{tauE}(D,\tau)(\gamma_E)\).
+Base change commutes with inverse and transpose, so CFB1 identifies
+the base change of the exact source action
+\(\rho_{Vr}(\mathrm{labLL},\lambda)(\gamma_E)\) with
+\(\rho_{\mathbb C}(T(R(\gamma)))\).
+The rational covariance clause of the given tie and (CFB.4)
+therefore give (CFB.8) for \(v\) in the range of \(b_\phi\).
+That range spans by CFB1, so complex linearity gives the identity
+for every \(v\).
+
+If \(k\in G_f(V)\), the first clause of \(c.\mathrm{Is}\)
+gives \(c.\rho(k)=1\), while \(R(k)=1\) by definition of
+\(G_f(V)\).  Thus (CFB.8) also holds for every \(\gamma k\)
+as in CFB3.  For fixed \(v\), both sides of (CFB.8) are continuous
+functions of the adelic group element: the left side uses the orbit
+continuity explicitly supplied by \(c.\mathrm{Is}\), and the right
+side uses HCU14 and the finite coefficient continuity in CFB1.
+Equivalently, apply every polynomial coefficient functional to
+\(e^{-1}\) of the left side; all these functionals are continuous
+on the finite-dimensional coefficient space.  CFB3 makes the points
+\(\gamma k\) dense at each prescribed \(u\in G_\infty(V)\).
+Equality of the continuous coordinate functions there proves
+(CFB.8).  Irreducibility and an arbitrary real intertwiner have not
+been introduced as extra premises.
+% END CFB4
+
+% BEGIN CFB5
+\paragraph{CFB5: the original-frame polynomial map, with exact image.}
+\label{claim:CFB5}
+Under (CFB.7), let \(B=(B_\tau)_\tau\) be any specified tuple of
+invertible complex matrices of the original rank.  There is an
+explicit injective complex linear map
+\(j:c.W\to\mathrm{Pol}_{\mathbb C}(I,n)\) such that
+\[
+ \begin{split}
+ \operatorname{range}(j)&=\mathrm{VV}_{\mathbb C}(\lambda),\\
+ j(c.\rho(u)w)&=
+   \mathrm{vact}_\lambda\bigl((B_\tau^{-1}
+          \mathrm{compAt}(\theta,\tau,\mathrm{mt}(V,u))
+                    B_\tau)_\tau\bigr)j(w)
+       \quad(u\in G_\infty(V)),\\
+ j(c_0(v))&=\mathrm{incl}\,
+       \rho_{\mathbb C}(T(B^{-1}))b_\phi(v).
+ \end{split}                                                    \tag{CFB.10}
+\]
+In particular the first two lines are the literal
+\texttt{CoefReal.exists\_poly\_model}.
+
+\emph{Proof.}
+Use the \(e\) determined in CFB2--CFB4 and define
+\[
+          j=\mathrm{incl}\circ
+               \rho_{\mathbb C}(T(B^{-1}))\circ e^{-1}.
+                                                               \tag{CFB.11}
+\]
+The middle factor has inverse \(\rho_{\mathbb C}(T(B))\), by
+the group law verified in CFB1.  Hence it is an automorphism of
+the unchanged \(\mathrm{VV}_{\mathbb C}(\lambda)\).
+The composite before inclusion is an isomorphism onto that very
+space; both injectivity and the exact range in (CFB.10) follow.
+The last line follows by applying (CFB.4).
+
+For covariance, abbreviate \(R=R(u)\).  The matrix of \(R\)
+is exactly \(\mathrm{compAt}(\theta,\tau,\mathrm{mt}(V,u))\)
+in each component, by its definition.  CFB4 makes the two operator
+products in the desired equality, before inclusion,
+\[
+ \rho(T(B^{-1}))\rho(T(R))e^{-1},\qquad
+ \rho(T(B^{-1}RB))\rho(T(B^{-1}))e^{-1}.
+                                                               \tag{CFB.12}
+\]
+Both equal \(\rho(T(B^{-1}R))e^{-1}\); use CFB1 to identify
+the second expression with \(\mathrm{vact}\) on the polynomial
+image.  This proves (CFB.10).  No isometry of \(j\) is asserted:
+the subsequent unit-vector normalization belongs to the Fock-map
+construction.  The present map is fixed by the supplied \(c_0\)
+and the specified \(B\).
+% END CFB5
+
+% BEGIN CFB6
+\paragraph{CFB6: the unchanged extremal polynomial is cyclic under the compact source.}
+\label{claim:CFB6}
+Let
+\[
+ h_\lambda=\mathrm{ten}\bigl(\tau\mapsto
+              \mathrm{extremal}_{\mathbb C}(n,\lambda_\tau)\bigr).
+\]
+Then the exact compact orbit spans the exact coefficient space:
+\[
+ \mathrm{VV}_{\mathbb C}(\lambda)
+   =\operatorname{span}_{\mathbb C}
+       \{\mathrm{vact}_\lambda(u)h_\lambda:
+                                  u\in\prod_{\tau\in I}U(n)\}.
+                                                               \tag{CFB.13}
+\]
+The compact group here is the source's
+\(\prod_\tau\mathrm{Kset}(\mathrm{allPos}(n))\), so this supplies
+\texttt{VV\_le\_span\_\allowbreak vact\_extremal} on its literal polynomial.
+
+\emph{Proof.}
+HP1 identifies \(h_\lambda\) with the product of the leading
+minor monomials in the separate blocks.  It belongs to the literal
+\(\mathrm{VV}\), and its value at the identity tuple is \(1\).
+The orbit span \(S\) is therefore nonzero, is contained in
+\(\mathrm{VV}\), and is stable under \(\mathrm{vact}(\prod U(n))\).
+We show directly that this implies stability under the full complex
+general linear product.
+
+In each block, the real skew-Hermitian space has the real basis
+\[
+ iE_{aa},\qquad E_{ab}-E_{ba},\qquad
+                    i(E_{ab}+E_{ba})\quad(a<b).
+                                                               \tag{CFB.14}
+\]
+The same list is a complex basis of \(M_n(\mathbb C)\): its
+off-diagonal pairs recover \(E_{ab},E_{ba}\), and its diagonal
+vectors recover \(E_{aa}\).  For real coordinates \(z\) in this
+basis, \(C(z)=(1-Z)(1+Z)^{-1}\) is unitary.  Indeed \(Z^*=-Z\),
+and \(1+Z\) is invertible because a skew-Hermitian matrix has no
+real eigenvalue \(-1\), as also follows by taking the real part
+of \(\langle Zv,v\rangle\).  The Cayley formula then verifies
+\(C(z)^*C(z)=1\).
+
+Choose a basis of \(S\) and any linear quotient map with kernel
+\(S\).  Applying that quotient map to
+\(\mathrm{vact}(C(z))v\), for a basis vector \(v\in S\), gives
+finitely many rational functions of the coordinates.  All
+denominators are products of powers of \(\det(1\pm Z_\tau)\),
+including those needed for the integer determinant twists.
+They do not vanish at real skew-Hermitian coordinates.  Each
+numerator vanishes for every real coordinate tuple, by compact
+stability.  Induction in the number of variables using the
+one-variable polynomial identity principle makes that numerator
+the zero polynomial over \(\mathbb C\).
+Because (CFB.14) is also a complex basis, complex Cayley coordinates
+parametrize the open subset \(\det(1+g_\tau)\ne0\) of
+\(\prod\mathrm{GL}_n(\mathbb C)\), with inverse
+\((1-g)(1+g)^{-1}\).  Thus every quotient coefficient vanishes
+on that open set and hence on the whole general linear product:
+after clearing determinants it is a polynomial vanishing on a
+nonempty polynomial open subset, and a polynomial ring is a domain.
+This proves full \(\mathrm{vact}\)-stability of \(S\).
+
+The map \(T\) in CFB1 is a bijective group automorphism, so this
+is equivalent to stability under all \(\rho_{\mathbb C}(g)\).
+HP2, whose proof is the finite factorial-pairing and highest-line
+argument on this same polynomial module, now gives
+\(S=\mathrm{VV}\).  Negative determinant shifts cause no change:
+their factors are nonzero regular functions on the invertible
+group and have already been retained when clearing denominators.
+For an empty \(I\) or rank zero, both sides of (CFB.13) are the
+constant line and the assertion holds directly.
+% END CFB6
+
+\subsection*{The original floors, dominant weight, and signed lowest type}
+
+For the rest of the finite arithmetic fix the original \(D\),
+\(i\in\{0,\ldots,m-1\}\), and \(\tau\).  Write
+\[
+ \begin{gathered}
+ k=D.R.k,\quad m=D.R.m,\quad t=D.R.t,\quad r=k+m-1,\\
+ p=\mathrm{sig}(W_c(D,i),\mathrm{tauE}(D,\tau))_1,
+ \quad q=\mathrm{sig}(W_c(D,i),\mathrm{tauE}(D,\tau))_2,\\
+ n=\mathrm{rank}(V_c(D,i)),\quad e=(D.\mathrm{hc}_\tau).e_i,
+ \quad \ell_a=\mathrm{lamAt}(D.\mathrm{hc}_\tau,a),\\
+ \alpha_a=\mathrm{aPl}(D,i,p,\tau,a),\qquad
+ \beta_a=\mathrm{aMi}(D,i,p,q,\tau,a).
+ \end{gathered}                                                 \tag{CFB.15}
+\]
+The notation \(\beta\) for the negative minor degrees is local to
+this section and is unrelated to a level matrix in the original
+datum.  Values \(\alpha_a\) outside \(a<p\) and \(\beta_a\)
+outside \(a<q\) are zero by their actual definitions.
+
+% BEGIN CFB7
+\paragraph{CFB7: the original ranks and integral decreasing row.}
+\label{claim:CFB7}
+The source fields give
+\[
+ p=k+i,\qquad q=m-i-1,\qquad p+q=r=\mathrm{rank}(W_c(D,i)),
+ \qquad n=r+t=p+q+t.                                          \tag{CFB.16}
+\]
+Here \(r,t\) are odd, \(n\) is even, \(p>0\), and \(t>0\).
+The entries \(e\) and \(\ell_a\), \(0\le a<r\), are integers,
+and for \(0\le a\le b<r\),
+\[
+                    \ell_b+(b-a)\le\ell_a.                    \tag{CFB.17}
+\]
+Moreover
+\[
+ \ell_{p-1}=-b_i,\qquad e-b_i\ge(t+3)/2,
+ \qquad
+ q>0\ \Longrightarrow\ 
+       \ell_p=-b_{i+1},\quad b_{i+1}-e\ge(t+3)/2,
+                                                               \tag{CFB.18}
+\]
+where \(b_j=(D.\mathrm{hc}_\tau).b_j\).
+
+\emph{Proof.}
+Insert \(j=i+1\) into the original \(W\)-signature and
+\(W,V\)-rank fields.  Since \(0\le i<m\), all their stated
+index guards hold; ordinary subtraction gives (CFB.16).
+The fields \(k,m\) even and \(t\) odd make \(r=k+m-1\) odd
+and \(n=r+t\) even.  The rank fields include \(m\ge2\),
+\(k\ge m+3\) and \(t>3m\), which give the displayed positivity.
+
+The actual row is
+\[
+       (v_0,\ldots,v_{k-2},-b_0,\ldots,-b_{m-1}).              \tag{CFB.19}
+\]
+The \(\mathrm{HCParam}\) fields make each entry integral.
+Successive \(v\)'s satisfy
+\(v_{a+1}<u_{a+1}<v_a\).
+At the join they satisfy \(-b_0<u_{k-1}<v_{k-2}\).
+For successive tail entries the two gap fields give
+\(b_j<e_j<b_{j+1}\), hence \(-b_{j+1}<-b_j\).
+Thus (CFB.19) is strictly decreasing.  Strict decrease of integers
+means a drop of at least one per step; summing these drops proves
+(CFB.17).  The last positive-block index is
+\(p-1=(k-1)+i\), giving its exact tail value in (CFB.18).
+If \(q>0\), then \(i+1<m\), so the next tail value and the
+second gap are defined and give the remaining identities.
+% END CFB7
+
+% BEGIN CFB8
+\paragraph{CFB8: every floor disappears, with both degree sequences antitone.}
+\label{claim:CFB8}
+Define the rational expressions
+\[
+ \begin{aligned}
+ A_a&=\ell_a+e-(p-a-1)-(t+1)/2 &&(0\le a<p),\\
+ D_c&=\ell_{p+c}+e+c+1+(t-1)/2 &&(0\le c<q).
+ \end{aligned}                                                  \tag{CFB.20}
+\]
+They are integers, and the literal source degrees satisfy
+\[
+       \alpha_a=A_a\ge1,\qquad
+       \beta_{q-1-c}=-D_c\ge1.                                \tag{CFB.21}
+\]
+Both \(\alpha\) on \(0,\ldots,p-1\) and \(\beta\) on
+\(0,\ldots,q-1\) are antitone.  In particular all the positivity,
+floor, and antitonicity fields in the original \texttt{ArithAt}
+hold without a further weight-arithmetic premise.
+
+\emph{Proof.}
+Since \(t\) is odd, \((t+1)/2\) and \((t-1)/2\) are integers.
+Together with CFB7 this gives integrality of (CFB.20).
+For \(a\le b<p\), (CFB.17) gives
+\[
+ A_b-A_a=(\ell_b+b)-(\ell_a+a)\le0.
+\]
+Likewise \(D_d\le D_c\) for \(c\le d<q\).
+At the two ends, (CFB.18) gives
+\[
+ A_{p-1}=e-b_i-(t+1)/2\ge1,
+ \qquad D_0=e-b_{i+1}+(t+1)/2\le-1\quad(q>0).
+                                                               \tag{CFB.22}
+\]
+Thus every \(A_a\ge1\), and every defined \(-D_c\ge1\).
+
+The actual \(\alpha_a\) is
+\(\max(\lfloor A_a\rfloor,0)\) on \(a<p\).
+For an integral nonnegative rational number this equals the number
+itself, proving the first identity in (CFB.21).
+For the negative degrees, substitute \(a=q-1-c\) into the actual
+definition of \(\mathrm{aMi}\).  Natural-number subtraction is
+exact because \(0\le c<q\): \(q-a=c+1\), and
+\(p+(q-a)-1=p+c\).  The expression inside its floor becomes
+\[
+          -[e+\ell_{p+c}+(c+1)+(t-1)/2]=-D_c.
+\]
+It too is a positive integer, proving the second identity.
+As \(a\) increases, \(q-1-a\) decreases; antitonicity of
+\(D_c\) therefore makes \(-D_{q-1-a}=\beta_a\) antitone.
+If \(q=0\), every negative-block assertion is empty and the
+definition gives \(\beta_a=0\) for all \(a\).
+% END CFB8
+
+% BEGIN CFB9
+\paragraph{CFB9: the dominant minor weight forces the original stored choice.}
+\label{claim:CFB9}
+Put
+\[
+ d=(p-q)/2-e-1/2=(p-q-1)/2-e,
+ \qquad
+ \Theta_a=
+ \begin{cases}
+       \alpha_a,&0\le a<p,\\
+       0,&p\le a<p+t,\\
+       -\beta_{q-1-c},&a=p+t+c,\quad0\le c<q.
+ \end{cases}                                                    \tag{CFB.23}
+\]
+Then \(d\in\mathbb Z\), and \(L_a=\Theta_a+d\), \(0\le a<n\),
+is an integral dominant weight.  For the \emph{actual} source choice
+\[
+        \lambda=\mathrm{Bridge.lamLdef}(n,i+1,\tau)
+\]
+one has
+\[
+ \mathrm{IsLamPrime}(\lambda,i+1,\tau),\qquad
+                  \lambda.w_a=\Theta_a+d\quad(0\le a<n).
+                                                               \tag{CFB.24}
+\]
+In particular the fallback branch of \texttt{lamLdef} cannot occur.
+
+\emph{Proof.}
+Since \(p+q\) is odd, \(p-q-1=(p+q)-2q-1\) is even.
+CFB7 therefore makes \(d\) an integer.  CFB8 makes the first
+block of \(\Theta\) antitone with values at least one.  Its
+middle block is zero.  In the last block,
+\(-\beta_{q-1-c}=D_c\le-1\) is antitone as \(c\) increases.
+These statements check every internal and boundary comparison,
+including \(q=0\), and prove dominance of \(\Theta\) and \(L\).
+
+It remains to identify the original conditional choice, rather
+than merely exhibit a different dominant weight.  Choose integral
+representatives of the supplied \(e,v_a,b_a\), and define a
+\texttt{WeightData} \(W\) with exactly
+\[
+ W.k=k,\ W.m=m,\ W.t=t,\ W.j=i+1,\ W.e=e,\quad
+ W.v(a+2)=v_a,\quad W.b(a+1)=b_a.                             \tag{CFB.25}
+\]
+Give unused natural indices arbitrary integral values, for example
+zero.  They do not enter any formula below.  Then
+\(W.p=p\), \(W.q=q\), \(W.nV=n\), and for \(0\le a<r\),
+\[
+                         W.\mathrm{lam}(a+1)=\ell_a.           \tag{CFB.26}
+\]
+For \(a<k-1\) this is \(W.v(a+2)=v_a\); for
+\(a=(k-1)+j\), it is \(-W.b(j+1)=-b_j\).
+
+We verify all three blocks of the one-based source formula.
+For \(a<p\), substitution into \(W.\mathrm{aPlus}\) gives
+\[
+ \begin{split}
+ W.\mathrm{aPlus}(a+1)
+ &=\ell_a+e-\frac{n+1-2(a+1)}2-\frac{p-q}2\\
+ &=\ell_a+e-(p-a-1)-(t+1)/2=A_a=\alpha_a.
+ \end{split}                                                    \tag{CFB.27}
+\]
+For \(a=p+t+c\), \(0\le c<q\), the argument of
+\(W.\mathrm{aMinus}\) in \(W.\mathrm{thetaWt}(a+1)\) is
+\(s=q-c\).  Consequently \(q+1-s=c+1\), and
+\[
+ \begin{split}
+ W.\mathrm{aMinus}(q-c)
+ &=b_{i+c+1}-e+\frac{1-t-2(c+1)}2\\
+ &=b_{i+c+1}-e-c-(t+1)/2=-D_c=\beta_{q-1-c}.
+ \end{split}                                                    \tag{CFB.28}
+\]
+Here \(i+c+1<m\) follows from \(c<q=m-i-1\), and
+\(\ell_{p+c}=-b_{i+c+1}\) follows from (CFB.19).
+The middle block of \(W.\mathrm{thetaWt}\) is zero by definition,
+and \(W.\mathrm{dTau}=d\).  Thus, throughout the actual rank,
+\[
+       W.\mathrm{thetaWt}(a+1)=\Theta_a,
+       \qquad W.\mathrm{lamPrime}(a+1)=\Theta_a+d.              \tag{CFB.29}
+\]
+The integral dominant weight \(L\) and this very \(W\) witness
+\(\mathrm{IsLamPrime}(L,i+1,\tau)\).  The existential test in
+\texttt{lamLdef} is therefore true.
+
+For completeness, (CFB.26)--(CFB.29) use only the fields in
+(CFB.25).  Hence they hold for \emph{every} \(W\) allowed by
+\(\mathrm{IsLamPrime}\), regardless of its unused entries.
+Any dominant weight satisfying that predicate has entries exactly
+\(\Theta_a+d\), and so equals \(L\).
+The source's selected witness consequently has (CFB.24).
+This proves both existence and independence of the internal choice,
+and also the universal \texttt{lamPrime\_eq} field of
+\texttt{ArithAt}.
+% END CFB9
+
+% BEGIN CFB10
+\paragraph{CFB10: the exact signed enumeration and lowest compact weight.}
+\label{claim:CFB10}
+Let \(\sigma=\mathrm{embLL}\), and let \(M\) be any of the
+original \(\mathrm{DSModel}(W_c(D,i),\mathrm{parAt}(W_c(D,i),\sigma))\)
+models with signs ordered as in the source,
+\(M.\epsilon_\tau(a)=\mathbf1_{a<p}\).
+Put \(\Lambda_a=\mathrm{lowK}(M.\epsilon_\tau,M.\mathrm{lam}_\tau)(a)\).
+Its stored parameters and this literal lowest weight satisfy
+\[
+ \begin{gathered}
+       M.\mathrm{lam}_\tau(a)=\ell_a\quad(0\le a<r),\\
+ \Lambda_a=\begin{cases}
+       \ell_a+q/2-(p-1)/2+a,&0\le a<p,\\
+       \ell_{p+c}-p/2-(q-1)/2+c,&a=p+c,\quad0\le c<q.
+ \end{cases}
+ \end{gathered}                                                 \tag{CFB.30}
+\]
+The last two quantities are the integral source values
+\(\kappa^+_a=\mathrm{kapW}(\mathrm{inl}(a))\) and
+\(\kappa^-_c=\mathrm{kapW}(\mathrm{inr}(c))\), and
+\[
+        \kappa^+_a=\alpha_a+n/2-e,\qquad
+        \kappa^-_c=-\beta_{q-1-c}-n/2-e.                        \tag{CFB.31}
+\]
+
+\emph{Proof.}
+We first check the base-place label, before using an enumeration.
+Equation (CFB.9) gives
+\(\mathrm{labE}(\mathrm{embLL},\tau)=\mathrm{tauE}(D,\tau)\).
+The \(\mathrm{tauE}\)'s are distinct: injectivity of the original
+\(\phi_0\), the automorphism parametrization \(\mathrm{sigmaOf}\)
+and \(D.eTau\) proves this from their definitions.
+No two are conjugates.  One direct check uses the original
+\(\xi_0\), whose image has positive imaginary part at every
+chosen \(\mathrm{tauE}\); complex conjugation reverses that sign.
+Thus the index chosen by \(\mathrm{lab}(\mathrm{embLL},\rho)\)
+must be \(\rho\), and only the un-conjugated branch of
+\(\mathrm{parAt}\) occurs.  This is also the base-label calculation
+in HCU20; it uses only \(D\) and therefore applies to the present
+arbitrary \(M\).
+
+By definition \(\mathrm{kapQ}\) is the pair of rational
+expressions in (CFB.30).  They are integers: \(\ell\) is
+integral, and \((q-p+1)/2\) and \(-(p+q-1)/2\) are integers
+since \(p+q\) is odd.  Its floor \(\mathrm{kapW}\) therefore
+equals it.  Inserting these two expressions into the actual
+\(\mathrm{holEnt}\) formulas cancels their half-sums and gives
+respectively \(\ell_a\) and \(\ell_{p+c}\).
+The signed \(\mathrm{holPar}\) is consequently the finite set
+\[
+       \{(\ell_a,\mathrm{true}):0\le a<p\}
+       \ \cup\ 
+       \{(\ell_{p+c},\mathrm{false}):0\le c<q\}.              \tag{CFB.32}
+\]
+Its first coordinates are all distinct by CFB7 and are already in
+strict decreasing order.  The stored \(M.\mathrm{enum}\) says
+that \(M.\mathrm{lam}\) is a strict decreasing enumeration of
+this same signed set.  Such an enumeration is unique: its first
+element is the unique maximum first coordinate, and deleting that
+element proves the statement successively for every index.
+Thus its parameter at position \(a\) is exactly \(\ell_a\),
+with the stated sign.  This agrees with the retained ordering field;
+no permutation of the original model is performed.
+
+The definition of \(\rho_C\) counts equal-sign indices above an
+index minus those below, divided by two; \(\rho_N\) does the
+same for opposite signs.  At \(a<p\), these counts give
+\(\rho_C=(p-1)/2-a\) and \(\rho_N=q/2\).
+At \(p+c\), they give \(\rho_C=(q-1)/2-c\) and
+\(\rho_N=-p/2\).
+Since \(\mathrm{lowK}=\mathrm{lam}+\rho_N-\rho_C\), this proves
+all of (CFB.30), also when the negative block is empty.
+Finally substitute (CFB.20)--(CFB.21) and
+\(n=p+q+t\); cancelling terms gives (CFB.31).
+This proves the \texttt{kap\_plus} and \texttt{kap\_minus}
+fields with the exact source normalization.
+% END CFB10
+
+% BEGIN CFB11
+\paragraph{CFB11: all three integer twists and both literal weight identities.}
+\label{claim:CFB11}
+For each original \(i\) there are integer functions
+\(x_1,x_2,x_3\) on the original \(\mathrm{Tau}\) such that,
+for every \(\tau\),
+\[
+ \begin{split}
+       x_{1,\tau}&=-e_\tau+n/2,\\
+       x_{2,\tau}&=-e_\tau-n/2,\\
+       x_{3,\tau}&=-d_\tau
+          =-\left[\frac{p_\tau-q_\tau}{2}
+                              +\left(-e_\tau-\frac12\right)\right].
+ \end{split}                                                    \tag{CFB.33}
+\]
+In (CFB.33), \(d_\tau\) is the arithmetic shift in (CFB.23),
+not a newly chosen determinant parameter.  In particular the
+coefficient of \(e_\tau\) in \(x_{3,\tau}\) is positive.
+For every \(M\) and base embedding as in CFB10,
+\[
+ \begin{split}
+ \mathrm{lowK}(M.\epsilon_\tau,M.\mathrm{lam}_\tau)(a)
+     &=\mathrm{wtK}(p_\tau,\alpha_\tau,\beta_\tau,
+                                      x_{1,\tau},x_{2,\tau})(a),\\
+ \mathrm{wtU}(p_\tau,q_\tau,\alpha_\tau,\beta_\tau,x_{3,\tau})(a)
+     &=-\bigl(\mathrm{Bridge.lamLdef}(n,i+1,\tau)\bigr).w_a.
+ \end{split}                                                    \tag{CFB.34}
+\]
+The first line is read in \(\mathbb R\) using its indicated
+integer casts.  Equations (CFB.33)--(CFB.34), with the original
+quantifiers, prove \texttt{weights\_of\_minors}.
+
+\emph{Proof.}
+By CFB7 write \(n=2s\) for an integer \(s\).  By CFB7 and CFB9,
+\(e_\tau\) and \(d_\tau\) are integral.  Define
+\(x_{1,\tau}=-e_\tau+s\),
+\(x_{2,\tau}=-e_\tau-s\) and \(x_{3,\tau}=-d_\tau\).
+These definitions give all three rational exponent identities,
+not merely their values modulo integers.
+
+The source \(\mathrm{wtK}\), on the \(r=p+q\) target indices,
+is \(\alpha_a+x_1\) for \(a<p\) and
+\(-\beta_{r-1-a}+x_2\) for \(a\ge p\).
+For \(a=p+c\), its reversed index is
+\(r-1-a=q-1-c\), with no truncated subtraction ambiguity.
+Thus (CFB.31) proves the first line of (CFB.34).
+
+On the source indices \(0\le a<n\), the literal formula is
+\[
+ \mathrm{wtU}(a)=
+     -\mathbf1_{a<p}\alpha_a
+       +\mathbf1_{n-1-a<q}\beta_{n-1-a}-d.                     \tag{CFB.35}
+\]
+Its first and last supports are disjoint, because
+\(n=p+t+q\) with \(t>0\).
+If \(a<p\), the last indicator vanishes and (CFB.35) is
+\(-\alpha_a-d=-\Theta_a-d\).
+If \(p\le a<p+t\), both vanish, so it is \(-d\).
+If \(a=p+t+c\), \(0\le c<q\), then
+\(n-1-a=q-1-c\), so it is \(\beta_{q-1-c}-d\).
+These are exactly \(-\Theta_a-d\) in every block.
+CFB9 now identifies the right side with the negative of the
+\emph{stored} \(\mathrm{lamLdef}\) weight, proving the second
+line.  No assertion at an arbitrary conjugate coefficient embedding
+has been used or is required.
+% END CFB11
+
+% BEGIN CFB12
+\paragraph{CFB12: the complete arithmetic interface and actual original frames.}
+\label{claim:CFB12}
+For every original \(D,i,\tau\), the literal
+\(\mathrm{ArithAt}(D,i,\tau)\) holds.
+For one supplied original \(R:\mathrm{RealDat}(D,A,K_s)\) with
+\(R.\mathrm{IsFam}\) and \(R.\mathrm{IsModels}\), choose once
+the witnesses \((\mathrm{gramR},c_{0R},c_{0L},h_T)\) in its
+\(\mathrm{fam\_tie}\).  Then for each \(i\), CFB5 applies to
+the actual data
+\[
+ \begin{gathered}
+ V=V_c(D,i),\quad c=R.cV(i),\quad \theta=R.\theta,\\
+ \lambda_{i,\tau}=\mathrm{Bridge.lamLdef}(\mathrm{rank}(V_c(D,i)),i+1,\tau),
+ \qquad c_0=c_{0L}(i),\qquad B_\tau=R.BV(i,\tau).
+ \end{gathered}                                                 \tag{CFB.36}
+\]
+It yields one \(j_i\) with the exact image and original real action
+of (CFB.10), using this same \(c_{0L}(i)\) and \(R.BV(i)\).
+
+\emph{Proof.}
+The \texttt{ArithAt} signature and rank fields are CFB7.
+Its two floor identities, the two antitone clauses and the two
+positive clauses are CFB8.  The two \texttt{kap} identities are
+the algebraic identities (CFB.31), whose derivation from
+\(\mathrm{kapQ}\) requires only CFB7--CFB8, not a choice of \(M\).
+The integer shift, the universal \(W.\mathrm{lamPrime}\) identity,
+the forced \(\mathrm{IsLamPrime}\), and the final coefficient
+identity are CFB9.  These are all the fields of the source record.
+In particular this proof does not infer the record merely from
+its two weight consequences.
+
+For (CFB.36), the \(\mathrm{inf}\) and \(\mathrm{cV}\) fields
+of \(R.\mathrm{IsModels}\) supply exactly
+\(\mathrm{IsInfFam}(R.\theta)\) and \((R.cV(i)).\mathrm{Is}\).
+The selected \(h_T.\mathrm{mapL}(i)\) is exactly
+\(\mathrm{CoefMapTie}\) for \(c_{0L}(i)\), with
+\(\rho_{Vr}(\mathrm{labLL}(D),\lambda_i)\), because these
+are the actual arguments of \(R.\mathrm{fam\_tie}\).
+No replacement coefficient model is involved.
+
+Finally the \(\mathrm{BV}\) field of the same model predicate gives
+\[
+           \mathrm{IsONBasis}(G_\tau,1,R.BV(i,\tau),n),
+\]
+where
+\(G_\tau=\mathrm{gramAt}(D,V_c(D,i),\tau)\).
+In the definition of that predicate, each of its \(n\) signed
+indices is less than \(n\), so every sign is \(+1\).  Thus
+\[
+                R.BV(i,\tau)^*G_\tau R.BV(i,\tau)=1.           \tag{CFB.37}
+\]
+The matrix \(R.BV(i,\tau)^*G_\tau\) is a left inverse.
+A square matrix with a left inverse over a field is invertible,
+as follows by taking determinants.  Hence the exact specified
+\(R.BV(i,\tau)\) is an admissible \(B_\tau\) in CFB5.
+All these choices precede any parameter \(t\) of the original
+family: \(c_{0L}\), \(cV\), \(BV\) and \(\lambda\) have no
+such parameter.
+% END CFB12
+
+% BEGIN CFB13
+\paragraph{CFB13: one simultaneous coefficient-and-weight package on the supplied datum.}
+\label{claim:CFB13}
+Under the same \(R.\mathrm{IsFam}\) and \(R.\mathrm{IsModels}\)
+hypotheses, for every original \(i\) there are one map \(j_i\)
+and three integer functions \(x_{1,i},x_{2,i},x_{3,i}\) such that
+all of the following hold on the original objects, before any
+choice of a family parameter:
+\[
+ \begin{gathered}
+ \operatorname{range}(j_i)=\mathrm{VV}_{\mathbb C}(\lambda_i),
+ \qquad\text{the exact real covariance (CFB.10)},\\
+ p_\tau+q_\tau=\mathrm{rank}(W_c(D,i))
+          \le\mathrm{rank}(V_c(D,i)),\qquad
+ \alpha_\tau,\beta_\tau\text{ antitone on their own blocks},\\
+ \text{all three identities (CFB.33), and both identities (CFB.34)
+ for }M_i=R.MW(i,\mathrm{sg}_0),\\
+ \mathrm{VV}_{\mathbb C}(\lambda_i)
+      =\operatorname{span}_{\mathbb C}
+          \bigl(\mathrm{vact}(\prod_\tau U(n))h_{\lambda_i}\bigr).
+ \end{gathered}                                                 \tag{CFB.38}
+\]
+The \(j_i\) retains the last line of (CFB.10) for the one selected
+\(c_{0L}(i)\), so the scalar-extension identification remains
+reviewable as an equality on the original rational coefficient map.
+This supplies the complete coefficient bridge, compact cyclicity,
+and finite weight inputs at the call to
+\texttt{exists\_io\_poly} inside \texttt{exists\_ioP}.
+
+\emph{Proof.}
+CFB12 supplies the \(j_i\)'s and the full arithmetic record;
+CFB6 supplies the exact compact cyclicity.  CFB7 gives the rank
+identity and inequality since \(t>0\).  CFB8 gives the required
+antitonicity.  The original \(R.hv0\) identifies
+\(\mathrm{sg}_0=\mathrm{sgAt}(\mathrm{embLL},A.v_0)\) with
+\(\mathrm{embLL}\), as explicitly verified in HCU20.
+The \(\mathrm{order}\) field of the same
+\(R.\mathrm{IsModels}\) gives the original ordering of
+\(M_i.\epsilon\).  Hence CFB11 applies to precisely \(M_i\)
+and supplies the three integer functions and both weights.
+These constructions use \(D,i,\tau,R\) and the once-selected
+\(\mathrm{fam\_tie}\) witnesses.  They do not use \(t\),
+the level at \(t\), or an action chosen after \(t\).
+Consequently any subsequent construction depending on this
+package can choose its map once for each \(i\) and then check
+the desired laws for every \(t\).
+
+The hypotheses \(R.\mathrm{IsFam}\) and
+\(R.\mathrm{IsModels}\) are retained as predicates on this
+\emph{one} original datum.  Their independent existence is not
+inferred from a list of abstractly isomorphic coefficient spaces.
+Nor does (CFB.38) alone assert \(\mathrm{IsIoW}\), its
+unit-vector normalization, the given Weil-action laws, or an
+analytic theta bound.  Those are separate consumers and producers
+whose finite Fock interface now receives the exact supplied data.
+% END CFB13
+
+\subsection*{Closure and the remaining common-object boundary}
+
+The new finite implications are complete: the original rational
+coefficient map extends uniquely; its actual real action is
+identified by rational approximation and continuity; the actual
+frame gives a polynomial image equal to the literal \(\mathrm{VV}\);
+and the full compact orbit of the literal extremal polynomial
+spans it.  The original floor degrees, dominant coefficient choice,
+signed lowest compact weight, and all determinant twists are also
+determined, including the empty negative block.
+
+The retained inputs are the same original \(D\), family and
+\(R\), its \(\mathrm{IsFam}\) coefficient tie, and its
+\(\mathrm{IsModels}\) actions, frames and ordering.  Nothing in
+this chapter constructs an otherwise missing compatible datum.
+The simultaneous joint-harmonic/Fock construction, the actual Weil
+and theta-vector inputs, and the subsequent analytic regularity
+remain separate tasks.  No new published theorem is required in
+this component; the inherited HP polynomial proofs, MF3 weak
+approximation, and HCU14/HCU20 original-object dictionaries are
+used only in their already stated scopes.

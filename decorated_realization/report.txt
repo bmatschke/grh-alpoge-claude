@@ -1,0 +1,299 @@
+RH / Dirichlet-GRH readable reconstruction — v0.14
+Component: decorated_realization
+Claims: DR1–DR3
+Owner: /root/global_frame
+Pinned source: CocoSgt/riemann-hypothesis-lean
+Commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+RESULT AND SCOPE
+
+This component supplies the initial unitary finite-adelic realizers that
+were explicitly retained in FC3, FC19, AD3 and NB6. It proves the actual
+exists_isPtOf_cm conclusion under its literal CMData and valid-decoration
+premises, including every IsPtOf field: unitarity, the exact carried global
+lattice in the full adelic sense, selected residue functionals, every
+auxiliary residue coordinate, and exact rational frame matrices at twist
+primes. It also verifies the set/orientation checks in exists_ptOf_twists.
+
+The proof proceeds directly through local integral Hermitian bases and the
+restricted product. The root arithmetic host, its CM-field condition,
+selected prime/character data and original column-law records remain
+supplied. No proof of their existence, no full RH/GRH conclusion, no
+rational strong approximation theorem, and no Lean kernel replay is claimed.
+
+The main substantive replacement is useful in two ways. First it proves
+the local norm-surjectivity and Hermitian diagonalization arguments even
+at dyadic primes, with no hidden division by 2. Second it constructs the
+finite-adelic object directly, avoiding a stronger rational isometry route
+that is present in the source but unnecessary for this particular endpoint.
+The exact source distinction is recorded below.
+
+EXACT INPUTS AND CONVENTIONS
+
+Let E/F be the supplied quadratic CM extension. Its actual involution fixes
+exactly F, and the Hermitian form on E^n is h(x,y)=bar(x)^t y, conjugate
+linear in the first variable. A full O_E-lattice N is self-dual when
+
+  N = {y in E^n : h(x,y) in O_E for every x in N}.
+
+This is the O_E-valued Hermitian dual, not a trace dual.
+
+CMData contains [E:F]=2, identification of the fixed field with F, and
+cmUnram. The last part of its literal IsCMUnram condition says that for
+every maximal prime P of O_E there exists theta in O_E such that
+
+  theta - bar(theta) is not in P.
+
+This is the actual hypothesis used to establish unramified local algebra.
+It is not an unstated assumption that the local extension happens to be
+unramified. The other cmUnram clauses make E totally complex and identify
+the involution with complex conjugation under all complex embeddings.
+
+At a finite prime v of F, set K=F_v, R=O_(F_v),
+B=E tensor_F K and A=product_(P|v) O_(E_P). These are the actual completed
+algebra and its integral subring. The involution exchanges conjugate
+components; it is not being treated as an automorphism of an individual
+split component. B's fixed field/algebra is K, by writing elements in the
+base-changed F-basis 1,theta. Its fixed integral subring is R, because a
+scalar has nonnegative valuation in a finite extension exactly when it
+has nonnegative valuation in K.
+
+DR1 — THE LOCAL INTEGRAL HERMITIAN NORMAL FORM
+
+1. Derive the exact quadratic etale integral algebra.
+
+Choose P over v and theta from the cmUnram condition. In the quadratic
+extension there are at most two primes over v and, if distinct, they are
+P and bar(P). The same delta=theta-bar(theta) is a unit at both, because
+bar(delta)=-delta. Hence delta is a unit of A.
+
+For any a in A define
+
+  b=(a-bar(a))/(theta-bar(theta)),  c=a-b*theta.
+
+Both are integral and fixed, hence in R. Therefore A=R+R*theta. The sum is
+direct because theta is nonfixed. Its monic quadratic polynomial has the
+actual trace/norm coefficients in R, and its discriminant delta^2 is a
+unit of R. Consequently the residue algebra is a separable quadratic
+algebra: either k x k or the quadratic finite field k_2/k. The involution
+exchanges its two roots or is the nontrivial finite-field involution.
+
+This argument also identifies A with the actual full integral order. It
+does not merely exhibit a quadratic suborder and then assume it is maximal.
+Formula (DR.3) proves that every integral element lies in R+R*theta.
+
+If the residue polynomial splits, lift its two simple roots by successive
+linear corrections a_(m+1)=a_m+varpi^m*t_m, solving the derivative equation
+modulo varpi at each step. Completeness gives the two roots, still separated
+by a unit. Chinese remaindering gives A=R x R. If the residue polynomial is
+irreducible, every element outside varpi*A has an inverse: lift a residue
+inverse and invert the remaining 1+varpi*z by a convergent geometric series.
+Since A is finite free over the complete DVR R, each nonzero element is a
+finite power of varpi times a unit. This gives precisely an unramified
+quadratic DVR, with residue field k_2. These deductions are valid at p=2.
+
+2. Prove the unit norm map is onto, including dyadic primes.
+
+For k=F_q and k_2=F_(q^2), the finite-field norm is z -> z^(q+1) and its
+image has q-1 elements, so it is onto k^x. The trace z+z^q is k-linear into
+k and is nonzero: its defining polynomial is nonzero of degree q<q^2,
+even when the characteristic is 2. Hence it too is onto.
+
+Given u in R^x, choose b_1 in A^x whose norm agrees with u modulo varpi.
+If N(b_m)-u=varpi^m*c_m, choose z_m with residual trace -c_m/u and put
+
+  b_(m+1) = b_m * (1+varpi^m*z_m).
+
+For m>=1, the quadratic term varpi^(2m)*N(z_m) lies in varpi^(m+1), so
+the norm error improves to the next power. The coefficient of the linear
+term is N(b_m), whose residue is u, so the sign and divisor in the trace
+equation above are exact. The successive differences are in varpi^m*A;
+the limit exists by completeness and remains in the same nonzero residue
+class. Its norm is u. No step divides by 2 or supposes Tr(1) is nonzero.
+For A=R x R, the norm is (a,b) -> ab and its unit surjectivity is immediate.
+
+3. Find a norm-one vector and split it off integrally.
+
+A perfect integral Hermitian lattice over the nonsplit DVR A is free.
+Its Gram determinant is a unit and the reduced pairing is nondegenerate.
+If every vector in the reduced space had zero self-pairing, then for every
+x,y,a one would have
+
+  0=h(x+a*y,x+a*y)=a*h(x,y)+bar(a)*overline(h(x,y)).
+
+Choose h(x,y) nonzero by nondegeneracy. Varying a makes the right side
+the trace of every element of k_2, contradicting surjectivity. This is the
+needed characteristic-two argument: the alternating-bilinear shortcut is
+not used. Lift a vector with nonzero self-pairing to the lattice. Its norm
+is a unit of R. Divide by a unit with that norm using the previous step.
+
+A norm-one vector v gives the integral projection x -> v*h(v,x), so the
+lattice is Av direct-sum (v-perp intersect M). The complement is free and
+perfect. A vector in its fraction-field span pairing integrally with the
+complement also pairs integrally with v (the pairing is zero); selfduality
+of M therefore puts it in M and then in the complement. Induction gives
+an orthonormal integral basis. Rank zero is immediate.
+
+For the split algebra R x R, the Hermitian form pairs the two R-lattice
+components perfectly. Choose a basis in one component and the dual basis
+in the other. Their paired vectors form an A-basis with Gram matrix I.
+Thus the local normal-form conclusion holds in both alternatives.
+
+Source relation for DR1.
+
+The argument proves the complete local CM specialization needed in
+GlobalTheory.St.G.Unimod.normal_form and exists_orthonormal, and their
+exists_unitary_of_selfDualAt application. The more general algebraic
+source lemma GlobalTheory.UnramifiedHermitian.exists_norm_eq_of_henselian
+allows abstract Henselian rings. DR1 does not claim that entire extra
+generality: it proves the complete DVR/finite residue case actually used
+by the true-column realization. Its explicit successive norm correction
+and finite-field trace argument replace that source's binary-form and
+Henselian-polynomial route in this application.
+
+DR2 — ASSEMBLE THE ACTUAL FINITE-ADELIC LATTICE REALIZER
+
+Let N=N# be a full O_E-lattice in standard E^n. Clearing generators and a
+field basis yields a nonzero rational integer d with
+d*O_E^n subset N subset d^-1*O_E^n. Thus N is the standard lattice away
+from finitely many primes. Local duality is the conjugate-transpose
+inverse-basis calculation: at a split P it uses the conjugate prime,
+and at a fixed prime it is the usual local Hermitian dual. Completion
+retains that matrix formula, so each completed lattice is perfect.
+
+At a nonsplit prime, DR1 gives an orthonormal basis of the actual completed
+N. Its column matrix g_v is unitary and carries the integral standard
+lattice onto that module. At a split pair choose any local basis matrix
+B_P for N_P and set the conjugate component equal to conjugate(B_P)^(-t).
+Selfduality says exactly that this is a basis at the conjugate prime.
+Choose identity everywhere the lattice is standard.
+
+The family is an actual element of E tensor_F A_(F,f), not merely a list
+of local objects. Expand the entries and inverse entries in a fixed
+F-basis 1,theta of E. Every coefficient equals its identity-matrix
+coefficient outside finitely many v; hence it is a finite adele of F.
+The two corresponding tensor terms construct every matrix entry.
+The componentwise inverse exists in the same restricted product, and
+unitarity holds at every component, hence globally.
+
+The local basis equalities imply
+
+  g * widehat(O_E)^n = product_P widehat(N_P) = widehat(N).
+
+The final equality is the full integral adelic-span identity already
+proved in AD4 with the finite sandwich and Chinese remainder theorem.
+It is an equality for arbitrary adelic vectors and therefore proves
+the literal Carries predicate. Intersecting with rational vectors gives
+globLat(g)=N: in a rational local basis completed membership is exactly
+nonnegativity of rational coefficient valuations, and LP1 recovers N.
+
+Important source-name distinction.
+
+Formalism.L2.Col.UnimodGenus hc n, in Columns/Inputs.lean61–63, is already
+the finite-adelic globLat existence assertion. DR2 proves it and thus
+the conclusion of ValuedLtOfMem.unimodGenus. In contrast,
+Formalism.L2.Col.UnimodGenusLoc and PI.UnimodGenus ask for SameGenus,
+which uses a rational unitary isometry at each semilocal prime pair.
+The original source route first proves that stronger rational statement
+and then assembles a finite-adelic element. DR2 bypasses that route.
+It neither claims those rational statements nor assumes a rational
+weak/strong approximation theorem. The ledger marks this distinction.
+
+DR3 — INSTALL THE EXACT DECORATION AND RATIONAL FRAMES
+
+Let p be a valid framed decoration with selfdual lattice N, finite type
+prime set ST, auxiliary set SG, and rational-frame set Q. The sets are
+pairwise disjoint and their union contains no conjugate pair. This is
+the exact source condition, not merely an unspecified finite support
+condition. In particular each selected prime is in a split pair, so
+its conjugate component can be chosen independently by the unitary
+inverse-transpose rule.
+
+Choose a rational O_(P)-basis B_P of N_P at every selected prime. It is
+an E-basis because N is full. At a type prime the nonzero functional
+on N_P induces a nonzero row r on k_P^n. Complete a basis of its kernel
+with a vector of value one; the column matrix U then has r*U=e_n^t.
+Lift its entries to O_E. Its determinant has nonzero residue at P,
+so the lift and its inverse are integral at P. Replacing B_P by this
+right multiple gives a rational local basis whose inverse last-coordinate
+reduction is exactly the supplied functional.
+
+At an auxiliary prime the supplied global be_surj and be_ker statements
+give an isomorphism N_P/P N_P -> k_P^n. Clearing one denominator outside
+P proves the localized kernel statement; global witnesses already prove
+surjectivity. Its matrix M relative to B_P is invertible over k_P.
+Lift M^-1 to a matrix integral and invertible at P, and use the resulting
+right multiple of B_P. Then every inverse-coordinate reduction is exactly
+the original auxiliary map. At Q choose the specified rational frame
+matrix itself. Disjointness ensures that no conflicting prescriptions
+have been assigned to the same component.
+
+These lifts are in GL_n(O_(P)), obtained by the determinant-unit criterion.
+The proof does not assert the generally stronger surjectivity of
+GL_n(O_E) -> GL_n(O_E/P), and does not need it.
+
+DR2 gives the starting unitary lattice realizer. Apply AD4 once with
+modification set ST union SG union Q and these rational local bases.
+It preserves the actual carried lattice and unitarity, installs the
+selected components exactly, and chooses conjugate components by the
+unitary rule. Pullback coordinates of x in N are now B_P^-1*x at P.
+
+For a coordinate a/s integral at P, choose r in O_E whose residue equals
+rho(a)/rho(s), with s outside P. Then a/s-r is in P O_(P), and therefore
+has completed multiplicative valuation strictly less than one. This is the exact
+HasRes predicate using the actual quotient map, not an isomorphism with
+an unrelated residue field.
+
+All five IsPtOf fields follow:
+
+  uni: the unitary matrix from DR2 and the unitary modification in AD4;
+  lat: the full adelic Carries equality, unchanged by AD4;
+  f: every selected last inverse-coordinate has residue f_P(x);
+  be: every auxiliary inverse-coordinate has its specified be_P(x)_j;
+  fr: at Q the matrix component equals the given rational frame exactly.
+
+In rank zero, a nonzero functional on the zero module is impossible,
+so a valid decoration forces ST empty. The empty identity matrix then
+works; all auxiliary and frame coordinate clauses are vacuous. Therefore this is the full actual
+exists_isPtOf_cm conclusion under its exact hypotheses.
+
+TRUE-COLUMN APPLICATION AND CLOSED BOUNDARY
+
+The all-twist wrapper exists_ptOf_twists uses only the source prime-set
+checks to apply the theorem just proved. A selected type prime contains
+T_u; every auxiliary or good twist prime does not. Integer membership
+in a prime is preserved by conjugation, so type primes are disjoint
+from those sets and their conjugates. The coprimality of pi_u and
+bar(pi_u) excludes conjugate pairs within the type set. The supplied
+LevTwist split/disjointness conditions handle the auxiliary/twist union.
+No further adelic geometric existence is introduced by that wrapper.
+
+Thus DR3 supplies the actual yStd points used in FC3, and every initial
+realizer needed in AD3/NB6. FC19 remains a valid, independently reviewed
+conditional construction; substituting this DR3 supplier removes its
+point-realizability premise for the actual CM host. The direct Forms0,
+level-zero carrier, Joint0, StdTied, h0 and companion joins are consequently
+available under the original supplied true-column data alone. The parent
+may combine these with VE9 without changing any frozen FC proof paragraph.
+
+The old next-source target exists_isPtOf_cm is closed by DR1–DR3. The
+special penultimate HSym/lamSym identification, terminal row incidence
+and til_ties/CarT joins remain separate full-column work. The existence
+of the original unramified CM field and the prescribed prime/character/
+column-law data is not manufactured by the realization theorem. None of
+this proves the independent analytic or spectral estimates needed in
+the wider RH/Dirichlet-GRH route.
+
+SOURCE AND VERIFICATION POLICY
+
+build_provenance.py compares every read source with git show at the pinned
+commit, hashes each exact full file and each one-indexed inclusive
+declaration range, and emits provenance.json, source_locators.txt and
+source_manifest.json. Missing sparse-checkout files are read from the
+pinned blob without changing checkout. It also checks the independent
+review's exact paragraph hashes if the review record is present.
+
+These are human mathematical proofs, including a shorter route to the
+actual source conclusion. No Lean source has been changed, no replacement
+proof has been formalized, and no Lean build or kernel replay was run.
+No PDF was generated or rendered, following the active user instruction.

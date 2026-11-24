@@ -1,0 +1,1188 @@
+\section{Determinant jets, their short windows, and the actual integral row tests}
+\label{sec:determinant-jet-v057}
+
+\status{This chapter proves the full original
+\texttt{FormalSeriesBounds.ThmP}, the literal row identity
+\texttt{BiValue}, and \texttt{BiContent} and \texttt{BiWindow}.
+It then proves the original conversion from a supplied Cartier normal
+form to its actual perturbation, including all four fields of
+\texttt{MtoHM}, and constructs the integral germs and the exact
+change-of-coordinates identity in \texttt{block\_of\_normal\_form}.
+The final window uses the same normal form, coordinates and original
+row gauge throughout.  Existence of the original normal form
+\texttt{RowData.LemmaM} is retained at the last application; it is not
+replaced by a new assumption about an unrelated power series.
+No whole global obligation is asserted here.}
+
+We want an integral row test whose value is not too divisible by a
+prime.  There are two separate issues.  The first is an estimate for
+an explicitly perturbed exponential in matrix variables.  The second
+is to show that this exponential is the restriction of the prescribed
+row gauge, and that its derivatives are values on actual integral
+germs.  A scalar estimate by itself would not settle the second issue.
+
+The short-window argument in the first part was prompted by the
+adjoint-functor reading edition, revision
+\texttt{94107d5f1a355a4ae0bd521123dba9ffd62e00f5},
+\texttt{tex/arithmetic.tex}, lines 6432--6528.  We give the coefficient,
+factorial and interpolation details.  The remaining parts reconstruct
+the original row and coordinate arguments.  All formal-source matches
+use revision
+\texttt{7cbf7a0c32fca1badf05931879a37c3f8a2b03b4}.
+The classical ordinary Cayley identity is the one published input in
+the determinant calculation; its exact statement is specified below.
+
+\subsection{Conventions and the local window}
+
+Let $K$ be a characteristic-zero field with an additive
+nonarchimedean valuation
+$v:K\longrightarrow\mathbb R\cup\{+\infty\}$.
+Thus $v(0)=+\infty$, $v(xy)=v(x)+v(y)$, and
+$v(x+y)\ge\min(v(x),v(y))$.  We impose neither completeness nor
+discreteness.  Fix a prime $p\ge5$ with $v(p)=1$, an odd integer
+$h\ge1$, and integers $n\ge1$, $0\le r\le n$.  Put
+\begin{gather}
+ q=p^h,\qquad \rho=\frac1{p^2-1},\qquad
+ \gamma=\frac p{p^2-1},\qquad
+ e=1+\frac{q-p}{p^2-1},\qquad c=-p^{-e},\label{djw:parameters}\\
+ a=\rho+\frac1{2q}-\frac1{8q},\qquad
+ b=\rho+\frac12-\frac1{8q}.
+ \label{djw:weights}
+\end{gather}
+Writing $h=2u+1$ gives
+$e=1+p\sum_{j<u}p^{2j}$, so $e$ is a positive integer.
+
+For independent $r$ by $r$ matrices $X,Y$, write $|A|,|B|$ for
+the total degrees of multiindices on their entries, and $A!,B!$ for
+the products of their factorials.  Let
+$U=\sum u_{A,B}X^AY^B$ satisfy
+\begin{align}
+ v(u_{A,B})+a|A|+b|B|&\ge\frac1{p-1},
+       &&\text{for every }A,B,\label{djw:hm1}\\
+ u_{A,B}\ne0&\Longrightarrow |B|\ge1.
+       \label{djw:hm2}
+\end{align}
+The second condition says $U(X,0)=0$.  In particular its formal
+exponential exists coefficient by coefficient.  All derivatives below
+are ordinary derivatives, so a monomial of exponent $A$ contributes
+the factorial $A!$, rather than a divided-power normalization.
+Define
+\begin{equation}
+ \Lambda_y=
+ \left.\det(\partial_X)^{qy}\det(\partial_Y)^y
+ \exp\left(c\sum_{i,j}X_{ij}^{q}Y_{ij}+U(X,Y)\right)
+ \right|_{X=Y=0}.
+ \label{djw:lambda}
+\end{equation}
+For a polynomial $P$ and a series $F$ in the same variables, write
+\[
+ \langle P,F\rangle=P(\partial)F(0)
+       =\sum_A P_A A!F_A.
+\]
+The sum is finite.  Empty determinants and empty products equal one.
+
+% BEGIN DJW1
+\paragraph{DJW1: integer and factorial valuations.}
+\label{claim:DJW1}
+The restriction of $v$ to nonzero integers is the ordinary
+$p$-adic valuation.  If a multiindex $A$ has at most $r^2$ coordinates,
+$|A|\le M$ and $M\ge1$, then
+\begin{equation}
+ v(A!)\ge\frac{|A|}{p-1}-r^2(\log_p M+1).
+ \label{djw:multifactorial}
+\end{equation}
+For
+\[
+ C_r(m)=\prod_{t=1}^{m}\prod_{j=0}^{r-1}(t+j)
+       =\prod_{j=0}^{r-1}\frac{(m+j)!}{j!},\qquad C_r(0)=1,
+\]
+and $r\ge1$, one has
+\begin{equation}
+ v(C_r(m))\le\frac{rm}{p-1}+r(\log_p r+1).
+ \label{djw:capacity}
+\end{equation}
+Also $v(m!)\le m/(p-1)$ for every $m\ge0$.
+
+\begin{proof}
+Repeated addition gives $v(z)\ge0$ for every integer $z$.
+If $p\nmid z$, Bezout supplies integers $u,w$ with $uz+wp=1$.
+If $v(z)>0$, both terms on the left have positive valuation, a
+contradiction.  Removing the power of $p$ from any nonzero integer
+proves the first assertion, including its sign.
+
+Counting the multiples of $p,p^2,\ldots$ in a factorial gives
+\[
+ v(m!)=\sum_{j\ge1}\left\lfloor\frac m{p^j}\right\rfloor
+       =\frac{m-s_p(m)}{p-1},
+\]
+where $s_p(m)$ is its base-$p$ digit sum.  For $m\ge1$,
+$s_p(m)\le(p-1)(\log_p m+1)$; $s_p(0)=0$.
+Sum this estimate over the coordinates of $A$ to obtain
+\eqref{djw:multifactorial}, allowing zero coordinates and $A=0$.
+The same formula gives
+\[
+ v(C_r(m))=
+ \frac{rm+\sum_{j<r}s_p(j)-\sum_{j<r}s_p(m+j)}{p-1}.
+\]
+Discard the last, nonpositive, sum and bound each remaining digit
+sum by $(p-1)(\log_p r+1)$.  The upper bound on $v(m!)$ follows
+by discarding its nonnegative digit sum.
+\end{proof}
+% END DJW1
+
+% BEGIN DJW2
+\paragraph{DJW2: the determinant factorial and its adjoint identity.}
+\label{claim:DJW2}
+Let $D=\det X$ with $r\ge1$.  The ordinary Cayley identity is
+\begin{equation}
+ \det(\partial_X)D^m=
+       \prod_{j=0}^{r-1}(m+j)D^{m-1}\qquad(m\ge1).
+ \label{djw:cayley}
+\end{equation}
+Its iteration gives
+$\langle D^m,D^m\rangle=C_r(m)$.
+If $0\le s\le y$ and $Q$ is homogeneous of degree $rqs$, then
+\begin{equation}
+ \frac{\langle D^{qy},D^{q(y-s)}Q\rangle}{C_r(qy)}
+       =\frac{\langle D^{qs},Q\rangle}{C_r(qs)}.
+ \label{djw:adjoint}
+\end{equation}
+
+\begin{proof}
+We use \eqref{djw:cayley} as the classical polynomial identity in
+Caracciolo--Sokal--Sportiello, Theorem 2.1.  It is an identity over
+$\mathbb Q$ and hence over every characteristic-zero $K$.
+No measure, metric or analytic continuation enters it.
+
+For a single variable, direct comparison of factorials gives
+$\langle P,X_jQ\rangle=\langle\partial_jP,Q\rangle$.
+Linearity and multiplication give the corresponding identity for
+$D$.  Apply it $q(y-s)$ times, and use \eqref{djw:cayley} on the
+left polynomial.  Its scalar is $C_r(qy)/C_r(qs)$, which is nonzero
+in $K$.  This proves \eqref{djw:adjoint} and, on taking $s=0$,
+the stated determinant factorial.
+\end{proof}
+% END DJW2
+
+% BEGIN DJW3
+\paragraph{DJW3: the weighted exponential and the Frobenius error.}
+\label{claim:DJW3}
+Put $E=\exp U$ and introduce an independent matrix $Z$.
+Then
+\begin{equation}
+ v(E_{A,B})+a|A|+b|B|\ge0,\qquad E(X,0)=1.
+ \label{djw:weightedexp}
+\end{equation}
+For
+$\Psi(X,Z)=\det(X^{[q]}-p^eZ)-D^q$, where
+$X^{[q]}=(X_{ij}^q)$, every coefficient of a monomial of
+$Z$-degree $k$ in $\Psi^s$ is divisible by
+\begin{equation}
+ p^{ek+(s-k)_+},
+ \label{djw:psidiv}
+\end{equation}
+and its $X$-degree is $q(rs-k)$.
+
+\begin{proof}
+A contribution from $U^j/j!$ has weighted valuation at least
+$j/(p-1)-v(j!)\ge0$.  At a fixed bidegree only finitely many $j$
+occur, because every monomial of $U$ has positive right degree.
+The ultrametric inequality proves \eqref{djw:weightedexp}.
+
+Every $Z$ in a determinant expansion supplies a factor $p^e$.
+The part of $\Psi$ free of $Z$ is divisible by $p$, since in
+characteristic $p$ the Frobenius map commutes with determinants:
+$\det(X^{[q]})=(\det X)^q$.
+Among $s$ factors of $\Psi$, at most $k$ can have positive
+$Z$-degree if the total degree is $k$.  At least $(s-k)_+$ of
+them therefore supply an additional $p$.  This proves
+\eqref{djw:psidiv} before and after equal monomials are combined.
+Every factor has weighted degree $rq$ if an $X$ has weight one
+and a $Z$ has weight $q$; the asserted $X$-degree follows.
+\end{proof}
+% END DJW3
+
+% BEGIN DJW4
+\paragraph{DJW4: an exact Newton expansion of the normalized jets.}
+\label{claim:DJW4}
+For $s\ge0$, let $Q_s(X)$ be the homogeneous part of degree $rqs$
+of
+$[\Psi(X,\partial_Y)^sE(X,Y)]_{Y=0}$.
+Then
+\begin{equation}
+ \frac{\Lambda_y}{c^{ry}C_r(qy)}
+   =\sum_{s=0}^{y}\binom ys a_s,\qquad
+ a_s=\frac{\langle D^{qs},Q_s\rangle}{C_r(qs)},\qquad a_0=1.
+ \label{djw:newton}
+\end{equation}
+
+\begin{proof}
+Conjugating $\partial_{Y_{ij}}$ by
+$\exp(c\sum X_{ij}^qY_{ij})$ replaces it by
+$\partial_{Y_{ij}}+cX_{ij}^q$.
+The entries of $X$ commute with these derivatives, and
+$c^{-1}=-p^e$.  Consequently the full right operator becomes
+\[
+ c^{ry}\bigl(D^q+\Psi(X,\partial_Y)\bigr)^y.
+\]
+Its two summands commute.  Expand by the binomial theorem and set
+$Y=0$.  The left polynomial $D^{qy}$ sees only total $X$-degree
+$rqy$, so in the term with index $s$ it sees precisely $Q_s$.
+Apply DJW2 to remove $D^{q(y-s)}$ from that term.  This is
+\eqref{djw:newton}.  Since $E(X,0)=1$, we have $Q_0=1$ and
+$a_0=1$.  Every sum used for a fixed coefficient is finite; no
+convergence in the valued field is needed.
+\end{proof}
+% END DJW4
+
+% BEGIN DJW5
+\paragraph{DJW5: an explicit lower bound for every late Newton coefficient.}
+\label{claim:DJW5}
+For $s\ge1$ the coefficients in DJW4 satisfy
+\begin{equation}
+ v(a_s)\ge
+ \frac s8-r^2\bigl(3\log_p r+2\log_p s+h+3\bigr).
+ \label{djw:newtonbound}
+\end{equation}
+
+\begin{proof}
+Fix a term of $Z$-degree $k$ in $\Psi^s$.
+Its $X$-degree is $q(rs-k)$, so its contribution to $Q_s$ takes
+a coefficient of $E$ of bidegree $(qk,k)$.
+Differentiation in $Y$ contributes a multiindex factorial of
+degree $k$.  By DJW1 and DJW3 the resulting coefficient has
+valuation at least
+\[
+ ek+(s-k)_++\frac{k}{p-1}
+       -r^2(\log_p(rs)+1)-aqk-bk.
+\]
+The exact identity
+\[
+ qa+b=e+\frac1{p-1}-\frac{1+q^{-1}}8
+\]
+reduces this to
+\[
+ (s-k)_++\frac{k(1+q^{-1})}{8}
+       -r^2(\log_p(rs)+1)
+ \ge \frac s8-r^2(\log_p(rs)+1).
+\]
+For $k\le s$ use $s-k+k/8\ge s/8$; for $k\ge s$ use
+$k/8\ge s/8$.  Taking finite sums proves this lower bound for
+each coefficient of $Q_s$.
+
+The coefficients of $D^{qs}$ are integers.  Its factorial pairing
+with $Q_s$ involves only factorials of total degree $rqs$.
+DJW1 gives
+\[
+ v(\langle D^{qs},Q_s\rangle)
+ \ge \frac s8-r^2(\log_p(rs)+1)
+       +\frac{rqs}{p-1}-r^2(\log_p(rqs)+1).
+\]
+Subtract the upper bound \eqref{djw:capacity} with $m=qs$.
+Since $\log_pq=h$ and $r\le r^2$, the result is
+\eqref{djw:newtonbound}.  A zero coefficient or pairing has
+valuation $+\infty$ and causes no exception.
+\end{proof}
+% END DJW5
+
+% BEGIN DJW6
+\paragraph{DJW6: the stated numerical threshold is sufficient.}
+\label{claim:DJW6}
+Let
+\begin{equation}
+ S(p,h,r)=\left\lceil64r^2
+          \bigl(h+3+3\log_p(r+1)\bigr)\right\rceil
+          \qquad(r\ge1).
+ \label{djw:windowlength}
+\end{equation}
+The right side of \eqref{djw:newtonbound} is strictly positive
+for every integer $s\ge S(p,h,r)$.
+
+\begin{proof}
+Set $A=h+3+3\log_p(r+1)\ge4$ and $s_0=64r^2A$.
+The function
+\[
+ F(t)=\frac{t}{8r^2}-h-3-3\log_p r-2\log_p t
+\]
+has positive derivative for $t\ge s_0$:
+$1/(8r^2)-2/(t\log p)>0$ there.
+With $b_0=\log_p(r+1)$, direct substitution gives
+\begin{align*}
+ F(s_0)&\ge7A-4b_0-2\log_p64-2\log_pA\\
+       &>7A-\frac{4A}{3}-6-2A
+        =\frac{11A}{3}-6>0.
+\end{align*}
+We used $b_0\le A/3$, $\log_p64<3$ for $p\ge5$, and
+$\log_pA\le A$ for $A\ge1$.  Monotonicity and the ceiling
+now prove the assertion.
+\end{proof}
+% END DJW6
+
+% BEGIN DJW7
+\paragraph{DJW7: integral interpolation on every translated interval.}
+\label{claim:DJW7}
+Let $K$ be any field with an additive nonarchimedean valuation,
+$S\ge1$, and $a_s\in K$ with $a_0=1$ and $v(a_s)>0$ for
+every $s\ge S$.  For each $Y_0\ge0$, some
+$Y_0\le y<Y_0+S$ satisfies
+\[
+ v\left(\sum_{s=0}^{y}\binom ys a_s\right)\le0.
+\]
+This assertion does not require characteristic zero or a normalized
+prime.
+
+\begin{proof}
+The integer matrix
+$V_{ij}=\binom{Y_0+i}{j}$, $0\le i,j<S$, factors as $BC$,
+where $B_{ik}=\binom ik$ is lower triangular with diagonal one
+and $C_{kj}=\binom{Y_0}{j-k}$ is upper triangular with diagonal
+one.  The factorization is the elementary binomial convolution.
+Thus $V^{-1}$ has integer entries, over $\mathbb Z$ and after
+mapping to $K$.  Every integer has nonnegative valuation.
+
+If all $S$ values in question had positive valuation, their finite
+tails with $s\ge S$ would also have positive valuation.  Subtract
+those tails, treating $\binom ys$ as zero when $s>y$.
+The resulting vector of truncated sums is
+$V(a_0,\ldots,a_{S-1})^t$ and has every entry of positive valuation.
+Multiplication by $V^{-1}$ preserves this property, which would
+give $v(a_0)>0$.  This contradicts $v(1)=0$.
+\end{proof}
+% END DJW7
+
+% BEGIN DJW8
+\paragraph{DJW8: the full original short-window theorem.}
+\label{claim:DJW8}
+Under \eqref{djw:parameters}--\eqref{djw:hm2}, if $r\ge1$,
+each $Y_0\ge0$ admits $Y_0\le y<Y_0+S(p,h,r)$ with
+\begin{equation}
+ v(\Lambda_y)\le
+ ry\bigl((q+1)\gamma-1\bigr)+n(\log_p n+1).
+ \label{djw:thmp}
+\end{equation}
+If $r=0$, then $\Lambda_y=1$ for every $y\ge0$.
+This is the complete original
+\texttt{FormalSeriesBounds.ThmP}, including its zero-size conjunct.
+
+\begin{proof}
+For $r\ge1$, use DJW4--DJW7 to find a normalized value with
+valuation at most zero.  DJW1 then gives
+\begin{align*}
+ v(\Lambda_y)
+ &\le-ery+\frac{rqy}{p-1}+r(\log_pr+1)\\
+ &=ry\bigl((q+1)\gamma-1\bigr)+r(\log_pr+1)\\
+ &\le ry\bigl((q+1)\gamma-1\bigr)+n(\log_pn+1).
+\end{align*}
+The middle identity is $q/(p-1)-e=(q+1)p/(p^2-1)-1$.
+The last inequality follows from $1\le r\le n$ and monotonicity
+of the two nonnegative factors.
+
+For $r=0$ there are no variables.  The only monomial has right
+degree zero, so \eqref{djw:hm2} forces $U=0$.  Both determinant
+operators are identities and the exponential is one.  In particular
+we do not try to use a zero-length interval in this case.
+\end{proof}
+% END DJW8
+
+\subsection{The exact row identity}
+
+The next algebraic statements have a wider scope than DJW8.
+In this subsection $K$ is any characteristic-zero field, and the
+integers $l,i,n,r,y$ are arbitrary nonnegative integers with $r\le n$.
+There is no prime, valuation, oddness or separated-row hypothesis.
+For these general indices use the original integer
+\[
+ e_{l,i}=1+l\sum_{j<(i-1)/2}(l^2)^j,
+ \qquad q=l^i,\qquad c=-\bigl(l^{e_{l,i}}\bigr)^{-1},
+\]
+where the sum uses integer truncation and the field inverse is zero
+at zero.  This agrees with \eqref{djw:parameters} in the prime,
+odd-distance case.  Let $Z,W$ be independent $n$ by $n$ matrices.
+Restriction $\operatorname{res}_r$ sets every variable outside the
+leading $r$ by $r$ blocks to zero.
+
+For completeness the source defines a truncated coefficient operation
+on every series $H$, even one with nonzero constant term, by
+\[
+ \operatorname{E}(H)_A
+       =\sum_{j=0}^{|A|}[X^A]H^j/j!.
+\]
+When $H(0)=0$ this is the ordinary formal exponential.  We use
+the symbol $\operatorname{E}$ only to state its unrestricted
+restriction law precisely.
+
+% BEGIN DJW9
+\paragraph{DJW9: restriction, support and genuine formal exponentials.}
+\label{claim:DJW9}
+Restriction is a ring homomorphism and
+\[
+ \operatorname{res}_r\operatorname{E}(H)
+       =\operatorname{E}(\operatorname{res}_rH)
+\]
+for every $H$.  If $H(0)=H'(0)=0$, then
+$\exp(H+H')=\exp(H)\exp(H')$.
+Series supported on a specified subset of variables remain so under
+sum, product, powers and $\operatorname{E}$.  A substitution by
+series with zero constant term preserves order of vanishing and
+commutes with ordinary formal exponentiation of a zero-constant
+series.
+
+\begin{proof}
+The coefficient of a product is the finite sum over decompositions
+of its exponent.  An exponent supported in the retained variables
+can be decomposed only into exponents supported there.  This proves
+multiplicativity.  The retained exponent has the same degree in
+the small and large variable sets, so the upper limit $|A|$ in
+$\operatorname{E}$ is unchanged.  Applying multiplicativity to
+each $H^j$ proves the unrestricted restriction law.
+
+For zero-constant series, the coefficient of degree at most $N$
+in a power with exponent $>N$ is zero.  The usual binomial identity,
+divided by its factorial, therefore proves the exponential product
+identity by finite sums in every degree.  The assertions about
+support follow from the same coefficient decompositions.
+
+Under a zero-constant substitution a monomial of degree $d$ has
+no terms of degree less than $d$.  Hence to compute a coefficient
+of degree $N$ one may first truncate the substituted series and
+the exponential at degree $N$.  Both are then finite polynomial
+identities.  This proves the last two assertions without any
+topological hypothesis on $K$.
+\end{proof}
+% END DJW9
+
+% BEGIN DJW10
+\paragraph{DJW10: determinant coefficients with prescribed diagonal rows.}
+\label{claim:DJW10}
+Every monomial of $(\det Z)^A(\det W)^B$ has degree $A$ in
+each row of $Z$ and $B$ in each row of $W$.
+If in every row $\rho\ge r$ a monomial uses only the diagonal
+entries, with exponents $A$ and $B$, then its coefficient is the
+coefficient of its remaining exponent in
+$(\det Z_{<r,<r})^A(\det W_{<r,<r})^B$.
+In particular this coefficient vanishes if the remaining monomial
+uses a column $\ge r$.
+
+\begin{proof}
+Each permutation monomial of a determinant uses exactly one entry
+in each row and column.  Taking products proves the degree assertion.
+Set all off-diagonal entries in rows $\rho\ge r$ equal to zero.
+The resulting matrix is block upper triangular, with its lower
+diagonal entries on the diagonal of the lower block.  Its determinant
+is the leading-block determinant times their product, with sign $+1$.
+Raise to the stated powers and compare coefficients.
+Specialization kills precisely the monomials using a deleted variable,
+so it does not change any coefficient under consideration.  This
+argument proves the source's full \texttt{DetPowDiag} over every
+commutative coefficient ring, including $r=0$, $r=n$ and zero powers.
+\end{proof}
+% END DJW10
+
+% BEGIN DJW11
+\paragraph{DJW11: the full diagonal-block jet formula.}
+\label{claim:DJW11}
+Suppose $G$ uses only rows $\rho<r$ and $H$ only rows $\rho\ge r$.
+Assume that, among exponents having degree at most $A$ in each
+right-hand $Z$ row and at most $B$ in each right-hand $W$ row,
+the only nonzero coefficient of $H$ is
+\[
+ \prod_{\rho=r}^{n-1}Z_{\rho\rho}^{A}W_{\rho\rho}^{B},
+ \qquad\text{with coefficient }1.
+\]
+Then
+\begin{equation}
+ \langle(\det Z)^A(\det W)^B,GH\rangle
+  =(A!B!)^{n-r}
+    \langle(\det Z_{<r,<r})^A(\det W_{<r,<r})^B,
+                \operatorname{res}_rG\rangle.
+ \label{djw:blockjet}
+\end{equation}
+In particular this proves the full source \texttt{BlockJet} on taking
+$A=Ly$, $B=y$ for arbitrary $L,y\ge0$.
+
+\begin{proof}
+For a monomial in the differential polynomial, DJW10 fixes each
+row degree.  In the coefficient convolution of $GH$, the exponent
+on the last rows comes entirely from $H$.  It is therefore within
+the stated row-degree limits.  The hypothesis on $H$ forces exactly
+the displayed diagonal exponent, with coefficient one.
+DJW10 then identifies the polynomial coefficient on the first rows
+with its leading-block coefficient and discards any remaining extra
+columns.  The factorial of the complete exponent is the factorial
+of its first-block exponent times $(A!B!)^{n-r}$, since the supports
+are disjoint.  Summing gives \eqref{djw:blockjet}.
+This coefficient proof also covers empty blocks and $A=0$ or $B=0$;
+no differentiation by a positive number of variables was presumed.
+\end{proof}
+% END DJW11
+
+Let $H_\rho,T_\rho,T'_\rho\in K[[Z,W]]$ satisfy the five
+original \texttt{BiHyp} requirements:
+each $H_\rho$ uses only row $\rho$ and has zero constant term;
+for $\rho\ge r$, $T_\rho$ uses only that row's $Z$ variables
+and equals $Z_{\rho\rho}$ to degree one, while $T'_\rho$
+uses only that row's $W$ variables and equals $W_{\rho\rho}$
+to degree one; finally
+\begin{equation}
+ \operatorname{res}_r\sum_{\rho<r}H_\rho
+       =c\sum_{a,b<r}Z_{ab}^{q}W_{ab}+U.
+ \label{djw:biR3}
+\end{equation}
+Here ``equals to degree one'' includes equality of the constant
+and every linear coefficient, not just the indicated diagonal
+coefficient.  Define the literal row product
+\[
+ F_y=\prod_{\rho=0}^{n-1}
+       \left(\begin{cases}1,&\rho<r,\\
+           T_\rho^{qy}(T'_\rho)^y,&\rho\ge r
+       \end{cases}\right)\exp(H_\rho).
+\]
+
+% BEGIN DJW12
+\paragraph{DJW12: the literal row-value identity \texttt{BiValue}.}
+\label{claim:DJW12}
+For every $y\ge0$ and all the algebraic indices just specified,
+\begin{equation}
+ \langle(\det Z)^{qy}(\det W)^y,F_y\rangle
+       =((qy)!y!)^{n-r}\Lambda_y.
+ \label{djw:bivalue}
+\end{equation}
+The $\Lambda_y$ on the right is the original small-block series
+formed from the same $U$ in \eqref{djw:biR3}; neither of the
+valuation hypotheses \eqref{djw:hm1}--\eqref{djw:hm2} is needed
+for this identity.
+
+\begin{proof}
+Factor $F_y=GH$, where
+$G=\exp(\sum_{\rho<r}H_\rho)$ and $H$ is the product over
+the remaining rows.  DJW9 justifies this factorization and its
+row supports.  A nonzero monomial in $T_\rho^{qy}$ has
+$Z$-row degree at least $qy$, with equality only for
+$Z_{\rho\rho}^{qy}$ and coefficient one.  This follows by choosing
+the linear term from every factor; every other term has larger degree.
+The same statement holds for $(T'_\rho)^y$.
+Every monomial of $\exp(H_\rho)$ has nonnegative degrees on both
+sides, and its constant coefficient is one.  Thus, within the degree
+limits $qy,y$, the product on the last rows has exactly the diagonal
+coefficient required by DJW11.  A nonconstant exponential term cannot
+survive these limits.  This remains valid if either power is zero.
+
+Apply DJW11 and then DJW9.  The restricted first-row factor is
+\[
+ \operatorname{res}_rG
+   =\exp\left(\operatorname{res}_r\sum_{\rho<r}H_\rho\right)
+   =\exp\left(c\sum_{a,b<r}Z_{ab}^{q}W_{ab}+U\right).
+\]
+Its exponent has zero constant term because the left side of
+\eqref{djw:biR3} does.  The remaining jet is precisely $\Lambda_y$.
+This proves every quantifier of \texttt{BiValue}, including $r=0$,
+$n=0$, $l=0$ and $i=0$ when their algebraic data are supplied.
+\end{proof}
+% END DJW12
+
+Return now to the valued prime and odd-distance hypotheses of the
+first subsection.  For brevity write
+\[
+ B_r(y)=ry((q+1)\gamma-1)+n(\log_p n+1).
+\]
+
+% BEGIN DJW13
+\paragraph{DJW13: the exact factorial content loss.}
+\label{claim:DJW13}
+If $v(\Lambda)\le B_r(y)$, then
+\begin{equation}
+ v\bigl(((qy)!y!)^{n-r}\Lambda\bigr)
+       \le B_n(y)+\frac{(n-r)(q+1)y}{p-1}.
+ \label{djw:content}
+\end{equation}
+This is the full original \texttt{BiContent} for every scalar
+$\Lambda$ satisfying its bound.
+
+\begin{proof}
+DJW1 bounds the two factorial valuations by $qy/(p-1)$ and
+$y/(p-1)$.  Also
+\[
+ (q+1)\gamma-1\ge0,
+\]
+because $q\ge p$ and
+$(p+1)p/(p^2-1)>1$.  Hence $B_r(y)\le B_n(y)$.
+Add these inequalities using multiplicativity of the valuation.
+The assumed finite upper bound also excludes $\Lambda=0$;
+there is no subtraction of an infinite valuation.
+\end{proof}
+% END DJW13
+
+% BEGIN DJW14
+\paragraph{DJW14: \texttt{BiWindow} and \texttt{content\_and\_window}.}
+\label{claim:DJW14}
+Suppose $1\le r\le n$, $n-r\le(h+1)m$, and the literal
+\texttt{BiHyp} data satisfy \eqref{djw:hm1}--\eqref{djw:hm2}
+for their same $U$.  Every $Y_0\ge0$ has an index
+$Y_0\le y<Y_0+S(p,h,r)$ such that
+\begin{equation}
+ v\bigl(\langle(\det Z)^{qy}(\det W)^y,F_y\rangle\bigr)
+ \le B_n(y)+\frac{(h+1)m(q+1)y}{p-1}.
+ \label{djw:biwindow}
+\end{equation}
+Together with DJW13, this supplies the full original
+\texttt{content\_and\_window} theorem.
+
+\begin{proof}
+Choose $y$ by DJW8 for the small block.  Substitute the exact
+identity DJW12 and apply DJW13.  The final comparison replaces
+$n-r$ by $(h+1)m$ in a nonnegative expression.  This is exactly
+the source's \texttt{biWindow\_of} implication with both its
+inputs now proved; it adds no geometric premise.
+\end{proof}
+% END DJW14
+
+\subsection{The perturbation attached to the original normal form}
+
+We now fix the original datum
+$\mathcal X=\texttt{RowData}(K,V,d,I,J)$.
+Its field is algebraically closed of characteristic zero, $d>0$,
+and $V=(v,p)$ is the original valued-prime datum.
+There are two finite sets of tangent labels $I_0,I_1$, their
+Cartier data $G_0,G_1$, and the original leaf gauges
+\[
+ H_{g,\alpha,\alpha'}\in
+ K[[z_w:w\in I_0\amalg I_1]].
+\]
+The datum contains the assigned types, the ranks, integral pairings,
+Cartier identities, and comparison of integral-germ spaces between
+coordinate systems.  None of those fields is silently changed here.
+We use in particular its axis-vanishing property: a gauge coefficient
+supported on just one of the two sides is zero.  Thus each such
+gauge has zero constant term.
+
+The actual integers in this datum are denoted $n,j,j'$ and
+$m=j+j'$.  Fix $g\in\{0,1\}$, a type $\alpha\in\mathbb Z/d\mathbb Z$,
+and $h\ge0$.  Until DJW21, these algebraic constructions do not
+require $h$ odd or $p\ge5$.
+Put $q=p^h$ and use the original integer $e_{p,h}$ above.
+For row vectors $u_c$ on $I_g$ and $v_b$ on $I_{1-g}$ write
+\[
+ H(u,v)(x,y)=H_{g,\alpha,\alpha+h}
+       \left(\sum_cu_c x_c,\sum_bv_b y_b\right).
+\]
+This is the literal linear pullback of the given gauge, not a
+replacement series chosen for the estimate.
+
+Here is the exact normal-form premise used below.  The given arrays
+$U_0,U'_0$ each have $n$ rows.  An original
+\texttt{MConcl} consists of $0\le r\le n$, vectors $e_c$ for
+$c<r$, vectors $v'_b$ for $b<n$, and a matrix $\Phi$ of size
+$n$ by $r$, with the following properties:
+\begin{enumerate}
+\item $n\le r+(h+1)j'+j$.
+\item The $e_c$ are integral and have an integral right inverse:
+there is $w_{x,c}$ with
+$\sum_x e_{c,x}w_{x,c'}=\delta_{cc'}$.
+\item $e=A U_0$ for an integral $r$ by $n$ matrix $A$.
+\item $v'=Y U'_0$ for an integral $n$ by $n$ matrix $Y$ with
+$v(\det Y)=0$.
+\item $\Phi$ is integral and its first $r$ rows are $-I_r$.
+\item Every coefficient $R_{A,B}$ of
+\begin{equation}
+ R(x,y)=H(e,v')(x,y)
+        -p^{-e_{p,h}}\sum_{b<n,c<r}\Phi_{bc}x_c^q y_b
+ \label{djw:actualremainder}
+\end{equation}
+satisfies
+$v(R_{A,B})+a|A|+b|B|\ge1/(p-1)$, with weights
+\eqref{djw:weights} for the present $p,h$.
+\item $R_{A,0}=0$ for every $A$.
+\end{enumerate}
+These are exactly the original fields, with its first pair of
+integer inequalities separated for readability.  When $h=1$ the
+additional original \texttt{MPlusConcl} means
+$v(R_{A,B})\ge0$ whenever $|A|<p^2$ and $|B|<p$.
+Saturation here is the displayed integral right inverse; no
+Noetherian or discrete-valuation interpretation is substituted.
+
+% BEGIN DJW15
+\paragraph{DJW15: all four original perturbation conclusions.}
+\label{claim:DJW15}
+Restrict \eqref{djw:actualremainder} by setting $y_b=0$ for
+$b\ge r$ and denote the result by $R_0(x,y)$.
+For independent $r$ by $r$ matrices $Z,W$ put
+\begin{equation}
+ U(Z,W)=\sum_{\rho<r}R_0(Z_{\rho,*},W_{\rho,*}).
+ \label{djw:actualU}
+\end{equation}
+This is exactly
+\texttt{restrictedCurveSystemSeries} of the original normal form.
+It satisfies all of \texttt{MtoHM}:
+\begin{align}
+ \sum_{\rho<r}H(e,v'_{<r})(Z_{\rho,*},W_{\rho,*})
+   &=-p^{-e_{p,h}}\sum_{\rho,c<r}Z_{\rho c}^qW_{\rho c}+U,
+        \label{djw:actualmain}\\
+ v(U_{A,B})+a|A|+b|B|&\ge\frac1{p-1},\qquad U_{A,0}=0.
+        \label{djw:actualHM}
+\end{align}
+If $h=1$ and \texttt{MPlusConcl} holds, the decomposition
+\eqref{djw:actualU} has each summand supported in one row and
+integral in all bidegrees $|A|<p^2$, $|B|<p$.
+
+\begin{proof}
+The restriction is the substitution $y_b\mapsto0$ for $b\ge r$.
+It commutes with the actual linear pullback of the gauge by DJW9's
+coefficient argument.  Since the first $r$ rows of $\Phi$ are
+$-I_r$, it takes the explicit main term in
+\eqref{djw:actualremainder} to
+$-p^{-e_{p,h}}\sum_{c<r}x_c^qy_c$.
+Thus the restricted remainder is precisely the difference defining
+the original restricted series.  Substitute each row and sum to
+obtain \eqref{djw:actualmain}, including its negative sign.
+
+A coefficient of $R_0$ is exactly a coefficient of $R$ with zeros
+inserted in the deleted positions.  Its left and right total degrees
+are unchanged.  Hence it retains the weighted inequality and
+the first-axis vanishing of $R$.  Row substitution is an injective
+renaming of variables.  A coefficient in its image retains those
+same two degrees; a coefficient outside its image is zero.
+For a fixed matrix exponent, every summand in
+\eqref{djw:actualU} therefore has valuation at least the same
+number $1/(p-1)-a|A|-b|B|$.  The valuation inequality for finite
+sums proves \eqref{djw:actualHM}, even where several summands
+contribute or cancel.  First-axis coefficients vanish in every
+summand, proving the second assertion without relying on such
+cancellation.
+
+When $h=1$, use the additional coefficient bound on $R$ before
+restriction.  The two degree cutoffs are again unchanged by
+restriction and injective row renaming.  This proves the exact
+\texttt{HSeparatedRowSum} conjunct, with the displayed summands
+as its witnesses.  If $r=0$, the sum is empty and every assertion
+has the same literal meaning.  We have imposed neither the
+alternating-type condition nor oddness in proving this conversion.
+\end{proof}
+% END DJW15
+
+\subsection{Constructing the actual integral row tests}
+
+Write $\mathcal O=\{a\in K:v(a)\ge0\}$.
+The integral germs of a coordinate system $t=(t^g_x)$ are, by
+the original definition, the series
+\begin{equation}
+ \gamma\bigl((t^g_x)_{g,x}\bigr),\qquad
+       \gamma\in\mathcal O[[z_w:w\in I_0\amalg I_1]],
+ \label{djw:intgerm}
+\end{equation}
+where each $t^g_x$ is inserted into its own side of the disjoint
+variable set.  This definition does not assert that the coefficients
+of $t^g_x$ in logarithmic coordinates are themselves integral.
+
+% BEGIN DJW16
+\paragraph{DJW16: completing split integral rows without a discrete valuation.}
+\label{claim:DJW16}
+Suppose $A\in M_{r,n}(\mathcal O)$,
+$B\in M_{n,r}(\mathcal O)$ and $AB=I_r$.
+For every $r\le j\le n$ there are integral matrices
+$A_j\in M_{j,n}(\mathcal O)$ and $B_j\in M_{n,j}(\mathcal O)$
+with $A_jB_j=I_j$ and first $r$ rows of $A_j$ equal to $A$.
+For $j=n$ this gives inverse square matrices
+$\bar A,\bar B\in M_n(\mathcal O)$ and
+$v(\det\bar A)=v(\det\bar B)=0$.
+
+\begin{proof}
+It suffices to add one row to a split pair with $j<n$.
+Over $K$, the kernel of $A_j:K^n\to K^j$ contains a nonzero
+vector $u$.  Choose an index $k$ at which $v(u_k)$ is minimal.
+The finite minimum is finite, so $u_k\ne0$.
+Set $s_x=u_x/u_k$.  Every $s_x$ is integral, $s_k=1$, and
+$A_js=0$.  Define the new row
+\[
+ r_x=\delta_{kx}-\sum_{c<j}(B_j)_{kc}(A_j)_{cx}.
+\]
+It is integral.  Direct multiplication gives
+\[
+ rB_j=0,\qquad rs=1,\qquad A_js=0.
+\]
+Append $r$ to $A_j$ and append $s$ as a column to $B_j$.
+These three identities together with $A_jB_j=I_j$ prove that
+the enlarged matrices still multiply to the identity.
+Induction supplies every intermediate size, including the empty
+initial set of rows.
+
+For $j=n$, taking determinants gives
+$\det\bar A\det\bar B=1$.
+Both determinants are integral, so both have valuation zero;
+the matrices are inverses over $K$ and already have integral
+entries.  The proof used only a minimum in a finite list of
+valuations.  No uniformizer, completeness or residue-field
+finiteness is needed.  This proves the original
+\texttt{complete\_rows}, with all its intermediate sizes.
+\end{proof}
+% END DJW16
+
+% BEGIN DJW17
+\paragraph{DJW17: actual standard Cartier coordinates.}
+\label{claim:DJW17}
+For either original Cartier datum $G_g$ one can choose its system
+$S_g$ and its associated formal coordinates $t^g_x$ so that
+\[
+ (S_g).\mathrm{IsT}(t^g),\qquad
+ t^g_x=z_x+\text{terms of total degree at least two}.
+\]
+These choices depend on the datum, not on the later integer $y$.
+
+\begin{proof}
+The original Cartier axiom supplies a typed curve with any integral
+typed initial tangent vector.  Apply it to each standard basis vector.
+The resulting system has identity tangent matrix, hence unit
+determinant.  If $\alpha_{c,s,x}$ is its tangent-side coefficient
+at Cartier index $s$, then $\alpha_{c,0,x}=\delta_{cx}$.
+The coordinate equations are the formal equalities
+\begin{equation}
+ \sum_{s\ge0,c}\alpha_{c,s,x}(t_c)^{p^s}=z_x.
+ \label{djw:cartiercoord}
+\end{equation}
+For any fixed degree the sum is finite, since $p\ge2$ and the
+coordinates have zero constant term.  Separate the $s=0$ terms
+and write this as $t_x=z_x-Q_x(t)$, where every monomial of
+$Q_x$ has degree at least two.
+
+Starting from zero, iterate $t\mapsto z-Q(t)$.
+If two zero-constant tuples agree below degree $N$, their images
+agree below degree $N+1$.  Indeed each difference
+$u^a-v^a$ factors by $u-v$, and its remaining $a-1\ge1$
+factors have positive degree.  Thus every coefficient of the
+iterates stabilizes after finitely many steps.  The stabilized
+tuple solves \eqref{djw:cartiercoord}, and the same argument
+proves uniqueness among zero-constant tuples.  Its degree-one
+part is $z$.
+
+Taking coefficients in \eqref{djw:cartiercoord} gives precisely
+the source's finite equation \texttt{Sys.IsT}; terms with
+$p^s$ above the coefficient degree vanish.  This constructs the
+actual systems and coordinates rather than merely positing a
+formal change of variables.
+\end{proof}
+% END DJW17
+
+% BEGIN DJW18
+\paragraph{DJW18: linear substitution and the ordinary differential pairing.}
+\label{claim:DJW18}
+Let $L:z\mapsto w$ be a linear substitution between finite sets
+of formal variables over a characteristic-zero field.  For every
+polynomial $P$ in the $z$ variables and every series $F$ in the
+$w$ variables,
+\begin{equation}
+ \langle P,F\circ L\rangle
+       =\langle P(L^t\partial_w),F\rangle.
+ \label{djw:linearjet}
+\end{equation}
+Here the right side means the polynomial obtained by replacing
+each differential letter $\partial_{z_j}$ by
+$\sum_iL_{ij}\partial_{w_i}$.  If, row by row, a square matrix
+of these letters becomes $P_0A^t$, its determinant becomes
+$\det A\det P_0$.
+
+\begin{proof}
+For one derivative the coefficient formula for substitution gives
+the ordinary chain rule
+$\partial_{z_j}(F\circ L)
+=\sum_iL_{ij}(\partial_{w_i}F)\circ L$.
+It is enough to check this on monomials; the factorial coefficients
+agree directly.  Iterate the identity and set $z=0$, then extend
+linearly over $P$.  In every prescribed degree all calculations
+involve finite polynomials, so the argument applies to formal
+series.  Determinant multiplicativity gives the last assertion.
+In particular the scalar is $\det A$, not its inverse.  This
+orientation will fix the exact scalar in the actual row value.
+\end{proof}
+% END DJW18
+
+For the rest of the construction take injective maps
+$\iota:[n]\hookrightarrow I_g$ and
+$\iota':[n]\hookrightarrow I_{1-g}$, and specialize the
+given normal form to
+\[
+ (U_0)_{b,x}=\delta_{x,\iota(b)},\qquad
+ (U'_0)_{b,x}=\delta_{x,\iota'(b)}.
+\]
+These are the same selected letters as in the original
+\texttt{block\_of\_normal\_form} theorem.  No further
+type or alternating hypothesis is needed once this original
+normal form is supplied.
+
+% BEGIN DJW19
+\paragraph{DJW19: the actual row substitution and all five \texttt{BiHyp} fields.}
+\label{claim:DJW19}
+For the given normal form, there are systems $S_g$, coordinates
+$t^g$, row exponents $H_\rho$ and row coordinates
+$T_\rho,T'_\rho$ satisfying the original \texttt{BiHyp} with
+the exact perturbation \eqref{djw:actualU}.
+All these objects are chosen before $y$.
+
+\begin{proof}
+Let $w$ be the integral right inverse of $e$ in the normal form.
+The matrix $B_{b,c}=w_{\iota(b),c}$ satisfies $AB=I_r$:
+substitute $e_{c,x}=\sum_bA_{cb}\delta_{x,\iota(b)}$ in
+$\sum_xe_{c,x}w_{x,c'}=\delta_{cc'}$.
+Apply DJW16 to obtain square inverse matrices $\bar A,\bar B$
+extending the first $r$ rows of $A$.
+Also put $Z_0=Y^{-1}$.  It is integral because the adjugate of
+the integral matrix $Y$ is integral and $v(\det Y)=0$.
+Define
+\[
+ E_{c,x}=\sum_b\bar A_{cb}\delta_{x,\iota(b)}.
+\]
+Its first $r$ rows are $e$.  Moreover
+$E_{c,\iota(b)}=\bar A_{cb}$ and
+$v'_{c,\iota'(b)}=Y_{cb}$, by injectivity of the selected letters.
+Choose the standard systems and coordinates from DJW17.
+
+For each $\rho<n$, the actual row substitution is
+\begin{align*}
+ z_{(g,x)}&\longmapsto\sum_cE_{c,x}Z_{\rho c},\\
+ z_{(1-g,x)}&\longmapsto\sum_cv'_{c,x}W_{\rho c}.
+\end{align*}
+Call it $L_\rho$, and define
+\begin{align*}
+ H_\rho&=H_{g,\alpha,\alpha+h}\circ L_\rho,\\
+ T_\rho&=
+ \left(\sum_b\bar B_{b\rho}t^g_{\iota(b)}\right)
+       \left(z_x=\sum_cE_{c,x}Z_{\rho c}\right),\\
+ T'_\rho&=
+ \left(\sum_b(Z_0)_{b\rho}t^{1-g}_{\iota'(b)}\right)
+       \left(z_x=\sum_cv'_{c,x}W_{\rho c}\right).
+\end{align*}
+Every substituted variable has zero constant term, so these formal
+substitutions are defined.
+
+The first series uses only row $\rho$ and has constant term zero,
+by the axis-vanishing of the original gauge.  The second uses only
+the left side of that row.  Its degree-one part is
+\[
+ \sum_{b,c}\bar B_{b\rho}E_{c,\iota(b)}Z_{\rho c}
+       =\sum_c(\bar A\bar B)_{c\rho}Z_{\rho c}
+       =Z_{\rho\rho}.
+\]
+Every higher term of $t$ remains of degree at least two under
+linear substitution.  The analogous computation with $YZ_0=I$
+gives the precise right diagonal coordinate.
+
+Finally restrict $\sum_{\rho<r}H_\rho$ to the leading blocks.
+The first $r$ rows of $E$ are $e$, and the surviving right
+columns are exactly $v'_{<r}$.  Thus the restricted sum is the
+left side of \eqref{djw:actualmain}.  DJW15 identifies it with
+the required main term plus the very same $U$.
+This proves all five \texttt{BiHyp} fields, including the exact
+restriction equality.  No choice in this construction depends
+on a derivative order or a window origin.
+\end{proof}
+% END DJW19
+
+To state the final value identity, use independent ambient variables
+$z_{\rho,w}$ for $\rho<n$ and $w\in I_0\amalg I_1$.
+Let
+\[
+ D_g=\det(z_{\rho,(g,\iota(c))})_{\rho,c<n},\qquad
+ D_{1-g}=\det(z_{\rho,(1-g,\iota'(c))})_{\rho,c<n},
+ \qquad P_y=D_g^{qy}D_{1-g}^{y}.
+\]
+These are the original selected-letter determinants.  The actual
+row value for germs $f_\rho$ is
+\begin{equation}
+ \mathcal V_y(f)=
+ \left\langle P_y,
+  \prod_{\rho<n}f_\rho(z_{\rho,*})
+              \exp H_{g,\alpha,\alpha+h}(z_{\rho,*})\right\rangle.
+ \label{djw:actualvalue}
+\end{equation}
+Thus its row-kind is the same
+$\operatorname{some}(g,\alpha,\alpha+h)$ in every row.
+
+% BEGIN DJW20
+\paragraph{DJW20: integral germs and the exact original value comparison.}
+\label{claim:DJW20}
+For every $y\ge0$, there are actual germs
+$f_{\rho,y}\in\operatorname{IntGerm}(V,t)$ such that
+\begin{equation}
+ \langle(\det Z)^{qy}(\det W)^y,F_y\rangle
+   = (\det\bar A)^{qy}(\det Y)^y\,
+                     \mathcal V_y(f_{*,y}).
+ \label{djw:exactscalar}
+\end{equation}
+The scalar has valuation zero.  In particular
+\begin{equation}
+ v(\mathcal V_y(f_{*,y}))
+ \le v\bigl(\langle(\det Z)^{qy}(\det W)^y,F_y\rangle\bigr),
+ \label{djw:actualcomparison}
+\end{equation}
+with equality for the displayed witnesses.  DJW19 and this statement
+are the full original \texttt{block\_of\_normal\_form} conclusion
+for its supplied normal form and restriction identity.
+More generally, for every supplied $h_1$ whose main-term expression
+equals the same restricted gauge, the construction satisfies
+\texttt{BiHyp} and \eqref{djw:exactscalar} with that $h_1$;
+no weighted estimate on $h_1$ is needed for this statement.
+
+\begin{proof}
+Define integral polynomials on the original tangent-label variables by
+\[
+ \gamma_{\rho,y}(z)=
+ \begin{cases}
+ 1,&\rho<r,\\[2pt]
+ \displaystyle
+ \left(\sum_b\bar B_{b\rho}z_{(g,\iota(b))}\right)^{qy}
+ \left(\sum_b(Z_0)_{b\rho}z_{(1-g,\iota'(b))}\right)^y,
+      &\rho\ge r.
+ \end{cases}
+\]
+All their coefficients lie in $\mathcal O$: their linear
+coefficients do, and this ring is closed under finite sums and
+products.  Put $f_{\rho,y}=\gamma_{\rho,y}(t)$ with the same
+coordinate system chosen in DJW19.  Formula \eqref{djw:intgerm}
+proves their required integrality in the original sense.
+
+Apply the row substitutions $L_\rho$ simultaneously to the series
+inside \eqref{djw:actualvalue}.  By construction each
+$f_{\rho,y}$ becomes the corresponding coordinate powers in $F_y$,
+and its gauge becomes $H_\rho$.  DJW9 permits composition of the
+zero-constant substitutions and commutation with the exponential.
+Thus the substituted product is exactly $F_y$.
+
+Apply DJW18 to its derivative polynomial.
+The matrix of left derivative letters is the selected-letter
+matrix multiplied on the right by $\bar A^t$, and the right
+one is multiplied on the right by $Y^t$.  Their determinants
+therefore contribute $\det\bar A$ and $\det Y$, respectively.
+Taking the powers $qy$ and $y$ proves \eqref{djw:exactscalar}.
+Both determinants have valuation zero, by DJW16 and the normal-form
+premise.  Taking valuations gives the equality and hence
+\eqref{djw:actualcomparison}, even when the value is zero.
+
+For the literal source theorem, the supplied series $h_1$ need
+only satisfy its displayed restriction identity, rather than be
+named by \eqref{djw:actualU}.  The construction just given uses
+that identity in DJW19 and no other property of $h_1$.
+Consequently it proves the source's full statement for every such
+$h_1$, not only for our canonical choice.  The canonical choice
+is used in DJW21 to obtain the weighted estimates from DJW15.
+\end{proof}
+% END DJW20
+
+% BEGIN DJW21
+\paragraph{DJW21: a short window on the actual theta-row data.}
+\label{claim:DJW21}
+Assume now $p\ge5$, $h$ odd and $n\ge1$, and keep the original
+normal form and selected letters of DJW19.
+There is one choice of the original systems $S$ and coordinates
+$t$, before any $y$ or $Y_0$, with the following property.
+Zero is an admissible order, and every $Y_0\ge0$ has
+$Y_0\le y<Y_0+S(p,h,n)$ and integral germs $f_{\rho,y}$ with
+\begin{equation}
+ v(\mathcal V_y(f_{*,y}))\le
+ \begin{cases}
+ 0,&y=0,\\[2pt]
+ \displaystyle
+ ny((q+1)\gamma-1)+n(\log_p n+1)
+       +\frac{(h+1)m(q+1)y}{p-1},&y>0.
+ \end{cases}
+ \label{djw:actualwindow}
+\end{equation}
+This is the original \texttt{Windows} conclusion on the actual
+selected-letter polynomial and its exact \texttt{blockBd},
+conditional only on the stated original normal-form premise.
+
+\begin{proof}
+Use DJW15 to supply both weighted hypotheses for the exact $U$,
+and DJW19--DJW20 for the actual coordinate and germ comparison.
+The normal-form rank inequality gives
+\[
+ n-r\le(h+1)j'+j\le(h+1)(j+j')=(h+1)m.
+\]
+If $r\ge1$, DJW14 supplies a suitable $y$ in a window of length
+$S(p,h,r)$.  This is at most $S(p,h,n)$, since $r^2$ and
+$h+3+3\log_p(r+1)$ are nonnegative increasing functions of $r$.
+Combine its estimate with \eqref{djw:actualcomparison}.
+
+If $r=0$, take $y=Y_0$ itself.  DJW8 gives $\Lambda_y=1$,
+and DJW12--DJW13 give the same bound after the factorial loss.
+The required interval has positive length because $n\ge1$.
+The hypothesis on the scalar in DJW13 holds since
+$B_0(y)=n(\log_p n+1)\ge0$.
+
+In both cases the case $y=0$ deserves its exact value rather than
+the rough logarithmic bound.  The polynomial $P_0$ is one, each
+$\gamma_{\rho,0}$ and $f_{\rho,0}$ is one, and every gauge
+has zero constant term.  Formula \eqref{djw:actualvalue} is
+therefore $\mathcal V_0=1$, of valuation zero.  The same argument
+shows explicitly that order zero belongs to the admissible set,
+as required by \texttt{Windows}.  All systems and coordinates
+were fixed before the order was selected.  This proves the exact
+window and its original quantifier order.
+\end{proof}
+% END DJW21
+
+\subsection{The next join and the retained normal-form construction}
+
+The original \texttt{window\_letterDet} theorem first obtains the
+normal form from \texttt{RowData.LemmaM}.  The theorem proved here
+begins with that exact normal form and constructs every remaining
+object explicitly.  Thus, once that original existence theorem is
+supplied, DJW21 applies to the same selected letters and proves its
+window.  In the alternating setting, an odd shift changes which
+side is big.  Hence both selected type spaces have rank at least
+$n$, and the first $n$ letters of either original flag give the
+injective selections used above.  Their indicator rows are saturated:
+the transpose indicators are an integral right inverse.  Renaming the
+leading minors as these selected-letter determinants gives the two
+original flag versions of \texttt{BiSupply}.
+
+This last description is a conditional assembly, not a claim that
+the normal form has now been constructed.  Its original producer
+\texttt{RowDataMainTermNormalFormAndLevelOne} uses the adapted
+Cartier-chain construction, residue rank estimates, a pairing-kernel
+estimate, the weighted gauge remainder, and first-axis vanishing.
+Those are the exact upstream tasks retained here.  In particular the
+arbitrary series used in the first part has been replaced in the
+application by the prescribed restricted gauge, but the common global
+theta family and its geometric realization have not been chosen by
+this chapter.  The previously closed
+\texttt{GLOBAL\_LOCAL\_GAIN} is not reopened or counted as a new
+whole closure.
+
+\paragraph{Exact source map.}
+All paths below are relative to \path{src/} at the stated source
+pin.  The metadata records the exact line ranges and byte hashes.
+\begin{itemize}
+\item The formal series, integer exponent and derivative conventions
+are in
+\path{Formalism/IncomingBounds/StatementThmP.lean}, lines 8--42.
+The targeted theorem is the distinct, precise
+\nolinkurl{Formalism.L2.FormalSeriesBounds.ThmP} in
+\path{Formalism/LocalToGlobal/CharacterGerms/}
+\path{BiadditiveInSingleVariables.lean}, lines 108--114.
+Its row interfaces are at lines 179--224.
+\item The window calculation and literal content/window assembly are
+in \path{Development/AbelianVarietyTheory/Proofs/UnramifiedDepth/}
+\path{SumEqOfIsHomogeneous.lean}, especially lines 771--954 and
+961--1085.  The row identity is proved in
+\path{BlockValueOnRowsEq.lean}, lines 477--596, using
+\path{DetPowDiagonalRowsBlockJetRestrict.lean}.
+\item The exact normal-form and restricted-series definitions are in
+\path{Formalism/LocalToGlobal/CharacterGerms/}
+\path{LatticeInclusionFormsInjective.lean}, lines 83--166.
+\path{MainTermImpliesRowHypothesis.lean}, lines 145--194, proves
+the full conversion reconstructed in DJW15.
+\item The integral completion and differential substitution are in
+\path{ConstantCoeffSubstSame.lean}, especially lines 275--350.
+The complete actual row construction is
+\path{BlockOfNormalForm.lean}, lines 317--434.
+The consumer is \path{OddLevelBlockBoundAttained.lean},
+lines 89--147, followed by its two flag installations.
+\end{itemize}
+
+\paragraph{Published identity and attribution.}
+The accepted classical input is S. Caracciolo, A. D. Sokal and
+A. Sportiello, \emph{Algebraic/combinatorial proofs of Cayley-type
+identities for derivatives of determinants and pfaffians},
+Advances in Applied Mathematics \textbf{50} (2013), 474--594,
+Theorem 2.1; arXiv:1105.6270, version 2, page 7.
+The adjoint-functor reader supplied the useful short organization of
+the local window calculation.  The original mathematical argument,
+definitions and target results are attributed to Alp\"oge and Claude.

@@ -1,0 +1,257 @@
+COMMON GLOBAL FRAME AND THE ACTUAL COMPANION LATTICES (SF1--SF7)
+RH/Dirichlet-GRH readable reconstruction, version 0.13
+Source commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+
+Scope
+=====
+This component reconstructs the global-frame algebra left open in LI5 and
+the first four priority-one targets in v0.12. It gives a single matrix B
+over the original host CM field, not unrelated local bases. It proves the
+actual companion-lattice identity from the source's literal base lattice
+and carrier identities. No Lean source is changed and no new kernel replay
+or full build is asserted.
+
+The supplied-data boundary is essential. We work with the same true-column
+record I, its Ok/Pins/Laws/Later data, and the forms F, Hermitian columns H
+and level-prime data A satisfying the source's StdF/StdLvC/CarH/CarT
+conditions. Their full existence is not proved here. In particular we do
+not infer all these structures just because their lattice components have
+an elementary form. The source supplies the entire structures through
+colsTiedSym_std and its imports. We reconstruct the specific matrix and
+companion consequences, which are then available with no further global
+orthonormalization or patching assumption.
+
+Notation and convention
+=======================
+Let E be the host CM field, O its ring of integers, F the maximal real
+subfield, and conjugation the host involution. In a specified coordinate
+map c:V -> E^n write h_J(x,y)=conjugate(x)^t J y. Thus conjugation is on the
+first variable and the Hermitian dual is
+
+  L# = { y : h_J(x,y) is in O for every x in L }.
+
+This is an O-submodule, since h_J is O-linear in y. Accordingly the explicit
+O-span of dualSet used by the source is precisely L#. This dual uses
+E-valued integrality. It is not a trace dual; no inverse different is being
+silently introduced. The host involution preserves O because it preserves
+monic equations over Z.
+
+SF1. A global orthonormal integral basis gives the required matrix
+================================================================
+Assume b_1,...,b_n is an E-basis with h(b_i,b_j)=delta_ij and L0=O-span(b).
+Let B be the matrix with columns c(b_i). It is invertible because c maps
+a basis to a basis. Its conjugate-Gram identity is entrywise:
+
+  (B* J B)_ij = h_J(c(b_i),c(b_j)) = h(b_i,b_j) = delta_ij.
+
+If v=sum_i a_i b_i, then c(v)=B a, so a=B^-1 c(v). Consequently
+
+  c(L0)=B O^n,    x in c(L0) iff every coordinate of B^-1 x is integral.
+
+This proves the literal StdB predicate. The source's coordinate space
+uses N(0), while B is indexed by R.k. The given equality N(0)=R.k induces
+one permutation/reindexing. Applying it to both indices of the matrix
+and to vector indices transports B, B^-1, the Gram identity and the
+integrality statement. No lattice denominator or extra arithmetic choice
+is produced by this reindexing.
+
+Source: TieStd.stdB_core, hermitian_form_frame_coordinates, exists_stdB,
+exists_stdB_of_tied; ComparisonMaps/TiedRec.StdB.
+
+SF2. The actual positive spaces and their coordinate assertions
+==============================================================
+I.Ok.spaces is the DiagSpaces condition. It explicitly identifies X_i
+with Examples2.posSpace in rank N(i), and X' with the positive space in
+rank N(m)-1. These spaces have form sum conjugate(x_j)y_j, canonical
+coordinate frame, and standard integral lattice. Direct evaluation on
+coordinate vectors gives all Gram entries. The lattice statement follows
+by expressing a vector in the same basis. Therefore StdTied, gramN=1,
+gramP=1 and the coordinatewise integer criterion are proved for I.rec7.
+
+One can use B=1 at level zero. This is stronger than needing an unspecified
+global change of basis, but it does not identify the independently chosen
+local bases from LI5 with 1. Those local bases must still be replaced;
+SF5--SF6 make that change and check the exact lattice axiom.
+
+The Pins.iX field sends corresponding initial coordinate vectors to one
+another. Expanding an arbitrary vector in the basis proves x -> (x,0).
+For each representative class c, latAt is defined as inverse coordinate
+image of the original representative's lattice. Forward transport cancels
+the inverse, proving literal equality with that lattice. The relevant
+frame set and determinant functions use the identity equivalence. Thus
+the result does not discard decorations, change representatives or replace
+a class lattice by an isomorphic unrelated lattice.
+
+Only the spaces part of Ok and the stated Pins field enter these elementary
+calculations, but the full source theorem is quantified over the supplied
+Laws and Later records so that I.rec7 is defined. Their existence remains
+part of the global-construction boundary.
+
+SF3. Exact diagonal dual and companion
+=====================================
+For n>=1 and nonzero pi in O, take
+
+  L_pi = O e_1 + ... + O e_(n-1) + pi O e_n.
+
+For y in L_pi#, evaluation on e_i (i<n) gives y_i in O, and evaluation
+on pi e_n gives conjugate(pi)y_n in O. Conversely these conditions imply
+integrality of the pairing with every vector of L_pi. Hence
+
+  L_pi# = O^(n-1) direct-sum conjugate(pi)^-1 O,
+  L_pi + conjugate(pi)L_pi# = O^n.
+
+The last equality can be proved by a literal decomposition, so does not
+depend on a dimension or index calculation: for x integral, write
+
+  x = (x_1,...,x_(n-1),0) + conjugate(pi)(0,...,0,x_n/conjugate(pi)).
+
+The first vector belongs to L_pi, the second vector before multiplication
+belongs to L_pi#. Conversely both full summands are integral. When n=0
+all the relevant modules are zero. When n>0 the actual norm relation
+pi conjugate(pi)=T, with T prime, guarantees pi nonzero. There is no step
+assuming a prime generator is a unit.
+
+The same coordinate formulas prove L_pi subset O^n subset L_pi# and
+T L_pi# subset L_pi. At bad primes dividing T the first containment can
+remain strict after localization; the frame replacement is asserted only
+where p does not divide T.
+
+SF4. Transport to the actual column data
+=======================================
+The following is the complete lattice-level join in the code.
+
+  item                         exact source field or definition
+  ---------------------------  -----------------------------------------
+  baseL(n,pi)                  integer coordinates, last divisible by pi
+  F_u's level-zero lattice     StdF.ends -> Reads.lb
+  H_u's level-zero lattice     CarH.car0.Lb_eq, with N(0)=R.k reindexing
+  interior chart lattice       StdF.mid -> Reads.lb -> CarH.carC.Lb_eq
+  terminal chart lattice       StdF.ends -> Reads.lb -> CarH.carM.Lb_eq
+  terminal chart uniqueness    H.Ch_m
+  actual generator             CarT.piU followed by StdF.piU
+  generator nonzero            X.piT_norm and B.T_prime
+  actual conjugation           CM involution = host conjugation
+  Gram and standard lattice    SF2 / spaces_in_coordinates
+
+Every rank reindexing preserves the ordinal of a coordinate. In particular
+the condition j.val+1=rank remains exactly the last-coordinate condition;
+it is not a cyclic rotation or an arbitrary permutation of the distinguished
+coordinate. Thus the inherited lattice is precisely L_(pi_u), not just a
+finite-index sublattice with the same covolume.
+
+Applying SF3 at zero and at every higher chart proves the source's
+SymmetricBaseCompatibility. This is the chart-indexed version of BaseTied;
+the two predicate names should not be conflated. Their level-zero clauses
+are the same. Choosing the integral ideal a_u=(conjugate(pi_u)) yields
+the actual Companion assertion for H.lev0:
+
+  L_u + a_u L_u# = L0.
+
+The choice of ideal is legal because conjugation preserves algebraic
+integrality. The source's companion_of_baseTied and companion_of_colsHermS
+make exactly this choice. Higher-level chart identities are also proved,
+although the common-frame application needs only the zero-level clause.
+
+This proof uses only the lattice/generator fields of supplied standard
+forms and carriers. It does not use the residual functionals or their
+uniformizer-annihilation condition h_pi. The latter is needed elsewhere
+in herm_rest_tied to construct the simultaneous full level-zero package.
+We do not treat that larger theorem as proved merely by proving its
+SymmetricBaseCompatibility output.
+
+SF5. The literal projected localized lattice
+============================================
+Fix a split place v of F and the LI splitting
+
+  phi:E tensor_F K -> K x K,  K=F_v,
+  phi(1 tensor a)=(a,a),  j(x)=first(phi(x tensor 1)).
+
+Let R be the completed integer ring. An element of O is integral over Z,
+so j(O) is in R, since R is integrally closed. The integral tensor subring
+intV is generated by O tensor 1 and 1 tensor R; its first projection lies
+in R, and it contains every diagonal scalar 1 tensor r. Hence
+
+  first(locL_v L) = R-span j(L).
+
+This restates the exact LI5 equality for the same splitting. It can also
+be verified directly by induction on span: an integral tensor scalar
+projects into R, and every R-linear combination lifts using diagonal
+tensor scalars. No completion/density argument is needed here.
+
+Now suppose L subset B O^n, N B e_i in L for all i, and N is a unit in R.
+Forward inclusion into j(B)R^n follows from integrality of B^-1 L.
+For t with u=j(B)^-1 t integral, the finite sum
+
+  sum_i [1 tensor (u_i/N)] * [image of N B e_i]
+
+belongs to locL_v L and has first projection t. Its coefficients are in
+the allowed integral tensor subring because N^-1 is in R. This is a
+witness for the existential membership predicate in LocId.fr_lat, not
+just a cardinality argument. It proves the full biconditional.
+
+SF6. Simultaneous replacement by base changes of B
+==================================================
+For a general supplied ColLevel, Lb_int gives L subset L#, and Lb_dual
+gives T L# subset L. The latter condition is stated on the dual set and
+extends to its O-span by sums and scalar multiplication. Since a_u is
+an integral ideal, a_u L# subset L#. Therefore the companion identity
+gives the sandwich
+
+  L subset L0=B O^n subset L#,   T B e_i in L.
+
+If p does not divide T, Bezout aT+bp=1 shows T is a unit at every v|p.
+Use SF5 with N=T. Retain the prior local identification's completion,
+splitting, field isomorphism, lattice and prime labels. Change only fr
+to j_v(B). The only affected structure axiom is fr_lat, just proved.
+
+In particular iw is unchanged by definition. All equations in LI4 and
+LI6 use iw, the prescribed coefficient embedding, the fixed Frobenius
+orbit representatives, and the same splitting/completion; none depends
+on the discarded arbitrary frame. Their c^s parity and valuation
+normalization therefore persist without another choice. This is exactly
+LocId.withFr, locIdStd, locIdStd_fr and locIdStd_iw.
+
+The B in this argument depends only on the one fixed global reference
+space and lattice. It does not depend on u, the auxiliary rational prime
+p, a coefficient place above p, a real-subfield place v, or a Frobenius
+position. No assertion is made that B is uniform across different choices
+of the entire arithmetic host/parameter construction.
+
+SF7. Endpoint and remaining inputs
+==================================
+For the supplied true-column data specified above we have simultaneously:
+
+  (1) StdTied, and a common B satisfying StdB;
+  (2) the actual Companion identity for each word's level-zero lattice;
+  (3) local identifications with fr=j_v(B), retaining all LI identities.
+
+The literal positive-coordinate specialization may take B=1. For a fixed
+noncanonical coordinate map the basis-matrix construction in SF1 gives
+the same conclusion with its appropriate B.
+
+This supplies the frame part required by CmpTied, but CmpTied also contains
+the comparison-map/representation identity. That latter identity is not
+proved by this component. The separate class-rank and comparison-span
+components must supply their own maps and hypotheses.
+
+Remaining supplier: ExistsStandardColumnComparisonsTrueColumns.colsTiedSym_std
+constructs standard forms F, Hermitian columns H, level-prime data A, their
+CarH/CarT identifications, level-zero residue functionals, additive
+characters, and all simultaneous compatibility. Its proof calls the
+standard-form, Hermitian-column and level-prime constructions. We have
+reconstructed the positive-space and actual companion outputs but have
+not replaced those entire constructions by self-contained proofs.
+
+Accordingly a continuation should either reconstruct those remaining
+standard-column constructors or clearly use them as existing source
+inputs. It must not relabel them as consequences of SF1--SF7. The original
+host/point/parameter, theta/spectral, metric, cohomological and prime-window
+branches retain their precise prior status.
+
+Source integrity
+================
+build_provenance.py enumerates the exact source declarations used here,
+hashes their unmodified full files and inclusive declaration ranges, and
+compares the files with Git blobs at the pinned commit. The ledger's
+statement/assumption fields define the claim boundaries. No replacement
+argument in this report has itself been formalized in Lean.

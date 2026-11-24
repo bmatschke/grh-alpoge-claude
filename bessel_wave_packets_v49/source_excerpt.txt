@@ -1,0 +1,2811 @@
+[BWP_groups_01] src/Formalism/FormalDegreeBessel/StatementG.lean:7-50
+Range SHA256 e9366511063173af7dd511be2f4a210017a0926715623dc7957355016c289400
+namespace Formalism.QuantumDeterminants
+
+def herm {ι : Type*} [Fintype ι] (H : Matrix ι ι ℂ) (v w : ι → ℂ) : ℂ := star w ⬝ᵥ (H *ᵥ v)
+
+def UH {ι : Type*} [Fintype ι] [DecidableEq ι] (H : Matrix ι ι ℂ) : Set (Matrix ι ι ℂ) :=
+  {g | gᴴ * H * g = H}
+
+def eI (k r : ℕ) (a : Fin r) : Fin (2 * r + k + 1) := ⟨a.val, by omega⟩
+
+def wI (k r : ℕ) (j : Fin (k + 1)) : Fin (2 * r + k + 1) := ⟨r + j.val, by omega⟩
+
+def esI (k r : ℕ) (a : Fin r) : Fin (2 * r + k + 1) := ⟨2 * r + k - a.val, by omega⟩
+
+def Hpk (k r : ℕ) : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ := fun i j =>
+  if i.val < r ∧ i.val + j.val = 2 * r + k then 1
+  else if j.val < r ∧ i.val + j.val = 2 * r + k then 1
+  else if r ≤ i.val ∧ i.val ≤ r + k ∧ i = j then (if i.val = r + k then -1 else 1)
+  else 0
+
+def bvec {m : ℕ} (i : Fin m) : Fin m → ℂ := Pi.single i 1
+
+def inWb (k r : ℕ) (v : Fin (2 * r + k + 1) → ℂ) : Prop :=
+  ∀ i : Fin (2 * r + k + 1), (i.val < r ∨ r + k < i.val) → v i = 0
+
+def Tz (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) : ℝ := -(herm (Hpk k r) z z).re
+
+def Nset (k r : ℕ) : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
+  {g | g ∈ UH (Hpk k r) ∧
+    (∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val →
+      g i (eI k r a) = if i = eI k r a then 1 else 0) ∧
+    (∀ i j : Fin (2 * r + k + 1), r ≤ j.val → j.val ≤ r + k → r ≤ i.val →
+      g i j = if i = j then 1 else 0)}
+
+def UWset (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) :
+    Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
+  {g | g ∈ UH (Hpk k r) ∧
+    (∀ a : Fin r, g *ᵥ bvec (eI k r a) = bvec (eI k r a) ∧ g *ᵥ bvec (esI k r a) = bvec (esI k r a)) ∧
+    g *ᵥ z = z}
+
+def Sset (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) :
+    Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :=
+  {s | ∃ h ∈ UWset k r z, ∃ m ∈ Nset k r, s = h * m}
+
+def ell (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
+
+
+[BWP_groups_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/HidaSetting.lean:24-65
+Range SHA256 ee9ae872e5aaa3d8e4ed2f1a94d840c81d84f7a405e0e8f92e1aef81898c30bd
+def hJ (ε : Fin n → Bool) (x y : Fin n → ℂ) : ℂ := star x ⬝ᵥ (Formalism.REAL.Jm ε *ᵥ y)
+
+def spanLt (e : Fin r → Fin n → ℂ) (a : ℕ) : Submodule ℂ (Fin n → ℂ) :=
+  Submodule.span ℂ (e '' {b | b.1 < a})
+
+def InS (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ) : Prop :=
+  (∀ a : Fin r, (g - 1) *ᵥ e a ∈ spanLt e a.1) ∧ (g - 1) *ᵥ z ∈ spanLt e r
+
+def InN (ε : Fin n → Bool) (e : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ) :
+    Prop :=
+  InS e z g ∧ ∀ y, (∀ a, hJ ε (e a) y = 0) → (g - 1) *ᵥ y ∈ spanLt e r
+
+def nxt {V : Type} (e : Fin r → V) (z : V) (a : Fin r) : V :=
+  if h : a.1 + 1 < r then e ⟨a.1 + 1, h⟩ else z
+
+def rootCoord (ε : Fin n → Bool) (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ) (g : Matrix (Fin n) (Fin n) ℂ)
+    (a : Fin r) : ℂ :=
+  hJ ε (f a) (g *ᵥ nxt e z a)
+
+def psiR (ε : Fin n → Bool) (gg : ℕ) (e f : Fin r → Fin n → ℂ) (z : Fin n → ℂ)
+    (g : Matrix (Fin n) (Fin n) ℂ) : ℂ :=
+  Complex.exp (2 * Real.pi * Complex.I *
+    ((∑ a, (rootCoord ε e f z g a + star (rootCoord ε e f z g a))) / (gg : ℂ)))
+
+end Real
+
+section Inst
+
+variable (I : Formalism.MainNotions.S.AutInst)
+
+def rv (v : InfinitePlace I.F) (x : Fin I.n → I.E) : Fin I.n → ℂ :=
+  (I.P v)⁻¹ *ᵥ fun i => I.φ v (x i)
+
+variable {r : ℕ}
+
+def Sinf (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) : Set I.Ginf :=
+  {s | ∀ v, InS (fun a => rv I v (e a)) (rv I v z) (uMat (s v))}
+
+def Ninf (e : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) : Set I.Ginf :=
+  {s | ∀ v, InN (I.ε v) (fun a => rv I v (e a)) (rv I v z) (uMat (s v))}
+
+def psiInf (g : ℕ) (e f : Fin r → Fin I.n → I.E) (z : Fin I.n → I.E) (s : I.Ginf) : ℂ :=
+
+
+[BWP_representations_01] src/Formalism/SharpRestriction/CuspSpanNormBounds/RelevantZeroGramTerms.lean:24-150
+Range SHA256 312e35b61a0314a2f544e433d00a19bb9f45f2ac22b3fb2c3290201da3c28bc9
+  Formalism.QuantumDeterminants.IsCRepOn G σ ∧ (∀ g ∈ G, ∀ v : H, ‖σ g v‖ = ‖v‖) ∧
+    ∀ v : H, ContinuousOn (fun g => σ g v) G
+
+def IsIrredOn (G : Set (Matrix (Fin n) (Fin n) ℂ)) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Prop :=
+  ∀ S : Submodule ℂ H, IsClosed (S : Set H) → (∀ g ∈ G, ∀ v ∈ S, σ g v ∈ S) → S = ⊥ ∨ S = ⊤
+
+def coefOn {ε : Fin n → Bool} (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (v w : H) :
+    Formalism.REAL.UJ ε → ℂ :=
+  fun g => ⟪w, σ (umat g) v⟫_ℂ
+
+def IsSqIntOn (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Prop :=
+  ∀ v w : H, MemLp (coefOn (ε := ε) σ v w) 2 (Formalism.REAL.muG ε)
+
+def IsFdeg {ε : Fin n → Bool} (μ : Measure (Formalism.REAL.UJ ε)) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (d : ℝ) : Prop :=
+  0 < d ∧ ∀ v w v' w' : H,
+    Integrable (fun g => coefOn σ v w g * star (coefOn σ v' w' g)) μ ∧
+    ∫ g, coefOn σ v w g * star (coefOn σ v' w' g) ∂μ = ⟪v', v⟫_ℂ * ⟪w, w'⟫_ℂ / (d : ℂ)
+
+def fdegOf {ε : Fin n → Bool} (μ : Measure (Formalism.REAL.UJ ε)) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (w : H) : ℝ :=
+  ‖w‖ ^ 4 / ∫ g, ‖coefOn σ w w g‖ ^ 2 ∂μ
+
+def IsWtOn (G : Set (Matrix (Fin n) (Fin n) ℂ)) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (μ : Fin n → ℝ) (v : H) : Prop :=
+  ∀ θ : Fin n → ℝ, Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I)) ∈ G →
+    σ (Matrix.diagonal (fun a => Complex.exp ((θ a : ℂ) * Complex.I))) v =
+      Complex.exp (((∑ a, μ a * θ a : ℝ) : ℂ) * Complex.I) • v
+
+def CDom (ε : Fin n → Bool) (μ Λ : Fin n → ℝ) : Prop :=
+  ∃ c : Fin n → Fin n → ℕ, (∀ a b, c a b ≠ 0 → a < b ∧ ε a = ε b) ∧
+    Λ - μ = ∑ a, ∑ b, (c a b : ℝ) • Formalism.REAL.root a b
+
+def IsKStableOn (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (S : Submodule ℂ H) :
+    Prop :=
+  ∀ g ∈ Formalism.REAL.Kset ε, ∀ v ∈ S, σ g v ∈ S
+
+def IsKTypeOf (ε : Fin n → Bool) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (Λ : Fin n → ℝ)
+    (S : Submodule ℂ H) : Prop :=
+  FiniteDimensional ℂ S ∧ IsKStableOn ε σ S ∧
+    (∀ S' : Submodule ℂ H, S' ≤ S → IsKStableOn ε σ S' → S' = ⊥ ∨ S' = S) ∧
+    (∃ v ∈ S, v ≠ 0 ∧ IsWtOn (Formalism.REAL.Kset ε) σ Λ v) ∧
+    ∀ (μ : Fin n → ℝ) (v : H), v ∈ S → v ≠ 0 → IsWtOn (Formalism.REAL.Kset ε) σ μ v → CDom ε μ Λ
+
+def vNormSq (ε : Fin n → Bool) (μ : Fin n → ℝ) : ℝ := Formalism.REAL.nsq (μ + (2 : ℝ) • Formalism.REAL.rhoC ε)
+
+def UJset (ε : Fin n → Bool) : Set (Matrix (Fin n) (Fin n) ℂ) := {g | Formalism.REAL.inUJ ε g}
+
+def IsDS (ε : Fin n → Bool) (lam : Fin n → ℝ) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) : Prop :=
+  CompleteSpace H ∧ Nontrivial H ∧ IsURepOn (UJset ε) σ ∧ IsIrredOn (UJset ε) σ ∧ IsSqIntOn ε σ ∧
+    (∃ S : Submodule ℂ H, IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S) ∧
+    ∀ (μ : Fin n → ℝ) (S : Submodule ℂ H), IsKTypeOf ε σ μ S →
+      vNormSq ε (Formalism.QuantumDeterminants.lowK ε lam) ≤ vNormSq ε μ
+
+def lowKSub (ε : Fin n → Bool) (lam : Fin n → ℝ) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) :
+    Submodule ℂ H :=
+  sSup {S | IsKTypeOf ε σ (Formalism.QuantumDeterminants.lowK ε lam) S}
+
+def IsOrthProjOnto (E : H →L[ℂ] H) (S : Submodule ℂ H) : Prop :=
+  E.comp E = E ∧ (∀ x y : H, ⟪E x, y⟫_ℂ = ⟪x, E y⟫_ℂ) ∧ LinearMap.range (E : H →ₗ[ℂ] H) = S
+
+def IsHighestUnit (ε : Fin n → Bool) (lam : Fin n → ℝ) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H))
+    (w : H) : Prop :=
+  ‖w‖ = 1 ∧ w ∈ lowKSub ε lam σ ∧ IsWtOn (Formalism.REAL.Kset ε) σ (Formalism.QuantumDeterminants.lowK ε lam) w
+
+def IsLowUnit (ε : Fin n → Bool) (lam : Fin n → ℝ) (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)) (w : H) : Prop :=
+  ‖w‖ = 1 ∧ w ∈ lowKSub ε lam σ
+
+def allPos (k : ℕ) : Fin k → Bool := fun _ => true
+
+def IsHCTypeU (k : ℕ) (u : Fin k → ℝ) (π : Matrix (Fin k) (Fin k) ℂ → (H →L[ℂ] H)) : Prop :=
+  Nontrivial H ∧ FiniteDimensional ℂ H ∧ IsURepOn (UJset (allPos k)) π ∧
+    IsKTypeOf (allPos k) π (Formalism.QuantumDeterminants.lowK (allPos k) u) ⊤
+
+end Rep
+
+section Hpk
+
+variable {H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+
+def IsCayley (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool)
+    (P : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : Prop :=
+  IsUnit P ∧ Pᴴ * Formalism.REAL.Jm ε * P = Formalism.QuantumDeterminants.Hpk k r
+
+def IsCayleyU (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool)
+    (P : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : Prop :=
+  IsCayley k r ε P ∧ P ∈ Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ
+
+def IsDSHpk (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ)
+    (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)) : Prop :=
+  ∃ P, IsCayleyU k r ε P ∧ IsDS ε lam (fun g => σ (P⁻¹ * g * P))
+
+def IsLowUnitH (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ)
+    (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)) (w : H) : Prop :=
+  ∃ P, IsCayleyU k r ε P ∧ IsLowUnit ε lam (fun g => σ (P⁻¹ * g * P)) w
+
+def IsHighestUnitH (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ)
+    (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)) (w : H) : Prop :=
+  ∃ P, IsCayleyU k r ε P ∧ IsHighestUnit ε lam (fun g => σ (P⁻¹ * g * P)) w
+
+def blockW (k r : ℕ) (h : Matrix (Fin k) (Fin k) ℂ) :
+    Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ :=
+  fun i j =>
+    if hi : r ≤ i.val ∧ i.val < r + k then
+      (if hj : r ≤ j.val ∧ j.val < r + k then h ⟨i.val - r, by omega⟩ ⟨j.val - r, by omega⟩ else 0)
+    else (if i = j then 1 else 0)
+
+def IsFrameW (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ)
+    (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : Prop :=
+  g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∧
+    (∀ a : Fin r, g *ᵥ Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r a) = Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.eI k r a) ∧
+      g *ᵥ Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.esI k r a) = Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.esI k r a)) ∧
+    g *ᵥ (((Real.sqrt (Formalism.QuantumDeterminants.Tz k r z) : ℝ) : ℂ) • Formalism.QuantumDeterminants.bvec (Formalism.QuantumDeterminants.wI k r (Fin.last k))) = z
+
+def IsHCTypeW (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ)
+    (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)) : Prop :=
+  ∃ g, IsFrameW k r z g ∧ IsHCTypeU k u (fun h => π (g * blockW k r h * g⁻¹))
+
+end Hpk
+
+def IsHaarOn {k r : ℕ} (S : Set (Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ))
+    (μ : Measure (Formalism.QuantumDeterminants.Mt k r)) : Prop :=
+  SigmaFinite μ ∧ μ ≠ 0 ∧ μ {x | Matrix.of x ∉ S} = 0 ∧
+    ∀ s ∈ S, μ.map (Formalism.QuantumDeterminants.lmulM s) = μ
+
+def hsInner {Wp Wq : Type*} [NormedAddCommGroup Wp] [InnerProductSpace ℂ Wp] [NormedAddCommGroup Wq]
+    [InnerProductSpace ℂ Wq] [FiniteDimensional ℂ Wq] (A B : Wq →L[ℂ] Wp) : ℂ :=
+
+
+[BWP_numbers_01] src/Formalism/SharpRestriction/CuspSpanNormBounds/CayleySignature.lean:18-54
+Range SHA256 5477fe74895ce20d091b136539b5c893c2915ff7ccf56186d111c647225ce710
+def lam48 (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ) : Fin (2 * r + k + 1) → ℝ :=
+  fun i => if h : i.val < k - 1 then v ⟨i.val, h⟩
+    else -b ⟨i.val - (k - 1), by have := i.isLt; omega⟩
+
+def eps48 (k r : ℕ) : Fin (2 * r + k + 1) → Bool :=
+  fun i => if i.val < k - 1 then true else decide ((i.val - (k - 1)) % 2 = 0)
+
+def InterlacingCondition (k r : ℕ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ) : Prop :=
+  (∀ i : Fin (k - 1), v i < u ⟨i.val, by have := i.isLt; omega⟩ ∧
+      u ⟨i.val + 1, by have := i.isLt; omega⟩ < v i) ∧
+    ∀ h : 0 < k, -b ⟨0, by omega⟩ < u ⟨k - 1, by omega⟩
+
+def HalfIntegralDifference (k r : ℕ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ) : Prop :=
+  ∀ i s, ∃ j : ℤ, u i - lam48 k r v b s = (j : ℝ) + 1 / 2
+
+def rk48 (k r : ℕ) : ℕ := 2 * r + k + 1
+
+def GapBig (k r : ℕ) (b : Fin (2 * r + 2) → ℝ) : Prop :=
+  ∃ t : ℕ, Odd t ∧ rk48 k r + 5 ≤ t ∧ 1801 ≤ rk48 k r + t ∧
+    ∀ (j : Fin (2 * r + 2)) (hj : j.val + 1 < 2 * r + 2),
+      2 * ((rk48 k r + (2 * r + 2) * t : ℕ) : ℝ) ^ 3 + (t : ℝ) + 3 < b ⟨j.val + 1, hj⟩ - b j
+
+def GapC (C : ℝ) (k r : ℕ) (b : Fin (2 * r + 2) → ℝ) : Prop :=
+  ∀ (j : Fin (2 * r + 2)) (hj : j.val + 1 < 2 * r + 2),
+    C * (rk48 k r : ℝ) ^ 3 < b ⟨j.val + 1, hj⟩ - b j
+
+def LowGapGe (h : ℝ) (r : ℕ) (b : Fin (2 * r + 2) → ℝ) : Prop :=
+  ∀ (j : Fin (2 * r + 2)) (hj : j.val + 1 < 2 * r + 2), h ≤ b ⟨j.val + 1, hj⟩ - b j
+
+def RealPlaceNumericalSetting (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ)
+    (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ) : Prop :=
+  1 ≤ k ∧ Even k ∧ Formalism.QuantumDeterminants.inWb k r z ∧ 0 < Formalism.QuantumDeterminants.Tz k r z ∧ (∀ a, c a ≠ 0) ∧
+    Formalism.QuantumDeterminants.IsHCParam u ∧ Formalism.QuantumDeterminants.IsHCParam (lam48 k r v b) ∧ InterlacingCondition k r u v b ∧
+    HalfIntegralDifference k r u v b ∧ GapBig k r b
+
+def wtF (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ) (X km : Mat k r) : ℝ :=
+  ∏ i : Fin (2 * r + k),
+
+
+[BWP_numbers_02] src/ReciprocityTheory/ReductiveGroups/DiscreteSeries/FormalDegree/CoefLocGap.lean:1-190
+Range SHA256 89f3c7351f2e0a93952834cf1fbe36156222afd2662fbe92562c144cbcc1873a
+import Formalism.SharpRestriction.CuspSpanNormBounds.CayleySignature
+import ReciprocityTheory.ReductiveGroups.DiscreteSeries.CasimirCoefficients.PsiExistsStatement
+
+noncomputable section
+
+namespace ReciprocityTheory.ChartRestriction.DS
+
+open Formalism.MainNotions.CayleySignature
+
+theorem lt_sub_of_increments {m : ℕ} (b : Fin m → ℝ) (G : ℝ) (hG : 0 < G)
+    (h : ∀ (j : Fin m) (hj : j.val + 1 < m), G < b ⟨j.val + 1, hj⟩ - b j) :
+    ∀ i j : Fin m, i < j → G < b j - b i := by
+  intro i j hij
+  obtain ⟨i, hi⟩ := i
+  obtain ⟨j, hj⟩ := j
+  have hij' : i < j := hij
+  clear hij
+  induction j with
+  | zero => omega
+  | succ j ih =>
+    have h1 : G < b ⟨j + 1, hj⟩ - b ⟨j, by omega⟩ := h ⟨j, by omega⟩ hj
+    rcases Nat.lt_succ_iff_lt_or_eq.mp hij' with hlt | heq
+    · have h2 := ih (by omega) hlt
+      linarith
+    · subst heq
+      exact h1
+
+theorem lt_abs_sub_of_increments {m : ℕ} (b : Fin m → ℝ) (G : ℝ) (hG : 0 < G)
+    (h : ∀ (j : Fin m) (hj : j.val + 1 < m), G < b ⟨j.val + 1, hj⟩ - b j)
+    (i j : Fin m) (hij : i ≠ j) : G < |b i - b j| := by
+  rcases lt_or_gt_of_ne hij with hlt | hlt
+  · have := lt_sub_of_increments b G hG h i j hlt
+    exact lt_abs.mpr (Or.inr (by linarith))
+  · have := lt_sub_of_increments b G hG h j i hlt
+    exact lt_abs.mpr (Or.inl (by linarith))
+
+theorem cayley_weight_high_index (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ)
+    (i : Fin (2 * r + k + 1)) (hi : ¬ i.val < k - 1) :
+    lam48 k r v b i = -b ⟨i.val - (k - 1), by have := i.isLt; omega⟩ := by
+  unfold lam48
+  exact dif_neg hi
+
+theorem gapAtLeast_of_increments (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ) (G : ℝ) (hG : 0 < G)
+    (hanti : StrictAnti (lam48 k r v b))
+    (hb : ∀ (j : Fin (2 * r + 2)) (hj : j.val + 1 < 2 * r + 2), G < b ⟨j.val + 1, hj⟩ - b j) :
+    GapAtLeast (eps48 k r) (lam48 k r v b) G := by
+  have key : ∀ a c : Fin (2 * r + k + 1), a.val < k - 1 → ¬ c.val < k - 1 → (c.val - (k - 1)) % 2 = 1 →
+      G ≤ |lam48 k r v b a - lam48 k r v b c| := by
+    intro a c ha hc hpar
+    have hk : k - 1 < 2 * r + k + 1 := by omega
+    have h1 := hanti (show a < ⟨k - 1, hk⟩ by rw [Fin.lt_def]; exact ha)
+    rw [cayley_weight_high_index k r v b ⟨k - 1, hk⟩ (by simp)] at h1
+    simp only [Nat.sub_self] at h1
+    rw [cayley_weight_high_index k r v b c hc]
+    have h2 := lt_sub_of_increments b G hG hb ⟨0, by omega⟩ ⟨c.val - (k - 1), by have := c.isLt; omega⟩
+      (by rw [Fin.lt_def]; simp only; omega)
+    refine le_trans ?_ (le_abs_self _)
+    linarith
+  intro a c hac
+  by_cases ha : a.val < k - 1 <;> by_cases hc : c.val < k - 1
+  · exfalso; apply hac; simp only [eps48, if_pos ha, if_pos hc]
+  · have hp : (c.val - (k - 1)) % 2 = 1 := by
+      by_contra hne
+      apply hac
+      simp only [eps48, if_pos ha, if_neg hc]
+      simp [show (c.val - (k - 1)) % 2 = 0 by omega]
+    exact key a c ha hc hp
+  · have hp : (a.val - (k - 1)) % 2 = 1 := by
+      by_contra hne
+      apply hac
+      simp only [eps48, if_pos hc, if_neg ha]
+      simp [show (a.val - (k - 1)) % 2 = 0 by omega]
+    rw [abs_sub_comm]; exact key c a hc ha hp
+  · rw [cayley_weight_high_index k r v b a ha, cayley_weight_high_index k r v b c hc]
+    have hne : (⟨c.val - (k - 1), by have := c.isLt; omega⟩ : Fin (2 * r + 2)) ≠
+        ⟨a.val - (k - 1), by have := a.isLt; omega⟩ := by
+      intro heq
+      apply hac
+      have hv : c.val - (k - 1) = a.val - (k - 1) := congrArg Fin.val heq
+      simp only [eps48, if_neg ha, if_neg hc]
+      rw [hv]
+    have := lt_abs_sub_of_increments b G hG hb _ _ hne
+    rw [show -b ⟨a.val - (k - 1), by have := a.isLt; omega⟩ - -b ⟨c.val - (k - 1), by have := c.isLt; omega⟩ =
+      b ⟨c.val - (k - 1), by have := c.isLt; omega⟩ - b ⟨a.val - (k - 1), by have := a.isLt; omega⟩ by ring]
+    exact this.le
+
+theorem q_le_of_cayley_signature (k r : ℕ) : qOf (eps48 k r) ≤ r + 1 := by
+  have hodd : ∀ x : Fin (2 * r + k + 1), eps48 k r x = false →
+      ¬ x.val < k - 1 ∧ (x.val - (k - 1)) % 2 = 1 := by
+    intro x hx
+    unfold eps48 at hx
+    by_cases h1 : x.val < k - 1
+    · rw [if_pos h1] at hx
+      exact absurd hx (by decide)
+    · rw [if_neg h1] at hx
+      refine ⟨h1, ?_⟩
+      have h2 : ¬ ((x.val - (k - 1)) % 2 = 0) := by simpa using hx
+      omega
+  unfold qOf
+  calc (Finset.univ.filter fun a => eps48 k r a = false).card
+      ≤ (Finset.range (r + 1)).card := by
+        apply Finset.card_le_card_of_injOn (fun a : Fin (2 * r + k + 1) => (a.val - (k - 1)) / 2)
+        · intro a _
+          simp only [Finset.mem_coe, Finset.mem_range]
+          have := a.isLt
+          omega
+        · intro a ha c hc hac
+          simp only [Finset.mem_coe, Finset.mem_filter, Finset.mem_univ, true_and] at ha hc
+          have h1 := hodd a ha
+          have h2 := hodd c hc
+          dsimp only at hac
+          apply Fin.ext
+          omega
+    _ = r + 1 := Finset.card_range _
+
+theorem cubic_bound_of_gap_nat (n r t M : ℕ) (hM : M = n + (2 * r + 2) * t) (ht : n + 5 ≤ t) :
+    96 * n ^ 2 * (r + 1) ≤ 2 * M ^ 3 := by
+  subst hM
+  have ht2 : 2 * t ≤ (2 * r + 2) * t := Nat.mul_le_mul (by omega) le_rfl
+  have hr : 10 * (r + 1) ≤ (2 * r + 2) * t := by
+    calc 10 * (r + 1) ≤ (2 * r + 2) * 5 := by omega
+      _ ≤ (2 * r + 2) * t := Nat.mul_le_mul le_rfl (by omega)
+  set X := (2 * r + 2) * t with hX
+  have h3 : 3 * n ≤ n + X := by omega
+  have h10 : 10 * (r + 1) ≤ n + X := by omega
+  calc 96 * n ^ 2 * (r + 1) ≤ 2 * ((3 * n) * (3 * n) * (10 * (r + 1))) := by
+        nlinarith [Nat.zero_le (n ^ 2 * r), Nat.zero_le (n ^ 2)]
+    _ ≤ 2 * ((n + X) * (n + X) * (n + X)) := by gcongr
+    _ = 2 * (n + X) ^ 3 := by ring
+
+theorem cayley_weight_gap (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ)
+    (hlam : Formalism.QuantumDeterminants.IsHCParam (Formalism.MainNotions.CayleySignature.lam48 k r v b)) (hgap : Formalism.MainNotions.CayleySignature.GapBig k r b) :
+    ∃ h : ℝ, Formalism.QuantumDeterminants.GapAtLeast (Formalism.MainNotions.CayleySignature.eps48 k r) (Formalism.MainNotions.CayleySignature.lam48 k r v b) h ∧
+      (1 ≤ S7.q0 (Formalism.MainNotions.CayleySignature.eps48 k r) →
+        ((2 * r + k + 1 : ℕ) : ℝ) * (pOf (Formalism.MainNotions.CayleySignature.eps48 k r) : ℝ) * (qOf (Formalism.MainNotions.CayleySignature.eps48 k r) : ℝ) + 1 < h ∧
+        8 * Real.sqrt (2 * (S7.q0 (Formalism.MainNotions.CayleySignature.eps48 k r) : ℝ)) *
+            (4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 * Real.sqrt (2 * ((r + 1 : ℕ) : ℝ)) +
+              2 * ((2 * r + k + 1 : ℕ) : ℝ) * S7.q0 (Formalism.MainNotions.CayleySignature.eps48 k r)) < h) := by
+  obtain ⟨t, -, ht1, -, ht⟩ := hgap
+  have ht1' : 2 * r + k + 1 + 5 ≤ t := ht1
+  obtain ⟨M, hM⟩ : ∃ M : ℕ, M = 2 * r + k + 1 + (2 * r + 2) * t := ⟨_, rfl⟩
+  have hb : ∀ (j : Fin (2 * r + 2)) (hj : j.val + 1 < 2 * r + 2),
+      2 * (M : ℝ) ^ 3 + (t : ℝ) + 3 < b ⟨j.val + 1, hj⟩ - b j := by
+    rw [hM]; exact ht
+  have hMpos : (0 : ℝ) ≤ (M : ℝ) := Nat.cast_nonneg _
+  have htpos : (0 : ℝ) ≤ (t : ℝ) := Nat.cast_nonneg _
+  refine ⟨2 * (M : ℝ) ^ 3 + (t : ℝ) + 3, ?_, ?_⟩
+  · exact gapAtLeast_of_increments k r v b _ (by positivity) hlam.1 hb
+  · intro _
+    have hq : qOf (eps48 k r) ≤ r + 1 := q_le_of_cayley_signature k r
+    have hpn : pOf (eps48 k r) ≤ 2 * r + k + 1 := by
+      unfold pOf; exact (Finset.card_filter_le _ _).trans (by simp)
+    have hqn : qOf (eps48 k r) ≤ 2 * r + k + 1 := by
+      unfold qOf; exact (Finset.card_filter_le _ _).trans (by simp)
+    have hq0 : S7.q0 (eps48 k r) ≤ r + 1 := (min_le_right _ _).trans hq
+    have hnM : 2 * r + k + 1 ≤ M := by rw [hM]; omega
+    have hnat1 : (2 * r + k + 1) * pOf (eps48 k r) * qOf (eps48 k r) ≤ M ^ 3 := by
+      calc _ ≤ M * M * M := Nat.mul_le_mul (Nat.mul_le_mul hnM (hpn.trans hnM)) (hqn.trans hnM)
+        _ = M ^ 3 := by ring
+    have hnat2 := cubic_bound_of_gap_nat (2 * r + k + 1) r t M hM ht1'
+    have c1 : ((2 * r + k + 1 : ℕ) : ℝ) * (pOf (eps48 k r) : ℝ) * (qOf (eps48 k r) : ℝ) ≤ (M : ℝ) ^ 3 := by
+      exact_mod_cast hnat1
+    have c2 : (96 : ℝ) * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 * ((r + 1 : ℕ) : ℝ) ≤ 2 * (M : ℝ) ^ 3 := by
+      exact_mod_cast hnat2
+    have hM3 : (0 : ℝ) ≤ (M : ℝ) ^ 3 := by positivity
+    refine ⟨by linarith, ?_⟩
+    have hN0 : (0 : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) := Nat.cast_nonneg _
+    have hQ0 : (0 : ℝ) ≤ (S7.q0 (eps48 k r) : ℝ) := Nat.cast_nonneg _
+    have hR1 : (1 : ℝ) ≤ ((r + 1 : ℕ) : ℝ) := by exact_mod_cast (by omega : 1 ≤ r + 1)
+    have hRN : ((r + 1 : ℕ) : ℝ) ≤ ((2 * r + k + 1 : ℕ) : ℝ) := by exact_mod_cast (by omega : r + 1 ≤ 2 * r + k + 1)
+    have hQR : (S7.q0 (eps48 k r) : ℝ) ≤ ((r + 1 : ℕ) : ℝ) := by exact_mod_cast hq0
+    have hs0 := Real.sqrt_nonneg (2 * (S7.q0 (eps48 k r) : ℝ))
+    have hu0 := Real.sqrt_nonneg (2 * ((r + 1 : ℕ) : ℝ))
+    have hu2 : Real.sqrt (2 * ((r + 1 : ℕ) : ℝ)) ^ 2 = 2 * ((r + 1 : ℕ) : ℝ) := Real.sq_sqrt (by positivity)
+    have hsu : Real.sqrt (2 * (S7.q0 (eps48 k r) : ℝ)) ≤ Real.sqrt (2 * ((r + 1 : ℕ) : ℝ)) :=
+      Real.sqrt_le_sqrt (by linarith)
+    have hu1' : 1 ≤ Real.sqrt (2 * ((r + 1 : ℕ) : ℝ)) := by nlinarith
+    have hu1 : Real.sqrt (2 * ((r + 1 : ℕ) : ℝ)) ≤ 2 * ((r + 1 : ℕ) : ℝ) := by nlinarith
+    have hsu' : Real.sqrt (2 * (S7.q0 (eps48 k r) : ℝ)) * Real.sqrt (2 * ((r + 1 : ℕ) : ℝ)) ≤
+        2 * ((r + 1 : ℕ) : ℝ) := by
+      nlinarith [mul_le_mul_of_nonneg_right hsu hu0]
+    have hQs : (S7.q0 (eps48 k r) : ℝ) * Real.sqrt (2 * (S7.q0 (eps48 k r) : ℝ)) ≤
+        ((r + 1 : ℕ) : ℝ) * (2 * ((r + 1 : ℕ) : ℝ)) :=
+      mul_le_mul hQR (hsu.trans hu1) hs0 (by linarith)
+    have p1 := mul_le_mul_of_nonneg_left hsu' (sq_nonneg ((2 * r + k + 1 : ℕ) : ℝ))
+    have p2 := mul_le_mul_of_nonneg_left hQs hN0
+    have p3 := mul_le_mul_of_nonneg_left hRN (mul_nonneg hN0 (by linarith : (0 : ℝ) ≤ ((r + 1 : ℕ) : ℝ)))
+    nlinarith [p1, p2, p3, c2]
+
+end ReciprocityTheory.ChartRestriction.DS
+
+
+[BWP_nilpotent_chart_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/NChartP.lean:1-116
+Range SHA256 e462e75a6d0f88f673fddfb2de2a5f258f3c80e758448ad4dc9b7ade34ac36ec
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NShear
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.OpnContinuous
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NilpotentChartNormBound
+
+open MeasureTheory Formalism.QuantumDeterminants Formalism.L2.SG.SplitPrimeNormLemmas Matrix
+
+noncomputable section
+
+namespace WlocSk
+
+theorem card_CI_le (k r : ℕ) : Fintype.card (NB.CI k r) ≤ r * r + r * (k + 1) + r * r := by
+  simp only [Fintype.card_sum, Fintype.card_prod, Fintype.card_fin]
+  have h : Fintype.card (NB.UP r) ≤ Fintype.card (Fin r × Fin r) :=
+    Fintype.card_le_of_injective Subtype.val Subtype.val_injective
+  simp only [Fintype.card_prod, Fintype.card_fin] at h
+  omega
+
+theorem dim_lt (k r : ℕ) :
+    (((2 * (2 * Fintype.card (NB.CI k r) + r)) : ℕ) : ℝ) < N1H k r := by
+  have hc := card_CI_le k r
+  have h1 : 2 * (2 * Fintype.card (NB.CI k r) + r) < 4 * (2 * r + k + 1) ^ 2 := by
+    have : 2 * (2 * Fintype.card (NB.CI k r) + r) ≤ 2 * (2 * (r * r + r * (k + 1) + r * r) + r) := by
+      omega
+    refine lt_of_le_of_lt this ?_
+    nlinarith
+  have h2 : (1 : ℝ) ≤ Real.sqrt (2 * ((r + 1 : ℕ) : ℝ)) := by
+    rw [Real.one_le_sqrt]
+    have : (0 : ℝ) ≤ (r : ℝ) := Nat.cast_nonneg r
+    push_cast; linarith
+  unfold N1H
+  have h1' : (((2 * (2 * Fintype.card (NB.CI k r) + r)) : ℕ) : ℝ) < 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 := by
+    exact_mod_cast h1
+  have hp : (0 : ℝ) ≤ 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 := by positivity
+  nlinarith
+
+theorem nilpotent_chart_exists : NChart := by
+  intro k r
+  let eC := Fintype.equivFin (NB.CI k r)
+  let Φ : CSp (Fintype.card (NB.CI k r)) r → Mt k r := fun t => NB.phi0 (t.1 ∘ eC) t.2
+  let ψ : Mt k r → CSp (Fintype.card (NB.CI k r)) r := fun x => (NB.psiC x ∘ eC.symm, NB.psiR x)
+  have hcomp : Continuous fun t : CSp (Fintype.card (NB.CI k r)) r => (t.1 ∘ eC, t.2) :=
+    (continuous_pi fun i => (continuous_apply (eC i)).comp continuous_fst).prodMk continuous_snd
+  have hΦc : Continuous Φ := NB.continuous_nilpotent_chart.comp hcomp
+  have hψc : Continuous ψ :=
+    (continuous_pi fun j => (continuous_apply (eC.symm j)).comp NB.continuous_psiC).prodMk
+      NB.continuous_psiR
+  have hleft : Function.LeftInverse ψ Φ := by
+    intro t
+    obtain ⟨h1, h2⟩ := NB.nilpotent_chart_right_inverse (t.1 ∘ eC) t.2
+    show (NB.psiC (NB.phi0 (t.1 ∘ eC) t.2) ∘ eC.symm, NB.psiR (NB.phi0 (t.1 ∘ eC) t.2)) = t
+    rw [h1, h2]
+    ext j <;> simp
+  have hright : ∀ x : Mt k r, Matrix.of x ∈ Nset k r → Φ (ψ x) = x := by
+    intro x hx
+    show NB.phi0 ((NB.psiC x ∘ eC.symm) ∘ eC) (NB.psiR x) = x
+    have : (NB.psiC x ∘ eC.symm) ∘ eC = NB.psiC x := by funext i; simp
+    rw [this]
+    exact NB.nilpotent_chart_left_inverse hx
+  have hrange : Set.range Φ = {x | Matrix.of x ∈ Nset k r} := by
+    ext x
+    constructor
+    · rintro ⟨t, rfl⟩
+      exact NB.test_vector_mem_schwartz_bruhat _ _
+    · intro hx
+      exact ⟨ψ x, hright x hx⟩
+  refine ⟨Fintype.card (NB.CI k r), r, 2, Φ, (r : ℝ) + 2, by norm_num, dim_lt k r, by positivity,
+    ?_, hrange, ?_, ?_⟩
+  ·
+    refine MeasurableEmbedding.of_measurable_inverse hΦc.measurable ?_ hψc.measurable hleft
+    have : Set.range Φ = {x | Φ (ψ x) = x} := by
+      ext x
+      constructor
+      · rintro ⟨t, rfl⟩
+        show Φ (ψ (Φ t)) = Φ t
+        rw [hleft t]
+      · intro hx
+        exact ⟨ψ x, hx⟩
+    rw [this]
+    exact (isClosed_eq (hΦc.comp hψc) continuous_id).measurableSet
+  ·
+    intro m₀ h0
+    let G : (Fin (Fintype.card (NB.CI k r)) → ℂ) → Fin (Fintype.card (NB.CI k r)) → ℂ :=
+      fun y j => NB.shG m₀ (y ∘ eC) (eC.symm j)
+    let H : (Fin (Fintype.card (NB.CI k r)) → ℂ) → Fin r → ℝ := fun y => NB.shH m₀ (y ∘ eC)
+    have hyc : Continuous fun y : Fin (Fintype.card (NB.CI k r)) → ℂ => y ∘ eC :=
+      continuous_pi fun i => continuous_apply (eC i)
+    refine ⟨fun t => (t.1 + G t.1, t.2 + H t.1), ?_, ?_⟩
+    · refine NB.shear_mp (fun j => NB.rk (eC.symm j)) G H
+        (fun j => ((NB.continuous_shG m₀ (eC.symm j)).comp hyc).measurable) ?_
+        ((NB.continuous_shH m₀).comp hyc).measurable
+      intro j y y' hyy
+      refine NB.shG_dep m₀ (eC.symm j) (y ∘ eC) (y' ∘ eC) fun i hi => ?_
+      exact hyy (eC i) (by simpa using hi)
+    · intro t
+      obtain ⟨h1, h2⟩ := NB.lmul_coord h0 (t.1 ∘ eC) t.2
+      have hmem : m₀ * NB.phi0 (t.1 ∘ eC) t.2 ∈ Nset k r := UnitaryGroupBasics.mem_n_mul h0 (NB.test_vector_mem_schwartz_bruhat _ _)
+      show m₀ * NB.phi0 (t.1 ∘ eC) t.2 = NB.phi0 ((t.1 + G t.1) ∘ eC) (t.2 + H t.1)
+      have e1 : (t.1 + G t.1) ∘ eC = t.1 ∘ eC + NB.shG m₀ (t.1 ∘ eC) := by
+        funext i; simp [G]
+      rw [e1, ← h1]
+      show _ = NB.phi0 (NB.psiC (m₀ * NB.phi0 (t.1 ∘ eC) t.2)) (t.2 + NB.shH m₀ (t.1 ∘ eC))
+      rw [← h2]
+      exact (NB.nilpotent_chart_left_inverse hmem).symm
+  ·
+    intro t
+    have hg := NB.nilpotent_chart_norm_bound (t.1 ∘ eC) t.2
+    have hn : ‖t‖ ≤ ‖(t.1 ∘ eC, t.2)‖ := by
+      rw [Prod.norm_def, Prod.norm_def]
+      refine max_le_max ?_ le_rfl
+      refine (pi_norm_le_iff_of_nonneg (norm_nonneg _)).2 fun j => ?_
+      have := norm_le_pi_norm (t.1 ∘ eC) (eC.symm j)
+      simpa using this
+    calc 1 + ‖t‖ ≤ 1 + ‖(t.1 ∘ eC, t.2)‖ := by linarith
+      _ ≤ _ := hg
+
+end WlocSk
+
+
+[BWP_nilpotent_chart_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/NShear.lean:1-115
+Range SHA256 042380d270ba76b59f516bffba97b72e43f49606bcd50c873072e7b1d9257437
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NilpotentChartRightInverse
+import Formalism.PeriodIntegrals.UnitaryGroupMassFormula.LowerShearHaar.MeasurePreservingOfCard
+
+open Matrix Formalism.QuantumDeterminants MeasureTheory
+
+noncomputable section
+
+namespace WlocSk.NB
+
+variable {k r : ℕ}
+
+def rk : CI k r → ℕ
+  | Sum.inl p => r - p.1.1.val
+  | Sum.inr (Sum.inl q) => r - q.1.val
+  | Sum.inr (Sum.inr _) => r + 1
+
+def dlt (m₀ : Mx k r) (x : CI k r → ℂ) : Matrix (Fin r) (Fin r) ℂ :=
+  (cF x)ᴴ * ((bF m₀)ᴴ * (bB m₀ * cE x + bC m₀ * cF x))
+
+def shG (m₀ : Mx k r) (x : CI k r → ℂ) : CI k r → ℂ
+  | Sum.inl p => ∑ c, if p.1.1 < c then bA m₀ p.1.1 c * cA x c p.1.2 else 0
+  | Sum.inr (Sum.inl q) => (∑ c, if q.1 < c then bA m₀ q.1 c * cB x c q.2 else 0) + bB m₀ q.1 q.2
+  | Sum.inr (Sum.inr p) => (dlt m₀ x p.1.1 p.1.2 - star (dlt m₀ x p.1.2 p.1.1)) / 2
+
+def shH (m₀ : Mx k r) (x : CI k r → ℂ) : Fin r → ℝ := fun a => (dlt m₀ x a a).im
+
+theorem split_low {A : Matrix (Fin r) (Fin r) ℂ} (hA : LowId A) (v : Fin r → ℂ) (a : Fin r) :
+    ∑ c, A a c * v c = v a + ∑ c, if a < c then A a c * v c else 0 := by
+  have : ∀ c, A a c * v c = (if a = c then v c else 0) + (if a < c then A a c * v c else 0) := by
+    intro c
+    rcases lt_trichotomy a c with h | rfl | h
+    · rw [if_neg (ne_of_lt h), if_pos h, zero_add]
+    · rw [if_pos rfl, if_neg (lt_irrefl a), add_zero, hA a a le_rfl, if_pos rfl, one_mul]
+    · rw [if_neg (ne_of_gt h), if_neg (not_lt.2 h.le), add_zero, hA a c h.le, if_neg (ne_of_gt h),
+        zero_mul]
+  rw [Finset.sum_congr rfl fun c _ => this c, Finset.sum_add_distrib, Finset.sum_ite_eq,
+    if_pos (Finset.mem_univ _)]
+
+theorem lowId_bA {g : Mx k r} (hc : ColB g) : LowId (bA g) := fun a b h => hc.aa a b h
+
+theorem mof_mul {m₀ g : Mx k r} (h0 : m₀ ∈ Nset k r) (hg : g ∈ Nset k r) :
+    mof (m₀ * g) = mof g + (bF g)ᴴ * ((bF m₀)ᴴ * (bB m₀ * bE g + bC m₀ * bF g)) := by
+  have hc0 := colB_of_mem h0
+  have hF0 := rel_F hc0 h0.1
+  rw [mof, mof, bF_mul hc0, bC_mul, conjTranspose_mul]
+  rw [add_assoc, Matrix.mul_add, Matrix.mul_add, Matrix.mul_add]
+  have : (bF g)ᴴ * (bF m₀)ᴴ * (bA m₀ * bC g) = (bF g)ᴴ * bC g := by
+    rw [Matrix.mul_assoc, ← Matrix.mul_assoc (bF m₀)ᴴ, hF0, Matrix.one_mul]
+  rw [this]
+  simp only [Matrix.mul_assoc, Matrix.mul_add]
+
+theorem lmul_coord {m₀ : Mx k r} (h0 : m₀ ∈ Nset k r) (x : CI k r → ℂ) (s : Fin r → ℝ) :
+    psiC (m₀ * phi0 x s) = x + shG m₀ x ∧ psiR (m₀ * phi0 x s) = s + shH m₀ x := by
+  have hg := test_vector_mem_schwartz_bruhat x s
+  have hcg := colB_of_mem hg
+  have hc0 := colB_of_mem h0
+  have hps := nilpotent_chart_right_inverse x s
+  have hM : mof (m₀ * phi0 x s) = mof (phi0 x s) + dlt m₀ x := by
+    rw [mof_mul h0 hg, dlt, phi0, bF_mk, bE_mk]
+  constructor
+  · funext i
+    rcases i with ⟨⟨a, b⟩, h⟩ | ⟨a, j⟩ | ⟨⟨a, b⟩, h⟩
+    · show bA (m₀ * phi0 x s) a b = _
+      rw [bA_mul hcg, Matrix.mul_apply, phi0, bA_mk, split_low (lowId_bA hc0)]
+      simp only [Pi.add_apply, shG, cA, dif_pos h]
+    · show bB (m₀ * phi0 x s) a j = _
+      rw [bB_mul hcg, Matrix.add_apply, Matrix.mul_apply, phi0, bB_mk, split_low (lowId_bA hc0)]
+      simp only [Pi.add_apply, shG, cB]
+      ring
+    · show kof (m₀ * phi0 x s) a b = _
+      have e1 : kof (phi0 x s) a b = x (Sum.inr (Sum.inr ⟨(a, b), h⟩)) :=
+        congrFun hps.1 (Sum.inr (Sum.inr ⟨(a, b), h⟩))
+      simp only [kof, hM, Matrix.add_apply, Pi.add_apply, shG, star_add] at e1 ⊢
+      rw [← e1]
+      ring
+  · funext a
+    have e1 : (mof (phi0 x s) a a).im = s a := congrFun hps.2 a
+    show (mof (m₀ * phi0 x s) a a).im = _
+    rw [hM, Matrix.add_apply, Complex.add_im, e1]
+    rfl
+
+theorem shG_dep (m₀ : Mx k r) (i : CI k r) (x y : CI k r → ℂ)
+    (hxy : ∀ j, rk j < rk i → x j = y j) : shG m₀ x i = shG m₀ y i := by
+  have hAB : (∀ j, rk j ≤ r → x j = y j) → cA x = cA y ∧ cB x = cB y := by
+    intro h
+    refine ⟨?_, ?_⟩
+    · ext a b; unfold cA; split_ifs with h1
+      · exact h _ (by simp only [rk]; omega)
+      · rfl
+      · rfl
+    · ext a j; exact h _ (by simp only [rk]; omega)
+  rcases i with ⟨⟨a, b⟩, h⟩ | ⟨a, j⟩ | ⟨⟨a, b⟩, h⟩
+  · simp only [shG]
+    refine Finset.sum_congr rfl fun c _ => ?_
+    split_ifs with hac
+    · congr 1
+      unfold cA
+      split_ifs with hcb
+      · exact hxy _ (by simp only [rk]; have := c.isLt; have : a.val < c.val := hac; omega)
+      · rfl
+      · rfl
+    · rfl
+  · simp only [shG]
+    congr 1
+    refine Finset.sum_congr rfl fun c _ => ?_
+    split_ifs with hac
+    · congr 1
+      exact hxy _ (by simp only [rk]; have := c.isLt; have : a.val < c.val := hac; omega)
+    · rfl
+  · obtain ⟨hA, hB⟩ := hAB fun j hj => hxy j (by show rk j < r + 1; omega)
+    simp only [shG, dlt, cF, cE, hA, hB]
+
+theorem continuous_dlt (m₀ : Mx k r) : Continuous (dlt m₀) :=
+  continuous_cF.matrix_conjTranspose.matrix_mul (continuous_const.matrix_mul
+    ((continuous_const.matrix_mul continuous_cE).add (continuous_const.matrix_mul continuous_cF)))
+
+
+[BWP_nilpotent_chart_03] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/NilpotentChartNormBound.lean:1-96
+Range SHA256 19757046275f1eab0211be4e6de9f7322b47961e3bb9a983a4959a31eaede524
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NilpotentChartRightInverse
+
+open Matrix Formalism.QuantumDeterminants
+
+noncomputable section
+
+namespace WlocSk.NB
+
+variable {k r : ℕ}
+
+theorem opn_nonneg' {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) : 0 ≤ Formalism.L2.SG.WuDecay.opn M :=
+  norm_nonneg _
+
+theorem entry_le_opn {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) (i j : Fin n) :
+    ‖M i j‖ ≤ Formalism.L2.SG.WuDecay.opn M := by
+  unfold Formalism.L2.SG.WuDecay.opn
+  have h1 := (Matrix.toEuclideanCLM (𝕜 := ℂ) (n := Fin n) M).le_opNorm
+    (EuclideanSpace.single j (1 : ℂ))
+  rw [PiLp.norm_single, norm_one, mul_one] at h1
+  refine le_trans (le_of_eq ?_) ((PiLp.norm_apply_le _ i).trans h1)
+  rw [← EuclideanSpace.toLp_single, Matrix.toEuclideanCLM_toLp, Matrix.mulVec_single_one]
+  simp
+
+theorem one_le_opn {g : Mx k r} (hg : g ∈ Nset k r) : 1 ≤ Formalism.L2.SG.WuDecay.opn g := by
+  have h := entry_le_opn g (wI k r 0) (wI k r 0)
+  rw [(colB_of_mem hg).ww 0 0, if_pos rfl, norm_one] at h
+  exact h
+
+theorem mof_le (g : Mx k r) (a b : Fin r) :
+    ‖mof g a b‖ ≤ r * Formalism.L2.SG.WuDecay.opn g ^ 2 := by
+  rw [mof, Matrix.mul_apply]
+  calc ‖∑ c, (bF g)ᴴ a c * bC g c b‖ ≤ ∑ c, ‖(bF g)ᴴ a c * bC g c b‖ := norm_sum_le _ _
+    _ ≤ ∑ _c : Fin r, Formalism.L2.SG.WuDecay.opn g ^ 2 := Finset.sum_le_sum fun c _ => by
+        rw [norm_mul, conjTranspose_apply, norm_star, sq]
+        exact mul_le_mul (entry_le_opn g (esI k r c) (esI k r a)) (entry_le_opn g (eI k r c) (esI k r b))
+          (norm_nonneg _) (opn_nonneg' _)
+    _ = r * Formalism.L2.SG.WuDecay.opn g ^ 2 := by simp
+
+theorem kof_le (g : Mx k r) (a b : Fin r) :
+    ‖kof g a b‖ ≤ r * Formalism.L2.SG.WuDecay.opn g ^ 2 := by
+  have h2 : ‖(2 : ℂ)‖ = 2 := by simp
+  rw [kof, norm_div, h2]
+  have := norm_sub_le (mof g a b) (star (mof g b a))
+  rw [norm_star] at this
+  have h1 := mof_le g a b
+  have h3 := mof_le g b a
+  linarith
+
+theorem psiC_le {g : Mx k r} (hg : g ∈ Nset k r) (i : CI k r) :
+    ‖psiC g i‖ ≤ ((r : ℝ) + 1) * Formalism.L2.SG.WuDecay.opn g ^ 2 := by
+  set o := Formalism.L2.SG.WuDecay.opn g with ho
+  have h1 : 1 ≤ o := one_le_opn hg
+  have hoo : o ≤ o ^ 2 := by nlinarith
+  have hr : (0 : ℝ) ≤ r := Nat.cast_nonneg r
+  have ho2 : 0 ≤ o ^ 2 := sq_nonneg o
+  rcases i with p | q | p
+  · have := entry_le_opn g (eI k r p.1.1) (eI k r p.1.2)
+    show ‖g _ _‖ ≤ _
+    nlinarith
+  · have := entry_le_opn g (eI k r q.1) (wI k r q.2)
+    show ‖g _ _‖ ≤ _
+    nlinarith
+  · have := kof_le g p.1.1 p.1.2
+    show ‖kof g _ _‖ ≤ _
+    nlinarith
+
+theorem psiR_le (g : Mx k r) (a : Fin r) :
+    ‖psiR g a‖ ≤ ((r : ℝ) + 1) * Formalism.L2.SG.WuDecay.opn g ^ 2 := by
+  have h := mof_le g a a
+  have h' : ‖psiR g a‖ ≤ ‖mof g a a‖ := by
+    rw [psiR, Real.norm_eq_abs]; exact Complex.abs_im_le_norm _
+  have ho2 : 0 ≤ Formalism.L2.SG.WuDecay.opn g ^ 2 := sq_nonneg _
+  nlinarith
+
+theorem growth (g : Mx k r) (hg : g ∈ Nset k r) :
+    1 + ‖(psiC g, psiR g)‖ ≤ ((r : ℝ) + 2) * Formalism.L2.SG.WuDecay.opn (Matrix.of g) ^ 2 := by
+  show 1 + ‖(psiC g, psiR g)‖ ≤ ((r : ℝ) + 2) * Formalism.L2.SG.WuDecay.opn g ^ 2
+  have h1 : 1 ≤ Formalism.L2.SG.WuDecay.opn g := one_le_opn hg
+  have hB : 0 ≤ ((r : ℝ) + 1) * Formalism.L2.SG.WuDecay.opn g ^ 2 := by positivity
+  have hC : ‖psiC g‖ ≤ ((r : ℝ) + 1) * Formalism.L2.SG.WuDecay.opn g ^ 2 :=
+    (pi_norm_le_iff_of_nonneg hB).2 fun i => psiC_le hg i
+  have hR : ‖psiR g‖ ≤ ((r : ℝ) + 1) * Formalism.L2.SG.WuDecay.opn g ^ 2 :=
+    (pi_norm_le_iff_of_nonneg hB).2 fun a => psiR_le g a
+  have hP : ‖(psiC g, psiR g)‖ ≤ ((r : ℝ) + 1) * Formalism.L2.SG.WuDecay.opn g ^ 2 := by
+    rw [Prod.norm_def]; exact max_le hC hR
+  nlinarith
+
+theorem nilpotent_chart_norm_bound (x : CI k r → ℂ) (s : Fin r → ℝ) :
+    1 + ‖(x, s)‖ ≤ ((r : ℝ) + 2) * Formalism.L2.SG.WuDecay.opn (Matrix.of (phi0 x s)) ^ 2 := by
+  have h := growth (phi0 x s) (test_vector_mem_schwartz_bruhat x s)
+  rw [(nilpotent_chart_right_inverse x s).1, (nilpotent_chart_right_inverse x s).2] at h
+  exact h
+
+end WlocSk.NB
+
+end
+
+
+[BWP_nilpotent_chart_04] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/OpnContinuous.lean:11-134
+Range SHA256 e364a2b284cec95a684a0a324ad7cb284edb9aaf2eb11edeb127e966cdb08ead
+
+instance instAddHaarCSp (m d : ℕ) : (volume : Measure (CSp m d)).IsAddHaarMeasure :=
+  Measure.prod.instIsAddHaarMeasure _ _
+
+def NCoordHaar : Prop :=
+  ∀ (k r : ℕ) (μN : Measure (Formalism.QuantumDeterminants.Mt k r)), IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μN →
+    (∀ K : Set (Formalism.QuantumDeterminants.Mt k r), IsCompact K → μN K < ⊤) →
+    ∃ (m d q : ℕ) (Φ : CSp m d → Formalism.QuantumDeterminants.Mt k r) (c : ℝ≥0∞) (κ : ℝ),
+      1 ≤ q ∧ ((q * (2 * m + d) : ℕ) : ℝ) < N1H k r ∧ 0 < κ ∧ c ≠ ⊤ ∧ Measurable Φ ∧
+      μN = c • (volume : Measure (CSp m d)).map Φ ∧
+      ∀ t, 1 + ‖t‖ ≤ κ * Formalism.L2.SG.WuDecay.opn (Matrix.of (Φ t)) ^ q
+
+def NChart : Prop :=
+  ∀ (k r : ℕ), ∃ (m d q : ℕ) (Φ : CSp m d → Formalism.QuantumDeterminants.Mt k r) (κ : ℝ),
+    1 ≤ q ∧ ((q * (2 * m + d) : ℕ) : ℝ) < N1H k r ∧ 0 < κ ∧ MeasurableEmbedding Φ ∧
+    Set.range Φ = {x | Matrix.of x ∈ Formalism.QuantumDeterminants.Nset k r} ∧
+    (∀ m₀ ∈ Formalism.QuantumDeterminants.Nset k r, ∃ T : CSp m d → CSp m d, MeasurePreserving T volume volume ∧
+      ∀ t, Formalism.QuantumDeterminants.lmulM m₀ (Φ t) = Φ (T t)) ∧
+    ∀ t, 1 + ‖t‖ ≤ κ * Formalism.L2.SG.WuDecay.opn (Matrix.of (Φ t)) ^ q
+
+def NUniq : Prop :=
+  ∀ (k r : ℕ) (μ μ' : Measure (Formalism.QuantumDeterminants.Mt k r)), IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μ →
+    IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μ' → ∃ c : ℝ≥0∞, c ≠ ⊤ ∧ μ = c • μ'
+
+theorem nCoordHaar_of (hC : NChart) (hU : NUniq) : NCoordHaar := by
+  intro k r μN hN _
+  obtain ⟨m, d, q, Φ, κ, hq, hD, hκ, hΦ, hrange, hT, hgrow⟩ := hC k r
+  have hmeasL : ∀ a : Mat k r, Measurable (Formalism.QuantumDeterminants.lmulM (k := k) (r := r) a) := fun a => by
+    have : Continuous (Formalism.QuantumDeterminants.lmulM (k := k) (r := r) a) := by
+      unfold Formalism.QuantumDeterminants.lmulM
+      exact continuous_const.matrix_mul continuous_id
+    exact this.measurable
+  have hH : IsHaarOn (Formalism.QuantumDeterminants.Nset k r) ((volume : Measure (CSp m d)).map Φ) := by
+    refine ⟨hΦ.sigmaFinite_map, ?_, ?_, ?_⟩
+    · intro h0
+      rw [Measure.map_eq_zero_iff hΦ.measurable.aemeasurable] at h0
+      exact isOpen_univ.measure_ne_zero (volume : Measure (CSp m d)) Set.univ_nonempty
+        (by rw [h0, Measure.coe_zero, Pi.zero_apply])
+    · rw [Measure.map_apply hΦ.measurable]
+      · have : Φ ⁻¹' {x | Matrix.of x ∉ Formalism.QuantumDeterminants.Nset k r} = ∅ := by
+          ext t
+          simp only [Set.mem_preimage, Set.mem_ofPred_eq, Set.mem_empty_iff_false, iff_false, not_not]
+          have : Φ t ∈ Set.range Φ := ⟨t, rfl⟩
+          rw [hrange] at this
+          exact this
+        rw [this, measure_empty]
+      · have hcl : MeasurableSet (Set.range Φ) := hΦ.measurableSet_range
+        rw [hrange] at hcl
+        exact hcl.compl
+    · intro s hs
+      obtain ⟨T, hTm, hTe⟩ := hT s hs
+      rw [Measure.map_map (hmeasL s) hΦ.measurable]
+      have : Formalism.QuantumDeterminants.lmulM s ∘ Φ = Φ ∘ T := funext hTe
+      rw [this, ← Measure.map_map hΦ.measurable hTm.measurable, hTm.map_eq]
+  obtain ⟨c, hc, hμ⟩ := hU k r μN _ hN hH
+  exact ⟨m, d, q, Φ, c, κ, hq, hD, hκ, hc, hΦ.measurable, hμ, hgrow⟩
+
+local instance instAlgCLM (n : ℕ) :
+    Algebra ℂ (EuclideanSpace ℂ (Fin n) →L[ℂ] EuclideanSpace ℂ (Fin n)) := ContinuousLinearMap.algebra
+local instance instModCLM (n : ℕ) :
+    Module ℂ (EuclideanSpace ℂ (Fin n) →L[ℂ] EuclideanSpace ℂ (Fin n)) := ContinuousLinearMap.module
+
+lemma opn_continuous (k r : ℕ) :
+    Continuous fun m : Formalism.QuantumDeterminants.Mt k r => Formalism.L2.SG.WuDecay.opn (Matrix.of m) := by
+  unfold Formalism.L2.SG.WuDecay.opn
+  have : Continuous fun m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ =>
+      Matrix.toEuclideanCLM (𝕜 := ℂ) (n := Fin (2 * r + k + 1)) m := by
+    let L : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ →ₗ[ℂ]
+        (EuclideanSpace ℂ (Fin (2 * r + k + 1)) →L[ℂ] EuclideanSpace ℂ (Fin (2 * r + k + 1))) :=
+      { toFun := fun m => Matrix.toEuclideanCLM (𝕜 := ℂ) m
+        map_add' := fun a b => map_add _ a b
+        map_smul' := fun a b => map_smul _ a b }
+    exact L.continuous_of_finiteDimensional
+  exact continuous_norm.comp (this.comp continuous_id)
+
+lemma finrank_CSp (m d : ℕ) : Module.finrank ℝ (CSp m d) = 2 * m + d := by
+  rw [Module.finrank_prod, Module.finrank_pi_fintype, Module.finrank_fin_fun]
+  simp [Complex.finrank_real_complex, mul_comm]
+
+theorem nIntDecay_of (h : NCoordHaar) : NIntDecay := by
+  intro k r μN hN hNc
+  obtain ⟨m, d, q, Φ, c, κ, hq, hD, hκ, hc, hΦ, hμ, hgrow⟩ := h k r μN hN hNc
+  have hq0 : (0 : ℝ) < q := by exact_mod_cast hq
+  have hD' : (Module.finrank ℝ (CSp m d) : ℝ) < N1H k r / q := by
+    rw [finrank_CSp, lt_div_iff₀ hq0, mul_comm]; exact_mod_cast hD
+  have hF : Measurable fun x : Formalism.QuantumDeterminants.Mt k r =>
+      ENNReal.ofReal (Formalism.L2.SG.WuDecay.opn (Matrix.of x) ^ (-N1H k r)) :=
+    ENNReal.measurable_ofReal.comp ((opn_continuous k r).measurable.pow_const _)
+  rw [hμ, lintegral_smul_measure, lintegral_map hF hΦ]
+  refine ENNReal.mul_lt_top hc.lt_top ?_
+  set s := N1H k r / q with hs
+  have hbound : ∀ t : CSp m d,
+      ENNReal.ofReal (Formalism.L2.SG.WuDecay.opn (Matrix.of (Φ t)) ^ (-N1H k r)) ≤
+        ENNReal.ofReal (κ ^ s) * ENNReal.ofReal ((1 + ‖t‖) ^ (-s)) := by
+    intro t
+    set o := Formalism.L2.SG.WuDecay.opn (Matrix.of (Φ t)) with ho
+    have ho0 : 0 ≤ o := norm_nonneg _
+    have h1 : 0 < 1 + ‖t‖ := by positivity
+    have h2 : (1 + ‖t‖) / κ ≤ o ^ q := by
+      rw [div_le_iff₀ hκ, mul_comm]; exact hgrow t
+    have h3 : 0 < (1 + ‖t‖) / κ := div_pos h1 hκ
+    have hoq : o ^ (-N1H k r) = (o ^ q) ^ (-s) := by
+      rw [← Real.rpow_natCast, ← Real.rpow_mul ho0, hs]
+      congr 1
+      field_simp
+    rw [← ENNReal.ofReal_mul (by positivity)]
+    apply ENNReal.ofReal_le_ofReal
+    rw [hoq]
+    calc (o ^ q) ^ (-s)
+        ≤ ((1 + ‖t‖) / κ) ^ (-s) :=
+          Real.rpow_le_rpow_of_nonpos h3 h2 (by
+            have : 0 < s := lt_of_le_of_lt (Nat.cast_nonneg _) hD'
+            linarith)
+      _ = κ ^ s * (1 + ‖t‖) ^ (-s) := by
+          rw [Real.div_rpow h1.le hκ.le, div_eq_mul_inv, ← Real.rpow_neg hκ.le, neg_neg, mul_comm]
+  calc ∫⁻ t, ENNReal.ofReal (Formalism.L2.SG.WuDecay.opn (Matrix.of (Φ t)) ^ (-N1H k r))
+      ≤ ∫⁻ t : CSp m d, ENNReal.ofReal (κ ^ s) *
+          ENNReal.ofReal ((1 + ‖t‖) ^ (-s)) := lintegral_mono hbound
+    _ = ENNReal.ofReal (κ ^ s) *
+          ∫⁻ t : CSp m d, ENNReal.ofReal ((1 + ‖t‖) ^ (-s)) :=
+        lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
+    _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top (finite_integral_one_add_norm hD')
+
+end WlocSk
+
+
+[BWP_reproducer_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:389-399
+Range SHA256 611dbcac7d77a83943e6bf5b00dcc08640334b6dc168c762106e5a4f308dbd91
+        ((γ : GL (Fin I.n) I.E) : Matrix (Fin I.n) (Fin I.n) I.E).det = 1 ∧
+          Formalism.L2.SG.ColsDim.ratHom I.cm.sig I.J (Af I.F) γ ∈ U
+
+def HCReprodDS : Prop :=
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsDS ε lam σ →
+    ∀ w ∈ lowKSub ε lam σ, ∀ U ∈ nhds (1 : Formalism.REAL.UJ ε),
+      ∃ α : Formalism.REAL.UJ ε → ℂ, Continuous α ∧ HasCompactSupport α ∧ Function.support α ⊆ U ∧
+        Integrable (fun g => α g • σ (uMat g) w) (Formalism.REAL.muG ε) ∧
+        ∫ g, α g • σ (uMat g) w ∂(Formalism.REAL.muG ε) = w
+
+
+
+[BWP_reproducer_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/HCReprodM.lean:1-90
+Range SHA256 ff05c8a99fbcce2516c15bf7c63e6d90d6aa05e8a2aca0c39b05adbbfc26a267
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.CasimirReductionTheory.OneParameterDerivatives.Admissible
+
+noncomputable section
+
+open MeasureTheory Formalism.MainNotions.S Formalism.MainNotions.BridgeCPX
+open scoped InnerProductSpace
+
+attribute [local instance] Matrix.normedAddCommGroup Matrix.normedSpace
+
+namespace Formalism.L2.SG.HCReprodM
+
+def HCReprodDSc : Prop :=
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsDS ε lam σ →
+    ∀ w ∈ lowKSub ε lam σ, ∃ α : Formalism.REAL.UJ ε → ℂ, Continuous α ∧ HasCompactSupport α ∧
+      Integrable (fun g => α g • σ (uMat g) w) (Formalism.REAL.muG ε) ∧
+      ∫ g, α g • σ (uMat g) w ∂(Formalism.REAL.muG ε) = w
+
+def HCReprodDSm : Prop :=
+  ∀ (n : ℕ) (ε : Fin n → Bool) (lam : Fin n → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+    [CompleteSpace H] (σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)), IsDS ε lam σ →
+    ∀ w ∈ lowKSub ε lam σ, ∃ (α : Formalism.REAL.UJ ε → ℂ) (Ω : Set (Formalism.REAL.UJ ε)) (a : ℝ), IsCompact Ω ∧
+      Measurable α ∧ (∀ g, α g ≠ 0 → g ∈ Ω) ∧ (∀ g, ‖α g‖ ≤ a) ∧
+      Integrable (fun g => α g • σ (uMat g) w) (Formalism.REAL.muG ε) ∧
+      ∫ g, α g • σ (uMat g) w ∂(Formalism.REAL.muG ε) = w
+
+section KFin
+
+variable {n : ℕ} {ε : Fin n → Bool} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {σ : Matrix (Fin n) (Fin n) ℂ → (H →L[ℂ] H)}
+
+theorem finsetSup_kstable (s : Finset (Submodule ℂ H))
+    (hs : ∀ S ∈ s, FiniteDimensional ℂ S ∧ IsKStableOn ε σ S) :
+    FiniteDimensional ℂ ↥(s.sup (id : Submodule ℂ H → Submodule ℂ H)) ∧
+      IsKStableOn ε σ (s.sup (id : Submodule ℂ H → Submodule ℂ H)) := by
+  unfold IsKStableOn at hs ⊢
+  revert hs
+  refine Finset.induction_on s ?_ ?_
+  · intro _
+    rw [Finset.sup_empty]
+    refine ⟨inferInstance, fun g _ v hv => ?_⟩
+    rw [Submodule.mem_bot] at hv ⊢
+    rw [hv, map_zero]
+  · intro a s _ ih hs
+    have h1 := hs a (Finset.mem_insert_self a s)
+    have h2 := ih (fun S hS => hs S (Finset.mem_insert_of_mem hS))
+    rw [Finset.sup_insert]
+    refine ⟨?_, ?_⟩
+    · haveI := h1.1
+      haveI := h2.1
+      show FiniteDimensional ℂ ↥(a ⊔ s.sup (id : Submodule ℂ H → Submodule ℂ H))
+      infer_instance
+    · intro g hg v hv
+      obtain ⟨y, hy, z, hz, rfl⟩ := Submodule.mem_sup.1 hv
+      rw [map_add]
+      exact Submodule.add_mem_sup (h1.2 g hg y hy) (h2.2 g hg z hz)
+
+theorem isKFin_of_mem_lowKSub {lam : Fin n → ℝ} {w : H} (hw : w ∈ lowKSub ε lam σ) : IsKFin ε σ w := by
+  unfold IsKFin lowKSub at *
+  unfold IsKTypeOf at hw
+  obtain ⟨s, hs, hws⟩ := (Submodule.mem_sSup_iff_exists_finset).1 hw
+  obtain ⟨hfd, hst⟩ := finsetSup_kstable s (fun S hS => ⟨(hs hS).1, (hs hS).2.1⟩)
+  have hws' : w ∈ s.sup (id : Submodule ℂ H → Submodule ℂ H) := by
+    rw [Finset.sup_eq_iSup]
+    exact hws
+  exact ⟨_, hfd, hws', hst⟩
+
+end KFin
+
+theorem hcReprodDSc : HCReprodDSc := by
+  intro n ε lam H _ _ _ σ hDS w hw
+  have hσ : IsURepOn (UJset ε) σ := hDS.2.2.1
+  have hirr : IsIrredOn (UJset ε) σ := hDS.2.2.2.1
+  have hadm : AdmProjAt ε σ := Formalism.L2.SG.Pf.harishChandra_admissible n ε lam H σ hDS
+  by_cases h0 : w = 0
+  · refine ⟨0, continuous_const, HasCompactSupport.zero, ?_, ?_⟩
+    · simp
+    · simp [h0]
+  · obtain ⟨Φ, hΦ, hx⟩ := kfin_mem_Vsub hσ hirr hadm h0 (isKFin_of_mem_lowKSub hw)
+    exact ⟨fun y => Φ (umat y), hΦ.1.continuous.comp continuous_umat, test_comp_cs hΦ,
+      vec_integrable hσ w hΦ, hx.symm⟩
+
+theorem hcReprodDSm : HCReprodDSm := by
+  intro n ε lam H _ _ _ σ hds w hw
+  obtain ⟨α, hc, hcs, hi, he⟩ := hcReprodDSc n ε lam H σ hds w hw
+  obtain ⟨a, ha⟩ := hc.bounded_above_of_compact_support hcs
+  exact ⟨α, tsupport α, a, hcs.isCompact, hc.measurable, fun g hg => subset_tsupport α hg, ha, hi, he⟩
+
+end Formalism.L2.SG.HCReprodM
+
+
+[BWP_weighted_coefficient_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:323-334
+Range SHA256 3ca6f49edf5508b410995b78e112c7d86ccaf2b7a8fc000ffd2a55b022cb09cf
+def CoefWeightedLoc : Prop :=
+  ∀ (k r : ℕ) (v : Fin (k - 1) → ℝ) (b : Fin (2 * r + 2) → ℝ),
+    Formalism.QuantumDeterminants.IsHCParam (Formalism.MainNotions.CayleySignature.lam48 k r v b) → Formalism.MainNotions.CayleySignature.GapBig k r b →
+    ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+      (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)),
+      Formalism.MainNotions.S.IsDS (Formalism.MainNotions.CayleySignature.eps48 k r) (Formalism.MainNotions.CayleySignature.lam48 k r v b) σ →
+      ∀ w : H, Formalism.MainNotions.S.IsLowUnit (Formalism.MainNotions.CayleySignature.eps48 k r) (Formalism.MainNotions.CayleySignature.lam48 k r v b) σ w →
+        ∫⁻ g, ‖⟪w, σ (Formalism.MainNotions.S.uMat g) w⟫_ℂ‖ₑ *
+            ENNReal.ofReal (‖Matrix.toEuclideanCLM (𝕜 := ℂ) (Formalism.MainNotions.S.uMat g)‖ ^
+              (4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 * Real.sqrt (2 * ((r + 1 : ℕ) : ℝ))))
+          ∂(Formalism.REAL.muG (Formalism.MainNotions.CayleySignature.eps48 k r)) < ⊤
+
+
+
+[BWP_local_measure_kernel_01] src/Formalism/SharpRestriction/CuspSpanNormBounds/RelevantZeroGramTerms.lean:208-228
+Range SHA256 7f92c8d29a8fc1438fa744aa2e0ce466ebe5e6b8eab37e828efb34f3da62a0f5
+def IsQuotMeas (μG μS ν : Measure (Formalism.QuantumDeterminants.Mt k r)) : Prop :=
+  ∀ f : Formalism.QuantumDeterminants.Mt k r → ENNReal, Measurable f →
+    ∫⁻ x, f x ∂μG = ∫⁻ x, (∫⁻ s, f (fun i j => (Matrix.of s * Matrix.of x) i j) ∂μS) ∂ν
+
+def IsSPsiEquiv {Wp : Type*} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] (z : Fin (2 * r + k + 1) → ℂ)
+    (ψ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → ℂ)
+    (π : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (Wp →L[ℂ] Wp))
+    (W : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → Wp) : Prop :=
+  ∀ h ∈ Formalism.QuantumDeterminants.UWset k r z, ∀ m ∈ Formalism.QuantumDeterminants.Nset k r, ∀ g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
+    W (h * m * g) = ψ m • π h (W g)
+
+def l2SG {Wp : Type*} [NormedAddCommGroup Wp] (ν : Measure (Formalism.QuantumDeterminants.Mt k r))
+    (W : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → Wp) : ENNReal :=
+  ∫⁻ x, (‖W (Matrix.of x)‖₊ : ENNReal) ^ 2 ∂ν
+
+def rconv {Wp : Type*} [NormedAddCommGroup Wp] [NormedSpace ℂ Wp] (μG : Measure (Formalism.QuantumDeterminants.Mt k r))
+    (e : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → ℂ)
+    (W : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → Wp) :
+    Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → Wp :=
+  fun x => ∫ g, e (Matrix.of g) • W (x * Matrix.of g) ∂μG
+
+
+
+[BWP_local_measure_kernel_02] src/Formalism/SharpRestriction/CuspSpanNormBounds/RelevantZeroGramTerms.lean:419-430
+Range SHA256 99f708632a679b249dabfed7e5fe2600e692b384ae63beccb25a0e2eabc4c6a8
+def fdegH (μG : Measure (Formalism.QuantumDeterminants.Mt k r))
+    (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)) (w : H) : ℝ :=
+  ‖w‖ ^ 4 / ∫ x, ‖⟪w, σ (Matrix.of x) w⟫_ℂ‖ ^ 2 ∂μG
+
+def eFun (μG : Measure (Formalism.QuantumDeterminants.Mt k r))
+    (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)) (w : H)
+    (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) : ℂ :=
+  (fdegH μG σ w : ℂ) * star ⟪w, σ g w⟫_ℂ
+
+def IsKFinHpk (σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)) (v : H) : Prop :=
+  ∃ S : Submodule ℂ H, FiniteDimensional ℂ S ∧ v ∈ S ∧
+    ∀ g ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∩ (Matrix.unitaryGroup (Fin (2 * r + k + 1)) ℂ : Set _), ∀ x ∈ S, σ g x ∈ S
+
+
+[BWP_wave_packet_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/WavePacketL1L2.lean:1-220
+Range SHA256 88bb4608fe43f2eb0fb1b1dfd71839b576923aebf412f63f2eda20e586c5204b
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.SettingBlocks
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.HCReprodM
+
+noncomputable section
+
+open MeasureTheory Formalism.MainNotions.S Formalism.MainNotions.CayleySignature Formalism.L2.SG.SplitPrimeNormLemmas Matrix
+open scoped InnerProductSpace ENNReal
+
+namespace WlocSk
+
+abbrev Gr (k r : ℕ) : Set (Mat k r) := Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)
+
+def mulP {k r : ℕ} (p : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r) : Formalism.QuantumDeterminants.Mt k r :=
+  fun i j => (Matrix.of p.1 * Matrix.of p.2) i j
+
+section Defs
+
+variable {k r : ℕ} {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
+  {Vp : Type} [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+
+def bInt (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (σ : Mat k r → (H →L[ℂ] H))
+    (π : Mat k r → (Vp →L[ℂ] Vp)) (w' : H) (ξ : Vp) (v : H)
+    (p : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r) : Vp :=
+  (⟪w', σ (Matrix.of p.1 * Matrix.of p.2) v⟫_ℂ * star (psiGen k r z c (Matrix.of p.2))) •
+    π (Matrix.of p.1)⁻¹ ξ
+
+def B0 (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (σ : Mat k r → (H →L[ℂ] H))
+    (π : Mat k r → (Vp →L[ℂ] Vp)) (μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)) (w' : H) (ξ : Vp) (v : H) : Vp :=
+  ∫ p, bInt z c σ π w' ξ v p ∂(μW.prod μN)
+
+def Af (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (σ : Mat k r → (H →L[ℂ] H))
+    (π : Mat k r → (Vp →L[ℂ] Vp)) (μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)) (w : H) (x₀ : Mat k r) (ξ : Vp)
+    (g : Mat k r) : Vp :=
+  B0 z c σ π μW μN (σ x₀ w) ξ (σ g w)
+
+def Wf (ν : Measure (Formalism.QuantumDeterminants.Mt k r)) (A : Mat k r → Vp) (g : Mat k r) : Vp :=
+  ((Real.sqrt (l2SG ν A).toReal)⁻¹ : ℂ) • A g
+
+def bOp (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (σ : Mat k r → (H →L[ℂ] H))
+    (π : Mat k r → (Vp →L[ℂ] Vp)) (μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)) (w : H) (x₀ x : Mat k r) :
+    Vp →L[ℂ] Vp :=
+  ∫ p : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r,
+    (⟪σ x₀ w, σ (Matrix.of p.1 * Matrix.of p.2) (σ x w)⟫_ℂ * star (psiGen k r z c (Matrix.of p.2))) •
+      π (Matrix.of p.1)⁻¹ ∂(μW.prod μN)
+
+def Hyp (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (σ : Mat k r → (H →L[ℂ] H)) (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H)
+    (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)) : Prop :=
+  RealPlaceNumericalSetting k r z c u v b ∧ IsDSHpk k r (eps48 k r) (lam48 k r v b) σ ∧ IsHCTypeW k r z u π ∧
+    IsLowUnitH k r (eps48 k r) (lam48 k r v b) σ w ∧
+    IsHaarOn (Gr k r) μG ∧ IsHaarOn (Formalism.QuantumDeterminants.Sset k r z) μS ∧ IsQuotMeas μG μS ν ∧
+    IsHaarOn (Formalism.QuantumDeterminants.UWset k r z) μW ∧ IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μN ∧ IsFiniteMeasure μW ∧
+    ∀ K : Set (Formalism.QuantumDeterminants.Mt k r), IsCompact K → μN K < ⊤
+
+end Defs
+
+def HaarWN : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ), Formalism.QuantumDeterminants.inWb k r z → 0 < Formalism.QuantumDeterminants.Tz k r z →
+    ∃ μW μN : Measure (Formalism.QuantumDeterminants.Mt k r), IsHaarOn (Formalism.QuantumDeterminants.UWset k r z) μW ∧
+      IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μN ∧ IsFiniteMeasure μW ∧
+      ∀ K : Set (Formalism.QuantumDeterminants.Mt k r), IsCompact K → μN K < ⊤
+
+def SGrp : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ), Formalism.QuantumDeterminants.inWb k r z →
+    0 < Formalism.QuantumDeterminants.Tz k r z →
+    Formalism.QuantumDeterminants.UWset k r z ⊆ Gr k r ∧ Formalism.QuantumDeterminants.Nset k r ⊆ Gr k r ∧
+    (∀ h ∈ Formalism.QuantumDeterminants.UWset k r z, ∀ h' ∈ Formalism.QuantumDeterminants.UWset k r z,
+      h * h' ∈ Formalism.QuantumDeterminants.UWset k r z ∧ h⁻¹ ∈ Formalism.QuantumDeterminants.UWset k r z ∧ h * h⁻¹ = 1) ∧
+    (∀ m ∈ Formalism.QuantumDeterminants.Nset k r, ∀ m' ∈ Formalism.QuantumDeterminants.Nset k r, m * m' ∈ Formalism.QuantumDeterminants.Nset k r ∧
+      m⁻¹ ∈ Formalism.QuantumDeterminants.Nset k r ∧ m * m⁻¹ = 1 ∧
+      psiGen k r z c (m * m') = psiGen k r z c m * psiGen k r z c m' ∧ ‖psiGen k r z c m‖ = 1) ∧
+    (∀ h ∈ Formalism.QuantumDeterminants.UWset k r z, ∀ m ∈ Formalism.QuantumDeterminants.Nset k r,
+      h⁻¹ * m * h ∈ Formalism.QuantumDeterminants.Nset k r ∧ psiGen k r z c (h⁻¹ * m * h) = psiGen k r z c m)
+
+def PiUnit : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (u : Fin k → ℝ) (Vp : Type) [NormedAddCommGroup Vp]
+    [InnerProductSpace ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)), Formalism.QuantumDeterminants.inWb k r z →
+    0 < Formalism.QuantumDeterminants.Tz k r z → IsHCTypeW k r z u π →
+    Formalism.QuantumDeterminants.IsCRepOn (Formalism.QuantumDeterminants.UWset k r z) π ∧ ∀ h ∈ Formalism.QuantumDeterminants.UWset k r z, ∀ ξ : Vp, ‖π h ξ‖ = ‖ξ‖
+
+def SigmaG : Prop :=
+  ∀ (k r : ℕ) (ε : Fin (2 * r + k + 1) → Bool) (lam : Fin (2 * r + k + 1) → ℝ) (H : Type)
+    [NormedAddCommGroup H] [InnerProductSpace ℂ H] (σ : Mat k r → (H →L[ℂ] H)),
+    IsDSHpk k r ε lam σ → IsURepOn (Gr k r) σ
+
+def SProd : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    ∃ cS : ℝ≥0∞, cS ≠ 0 ∧ cS ≠ ⊤ ∧ (μW.prod μN).map mulP = cS • μS
+
+def Decay : Prop :=
+  CoefWeightedLoc → ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    ∫⁻ g, ‖⟪w, σ (Matrix.of g) w⟫_ℂ‖ₑ *
+      ENNReal.ofReal (Formalism.L2.SG.WuDecay.opn (Matrix.of g) ^ N1H k r) ∂μG < ⊤
+
+def SchurG : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    ∃ d : ℝ, 0 < d ∧ ∀ v₁ w₁ v₂ w₂ : H,
+      Integrable (fun g : Formalism.QuantumDeterminants.Mt k r =>
+        ⟪w₁, σ (Matrix.of g) v₁⟫_ℂ * star ⟪w₂, σ (Matrix.of g) v₂⟫_ℂ) μG ∧
+      ∫ g, ⟪w₁, σ (Matrix.of g) v₁⟫_ℂ * star ⟪w₂, σ (Matrix.of g) v₂⟫_ℂ ∂μG =
+        ⟪v₂, v₁⟫_ℂ * ⟪w₁, w₂⟫_ℂ / (d : ℂ)
+
+def ReprodG : Prop :=
+  Formalism.L2.SG.HCReprodM.HCReprodDSm → ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    ∃ (α : Mat k r → ℂ) (Ω : Set (Mat k r)) (a : ℝ), IsCompact Ω ∧ Ω ⊆ Gr k r ∧
+      Measurable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g)) ∧ (∀ y, α y ≠ 0 → y ∈ Ω) ∧ (∀ y, ‖α y‖ ≤ a) ∧
+      Integrable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g) • σ (Matrix.of g) w) μG ∧
+      ∫ g, α (Matrix.of g) • σ (Matrix.of g) w ∂μG = w
+
+def NIntDecay : Prop :=
+  ∀ (k r : ℕ) (μN : Measure (Formalism.QuantumDeterminants.Mt k r)), IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μN →
+    (∀ K : Set (Formalism.QuantumDeterminants.Mt k r), IsCompact K → μN K < ⊤) →
+    ∫⁻ m, ENNReal.ofReal (Formalism.L2.SG.WuDecay.opn (Matrix.of m) ^ (-N1H k r)) ∂μN < ⊤
+
+def AInt : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    ∀ g ∈ Gr k r, Integrable (bInt z c σ π (σ x₀ w) ξ (σ g w)) (μW.prod μN)
+
+def AEquiv : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    IsSPsiEquiv z (psiGen k r z c) π (Af z c σ π μW μN w x₀ ξ)
+
+def ACont : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    ContinuousOn (Af z c σ π μW μN w x₀ ξ) (Gr k r)
+
+def AKind : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    ∀ x ∈ Gr k r,
+      Integrable (fun g : Formalism.QuantumDeterminants.Mt k r => eFun μG σ w (Matrix.of g) • (Af z c σ π μW μN w x₀ ξ) (x * Matrix.of g)) μG ∧
+      rconv μG (eFun μG σ w) (Af z c σ π μW μN w x₀ ξ) x = (Af z c σ π μW μN w x₀ ξ) x
+
+def AReprod : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    ∃ (α : Mat k r → ℂ) (Ω : Set (Mat k r)) (a : ℝ), IsCompact Ω ∧ (1 : Mat k r) ∈ Ω ∧ Ω ⊆ Gr k r ∧
+      Measurable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g)) ∧ (∀ y, α y ≠ 0 → y ∈ Ω) ∧ (∀ y, ‖α y‖ ≤ a) ∧
+      ∀ x ∈ Gr k r,
+        Integrable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g) • (Af z c σ π μW μN w x₀ ξ) (x * Matrix.of g)) μG ∧
+        rconv μG α (Af z c σ π μW μN w x₀ ξ) x = (Af z c σ π μW μN w x₀ ξ) x
+
+def WavePacketL1L2 : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    ∫⁻ x, ‖(Af z c σ π μW μN w x₀ ξ) (Matrix.of x)‖ₑ ∂ν < ⊤ ∧ l2SG ν (Af z c σ π μW μN w x₀ ξ) < ⊤
+
+def AWeighted : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    ∫⁻ x, ‖(Af z c σ π μW μN w x₀ ξ) (Matrix.of x)‖ₑ * ENNReal.ofReal (nuH k r z (Matrix.of x) ^ N1H k r) ∂ν < ⊤
+
+def ANonzero : Prop :=
+  BesselNVGap → ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc →
+    ∃ x₀ ∈ Gr k r, ∃ ξ : Vp, l2SG ν (Af z c σ π μW μN w x₀ ξ) ≠ 0
+
+def ABound : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ) (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    (σ : Mat k r → (H →L[ℂ] H)) (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp]
+    [FiniteDimensional ℂ Vp] (π : Mat k r → (Vp →L[ℂ] Vp)) (w : H) (μG μS ν μW μN : Measure (Formalism.QuantumDeterminants.Mt k r)),
+    Hyp k r z c u v b σ π w μG μS ν μW μN →
+    Formalism.L2.SG.HCReprodM.HCReprodDSm → CoefWeightedLoc → ∀ x₀ ∈ Gr k r, ∀ ξ : Vp,
+    ∃ C : ℝ, 0 ≤ C ∧ ∀ g ∈ Gr k r,
+      ∫⁻ p, ‖bInt z c σ π (σ x₀ w) ξ (σ g w) p‖ₑ ∂(μW.prod μN) ≤
+        ENNReal.ofReal (C * Formalism.L2.SG.WuDecay.opn g ^ N1H k r)
+
+end WlocSk
+
+
+[BWP_wave_packet_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/WavePacketL1L2OfNilpotentChart.lean:1-74
+Range SHA256 e1d6eb3dbb6a9d00928b33249f445258e3277e15c7379489d18471ec944b7a9d
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.L2SGWfEqOne
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.SigmaDecomposition
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.SchurOrthogonalityRelations
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.SubgroupHypothesisHolds
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.RepresentationUnitary
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.DecayR
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.HaarWN
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NotMidCases
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.ProductDecompositionHolds
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.OpnContinuous
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NilradicalHaarUnique
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NilradicalHalfSumNonneg
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.PsiGenNorm
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.AeProductMemUnipotentAndNilradical
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.RepresentationContinuous
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.StarOfInv
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.WavePacketL1L2OfHypotheses
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.AKindR
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NilradicalUnimodularConjInvariant
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.ANonzeroOf
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.UnipotentRightInvariance
+
+noncomputable section
+
+open Formalism.L2.SG.SplitPrimeNormLemmas
+
+namespace WlocSk
+
+theorem unipotent_set_compact : PtD.UWComp := fun _ _ z hz hT => HM.compactW z hz hT
+
+theorem nIntDecay_of_chart (hNC : NChart) : NIntDecay := nIntDecay_of (nCoordHaar_of hNC nilradical_haar_unique)
+
+theorem aInt_of_chart (hNC : NChart) : AInt :=
+  PtD.wave_packet_integrable sigma_decomposition DecayR.decay_estimate DecayR.reproducing_formula_holds subgroup_hypothesis_holds representation_unitary
+    (nIntDecay_of_chart hNC) unipotent_set_compact
+
+theorem aCont_of_chart (hNC : NChart) : ACont :=
+  PtD.wave_packet_continuous sigma_decomposition DecayR.decay_estimate DecayR.reproducing_formula_holds subgroup_hypothesis_holds representation_unitary
+    (nIntDecay_of_chart hNC) unipotent_set_compact
+
+theorem aBound_of_chart (hNC : NChart) : ABound :=
+  PtD.aBound_of sigma_decomposition DecayR.decay_estimate DecayR.reproducing_formula_holds subgroup_hypothesis_holds representation_unitary
+    (nIntDecay_of_chart hNC) unipotent_set_compact
+
+theorem aEquiv_of_charts (hNC : NChart) (hWR : WRightInv) (hNU : NUnimod) : AEquiv :=
+  aEquiv_of subgroup_hypothesis_holds representation_unitary sigma_decomposition hWR hNU (aInt_of_chart hNC)
+
+theorem wave_packet_weighted_integrable : AWeighted :=
+  AQ.aWeighted_of subgroup_hypothesis_holds representation_unitary sigma_decomposition product_decomposition_holds DecayR.decay_estimate
+
+theorem aKind_of_chart (hNC : NChart) : AKind :=
+  AK.aKind_of sigma_decomposition subgroup_hypothesis_holds (aBound_of_chart hNC) DecayR.decay_estimate Port.schur_orthogonality_relations
+
+theorem aReprod_of_chart (hNC : NChart) : AReprod :=
+  AK.aReprod_of sigma_decomposition subgroup_hypothesis_holds (aBound_of_chart hNC) DecayR.reproducing_formula_holds
+
+theorem wave_packet_l1_l2_of_nilpotent_chart (hNC : NChart) (hWR : WRightInv) : WavePacketL1L2 :=
+  AQ.wave_packet_l1_l2_of_hypotheses subgroup_hypothesis_holds representation_unitary sigma_decomposition product_decomposition_holds DecayR.decay_estimate hWR nilradical_unimodular_conj_invariant
+    (aBound_of_chart hNC)
+
+theorem aNonzero_of_charts (hNC : NChart) (hWR : WRightInv) : ANonzero :=
+  ANz.aNonzero_of subgroup_hypothesis_holds representation_unitary product_decomposition_holds (aEquiv_of_charts hNC hWR nilradical_unimodular_conj_invariant)
+    (aCont_of_chart hNC)
+
+theorem wlocExists_of_charts (hNC : NChart) (hWR : WRightInv)
+    (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm) : WlocExists :=
+  scWlocExists_of haar_measure_unipotent_nilradical (aEquiv_of_charts hNC hWR nilradical_unimodular_conj_invariant) (aCont_of_chart hNC)
+    (aKind_of_chart hNC) (aReprod_of_chart hNC) (wave_packet_l1_l2_of_nilpotent_chart hNC hWR) wave_packet_weighted_integrable
+    (aNonzero_of_charts hNC hWR) hR
+
+theorem scWlocExists_of_chart (hNC : NChart) (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm) : WlocExists :=
+  wlocExists_of_charts hNC unipotent_right_invariance hR
+
+end WlocSk
+
+
+[BWP_convolution_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/AKindR.lean:20-176
+Range SHA256 edf51b458732ce3f5dd651b099cd57e200efcbbe7a832ec8abf5fc774abc3869
+def bLin (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (σ : Mat k r → (H →L[ℂ] H))
+    (π : Mat k r → (Vp →L[ℂ] Vp)) (w' : H) (ξ : Vp) (p : Mt k r × Mt k r) : H →L[ℂ] Vp :=
+  star (psiGen k r z c (Matrix.of p.2)) •
+    ((innerSL ℂ w').comp (σ (Matrix.of p.1 * Matrix.of p.2))).smulRight (π (Matrix.of p.1)⁻¹ ξ)
+
+theorem bLin_apply (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (w' : H) (ξ : Vp)
+    (p : Mt k r × Mt k r) (v : H) : bLin z c σ π w' ξ p v = bInt z c σ π w' ξ v p := by
+  simp only [bLin, bInt, _root_.smul_apply, ContinuousLinearMap.smulRight_apply,
+    ContinuousLinearMap.comp_apply, innerSL_apply_apply, smul_smul]
+  rw [mul_comm]
+
+theorem integrable_and_integral_smul_B0_eq (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (hσ : IsURepOn (Gr k r) σ)
+    {μG μW μN : Measure (Mt k r)} [SFinite μG] [SFinite μW] [SFinite μN]
+    (hGc : μG {x | Matrix.of x ∉ Gr k r} = 0)
+    (hUWc : IsClosed (UWset k r z)) (hUWG : UWset k r z ⊆ Gr k r)
+    (hUWinv : ∀ h ∈ UWset k r z, h⁻¹ ∈ UWset k r z)
+    (hπc : ∀ ξ : Vp, ContinuousOn (fun h => π h ξ) (UWset k r z))
+    (hae : ∀ᵐ p ∂(μW.prod μN), Matrix.of p.1 ∈ UWset k r z ∧ Matrix.of p.1 * Matrix.of p.2 ∈ Gr k r)
+    (w' w : H) (ξ : Vp) {C : ℝ} (hC : 0 ≤ C)
+    (hB : ∀ g ∈ Gr k r, ∫⁻ p, ‖bInt z c σ π w' ξ (σ g w) p‖ₑ ∂(μW.prod μN) ≤
+      ENNReal.ofReal (C * opn g ^ N1H k r))
+    {β : Mat k r → ℂ} (hβm : AEStronglyMeasurable (fun g : Mt k r => β (Matrix.of g)) μG)
+    (hβw : ∫⁻ g, ‖β (Matrix.of g)‖ₑ * ENNReal.ofReal (opn (Matrix.of g) ^ N1H k r) ∂μG < ⊤)
+    (hβi : Integrable (fun g : Mt k r => β (Matrix.of g) • σ (Matrix.of g) w) μG)
+    (hβr : ∫ g, β (Matrix.of g) • σ (Matrix.of g) w ∂μG = w)
+    {x : Mat k r} (hx : x ∈ Gr k r) :
+    Integrable (fun g : Mt k r => β (Matrix.of g) • B0 z c σ π μW μN w' ξ (σ (x * Matrix.of g) w)) μG ∧
+      ∫ g, β (Matrix.of g) • B0 z c σ π μW μN w' ξ (σ (x * Matrix.of g) w) ∂μG =
+        B0 z c σ π μW μN w' ξ (σ x w) := by
+  set F : Mt k r × (Mt k r × Mt k r) → Vp :=
+    fun q => β (Matrix.of q.1) • bInt z c σ π w' ξ (σ (x * Matrix.of q.1) w) q.2 with hFdef
+  have hG : ∀ᵐ g ∂μG, Matrix.of g ∈ Gr k r := ae_gr hGc
+
+  have hq1 : ∀ᵐ q ∂(μG.prod (μW.prod μN)), Matrix.of q.1 ∈ Gr k r :=
+    Measure.quasiMeasurePreserving_fst.ae hG
+  have hq2 : ∀ᵐ q ∂(μG.prod (μW.prod μN)),
+      Matrix.of q.2.1 ∈ UWset k r z ∧ Matrix.of q.2.1 * Matrix.of q.2.2 ∈ Gr k r :=
+    Measure.quasiMeasurePreserving_snd.ae hae
+  set T : Set (Mt k r × (Mt k r × Mt k r)) := {q | Matrix.of q.1 ∈ Gr k r ∧
+    Matrix.of q.2.1 ∈ UWset k r z ∧ Matrix.of q.2.1 * Matrix.of q.2.2 ∈ Gr k r} with hTdef
+  have hc1 : Continuous fun q : Mt k r × (Mt k r × Mt k r) => (Matrix.of q.1 : Mat k r) := continuous_fst
+  have hc21 : Continuous fun q : Mt k r × (Mt k r × Mt k r) => (Matrix.of q.2.1 : Mat k r) :=
+    continuous_fst.comp continuous_snd
+  have hc22 : Continuous fun q : Mt k r × (Mt k r × Mt k r) => (Matrix.of q.2.2 : Mat k r) :=
+    continuous_snd.comp continuous_snd
+  have hcm : Continuous fun q : Mt k r × (Mt k r × Mt k r) =>
+      (Matrix.of q.2.1 * Matrix.of q.2.2 : Mat k r) := hc21.matrix_mul hc22
+  have hcy : Continuous fun q : Mt k r × (Mt k r × Mt k r) =>
+      (Matrix.of q.2.1 * Matrix.of q.2.2 * (x * Matrix.of q.1) : Mat k r) :=
+    hcm.matrix_mul (continuous_const.matrix_mul hc1)
+  have hTc : IsClosed T :=
+    (gr_isClosed.preimage hc1).inter ((hUWc.preimage hc21).inter (gr_isClosed.preimage hcm))
+  have hTae : ∀ᵐ q ∂(μG.prod (μW.prod μN)), q ∈ T := by
+    filter_upwards [hq1, hq2] with q h1 h2
+    exact ⟨h1, h2⟩
+  set F' : Mt k r × (Mt k r × Mt k r) → Vp := fun q =>
+    (⟪w', σ (Matrix.of q.2.1 * Matrix.of q.2.2 * (x * Matrix.of q.1)) w⟫_ℂ *
+      star (psiGen k r z c (Matrix.of q.2.2))) • π (Matrix.of q.2.1)⁻¹ ξ with hF'def
+  have hF'c : ContinuousOn F' T := by
+    have h1 : ContinuousOn (fun q : Mt k r × (Mt k r × Mt k r) =>
+        σ (Matrix.of q.2.1 * Matrix.of q.2.2 * (x * Matrix.of q.1)) w) T :=
+      (hσ.2.2 w).comp hcy.continuousOn (fun q hq => gr_mul hq.2.2 (gr_mul hx hq.1))
+    have hi : ContinuousOn (fun q : Mt k r × (Mt k r × Mt k r) => (Matrix.of q.2.1)⁻¹) T :=
+      inv_contOn.comp hc21.continuousOn (fun q hq => hUWG hq.2.1)
+    have h2 : ContinuousOn (fun q : Mt k r × (Mt k r × Mt k r) => π (Matrix.of q.2.1)⁻¹ ξ) T :=
+      (hπc ξ).comp hi (fun q hq => hUWinv _ hq.2.1)
+    have h3 : Continuous fun q : Mt k r × (Mt k r × Mt k r) => star (psiGen k r z c (Matrix.of q.2.2)) :=
+      continuous_star.comp ((psiGen_cont z c).comp hc22)
+    exact ((continuousOn_const.inner h1).mul h3.continuousOn).smul h2
+  have hF'm : AEStronglyMeasurable F' (μG.prod (μW.prod μN)) := by
+    have := hF'c.aestronglyMeasurable (μ := μG.prod (μW.prod μN)) hTc.measurableSet
+    rwa [Measure.restrict_eq_self_of_ae_mem hTae] at this
+  have hFm : AEStronglyMeasurable F (μG.prod (μW.prod μN)) := by
+    refine ((hβm.comp_quasiMeasurePreserving Measure.quasiMeasurePreserving_fst).smul hF'm).congr ?_
+    filter_upwards [hTae] with q hq
+    show β (Matrix.of q.1) • F' q = β (Matrix.of q.1) • bInt z c σ π w' ξ (σ (x * Matrix.of q.1) w) q.2
+    congr 1
+    simp only [hF'def, bInt]
+    rw [← sigma_mul hσ hq.2.2 (gr_mul hx hq.1)]
+
+  have hlin : ∫⁻ q, ‖F q‖ₑ ∂(μG.prod (μW.prod μN)) < ⊤ := by
+    rw [lintegral_prod _ hFm.enorm]
+    calc ∫⁻ g, ∫⁻ p, ‖F (g, p)‖ₑ ∂(μW.prod μN) ∂μG
+        = ∫⁻ g, ‖β (Matrix.of g)‖ₑ *
+            ∫⁻ p, ‖bInt z c σ π w' ξ (σ (x * Matrix.of g) w) p‖ₑ ∂(μW.prod μN) ∂μG := by
+          refine lintegral_congr fun g => ?_
+          simp only [hFdef, enorm_smul]
+          exact lintegral_const_mul' _ _ enorm_ne_top
+      _ ≤ ∫⁻ g, ENNReal.ofReal (C * opn x ^ N1H k r) *
+            (‖β (Matrix.of g)‖ₑ * ENNReal.ofReal (opn (Matrix.of g) ^ N1H k r)) ∂μG := by
+          apply lintegral_mono_ae
+          filter_upwards [hG] with g hg
+          have hb := hB _ (gr_mul hx hg)
+          have hN := nilradical_half_sum_nonneg (k := k) (r := r)
+          have h1 : C * opn (x * Matrix.of g) ^ N1H k r ≤
+              C * opn x ^ N1H k r * opn (Matrix.of g) ^ N1H k r := by
+            rw [mul_assoc, ← Real.mul_rpow (opn_nonneg _) (opn_nonneg _)]
+            exact mul_le_mul_of_nonneg_left
+              (Real.rpow_le_rpow (opn_nonneg _) (opn_mul _ _) hN) hC
+          calc ‖β (Matrix.of g)‖ₑ * ∫⁻ p, ‖bInt z c σ π w' ξ (σ (x * Matrix.of g) w) p‖ₑ ∂(μW.prod μN)
+              ≤ ‖β (Matrix.of g)‖ₑ * ENNReal.ofReal (C * opn x ^ N1H k r * opn (Matrix.of g) ^ N1H k r) := by
+                gcongr
+                exact hb.trans (ENNReal.ofReal_le_ofReal h1)
+            _ = _ := by
+                rw [ENNReal.ofReal_mul (mul_nonneg hC (Real.rpow_nonneg (opn_nonneg _) _))]
+                ring
+      _ = ENNReal.ofReal (C * opn x ^ N1H k r) *
+            ∫⁻ g, ‖β (Matrix.of g)‖ₑ * ENNReal.ofReal (opn (Matrix.of g) ^ N1H k r) ∂μG :=
+          lintegral_const_mul' _ _ ENNReal.ofReal_ne_top
+      _ < ⊤ := ENNReal.mul_lt_top ENNReal.ofReal_lt_top hβw
+  have hint : Integrable F (μG.prod (μW.prod μN)) := ⟨hFm, hlin⟩
+  have hsl : ∀ g : Mt k r, ∫ p, F (g, p) ∂(μW.prod μN) =
+      β (Matrix.of g) • B0 z c σ π μW μN w' ξ (σ (x * Matrix.of g) w) := fun g => by
+    simp only [hFdef, B0]
+    exact integral_smul _ _
+  refine ⟨?_, ?_⟩
+  · have := hint.integral_prod_left
+    simp only [hsl] at this
+    exact this
+  · have hsw := integral_integral_swap (f := fun g p => F (g, p)) hint
+    simp only [hsl] at hsw
+    rw [hsw]
+    simp only [B0]
+    refine integral_congr_ae (Filter.Eventually.of_forall fun p => ?_)
+    show ∫ g, F (g, p) ∂μG = bInt z c σ π w' ξ (σ x w) p
+    have hcomp : ∀ᵐ g ∂μG, F (g, p) = ((bLin z c σ π w' ξ p).comp (σ x))
+        (β (Matrix.of g) • σ (Matrix.of g) w) := by
+      filter_upwards [hG] with g hg
+      simp only [hFdef, ContinuousLinearMap.comp_apply, map_smul, bLin_apply]
+      rw [sigma_mul hσ hx hg]
+    rw [integral_congr_ae hcomp, ContinuousLinearMap.integral_comp_comm _ hβi, hβr,
+      ContinuousLinearMap.comp_apply, bLin_apply]
+
+end Kernel
+
+theorem uw_isClosed (z : Fin (2 * r + k + 1) → ℂ) : IsClosed (UWset k r z) := by
+  have h1 : IsClosed {g : Mat k r | gᴴ * Hpk k r * g = Hpk k r} :=
+    isClosed_eq ((continuous_id.matrix_conjTranspose.matrix_mul continuous_const).matrix_mul continuous_id)
+      continuous_const
+  have h2 : ∀ v : Fin (2 * r + k + 1) → ℂ, IsClosed {g : Mat k r | g *ᵥ v = v} := fun v =>
+    isClosed_eq (continuous_id.matrix_mulVec continuous_const) continuous_const
+  have e : UWset k r z = {g : Mat k r | gᴴ * Hpk k r * g = Hpk k r} ∩
+      ((⋂ a : Fin r, ({g : Mat k r | g *ᵥ bvec (eI k r a) = bvec (eI k r a)} ∩
+        {g : Mat k r | g *ᵥ bvec (esI k r a) = bvec (esI k r a)})) ∩ {g : Mat k r | g *ᵥ z = z}) := by
+    ext g
+    constructor
+    · rintro ⟨ha, hb, hc⟩
+      exact ⟨ha, Set.mem_iInter.2 fun a => ⟨(hb a).1, (hb a).2⟩, hc⟩
+    · rintro ⟨ha, hb, hc⟩
+      exact ⟨ha, fun a => ⟨(Set.mem_iInter.1 hb a).1, (Set.mem_iInter.1 hb a).2⟩, hc⟩
+  rw [e]
+  exact h1.inter ((isClosed_iInter fun a => (h2 _).inter (h2 _)).inter (h2 z))
+
+theorem ak_one_le {g : Mat k r} (hg : g ∈ Gr k r) :
+    1 ≤ opn (Hpk k r) ^ N1H k r * opn g ^ N1H k r := by
+  have h1 : opn (1 : Mat k r) ≤ opn g⁻¹ * opn g := by
+    rw [← Matrix.nonsing_inv_mul _ (gr_isUnit hg)]; exact opn_mul _ _
+
+
+[BWP_nonvanishing_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:406-423
+Range SHA256 0ee1219467cab04aaa799eed77be0cda4a8c7f818ca815345fdc598abca94a40
+def BesselNVGap : Prop :=
+  ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ),
+    2 ≤ k → Even k → Formalism.QuantumDeterminants.inWb k r z → 0 < Formalism.QuantumDeterminants.Tz k r z → (∀ a, c a ≠ 0) →
+    Formalism.QuantumDeterminants.IsHCParam u → Formalism.QuantumDeterminants.IsHCParam (lam48 k r v b) → InterlacingCondition k r u v b →
+    HalfIntegralDifference k r u v b → GapBig k r b →
+  ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Mat k r → (H →L[ℂ] H)),
+    IsDSHpk k r (eps48 k r) (lam48 k r v b) σ →
+  ∀ (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
+    (π : Mat k r → (Vp →L[ℂ] Vp)), IsHCTypeW k r z u π →
+  ∀ w : H, IsLowUnitH k r (eps48 k r) (lam48 k r v b) σ w →
+  ∀ μW μN : MeasureTheory.Measure (Formalism.QuantumDeterminants.Mt k r), IsHaarOn (Formalism.QuantumDeterminants.UWset k r z) μW →
+    IsHaarOn (Formalism.QuantumDeterminants.Nset k r) μN →
+  ∃ x x₀ : Mat k r, x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∧ x₀ ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∧
+    ∫ p : Formalism.QuantumDeterminants.Mt k r × Formalism.QuantumDeterminants.Mt k r,
+      (⟪σ x₀ w, σ (Matrix.of p.1 * Matrix.of p.2) (σ x w)⟫_ℂ * star (psiGen k r z c (Matrix.of p.2))) •
+        π (Matrix.of p.1)⁻¹ ∂(μW.prod μN) ≠ 0
+
+
+
+[BWP_local_endpoint_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:425-452
+Range SHA256 a81ca838ae5d19d8d42f1ad1869ed9d6e2522e482d344a67bf5958c4d7b6d88d
+  ⨅ t : Formalism.QuantumDeterminants.Sset k r z, Formalism.L2.SG.WuDecay.opn ((t : Mat k r) * x)
+
+def N1H (k r : ℕ) : ℝ := 4 * ((2 * r + k + 1 : ℕ) : ℝ) ^ 2 * Real.sqrt (2 * ((r + 1 : ℕ) : ℝ))
+
+def WlocExists : Prop :=
+  BesselNVGap → CoefWeightedLoc → ∀ (k r : ℕ) (z : Fin (2 * r + k + 1) → ℂ) (c : Fin r → ℂ) (u : Fin k → ℝ) (v : Fin (k - 1) → ℝ)
+    (b : Fin (2 * r + 2) → ℝ), RealPlaceNumericalSetting k r z c u v b →
+  ∀ (H : Type) [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H] (σ : Mat k r → (H →L[ℂ] H)),
+    IsDSHpk k r (eps48 k r) (lam48 k r v b) σ →
+  ∀ (Vp : Type) [NormedAddCommGroup Vp] [InnerProductSpace ℂ Vp] [FiniteDimensional ℂ Vp]
+    (π : Mat k r → (Vp →L[ℂ] Vp)), IsHCTypeW k r z u π →
+  ∀ w : H, IsLowUnitH k r (eps48 k r) (lam48 k r v b) σ w →
+  ∀ μG μS ν : MeasureTheory.Measure (Formalism.QuantumDeterminants.Mt k r),
+    IsHaarOn (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) μG → IsHaarOn (Formalism.QuantumDeterminants.Sset k r z) μS →
+    IsQuotMeas μG μS ν →
+  ∃ W : Mat k r → Vp, ContinuousOn W (Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r)) ∧ IsSPsiEquiv z (psiGen k r z c) π W ∧
+    (∀ x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
+      MeasureTheory.Integrable (fun g : Formalism.QuantumDeterminants.Mt k r => eFun μG σ w (Matrix.of g) • W (x * Matrix.of g)) μG ∧
+      rconv μG (eFun μG σ w) W x = W x) ∧
+    ∫⁻ x, ‖W (Matrix.of x)‖ₑ ∂ν < ⊤ ∧ l2SG ν W = 1 ∧
+    ∫⁻ x, ‖W (Matrix.of x)‖ₑ * ENNReal.ofReal (nuH k r z (Matrix.of x) ^ N1H k r) ∂ν < ⊤ ∧
+    ∃ (α : Mat k r → ℂ) (Ω : Set (Mat k r)) (a : ℝ), IsCompact Ω ∧ (1 : Mat k r) ∈ Ω ∧
+      Ω ⊆ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r) ∧
+      Measurable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g)) ∧ (∀ y, α y ≠ 0 → y ∈ Ω) ∧ (∀ y, ‖α y‖ ≤ a) ∧
+      ∀ x ∈ Formalism.QuantumDeterminants.UH (Formalism.QuantumDeterminants.Hpk k r),
+        MeasureTheory.Integrable (fun g : Formalism.QuantumDeterminants.Mt k r => α (Matrix.of g) • W (x * Matrix.of g)) μG ∧
+        rconv μG α W x = W x
+
+
+
+[BWP_local_endpoint_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/LocalWeightCharts/ScWlocExists.lean:1-5
+Range SHA256 215c497572c9b5a1e0dc550e3a08a88eb646597dc037c481cd4c2212c24b2771
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.WavePacketL1L2OfNilpotentChart
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.LocalWeightCharts.NChartP
+
+theorem scWlocExists (hR : Formalism.L2.SG.HCReprodM.HCReprodDSm) : Formalism.L2.SG.SplitPrimeNormLemmas.WlocExists :=
+  WlocSk.scWlocExists_of_chart WlocSk.nilpotent_chart_exists hR
+
+
+[BWP_global_records_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:149-215
+Range SHA256 8598f8a7c34e948b5c3316545c112ea0e3a32b7fdbc352f8722b4dc58c7e5f6c
+  σs := Bu.σs
+  tens := Bu.tens
+  tens_spec := Bu.tens_spec
+  R := Bu.R
+  R_spec := Bu.R_spec
+  g := gD D
+  g₀ := D.host.g 0
+  e := eOf A P Rf Bu.μf
+  e_adm := Bu.e_adm
+  Re := Bu.Re
+  Re_spec := Bu.Re_spec
+
+abbrev eC (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) : Fin D.R.rS → Fin A.I.n → A.I.E := fun a => crdOf A.I A.ιE A.bas (L.eX a)
+abbrev fC (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) : Fin D.R.rS → Fin A.I.n → A.I.E := fun a => crdOf A.I A.ιE A.bas (L.fY a)
+abbrev zC (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) (u : D.what₂.Word) : Fin A.I.n → A.I.E := crdOf A.I A.ιE A.bas (L.zu u)
+
+structure RepresentationData (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) where
+  Vpi : D.what₂.Word → Type
+  [vN : ∀ u, NormedAddCommGroup (Vpi u)]
+  [vI : ∀ u, InnerProductSpace ℂ (Vpi u)]
+  [vF : ∀ u, FiniteDimensional ℂ (Vpi u)]
+  piU : ∀ u, A.I.Ginf → (Vpi u →L[ℂ] Vpi u)
+  piU_rep : ∀ u, IsRepS A.I (Sinf A.I (eC A L) (zC A L u)) (Ninf A.I (eC A L) (zC A L u)) (piU u)
+  Vloc : D.what₂.Word → InfinitePlace A.I.F → Type
+  [lN : ∀ u v, NormedAddCommGroup (Vloc u v)]
+  [lI : ∀ u v, InnerProductSpace ℂ (Vloc u v)]
+  [lF : ∀ u v, FiniteDimensional ℂ (Vloc u v)]
+  piLoc : ∀ u v, Matrix (Fin D.R.k) (Fin D.R.k) ℂ → (Vloc u v →L[ℂ] Vloc u v)
+  piLoc_type : ∀ u v, IsHCTypeU D.R.k (fun i => ((D.hcW u (A.pl v)).u i : ℝ)) (piLoc u v)
+  wfr : D.what₂.Word → InfinitePlace A.I.F → Fin D.R.k → Fin A.I.n → ℂ
+  wfr_on : ∀ u v a b, hJ (A.I.ε v) (wfr u v a) (wfr u v b) = if a = b then 1 else 0
+  wfr_perp : ∀ u v a, (∀ c, hJ (A.I.ε v) (rv A.I v (eC A L c)) (wfr u v a) = 0 ∧
+      hJ (A.I.ε v) (rv A.I v (fC A L c)) (wfr u v a) = 0) ∧
+    hJ (A.I.ε v) (rv A.I v (zC A L u)) (wfr u v a) = 0
+  tensU : ∀ u, (∀ v, Vloc u v) → Vpi u
+  tensU_inner : ∀ u x y, ⟪tensU u x, tensU u y⟫_ℂ = ∏ v, ⟪x v, y v⟫_ℂ
+  tensU_span : ∀ u, Submodule.span ℂ (Set.range (tensU u)) = ⊤
+  tensU_equiv : ∀ u, ∀ s ∈ Hset A.I (Set.range (eC A L) ∪ Set.range (fC A L) ∪ {zC A L u}), ∀ x,
+    piU u s (tensU u x) = tensU u (fun v => piLoc u v (matW A.I (wfr u v) v s) (x v))
+
+attribute [instance] RepresentationData.vN RepresentationData.vI RepresentationData.vF RepresentationData.lN RepresentationData.lI RepresentationData.lF
+
+structure MuBlocks (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) where
+  muN : D.what₂.Word → Measure A.I.Ginf
+  muH : D.what₂.Word → Measure A.I.Ginf
+  muN_haar : ∀ u, IsHaarOnSet A.I (Ninf A.I (eC A L) (zC A L u)) (muN u)
+  muH_haar : ∀ u, IsHaarOnSet A.I (Hset A.I (Set.range (eC A L) ∪ Set.range (fC A L) ∪ {zC A L u})) (muH u)
+  nuQ : D.what₂.Word → Measure A.I.Ginf
+  nuQ_weil : ∀ u, IsQuotMeasS A.I (((muN u).prod (muH u)).map (fun p => p.1 * p.2)) (nuQ u)
+
+structure WBlk (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) {P : AdditiveCharacterData A} {Rf : ReferenceFrame A L} (Bu : AutomorphicBundle A P Rf)
+    (Pi : RepresentationData A L) (Mu : MuBlocks A L) where
+  Wu : ∀ u, A.I.Ginf → Pi.Vpi u
+  Wu_spec : ∀ u, IsWu A.I
+    (Formalism.L2.SG.ProjRows.phInf A.I Bu.σ Bu.w fun v => fdegOf (Formalism.REAL.muG (A.I.ε v)) (Bu.σ v) (Bu.w v))
+    (Sinf A.I (eC A L) (zC A L u)) (psiInf A.I (gD D) (eC A L) (fC A L) (zC A L u)) (Pi.piU u) (Mu.nuQ u) (Wu u)
+  Wloc : ∀ u v, Formalism.REAL.UJ (A.I.ε v) → Pi.Vloc u v
+  Wloc_cont : ∀ u v, Continuous (Wloc u v)
+  Wu_tens : ∀ u x, Wu u x = Pi.tensU u (fun v => Wloc u v (x v))
+
+structure MBlk (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) where
+  measG : Formalism.L2.SG.Measures.MeasG A.I.cm.sig A.I.J D.R.rS
+  measG_norm : measG.IsTextNorm
+  measW : ∀ u, Formalism.L2.SG.Measures.MeasW A.I.cm.sig A.I.J
+    (⟨eC A L, fC A L, zC A L u⟩ : Formalism.L2.SG.Sub.Frame A.I.E A.I.n D.R.rS)
+  measW_norm : ∀ u, (measW u).IsTextNorm
+
+
+
+[BWP_global_records_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:354-380
+Range SHA256 ae05aece1eb6f17ba0071058e81aedfdb5ce33a20977ef95e983529b143dd1e8
+def WExists : Prop :=
+  GapHyp D → ∀ (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) (P : AdditiveCharacterData A) (Rf : ReferenceFrame A L) (Xu : TransportData A L Rf)
+    (Bu : AutomorphicBundle A P Rf) (Pi : RepresentationData A L) (Mu : MuBlocks A L),
+    ∃ Wb : WBlk A L Bu Pi Mu, ∀ Mb : MBlk A L, Formalism.L2.SG.WuDecay.WuDecay (mk A L P Rf Xu Bu Pi Mu Wb Mb)
+
+def MExists : Prop :=
+  ∀ (A : UnitaryGroupInstance D) (L : UnitaryLatticeData D) (P : AdditiveCharacterData A) (Rf : ReferenceFrame A L) (Xu : TransportData A L Rf)
+    (Bu : AutomorphicBundle A P Rf) (Pi : RepresentationData A L) (Mu : MuBlocks A L) (Wb : WBlk A L Bu Pi Mu),
+    ∃ Mb : MBlk A L, ∃ hb : Formalism.L2.SG.AdBridge.AdBridgeIso A.I,
+      (mk A L P Rf Xu Bu Pi Mu Wb Mb).MeasTie hb
+
+theorem settingExists_of_steps (hC : CoefWeightedLoc) (h1 : InstExists D) (h2 : LatExists D) (h3 : PsiExists D)
+    (h4 : RefExists D) (h5 : XuExists D) (h6 : BunExists D) (h7 : PiExists D) (h8 : MuExists D)
+    (h9 : WExists D) (h10 : MExists D) : ConcreteSettingExists D := by
+  intro hG
+  obtain ⟨A⟩ := h1
+  obtain ⟨L⟩ := h2
+  obtain ⟨P⟩ := h3 A
+  obtain ⟨Rf⟩ := h4 A L
+  obtain ⟨Xu⟩ := h5 A L Rf
+  obtain ⟨Bu⟩ := h6 hC hG A L P Rf
+  obtain ⟨Pi⟩ := h7 A L
+  obtain ⟨Mu⟩ := h8 A L
+  obtain ⟨Wb, hW⟩ := h9 hG A L P Rf Xu Bu Pi Mu
+  obtain ⟨Mb, hb, hM⟩ := h10 A L P Rf Xu Bu Pi Mu Wb
+  exact ⟨mk A L P Rf Xu Bu Pi Mu Wb Mb, hb, hM, hW Mb, Bu.ph_int⟩
+
+
+
+[BWP_global_records_03] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/HidaSetting.lean:145-160
+Range SHA256 8ca013a60380b2e40a53a52358bd1adbea6d0b1bb5f7c30eddef0ac1e0e94b72
+  SigmaFinite μ ∧ μ ≠ 0 ∧ μ Sᶜ = 0 ∧ ∀ s ∈ S, μ.map (fun x => s * x) = μ
+
+def IsQuotMeasS (μS ν : Measure I.Ginf) : Prop :=
+  ∀ f : I.Ginf → ℝ≥0∞, Measurable f →
+    ∫⁻ x, f x ∂(Formalism.L2.SG.ProjRows.muInf I) = ∫⁻ x, (∫⁻ s, f (s * x) ∂μS) ∂ν
+
+def IsWu (ph : I.Ginf → ℂ) (S : Set I.Ginf) (psi : I.Ginf → ℂ) (rho : I.Ginf → (V →L[ℂ] V))
+    (ν : Measure I.Ginf) (W : I.Ginf → V) : Prop :=
+  (∀ s ∈ S, ∀ x, W (s * x) = psi s • rho s (W x)) ∧
+    (∀ x, Integrable (fun y => ph y • W (x * y)) (Formalism.L2.SG.ProjRows.muInf I) ∧
+      ∫ y, ph y • W (x * y) ∂(Formalism.L2.SG.ProjRows.muInf I) = W x) ∧
+    Continuous W ∧ ∫⁻ x, ‖W x‖ₑ ∂ν < ⊤ ∧ ∫⁻ x, ‖W x‖ₑ ^ 2 ∂ν = 1
+
+def Hset (S : Set (Fin I.n → I.E)) : Set I.Ginf :=
+  {s | ∀ v, ∀ x ∈ S, uMat (s v) *ᵥ rv I v x = rv I v x}
+
+
+
+[BWP_global_records_04] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/WuDecay.lean:1-45
+Range SHA256 b982f387cd80cb10002fa9767d068ee52c5e457309f8a64b752abd8eb85d1f57
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.PoincareInHH
+
+noncomputable section
+
+open MeasureTheory NumberField Formalism.BasicNotions Formalism.MainNotions.S Formalism.L2.SG.HidaSetting Formalism.L2.SG.PoincareInHH.PoincareSetting
+open scoped InnerProductSpace ENNReal NNReal
+open Matrix
+
+set_option linter.dupNamespace false
+
+namespace Formalism.L2.SG.WuDecay
+
+def opn {n : ℕ} (M : Matrix (Fin n) (Fin n) ℂ) : ℝ := ‖Matrix.toEuclideanCLM (𝕜 := ℂ) M‖
+
+variable {D : D7} (X : HidaSetting D)
+
+def normInf (g : X.B.I.Ginf) : ℝ := ∏ v, opn (uMat (g v))
+
+def nuInf (u : D.what₂.Word) (x : X.B.I.Ginf) : ℝ := ⨅ t : X.SinfU u, normInf X ((t : X.B.I.Ginf) * x)
+
+def N1 : ℝ :=
+  4 * (X.B.I.n : ℝ) ^ 2 * Real.sqrt (2 * ((Finset.univ.sup fun v => X.B.I.qAt v : ℕ) : ℝ))
+
+def WuReprod (u : D.what₂.Word) : Prop :=
+  ∃ (α : X.B.I.Ginf → ℂ) (Ωi : Set X.B.I.Ginf) (a : ℝ≥0), IsCompact Ωi ∧ (1 : X.B.I.Ginf) ∈ Ωi ∧
+    Measurable α ∧ (∀ z, α z ≠ 0 → z ∈ Ωi) ∧ (∀ z, ‖α z‖ ≤ a) ∧
+    ∀ x, Integrable (fun z => α z • X.Wu u (x * z)) (Formalism.L2.SG.ProjRows.muInf X.B.I) ∧
+      ∫ z, α z • X.Wu u (x * z) ∂(Formalism.L2.SG.ProjRows.muInf X.B.I) = X.Wu u x
+
+def WuWeighted (u : D.what₂.Word) : Prop :=
+  ∫⁻ x, ‖X.Wu u x‖ₑ * ENNReal.ofReal (nuInf X u x ^ N1 X) ∂(X.nuQ u) < ⊤
+
+def WuDecay : Prop := ∀ u : D.what₂.Word, WuReprod X u ∧ WuWeighted X u
+
+def FoldOK (u : D.what₂.Word) (hK : X.LevelSubgroupCharacter) : Prop :=
+  (∃ Fs : Set X.B.I.GA, IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf)) ∧
+  ∃ (Ω₀ : Set X.B.I.GA) (a : ℝ≥0), IsCompact Ω₀ ∧ (1 : X.B.I.GA) ∈ Ω₀ ∧ ∀ T : Cu X u hK,
+    (∀ Ω : Set X.B.I.GA, IsCompact Ω → Ω₀ ⊆ Ω →
+      Formalism.L2.SG.PoincareSeriesSquareIntegrable.IsFoldDatum (X.B.I.muA X.B.μf) (Srat X u) Ω a (Ph X u hK T)) ∧
+    ∀ Ω : Set X.B.I.GA, IsCompact Ω → ∀ Fs : Set X.B.I.GA,
+      IsFundamentalDomain (Srat X u) Fs (X.B.I.muA X.B.μf) →
+        Formalism.L2.SG.PoincareSeriesSquareIntegrable.multiplicityLIntegral (X.B.I.muA X.B.μf) (Formalism.MainNotions.LeviCoordinates.rr_GF X.B.I) Ω Fs (Ph X u hK T) < ⊤
+
+end Formalism.L2.SG.WuDecay
+
+
+[BWP_frame_transport_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/BesselFrame.lean:380-417
+Range SHA256 a52c992b75c0b9db3b08b2e334ad5af6a2ad7396d16001cc1799d47a2648ebba
+  · rw [← Matrix.mulVec_mulVec, hrow]
+
+theorem psiGen_UW_mul {zB : Fin (2 * r + k + 1) → ℂ} (c : Fin r → ℂ)
+    {h m : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ} (hh : h ∈ UWset k r zB) :
+    psiGen k r zB c (h * m) = psiGen k r zB c m := by
+  unfold psiGen; simp only [ellA_UW_mul hh]
+
+section Frame2
+variable {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
+  {wf : Fin k → Fin (2 * r + k + 1) → ℂ} {z0 : Fin (2 * r + k + 1) → ℂ}
+
+theorem ellA_conj (hF : IsFrameJ ε e f wf z0) {zB z : Fin (2 * r + k + 1) → ℂ} (hz : Qm e f wf z0 *ᵥ zB = z)
+    (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) (a : Fin r) :
+    ellA k r zB (Qi ε e f wf z0 * g * Qm e f wf z0) a = rootCoord ε e f z g a := by
+  unfold ellA rootCoord nxt
+  split
+  · rw [conj_apply, colQ_eI, Qi_mulVec_eI]
+  · rw [← Matrix.mulVec_mulVec, ← Matrix.mulVec_mulVec, hz, Qi_mulVec_eI]
+
+theorem psi_conj (hF : IsFrameJ ε e f wf z0) {zB z : Fin (2 * r + k + 1) → ℂ} (hz : Qm e f wf z0 *ᵥ zB = z)
+    {gg : ℕ} (hg : 0 < gg) (g : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ) :
+    psiGen k r zB (fun _ => ((4 * Real.pi / gg : ℝ) : ℂ)) (Qi ε e f wf z0 * g * Qm e f wf z0) =
+      psiR ε gg e f z g := by
+  unfold psiGen psiR
+  simp only [ellA_conj hF hz]
+  congr 1
+  set x : Fin r → ℂ := fun a => rootCoord ε e f z g a with hx
+  have hre : (∑ a, ((4 * Real.pi / gg : ℝ) : ℂ) * x a).re = (4 * Real.pi / gg) * ∑ a, (x a).re := by
+    rw [Complex.re_sum, Finset.mul_sum]
+    exact Finset.sum_congr rfl fun a _ => Complex.re_ofReal_mul _ _
+  have hsum : ∑ a, (x a + star (x a)) = ((2 * ∑ a, (x a).re : ℝ) : ℂ) := by
+    push_cast; rw [Finset.mul_sum]
+    exact Finset.sum_congr rfl fun a _ => by rw [Complex.star_def, Complex.add_conj]; push_cast; ring
+  show Complex.I * ((∑ a, ((4 * Real.pi / gg : ℝ) : ℂ) * x a).re : ℂ) =
+    2 * Real.pi * Complex.I * ((∑ a, (x a + star (x a))) / (gg : ℂ))
+  rw [hre, hsum]
+  have hg' : (gg : ℂ) ≠ 0 := by exact_mod_cast hg.ne'
+  push_cast
+
+
+[BWP_frame_transport_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/BesselFrame.lean:650-727
+Range SHA256 56cf6d73db9edae84a5724a256d83887e28db8ce0a5a466ef83a61634e58082b
+
+theorem isHaarOn_S (hF : IsFrameJ ε e f wf z0) {zB : Fin (2 * r + k + 1) → ℂ} {μS : Measure (Formalism.REAL.UJ ε)}
+    (hS : IsLocHaar (HNset ε e f wf z0 zB) μS) :
+    IsHaarOn (Sset k r zB) (μS.map (cM (Qi ε e f wf z0) (Qm e f wf z0))) := by
+  have emb := cM_measEmb (ε := ε) (A := Qi ε e f wf z0) (B := Qm e f wf z0) (A' := Qm e f wf z0)
+    (B' := Qi ε e f wf z0) (Qm_mul_Qi hF) (Qm_mul_Qi hF)
+  obtain ⟨hsf, hne, hcon, hinv⟩ := hS
+  haveI := hsf
+  refine ⟨emb.sigmaFinite_map, (Measure.map_ne_zero_iff emb.measurable.aemeasurable).mpr hne, ?_, ?_⟩
+  · rw [emb.map_apply]
+    exact (congrArg μS (Set.ext fun g => Iff.rfl)).trans hcon
+  · intro s hs
+    have ht := conjQ_UJ hF (Sset_sub_UH hs)
+    set t := toUJ (Qm e f wf z0 * s * Qi ε e f wf z0) ht
+    have htS : t ∈ HNset ε e f wf z0 zB := by
+      show Qi ε e f wf z0 * uMat t * Qm e f wf z0 ∈ Sset k r zB
+      rw [uMat_toUJ, Qi_Qm_conj hF]; exact hs
+    rw [Measure.map_map (measurable_lmulM s) emb.measurable]
+    have hfun : lmulM s ∘ cM (Qi ε e f wf z0) (Qm e f wf z0) =
+        cM (Qi ε e f wf z0) (Qm e f wf z0) ∘ (fun g : Formalism.REAL.UJ ε => t * g) := by
+      funext g
+      simp only [Function.comp, lmulM_cM]
+      unfold cM
+      rw [uMat_mul, uMat_toUJ]
+      simp only [← Matrix.mul_assoc, Qi_mul_Qm hF, Matrix.one_mul]
+      try rfl
+    rw [hfun, ← Measure.map_map emb.measurable (measurable_const_mul t), hinv t htS]
+
+theorem cM_comp_mul (hF : IsFrameJ ε e f wf z0) (P0 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ)
+    (s x : Formalism.REAL.UJ ε) :
+    (fun i j => (Matrix.of (cM (Qi ε e f wf z0) (Qm e f wf z0) s) * Matrix.of (cM (Qi ε e f wf z0) P0 x)) i j) =
+      cM (Qi ε e f wf z0) P0 (s * x) := by
+  have h : (Qi ε e f wf z0 * uMat s * Qm e f wf z0) * (Qi ε e f wf z0 * uMat x * P0) =
+      Qi ε e f wf z0 * uMat (s * x) * P0 := by
+    rw [uMat_mul]
+    simp only [← Matrix.mul_assoc]
+    rw [Matrix.mul_assoc (Qi ε e f wf z0 * uMat s), Qm_mul_Qi hF, Matrix.mul_one]
+  funext i j
+  exact congrFun (congrFun h i) j
+
+theorem cM_left (hF : IsFrameJ ε e f wf z0) {P0 B0 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (ht : (Qm e f wf z0 * B0)ᴴ * Formalism.REAL.Jm ε * (Qm e f wf z0 * B0) = Formalism.REAL.Jm ε) (g : Formalism.REAL.UJ ε) :
+    cM (Qi ε e f wf z0) P0 (toUJ (Qm e f wf z0 * B0) ht * g) = cM B0 P0 g := by
+  have h : Qi ε e f wf z0 * uMat (toUJ (Qm e f wf z0 * B0) ht * g) * P0 = B0 * uMat g * P0 := by
+    rw [uMat_mul, uMat_toUJ]
+    simp only [← Matrix.mul_assoc, Qi_mul_Qm hF, Matrix.one_mul]
+  exact h
+
+theorem isQuotMeas_B (hF : IsFrameJ ε e f wf z0) {P0 B0 : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ}
+    (hP : CayPair ε P0 B0) {μS ν : Measure (Formalism.REAL.UJ ε)} (hQ : IsLocQuot μS ν) :
+    IsQuotMeas ((Formalism.REAL.muG ε).map (cM B0 P0)) (μS.map (cM (Qi ε e f wf z0) (Qm e f wf z0)))
+      (ν.map (cM (Qi ε e f wf z0) P0)) := by
+  have embG := cM_measEmb (ε := ε) (A := B0) (B := P0) (A' := P0) (B' := B0) hP.PB hP.PB
+  have embS := cM_measEmb (ε := ε) (A := Qi ε e f wf z0) (B := Qm e f wf z0) (A' := Qm e f wf z0)
+    (B' := Qi ε e f wf z0) (Qm_mul_Qi hF) (Qm_mul_Qi hF)
+  have embX := cM_measEmb (ε := ε) (A := Qi ε e f wf z0) (B := P0) (A' := Qm e f wf z0) (B' := B0)
+    (Qm_mul_Qi hF) hP.PB
+  intro F hFm
+  rw [embG.lintegral_map, embX.lintegral_map]
+  simp only [embS.lintegral_map, cM_comp_mul hF]
+  have ht : (Qm e f wf z0 * B0)ᴴ * Formalism.REAL.Jm ε * (Qm e f wf z0 * B0) = Formalism.REAL.Jm ε := by
+    simp only [conjTranspose_mul]
+    calc _ = B0ᴴ * ((Qm e f wf z0)ᴴ * Formalism.REAL.Jm ε * Qm e f wf z0) * B0 := by simp only [Matrix.mul_assoc]
+      _ = Formalism.REAL.Jm ε := by rw [gramQ hF, hP.BHB]
+  have h1 := hQ (fun y => F (cM (Qi ε e f wf z0) P0 y)) (hFm.comp embX.measurable)
+  rw [← h1]
+  calc ∫⁻ g, F (cM B0 P0 g) ∂(Formalism.REAL.muG ε)
+      = ∫⁻ g, F (cM (Qi ε e f wf z0) P0 (toUJ (Qm e f wf z0 * B0) ht * g)) ∂(Formalism.REAL.muG ε) := by
+        simp only [cM_left hF ht]
+    _ = ∫⁻ y, F (cM (Qi ε e f wf z0) P0 y) ∂(Formalism.REAL.muG ε) :=
+        lintegral_mul_left_eq_self (fun y => F (cM (Qi ε e f wf z0) P0 y)) _
+
+end Meas3
+
+section Loc
+open Formalism.L2.SG.SplitPrimeNormLemmas Formalism.L2.SG.WuDecay
+
+variable {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
+
+
+[BWP_frame_transport_03] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/BesselFrame.lean:814-1009
+Range SHA256 a0234d70327d1bfe8cc638129ec440fdd45b922fbb96a85638a1940a409d64ae
+theorem locPack (hB : BesselNVGap) (hCW : CoefWeightedLoc) (hWl : WlocExists) (hε : ε = eps48 k r)
+    (hk : 1 ≤ k) (hke : Even k) {T : ℝ} (hT : 0 < T) {gg : ℕ} (hg : 0 < gg)
+    {u : Fin k → ℝ} {v : Fin (k - 1) → ℝ} {b : Fin (2 * r + 2) → ℝ} (hu : Formalism.QuantumDeterminants.IsHCParam u)
+    (hl : Formalism.QuantumDeterminants.IsHCParam (lam48 k r v b)) (hI : InterlacingCondition k r u v b) (hH : HalfIntegralDifference k r u v b)
+    (hGap : GapBig k r b) {z : Fin (2 * r + k + 1) → ℂ} (hz0 : z0 = z0v T z) (hF : IsFrameJ ε e f wf z0)
+    {H : Type} [NormedAddCommGroup H] [InnerProductSpace ℂ H] [CompleteSpace H]
+    {σ : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ → (H →L[ℂ] H)} (hDS : IsDS ε (lam48 k r v b) σ)
+    {w : H} (hw : IsLowUnit ε (lam48 k r v b) σ w)
+    {Vl : Type} [NormedAddCommGroup Vl] [InnerProductSpace ℂ Vl] [FiniteDimensional ℂ Vl]
+    {πl : Matrix (Fin k) (Fin k) ℂ → (Vl →L[ℂ] Vl)} (hπ : IsHCTypeU k u πl)
+    {μS ν : Measure (Formalism.REAL.UJ ε)} (hS : IsLocHaar (HNset ε e f wf z0 (zBv k r T)) μS) (hQ : IsLocQuot μS ν) :
+    ∃ W : Formalism.REAL.UJ ε → Vl, Continuous W ∧
+      (∀ s x : Formalism.REAL.UJ ε, ∀ h ∈ UWset k r (zBv k r T), ∀ m ∈ Nset k r,
+        Qi ε e f wf z0 * uMat s * Qm e f wf z0 = h * m →
+        W (s * x) = psiR ε gg e f z (uMat s) • piB ε e f wf z0 πl h (W x)) ∧
+      (∀ x, Integrable (fun g => (((fdegOf (Formalism.REAL.muG ε) σ w : ℝ) : ℂ) * star ⟪w, σ (uMat g) w⟫_ℂ) •
+          W (x * g)) (Formalism.REAL.muG ε) ∧
+        ∫ g, (((fdegOf (Formalism.REAL.muG ε) σ w : ℝ) : ℂ) * star ⟪w, σ (uMat g) w⟫_ℂ) • W (x * g)
+          ∂(Formalism.REAL.muG ε) = W x) ∧
+      ∫⁻ x, ‖W x‖ₑ ∂ν < ⊤ ∧ ∫⁻ x, ‖W x‖ₑ ^ 2 ∂ν = 1 ∧
+      ∫⁻ x, ‖W x‖ₑ * ENNReal.ofReal (nuLoc (e := e) (f := f) (wf := wf) (z0 := z0) (zBv k r T) x ^ N1H k r) ∂ν < ⊤ ∧
+      ∃ (α : Formalism.REAL.UJ ε → ℂ) (Ω : Set (Formalism.REAL.UJ ε)) (a : ℝ), IsCompact Ω ∧ 1 ∈ Ω ∧
+        Measurable α ∧ (∀ y, α y ≠ 0 → y ∈ Ω) ∧ (∀ y, ‖α y‖ ≤ a) ∧
+        ∀ x, Integrable (fun g => α g • W (x * g)) (Formalism.REAL.muG ε) ∧
+          ∫ g, α g • W (x * g) ∂(Formalism.REAL.muG ε) = W x := by
+  obtain ⟨P0, hP0⟩ := Formalism.MainNotions.S.Inh.exists_isCayleyU_eps48 k r hk
+  have hCP : CayPair ε P0 (Hpk k r * P0ᴴ * Formalism.REAL.Jm ε) := ⟨hε ▸ hP0.1.2, rfl⟩
+  generalize hB0 : Hpk k r * P0ᴴ * Formalism.REAL.Jm ε = B0 at hCP
+  have hinv : P0⁻¹ = B0 := Matrix.inv_eq_left_inv hCP.BP
+  have hσB1 : (fun g => (fun M => σ (P0 * M * B0)) (P0⁻¹ * g * P0)) = σ := by
+    funext g
+    simp only [hinv]
+    congr 1
+    simp only [← Matrix.mul_assoc, hCP.PB, Matrix.one_mul]
+    rw [Matrix.mul_assoc, hCP.PB, Matrix.mul_one]
+  have hP0' : IsCayleyU k r ε P0 := hε ▸ hP0
+  have hDSB : IsDSHpk k r (eps48 k r) (lam48 k r v b) (fun M => σ (P0 * M * B0)) :=
+    hε ▸ ⟨P0, hP0', by rw [hσB1]; exact hDS⟩
+  have hwB : IsLowUnitH k r (eps48 k r) (lam48 k r v b) (fun M => σ (P0 * M * B0)) w :=
+    hε ▸ ⟨P0, hP0', by rw [hσB1]; exact hw⟩
+  have hS48 : RealPlaceNumericalSetting k r (zBv k r T) (fun _ => ((4 * Real.pi / gg : ℝ) : ℂ)) u v b := by
+    refine ⟨hk, hke, inWb_zB T, by rw [Tz_zB hT.le]; exact hT, fun _ => ?_, hu, hl, hI, hH, hGap⟩
+    have : (0 : ℝ) < 4 * Real.pi / gg := by positivity
+    show ((4 * Real.pi / gg : ℝ) : ℂ) ≠ 0
+    exact_mod_cast this.ne'
+  have hπB := hcTypeW_piB hF hT.le hπ
+  have hG := isHaarOn_G hCP
+  have hSB := isHaarOn_S hF hS
+  have hQB := isQuotMeas_B hF hCP hQ
+  obtain ⟨WB, hcont, hequiv, hrep, hL1, hL2, hwt, α, Ω, a, hΩc, h1Ω, hΩU, hαm, hαs, hαb, hαr⟩ :=
+    hWl hB hCW k r (zBv k r T) _ u v b hS48 H _ hDSB Vl (piB ε e f wf z0 πl) hπB w hwB _ _ _ hG hSB hQB
+  have embG := cM_measEmb (ε := ε) (A := B0) (B := P0) (A' := P0) (B' := B0) hCP.PB hCP.PB
+  have embX := cM_measEmb (ε := ε) (A := Qi ε e f wf z0) (B := P0) (A' := Qm e f wf z0) (B' := B0)
+    (Qm_mul_Qi hF) hCP.PB
+  have hXU : ∀ x, Matrix.of (cM (Qi ε e f wf z0) P0 x) ∈ UH (Hpk k r) := cX_mem_UH hF hCP
+  have hfd : fdegH ((Formalism.REAL.muG ε).map (cM B0 P0)) (fun M => σ (P0 * M * B0)) w = fdegOf (Formalism.REAL.muG ε) σ w :=
+    fdegH_map hCP σ w
+  have hσg : ∀ g : Formalism.REAL.UJ ε, σ (P0 * (Matrix.of (cM B0 P0 g) : Mat k r) * B0) = σ (uMat g) := by
+    intro g
+    show σ (P0 * (B0 * uMat g * P0) * B0) = σ (uMat g)
+    congr 1; simp only [← Matrix.mul_assoc, hCP.PB, Matrix.one_mul]; rw [Matrix.mul_assoc, hCP.PB, Matrix.mul_one]
+  refine ⟨fun x => WB (cM (Qi ε e f wf z0) P0 x), ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · exact hcont.comp_continuous (cM_closedEmb (Qm_mul_Qi hF) hCP.PB).continuous hXU
+  · intro s x h hh m hm hsm
+    have h1 : Matrix.of (cM (Qi ε e f wf z0) P0 (s * x)) = h * m * Matrix.of (cM (Qi ε e f wf z0) P0 x) := by
+      rw [← hsm]
+      show Qi ε e f wf z0 * uMat (s * x) * P0 = Qi ε e f wf z0 * uMat s * Qm e f wf z0 * (Qi ε e f wf z0 * uMat x * P0)
+      rw [uMat_mul]; simp only [← Matrix.mul_assoc]; rw [Matrix.mul_assoc _ (Qm e f wf z0), Qm_mul_Qi hF, Matrix.mul_one]
+    have hz : Qm e f wf z0 *ᵥ zBv k r T = z := hz0 ▸ Qm_zB hT z
+    show WB (Matrix.of (cM (Qi ε e f wf z0) P0 (s * x))) = _
+    rw [h1, hequiv h hh m hm _ (hXU x), ← psiGen_UW_mul _ hh, ← hsm, psi_conj hF hz hg]
+    rfl
+  · intro x
+    obtain ⟨hint, hval⟩ := hrep _ (hXU x)
+    have hint2 := embG.integrable_map_iff.mp hint
+    have hpt : ∀ g : Formalism.REAL.UJ ε, ((fun g' : Mt k r => eFun ((Formalism.REAL.muG ε).map (cM B0 P0))
+        (fun M => σ (P0 * M * B0)) w (Matrix.of g') •
+        WB (@HMul.hMul (Mat k r) (Mat k r) (Mat k r) _ (cM (Qi ε e f wf z0) P0 x) (Matrix.of g'))) ∘ cM B0 P0) g =
+        (((fdegOf (Formalism.REAL.muG ε) σ w : ℝ) : ℂ) * star ⟪w, σ (uMat g) w⟫_ℂ) •
+          WB (cM (Qi ε e f wf z0) P0 (x * g)) := by
+      intro g
+      simp only [Function.comp_apply, eFun]
+      rw [hfd, hσg, cMprod hCP]
+      rfl
+    refine ⟨hint2.congr (ae_of_all _ hpt), ?_⟩
+    rw [← integral_congr_ae (ae_of_all _ hpt)]
+    exact (embG.integral_map _).symm.trans hval
+  · refine lt_of_eq_of_lt ?_ hL1
+    exact (embX.lintegral_map (μ := ν) (fun y : Mt k r => ‖WB (Matrix.of y)‖ₑ)).symm
+  · refine Eq.trans ?_ hL2
+    unfold l2SG
+    rw [embX.lintegral_map]
+    simp only [enorm_eq_nnnorm]
+    rfl
+  · have hc : 0 ≤ opn (Qm e f wf z0) * opn B0 :=
+      mul_nonneg (Formalism.L2.SG.WuDecayPf.opn_nonneg _) (Formalism.L2.SG.WuDecayPf.opn_nonneg _)
+    have hN : 0 ≤ N1H k r := by unfold N1H; positivity
+    have hpt : ∀ x : Formalism.REAL.UJ ε, ‖WB (cM (Qi ε e f wf z0) P0 x)‖ₑ *
+        ENNReal.ofReal (nuLoc (e := e) (f := f) (wf := wf) (z0 := z0) (zBv k r T) x ^ N1H k r) ≤
+        ENNReal.ofReal ((opn (Qm e f wf z0) * opn B0) ^ N1H k r) * (‖WB (cM (Qi ε e f wf z0) P0 x)‖ₑ *
+          ENNReal.ofReal (nuH k r (zBv k r T) (cM (Qi ε e f wf z0) P0 x) ^ N1H k r)) := by
+      intro x
+      have h0 : 0 ≤ nuLoc (e := e) (f := f) (wf := wf) (z0 := z0) (zBv k r T) x :=
+        Real.iInf_nonneg fun _ => Formalism.L2.SG.WuDecayPf.opn_nonneg _
+      have h0' : 0 ≤ nuH k r (zBv k r T) (cM (Qi ε e f wf z0) P0 x) :=
+        Real.iInf_nonneg fun _ => Formalism.L2.SG.WuDecayPf.opn_nonneg _
+      have hle := nuLoc_le hF hCP (zBv k r T) x
+      rw [mul_left_comm]
+      refine mul_le_mul' le_rfl ?_
+      rw [← ENNReal.ofReal_mul (Real.rpow_nonneg hc _), ← Real.mul_rpow hc h0']
+      exact ENNReal.ofReal_le_ofReal (Real.rpow_le_rpow h0 hle hN)
+    refine lt_of_le_of_lt (lintegral_mono hpt) ?_
+    rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
+    refine ENNReal.mul_lt_top ENNReal.ofReal_lt_top (lt_of_eq_of_lt ?_ hwt)
+    exact (embX.lintegral_map (μ := ν) (fun y : Mt k r =>
+      ‖WB (Matrix.of y)‖ₑ * ENNReal.ofReal (nuH k r (zBv k r T) (Matrix.of y) ^ N1H k r))).symm
+  · refine ⟨fun g => α (cM B0 P0 g), cM B0 P0 ⁻¹' Ω, a, (cM_closedEmb hCP.PB hCP.PB).isCompact_preimage hΩc, ?_,
+      hαm.comp embG.measurable, fun y hy => hαs _ hy, fun y => hαb _, ?_⟩
+    · show Matrix.of (cM B0 P0 (1 : Formalism.REAL.UJ ε)) ∈ Ω
+      have : Matrix.of (cM B0 P0 (1 : Formalism.REAL.UJ ε)) = (1 : Mat k r) := by
+        show B0 * uMat 1 * P0 = 1; rw [uMat_one, Matrix.mul_one, hCP.BP]
+      rw [this]; exact h1Ω
+    · intro x
+      obtain ⟨hint, hval⟩ := hαr _ (hXU x)
+      have hint2 := embG.integrable_map_iff.mp hint
+      have hpt : ∀ g : Formalism.REAL.UJ ε, ((fun g' : Mt k r => α (Matrix.of g') •
+          WB (@HMul.hMul (Mat k r) (Mat k r) (Mat k r) _ (cM (Qi ε e f wf z0) P0 x) (Matrix.of g'))) ∘ cM B0 P0) g =
+          α (cM B0 P0 g) • WB (cM (Qi ε e f wf z0) P0 (x * g)) := by
+        intro g
+        simp only [Function.comp_apply]
+        rw [cMprod hCP]
+        rfl
+      refine ⟨hint2.congr (ae_of_all _ hpt), ?_⟩
+      rw [← integral_congr_ae (ae_of_all _ hpt)]
+      exact (embG.integral_map _).symm.trans hval
+
+end Pack
+
+section Steps
+
+def BesselLevi : Prop :=
+  ∀ (k r : ℕ) (T : ℝ), 0 < T → ∀ s : Matrix (Fin (2 * r + k + 1)) (Fin (2 * r + k + 1)) ℂ,
+    s ∈ UH (Hpk k r) →
+    (∀ (a : Fin r) (i : Fin (2 * r + k + 1)), a.val ≤ i.val → s i (eI k r a) = if i = eI k r a then 1 else 0) →
+    (∀ i : Fin (2 * r + k + 1), r ≤ i.val →
+      (s *ᵥ (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k)))) i =
+        (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k))) i) →
+    s ∈ Sset k r (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k)))
+
+def BesselSGroup : Prop :=
+  ∀ (k r : ℕ) (T : ℝ), 0 < T →
+    (∀ s ∈ Sset k r (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k))),
+      ∀ t ∈ Sset k r (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k))),
+        s * t ∈ Sset k r (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k)))) ∧
+    ∀ s ∈ Sset k r (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k))),
+      Hpk k r * sᴴ * Hpk k r ∈ Sset k r (((Real.sqrt T : ℝ) : ℂ) • bvec (wI k r (Fin.last k)))
+
+def TensInt : Prop :=
+  ∀ (ι : Type) [Fintype ι] (X : ι → Type) [∀ v, MeasurableSpace (X v)] (μ : ∀ v, Measure (X v))
+    [∀ v, SigmaFinite (μ v)] (V : ι → Type) [∀ v, NormedAddCommGroup (V v)] [∀ v, InnerProductSpace ℂ (V v)]
+    [∀ v, FiniteDimensional ℂ (V v)] (Vπ : Type) [NormedAddCommGroup Vπ] [InnerProductSpace ℂ Vπ]
+    [FiniteDimensional ℂ Vπ] (tens : (∀ v, V v) → Vπ),
+    (∀ x y, ⟪tens x, tens y⟫_ℂ = ∏ v, ⟪x v, y v⟫_ℂ) → Submodule.span ℂ (Set.range tens) = ⊤ →
+    ∀ G : ∀ v, X v → V v, (∀ v, Integrable (G v) (μ v)) →
+      Integrable (fun y : ∀ v, X v => tens (fun v => G v (y v))) (Measure.pi μ) ∧
+        ∫ y, tens (fun v => G v (y v)) ∂(Measure.pi μ) = tens (fun v => ∫ t, G v t ∂(μ v))
+
+def QuotProdK : Prop :=
+  ∀ (ι : Type) [Fintype ι] (n : ι → ℕ) (ε : ∀ v, Fin (n v) → Bool)
+    (N H : ∀ v, Set (Formalism.REAL.UJ (ε v))),
+    (∀ v, IsClosed (N v)) → (∀ v, IsCompact (H v)) →
+    (∀ v, (1 : Formalism.REAL.UJ (ε v)) ∈ N v ∧ (∀ a ∈ N v, ∀ b ∈ N v, a * b ∈ N v) ∧ ∀ a ∈ N v, a⁻¹ ∈ N v) →
+    (∀ v, (1 : Formalism.REAL.UJ (ε v)) ∈ H v ∧ (∀ a ∈ H v, ∀ b ∈ H v, a * b ∈ H v) ∧ ∀ a ∈ H v, a⁻¹ ∈ H v) →
+    (∀ v, ∀ h ∈ H v, ∀ m ∈ N v, h * m * h⁻¹ ∈ N v) →
+    (∀ v (μ : Measure (Formalism.REAL.UJ (ε v))), SigmaFinite μ → μ ≠ 0 → μ (N v)ᶜ = 0 →
+      (∀ s ∈ N v, μ.map (fun x => s * x) = μ) → ∀ s ∈ N v, μ.map (fun x => x * s) = μ) →
+    ∀ muN muH nuQ : Measure (∀ v, Formalism.REAL.UJ (ε v)),
+      (SigmaFinite muN ∧ muN ≠ 0 ∧ muN (Set.pi Set.univ N)ᶜ = 0 ∧
+        ∀ s ∈ Set.pi Set.univ N, muN.map (fun x => s * x) = muN) →
+      (SigmaFinite muH ∧ muH ≠ 0 ∧ muH (Set.pi Set.univ H)ᶜ = 0 ∧
+        ∀ s ∈ Set.pi Set.univ H, muH.map (fun x => s * x) = muH) →
+      (∀ f : (∀ v, Formalism.REAL.UJ (ε v)) → ENNReal, Measurable f →
+        ∫⁻ x, f x ∂(Measure.pi fun v => Formalism.REAL.muG (ε v)) =
+          ∫⁻ x, (∫⁻ s, f (s * x) ∂((muN.prod muH).map (fun p => p.1 * p.2))) ∂nuQ) →
+      ∃ (μS νl : ∀ v, Measure (Formalism.REAL.UJ (ε v))) (C : ENNReal), C ≠ 0 ∧ C ≠ ⊤ ∧
+        (∀ v, (SigmaFinite (μS v) ∧ μS v ≠ 0 ∧ μS v {s | ∃ m ∈ N v, ∃ h ∈ H v, s = m * h}ᶜ = 0 ∧
+          ∀ s ∈ {s | ∃ m ∈ N v, ∃ h ∈ H v, s = m * h}, (μS v).map (fun x => s * x) = μS v) ∧
+          ∀ F : Formalism.REAL.UJ (ε v) → ENNReal, Measurable F →
+            ∫⁻ x, F x ∂(Formalism.REAL.muG (ε v)) = ∫⁻ x, (∫⁻ s, F (s * x) ∂(μS v)) ∂(νl v)) ∧
+        ∀ F : ∀ v, Formalism.REAL.UJ (ε v) → ENNReal, (∀ v, Measurable (F v)) →
+          (∀ v, ∀ m ∈ N v, ∀ h ∈ H v, ∀ x, F v (m * h * x) = F v x) →
+          ∫⁻ x, ∏ v, F v (x v) ∂nuQ = C * ∏ v, ∫⁻ y, F v y ∂(νl v)
+
+end Steps
+
+end Formalism.L2.SG.Pf.WFL
+
+
+[BWP_frame_transport_04] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/WFLUnit.lean:291-337
+Range SHA256 e4b302a38dfdbc85f17c773b9cb09dd016ad03e992a1c2657919e72e47f93672
+theorem mEqR (R : Ranks) : 2 * R.rS + 2 = R.m := by
+  obtain ⟨j, hj⟩ := R.m_even
+  have h2 := R.two_le_m
+  show 2 * (R.m / 2 - 1) + 2 = R.m
+  omega
+
+theorem lam_matchR (R : Ranks) (P : HCParam R) (i : Fin (2 * R.rS + R.k + 1)) (hr : 2 * R.rS + R.k + 1 = R.r) :
+    lamS R P (Fin.cast hr i) =
+      lam48 R.k R.rS (fun i => (P.v i : ℝ)) (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) i := by
+  have hm := mEqR R
+  have hk := R.m_add_three_le_k
+  have hi := i.isLt
+  unfold lamS lam48
+  simp only [Fin.coe_cast]
+  split_ifs with h1 h2 <;> first | rfl | (exfalso; omega)
+
+theorem interlace_of (R : Ranks) (P Q : HCParam R) (hv : Q.v = P.v) (hb : Q.b = P.b) :
+    InterlacingCondition R.k R.rS (fun i => (Q.u i : ℝ)) (fun i => (P.v i : ℝ)) (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) := by
+  refine ⟨fun i => ⟨?_, ?_⟩, fun h => ?_⟩
+  · have := Q.u_gt_v i
+    rw [hv] at this
+    dsimp only
+    exact_mod_cast this
+  · have := Q.v_gt_u i
+    rw [hv] at this
+    dsimp only
+    exact_mod_cast this
+  · have h2 := R.two_le_m
+    have := Q.u_last_gt h (by omega)
+    rw [hb] at this
+    simp only [Fin.cast_mk]
+    exact_mod_cast this
+
+theorem halfInt_of (R : Ranks) (P Q : HCParam R) :
+    HalfIntegralDifference R.k R.rS (fun i => (Q.u i : ℝ)) (fun i => (P.v i : ℝ)) (fun j => (P.b (Fin.cast (mEqR R) j) : ℝ)) := by
+  intro i s
+  choose gv hgv using P.v_int
+  choose gb hgb using P.b_int
+  obtain ⟨a, ha⟩ := Q.u_half i
+  unfold lam48
+  dsimp only
+  split_ifs with h
+  · refine ⟨a - gv ⟨s.val, h⟩, ?_⟩
+    rw [ha, hgv]
+    push_cast
+    ring
+  · refine ⟨a + gb (Fin.cast (mEqR R) ⟨s.val - (R.k - 1), by have := s.isLt; omega⟩), ?_⟩
+
+
+[BWP_quotient_product_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/QuotRaw.lean:1-179
+Range SHA256 3f16a74ecbe6be6130325ed693fbaa197a0f7437551dacdedba08600abd9a094
+import Mathlib
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.BesselLevi
+import Formalism.LocalToGlobal.SiegelLatticeTheory.HaarTransversals.UnitaryHaarProducts.SCompact
+
+noncomputable section
+
+open Matrix MeasureTheory NumberField Formalism.BasicNotions Formalism.L2.SG.HidaSetting Formalism.QuantumDeterminants Formalism.MainNotions.S Formalism.MainNotions.CayleySignature
+open Formalism.L2.SG.SplitPrimeNormLemmas
+open scoped InnerProductSpace
+
+namespace Formalism.L2.SG.Pf.WFL
+
+variable {k r : ℕ}
+
+section Blocks
+
+attribute [local instance] Formalism.BasicNotions.Host.cmStar
+
+variable {D : D7}
+
+theorem hform_crdA (A : UnitaryGroupInstance D) (v w : (VS D).V) :
+    A.ιE (Formalism.UG.hform (starRingEnd A.I.E) A.I.J (crdOf A.I A.ιE A.bas v) (crdOf A.I A.ιE A.bas w)) =
+      (VS D).hT v w := by
+  conv_rhs => rw [← A.bas.sum_repr v, ← A.bas.sum_repr w]
+  simp only [map_sum, LinearMap.map_smulₛₗ, LinearMap.sum_apply, LinearMap.smul_apply, smul_eq_mul,
+    Formalism.UG.hform, map_mul, crdOf, starRingEnd_apply, A.ιE_conj, RingEquiv.apply_symm_apply,
+    A.J_eq, Finset.mul_sum]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun i _ => Finset.sum_congr rfl fun j _ => ?_
+  simp only [← Formalism.BasicNotions.bridge_star_holds D.R D.host, RingHom.id_apply]
+  ring
+
+theorem hJ_crdA (A : UnitaryGroupInstance D) (v : InfinitePlace A.I.F) (p q : (VS D).V) :
+    hJ (A.I.ε v) (rv A.I v (crdOf A.I A.ιE A.bas p)) (rv A.I v (crdOf A.I A.ιE A.bas q)) =
+      A.I.φ v (A.ιE.symm ((VS D).hT p q)) := by
+  rw [Formalism.L2.SG.Pf.hJ_rv_sc, ← hform_crdA A p q, RingEquiv.symm_apply_apply]
+
+end Blocks
+
+section FrameOf
+variable {ε : Fin (2 * r + k + 1) → Bool}
+
+theorem hJ_smul_right {n : ℕ} (ε : Fin n → Bool) (x y : Fin n → ℂ) (c : ℂ) : hJ ε x (c • y) = c * hJ ε x y := by
+  unfold hJ; rw [Matrix.mulVec_smul, dotProduct_smul, smul_eq_mul]
+
+theorem hJ_smul_left {n : ℕ} (ε : Fin n → Bool) (x y : Fin n → ℂ) (c : ℂ) :
+    hJ ε (c • x) y = star c * hJ ε x y := by
+  unfold hJ; rw [star_smul, smul_dotProduct, smul_eq_mul]
+
+theorem isFrameJ_of (e f : Fin r → Fin (2 * r + k + 1) → ℂ) (z : Fin (2 * r + k + 1) → ℂ)
+    (wf : Fin k → Fin (2 * r + k + 1) → ℂ) {T : ℝ} (hT : 0 < T)
+    (hee : ∀ a b, hJ ε (e a) (e b) = 0) (hff : ∀ a b, hJ ε (f a) (f b) = 0)
+    (hef : ∀ a b, hJ ε (e a) (f b) = if a = b then 1 else 0)
+    (hez : ∀ a, hJ ε (e a) z = 0) (hfz : ∀ a, hJ ε (f a) z = 0) (hzz : hJ ε z z = -(T : ℂ))
+    (hww : ∀ a b, hJ ε (wf a) (wf b) = if a = b then 1 else 0)
+    (hew : ∀ c a, hJ ε (e c) (wf a) = 0) (hfw : ∀ c a, hJ ε (f c) (wf a) = 0) (hzw : ∀ a, hJ ε z (wf a) = 0) :
+    IsFrameJ ε e f wf (z0v T z) := by
+  have hs : Real.sqrt T ≠ 0 := (Real.sqrt_pos.mpr hT).ne'
+  refine ⟨hee, hff, hef, fun a => ?_, fun a => ?_, ?_, hww, hew, hfw, fun a => ?_⟩
+  · rw [z0v, hJ_smul_right, hez, mul_zero]
+  · rw [z0v, hJ_smul_right, hfz, mul_zero]
+  · rw [z0v, hJ_smul_right, hJ_smul_left, hzz, Complex.star_def, Complex.conj_ofReal]
+    have h1 : ((Real.sqrt T)⁻¹ : ℝ) * (Real.sqrt T)⁻¹ * T = 1 := by
+      rw [← mul_inv, Real.mul_self_sqrt hT.le, inv_mul_cancel₀ hT.ne']
+    have h2 : (((Real.sqrt T)⁻¹ : ℝ) : ℂ) * (((Real.sqrt T)⁻¹ : ℝ) * -(T : ℂ)) =
+        -((((Real.sqrt T)⁻¹ * (Real.sqrt T)⁻¹ * T : ℝ)) : ℂ) := by push_cast; ring
+    rw [h2, h1]; simp
+  · rw [z0v, hJ_smul_left, hzw, mul_zero]
+
+end FrameOf
+
+section QuotRaw
+
+theorem fix_one {n : ℕ} {ε : Fin n → Bool} {e f : Fin r → Fin n → ℂ} {z : Fin n → ℂ} :
+    (∀ a, uMat (1 : Formalism.REAL.UJ ε) *ᵥ e a = e a) ∧ (∀ a, uMat (1 : Formalism.REAL.UJ ε) *ᵥ f a = f a) ∧
+      uMat (1 : Formalism.REAL.UJ ε) *ᵥ z = z := by
+  refine ⟨fun a => ?_, fun a => ?_, ?_⟩ <;> simp [uMat]
+
+theorem fix_mul {n : ℕ} {ε : Fin n → Bool} {e f : Fin r → Fin n → ℂ} {z : Fin n → ℂ} {a b : Formalism.REAL.UJ ε}
+    (ha : (∀ c, uMat a *ᵥ e c = e c) ∧ (∀ c, uMat a *ᵥ f c = f c) ∧ uMat a *ᵥ z = z)
+    (hb : (∀ c, uMat b *ᵥ e c = e c) ∧ (∀ c, uMat b *ᵥ f c = f c) ∧ uMat b *ᵥ z = z) :
+    (∀ c, uMat (a * b) *ᵥ e c = e c) ∧ (∀ c, uMat (a * b) *ᵥ f c = f c) ∧ uMat (a * b) *ᵥ z = z := by
+  refine ⟨fun c => ?_, fun c => ?_, ?_⟩
+  · rw [show uMat (a * b) = uMat a * uMat b from rfl, ← Matrix.mulVec_mulVec, hb.1 c, ha.1 c]
+  · rw [show uMat (a * b) = uMat a * uMat b from rfl, ← Matrix.mulVec_mulVec, hb.2.1 c, ha.2.1 c]
+  · rw [show uMat (a * b) = uMat a * uMat b from rfl, ← Matrix.mulVec_mulVec, hb.2.2, ha.2.2]
+
+theorem fix_inv {n : ℕ} {ε : Fin n → Bool} {e f : Fin r → Fin n → ℂ} {z : Fin n → ℂ} {a : Formalism.REAL.UJ ε}
+    (ha : (∀ c, uMat a *ᵥ e c = e c) ∧ (∀ c, uMat a *ᵥ f c = f c) ∧ uMat a *ᵥ z = z) :
+    (∀ c, uMat a⁻¹ *ᵥ e c = e c) ∧ (∀ c, uMat a⁻¹ *ᵥ f c = f c) ∧ uMat a⁻¹ *ᵥ z = z := by
+  have hinv : uMat a⁻¹ * uMat a = 1 := by
+    show ((a⁻¹ : Formalism.REAL.UJ ε) : (Matrix (Fin n) (Fin n) ℂ)ˣ).val * (a : (Matrix (Fin n) (Fin n) ℂ)ˣ).val = 1
+    rw [← Units.val_mul, ← Subgroup.coe_mul, inv_mul_cancel]; rfl
+  have key : ∀ y, uMat a *ᵥ y = y → uMat a⁻¹ *ᵥ y = y := fun y hy => by
+    conv_lhs => rw [← hy]
+    rw [Matrix.mulVec_mulVec, hinv, Matrix.one_mulVec]
+  exact ⟨fun c => key _ (ha.1 c), fun c => key _ (ha.2.1 c), key _ ha.2.2⟩
+
+variable {ε : Fin (2 * r + k + 1) → Bool} {e f : Fin r → Fin (2 * r + k + 1) → ℂ}
+  {wf : Fin k → Fin (2 * r + k + 1) → ℂ}
+
+theorem HNset_eq_NH (hHN : LocHNProps) {T : ℝ} (hT : 0 < T) {z : Fin (2 * r + k + 1) → ℂ}
+    (hF : IsFrameJ ε e f wf (z0v T z)) (s : Formalism.REAL.UJ ε) :
+    s ∈ HNset ε e f wf (z0v T z) (zBv k r T) ↔
+      ∃ m ∈ {g : Formalism.REAL.UJ ε | InN ε e z (uMat g)},
+        ∃ h ∈ {g : Formalism.REAL.UJ ε | (∀ a, uMat g *ᵥ e a = e a) ∧ (∀ a, uMat g *ᵥ f a = f a) ∧ uMat g *ᵥ z = z},
+          s = m * h := by
+  have hc : (((Real.sqrt T)⁻¹ : ℝ) : ℂ) ≠ 0 := by
+    have : (Real.sqrt T)⁻¹ ≠ 0 := inv_ne_zero (Real.sqrt_pos.mpr hT).ne'
+    exact_mod_cast this
+  obtain ⟨-, -, -, hnorm⟩ := hHN k r ε e f wf (z0v T z) z _ hF hc rfl
+  have hz := Qm_zB (e := e) (f := f) (wf := wf) hT z
+  have hzB : ∀ i : Fin (2 * r + k + 1), i.val < r ∨ r + k < i.val → zBv k r T i = 0 := inWb_zB T
+  have hz0 : ∃ t : ℂ, z0v T z = t • z := ⟨_, rfl⟩
+  rw [HNset_iff hF hz hzB hz0]
+  constructor
+  · rintro ⟨h, n, rfl, he, hf, hzz, hn⟩
+    refine ⟨h * n * h⁻¹, hnorm h ⟨he, hf, hzz⟩ n hn, h, ⟨he, hf, hzz⟩, by group⟩
+  · rintro ⟨m, hm, h, hh, rfl⟩
+    refine ⟨h, h⁻¹ * m * h, by group, hh.1, hh.2.1, hh.2.2, ?_⟩
+    have := hnorm h⁻¹ (fix_inv hh) m hm
+    simpa using this
+
+end QuotRaw
+
+section QuotRaw2
+
+theorem quotRaw (hQK : QuotProdK) (hHN : LocHNProps) (hNU : NUnimodLoc) {ι : Type} [Fintype ι]
+    {ε : ι → Fin (2 * r + k + 1) → Bool} (e f : ι → Fin r → Fin (2 * r + k + 1) → ℂ)
+    (z : ι → Fin (2 * r + k + 1) → ℂ) (wf : ι → Fin k → Fin (2 * r + k + 1) → ℂ) {T : ℝ} (hT : 0 < T)
+    (hF : ∀ v, IsFrameJ (ε v) (e v) (f v) (wf v) (z0v T (z v)))
+    (muN muH nuQ : Measure (∀ v, Formalism.REAL.UJ (ε v)))
+    (hN : SigmaFinite muN ∧ muN ≠ 0 ∧ muN {s | ∀ v, InN (ε v) (e v) (z v) (uMat (s v))}ᶜ = 0 ∧
+      ∀ s ∈ {s : ∀ v, Formalism.REAL.UJ (ε v) | ∀ v, InN (ε v) (e v) (z v) (uMat (s v))}, muN.map (fun x => s * x) = muN)
+    (hH : SigmaFinite muH ∧ muH ≠ 0 ∧ muH {s : ∀ v, Formalism.REAL.UJ (ε v) | ∀ v, (∀ a, uMat (s v) *ᵥ e v a = e v a) ∧
+        (∀ a, uMat (s v) *ᵥ f v a = f v a) ∧ uMat (s v) *ᵥ z v = z v}ᶜ = 0 ∧
+      ∀ s ∈ {s : ∀ v, Formalism.REAL.UJ (ε v) | ∀ v, (∀ a, uMat (s v) *ᵥ e v a = e v a) ∧
+        (∀ a, uMat (s v) *ᵥ f v a = f v a) ∧ uMat (s v) *ᵥ z v = z v}, muH.map (fun x => s * x) = muH)
+    (hW : ∀ F : (∀ v, Formalism.REAL.UJ (ε v)) → ENNReal, Measurable F →
+      ∫⁻ x, F x ∂(Measure.pi fun v => Formalism.REAL.muG (ε v)) =
+        ∫⁻ x, (∫⁻ s, F (s * x) ∂((muN.prod muH).map (fun p => p.1 * p.2))) ∂nuQ) :
+    ∃ (μS νl : ∀ v, Measure (Formalism.REAL.UJ (ε v))) (C : ENNReal), C ≠ 0 ∧ C ≠ ⊤ ∧
+      (∀ v, IsLocHaar (HNset (ε v) (e v) (f v) (wf v) (z0v T (z v)) (zBv k r T)) (μS v) ∧ IsLocQuot (μS v) (νl v)) ∧
+      ∀ F : ∀ v, Formalism.REAL.UJ (ε v) → ENNReal, (∀ v, Measurable (F v)) →
+        (∀ v, ∀ s ∈ HNset (ε v) (e v) (f v) (wf v) (z0v T (z v)) (zBv k r T), ∀ x, F v (s * x) = F v x) →
+        ∫⁻ x, ∏ v, F v (x v) ∂nuQ = C * ∏ v, ∫⁻ y, F v y ∂(νl v) := by
+  have hc : (((Real.sqrt T)⁻¹ : ℝ) : ℂ) ≠ 0 := by
+    have : (Real.sqrt T)⁻¹ ≠ 0 := inv_ne_zero (Real.sqrt_pos.mpr hT).ne'
+    exact_mod_cast this
+  set N : ∀ v, Set (Formalism.REAL.UJ (ε v)) := fun v => {g | InN (ε v) (e v) (z v) (uMat g)} with hNdef
+  set H : ∀ v, Set (Formalism.REAL.UJ (ε v)) := fun v => {g | (∀ a, uMat g *ᵥ e v a = e v a) ∧
+    (∀ a, uMat g *ᵥ f v a = f v a) ∧ uMat g *ᵥ z v = z v} with hHdef
+  have hP := fun v => hHN k r (ε v) (e v) (f v) (wf v) (z0v T (z v)) (z v) _ (hF v) hc rfl
+  have hpiN : Set.pi Set.univ N = {s : ∀ v, Formalism.REAL.UJ (ε v) | ∀ v, InN (ε v) (e v) (z v) (uMat (s v))} := by
+    ext s; simp [Set.mem_pi, hNdef]
+  have hpiH : Set.pi Set.univ H = {s : ∀ v, Formalism.REAL.UJ (ε v) | ∀ v, (∀ a, uMat (s v) *ᵥ e v a = e v a) ∧
+      (∀ a, uMat (s v) *ᵥ f v a = f v a) ∧ uMat (s v) *ᵥ z v = z v} := by
+    ext s; simp [Set.mem_pi, hHdef]
+  have hN' := hN; rw [← hpiN] at hN'
+  have hH' := hH; rw [← hpiH] at hH'
+  obtain ⟨μS, νl, C, hC0, hCt, hloc, hK⟩ := hQK ι (fun _ => 2 * r + k + 1) ε N H
+    (fun v => (hP v).1) (fun v => (hP v).2.1) (fun v => (hP v).2.2.1)
+    (fun v => ⟨fix_one, fun a ha b hb => fix_mul ha hb, fun a ha => fix_inv ha⟩)
+    (fun v h hh m hm => (hP v).2.2.2 h hh m hm)
+    (fun v μ h1 h2 h3 h4 => hNU k r (ε v) (e v) (f v) (wf v) (z0v T (z v)) (z v) _ (hF v) hc rfl μ h1 h2 h3 h4)
+    muN muH nuQ hN' hH' hW
+  have hset : ∀ v, {s : Formalism.REAL.UJ (ε v) | ∃ m ∈ N v, ∃ h ∈ H v, s = m * h} =
+      HNset (ε v) (e v) (f v) (wf v) (z0v T (z v)) (zBv k r T) := by
+    intro v; ext s; exact (HNset_eq_NH hHN hT (hF v) s).symm
+  refine ⟨μS, νl, C, hC0, hCt, fun v => ?_, fun F hFm hFi => hK F hFm fun v m hm h hh x => ?_⟩
+  · obtain ⟨⟨h1, h2, h3, h4⟩, hq⟩ := hloc v
+    rw [hset v] at h3 h4
+    exact ⟨⟨h1, h2, h3, h4⟩, hq⟩
+  · refine hFi v (m * h) ?_ x
+    rw [← hset v]; exact ⟨m, hm, h, hh, rfl⟩
+
+end QuotRaw2
+
+end Formalism.L2.SG.Pf.WFL
+
+
+[BWP_global_assembly_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/WFromLoc.lean:37-151
+Range SHA256 ad264e9e385fc669e8cbe653634aea014aa17e1e65db24352fe85246866250c4
+theorem wblk_core (hQK : QuotProdK) (hHN : LocHNProps) (hNU : NUnimodLoc) (hTens : TensInt) {D : D7}
+    (hB : BesselNVGap) (hCW : CoefWeightedLoc) (hWl : WlocExists) (hGB : GapBigOfGapHyp D) (hG : GapHyp D)
+    (I : AutInst) (ιE : I.E ≃+* D.host.E) (ιE_conj : ∀ x : I.E, ιE (star x) = D.host.conj (ιE x))
+    (ιE_F : ∀ y : D.host.E, y ∈ D.host.F ↔ ∃ a : I.F, ιE (algebraMap I.F I.E a) = y)
+    (bas : Module.Basis (Fin I.n) D.host.E (VS D).V) (J_eq : ∀ i j, ιE (I.J i j) = (VS D).hT (bas i) (bas j))
+    (L_eq : ∀ x : Fin I.n → I.E, x ∈ I.L ↔ (∑ i, ιE (x i) • bas i) ∈ (VS D).L0)
+    (pl : InfinitePlace I.F ≃ D.what₂.Tau) (φ_eq : ∀ v (x : I.E), I.φ v x = embS D (pl v) (ιE x))
+    (n_eq : I.n = D.R.r) (eps_eq : ∀ v (i : Fin I.n), I.ε v i = epsS D.R (Fin.cast n_eq i))
+    (L : UnitaryLatticeData D) (Ps : AdditiveCharacterData (⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ : UnitaryGroupInstance D))
+    (Rf : ReferenceFrame (⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ : UnitaryGroupInstance D) L)
+    (Bu : AutomorphicBundle (⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ : UnitaryGroupInstance D) Ps Rf)
+    (Pi : RepresentationData (⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ : UnitaryGroupInstance D) L)
+    (Mu : MuBlocks (⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ : UnitaryGroupInstance D) L) :
+    Nonempty (WBlk (⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ : UnitaryGroupInstance D) L Bu Pi Mu) := by
+
+  have hJc : ∀ v (p q : (VS D).V), hJ (I.ε v) (rv I v (crdOf I ιE bas p)) (rv I v (crdOf I ιE bas q)) =
+      I.φ v (ιE.symm ((VS D).hT p q)) :=
+    fun v p q => hJ_crdA (⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ : UnitaryGroupInstance D) v p q
+  cases I with
+  | mk F E cm n J J_herm J_det L0 L_span L_fg L_dual ε φ φ_over P P_unit P_spec topf_open topf_basis =>
+  have hn : n = 2 * D.R.rS + D.R.k + 1 := n_eq.trans (dimS_eq D.R).symm
+  subst hn
+
+  set eV : InfinitePlace F → Fin D.R.rS → Fin (2 * D.R.rS + D.R.k + 1) → ℂ :=
+    fun v a => rv _ v (crdOf _ ιE bas (L.eX a)) with heV
+  set fV : InfinitePlace F → Fin D.R.rS → Fin (2 * D.R.rS + D.R.k + 1) → ℂ :=
+    fun v a => rv _ v (crdOf _ ιE bas (L.fY a)) with hfV
+  set zV : D.what₂.Word → InfinitePlace F → Fin (2 * D.R.rS + D.R.k + 1) → ℂ :=
+    fun u v => rv _ v (crdOf _ ιE bas (L.zu u)) with hzV
+  set TV : D.what₂.Word → ℝ := fun u => (((D.mem u).A.T : ℕ) : ℝ) with hTV
+  have hT : ∀ u, 0 < TV u := fun u => Nat.cast_pos.mpr (D.mem u).A.T_prime.pos
+  have hFr : ∀ u v, IsFrameJ (ε v) (eV v) (fV v) (Pi.wfr u v) (z0v (TV u) (zV u v)) := by
+    intro u v
+    refine isFrameJ_of (eV v) (fV v) (zV u v) (Pi.wfr u v) (hT u) (fun a b => ?_) (fun a b => ?_) (fun a b => ?_)
+      (fun a => ?_) (fun a => ?_) ?_ (Pi.wfr_on u v) (fun c a => ((Pi.wfr_perp u v a).1 c).1)
+      (fun c a => ((Pi.wfr_perp u v a).1 c).2) (fun a => (Pi.wfr_perp u v a).2)
+    · rw [heV]; simp only; rw [hJc, L.ee]; simp
+    · rw [hfV]; simp only; rw [hJc, L.ff]; simp
+    · rw [heV, hfV]; simp only; rw [hJc, L.ef]; split_ifs <;> simp
+    · rw [heV, hzV]; simp only; rw [hJc, (L.zu_orth u a).1]; simp
+    · rw [hfV, hzV]; simp only; rw [hJc, (L.zu_orth u a).2]; simp
+    · rw [hzV]; simp only; rw [hJc, L.zu_norm]; simp [hTV]
+
+  have hk : 1 ≤ D.R.k := by have := D.R.m_add_three_le_k; omega
+  have hke : Even D.R.k := D.R.k_even
+  have hg : 0 < gD D := Nat.mul_pos (D.host.g_prime 0).pos (D.host.g_prime 1).pos
+  have hε : ∀ v, ε v = eps48 D.R.k D.R.rS := fun v => funext fun i =>
+    (eps_eq v i).trans (by simp [epsS, eps48])
+  have hlamE : ∀ v, (fun i => lamS D.R (D.hc (pl v)) (Fin.cast n_eq i)) =
+      lam48 D.R.k D.R.rS (fun i => ((D.hc (pl v)).v i : ℝ)) (fun j => ((D.hc (pl v)).b (Fin.cast (mEqR D.R) j) : ℝ)) :=
+    fun v => funext fun i => lam_matchR D.R (D.hc (pl v)) i n_eq
+  have hDS : ∀ v, IsDS (ε v) (lam48 D.R.k D.R.rS (fun i => ((D.hc (pl v)).v i : ℝ))
+      (fun j => ((D.hc (pl v)).b (Fin.cast (mEqR D.R) j) : ℝ))) (Bu.σ v) := fun v => by
+    rw [← hlamE v]; exact Bu.ds v
+  have hwL : ∀ v, IsLowUnit (ε v) (lam48 D.R.k D.R.rS (fun i => ((D.hc (pl v)).v i : ℝ))
+      (fun j => ((D.hc (pl v)).b (Fin.cast (mEqR D.R) j) : ℝ))) (Bu.σ v) (Bu.w v) := fun v => by
+    rw [← hlamE v]; exact Bu.low v
+  have hl : ∀ v, Formalism.QuantumDeterminants.IsHCParam (lam48 D.R.k D.R.rS (fun i => ((D.hc (pl v)).v i : ℝ))
+      (fun j => ((D.hc (pl v)).b (Fin.cast (mEqR D.R) j) : ℝ))) := fun v => by
+    have h := Formalism.MainNotions.S.Inh.obj_isHCParam_lamSH D.R (D.hc (pl v))
+    have e : lamSH D.R (D.hc (pl v)) = lam48 D.R.k D.R.rS (fun i => ((D.hc (pl v)).v i : ℝ))
+        (fun j => ((D.hc (pl v)).b (Fin.cast (mEqR D.R) j) : ℝ)) :=
+      funext fun i => lam_matchR D.R (D.hc (pl v)) i (dimS_eq D.R)
+    rwa [e] at h
+  have hGap : ∀ v, GapBig D.R.k D.R.rS (fun j => ((D.hc (pl v)).b (Fin.cast (mEqR D.R) j) : ℝ)) :=
+    fun v => hGB (mEqR D.R).symm hG (pl v)
+
+  have hHset : ∀ u, Hset _ (Set.range (eC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L) ∪
+      Set.range (fC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L) ∪
+      {zC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L u}) =
+      {s : ∀ v, Formalism.REAL.UJ (ε v) | ∀ v, (∀ a, uMat (s v) *ᵥ eV v a = eV v a) ∧
+        (∀ a, uMat (s v) *ᵥ fV v a = fV v a) ∧ uMat (s v) *ᵥ zV u v = zV u v} := by
+    intro u; ext s
+    simp only [Hset, Set.mem_setOf_eq, Set.mem_union, Set.mem_range, Set.mem_singleton_iff]
+    constructor
+    · intro h v
+      exact ⟨fun a => h v _ (Or.inl (Or.inl ⟨a, rfl⟩)), fun a => h v _ (Or.inl (Or.inr ⟨a, rfl⟩)),
+        h v _ (Or.inr rfl)⟩
+    · rintro h v x ((⟨a, rfl⟩ | ⟨a, rfl⟩) | rfl)
+      · exact (h v).1 a
+      · exact (h v).2.1 a
+      · exact (h v).2.2
+  have hQ := fun u => quotRaw hQK hHN hNU eV fV (zV u) (Pi.wfr u) (hT u) (hFr u) (Mu.muN u) (Mu.muH u) (Mu.nuQ u)
+    (Mu.muN_haar u) (by have h := Mu.muH_haar u; rw [hHset u] at h; exact h) (Mu.nuQ_weil u)
+  choose μS νl C hC0 hCt hloc hK using hQ
+
+  have hP := fun u v => locPack hB hCW hWl (hε v) hk hke (hT u) hg
+    (Formalism.MainNotions.S.Inh.obj_isHCParam_u D.R (D.hcW u (pl v))) (hl v)
+    (interlace_of D.R (D.hc (pl v)) (D.hcW u (pl v)) (D.hcW_v u (pl v)) (D.hcW_b u (pl v)))
+    (halfInt_of D.R (D.hc (pl v)) (D.hcW u (pl v))) (hGap v) (z := zV u v) rfl (hFr u v) (hDS v) (hwL v)
+    (Pi.piLoc_type u v) (hloc u v).1 (hloc u v).2
+  choose Wl hWc hWe hWr hW1 hW2 hWw hWα using hP
+
+  classical
+  have hne : Nonempty (InfinitePlace F) := ⟨pl.symm (D.eTau.symm (Classical.arbitrary _))⟩
+  let v0 : InfinitePlace F := Classical.arbitrary _
+  let cU : D.what₂.Word → ℂ := fun u => (((C u).toReal ^ (-(1 / 2 : ℝ)) : ℝ) : ℂ)
+  let cv : D.what₂.Word → InfinitePlace F → ℂ := fun u v => if v = v0 then cU u else 1
+  have hcv : ∀ u, ∏ v, cv u v = cU u := fun u => by simp [cv, Finset.prod_ite_eq']
+  let Wloc : ∀ u v, Formalism.REAL.UJ (ε v) → Pi.Vloc u v := fun u v y => cv u v • Wl u v y
+  have hWlc : ∀ u v, Continuous (Wloc u v) := fun u v => (hWc u v).const_smul (cv u v)
+
+  have hinv : ∀ u v, ∀ s ∈ HNset (ε v) (eV v) (fV v) (Pi.wfr u v) (z0v (TV u) (zV u v)) (zBv D.R.k D.R.rS (TV u)),
+      ∀ y, ‖Wloc u v (s * y)‖ₑ = ‖Wloc u v y‖ₑ := by
+    intro u v s hs y
+    simp only [Wloc, enorm_smul]
+    rw [show ‖Wl u v (s * y)‖ₑ = ‖Wl u v y‖ₑ by
+      simp only [enorm_eq_nnnorm]
+      congr 1
+      exact NNReal.eq (loc_norm_inv (hT u) (hFr u v) (Pi.piLoc_type u v) (hWe u v) hs y)]
+  have hnorm : ∀ u (x : ∀ v, Formalism.REAL.UJ (ε v)),
+      ‖Pi.tensU u (fun v => Wloc u v (x v))‖ₑ = ∏ v, ‖Wloc u v (x v)‖ₑ := by
+    intro u x
+    simp only [enorm_eq_nnnorm]
+    rw [← ENNReal.coe_finset_prod]
+
+
+[BWP_global_assembly_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/WFromLoc.lean:151-282
+Range SHA256 9725e18996831c19bbb4581b9c6e43a965139bc68a3d6777578cc843e41604f1
+    rw [← ENNReal.coe_finset_prod]
+    congr 1
+    exact NNReal.eq (by push_cast; exact Formalism.L2.SG.Pf.WuDec.norm_tens (Pi.tensU_inner u) _)
+  refine ⟨⟨fun u x => Pi.tensU u (fun v => Wloc u v (x v)), fun u => ?_, Wloc, hWlc, fun u x => rfl⟩⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · intro s hs x
+    have hsv : ∀ v, ∃ h ∈ UWset D.R.k D.R.rS (zBv D.R.k D.R.rS (TV u)), ∃ m ∈ Nset D.R.k D.R.rS,
+        Qi (ε v) (eV v) (fV v) (Pi.wfr u v) (z0v (TV u) (zV u v)) * uMat (s v) *
+          Qm (eV v) (fV v) (Pi.wfr u v) (z0v (TV u) (zV u v)) = h * m :=
+      fun v => HNset_of_inS (fun k r T hT s hs h1 h2 => bessel_levi_formula k r T hT s hs h1 h2) (hFr u v) (hT u)
+        (Qm_zB (hT u) _) (hs v)
+    choose hB hhB mB hmB hsm using hsv
+    let gH : ∀ v, Formalism.REAL.UJ (ε v) := fun v => toUJ _ (conjQ_UJ (hFr u v) (hhB v).1)
+    let gN : ∀ v, Formalism.REAL.UJ (ε v) := fun v => toUJ _ (conjQ_UJ (hFr u v) (hmB v).1)
+    have hsplit : s = gH * gN := funext fun v => split_S (hFr u v) (s v) (hsm v) _ _
+    have hfixv : ∀ v, (∀ a, uMat (gH v) *ᵥ eV v a = eV v a) ∧ (∀ a, uMat (gH v) *ᵥ fV v a = fV v a) ∧
+        uMat (gH v) *ᵥ zV u v = zV u v := fun v => rev_UW (hFr u v) (Qm_zB (hT u) _) (hhB v)
+    have hgH : gH ∈ Hset _ (Set.range (eC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L) ∪
+        Set.range (fC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L) ∪
+        {zC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L u}) := by
+      intro v y hy
+      rcases hy with ((⟨a, rfl⟩ | ⟨a, rfl⟩) | hy)
+      · exact (hfixv v).1 a
+      · exact (hfixv v).2.1 a
+      · rw [Set.mem_singleton_iff] at hy; subst hy; exact (hfixv v).2.2
+    have hgN : ∀ v, InN (ε v) (eV v) (zV u v) (uMat (gN v)) := fun v =>
+      rev_N (hFr u v) (Qm_zB (hT u) _) (inWb_zB _) (hmB v)
+    have hgHS : gH ∈ Sinf _ (eC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L)
+        (zC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L u) := by
+      intro v
+      refine ⟨fun a => ?_, ?_⟩
+      · have : (uMat (gH v) - 1) *ᵥ eV v a = 0 := by
+          rw [Matrix.sub_mulVec, Matrix.one_mulVec, (hfixv v).1 a, sub_self]
+        exact this ▸ Submodule.zero_mem _
+      · have : (uMat (gH v) - 1) *ᵥ zV u v = 0 := by
+          rw [Matrix.sub_mulVec, Matrix.one_mulVec, (hfixv v).2.2, sub_self]
+        exact this ▸ Submodule.zero_mem _
+    have hgNS : gN ∈ Sinf _ (eC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L)
+        (zC ⟨_, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ L u) := fun v => (hgN v).1
+    obtain ⟨-, hmul, -, hNtriv, -⟩ := Pi.piU_rep u
+    have hpiU : Pi.piU u s = Pi.piU u gH := by
+      rw [hsplit, hmul gH hgHS gN hgNS, hNtriv gN hgN, mul_one]
+    have hL : (fun v => Wloc u v ((s * x) v)) = fun v =>
+        (cv u v * psiR (ε v) (gD D) (eV v) (fV v) (zV u v) (uMat (s v))) •
+          piB (ε v) (eV v) (fV v) (Pi.wfr u v) (z0v (TV u) (zV u v)) (Pi.piLoc u v) (hB v) (Wl u v (x v)) := by
+      funext v
+      show cv u v • Wl u v (s v * x v) = _
+      rw [hWe u v (s v) (x v) (hB v) (hhB v) (mB v) (hmB v) (hsm v), smul_smul]
+    have hR : Pi.piU u s (Pi.tensU u (fun v => Wloc u v (x v))) = Pi.tensU u (fun v => cv u v •
+        piB (ε v) (eV v) (fV v) (Pi.wfr u v) (z0v (TV u) (zV u v)) (Pi.piLoc u v) (hB v) (Wl u v (x v))) := by
+      rw [hpiU, Pi.tensU_equiv u gH hgH]
+      congr 1; funext v
+      show Pi.piLoc u v _ (cv u v • Wl u v (x v)) = _
+      rw [map_smul]; rfl
+    show Pi.tensU u (fun v => Wloc u v ((s * x) v)) = _ • Pi.piU u s (Pi.tensU u (fun v => Wloc u v (x v)))
+    rw [hL, hR, Formalism.L2.SG.Pf.WuDec.tens_smul (Pi.tensU_inner u), Formalism.L2.SG.Pf.WuDec.tens_smul (Pi.tensU_inner u),
+      smul_smul, Finset.prod_mul_distrib, mul_comm (∏ v, cv u v)]
+    rfl
+  · intro x
+    let G : ∀ v, Formalism.REAL.UJ (ε v) → Pi.Vloc u v := fun v t => cv u v •
+      ((((fdegOf (Formalism.REAL.muG (ε v)) (Bu.σ v) (Bu.w v) : ℝ) : ℂ) * star ⟪Bu.w v, Bu.σ v (uMat t) (Bu.w v)⟫_ℂ) •
+        Wl u v (x v * t))
+    have hGi : ∀ v, Integrable (G v) (Formalism.REAL.muG (ε v)) := fun v => ((hWr u v (x v)).1).smul (cv u v)
+    obtain ⟨hint, hval⟩ := hTens (InfinitePlace F) (fun v => Formalism.REAL.UJ (ε v)) (fun v => Formalism.REAL.muG (ε v))
+      (Pi.Vloc u) (Pi.Vpi u) (Pi.tensU u) (Pi.tensU_inner u) (Pi.tensU_span u) G hGi
+    have hpt : ∀ y : ∀ v, Formalism.REAL.UJ (ε v),
+        Formalism.L2.SG.ProjRows.phInf _ Bu.σ Bu.w (fun v => fdegOf (Formalism.REAL.muG (ε v)) (Bu.σ v) (Bu.w v)) y •
+          Pi.tensU u (fun v => Wloc u v ((x * y) v)) = Pi.tensU u (fun v => G v (y v)) := by
+      intro y
+      have hG : (fun v => G v (y v)) = fun v => (cv u v * ((((fdegOf (Formalism.REAL.muG (ε v)) (Bu.σ v) (Bu.w v) : ℝ) : ℂ) *
+          star ⟪Bu.w v, Bu.σ v (uMat (y v)) (Bu.w v)⟫_ℂ))) • Wl u v (x v * y v) := by
+        funext v; simp only [G]; rw [smul_smul]
+      have hW' : (fun v => Wloc u v ((x * y) v)) = fun v => cv u v • Wl u v (x v * y v) := rfl
+      rw [hG, hW', Formalism.L2.SG.Pf.WuDec.tens_smul (Pi.tensU_inner u), Formalism.L2.SG.Pf.WuDec.tens_smul (Pi.tensU_inner u),
+        smul_smul, Finset.prod_mul_distrib]
+      congr 1
+      simp only [Formalism.L2.SG.ProjRows.phInf, Formalism.L2.SG.ProjRows.mInf, Complex.ofReal_prod, star_prod,
+        ← Finset.prod_mul_distrib]
+      exact Finset.prod_congr rfl fun v _ => by rw [mul_comm _ (cv u v)]
+    refine ⟨hint.congr (ae_of_all _ fun y => (hpt y).symm), ?_⟩
+    rw [integral_congr_ae (ae_of_all _ hpt), hval]
+    congr 1; funext v
+    simp only [G]
+    rw [integral_smul, (hWr u v (x v)).2]
+  · exact (Formalism.L2.SG.Pf.WuDec.continuous_tens (Pi.tensU_inner u)).comp
+      (continuous_pi fun v => (hWlc u v).comp (continuous_apply v))
+  ·
+    rw [lintegral_congr (fun x => hnorm u x),
+      hK u (fun v y => ‖Wloc u v y‖ₑ) (fun v => (hWlc u v).enorm.measurable) (fun v s hs y => hinv u v s hs y)]
+    refine ENNReal.mul_lt_top (lt_top_iff_ne_top.2 (hCt u)) (ENNReal.prod_lt_top fun v _ => ?_)
+    simp only [Wloc, enorm_smul]
+    rw [lintegral_const_mul' _ _ enorm_ne_top]
+    exact ENNReal.mul_lt_top enorm_lt_top (hW1 u v)
+  ·
+    have h2 : ∀ x : ∀ v, Formalism.REAL.UJ (ε v), ‖Pi.tensU u (fun v => Wloc u v (x v))‖ₑ ^ 2 =
+        ∏ v, ‖Wloc u v (x v)‖ₑ ^ 2 := fun x => by rw [hnorm u x, Finset.prod_pow]
+    rw [lintegral_congr h2,
+      hK u (fun v y => ‖Wloc u v y‖ₑ ^ 2) (fun v => ((hWlc u v).enorm.measurable.pow_const 2))
+        (fun v s hs y => by show ‖Wloc u v (s * y)‖ₑ ^ 2 = ‖Wloc u v y‖ₑ ^ 2; rw [hinv u v s hs y])]
+    have hloc2 : ∀ v, ∫⁻ y, ‖Wloc u v y‖ₑ ^ 2 ∂(νl u v) = ‖cv u v‖ₑ ^ 2 := fun v => by
+      simp only [Wloc, enorm_smul, mul_pow]
+      rw [lintegral_const_mul' _ _ (ENNReal.pow_ne_top enorm_ne_top), hW2 u v, mul_one]
+    simp only [hloc2]
+    rw [Finset.prod_pow]
+    have hcU : ∏ v, ‖cv u v‖ₑ = ‖cU u‖ₑ := by
+      rw [← hcv u]; simp only [enorm_eq_nnnorm]; rw [← ENNReal.coe_finset_prod]; congr 1; rw [nnnorm_prod]
+    rw [hcU]
+    have ht : 0 < (C u).toReal := ENNReal.toReal_pos (hC0 u) (hCt u)
+    have he : ‖cU u‖ₑ ^ 2 = (C u)⁻¹ := by
+      have hnn : 0 ≤ (C u).toReal ^ (-(1 / 2 : ℝ)) := Real.rpow_nonneg ht.le _
+      rw [show ‖cU u‖ₑ = ENNReal.ofReal ((C u).toReal ^ (-(1 / 2 : ℝ))) by
+        rw [← ofReal_norm_eq_enorm]; simp only [cU]; rw [Complex.norm_real, Real.norm_of_nonneg hnn]]
+      rw [← ENNReal.ofReal_pow hnn, ← Real.rpow_natCast, ← Real.rpow_mul ht.le]
+      norm_num
+      rw [Real.rpow_neg_one, ENNReal.ofReal_inv_of_pos ht, ENNReal.ofReal_toReal (hCt u)]
+    rw [he, ENNReal.mul_inv_cancel (hC0 u) (hCt u)]
+
+end Main
+
+section Final
+
+theorem weighted_block_exists_of_local_data (hQK : QuotProdK) (hHN : LocHNProps) (hNU : NUnimodLoc) (D : D7)
+    (hB : BesselNVGap) (hCW : CoefWeightedLoc) (hWl : WlocExists) (hGB : GapBigOfGapHyp D) :
+    Formalism.L2.SG.Pf.Set3.WBlkExists D := by
+  intro hG A L Ps Rf Bu Pi Mu
+  obtain ⟨I, ιE, ιE_conj, ιE_F, bas, J_eq, L_eq, pl, φ_eq, n_eq, eps_eq⟩ := A
+  exact wblk_core hQK hHN hNU Formalism.L2.SG.Pf.WuDec.integrable_and_integral_pi_apply hB hCW hWl hGB hG I ιE ιE_conj ιE_F bas J_eq L_eq pl
+    φ_eq n_eq eps_eq L Ps Rf Bu Pi Mu
+
+end Final
+
+end Formalism.L2.SG.Pf.WFL
+
+
+[BWP_global_assembly_03] src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/RootLatticeThresholds/WuDecayAll.lean:410-527
+Range SHA256 f4d1c497b8729992b1ca39e704ba301d06aa884c4894217d428daeb80b238cc0
+def QuotWit (μS νl : ∀ v, Measure (Formalism.REAL.UJ (X.B.I.ε v))) (C : ℝ≥0∞) : Prop :=
+  C ≠ 0 ∧ C ≠ ⊤ ∧
+    (∀ v, (SigmaFinite (μS v) ∧ μS v ≠ 0 ∧ μS v (NHloc X u v)ᶜ = 0 ∧
+        ∀ s ∈ NHloc X u v, (μS v).map (fun x => s * x) = μS v) ∧
+      ∀ F : Formalism.REAL.UJ (X.B.I.ε v) → ℝ≥0∞, Measurable F →
+        ∫⁻ x, F x ∂(Formalism.REAL.muG (X.B.I.ε v)) = ∫⁻ x, (∫⁻ s, F (s * x) ∂(μS v)) ∂(νl v)) ∧
+    ∀ F : ∀ v, Formalism.REAL.UJ (X.B.I.ε v) → ℝ≥0∞, (∀ v, Measurable (F v)) →
+      (∀ v, ∀ m ∈ Nloc X u v, ∀ h ∈ Hloc X u v, ∀ x, F v (m * h * x) = F v x) →
+      ∫⁻ x, ∏ v, F v (x v) ∂(X.nuQ u) = C * ∏ v, ∫⁻ y, F v y ∂(νl v)
+
+def QuotProdX : Prop := ∃ μS νl C, QuotWit X u μS νl C
+
+def LocDecayX (νl : ∀ v, Measure (Formalism.REAL.UJ (X.B.I.ε v))) : Prop :=
+  ∀ v, (∫⁻ x, ‖X.Wloc u v x‖ₑ * ENNReal.ofReal (nuLocX X u v x ^ N1 X) ∂(νl v) < ⊤) ∧
+    ∃ (α : Formalism.REAL.UJ (X.B.I.ε v) → ℂ) (Ω : Set (Formalism.REAL.UJ (X.B.I.ε v))) (a : ℝ), IsCompact Ω ∧ 1 ∈ Ω ∧
+      Measurable α ∧ (∀ y, α y ≠ 0 → y ∈ Ω) ∧ (∀ y, ‖α y‖ ≤ a) ∧
+      ∀ x, Integrable (fun g => α g • X.Wloc u v (x * g)) (Formalism.REAL.muG (X.B.I.ε v)) ∧
+        ∫ g, α g • X.Wloc u v (x * g) ∂(Formalism.REAL.muG (X.B.I.ε v)) = X.Wloc u v x
+
+end Steps
+
+def QuotAll : Prop := ∀ (D : D7) (X : HidaSetting D) (u : D.what₂.Word), QuotProdX X u
+
+def LocDecayStep : Prop :=
+  ∀ (D : D7), Formalism.L2.SG.ConcreteSettingExists.GapHyp D → ∀ (X : HidaSetting D) (u : D.what₂.Word)
+    (μS νl : ∀ v, Measure (Formalism.REAL.UJ (X.B.I.ε v))) (C : ℝ≥0∞), QuotWit X u μS νl C → LocDecayX X u νl
+
+section Assembly
+
+open Classical
+
+variable {D : D7} (X : HidaSetting D) (u : D.what₂.Word)
+
+theorem Nloc_sub (v : InfinitePlace X.B.I.F) {m : Formalism.REAL.UJ (X.B.I.ε v)} (hm : m ∈ Nloc X u v) :
+    m ∈ Sloc X u v := hm.1
+
+theorem Hloc_sub (v : InfinitePlace X.B.I.F) {h : Formalism.REAL.UJ (X.B.I.ε v)} (hh : h ∈ Hloc X u v) :
+    h ∈ Sloc X u v := by
+  refine ⟨fun a => ?_, ?_⟩
+  · have : uMat h *ᵥ rv X.B.I v (X.eR a) = rv X.B.I v (X.eR a) := hh _ (Or.inl (Or.inl ⟨a, rfl⟩))
+    rw [Matrix.sub_mulVec, Matrix.one_mulVec, this, sub_self]; exact Submodule.zero_mem _
+  · have : uMat h *ᵥ rv X.B.I v (X.zR u) = rv X.B.I v (X.zR u) := hh _ (Or.inr rfl)
+    rw [Matrix.sub_mulVec, Matrix.one_mulVec, this, sub_self]; exact Submodule.zero_mem _
+
+def Fw (v : InfinitePlace X.B.I.F) (y : Formalism.REAL.UJ (X.B.I.ε v)) : ℝ≥0∞ :=
+  ‖X.Wloc u v y‖ₑ * ENNReal.ofReal (nuLocX X u v y ^ N1 X)
+
+theorem measurable_Fw (v : InfinitePlace X.B.I.F) : Measurable (Fw X u v) :=
+  (X.Wloc_cont u v).enorm.measurable.mul ((measurable_nuLocX X u v).pow_const _).ennreal_ofReal
+
+theorem Fw_inv (v : InfinitePlace X.B.I.F) (m : Formalism.REAL.UJ (X.B.I.ε v)) (hm : m ∈ Nloc X u v)
+    (h : Formalism.REAL.UJ (X.B.I.ε v)) (hh : h ∈ Hloc X u v) (x : Formalism.REAL.UJ (X.B.I.ε v)) :
+    Fw X u v (m * h * x) = Fw X u v x := by
+  have hs : m * h ∈ Sloc X u v := mul_mem_Sloc X u v (Nloc_sub X u v hm) (Hloc_sub X u v hh)
+  unfold Fw
+  rw [← enorm_norm (X.Wloc u v (m * h * x)), norm_Wloc_inv X u v hs, enorm_norm, nuLocX_inv X u v hs]
+
+theorem wuWeighted_of_loc {μS νl : ∀ v, Measure (Formalism.REAL.UJ (X.B.I.ε v))} {C : ℝ≥0∞}
+    (hQ : QuotWit X u μS νl C) (hL : LocDecayX X u νl) : WuWeighted X u := by
+  obtain ⟨_, hCt, _, hprod⟩ := hQ
+  have hpt : ∀ x : X.B.I.Ginf, ‖X.Wu u x‖ₑ * ENNReal.ofReal (nuInf X u x ^ N1 X) ≤ ∏ v, Fw X u v (x v) := by
+    intro x
+    have e1 : ‖X.Wu u x‖ₑ = ∏ v, ‖X.Wloc u v (x v)‖ₑ := by
+      rw [← ofReal_norm, norm_Wu, ENNReal.ofReal_prod_of_nonneg (fun _ _ => norm_nonneg _)]
+      simp only [ofReal_norm]
+    have e2 : ENNReal.ofReal (nuInf X u x ^ N1 X) ≤ ∏ v, ENNReal.ofReal (nuLocX X u v (x v) ^ N1 X) := by
+      rw [← ENNReal.ofReal_prod_of_nonneg (fun v _ => Real.rpow_nonneg (nuLocX_nonneg X u v _) _),
+        Real.finsetProd_rpow _ _ (fun v _ => nuLocX_nonneg X u v _)]
+      exact ENNReal.ofReal_le_ofReal (Real.rpow_le_rpow (nuInf_nonneg X u x) (nuInf_le_prod X u x) (weight_exponent_nonneg X))
+    calc ‖X.Wu u x‖ₑ * ENNReal.ofReal (nuInf X u x ^ N1 X)
+        ≤ (∏ v, ‖X.Wloc u v (x v)‖ₑ) * ∏ v, ENNReal.ofReal (nuLocX X u v (x v) ^ N1 X) := by
+          rw [e1]; gcongr
+      _ = ∏ v, Fw X u v (x v) := by rw [← Finset.prod_mul_distrib]; rfl
+  unfold WuWeighted
+  calc ∫⁻ x, ‖X.Wu u x‖ₑ * ENNReal.ofReal (nuInf X u x ^ N1 X) ∂(X.nuQ u)
+      ≤ ∫⁻ x, ∏ v, Fw X u v (x v) ∂(X.nuQ u) := lintegral_mono hpt
+    _ = C * ∏ v, ∫⁻ y, Fw X u v y ∂(νl v) :=
+        hprod _ (fun v => measurable_Fw X u v) (fun v m hm h hh x => Fw_inv X u v m hm h hh x)
+    _ < ⊤ := ENNReal.mul_lt_top (lt_top_iff_ne_top.2 hCt)
+        (ENNReal.prod_lt_top fun v _ => (hL v).1)
+
+theorem wuReprod_of_loc {νl : ∀ v, Measure (Formalism.REAL.UJ (X.B.I.ε v))} (hL : LocDecayX X u νl) : WuReprod X u := by
+  choose α Ω a hΩc h1 hαm hαs hαb hαr using fun v => (hL v).2
+  refine ⟨fun z => ∏ v, α v (z v), Set.univ.pi Ω, ∏ v, (a v).toNNReal, isCompact_univ_pi hΩc,
+    fun v _ => h1 v, Finset.measurable_prod _ fun v _ => (hαm v).comp (measurable_pi_apply v), ?_, ?_, ?_⟩
+  · intro z hz v _
+    exact hαs v (z v) ((Finset.prod_ne_zero_iff.1 hz) v (Finset.mem_univ v))
+  · intro z
+    rw [norm_prod, NNReal.coe_prod]
+    exact Finset.prod_le_prod (fun v _ => norm_nonneg _)
+      (fun v _ => (hαb v (z v)).trans (Real.le_coe_toNNReal _))
+  · intro x
+    have hT := integrable_and_integral_pi_apply (InfinitePlace X.B.I.F) (fun v => Formalism.REAL.UJ (X.B.I.ε v))
+      (fun v => Formalism.REAL.muG (X.B.I.ε v)) (X.Vloc u) (X.Vpi u) (X.tensU u) (X.tensU_inner u) (X.tensU_span u)
+      (fun v g => α v g • X.Wloc u v (x v * g)) (fun v => (hαr v (x v)).1)
+    have heq : (fun z : X.B.I.Ginf => (∏ v, α v (z v)) • X.Wu u (x * z)) =
+        fun z => X.tensU u (fun v => α v (z v) • X.Wloc u v (x v * z v)) := by
+      funext z
+      rw [tens_smul (X.tensU_inner u), X.Wu_tens]
+      rfl
+    refine ⟨?_, ?_⟩
+    · rw [heq]; exact hT.1
+    · rw [heq]
+      show ∫ z, X.tensU u (fun v => α v (z v) • X.Wloc u v (x v * z v))
+          ∂(Measure.pi fun v => Formalism.REAL.muG (X.B.I.ε v)) = X.Wu u x
+      rw [hT.2, X.Wu_tens]
+      congr 1
+      funext v
+      exact (hαr v (x v)).2
+
+end Assembly
+
+section LocalL2Isometry
+
+open Classical
+
+variable {D : D7} (X : HidaSetting D) (u : D.what₂.Word)
+
+
+
+[BWP_global_gap_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/ConcreteSettingExists.lean:13-20
+Range SHA256 7867ce8b1118345e6edd17112de11eacd6722e76c75a0f56df71ee472319afe0
+def GapHyp (D : D7) : Prop :=
+  1801 ≤ D.R.r ∧ ∀ (τ : D.what₂.Tau) (j : Fin D.R.m) (h : j.1 + 1 < D.R.m),
+    16 * (D.R.r : ℚ) ^ 19 ≤ (D.hc τ).b ⟨j.1 + 1, h⟩ - (D.hc τ).b j
+
+def ConcreteSettingExists (D : D7) : Prop :=
+  GapHyp D → ∃ X : HidaSetting D, ∃ hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I,
+    X.MeasTie hb ∧ Formalism.L2.SG.WuDecay.WuDecay X ∧ Integrable X.ph (Formalism.L2.SG.ProjRows.muInf X.B.I)
+
+
+
+[BWP_global_gap_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/RootLatticeThresholds/WuDecayAll.lean:44-72
+Range SHA256 c9de0af46bbe66013859f4e7d774d5599c18ce777ebdbbcfc37dabf062ee7a01
+theorem gapBig_of_gapHyp (D : D7) (hG : Formalism.L2.SG.ConcreteSettingExists.GapHyp D) (τ : D.what₂.Tau) :
+    Formalism.MainNotions.CayleySignature.GapBig D.R.k D.R.rS (Formalism.MainNotions.b48 D τ) := by
+  obtain ⟨hr, hgap⟩ := hG
+  have hdim := dimS D
+  have hm := Formalism.MainNotions.two_rS_add_two D
+  have hk := D.R.m_add_three_le_k
+  refine ⟨D.R.r + 6, ?_, ?_, ?_, ?_⟩
+  · obtain ⟨c, hc⟩ := r_odd D
+    exact ⟨c + 3, by omega⟩
+  · simp only [Formalism.MainNotions.CayleySignature.rk48]; omega
+  · simp only [Formalism.MainNotions.CayleySignature.rk48]; omega
+  · intro j hj
+    have hN : (6 : ℝ) ≤ (D.R.r : ℝ) := by exact_mod_cast (by omega : 6 ≤ D.R.r)
+    have hmN : ((2 * D.R.rS + 2 : ℕ) : ℝ) ≤ (D.R.r : ℝ) := by exact_mod_cast (by omega : 2 * D.R.rS + 2 ≤ D.R.r)
+    have key := Formalism.MainNotions.numNV (D.R.r : ℝ) ((2 * D.R.rS + 2 : ℕ) : ℝ) ((D.R.r + 6 : ℕ) : ℝ) hN hmN (by positivity)
+      (by push_cast; ring)
+    have hrk : Formalism.MainNotions.CayleySignature.rk48 D.R.k D.R.rS = D.R.r := by simp only [Formalism.MainNotions.CayleySignature.rk48]; omega
+    have hcast : (((Formalism.MainNotions.CayleySignature.rk48 D.R.k D.R.rS + (2 * D.R.rS + 2) * (D.R.r + 6) : ℕ)) : ℝ) =
+        (D.R.r : ℝ) + ((2 * D.R.rS + 2 : ℕ) : ℝ) * ((D.R.r + 6 : ℕ) : ℝ) := by
+      rw [hrk]; push_cast; ring
+    rw [hcast]
+    have hj' : (Fin.cast hm j).1 + 1 < D.R.m := by simp; omega
+    have hg := hgap τ (Fin.cast hm j) hj'
+    have hgR : (16 : ℝ) * (D.R.r : ℝ) ^ 19 ≤ Formalism.MainNotions.b48 D τ ⟨j.val + 1, hj⟩ - Formalism.MainNotions.b48 D τ j := by
+      have : Formalism.MainNotions.b48 D τ ⟨j.val + 1, hj⟩ - Formalism.MainNotions.b48 D τ j =
+          (((D.hc τ).b ⟨(Fin.cast hm j).1 + 1, hj'⟩ - (D.hc τ).b (Fin.cast hm j) : ℚ) : ℝ) := by
+        simp only [Formalism.MainNotions.b48]; push_cast; rfl
+      rw [this]
+      exact_mod_cast hg
+
+
+[BWP_global_endpoint_01] src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/SettingBlocks.lean:453-469
+Range SHA256 8d2c0b113e0f26351d85b42408cc2ae482e78789af5030c8b1ef03855a399c4f
+def GapBigOfGapHyp (D : D7) : Prop :=
+  ∀ hm : D.R.m = 2 * D.R.rS + 2, Formalism.L2.SG.ConcreteSettingExists.GapHyp D → ∀ τ : D.what₂.Tau,
+    GapBig D.R.k D.R.rS (fun j => ((D.hc τ).b (Fin.cast hm.symm j) : ℝ))
+
+def WFromLoc (D : D7) : Prop := BesselNVGap → CoefWeightedLoc → WlocExists → GapBigOfGapHyp D → WExists D
+
+theorem wExists_of_loc (D : D7) (hF : WFromLoc D) (hB : BesselNVGap) (hC : CoefWeightedLoc) (hW : WlocExists)
+    (hG : GapBigOfGapHyp D) : WExists D :=
+  hF hB hC hW hG
+
+theorem settingExists_of_inputs (D : D7) (hB : BesselNVGap) (hC : CoefWeightedLoc) (hW : WlocExists)
+    (hG : GapBigOfGapHyp D) (hF : WFromLoc D) (h1 : InstExists D) (h2 : LatExists D) (h3 : PsiExists D)
+    (h4 : RefExists D) (h5 : XuExists D) (h6 : BunExists D) (h7 : PiExists D) (h8 : MuExists D)
+    (h10 : MExists D) : Formalism.L2.SG.ConcreteSettingExists.ConcreteSettingExists D :=
+  settingExists_of_steps D hC h1 h2 h3 h4 h5 h6 h7 h8 (wExists_of_loc D hF hB hC hW hG) h10
+
+end Formalism.L2.SG.SplitPrimeNormLemmas
+
+
+[BWP_global_endpoint_02] src/Formalism/LocalToGlobal/SiegelLatticeTheory/ClosedVolumeStatements/SettingExistsOfGap.lean:24-40
+Range SHA256 5b882b6934749dc5a40880b499141367f0218e535ebdef1f68b604bc913e07f8
+theorem setting_exists_of_gap (hPC : Formalism.L2.SG.Pf.LatEx.PrimesInClasses)
+    (D : D7) (hG : Formalism.L2.SG.ConcreteSettingExists.GapHyp D) :
+    ∃ X : Formalism.L2.SG.HidaSetting.HidaSetting D, ∃ hb : Formalism.L2.SG.AdBridge.AdBridgeIso X.B.I, X.MeasTie hb := by
+  obtain ⟨A⟩ := InstExists_holds D
+  obtain ⟨L⟩ := LatExists_of_primesInClasses hPC D
+  obtain ⟨P⟩ := PsiExists_holds D A
+  obtain ⟨Rf⟩ := RefExists_holds D A L
+  obtain ⟨Xu⟩ := XuExists_holds D A L Rf
+  obtain ⟨Bu⟩ := BunExists_holds D CoefWeightedLoc_holds hG A L P Rf
+  obtain ⟨Pi⟩ := PiExists_holds D A L
+  obtain ⟨Mu⟩ := MuExists_holds D A L
+  obtain ⟨Wb⟩ := weighted_block_exists_of_local_data QuotProdK_holds locHNProps_holds NUnimodLoc_holds D BesselNVGap_holds
+    CoefWeightedLoc_holds WlocExists_holds (GapBigOfGapHyp_holds D) hG A L P Rf Bu Pi Mu
+  obtain ⟨Mb, hb, hM⟩ := MExists_holds D A L P Rf Xu Bu Pi Mu Wb
+  exact ⟨mk A L P Rf Xu Bu Pi Mu Wb Mb, hb, hM⟩
+
+end Formalism.L2.SG.Closed
+

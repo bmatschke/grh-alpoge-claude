@@ -1,0 +1,667 @@
+INTEGRAL PATH GENERATORS AND FROBENIUS COLUMN KEYS — v0.5
+
+Source: https://github.com/CocoSgt/riemann-hypothesis-lean
+Pinned commit: 7cbf7a0c32fca1badf05931879a37c3f8a2b03b4
+Scope: the exact GeneratorSpanInclusion and GeneratorImageIsSymbol remaining
+at SY6, and the shared integral path-column basis required by PlaneGram.SPAN.
+This is a human reconstruction, not a new Lean compilation or an assertion
+that the remaining analytic/arithmetic proof of RH has been completed.
+Source declarations, byte ranges, hashes, and pinned URLs are in
+provenance.json; regenerate them with regenerate_provenance.py.
+
+RESULT AND LOGICAL STATUS
+
+IP1–IP11 below supply proofs of both SY6 generator assertions. The universal
+path-basis proof also supplies the exact SPAN interface used by the Gram
+argument, with the column facts listed in IP5. The assertions are about a
+single integral basis adapted to dominance and minimum/maximum-weight
+filtrations. They do NOT assert an integral direct sum of rational
+isotypic lattices. In particular there is no division by a hook length,
+factorial, projector denominator, or residue characteristic.
+
+The proof of GeneratorImageIsSymbol is shorter than the exported source
+route. The source LetterWeightPos.generator_path_homogeneous_holds invokes
+PathWeightComponents and ConclusionB3, including machinery for saturated
+joint-type spaces. For the assertion needed here, the literal product
+identity prod_plTan and the individual column key construction suffice.
+We prove homogeneity directly. Consequently no saturation or independence
+claim about a different symbol family is being substituted for the actual
+PGen family.
+
+The remaining inputs are the already stated frame/position hypotheses,
+the mixed-characteristic coefficient ring and its Witt Frobenius, and the
+definitions of the actual selected generator family. The universal basis,
+its prefix filtration adaptation, the matched-pair condition, the column
+key estimates, and assembly are proved below. None is left as an unnamed
+"standard monomial theory" assumption. This does not supply the separate
+quantitative projector estimate, the rank of the selected symbol space,
+or any global spectral input.
+
+IP1. EXACT SIGNED PATH POLYNOMIALS
+
+Let R be a commutative ring, n>=1, and let N letters x_i=(x_{i,1},...,x_{i,n}),
+0<=i<N, be labelled either vector (+) or covector (-). Fix their nonnegative
+degrees d_i. A path is a sequence of dominant integer tuples
+
+  lambda^0=0, lambda^1,...,lambda^N in Z^n,
+
+with a horizontal-strip increase of size d_i at a vector letter, and a
+horizontal-strip decrease at a covector letter. "Horizontal strip increase"
+from a to b means
+
+  b_1>=a_1>=b_2>=a_2>=...>=b_n>=a_n,
+  sum_j(b_j-a_j)=d_i.
+
+All tuples may have negative entries. Put h_i(c)=#{a:c<=lambda^i_a}.
+The strip inequalities give h_{i+1}(c)-h_i(c) in {0,1} at vector letters
+and in {0,-1} at covector letters.
+
+For an array A indexed by subsets J of {1,...,n}, use the source's
+right-wedge sign convention:
+
+  W_x(A)(J)=sum_{m in J}(-1)^{#{j in J:j>m}} x_m A(J\{m}),
+  C_x(A)(J)=sum_{m notin J}(-1)^{#{j in J:j>m}} x_m A(J union {m}).
+
+Start every column c at the array 1_empty. For c>0, a rise of h applies W,
+a fall applies C, and no change does nothing. For c<=0 interchange W and C.
+Call the resulting array after N letters K_c. This is exactly Kcol.
+It has exterior degree h_N(c) for c>0 and n-h_N(c) for c<=0.
+
+Choose subsets I_c of those respective cardinalities, and put
+
+  hat I_c=I_c (c>0),        hat I_c=I_c^complement (c<=0).
+
+The source standard condition says that, for every t,
+
+  #(hat I_{c+1} intersect {1,...,t})
+       <= #(hat I_c intersect {1,...,t}).
+
+Equivalently the increasing lists in consecutive columns are weakly
+increasing along rows. Outside a finite interval all I_c are empty.
+The path polynomial is
+
+  Psi_{lambda,I}=product_c K_c(I_c).
+
+Only finitely many factors differ from 1. The source uses the larger
+finite interval colRange(lambda)=[-T,T], T=sum_{i,a}|lambda^i_a|; the
+extra factors are exactly 1. Thus our finite product is byte-definition
+equivalent to the source polynomial, not a new normalization.
+
+IP2. THE UNIVERSAL BASIS: TWO INDEPENDENCE ARGUMENTS
+
+We first work over an arbitrary field k; no characteristic assumption
+enters.
+
+(a) Canonical path products.
+For an endpoint lambda, define I_c^can={1,...,h_N(c)} for c>0 and its
+complement for c<=0. Denote Psi_{lambda,Ican} by H_lambda, retaining the
+whole path in the subscript.
+
+Order exponents of the last letter lexicographically, giving coordinate n
+first priority at a vector letter and coordinate 1 first priority at a
+covector letter. The highest component of H_lambda for this order is
+
+  epsilon * H_{truncated lambda}
+       * product_a x_{N-1,a}^{|lambda^N_a-lambda^{N-1}_a|},
+       epsilon in {1,-1}.                                      (IP2.1)
+
+Here "highest component" retains the entire polynomial in the earlier
+letters. To verify (IP2.1), examine one changing column. For c>0, a rise
+h->h+1 has output {1,...,h+1}, and the highest term of W uses m=h+1.
+A fall h->h-1 has output {1,...,h-1}, and the highest term of C uses m=h.
+For c<=0, the output is complementary: a rise uses C with m=h+1,
+and a fall uses W with m=h. In every case the remaining subset is the
+previous canonical subset and the coefficient is a sign. Other summands
+use a strictly less preferred coordinate of the last letter. Products
+preserve this lexicographic leading component. The number of changing
+columns assigned to a is exactly |lambda^N_a-lambda^{N-1}_a|, proving
+the displayed exponent.
+
+For a fixed final endpoint, that exponent vector determines the preceding
+endpoint, since the sign of the step is prescribed. In a relation among
+canonical products, take the largest last-letter exponent appearing,
+and use induction on N for the preceding paths. This proves independence
+of the canonical products with fixed endpoint over every field, and
+equally over any field extension. Their leading coefficients are units
+even in characteristic 2.
+
+(b) The final-index functions.
+Let g be a generic invertible n by n matrix. For a fixed dominant lambda,
+define the rational function
+
+  b_I(g)=product_c det(g_{I_c^can,I_c})                  (c>0)
+                  det((g^{-1})^t_{I_c^can,I_c})        (c<=0).
+
+Choose integers lo<=0<=hi with lo<=lambda_a<=hi. Jacobi's complementary
+minor identity gives
+
+  b_I(g)=epsilon_I det(g)^lo
+           product_{c=lo+1}^hi det(g_{[1,h(c)],hat I_c}).       (IP2.2)
+
+The signs epsilon_I are units. Jacobi's identity follows by applying the
+perfect exterior pairing between complementary subsets to g and g^{-1};
+equivalently it follows by expanding the adjugate identity. It holds
+over Z[entries(g),det(g)^{-1}], so it remains valid in every field.
+
+Give generic matrix variables lexicographic row-major order, with a
+smaller column index preferred within a row. Each flag minor has leading
+monomial its diagonal product, with coefficient 1. The leading monomial
+of the product in (IP2.2) records, for each tableau row, the multiset of
+entries in that row. Standardness orders that multiset weakly increasingly,
+so it reconstructs the row and hence all hat I_c. These leading monomials
+are distinct. Therefore the b_I(g), for standard I, are linearly
+independent over k. The common nonzero det(g)^lo and signs do not affect
+this conclusion.
+
+(c) All path polynomials.
+Apply the generic GL_n change of variables, vectors by g and covectors
+by inverse transpose. Exterior covariance and Cauchy–Binet expand the
+transform of Psi_{lambda,I} as a sum over all terminal subset choices J.
+Its torus weights are idxWeight(J), where each positive column contributes
+1_J and each negative column contributes -1_J. For fixed subset sizes,
+
+  idxWeight(J) is dominated by lambda^N,
+
+and equality occurs only for J=Ican. Indeed, for each initial coordinate
+set {1,...,t}, a positive subset contributes at most min(t,h), and a
+negative subset at least max(0,t-h); equality for all t forces the
+canonical choices. Summing the column inequalities proves dominance.
+Consequently the lambda^N-weight component of the generic transform is
+
+  b_I(g) H_lambda.                                      (IP2.3)
+
+In a nonzero relation, choose a maximal endpoint for dominance, using the
+sum of initial partial sums as a strictly increasing height function.
+Projecting the generic transform to that endpoint kills every term with
+a different surviving endpoint. The independence in (a), now over k(g),
+then gives a relation among the b_I for each fixed path; (b) makes all
+its coefficients zero. This contradiction proves independence of all
+standard path polynomials in every field.
+
+This is a triangular argument with generic weights. It does not identify
+the individual path polynomials with rational irreducible summands.
+
+IP3. COUNTING AND THE INTEGRAL CONCLUSION
+
+Let s_n(lambda) be the number of standard terminal choices for lambda.
+After choosing lo<=min(0,lambda_n), the columns hat I_{lo+1},...,hat I_hi
+are precisely semistandard tableaux of the partition lambda-lo*(1,...,1)
+on the alphabet {1,...,n}. Adding a complete height-n column changes no
+count: that column is forced to be 1,...,n and its row comparisons with
+the next column are automatic.
+
+The elementary row-insertion bijection gives
+
+  sum_{mu/lambda horizontal strip of size b} s_n(mu)
+       = s_n(lambda) * binom(n+b-1,b).                    (IP3.1)
+
+For clarity, insert the weakly increasing word a_1<=...<=a_b into a
+semistandard tableau by replacing the first entry strictly larger than
+the inserted entry in a row and passing that entry to the next row.
+If there is no such entry, append the inserted entry. Comparison of two
+consecutive insertion routes shows that the later new box is strictly
+to the right of the earlier one; the added boxes therefore form a
+horizontal strip. Reverse insertion removes added boxes from right to
+left, moving the displaced entry upward by replacing the rightmost
+strictly smaller entry. These rules undo each other; reversing the order
+of the recovered letters gives the original weakly increasing word.
+They preserve the row and column inequalities. There are
+binom(n+b-1,b) possible input words. A sufficiently large determinant
+shift makes every shape in this finite identity a partition, so the
+same identity holds for arbitrary dominant integer lambda.
+
+For downward strips use lambda^vee=(-lambda_n,...,-lambda_1). The map
+
+  I_c -> J_c=I_{1-c}
+
+is a bijection of standard choices for lambda and lambda^vee: its hatted
+columns are the complements of the old columns in reversed order.
+Complementation reverses the prefix-count inequalities. Horizontal
+increases correspond to decreases under lambda->lambda^vee.
+Thus (IP3.1) also holds with downward strips.
+
+Iterating (IP3.1) along the signed letters, from lambda^0=0, gives
+
+  # {(path,standard I)}
+       = product_i binom(n+d_i-1,d_i),                   (IP3.2)
+
+the number of ordinary monomials of the prescribed letter degrees.
+There are finitely many paths, since every coordinate remains between
+-sum d_i and sum d_i. Every column operation is linear in the current
+letter and a horizontal strip uses exactly d_i columns, so all Psi have
+those prescribed degrees.
+
+Form the square integer coefficient matrix of these Psi against the
+ordinary monomials. IP2 shows that its reduction is nonsingular over
+F_p for every prime p. Its integer determinant consequently has no prime
+divisor and equals +1 or -1. Its inverse is an integer matrix. Therefore
+the Psi are a basis over Z and, by scalar extension, over every
+commutative ring R. This establishes the precise integral basis needed
+here without assuming integral semisimplicity.
+
+IP4. PREFIX MINIMUM AND MAXIMUM FILTRATIONS
+
+For the first i letters, let v_i(F) and M_i(F) be the minimum and maximum
+Laurent exponents from the source generic conjugated rank-one torus
+substitution (last coordinate for v_i, first coordinate for M_i).
+For a zero polynomial set v_i=+infinity and M_i=-infinity.
+For arbitrary integer cutoffs theta_i and U_i, the integral basis in IP3
+has the exact property
+
+  v_i(F)>=theta_i and M_i(F)<=U_i for every i
+    iff F is an R-linear combination of the Psi for which
+         lambda^i_n>=theta_i and lambda^i_1<=U_i for every i,   (IP4.1)
+
+when R is an integral domain. The implication to the right retains the
+coefficients in R.
+
+Here is a proof, including the point where cancellation must be excluded.
+
+First work over a field. Conjugating a diagonal rank-one torus by a
+generic matrix, then undoing the outer change of variables, shows that
+its Laurent exponents are exactly the corresponding coordinate weights
+of the generic GL transform of F. The outer substitution is invertible,
+so a Laurent coefficient vanishes before that substitution exactly when
+it vanishes afterward. Thus the definitions used here coincide with the
+source valS and lam1S, rather than with diagonal weights in one fixed
+basis.
+
+For the full prefix i=N, all weights in the generic transform of
+Psi_{lambda,I} have every coordinate between lambda_n and lambda_1:
+each positive column of height n contributes 1 in every coordinate;
+other positive columns contribute 0 or 1; the complementary assertion
+holds for negative columns. This proves containment for good endpoints.
+
+Conversely expand F in the basis. If a bad endpoint occurs, choose one
+maximal in dominance among the bad endpoints. A good endpoint cannot
+dominate it: the condition theta<=lambda_n and lambda_1<=U is downward
+closed among dominant weights of fixed total sum. Another bad endpoint
+can contribute to its torus-weight component only if it dominates it,
+so maximality eliminates all different such endpoints. Formula (IP2.3)
+and the two independence statements of IP2 show that this forbidden
+weight component cannot vanish. This contradicts the Laurent bounds.
+Thus the full-prefix filtration is exactly the good-endpoint span.
+
+For i<N, expand F by its monomials in the tail letters. Those monomials
+are fixed by the prefix substitution and are linearly independent.
+Consequently the Laurent bounds hold separately for every coefficient
+polynomial in the first i letters. The constrained space therefore has
+dimension
+
+  (# standard prefix path polynomials with good endpoint)
+      * product_{j=i}^{N-1} binom(n+d_j-1,d_j).            (IP4.2)
+
+The full path polynomials with good lambda^i lie in this space. Indeed,
+cut each exterior column recurrence immediately after letter i. The
+remaining operations are linear in that intermediate exterior array;
+expanding its coordinates writes the full Psi as a sum of prefix path
+products with arbitrary terminal subset choices, times tail polynomials.
+Every such prefix product has its generic weights between lambda^i_n
+and lambda^i_1, by the preceding column count.
+
+These full path polynomials are independent. Their number equals
+(IP4.2), because iterating the Pieri count starting from a fixed
+lambda^i gives s_n(lambda^i) times the tail monomial count. They therefore
+span the whole prefix-constrained space. This proof uses dimensions of
+explicit polynomial spaces and a combinatorial count, not a decomposition
+into irreducible representations.
+
+There is one basis for all prefixes. Uniqueness of its expansion makes
+intersection of the individual prefix spans the span of the intersection
+of their index sets. This proves the simultaneous version over a field.
+For an integral domain R, first expand F in the R-basis from IP3, and map
+to Frac(R). The field result makes every forbidden coefficient zero in
+Frac(R), hence zero in R. This proves (IP4.1) integrally.
+
+For minimum cutoffs alone, use the same proof with U_i=sum_j d_j, which
+is a universal upper bound; no extra restriction results.
+
+A useful sanity check is rank 2 with two vector letters of degree 1.
+The family consists of three ordered monomial products and their
+2 by 2 determinant. Its coefficient matrix is unimodular, including
+modulo 2. The three monomials are not all symmetric tensors. No false
+integral symmetric/alternating decomposition has been used.
+
+IP5. THE EXACT SHARED PlaneGram.SPAN COLUMN DATA
+
+For each basis element, take the actual factors
+C_c=Kcol(lambda,c,N,I_c), with c in the source colRange. Put
+
+  occ_c={i:h_{i+1}(c)!=h_i(c)}.
+
+The recurrence proves that C_c is homogeneous of degree 1 in every
+letter in occ_c and degree 0 in every other letter. Each strip has
+size d_i, so exactly d_i of the occ_c contain i. For c>0, h_0(c)=0,
+and height rises only at a used vector letter; hence
+
+  h_i(c)<=#{j<i:j in occ_c and j is a vector letter}.
+
+Cutting the column recurrence at prefix i and applying exterior
+covariance gives
+
+  v_i(C_c) >= q(c,h_i(c)),
+  q(c,h)=1_{c>0 and h=n}-1_{c<=0 and h<n}.                 (IP5.1)
+
+For a positive column, the intermediate coordinates transform in
+exterior degree h: every rank-one torus weight is 0 or 1, and is 1
+when h=n. For a negative column the intermediate coordinates transform
+in exterior degree n-h of the dual: weights are 0 or -1 and all are 0
+when h=n. Tail coefficients are fixed by the prefix action, which proves
+the stated lower bound even if terms cancel. Finally
+
+  lambda^i_n=sum_c q(c,h_i(c)),                           (IP5.2)
+
+by counting positive columns c<=lambda^i_n and negative columns
+lambda^i_n<c<=0. Equations (IP4.1), (IP5.1), (IP5.2), the factorization,
+and the occurrence counts are precisely the SPAN clauses in
+MonomialOrderSegments/LiftBoundOfHypotheses.lean, with n there called r.
+For a valuation ring, coefficients in R are exactly coefficients with
+nonnegative valuation. The assertion therefore applies to that interface
+without any change of the path basis.
+
+IP6. THE ACTUAL MGen0-TO-PGen INCLUSION
+
+Return to a source frame segment. Enumerate its lifted selected positions
+s_0<...<s_{N-1}, and use vector letters at even s_i, covectors at odd s_i.
+Write k=r+K. A literal MGen0 generator is A times G in disjoint coordinate
+blocks of dimensions r and K, after renaming the lifted positions. Both
+are integral and homogeneous separately at every letter. The tangential
+degree of G is zero on the preceding-frame block W. That block is an
+initial interval of letters consisting entirely of vector letters.
+
+If A or G is zero the conclusion is immediate. Otherwise apply IP4 to
+A and G with their actual finite prefix lower and upper weights.
+They are integral combinations of path polynomials with paths nu and
+kappa satisfying all the source weight bounds.
+
+Outside W, write v_<i and M_<i for the weights of letters with index <i,
+and v_<=i and M_<=i for those with index <=i. The zero-gap conditions
+are exactly
+
+  vector i:   M_<=i(G)<=m_i<=v_<i(A),
+  covector i: M_<i(G)<=m_i<=v_<=i(A).
+
+Therefore every resulting pair satisfies, in the path indexing of IP1,
+
+  vector i:   kappa^{i+1}_1 <= nu^i_r,
+  covector i: kappa^i_1 <= nu^{i+1}_r.                    (IP6.1)
+
+On W the kappa path stays zero, since its letter degrees are zero.
+The nu path there uses only vector increases, so its coordinates are
+nonnegative and (IP6.1) again holds.
+
+Append the tuples: lambda^i=(nu^i,kappa^i). The within-block horizontal
+strip inequalities already hold. The only missing inequality across
+the block boundary is exactly (IP6.1). Dominance of each appended tuple
+follows from it and monotonicity of the current step (and lambda^0=0).
+The sizes add. Thus lambda is a genuine k-dimensional source PPath.
+Conversely restricting an appended path gives these conditions, although
+only the forward construction is needed here.
+
+Each product Psi_nu,I' Psi_kappa,I'' is therefore literally a PGen element.
+Multiplying the two integral expansions proves GeneratorSpanInclusion.
+No characteristic-zero spanning argument or enlargement of PGen occurs.
+
+IP7. SPLIT COLUMNS, NORMAL DEGREE, AND EXACT PRODUCT IDENTITY
+
+Take a literal PGen element with lambda=joinPT(nu,kappa). For each c put
+J_c=I'_c union (r+I''_c), the source joinI. Its split column is
+
+  S_c = Kcol(nu,c,N,I'_c) * Kcol(kappa,c,N,I''_c)
+
+in disjoint coordinate blocks; this is exactly plTanCol(lambda,c,J_c).
+Padding both finite column ranges with their identity factors gives
+
+  PsiPl(nu,I') PsiTan(kappa,I'') = product_c S_c.          (IP7.1)
+
+Only the empty-index convention outside each block's column range is
+needed. This is the direct source prod_plTan identity.
+
+Let z be the last row of the new frame, let omega_i=p^{z-s_i}, and put
+Q=p^{G'}. All exponents are nonnegative, the s_i are strictly increasing,
+and omega_0<=Q by the actual frame-gap bound. Normal coordinates are the
+last K coordinates at vector letters and the first r coordinates at
+covector letters.
+
+A column step is costly when its full height rises from h>=r, or falls
+from h<=r. Write
+
+  a_c=sum_{i costly for c} omega_i.                       (IP7.2)
+
+Dominance makes the block heights min(h,r) and max(h-r,0). At a changing
+step exactly one of these heights changes. A costly step uses a normal
+coordinate in that changing block; a noncostly step uses a tangential
+coordinate. Thus every monomial in S_c has normal weighted degree a_c
+for the weights omega_i. This elementary induction also covers zero
+columns. After the actual phSeg substitution x_{i,b}->X_{s_i mod n',b}^omega_i,
+the polynomial S_c has ordinary normal degree a_c. Even n' ensures
+that reducing positions modulo n' preserves parity; injectivity of that
+renaming is not needed for this homogeneity assertion.
+
+For c<=0, the full height starts at k and falls by at most one at each
+letter. The source inequality N+r<=K gives
+
+  h_i(c)>=r+K-i>=r+K-N>=2r>r.                            (IP7.3)
+
+This is the precise reason that negative columns never enter the first
+block in the following support and sign argument. It is not legitimate
+to omit this size condition from the key proof.
+
+IP8. THE EXPLICIT FROBENIUS COLUMN POLYNOMIAL
+
+Let O be the source DVR, finite and faithful over W(F_{p^{n'}}), with
+uniformizer w satisfying w^2=p, p>=13, and even n'>0. (Finite and faithful
+are part of OHyp; the calculations below only need the stated integral
+algebra structure and w^2=p.) Fix the source chart g in
+GL_k(W(F_{p^{n'}})).
+Use its adapted row coordinates x_i sigma^{s_i}(g) at vector letters,
+and sigma^{s_i}(g)^{-1} x_i at covector letters. These are integral,
+because the determinant of g is a unit.
+
+For a fixed column c start from 1_empty. Skip unused letters. At a used
+letter of position s, first raise every component of the current exterior
+array to p^{s-t}, where t is the preceding used position, and then apply
+the usual wedge or contraction using this new adapted letter. At the
+first used letter there is no initial powering. At the end raise every
+component to p^{z-t}. Denote the J-component by F_{c,J}^g.
+This is exactly KKstate followed by KKc, not an ordinary Frobenius
+substitution of the finished characteristic-zero column polynomial.
+
+All coefficients are integral, and a used letter has final degree
+p^{z-s_i}=omega_i. An unused letter has degree zero. These statements
+follow immediately by induction through the powering and linear
+exterior operations. Only the positions in the source selected set TT
+occur.
+
+We next prove the two properties that turn F_{c,J}^g into a source key:
+
+  Phi_{g'} F_{c,J}^g is in w^{a_c} O[X] for every chart g',
+  Phi_g F_{c,J}^g = w^{a_c} phSeg(S_c,J) mod w^{a_c+1}.  (IP8.1)
+
+Here S_c,J means plTanCol(lambda,c,J); no standardness of J is required
+for this individual-column assertion.
+
+IP9. ALL-CHART DIVISIBILITY: THE MOVING EXTERIOR-BASIS ARGUMENT
+
+The following finite algebraic calculation is the entire Frobenius
+ingredient. Let L_s,L_t be invertible integral matrices and P=p^{t-s},
+t>=s, such that entrywise
+
+  (L_s^{-1})^{[P]} = L_t^{-1} mod p.
+
+If V L_s=w^a Z, then the binomial theorem in characteristic p gives
+
+  V^{[P]} L_t = w^{aP}(Z^{[P]}+p R)                    (IP9.1)
+
+for an integral vector R. Brackets mean componentwise powers, not a
+matrix power. In particular every component has order at least aP.
+If Z_J is divisible by w, the J-component has order at least
+aP+min(P,2), since p=w^2. A strict positive position gap gives P>=p>=2,
+so an extra w becomes TWO extra powers of w. A zero gap preserves one.
+
+For clarity, (IP9.1) follows by writing V=w^a ZL_s^{-1}, expanding
+each component's Pth power, and replacing (L_s^{-1})^{[P]} by L_t^{-1}
+modulo p before multiplying by L_t. Both replacement errors and all
+mixed binomial terms are multiples of p. No inverse of w is used in
+this calculation.
+
+In an arbitrary chart g', the letter coordinates in the raw recursion
+are related to the standard scaled coordinates
+
+  y_{i,b}=w X_{i,b} if normal, and X_{i,b} otherwise
+
+by the Frobenius twists of g'^{-1}g and g^{-1}g'. Exterior covariance
+therefore supplies the matrices L_s in (IP9.1). For positive columns
+they are the direct-sum exterior-power matrices of sigma^s(g^{-1}g');
+for negative columns use sigma^s(g'^{-1}g)^t. The wedge and contraction
+identities give exact intertwining at each step. Their entries and
+inverse entries are integral minors.
+
+Witt Frobenius satisfies
+
+  sigma^s(beta)^{p^{t-s}} = sigma^t(beta) mod p,
+
+including negative s,t interpreted periodically. Reduction to the
+constant Witt coefficient proves this identity, because that residue
+lies in F_{p^{n'}}. Applied to the minors, it supplies exactly the
+congruence required for (IP9.1).
+
+Here are the support sets that carry the induction. At height h, call J
+nominal if:
+
+  c>0, h<=r: |J|=h and J is contained in the first r coordinates;
+  c>0, h>=r: |J|=h and J contains the first r coordinates;
+  c<=0:     J is contained in the last K coordinates.
+
+The two descriptions agree at h=r. For negative columns the exterior
+degree is still the fixed n-h, but it need not be repeated in this
+support condition.
+
+At every stage, after transfer to the current exterior basis:
+  every component has the predicted order a;
+  every nonnominal component has order at least a+1.     (IP9.2)
+
+Initially the only nonzero component is the empty subset, so the
+assertion holds. An advance of positions multiplies a by the appropriate
+power of p and preserves the extra order by (IP9.1). Immediately before
+a costly step, every earlier used position is strictly smaller.
+Evaluate the preceding state at s-1, then advance once to s; (IP9.1)
+upgrades each nonnominal component to a+2.
+
+At a noncostly step, terms using a normal coordinate acquire w. A term
+using a tangential coordinate can leave the nominal support only if its
+predecessor was nonnominal. This preserves (IP9.2) with unchanged a.
+
+At a costly step, normal-coordinate terms acquire w, giving the new
+base order a+1. A tangential-coordinate term must have a nonnominal
+predecessor: a positive wedge above the rank boundary cannot add a
+first-block index to a subset already containing that whole block;
+a positive contraction below the boundary cannot remove a last-block
+index from a first-block subset; for a negative column the nominal
+subset is in the last block and (IP7.3) rules out the other boundary
+case. Thus such terms have order at least a+2. If the output subset is
+nonnominal, the remaining normal-coordinate terms also have a
+nonnominal predecessor, so again have order at least a+2.
+This proves (IP9.2) with new base order a+1.
+
+The final advance to z gives a=a_c. The exterior transfer is invertible
+over O, so divisibility of all transferred components implies
+divisibility of all original components. This proves the first
+assertion of (IP8.1), for every chart.
+
+IP10. THE OWN-CHART LEADING TERM AND UNIFORM ORDER BOUND
+
+In the chart g itself, the adapted coordinate changes cancel exactly,
+so the recursion uses the y_i above without a moving basis.
+Divide out the predicted w-power and reduce modulo w.
+
+At a noncostly step only tangential coordinates survive. At a costly
+step only normal coordinates survive: an unwanted tangential term has
+a predecessor whose normalized residue is zero; strict separation of
+positions raises that predecessor at least to the pth power before
+the step. Dividing by the one newly counted w still leaves a multiple
+of w, since p>=2. Thus the reduced normalized recursion keeps exactly
+the block required by the path at every step.
+
+Its resulting exterior array is the product of the first-block and
+last-block column arrays. For a first-block operation the last-block
+array is supported on the empty subset, so the source right-wedge
+sign receives no extra contribution from that block. A last-block
+operation has no first-block indices to its right, so its sign also
+agrees exactly with the source split-column convention. Negative
+columns stay wholly in the last block by (IP7.3). This proves the
+identity with plTanCol, including its sign.
+
+In the residue field, componentwise pth powers distribute over sums;
+the split-column coefficients are integers and hence fixed by
+Frobenius. Following the positions through the recursion therefore
+replaces each x_{i,b} by X_{i,b}^{omega_i}. The reduced normalized
+polynomial is precisely phSeg(S_c,J). This proves the second assertion
+of (IP8.1).
+
+Finally the costly positions are distinct integers. If E=z-s_0, then
+
+  a_c <= sum_{e=0}^E p^e < 2 p^E <= 2Q.                  (IP10.1)
+
+The bound is independent of the degrees d_i, the number of columns,
+and the particular standard choices. The final used-letter degrees
+are exactly omega_i; no factorial denominators or untracked factors
+depending on the number of letters have appeared.
+
+Together IP7–IP10 prove every literal IsKey clause for F_{c,J}^g and
+its leading term w^{a_c}phSeg(S_c,J): integrality, normal homogeneity,
+the w^{a_c} leading divisibility, one extra order in its own chart,
+order a_c in every chart, and a_c<=2Q. They also prove the separately
+required support condition at TT.
+
+IP11. ASSEMBLY AND WHAT HAS BEEN CLOSED
+
+For the actual PGen pair, take J_c=joinI(I',I'')_c and o=sum_c a_c.
+By (IP7.1),
+
+  w^o phSeg(P)
+     = product_c [w^{a_c} phSeg(plTanCol(lambda,c,J_c))].
+
+Every factor on the right is a leading key of its stated order,
+supported on TT. The product is therefore literally in bc_KP at total
+order o, hence in bc_agen(o,0) by taking tangential coefficient 1.
+The left-hand polynomial phSeg(P) is homogeneous of normal degree o.
+This is exactly Sy(o,phSeg(P)), proving GeneratorImageIsSymbol.
+If some factor is zero, the same identity and all divisibility
+conditions remain valid.
+
+IP6 proves GeneratorSpanInclusion; IP11 proves GeneratorImageIsSymbol.
+Combined with the already reconstructed SY4 RestMon and SY5 finite
+cleaning, they remove the two representation placeholders from SY6.
+The same universal integral filtered basis, with IP5, removes the
+identical SPAN placeholder in the Gram reconstruction.
+
+This conclusion is deliberately restricted to these statements. It
+does not infer a primitive decomposition into individual rational
+isotypic components, a quantitative norm estimate for projectors,
+the density/rank of the chosen global symbol space, or RH/GRH from
+these local algebraic constructions alone.
+
+RECONSTRUCTION VERSUS SOURCE ROUTE
+
+Faithful translation:
+  IP1 definitions; IP2 leading-term and generic-minor independence;
+  IP3 field-independent coefficient-matrix argument; IP5 column
+  occurrence facts; IP6 boundary interlacing; IP8 raw Frobenius
+  recursion; IP9 extra-two-powers induction; IP10 leading congruence.
+
+Independent simplifications with source-compatible conclusions:
+  IP3 uses semistandard row insertion to prove the count, whereas the
+  archive exports the same count through Gelfand--Tsetlin recursion.
+  The all-prime coefficient determinant argument is the source argument.
+  IP4 proves prefix min/max adaptation directly by a bad-endpoint
+  argument and continuation counting, avoiding the larger abstract
+  representation filtration package.
+  IP7/IP11 use the exact split-product identity and direct
+  homogeneity, avoiding the unused saturation and joint-type portions
+  of ConclusionB3 and the full lowest-weight theorem.
+
+All source citations in the ledger identify whether they define the
+target, contain the parallel source proof, or provide a normalization.
+The companion proof above is the justification of the human claims;
+the ledger is an audit trail, not a substitute for those arguments.

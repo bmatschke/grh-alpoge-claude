@@ -1,0 +1,172 @@
+# Ordinary host and window construction: v0.2 audit
+
+**Outcome.** The ordinary field, its four distinguished characters, the order of parameter choices, and the use of one auxiliary pair on a whole interval can all be written out without the general character apparatus. The exact ordinary specialization even yields a cohomological interval `[W,W²]`; the general source retains `[W,W^(3/2)]` to absorb a constant that equals one for the zeta character. This is a proved assembly of two explicitly retained inputs, `PairEx` and `VWinAt`. It does not prove either input from first principles.
+
+The short inclusion fragment is `ordinary_host_fragment.tex`. Stable statements are OH1–OH4 there and OH5–OH8 below. `ordinary_host_provenance.json` pins every source declaration used and records which claims are new human deductions rather than quoted source theorems. All original-source paths are relative to the pinned CocoSgt tree, commit `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`.
+
+## OH1–OH4: details relevant to integration
+
+### The ordinary field is CM but is not the full cyclotomic compositum
+
+The field is
+
+\[
+E_e=\mathbb Q(\zeta_{2^{e+2}})^+(\sqrt{-q},\sqrt{-d}),
+\qquad [E_e:\mathbb Q]=4\cdot2^e.
+\]
+
+Its maximal real subfield is `Q(ζ)^+(√qd)`, of degree `2·2^e`. The source's frame order `n` is `2^e`. The larger field `Q(ζ_{2^{e+2}},√−q,√−d)` is used for auxiliary two-adic comparisons and has degree twice that of this host. Conflating the two shifts degree and rank constants.
+
+For `e≥1`, the host conductor is exactly `2^(e+2) q d`: the real cyclotomic field has conductor `2^(e+2)`, and its two quadratic companions have coprime odd conductors `q,d`. The Galois kernel is exactly the `IsChiField` kernel. The actual construction's `Q_S` is `2^(e+2)`: it is both divisible by that number and a divisor of `lcm(2^(e+2),1)`.
+
+The multiplier `c` in the general order formula is one, directly from `ordAny`'s inequalities `1≤c≤card⟨ψ⟩`. This is stronger provenance than merely guessing from the field degree. At sufficiently large cutoffs all lower bounds on `e`, `b=floor(Y^(ε/5))`, and `q≠3` needed by `fieldChi` hold. That theorem also supplies the full frame/field-row structures, but their later admissibility and theta-family construction remain separate inputs.
+
+### All parts of `PairGood 1` must remain present
+
+The elementary field conditions are:
+
+| Condition | Exact content |
+|---|---|
+| First prime | `q` prime, `q ≡ 3 (mod 8)` |
+| Second prime | `d` prime, `d ≡ 7 (mod 16)` |
+| First size | `Y^(ε/5)/2 < log q ≤ Y^(ε/5)` |
+| Second size | `Y^(ε/5)(log Y)²/2 < log d ≤ Y^(ε/5)(log Y)²` |
+| Splitting congruences | `q | d+1`; every odd prime `p≤Y^(ε/5)` divides `d+1` |
+| Centered ramps | For `χ=J_q,J_d,J_qJ_d` and **every** `u∈[Y,X]`, `|Gχ(u)|≤u^(1/2+ε/2)` |
+| Constants at one | For those same characters and every such `u`, `|L'/L(1,χ)|≤4 log u` |
+| Real zero boxes | For every real primitive `ρ` with conductor dividing `8`, and every `(i,j)≠(0,0)` in `{0,1}²`, `L(s,ρJ_q^iJ_d^j)≠0` if `Re s>399/400` and `|Im s|≤8 exp(Y^(ε/5)) exp(Y^(ε/5)(log Y)²)^j` |
+
+The box row involves the four primitive real characters of conductor dividing eight, hence twelve ramified quadratic twists. It is stronger than three ramp bounds. It is used through the source's real-character and thin-character estimates; no argument here removes it.
+
+The four-character coefficient identity is polynomial, so remains true at ramified primes under the usual zero extension of a primitive Dirichlet character. At `q` it gives zero; at `d` it gives `1+(-1)^k`. For small odd primes the source congruence proves `(-d/p)=1`, and reciprocity identifies that with `(p/d)`. At `2`, `(2/d)=1` because `d≡7 mod8`. Consequently all powers of small primes vanish. This is an exact support statement, not a uniform control of the centered tail.
+
+### What is fixed, what varies
+
+For each fixed `ε`, choose `e(x)`, then `J` and the threshold for the cohomological input. Apply `PairEx` with the now fixed exponent `A=J`; only after these choices select a sufficiently large `X`. Set `Y=X^(1/J)`, choose `q,d`, and then select `W`. The pair, its congruences, and the base `Y` are fixed for every `x∈[W,W²]`. The cyclotomic exponent `e(x)` and the host field vary with `x`.
+
+The Lean theorem `winPairs` states `∀x∃Y q d e`, which hides the stronger order of choices actually used in its proof. Its code chooses `q,d` before `W` and before introducing `x`. Our ordinary strengthening keeps these existential quantifiers outside the cutoff quantifier and removes the rescaling. The source's general scale factor is `κ=c^(1/(2+8ε))`; its demands `W≥κ³` and `W≥κ^400` are automatic for `c=1`. This is why a square window is available at this interface. It does not by itself change the exponents of downstream general theorems.
+
+## OH5. A complete finite-exception window lemma
+
+Let `0<η≤C`, `X>1`, and let `T` contain at most `R` nonnegative integers. Define
+
+\[
+A=2C/\eta,\qquad W_j=X^{1/(2A^j)},\quad 0\le j\le R.
+\]
+
+At least one of these `R+1` candidates has the following property:
+
+\[
+W_j\le x\le W_j^2,\quad r\in T,\quad r\le x^C
+\quad\Longrightarrow\quad r\le x^\eta.
+\]
+
+**Proof.** The potentially bad integers lie in `(W_j^η,W_j^(2C)]`. These intervals are pairwise disjoint, because `W_(j+1)^(2C)=W_j^η` and the lower endpoint is excluded. At most `R` of the `R+1` intervals meet `T`. Choose an empty one. If `r≤x^C≤W_j^(2C)`, emptiness forces `r≤W_j^η≤x^η`. Also `W_j²≤X` and
+
+\[
+W_j\ge X^{1/J_*},\qquad J_*=2(2C/\eta)^R.
+\]
+
+This is an independently proved, slightly sharper numerical form of `Win.window`, which uses `J=4(2C/η)^R`. It explains the source's window mechanism completely. It does **not** bound the number of exceptions or their cohomological sizes. Those are the arithmetic assertions in `ABound`, `FirstBound`, `SecondBound`, `partA`, and `thmBab_of`. In particular, small exceptional indices are still present and require their separate bound.
+
+The finite-exception deduction from the spectral part of `ABound` is also elementary. In a normed extension of `Q_ℓ`, put `B=floor(log_ℓ Z)`. A strict ball `|s-j|<ℓ^(−B)` contains at most one integer `j∈[1,Z]`: two such integers would satisfy `|j−k|<ℓ^(−B)` by the ultrametric inequality, whereas `0<|j−k|_∞≤Z` implies `v_ℓ(j−k)≤B`. Thus `R` spectral centers exclude at most `R` integers. Outside them the source's assumed spectral length bound applies with this `B`, giving `R(max(m,j₀)+c+B)`. This proves the implication `ABound → FirstBound`; producing the centers and bounding the excluded small twists remain the arithmetic steps.
+
+## OH6. Ordinary reference fields simplify to two fixed cyclotomic fields
+
+From the exact definitions in `StmtFields`, the ordinary target has
+
+\[
+\operatorname{ord}(\mathbf1)=1,\quad p_K=7,\quad
+h(\mathbb Q(\sqrt{-7}))=1,\quad p_1=3,\quad B_\chi=\{3,7\}.
+\]
+
+Here `p_K` is the least prime `≥7` congruent to three modulo four; `p_1` is the least prime coprime to `2p_K`, since the order-one congruence is vacuous. Minkowski's ideal-class bound for `Q(√−7)` is `(2/π)√7<2`, so every ideal class contains the unit ideal. This proves the values without a class-number lookup.
+
+The reference fields `Lχ(3),Lχ(7)` are `Q(ζ3),Q(ζ7)`. Both have class number one. The first has Minkowski bound below two. For the second the bound is
+
+\[
+(4/\pi)^3\frac{6!}{6^6}\sqrt{7^5}<5.
+\]
+
+An ideal of norm `2,3,4` cannot occur: the residue degrees of `2,3` modulo seven are three and six. Thus every class again contains an ideal of norm one.
+
+Their pure `ℓ`-power cyclotomic towers have trivial `ℓ`-class groups at every finite level, for `ℓ=3,7`. Indeed only the unique prime above `ℓ` ramifies at each cyclic degree-`ℓ` step. Chevalley's ambiguous ideal-class formula gives trivial `ℓ`-part of the fixed class group if the preceding class group has trivial `ℓ`-part. A nonzero finite `ℓ`-group acted on by a cyclic group of order `ℓ` has nonzero fixed points (orbit counting), so the entire next `ℓ`-class group is trivial. Induct.
+
+For the classical formula used here, see Li–Yu, *The Chevalley–Gras formula over global fields*, Theorem 2.1, printed p. 528: specialize to the ordinary class group and a totally imaginary cyclic extension. It gives `|Cl(L)^G|=h(K)·(∏v e_v)/([L:K]·[O_K^×:O_K^×∩N(L^×)])`. In this tower `∏v e_v=[L:K]=ℓ`, so the fixed class number divides the preceding class number. [Primary paper](https://www.numdam.org/item/10.5802/jtnb.1133.pdf).
+
+This standard class-group argument is useful for the fixed reference fields. The source's transport from those reference towers to cohomology of the changing host remains an obligation; class number one at `3` and `7` does not say that all host cohomology at odd primes vanishes.
+
+## OH7. Precisely what remains in the cohomological input
+
+With the source's sign convention, let
+
+\[
+\Sha_p(E,j)=\ker\left(H^1(G_{E,S_p},\mathbb Q_p/\mathbb Z_p(-j))
+\longrightarrow\prod_{v\mid p}H^1(E_v,\mathbb Q_p/\mathbb Z_p(-j))\right).
+\]
+
+Its `Z_p`-length is `shaLen`. `VVle E t B` says every length for `1≤j<t` is finite and every finite prime subsum of the log-weighted total is at most `B`. It is not a statement merely about degree-zero ideal classes. The definition quantifies over the choices of algebraic closure and local data; the displayed kernel is the conventional representative of the same objects.
+
+For odd `p`, complex conjugation is an involution preserving `Sha_p`. The projectors `(1±(-1)^j c)/2` split it, so
+
+\[
+\ell_p=\ell_p^++\ell_p^-,\qquad
+\mathcal V\le(\log2)\mathcal V_2+\mathcal V_-+\mathcal V_+.
+\]
+
+This is a complete elementary module argument, formalized by `shaLen_eq_add` and `vvle_of_parts`. The source's three bounds, and their ordinary simplifications, are:
+
+| Part | Required conclusion | Where the remaining work lies |
+|---|---|---|
+| Two-primary | Unweighted total through `t` at most `exp(x^(4ε/5))` on the selected interval | `BaAt`, `TwoIn`, `ABound`, comparison with the full two-adic tower, and treatment of small exceptional twists |
+| Odd minus | At most `3[E:Q]t² log(t cond E)` | `ThmBc`; the extra sum over prime divisors of the character order is empty when that order is one |
+| Odd plus | At most `(t cond E)^C + C exp(x^(4ε/5))` | `HVAt` / `ThmHV`, reference-layer transport, and the source's automorphic/cohomological vanishing arguments |
+
+All three are needed. Once established, their sum is below `exp(x^ε/2)` for large `x`: `log(cond E)` is bounded by a constant times `log x + Y^(ε/5)(log Y)²`, and `Y≤x`, so it is `O(x^(ε/4))`; `t≤x^401` and `[E:Q]≤8x^(2+8ε)`. Polynomial terms and `exp(O(x^(4ε/5)))` are eventually smaller than the target. This last absorption is elementary; the table's inputs are not.
+
+Exact source backtracking is
+
+`vwin_of_row → automorphic_window_of_inputs → v_window_of_depth_zero_residual_bc_cm → v_window_of_literal_automorphy_n → v_window_of_automorphy_csd_ss_mono_odd → vwin_of_hypotheses_H_E_alt → HV.Core.of_four_alt → vwin_of_counts`,
+
+with the explicit arithmetic interface also expressed by
+
+`ThmBab + ThmHV → JointWin; JointWin + ThmBc → vwinAt_of_joint`.
+
+The `of_four_alt` junction supplies `ThmBab` by `thmBab_of_lemmaK` (Poitou–Tate duality, local finiteness/duality, Ferrero–Washington, and `LemmaK`), and feeds five character-case counts to `vwin_of_counts`. Its odd-minus input is `Odd.thmBcFree_of`. In `JointWinOfCounts`, the five counts yield `PointHV`, then `ThmHV`, then `JointWin`; `vwin_of_joint` combines the latter with `ThmBcFree` via `thmBc_iff`. The source ledger records each of these junctions. The character-case counting proofs are an explicit frontier, not compressed here into an unnamed “standard estimate.”
+
+Names containing “literature” or “of_row” are wrappers with substantial premises, not short independent proofs of `VVle`. This audit traces their assertions and composition; it does not validate all the automorphy, patching, or Galois-representation premises.
+
+## OH8. The proposed two-primary shortcut: a proved algebraic core and unresolved bridges
+
+The AI-agent guide proposes selecting the pair so that
+
+\[
+v_2h(-4qd)=v_2h(-8qd)=3,
+\]
+
+then eliminating all positive exceptional twists. The following underlying **matrix lemma is correct** and has an independent short proof.
+
+Let `M∈GL₂(Z₂)` satisfy `v₂det(M−I)=v₂det(M+I)=2`. For every positive integer `j` and `m≥0`,
+
+\[
+v_2\det((5^jM)^{2^m}-I)=2m+2.
+\]
+
+Put `s=tr(M−I)` and `p=det(M−I)`. The identity `det(M+I)=4+2s+p` and the two valuation assumptions give `v₂(s)=1`. Thus the characteristic polynomial of `(M−I)/2` has integral coefficients and reduces to `U²+U+1`. Its roots `z,z'` belong to the unramified quadratic extension of `Q₂` and have residues in `F₄\F₂`. Each eigenvalue of `5^jM` is `u=5^j(1+2z)`; `(u−1)/2` and `(u+1)/2` have nonzero residues `z` and `z+1`. Hence both have valuation one. The first squaring gives `v₂(u²−1)=2`, and every further squaring increases the valuation by one. Each eigenvalue therefore contributes `m+1`, including `m=0`.
+
+If a free rank-three module has an invariant rank-two kernel with this characteristic polynomial and a rank-one quotient on which the cyclotomic generator acts trivially, determinant multiplicativity adds
+`v₂(5^(j 2^m)−1)=m+2+v₂(j)`. Its twisted cokernel consequently has length exactly
+
+\[
+3m+4+v_2(j).
+\]
+
+No splitting of the module extension is needed. With the source's extra host-comparison allowance of one, the host's two-primary length would be at most `3m+5+v₂(j)`, and its sum for `1≤j<t` at most `(t−1)(3m+5)+v₂((t−1)!)`.
+
+**What this proves and what it does not.** We have proved the matrix implication, not identified the required matrix for every chosen host. To obtain the advertised shortcut one still needs (a) the precise ordinary Iwasawa-module and class-number identifications, including integral torsion and descent; (b) the host-to-tower comparison with the correct Tate-twist sign; (c) a simultaneous prime-selection theorem imposing this additional class-number condition along with every row of `PairGood`; and (d) the odd-prime plus and minus bounds in OH7. The source's `PairEx` does not include the class-number condition. Finite examples such as `(q,d)=(3,23)` do not satisfy the growing prime-size conditions and cannot be reused at large cutoffs.
+
+The guide sketches a Rédei governing field plus a uniform effective Chebotarev argument to supply (c), citing Stevenhagen and Thorner–Zaman. That is a new strengthening of the original pair-selection theorem, not its immediate ordinary specialization. This audit has not verified those bridges sufficiently to replace `VWinAt` or claim a proof valid at every large cutoff. The main fragment therefore retains the exact window input, and the matrix shortcut remains a clearly marked possible next audit.
+
+## Fresh source check
+
+A targeted primary-source search on 21 November found no new short author exposition. The public AI-agent guide has revision 34; the ordinary-host notes are unchanged from revision 33. Its new material concerns Smith factors and residue attainment of arithmetic branch maps, outside this section. The relevant newer guide copy is under `guide34/reading-guide.md`. The source is an AI-agent reconstruction, not an independent human verification; none of its new all-cutoff conclusions is silently imported here.

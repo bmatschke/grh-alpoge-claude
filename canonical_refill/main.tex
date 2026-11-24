@@ -1,0 +1,832 @@
+\section{Canonical refill and the conditional arithmetic point}
+\label{sec:canonical-refill}
+
+\status{RF1--RF8 construct the literal canonical refill, complete the
+\texttt{exists\_ledPart} implication using LP, and install the resulting
+ideal-scaled lattice and height in the point. RF9 proves the two scale
+comparisons needed by that construction. RF10 proves the uniform point join
+from the explicitly retained recursive, host-column, level and initial-size
+suppliers. The geometric \texttt{Lay}/\texttt{RecOK}/\texttt{LedOK} package,
+the analytic supply of level primes and the stronger \texttt{NumAt} record
+are not inferred from the refill. RF11--RF15 additionally prove the
+quantitative rank, thin-size, gap and band estimates and construct every
+field of the block-length record \texttt{ParamsT}; RF16 proves the
+actual upper bound on word cardinality. The complete
+\texttt{ParameterChoice'} and \texttt{SizesAt} suppliers remain explicit.}
+
+Fix the actual datum $D$, a size datum $L_0$, the local constants $K$,
+and an error datum $\mathcal E$. Write $p_w$ and $e_w>0$ for the residue
+characteristic and ramification index of a finite place. The set of words
+$u$ is finite. Here $m=D.R.m$ is the global chain length, $k=D.R.k$,
+$n=|A|$, and $J=\{1,\ldots,m\}$. Put
+\[
+ b=e^{x^\epsilon},\quad a=xb,\quad X'=e^{x^{\epsilon/3}},\quad
+ b'=a/X',\quad w''=b'/(xn),\quad X''=a/w''=X'xn.       \tag{RF.1}
+\]
+The top degree functions $a_T,b_T$, the weights $w_j(\tau)$, and all
+geometric and representation data are the supplied ones. In particular,
+this construction will retain $L_0$'s scale and its exact selected degrees.
+
+\paragraph{RF1: choose the same representative throughout an orbit.}
+The finite abelian group $A$ comes with its source enumeration
+$\operatorname{ofNat}$ and integer labels. For $h,t\in A$, define
+$\operatorname{bs}(h,t)$ to be $\operatorname{ofNat}(v)$ for the least
+nonnegative $v$ such that
+\[
+                  \operatorname{ofNat}(v)+ih=t
+                  \quad\hbox{for some }i\geq0.                 \tag{RF.2}
+\]
+Such a $v$ exists by taking the label of $t$. The same candidate labels
+work for $t$ and $t+h$: add one to $i$ in one direction, and add
+$\operatorname{ord}(h)-1$ in the other. Thus
+\[
+ \operatorname{bs}(h,t)+ih=t\ \hbox{for some }i\geq0,
+ \qquad\operatorname{bs}(h,t+h)=\operatorname{bs}(h,t).          \tag{RF.3}
+\]
+This is the literal \texttt{Arith.bsH}; its choice uses the given labels,
+so it remains compatible when points are compared in those labels.
+
+\paragraph{RF2: fill the actual weights, including the unused indices.}
+Label the archimedean positions by $z=(\delta,t)\in\{0,1\}\times A$,
+using the original bijection $\tau(z)$. A top is $(0,t)$ with
+$t\in TT$; a thick position has first coordinate $1$ and second
+coordinate in the translated second set; all other positions are thin.
+These are the actual top and thick sets: injectivity of the position map
+shows that their label descriptions agree with the geometric descriptions.
+Extend $b_T$ by zero away from $TT$ and set
+\[
+ o_j(z)=
+ \begin{cases}
+ w_j(\tau(z))-\mathbf1_{\mathrm{top}}(z)b_T(t),&j\in J,\\
+ b'/x,&j\notin J,\ z\text{ top},\\
+ b,&j\notin J,\ z\text{ thick},\\
+ w'',&j\notin J,\ z\text{ thin}.
+ \end{cases}                                                  \tag{RF.4}
+\]
+The three supplied weight windows give, respectively,
+\[
+ \frac{b'}x\leq o_j(z)\leq\frac{b'}x+\eta,\qquad
+ b\leq o_j(z)\leq b+\eta+1,\qquad
+ w''\leq o_j(z)\leq w''+\eta.                                 \tag{RF.5}
+\]
+They apply for every $j$, because (RF.4) gives their lower endpoints
+outside $J$. Define
+\[
+ \operatorname{fill}_j(z)=\mathbf1_{\mathrm{top}}(z)b_T(t)+o_j(z).
+\]
+Then $\operatorname{fill}_j(z)=w_j(\tau(z))$ for $j\in J$.
+If $w''\geq1$, every fill is at least $1$: thin positions use $w''$,
+thick positions use $b\geq1$, and tops use $b_T\geq b'>0$ and
+$b'/x=nw''\geq1$.
+
+Use (RF.3) for the orbit selector, (RF.4) for its offsets, and set
+\[
+ e_p=\left\lceil C_e f k^2\log_p a\right\rceil_+,
+ \qquad \kappa_I=\inf\{\kappa:\kappa\text{ is an admissible
+                            universal Type-I loss}\}.         \tag{RF.6}
+\]
+The admissible set is the actual \texttt{kapISet}; its nonemptiness and
+infimum attainment were proved in GJ1. Defining (RF.6) gives
+\texttt{EpDef} and \texttt{KapIDef}; it does not by itself identify $e_p$
+with the geometric stabilizer sandwich exponent. That distinct assertion
+is \texttt{EpTie}. Equations (RF.3)--(RF.4) prove \texttt{CanonInst},
+including its prescribed first-coordinate-zero offsets outside $J$.
+
+\paragraph{RF3: one finite set supports every numerical field.}
+Assume that the twist set
+$S_{\rm tw}=\{w:\mu_w\ne\mu_0\}$ is finite and that the positive
+integers $D_{\Gamma,u}$ are supplied. Let $T_u$ denote the actual type
+prime of word $u$, and choose
+\[
+ B_S=\lceil X''\rceil_++g_0+g_1+d+
+                           \sum_u(T_u+D_{\Gamma,u}),\qquad
+ S=\{w:p_w\leq B_S\}\cup S_{\rm tw}.                          \tag{RF.7}
+\]
+This set is finite. Indeed, a place over a rational prime $p$ determines
+a prime ideal dividing the nonzero principal ideal $(p)$ in the number
+ring; unique ideal factorization makes that set finite. There are only
+finitely many $p\leq B_S$.
+If $w\notin S$, then
+\[
+ \begin{gathered}
+ p_w>X'',\quad p_w\notin\{g_0,g_1,d\},\quad
+ p_w\ne T_u,\quad p_w\nmid D_{\Gamma,u}\quad(\text{every }u),\\
+                         \mu_w=\mu_0.                         \tag{RF.8}
+ \end{gathered}
+For the divisibility assertion use $D_{\Gamma,u}>0$: a positive integer
+divisible by $p_w$ is at least $p_w$, contradicting $p_w>B_S$.
+In particular $S$ contains every place of residue characteristic at most
+$X''$, as well as every nontrivially twisted place.
+
+\paragraph{RF4: the literal gain, forcing, error and deficit values.}
+We spell out the outer cases, since they are what makes the refill
+possible. Let $\mathcal R_p$ be the orbit representatives from RF1 and
+$\mathcal V_p=\texttt{VV}(p)$ the actual served representatives. Write
+$g^0_{jv},g^U_{jv},P_{jv}$ for the source local gain scores and correction,
+$t_v,D_p$ for the local depth and degree budgets, and
+$\Sigma_p=m\sum_{v\in\mathrm{goodReps}(p)}\kappa_v$.
+All are evaluated at the same selected $a_T,b_T$, scale and instance.
+The explicit formulas for these unchanged scalar scores are recorded in
+the expanded report. Set
+\[
+ S_v=\left\lceil\sum_{j\in J}
+        \max\{0,g^U_{jv}-P_{jv}-\max(g^0_{jv},0)\}\right\rceil,
+                                                               \tag{RF.9}
+\]
+and define
+\[
+ \begin{split}
+ \tau_p&=\begin{cases}0,&\mathcal V_p=\varnothing,\\
+ e_p+m\sum_{v\in\mathcal V_p}(\lceil t_v\rceil_++D_p+1),
+                                      &\mathcal V_p\ne\varnothing,
+                         \end{cases}\\
+ \iota_p&=\begin{cases}0,&\mathcal V_p=\varnothing,\\
+ 2\Sigma_p\max_{v\in\mathcal V_p}S_v,&\mathcal V_p\ne\varnothing.
+                         \end{cases}                          \tag{RF.10}
+ \end{split}
+\]
+The gain is zero when $p>X''$ or when $p$ is of the source inert class
+and $h_p=0$. Otherwise it is
+\[
+ G_{jp}=\sum_{v\in\mathcal V_p}
+       \max\{g^U_{jv}-P_{jv},\max(g^0_{jv},0)\}
+          +\sum_{v\in\mathcal R_p\setminus\mathcal V_p}
+                                      \max(g^0_{jv},0).         \tag{RF.11}
+\]
+At a place $w$, install $G_{j,p_w}$ only for the inert or signal class,
+and install zero for the other classes. In particular it vanishes at
+$g_0,g_1$: \texttt{HostArith} places these level primes in the split class.
+
+The forcing value is, in priority order,
+\[
+ F_{jp}=\begin{cases}
+ F^G_j,&p\in\{g_0,g_1\},\\
+ F^d_j,&\operatorname{cls}(p)=\mathrm{ramD},\\
+ F^{\rm in}_{jp},&p\leq X'',\ p\text{ inert or signal},\\
+ 0,&\text{otherwise}.
+ \end{cases}                                                  \tag{RF.12}
+\]
+Here $F^G_j=-\operatorname{fockDeg}_j/2$,
+$F^d_j=-(k-1)\sum_t\min(w_j(0,t),w_j(1,t))/2$, and
+$F^{\rm in}_{jp}$ is the explicit finite orbit/linear-program expression
+in the report. In the error formula the own type prime has first priority:
+\[
+ E_{ujw}=\begin{cases}
+ E^T_{uw},&p_w=T_u,\\
+ v_{p_w}(D_{\Gamma,u})+E^G_{0,ujw},&p_w\ne T_u,\ p_w=g_0,\\
+ v_{p_w}(D_{\Gamma,u})+E^G_{1,ujw},&p_w\ne T_u,g_0,\ p_w=g_1,\\
+ v_{p_w}(D_{\Gamma,u})+E^d_j,&\text{next, if }\operatorname{cls}(p_w)=\mathrm{ramD},\\
+ v_{p_w}(D_{\Gamma,u})+E^C_{jp_w},&\text{next, if }p_w\leq X'',\ p_w\text{ inert},\ h_{p_w}=0,\\
+ v_{p_w}(D_{\Gamma,u})+E^I_{jp_w},&\text{next, if }p_w\leq X'',\ p_w\text{ inert or signal},\\
+ v_{p_w}(D_{\Gamma,u}),&\text{otherwise}.
+ \end{cases}                                                  \tag{RF.13}
+\]
+The report records every term of $E^T,E^G,E^d,E^C,E^I$, including the
+ramification division in $E^G$ and the odd-order correction in $E^I$.
+No sign or size estimate for these quantities is asserted merely by
+installing their values.
+
+Every field in (RF.10)--(RF.13) is zero off $S$. For $F$ and $E$, use
+(RF.8), the implication $\operatorname{cls}(p)=\mathrm{ramD}\Rightarrow
+p=d$, and $v_p(D_{\Gamma,u})=0$ when $p\nmid D_{\Gamma,u}$.
+For $G$ use its $p>X''$ cutoff. A served prime must satisfy $p<X'$;
+since $X'\leq X''$ by (RF.1), no place outside $S$ is served, giving
+$\tau=\iota=0$ there. Conjugate places have the same rational residue
+characteristic, so (RF.12) also gives $F_{j,\bar w}=F_{jw}$.
+
+\paragraph{RF5: refill the record without changing its parameters.}
+Replace the five numerical fields of $L_0$ by RF4 and its support by
+$S$. Define
+\[
+ \begin{split}
+ \mathrm{drop}&=\{p:\operatorname{NoGain}(p)\text{ and }p\ne T_u
+                                             \text{ for every }u\},\\
+ TT_p&=\begin{cases}TT,&p\text{ signal or }p\geq X',\\
+ \{t\in TT:\operatorname{bs}(\operatorname{step}_p,t)\in\mathcal V_p\},
+                                                       &\text{otherwise},
+ \end{cases}\\
+ w^{\rm part}_{j,t,p,e}&=\operatorname{fill}_j
+             \bigl(\operatorname{partner}(p,t,e)\bigr).        \tag{RF.14}
+ \end{split}
+\]
+Store $TT_p$ as the corresponding subset of the subtype $TT$. This
+subtype introduces no lost labels because $TT_p\subset TT$; forgetting
+the subtype gives exactly $TT_p$. Its full-set clause follows from the
+first branch in (RF.14), and $w^{\rm part}\geq1$ follows from RF2.
+The set $\mathrm{drop}$ is generally infinite. Finite support is asserted
+for the five numerical fields, not for that set.
+
+The remaining essential supplied condition is
+\[
+ \mu_w=\mu_0\quad\Longrightarrow\quad F_{jw}=0\quad(j\in J).
+                                                               \tag{RF.15}
+\]
+Together with $L_0$'s untwisted vanishing of $A_j(w)$, this proves the
+refilled untwisted field. At a place of neither inert nor signal class,
+the gain is zero by definition and $\mathcal V_p=\varnothing$ by the
+candidate condition; hence both deficits vanish. Type primes are excluded
+from $\mathrm{drop}$ by definition.
+
+All other fields are copied. The formulas used in RF1--RF4 depend on
+the copied fields and on the fixed $D$, never on the fields being replaced.
+Reconstructing the canonical instance over the refilled datum therefore
+gives exactly the same selector, offsets, $\kappa_I$ and $e_p$.
+The weight identity in RF2, partner identity and subset identity in
+(RF.14), and the definitions of gain and deficits prove every clause of
+\texttt{ParametersFill}. Its final clause $\mathrm{La}(K,s)=L.\mathrm{LaG}$
+is the retained \texttt{Val.La\_eq}. Thus we obtain the literal
+\texttt{exists\_refill} conclusion, preserving
+\[
+           L.sc=L_0.sc,\qquad L.a_T=L_0.a_T,\qquad L.b_T=L_0.b_T,
+                                                               \tag{RF.16}
+\]
+and \texttt{Val}, together with \texttt{CanonInst}, \texttt{EpDef},
+\texttt{KapIDef}, \texttt{FDef}, \texttt{EDef}, both support containments,
+all-place \texttt{ParametersFill}, and the exact drop-set equivalence.
+
+\paragraph{RF6: a served prime is never discarded.}
+Nonempty $\mathcal V_p$ forces the literal candidate conditions
+\[
+ p\text{ prime},\quad p<X',\quad p\text{ inert},\quad
+ x^{\epsilon/4}\leq\operatorname{ord}(h_p),\quad
+ p\geq p_0\Longrightarrow p\notin\mathrm{Band},\quad
+                         \Sigma_p\leq x^{-\epsilon}.           \tag{RF.17}
+\]
+The band's power condition is
+$|p^i-X'|\leq\rho_B X'$ for some $i\geq1$, with $p_0\leq p<X'$.
+Consequently (RF.17) excludes the small-order, power-band and excess-loss
+alternatives in \texttt{NoGain}, as well as its $p>X''$ and
+non-inert/non-signal alternatives. The only remaining alternative is
+\texttt{IsCs}: inert class with nonzero odd-order $h_p$.
+
+Here is the needed group argument. The frame has a homomorphism from
+$A$ into a $2$-group, injective on a cyclic subgroup $A_0$, and
+$[A:A_0]=o\leq x^{\epsilon/100}$. An odd-order element has zero image
+in the $2$-group. Its multiple by $o$ lies in $A_0$ and still has zero
+image; injectivity gives $oh_p=0$. Thus its order divides $o$, contrary to
+\[
+ x^{\epsilon/4}\leq\operatorname{ord}(h_p)\leq o
+                 \leq x^{\epsilon/100}<x^{\epsilon/4}.
+\]
+We have proved
+\[
+ \mathcal V_p\ne\varnothing\ \Longrightarrow\
+ \neg\operatorname{NoGain}(p),\qquad
+ p\in\mathrm{drop}\ \Longrightarrow\ \mathcal V_p=\varnothing.
+                                                               \tag{RF.18}
+\]
+This uses the actual small odd-part bound; a numerical lower bound on the
+order alone would not imply even order in an arbitrary finite group.
+
+\paragraph{RF7: complete the supplied-data \texttt{LedPart} construction.}
+Assume the literal \texttt{Lay}, \texttt{RecOK} and \texttt{LedOK} data,
+\texttt{Std}, $c_g\geq10$, an initial $L_0$ with the required
+\texttt{Val} and degree identities, \texttt{HostArith}, and $w''\geq1$.
+Retain also the source's $X'\leq T_u$ assumption. The relevant content of
+\texttt{RecOK} is finite twist support, positive $D_{\Gamma,u}$, fullness
+of each actual $M_{\rm ram}(u)$, and the two-sided commensurability at
+its own type prime. The quantified \texttt{LedOK} supplies (RF.15) and,
+for every canonical instance satisfying the defining numerical and fill
+identities, the actual \texttt{LatTied}, \texttt{EpTie} and served-place
+containment/commensurability predicates of LP4.
+
+Apply \texttt{LedOK} first to $L_0$ to get (RF.15), then apply RF5.
+Because (RF.16) and \texttt{Val} survive, apply \texttt{LedOK} again to
+this refilled datum. This second application is essential: one cannot
+transfer the geometric local predicates from an unrelated instance.
+LP4 now patches the prescribed served and own-type local modules into
+one $N_u$ for every word. LP5 installs these modules and
+\[
+ \operatorname{lenMN}(u,w)
+       =\frac{\operatorname{toNat}(\operatorname{lenLoc}_w
+                          (N_u,M_{\rm ram}(u)))}{e_w}.          \tag{RF.19}
+\]
+At a non-type place where $p\in\mathrm{drop}$, (RF.18) makes the place
+unserved, so LP gives $N_{u,w}=M_{{\rm ram},u,w}$. The same is true
+if $p$ is of neither inert nor signal class. At every non-type place
+LP gives the required local containment. These are the first two clauses
+of \texttt{NuDef}. Its third clause is the exact finite-length equation
+$\ell=e_w\operatorname{lenMN}(u,w)$ from (RF.19).
+Equality of localized modules makes their localized quotient zero, so
+every non-type unserved length is zero. This proves \texttt{TiesAt.lats0}
+and \texttt{NuUnserved}, not just the patch's existence.
+
+The served and type identities are precisely \texttt{LatDefs}; all-place
+filling and both support containments come from RF5; \texttt{LatTied} and
+\texttt{EpTie} come from the second \texttt{LedOK} application. The
+supplied level/error data and (RF.13) give \texttt{ErrDefs}; its three
+constant inequalities follow from the standard fixed constants and
+$c_g\geq10$. We have therefore constructed the entire literal
+\texttt{LedPart}, with the same scale, selected degrees, \texttt{Val}
+and canonical instance. No global containment $N_u\subset M_{\rm ram}(u)$
+is added at a type prime, and finiteness of an arbitrary local length is
+not asserted by (RF.19).
+
+\paragraph{RF8: install the actual final lattice and height.}
+For the constructed $L$ put
+\[
+ s_{uw}=\sum_{j\in J}\bigl(G^{\rm kept}_{jw}+F_{jw}-E_{ujw}\bigr),
+ \qquad
+ I_u=\prod_{w\in S}\mathfrak p_w^{-\lfloor e_ws_{uw}\rfloor},
+ \qquad N'_u=I_uN_u.                                         \tag{RF.20}
+\]
+Here $G^{\rm kept}_{jw}=0$ on the drop set and is the installed gain
+otherwise. The fractional-ideal product is finite by RF3--RF5; its powers
+are integral and may have either sign. In particular the floor is taken
+\emph{after} ramification scaling. The product $I_uN_u$ means the integer-ring
+span of all $ay$ with $a\in I_u$, $y\in N_u$, exactly the source
+\texttt{nPrime}.
+
+Replace the source-lattice field of $D$ by $N'_u$, its height field by
+the prescribed $h_u=\texttt{hExpl6}(D,L,Y.X,C_{\rm sz},u)$, and its
+common height allowance by
+\[
+                  H'=\max\{1,\operatorname{sFrame}(N',h)
+                                      +\mu_{\max}(RR)\}.       \tag{RF.21}
+\]
+The vector spaces, forms, host, weights, local comparisons and local
+selected modules are retained. Hence the defining $N'$ and $h$ fields
+now hold as identities. The numerical functions $\mathcal V_p,G,\tau,
+\iota,TT_p$ and the local module $NP$ are unchanged, since none reads the
+replaced output-lattice or height field. The auxiliary row-side maps are
+unchanged as well: induction on their defining chain leaves each map,
+its image and its adjoint composition identical. Thus every supplied
+comparison, kernel and auxiliary datum transports to the new record.
+This constructs the literal point \texttt{LedPart.pt} and preserves
+its scale, degree identities, \texttt{Val} and \texttt{CanonInst}.
+If the supplied recursive datum has the tame, Minkowski and local
+quadratic-twisting properties, these transport too. Installing their
+records does not prove their geometric or metric premises.
+
+\paragraph{RF9: the two eventual scale inequalities have elementary proofs.}
+For fixed $\epsilon>0$, \texttt{RankVal} gives
+$n\leq2x^{2+8\epsilon}\leq x^3$ when $x\geq4$, because
+$\epsilon<1/52$. Also
+\[
+                         w''=\frac{e^{x^\epsilon-x^{\epsilon/3}}}{n}.
+\]
+For $x^{2\epsilon/3}\geq2$ and $\log x\geq12/\epsilon^2$,
+$x^\epsilon-x^{\epsilon/3}\geq x^\epsilon/2\geq3\log x$.
+The last inequality follows from
+$e^{\epsilon\log x}\geq(\epsilon\log x)^2/2$.
+Thus $w''\geq x^3/n\geq1$, with an explicit threshold depending only
+on $\epsilon$.
+Next, if $c_s>0$, $m\geq1$, $T>0$, and
+$\log T\geq c_smx^\epsilon$, then
+\[
+ x^{2\epsilon/3}\geq c_s^{-1}
+       \quad\Longrightarrow\quad \log T\geq x^{\epsilon/3}
+       \quad\Longrightarrow\quad X'\leq T.                   \tag{RF.22}
+\]
+These prove the two threshold lemmas used in the point join without
+changing any previously fixed local constant.
+
+\paragraph{RF10: the uniform point join and its exact remaining suppliers.}
+The recursive premise \texttt{RecExP} has a useful order of choices.
+After the external constants it supplies $c_s>0$ and a threshold.
+For each sufficiently large admissible column datum it chooses positive
+$d_u,D_*$ and lower bounds on the logarithms of the desired type-prime
+centers. It then supplies $D,Y$, \texttt{Over}, \texttt{RecOK},
+\texttt{LedOK}, and the twisting data \emph{for every} level record
+with those $d_u,D_*$ and the prescribed $\Gamma$. Its requested property
+$Q$ holds for every compatible completed \texttt{LedPart}.
+The universal quantifier over the level record permits the level choice
+to be made after $d_u,D_*$ have been fixed.
+
+Retain the following three substantive suppliers with their literal
+uniform hypotheses: \texttt{chGood\_of\_host}, which constructs the
+compatible weight columns from the host and selected degrees;
+\texttt{exists\_levCh\_of\_levelPrime}, which consumes
+\texttt{LevelPrime} and chooses the prescribed norm/congruence primes;
+and \texttt{exists\_sizeData\_over}, which constructs $L_0$ and the
+same-host/word-label identifications from the recursive datum. These
+are not consequences of the refill. With them, the point join is now
+explicit. Enlarge the middle constant thresholds to include $c_g\geq10$,
+replace the lower $c_D$ threshold by its maximum with $0$, and the lower
+$c_h$ threshold by its maximum with $402$. Take the maximum of the
+recursive, three supplier and two RF9 thresholds. For each admissible
+host, selected degree pair, word code and distinguished position:
+construct the columns; obtain $d_u,D_*$ recursively; choose the levels;
+apply the universal recursive assertion; obtain $L_0$; apply RF7; and
+install the point by RF8. The recursive property $Q$ applies to this
+very \texttt{LedPart}, and the retained tame, Minkowski and twisting
+properties give the accompanying duties.
+
+The threshold order is exactly
+\[
+ \epsilon_0;\quad(\epsilon,C_8,C_5,c_6,C_b);\quad K_0;\quad C;
+ \quad c_{D,0};\quad c_D;\quad c_{h,0};\quad c_h;\quad x_0;
+ \quad(s,R,H,q_0,a_T,b_T,\mathrm{code},u_0).                    \tag{RF.23}
+\]
+No threshold may depend on the final degree pair or distinguished
+position. The resulting point retains the original host field, top and
+second sets, primes, Frobenius labels, word code and $u_0$ through the
+supplied \texttt{Over}/initial-size identifications. This is the
+\texttt{objCP\_and\_of\_recExP} join, with its three construction
+suppliers still explicit. It does not assert \texttt{RecExP},
+\texttt{LevelPrime}, or \texttt{NumAt}. The exact next-source list
+records those remaining constructions rather than treating the record
+type \texttt{ObjCP} as a proof of their existence.
+
+\subsection{Actual numerical estimates beyond the refill}
+
+These estimates have the precise \texttt{SzRow} order of quantifiers:
+for each $0<\epsilon<1/52$ and fixed standard constant record $C$, choose
+$c_{D,0}$; for every $c_D\geq c_{D,0}$ choose $c_{h,0}$; for every
+$c_h\geq c_{h,0}$ choose $x_0$; then the conclusions hold for every
+supplied $D,L$ with $\operatorname{Val}(C,c_D,c_h,L)$,
+$L.\mathrm{sc}.\epsilon=\epsilon$, and $x\geq x_0$.
+There is no choice of a different $D$ or $L$ in these assertions.
+We write $\mathcal L=x^\epsilon$, $\delta=x^{-\epsilon/8}$,
+$r=k+m-1$, $f=2n$, and $N_m=k+m(t+1)$.
+All terminating decimals below denote exact rational numbers.
+
+\paragraph{RF11: an explicit comparison principle for all the scales.}
+If $a<b$, $p$ is a nonnegative integer and $A$ is fixed, then
+\[
+             A x^a(\log x)^p=o(x^b)\quad(x\longrightarrow\infty).
+                                                               \tag{RF.24}
+\]
+Indeed, with $y=\log x\geq1$ and $d=b-a>0$, the positive series for
+$e^{dy}$ gives
+\[
+ \frac{|A|y^p}{e^{dy}}
+       \leq \frac{|A|(p+1)!}{d^{p+1}y}\longrightarrow0.
+\]
+This supplies an actual threshold for any requested positive upper
+constant. Taking the maximum of three thresholds proves, for
+$0\leq a<b$ and $\kappa>0$,
+\[
+ c\log x+A x^a(\log x)^p+A\leq\kappa x^b                 \tag{RF.25}
+\]
+eventually, with absolute values used for negative coefficients.
+Consequently, for any fixed real $c$ and $\kappa>0$, all the following
+hold at one threshold depending only on $\epsilon,c,\kappa$:
+\begin{gather*}
+ x^c\leq e^{x^{\epsilon/8}},\qquad
+ x^c\leq (X')^\kappa,\qquad x^cX'\leq b^\kappa,
+ \qquad b'x^c\leq b,\\
+ b^{1-\kappa}x^c\leq b',\qquad
+ b^{1-\kappa}x^c\leq w''\leq b'
+       \quad(1\leq n\leq x^3),\\
+ e^{c x^{\epsilon/5}(\log x)^2}x^c\leq(X')^\kappa.
+                                                               \tag{RF.26}
+\end{gather*}
+For example the lower bound for $w''$ reduces, using
+$\log n\leq3\log x$, to
+$(c+3)\log x+x^{\epsilon/3}\leq\kappa x^\epsilon$.
+The other inequalities follow by taking logarithms in (RF.1).
+Thus this comparison principle proves the actual scale-polynomial
+supplier used below, including its uniformity in $n$.
+
+\paragraph{RF12: ranks, the large order, and the seven rank-parameter bounds.}
+Put
+\[
+ T=\lceil x^{377}\rceil_+,
+ \quad W=10r\left(f+\frac{f^2(k-1)^3\mathcal L^2}{m}\right),
+ \quad n_W=8\lceil W/8\rceil_+ .                            \tag{RF.27}
+\]
+The supplied rank condition says $r+t=8fr+4+Tn_W$.
+For $x\geq1000^{1000}$, constants at most $1000$ can be absorbed into
+an additional exponent $0.001$: if $A\leq1000$ and $u+0.001\leq v$,
+then $Ax^u\leq x^v$. The three defining rank windows therefore give
+\[
+\begin{array}{c|ccccccc}
+\text{quantity}&f&r&k&\mathcal L&m&m^{-1}&f\binom r2\\ \hline
+\text{upper power of }x&2.156&4.694&4.694&0.020&0.501&-0.498&11.544
+\end{array}                                                   \tag{RF.28}
+\]
+For instance $r\leq2k\leq4x^{9/2+10\epsilon}$ and
+$m\geq x^{1/2-\epsilon/16}\geq x^{0.498}$; also
+$f\binom r2\leq fr^2$.
+The second term of $W$ has exponent at most
+$4.694+2(2.156)+3(4.694)+2(0.020)-0.498=22.630$.
+The first has exponent at most $6.850$. Since $n_W<W+8$,
+\[
+ n_W\leq28x^{22.7}\leq x^{22.9},\quad
+ x^{377}\leq T\leq x^{378},\quad
+ x^{377}\leq t\leq13x^{400.9}\leq x^{401}.                  \tag{RF.29}
+\]
+The lower bound for $t$ uses $n_W\geq1$ and $8fr\geq r$.
+Finally $N_m=k+m(t+1)\leq3x^{401.6}\leq x^{402}$.
+This proves all seventeen conclusions of the source's
+\texttt{rank\_basic\_bounds}: in addition to (RF.28)--(RF.29),
+\[
+\begin{gathered}
+ f\leq x^3,\quad m\leq x,\quad r\leq x^5,\quad k\leq r\leq2k,
+ \quad1\leq\mathcal L\leq x,\\
+ x^{6.5}\leq fr\mathcal L\leq x^{6.87},\quad
+ f\binom r2\leq x^{12},\quad kf/m\leq x^7,\\
+ x^{1/2-\epsilon/16}\leq m\leq2x^{1/2-\epsilon/16}.
+\end{gathered}                                                 \tag{RF.30}
+\]
+The lower bound for $fr\mathcal L$ follows from
+$f\geq x^2$, $r\geq k\geq x^{9/2}$ and $\mathcal L\geq1$;
+the upper bound and $kf/m$ follow by adding the exponents in (RF.28).
+
+Let $R_0=nx^{-\epsilon}$ and let $C_k,C_6,C_f$ be the actual fixed
+constants. At a further threshold the seven required inequalities are
+\[
+\begin{gathered}
+ C_km^5f\mathcal L x^\epsilon\leq k,\qquad
+ k\leq x^{1/2}nR_0,\qquad \sqrt{k/m}\leq R_0,\\
+ m^2\mathcal L\leq k,\quad mx^{1/2}\log x\leq k,\quad
+ C_6m^6\mathcal L\leq k\log k,\quad C_f\mathcal L\leq f\log k.
+\end{gathered}                                                 \tag{RF.31}
+\]
+For the first three, the ratios of the left sides to the available
+lower bounds on the right sides are bounded respectively by
+$128|C_k|x^{-5\epsilon/16}$,
+$2x^{-5\epsilon}$, and, after squaring the third inequality,
+$2x^{-63\epsilon/16}$. They tend to zero.
+For the last four put $y=x^{1/2}$ and require
+$y\geq\max(8,64C_6,C_f)$. Then
+$m\leq2y$, $k\geq y^9$, $f\geq y^4$,
+$\mathcal L\leq y$, $0\leq\log x\leq y^2$, and $\log k\geq1$.
+The four left sides are at most $4y^3$, $2y^4$, $y^8$, and $y^2$,
+respectively. This proves the literal rank-parameter families, not only
+their eventual conjunction.
+
+\paragraph{RF13: thin-size domination and every prescribed column gap.}
+From (RF.26) with $c=5|C_w|$ and $\kappa=1/10$, and $1\leq k\leq x^5$,
+\[
+                    k^{C_w}\leq w'',\qquad b^{9/10}\leq w''.
+                                                               \tag{RF.32}
+\]
+Indeed both quantities are at most the product
+$b^{9/10}x^{5|C_w|}$, which is at most $w''$.
+This retains the source's fixed value $c_w=9/10$.
+
+For the gap conditions let
+$\Delta_{\mathrm{cl}}=\lceil x^{c_D}\rceil_+$,
+$H_0=2\lceil x^{c_h}\rceil_+$ and
+$G=C_{\mathrm{gap}}km^4+N_m m^{10}$.
+Take $c_D,c_h\geq430$, $x\geq\max(2,C_{\mathrm{gap}})$,
+and enlarge the scale threshold until $b,b',w''\geq x^{430}$.
+By (RF.30),
+$G\leq x^{10}+x^{412}<x^{430}$.
+The actual \texttt{HCVal} columns are
+\[
+ v_i=(k-2-i)4\Delta_{\mathrm{cl}},\qquad b_j=b_1+jH_0,
+       \qquad e_j=b_j+H_0/2.                                 \tag{RF.33}
+\]
+At a top, $b_1=b_T+\lfloor b'/x\rfloor\geq b'$; at a thick
+position $b_1\geq\lceil b\rceil$; at a thin position
+$b_1=\lceil w''\rceil$. Therefore $b_1\geq x^{430}$ in all cases.
+The three gaps are exactly $4\Delta_{\mathrm{cl}}$, $v_{k-2}+b_1=b_1$, and $H_0$.
+Each is strictly greater than $G$. This proves all three clauses of
+\texttt{szRow\_sig\_gaps} with the actual columns.
+
+\paragraph{RF14: the full band, lambda and host-prime bounds.}
+Here the integer orbit-count construction is also expanded. Set
+$h=2+8\epsilon$, $r_G=\lceil8(h+2)/\epsilon\rceil_++1$,
+$q=6r_G+1$, and $\ell=\log x\geq1$. The source definitions are
+\[
+ U=\lceil1/\delta\rceil_+,\quad
+ M=\lceil(h+3)10^q\ell\rceil_+,\quad
+ G'=(M+5)qU,
+ \quad N_1=\left\lceil\max(6eG'\delta,(h+3)\log_2x)\right\rceil_++1.
+                                                               \tag{RF.34}
+\]
+Since $\delta U\leq2$,
+$M+5\leq((h+3)10^q+6)\ell$, and $\log_2x\leq2\ell$, the
+explicit constant
+\[
+ B_N=6e\bigl((h+3)10^q+6\bigr)2q+2(h+3)+2
+\]
+satisfies $1\leq N_1\leq B_N\log x$.
+For $K_{\Lambda}\geq1$, put $B=K_{\Lambda}B_N^2$. The actual
+$\Lambda=K_{\Lambda}N_1^2\log a$ consequently satisfies
+\[
+              x^\epsilon\leq\Lambda
+                   \leq2B x^\epsilon(\log x)^2              \tag{RF.35}
+\]
+once $\log x\leq x^\epsilon$.
+
+For any fixed real $c$, set
+\[
+ \rho(c)=\frac{8n\delta x^\epsilon\Lambda
+                         +c\log x\,\Lambda}{k}.
+\]
+The rank windows, $\delta\leq1$ and (RF.35) bound its two numerators by
+$32B x^{2+10\epsilon}(\log x)^2$ and
+$2|c|B x^\epsilon(\log x)^3$.
+By (RF.24), each is at most
+$\tfrac12x^{5/2+10\epsilon}$ at a uniform threshold.
+Dividing by $k\geq x^{9/2+10\epsilon}$ gives
+\[
+                         \rho(c)\leq x^{-2}.                \tag{RF.36}
+\]
+The choice $c=K_\rho K_N$ is exactly $\rho_B$; the choice
+$c=C_\rho$ is exactly the parameter condition $\rho_P$.
+Together with the supplied host top-count and $b_T$ bounds, this proves
+the whole top/band/bottom parameter family as well.
+
+Write $Q_c=QS\,q_0d$ for the host conductor product, using $q_0$ to
+distinguish the host prime from the integer $q$ in (RF.34).
+In this numerical argument $C_8=C.P.C_{p\mathrm{de}}$ is the constant
+in the supplied \texttt{HostVal}.
+The supplied \texttt{PairRow} at some $Y\leq x$ gives
+\[
+ \log Q_c\leq2x^{\epsilon/5}(\log x)^2,\qquad
+ \log p_{\mathrm{de}},\ \log p'_{\mathrm{de}}
+            \leq2C_8x^{\epsilon/5}(\log x)^2.
+                                                               \tag{RF.37}
+\]
+Here the second statement follows from the actual inequalities
+$p_{\mathrm{de}},p'_{\mathrm{de}}\leq Q_c^{C_8}$.
+RF11 makes the last bound strictly smaller than $x^{\epsilon/3}$;
+hence both auxiliary primes are strictly below $X'$.
+For the already supplied level primes set $Y_g=(kb)^8$.
+The host condition says $Y_g\leq g_i\leq2Y_g$. Since $k\leq x^5$,
+RF11 gives
+\[
+ g_i\leq e^{9\mathcal L},\qquad \log Y_g\leq9\mathcal L,
+ \qquad N_m^4Q_c^{C_Y}\leq Y_g^{1/4}.                       \tag{RF.38}
+\]
+For the last inequality take logarithms and use
+$1608\log x+2C_Yx^{\epsilon/5}(\log x)^2\leq2x^\epsilon$;
+the right logarithm is $2\log k+2x^\epsilon$.
+These are the complete type-prime scale inequalities with the fixed
+$C_{YL}=9$. They concern the supplied $g_i$ and do not choose any prime.
+
+Finally, the lower and upper top-count bounds are precisely
+\texttt{ChTT\_at}. The identity
+$\#\mathrm{Word}=\lceil3\Gamma_L^2x^{C_F}\rceil_+$ implies
+\texttt{ChCode\_at} with constants $(3,C_F)$ by the defining ceiling
+inequality; it is a lower bound, not the separate exponential upper
+bound on the word count. Since $1\leq J\leq C_8$,
+$\epsilon/J\geq\epsilon/C_8$. Thus
+$x\geq11^{5C_8/\epsilon}$ also gives
+$11\leq\lfloor x^{(\epsilon/J)/5}\rfloor_+\leq\mathrm{splitBound}$.
+This proves the full source \texttt{szRow\_band\_lambda\_primes}
+and the additional split-bound clause, with no host existence inference.
+
+\paragraph{RF15: construct every field of the actual block-length record.}
+Suppose a compatible parameter record $P$ is supplied, so that
+$P.C_{nW}=C.P.C_{nW}=10$. Set
+\[
+ \mathsf{TO}=T,\quad \mathsf n_W=n_W,\quad
+ \mathsf n_P=8fr+4,\quad Z=fr\mathcal L,\quad
+ \mathsf P=C_PZ^{12},\quad \mathsf D=f\binom r2,
+ \quad s=r+6.                                                \tag{RF.39}
+\]
+Copy the seven constants from $C.T$. Standardness fixes
+$e_P=12$, $C_p=1$, $c_{TO}=377$, gives $C_P\geq1000$, and gives the
+other required lower bounds. Choose $c_D\geq800$, $c_h\geq1000$,
+and then $x$ large enough that $C_P\leq x^{0.001}$,
+$C_{hT},C_{bN}\leq x$ and RF11--RF14 apply.
+Since $Z\leq x^{6.87}$ and $Z\geq x^{6.5}$,
+\[
+ 1000x^{78}\leq\mathsf P\leq x^{82.441}\leq x^{85},
+ \qquad \mathsf D\leq x^{11.544}\leq x^{12}.                \tag{RF.40}
+\]
+The defining second-set density gives
+$\delta_2\geq x^{-\epsilon}$, hence
+$\delta_2^{-1}\leq x^{0.020}$.
+The strongest lower bound on $\mathsf{TO}$ now has an explicit exponent:
+\[
+ \frac{\mathsf P^4\mathsf D^3kf x}{m\delta_2}
+ \leq x^{4(82.441)+3(11.544)+4.694+2.156+1-0.498+0.020}
+ =x^{371.768}\leq x^{377}\leq\mathsf{TO}.                  \tag{RF.41}
+\]
+In particular this uses the exact order scale $377$; replacing the
+inputs prematurely by much coarser bounds would not prove the claim.
+
+The count interval is $W\leq\mathsf n_W<W+8$ and
+$8\mid\mathsf n_W$. Since $m\leq k-1$, $f\geq2$ and
+$\mathcal L\geq1$,
+$W\geq10fr(1+(k-1)^2)\geq fr(r+1)$.
+Also $(k-1)f+2r\leq2fr\leq W$ and $8fr+4\leq10fr\leq W$.
+These prove all three lower-count conditions.
+Moreover
+$(2fm)^4\mathsf n_W\leq16x^{33.528}\leq\mathsf P$ and
+$\mathsf n_W\leq\mathsf P$.
+The exact splitting identity is the supplied rank identity in (RF.27).
+Because $k,m$ are even, $r$ and $s=r+6$ are odd, and
+$r+5<s\leq r+7$.
+
+For completeness the remaining polynomial tests admit the following
+explicit upper bounds. Increase $x_0$ to absorb the fixed coefficients.
+\[
+\begin{array}{l|r}
+\text{quantity bounded above}&\text{power of }x\\ \hline
+(\mathsf D+2)\mathsf n_W+2r&36\\
+40(\mathsf D+2)&13\\
+11\mathsf D^2&25\\
+r+2(2\cdot5^4r)(\mathsf D+1)&18\\
+\mathsf D k/m&17
+\end{array}
+\qquad
+\begin{array}{l|r}
+\text{quantity bounded above}&\text{power of }x\\ \hline
+\mathsf{TO}^2&756\\
+(\mathsf{TO}+\mathsf D+2)
+ (\mathsf{TO}+\mathsf D+2+2N_m)&782\\
+4\mathsf{TO}^2+2t&757\\
+\mathsf P\mathsf D f m^2N_m\mathsf{TO}&882\\
+\mathsf P(fmk)^3k/m&117\\
+C_{hT}\mathsf{TO}N_m f^2m^2k\mathsf D\mathsf P&891
+\end{array}                                                   \tag{RF.42}
+\]
+Every entry of the left table is at most $\mathsf{TO}$.
+The first two entries of the right table are at most
+$\Delta_{\mathrm{cl}}=\lceil x^{c_D}\rceil_+$; the last four are at most
+$h_0=L.\etaSz/m=2\lceil x^{c_h}\rceil_+$.
+For the product of two sums, use
+$\mathsf{TO}+\mathsf D+2\leq x^{379}$ and the second factor
+$\leq x^{403}$. For the first height entry use
+$4x^{756}+2x^{401}\leq6x^{756}\leq x^{757}$.
+The other height exponents are obtained by multiplying the explicit
+bounds $\mathsf P\leq x^{85}$, $\mathsf D\leq x^{12}$,
+$f\leq x^3$, $m\leq x$, $k\leq x^5$, $N_m\leq x^{402}$,
+$\mathsf{TO}\leq x^{378}$; in the cubic entry use $m\geq1$.
+
+The tests against $b$ and $\sqrt b$ are not additional assumptions:
+\[
+\begin{array}{l|r}
+\mathsf{TO}\mathsf P x^{C_b}&x^{463+C_b}\\
+\mathsf{TO}\mathsf P&x^{463}\\
+\mathsf P^3\mathsf{TO}^2x^{C_b}&x^{1011+C_b}\\
+\mathsf P^3\mathsf{TO}^2&x^{1011}\\
+\mathsf{TO}\mathsf D^2\log b\,x^{C_b}&x^{403+C_b}\\
+\mathsf{TO}\mathsf D^2\log b&x^{403}\\
+C_{bN}rmk\mathsf P^2\mathsf D^3&x^{218}
+\end{array}                                                   \tag{RF.43}
+\]
+RF11 puts the first, third, fifth and seventh rows below $b$, and the
+second, fourth and sixth below $b^{1/2}$.
+The three polynomial-size bounds are immediate from
+$\mathsf P\leq x^{85}$, $\mathsf D\leq x^{12}$,
+$\mathsf{TO}\leq x^{378}\leq x^{401}$.
+This checks every defining field of \texttt{ParamsT}, including its
+constant list and the identity $e_P=C.T.e_P$.
+It proves the entire \texttt{szRow\_blockLengthParams} implication,
+uniformly for every supplied compatible $P$.
+
+\paragraph{The exact numerical supplier boundary.}
+Including RF16 below, seven of the twenty-one parameter families in
+\texttt{explicitConstants\_parameterConditions\_large} have now been
+proved here: the three rank-$k$ bounds; the four other rank bounds;
+top-count/band/bottom bounds; thin-size bounds; all signature gaps;
+the type-prime scale bounds; and the upper word-cardinality bound.
+RF15 proves the full block-length
+supplier, and RF14 proves the full band/lambda/prime supplier.
+The fourteen other parameter families and the complete
+\texttt{SizesAt} package are still retained, with their exact source
+targets recorded in the continuation files.
+
+If those remaining suppliers give a compatible $P$ and
+\texttt{SizesAt} for the same $D,L$, RF15 gives \texttt{ParamsT} and
+RF14 gives every nontrivial remaining inequality in \texttt{NumAt}.
+Its other fields are the literal identities in \texttt{Val}:
+the constants, $b_T$, the top ideal $cc_K$, the logarithmic depth,
+the common cloud vector, the rank windows, and the formula for $L_w$
+using $C_t=401$. Thus \texttt{NumAt}, \texttt{ChTT\_at} and
+\texttt{ChCode\_at} follow conditionally on precisely these two
+remaining packages. Neither those packages nor the simultaneous
+geometric construction is asserted by this numerical extension.
+
+\paragraph{RF16: the literal upper bound on the number of words.}
+This last estimate uses the actual exponential value of $\Gamma_L$.
+Write $G=C.C_\Gamma\geq1$, $F=C.P.C_F\geq1$, and
+$H=m^5f x^\epsilon$. The exact \texttt{Val} identities give
+\[
+ \Gamma_L=e^{GH},\qquad
+ \#\mathrm{Word}=\left\lceil3e^{2GH}x^F\right\rceil_+.
+                                                               \tag{RF.44}
+\]
+The rank windows, with the full saving in the exponent of $m$, imply
+\[
+ H\leq128x^{9/2+139\epsilon/16},\qquad
+ k\geq x^{9/2+160\epsilon/16}.                              \tag{RF.45}
+\]
+The difference is $21\epsilon/16>0$. Fix a threshold at which
+$k\geq6$,
+\[
+ 256Gx^{9/2+139\epsilon/16}
+                  \leq\tfrac18x^{9/2+160\epsilon/16},
+ \qquad F\log x+\log6
+                  \leq\tfrac18x^{9/2+160\epsilon/16}.        \tag{RF.46}
+\]
+For the first inequality it suffices that
+$x^{21\epsilon/16}\geq2048G$; RF11 supplies the second.
+Both thresholds depend only on $\epsilon,C$.
+Put $A=3e^{2GH}x^F\geq3$. Since
+$\lceil A\rceil_+<A+1\leq2A$,
+\[
+ \log\#\mathrm{Word}
+       \leq\log6+2GH+F\log x\leq k/4
+       \leq(k-3)\log2.                                     \tag{RF.47}
+\]
+The last inequality uses $k-3\geq k/2$ and $\log2>1/2$.
+Exponentiating, and identifying the natural subtraction with the
+integer $k-3$ because $k\geq6$, proves
+\[
+                         \#\mathrm{Word}\leq2^{k-3}.         \tag{RF.48}
+\]
+This is the complete \texttt{szRow\_card\_words\_le} family.
+It has $c_{D,0}=c_{h,0}=0$, so it combines with the preceding
+families without changing their quantifier order. The number of words
+is not treated as polynomial: its logarithm is compared to the
+larger rank $k$ with the explicit positive gap in (RF.45).
