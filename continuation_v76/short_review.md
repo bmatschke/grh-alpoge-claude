@@ -1,0 +1,5 @@
+# Independent mathematical review
+
+Reviewed TeX SHA-256 `5fee2fe2d6d2215b16ad78d28b37138ef5eab40dde05ebc522a4a89b36e1627b`.
+
+I compared the component reading with the point-value and common-constant steps of ShortSeriesReadingsEqClassicalThetaSeries, including its order of quantifiers. In the identity cover the shifted lattice and translation quotients in phiF and the native finite system use the identical half ideal. The finite Fourier sum is unnormalized, while both intermediate vacuum projectors are averages. This accounts for the residual cardinality and for the reciprocal square root of the standard-lattice index. The two indices in the torsion enumeration and normalization have the same denominator N times the standard lattice. Their quotient is therefore independent of N. The normalization of the algebraic rule retains betaH. Finally the constant-modulus argument only divides by a nonvanishing member locally. It handles a component on which the whole family vanishes and recovers the simultaneous identity on the connected domain. This is the identity-cover result on the listed marked data.

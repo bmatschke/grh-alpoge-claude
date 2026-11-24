@@ -1,0 +1,5 @@
+# Independent mathematical review
+
+Reviewed TeX SHA-256 `b3f7ab3c5efe50ffe8625384888ae11c94582788e156b53f6150a6b7b6e7e319`.
+
+I checked the nine fields of IsSystem against the finite construction. Local residue bases force overlap to vanish for moves outside the group. For the cusp field each allowed translate carries a nontrivial character on the isotropic direction, and the finite product of annihilators has nonzero augmentation. For doubled admission the vertical character gives the support on the tensor lattice sum. A projective splitting over the Dedekind ring, corrected by the trace-one integer, gives the Hermitian quadratic phase. Polarizing the Heisenberg norm identity compares its argument for two projections; equal absolute values alone would not suffice. A common level clears the shifts, phases and supports, and the final Bezout calculation uses the column restriction in the locality clause. The hypotheses require the same chart, vacua and multiplier. The independent doubled constructions and the ordinary unitary action in this edition supply their respective transformation inputs.

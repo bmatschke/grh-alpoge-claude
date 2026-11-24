@@ -1,0 +1,9 @@
+# Uniform rational coordinates on the actual geometric datum
+
+Reviewed TeX SHA-256 `68e77891c2e17c43b1d9c4eed12f18862afe24e4a70a2e5f4d472e12d6680735`.
+
+C76U1 uses the actual R3.Dat field sequence: alg_eq identifies the restricted embedding, pins.char supplies the weak characterization, and the existence fields give the missing true identities. Each residue determinant lifts to a single-place unit idele. The value at infinity is one, so the inverse character and its inverse both belong to the base coefficient field. This supplies the coefficient part of EqAt as well as X76R1's complex equality. The stored constant-comparison implication is used at the distinguished embedding without assuming the phase tie at LUnif.
+
+For C76U2 the conjugate branch can involve different unit vectors. The pairing identity for any pair is available even when the fallback definition of the multiplicity pairing would otherwise allow zero. Subtraction from the self-pairing produces the witness in the orthogonal case. The cross-pairing gives the scalar with the inner product linear in its second variable, and the norm equality handles a zero scalar. The same vectors work across all cusp sections in a row. Extension of the original geometric action on a rational basis gives an action over L valid at all embeddings, including the zero target.
+
+C76U3 compares the two actions only at the distinguished embedding. A missing level lift makes the corresponding operator zero and is impossible for a nonzero target, by invertibility and model injectivity. The trivial flag there gives the actual right translation. The cusp stability and stored action tie apply to the same geometric sections, and evaluation injectivity compares the two values at the specified unit vector. Equality on the L-basis at one embedding identifies the two L-linear actions. Substitution at the other embeddings proves the full native LUnif condition. Its scope retains the actual R3.Dat, ExAt and InGeo.

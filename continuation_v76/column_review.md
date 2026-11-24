@@ -1,0 +1,9 @@
+# Rational tests on each eligible geometric column
+
+Reviewed TeX SHA-256 `059e8c9747cc1a26cd829e6240cb3193a247bd2316e8f264599f465e70b723be`.
+
+**Q76Z1.** The quantified datum agrees with `FieldValuesMemFixedField.lean:35–56` and `CoverFieldOfWeberLev.lean:85–87`. A base, frame and twist data precede the choice of column. Its level fixes the stages and the D7 used in the rank inequality, with the column's original dependent field witness and place set. The pins of that very record give the weak characterization and the prime guard. In particular `OfDat.lean:19–27` projects `z.pins.char`, `z.pins.keep.guard` and `z.pins.phs`. Neither the conclusion nor the existence of a geometric record appears in those projections.
+
+The supplied existence and geometric hypotheses are exactly those declared in C76U3 on the same real datum. Its uniformity and Y76O3 satisfy X76R3, using only the independent cover-field portion of U76W3. Together the component proofs use exactly weak characterization, existence, guard and rank from the base ties. This is also the direct selection of `hB.char`, `hB.ex`, `hB.guard` and `hB.nV` in the native lift-tests implication. Its frame, vector, phase and field inputs come from this column's own geometric data and the listed intermediate results.
+
+For each row the finite dual family separates its whole target. Every functional is tested on every tuple and rational input, and on each `w0C b j (Pi.single k 1)` of the indicated good basis. These are exactly the quantifiers of `RatZOfTests.lean:22–29`. RTG21 constructs one ambient coordinate family for both Boolean levels. The lattice part concerns both stored lattices through their original coordinate maps. The one finite request is made once with the dependence on prehost and twist family described in U76W2, before later columns and records. Existence of common records at all required scales remains outside this implication.

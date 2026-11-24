@@ -1,22 +1,22 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.75 proves the stable-range definite Siegel–Weil identity for the original admitted families. The proof counts split-prime neighbors and bounds the theta–Eisenstein difference uniformly over all twists and periods. It yields the differentiated arithmetic kernel for a supplied level system with the specified doubling laws. Edition 0.74 supplies the real reproducing integral and one normalization for the adelic and geometric theta lifts. **Ten whole obligations remain** in the human reconstruction, shared by RH and unrestricted Dirichlet GRH. [Current reading guide](../RH_reconstruction_progress_v0_75.md) · [New TeX manuscript](../RH_new_proofs_v0_75.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_75.tex)
+Edition 0.76 proves that the integral cusp forms on a pinned geometric row give a full lattice. For each eligible geometric column it derives the rational theta-lift tests at both prescribed levels from the original existence and geometric comparison data and the rank bound. One finite request for Weber values supplies the higher cover fields across the allowed tuples. **Ten whole obligations remain**, all shared by RH and unrestricted Dirichlet GRH. [Current reading guide](../RH_reconstruction_progress_v0_76.md) · [New TeX manuscript](../RH_new_proofs_v0_76.tex) · [Cumulative TeX manuscript](../RH_readable_reconstruction_v0_76.tex)
 
 ## Read and verify
 
 | Question | Source |
 | --- | --- |
-| Why are the two weighted series equal? | [Contraction at a split prime](../continuation_v75/definite.tex) · [Full Hecke calculation](../continuation_v75/hecke.tex) · [Induction and kernel](../continuation_v75/identity.tex) |
-| What allows the infinite series, boundary limits and uniform bound? | [Absolute convergence](../continuation_v75/convergence.tex) · [Boundary limits](../continuation_v75/boundary.tex) · [Invariant norm](../continuation_v75/bounds.tex) |
-| How does the argument preserve the finite tests? | [Finite Weil action from Poisson summation](../continuation_v75/weil.tex) · [Level and locality under Weil transport](../continuation_v75/admission.tex) |
-| Why does an equality at zero suffice after differentiation? | [Invariant derivatives and the heat equations](../continuation_v75/heat.tex) |
-| Where are the point comparison and the reproducing integral? | [Edition 0.74](../RH_reconstruction_progress_v0_74.md) |
-| What is still open? | [Original contracts](../continuation_v75/obligations.json) · [Current checkpoint](../CURRENT_CHECKPOINT_v0_75.json) · [Verification](../continuation_v75/validation.json) |
+| How do the analytic theta series become algebraic sections over the given number field? | [Short-section comparison](../continuation_v76/short.tex) · [Algebraic span](../continuation_v76/span.tex) |
+| Why does the integral cusp lattice span in every positive weight? | [One denominator across all frames](../continuation_v76/integral.tex) · [Full lattice](../continuation_v76/full.tex) |
+| Where do the rational coordinates of a theta lift come from? | [Base class-sum span](../continuation_v76/base.tex) · [Rationality and separating tests](../continuation_v76/ties.tex) · [Exact column hypotheses](../continuation_v76/column.tex) |
+| Which field works for all higher levels on a column? | [Geometric components](../continuation_v76/field.tex) · [Finite Weber request](../continuation_v76/weber.tex) |
+| Which analytic identity underlies the span? | [Edition 0.75, definite Siegel–Weil and the arithmetic kernel](../RH_reconstruction_progress_v0_75.md) |
+| What remains open? | [Whole contracts](../continuation_v76/obligations.json) · [Current checkpoint](../CURRENT_CHECKPOINT_v0_76.json) · [Verification](../continuation_v76/validation.json) |
 
 ~~~sh
-python3 continuation_v75/verify.py --formal-git formal_source
-pdflatex RH_new_proofs_v0_75.tex
-pdflatex RH_new_proofs_v0_75.tex
+python3 continuation_v76/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_76.tex
+pdflatex RH_new_proofs_v0_76.tex
 ~~~
 
 ## Reproduce the portable v0.58 files

@@ -1,0 +1,13 @@
+# Principal charts and component stabilizers
+
+Reviewed TeX SHA-256 `84c4211cae1b4b3b5f8aa12b3929f74c560eb9d872cfa31907be9ff843f99b5a`.
+
+**C76P1 and C76P2.** The principal atlas uses the integral period pairing on the actual lower datum and the section bases of D74U2. The sign of the imaginary embedding agrees with the choice of host root. The transferred bound compares readings on orthonormal flags over the same point. The two Hermitian metrics and the rigidification fix the relative scaling, and the squared *mean* norm of the theta generator is the scalar required for its change of frame. The powers and order of the CM labels have been retained.
+
+**C76P3 and C76P4.** Projectivity of the lattice permits an integral lift of the half-marking. Complementary coprime ideals make the two summands into a perfect dual pair modulo the integer level. On one prime of each split pair the marked vectors form a basis. The other local factor is forced by the unitary identity. The Cayley parameterization and weak approximation give simultaneous rational isometries even if the initially specified local matrices have eigenvalue minus one. Matching the dual half-marking determines the original marked component via the level pairing, which is precisely the component distinction needed for the span.
+
+**C76P5 and C76P6.** The identity cover has residual group and multiplier of order one. The coprime, odd half ideals, the integral half-trace generator and the lifted basis meet the fields of the original level tie. The signed and reversed letter order in the negative block uses the same Borel weight as the harmonic row action, including an empty block and the last entries. The comparison is in the specified finite degree over the given field.
+
+**C76P7.** A stabilizer congruent to one on one half at every level prime is congruent to one on the dual half via the inverse adjoint. This proves the full congruence on the shadow lattice because multiplication by the fractional ideal commutes with the normalized endomorphism. The shadow need not be globally identified with the original integral period lattice. Its finite projective module, unimodular alternating form and shared rational signature yield its own CM datum and adapted basis, exactly the starting point of the pinned principal-congruence vacuum calculation. The determinant bound uses all embeddings. The direct signed-coset description in the adapted basis and the squared theta multiplier fix the eigenvalue after taking an even number of rows. Thus the orbit extension has the required stabilizer invariance.
+
+The chapter constructs inputs for each supplied pinned lower row. It makes no existence assertion over the entire sequence of lower models.
