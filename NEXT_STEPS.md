@@ -44,7 +44,9 @@ The [reference series and its conjugation](FIRST_PASS_REFERENCE_PHASE.md) yield 
 
 The [integral Hecke operators](FIRST_PASS_HECKE_LATTICE.md) now split each fitted lattice by residual character. On each installed local block the characteristic-zero joint eigenspaces span, with an empty additional coefficient request. In a mixed block of two simple eigenlines, the integral matrix of one separating operator gives the exact local congruence length.
 
-**Next construction.** Produce the required compatible automorphic and Galois realizations after the character level. On the remaining mixed active pairs identify the good summands with the image of the original projection, or verify the resulting normalized determinant indices directly. The [two-projection formula](FIRST_PASS_PROJECTOR_LENGTH.md) already proves equality in smaller dimensions and describes equality of normalized lengths by minors on the other pairs. The field, level, reference phase and stored bases must continue to agree through export and retwisting. [Order of the first and second passes](continuation_v78/producer.tex#L218-L266)
+The [automorphic specialization](FIRST_PASS_CONGRUENCE_LENGTHS.md#realizing-a-request-on-the-constructed-first-pass) now realizes any finite coefficient request on this pass with the required residual semisimplicity and the same local readings.
+
+**Next construction.** On the realized localizations, compare the good spectral constituents with the image and kernel of the original row projection. This uses the geometric Galois comparison and the theta and type identifications on the same rows. Alternatively, prove the normalized determinant indices agree directly on the remaining mixed pairs. The [two-projection formula](FIRST_PASS_PROJECTOR_LENGTH.md) already proves equality in smaller dimensions and describes equality of normalized lengths by minors on the other pairs. The field, level, reference phase and stored bases must continue to agree through export and retwisting. [Order of the first and second passes](continuation_v78/producer.tex#L218-L266)
 
 | Open obligation | Next mathematical action | What closes the whole obligation |
 |---|---|---|
