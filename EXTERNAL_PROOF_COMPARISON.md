@@ -1,5 +1,16 @@
 # External proof comparisons for RH and Dirichlet GRH
 
+## Sources used for the all-row denominator and the marked period
+
+The 26 November comparison found the same public revisions of Adriazola’s reconstruction, the RH Lean Roadmap and the reading edition as in the preceding check. Adriazola’s status table distinguishes the manuscript’s remaining comparisons from its reconstruction of K1. None of the checked accounts supplies the quantitative positive-dimensional theta determinant or the strict ramified witness at our prescribed level. [Adriazola's status at the checked revision](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/9eefc08b0819728d4dd2ef0568b49a61251af111/docs/STATUS.md) · [Roadmap](https://github.com/rh-lean-roadmap/rh-lean-roadmap)
+
+| Primary input | Use on our selected data |
+|---|---|
+| [Lan's analytic and algebraic toroidal comparison](https://www.kwlan.org/articles/cpt-ana-alg.pdf) and [the fibrewise Cartier criterion](https://stacks.math.columbia.edu/tag/062Y) | The [all-row denominator proof](PEL_ALL_FRAME_DENOMINATORS.md) constructs a common model of the actual graph theta divisor and checks its generator on the original frames. |
+| The pinned archive's definite class-sum pairing, coefficient lattices and first-block level | The [marked-fibre identity](PERIOD_MARKED_FIBRE_PAIRING.md) removes the extra marked-prime pairing cost in entry 7 on every fitted definite layer. |
+| [Muić's integral nonvanishing method](https://arxiv.org/abs/1505.02263) and the archive's absolutely convergent return expansion | The [ramified-column argument](PERIOD_RAMIFIED_LEVEL_NONVANISHING.md) proves strict nonvanishing at one auxiliary refinement and gives an explicit sufficient criterion at the original level. |
+| [Hironaka's Hermitian representation densities](https://doi.org/10.2969/jmsj/05130553), the project's finite-field calculation and the archive’s frame disintegration | The [trace mass formula](SPECTRAL_TRACE_LATTICE_MASS.md) applies also to the split case. [Counting the kernels on the complement](SPECTRAL_COMPLEMENT_KERNEL_COUNTS.md) gives the signed finite estimate under the stated move comparison. |
+
 ## Current sources for the period and spectral estimates
 
 Adriazola's 25 November status points to §17.4.3 for the original K1 argument and §18.7 for the comparisons still needed in its manuscript. Rubinstein's zeta-specialized account gives an analytic formulation and explicitly leaves thirteen hypotheses for its main inequality. The RH Lean Roadmap and the original archive identify the exact mass, weight and determinant normalizations used below. [Adriazola’s reconstruction status](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/main/docs/STATUS.md) · [Rubinstein’s account](https://www.math.uwaterloo.ca/~mrubinst/alpoge_claude_grh/) · [RH Lean Roadmap](https://github.com/rh-lean-roadmap/rh-lean-roadmap)
