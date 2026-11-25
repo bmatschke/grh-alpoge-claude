@@ -1,0 +1,47 @@
+# The congruence length of an active row from two rational subspaces
+
+Fix a fitted first-pass state, an active coefficient place $w$ of residual characteristic $\ell$, and a row $j$. There are two calculations of the length in the [local comparison](FIRST_PASS_CONGRUENCE_LENGTHS.md). We give a formula for each in its original lattice. It proves their equality whenever the dimension $d_{j,w}$ is at most one. In larger dimension it also allows a comparison after interchanging the two spectral pieces in any local block.
+
+## One lattice
+
+Let $R$ be a discrete valuation ring with fraction field $F$, uniformizer $\pi$ and valuation $v(\pi)=1$. Let $\Lambda$ be a full lattice in a finite dimensional $F$-space $V$. Suppose $G,B\subseteq V$ are disjoint $F$-subspaces. Set $S=G+B$, $\Lambda_S=\Lambda\cap S$ and write $P:S\to G$ for projection along $B$. Then there are natural isomorphisms
+$$
+ \frac{G\cap(\Lambda+B)}{G\cap\Lambda}
+ \simeq \frac{\Lambda_S}{(\Lambda\cap G)\oplus(\Lambda\cap B)}
+ \simeq \frac{\Lambda_S+P\Lambda_S}{\Lambda_S}.
+$$
+Indeed $P\lambda\in G\cap(\Lambda+B)$ for $\lambda\in\Lambda_S$. Conversely, writing $g=\lambda+b$ with $g\in G$ gives $\lambda\in\Lambda_S$ and $P\lambda=g$. The class of $P\lambda$ vanishes modulo $\Lambda\cap G$ precisely when both $P\lambda$ and $\lambda-P\lambda$ are in $\Lambda_S$. This is the stated kernel, also for the map $\lambda\mapsto P\lambda\bmod\Lambda_S$. In particular $P$ and $1-P$ give isomorphic congruence modules. In the setting of a finite flat reduced local Hecke algebra with split semisimple generic algebra this is the congruence module of Tilouine and Urban, §2.1, for a decomposition into two factors. Their symmetry applies even if a factor contains several systems of eigenvalues. The direct proof above also applies inside a proper $S$. [Tilouine–Urban, §2.1, p. 8](https://arxiv.org/pdf/1811.11166#page=8) · [Local numerator and denominator][local]
+
+Take an $R$-basis of $\Lambda_S$. It exists because $\Lambda_S$ is a submodule of a finite free module over a DVR, and clearing denominators shows it spans $S$. In these coordinates let $P_{I,J}$ range over square minors of the matrix of $P$, including the empty minor with determinant $1$. Define
+$$
+ m_R(P)=-\min_{|I|=|J|}v(\det P_{I,J}),\qquad v(0)=+\infty .
+$$
+The matrix with columns $[\,1\mid P\,]$ generates $\Lambda_S+P\Lambda_S$ in the chosen basis. Its full-size minors are, up to sign, exactly the minors in the formula and possibly zeros. Thus the valuation of its determinant lattice is the minimum displayed. By Smith normal form, the index length of $\Lambda_S$ in this larger lattice is the opposite of that valuation. This proves the formula also for $S=0$. Equivalently, if $H_G,H_B$ are matrices of bases of the two saturated intersections $\Lambda\cap G,\Lambda\cap B$ in $\Lambda_S$, the same length is $v(\det[\,H_G\mid H_B\,])$. In particular it vanishes exactly when $P\Lambda_S\subseteq\Lambda_S$.
+
+## Applying the two calculations
+
+*Original row.* Use the source's level-form space over its number field $K$, with its level coefficient lattice $N$. Write $A$ for the inclusion of the selected subspace into these level coordinates and $p$ for the source's coordinate projection. The definite form and projector laws give $pA=1$. They identify $T=pN$ with the projected lattice and $C=\{z:Az\in N\}$ with the cut lattice. The second equality is the cut-lattice compatibility with the ambient level, where the original definition uses the full lattice of forms. Consequently $A$ identifies $T/C$ with the congruence module of $P=Ap$, with $G=\operatorname{im}A$ and $B=\ker p$. Both matrices are defined over $K$ before localization. In the source's coordinates $p$ includes the change from level forms to the good finite-type subspace and the projection there using its Gram matrix. This order also fixes the conjugation of the Gram coefficients when $w$ and its conjugate are distinct. [Definition of the level projection and cut][row] · [Left inverse and cut-lattice identities][cut] · [Transport to the rational family][family]
+
+Localize at $w$ and take a basis of $N_w$. Images commute with localization, as do kernels in the description of the cut. Hence the original target is $m_{\mathcal O_{K,w}}(P)/v_w(\ell)$. If the coefficients are further read in a DVR $R'$ above $w$, with the original basis extended, all nonzero minor valuations scale by $v_{R'}(\pi_w)$, the same factor as $v_w(\ell)$. This proves invariance of the normalized length, including for the coefficient embeddings used in this construction. It requires the extension of the lattice in question. [Coefficient embedding and normalized base change][change]
+
+*Localized row.* For each index $i$ over $(j,w)$, take the actual lattice $\Lambda_i$ over $O_i$ and the sums $G_i,B_i$ of its joint eigenspaces for good and complementary eigencharacters. They are disjoint. Distinct characters can be separated by polynomials in the Hecke operators after extending to the fraction field. Apply the first calculation inside $S_i=G_i+B_i$ and write $P_i$ for its projection. In particular the following is an exact finite test of the length identity for this realization:
+$$
+ \sum_{i\ {\rm over}\ (j,w)}
+ \frac{m_{O_i}(P_i)}{v_{O_i}(\ell)}
+ =
+ \frac{m_{\mathcal O_{K,w}}(P)}{v_w(\ell)} .
+$$
+The saturated lattices in this test are essential. A basis of each eigenspace made from arbitrarily scaled eigenvectors need not give a basis of its intersection with $\Lambda_i$. The test uses only the unordered pair of subspaces on each block. It applies even if the proof of eigenspace spanning on all of $\Lambda_i\otimes F_i$ has yet to be supplied. [Actual local modules][local] · [Sum of local lengths][localnorm]
+
+If $d_{j,w}\leq1$, the original $P$ on the level-form space of that dimension is either zero or the identity. Its congruence module is zero. The sum of the ranks of all local lattices is $d_{j,w}$. Each local $S_i$ has dimension at most one and hence one of $G_i,B_i$ is zero. All terms on the left vanish as well. This settles the active comparison in dimensions zero and one, for every realization of the fixed state. It uses no character classification. In dimension two with two distinct eigenlines in a single block and one good line, the local answer is $v(\det[u\,v])/v(\ell)$ for primitive vectors $u,v$ on those lines in an integral basis. Exchanging the good and complementary labels leaves this length unchanged. [Ranks of the actual local blocks](FIRST_PASS_CONGRUENCE_LENGTHS.md)
+
+There is also a sufficient structural test in any dimension. Suppose in a common coefficient DVR the completed original lattice is the direct sum of the transported local lattices, the $S_i$ are the whole blocks, and the original projection restricts on each block to $P_i$ or $1-P_i$. The middle quotient in the first formula then splits as the direct sum of the local quotients, with the unordered intersections on each block. Length additivity and the ramification calculation prove the identity. On the general pinned route Hecke stability supplies integral splitting by residual blocks, and the spectral comparison identifies which pieces occur in each block. The determinant calculation specifies what must agree if one verifies lengths directly on a fitted family. The rank bound alone does not give that agreement for mixed higher-dimensional blocks. [Spectral comparison hypotheses][spectral] · [Integral splitting and the direct sum][sum]
+
+[local]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/LevelLetterCocycles/DataN.lean#L205-L220
+[row]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/RowLat.lean#L131-L155
+[cut]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/LiftLatLemmas.lean#L265-L312
+[family]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/RationalFormLengthEqDefiniteFamily.lean#L76-L153
+[change]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/SumLocalCongruenceLengthEqRationalLength.lean#L173-L200
+[localnorm]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/SumLocalCongruenceLengthEqRationalLength.lean#L58-L78
+[spectral]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/GoodPartProjectorSpectralAtEveryLocalisation.lean#L17-L29
+[sum]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/SumLocalCongruenceLengthEqRationalLength.lean#L279-L314
