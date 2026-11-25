@@ -111,6 +111,35 @@ $$
 $$
 The middle inequality follows by taking the determinant of the integral matrix $|G|$ times the inverse semilocal Gram. The last bound is the native group-order estimate on the selected size data and the identification of the row group; it applies when $s=1$, uniformly over the tuples. Thus the quotient-Gram contribution to (7) is controlled at the required scale on the constructed sharp row. Its remaining sufficient condition is (5) with $A_1,D_1,I_1$ and the sharp multiplicities. It is possible to retain the nonpositive Gram defect when testing this sharper version. [Test dual and quotient][testdual] · [Metric normalization][levelnorm] · [Group order at denominator one][onebudget]
 
+### Removing the spherical eigenvalue from the archimedean average
+
+Under the convergent-lift and standard reference-tuple hypotheses of B5.07y, let $r=k+m-1$, $n=r+t$ and $f=[E^+:\mathbb Q]$. For each infinite coefficient place $v$ take the representative $\tau$ agreeing with the distinguished embedding on the imaginary quadratic field $K_d$. For the reference lift in layer $j$ set
+$$
+ C_{j,v}=M d_{\mathrm{coeff}}\,
+   \frac{\prod_\rho d_\rho H_\rho J_\rho}{d_Od_S}.
+$$
+Here $M$ is the standard definite genus mass, $d_{\mathrm{coeff}}$ is the dimension of the definite coefficient representation at this layer, $d_\rho$ is a lowest-type dimension, $H_\rho$ is the product of its two hook products, and $J_\rho$ is its real integral in the given measure. The two unramified and marked denominator products are $d_O,d_S$. Each factor is independent of the varying spherical system $c$ at fixed layer and embedding. The symbol $d_c$ in the source denotes the coefficient dimension. Its definition is given before unfolding. The exact Rallis calculation has $l_c=C_{j,v}|\mathcal E_c|$. At each host prime $P$ each of the at most $r$ Euler arguments $z$ has $|z|\le (NP)^{-2}\le 1/4$. Consequently $-|z|\le-\log|1-z|\le 2|z|$, and $\sum_P(NP)^{-2}\le 2f$. Thus $-2rf\le\log|\mathcal E_c|\le4rf$ for every system. [Normalization and two hooks][rall0] · [Exact scalar and its Euler product][rall1]
+
+The spherical operators have an orthogonal eigenbasis on the full cuspidal target. The inequalities $C_{j,v}e^{-2rf}I\le TT^*\le C_{j,v}e^{4rf}I$ therefore hold on the entire target. Compress to the range of the retained orthogonal projector $e$. For $S=eT$, $\langle SS^*z,z\rangle=\langle TT^*z,z\rangle$ for every $ez=z$, including sums of distinct spherical eigenvectors. On $(\ker S)^\perp$, the nonzero squared singular values of $S$ lie in the same interval. At $v_0$ the active target identity for the primitive row gives the interval for $\lambda$. At the other embeddings the rational column supplied on an occurring reference block gives the ratio of these squared norms and belongs to the requisite kernel complement. When the stored representative is the conjugate of $\tau$, conjugating both the target pairing and the source class-sum pairing preserves the real ratio. [Actual kernel complement and rational numerator](PERIOD_OFF_BASE_SCALAR.md) · [Conjugate embeddings][rall2]
+
+Every contributing sharp block also occurs on the reference side of the linked selection used here. The rational level inclusion at each character level is obtained from inclusion of the same class forms, projecting to the same good quotient. It preserves the simultaneous Hecke part. Hence a nonzero sharp part embeds into the corresponding principal good part. The finite group preserves that part because it commutes with the defining Hecke action. Some good irreducible occurs there. On each such irreducible the base subgroup character has multiplicity one, so the base projector gives a nonzero vector in the same part. The reference layer multiplicity identity and the rational-column argument give the required positive reference probe at every embedding. Finally the two levels have the same assigned $\lambda$ for this part. A part absent at both levels has zero weight in either determinant. [Level inclusion and good representations](PERIOD_SHARP_ROW_TRANSFER.md) · [Multiplicity and rational columns](continuation_v73/reading.tex#L3-L128) · [Agreement across levels][sharp]
+
+Since $\sum_\alpha m_{i,\alpha}/D_i=1$, both levels obey
+$$
+ -2mrf\ \le A_i-\sum_j\langle\log C_{j,v}\rangle_\infty
+                \le 4mrf,\qquad |A_1-A_0|\le6mrf.                  \tag{9}
+$$
+The error is absorbed by the family allowance: $r\le n_*\le b$, $m,L\ge1$, and $B_0=fmbL$ in these coordinates. Thus the open estimate after (8) involves a common explicit archimedean product, the selected finite ideal at the sharp level, and the two original signed main terms. An upper bound on the reference Euler factors and changing spectral multiplicities at infinity introduce no further input. Equations (8) and (9) do not bound the individual ideal exponents.
+
+In particular write $C_\infty=\sum_j\langle\log C_{j,v}\rangle_\infty$. It is sufficient to prove, on the constructed family with one cutoff,
+$$
+ C_\infty+\frac{\log N_F J_1}{D_1[F:\mathbb Q]}
+       -\frac{E_{Q,1}}{D_1}
+       -2F_*-\sum_{j,\rho}\beta_jw_{j\rho}\log\Omega
+           \ \le\ C\,mL(B_0+N_c).
+$$
+Here $F=K^{\bar{}}$ and $J_1$ is the ideal defined above. Equations (8) and (9) restore the discarded Gram and Euler terms within a uniform increase of $C$. Discarding the negative defect gives a stronger sufficient criterion. This final inequality is an open arithmetic estimate.
+
 Uniform boundedness of the positive real ratios alone does not bound these selected valuations. For example take $K=\mathbb Q(i)$, one one-dimensional target, identity source forms, target metric one, and the integral maps $\theta_{t_0}=p^n+1$, $\theta_t=p^n$ for a fixed rational prime $p$. The relative scalar is $(p^n/(p^n+1))^2$, lying between $1/4$ and $1$ at both complex embeddings, whereas its valuation at any $w$ above $p$ is $2ne_w$. This tests the inference from an archimedean ratio alone. The Rallis inner product theorem can give analytic formulas for the lift norms after identifying vectors, measures and local data, but that formula alone does not establish (5). The original geometric covolume and two-run cut estimates remain a separate sufficient route to the same reference bound. The quantitative step still needed is a uniform estimate on the actual family, either (7) directly or a reference estimate such as (5) together with a justified passage to the sharp level. [Rallis formula](https://arxiv.org/abs/1207.4709) · [Original two-run route][global]
 
 [data]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L8223-L8275
@@ -131,3 +160,7 @@ Uniform boundedness of the positive real ratios alone does not bound these selec
 [testdual]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/RowLatLemmas.lean#L22-L74
 [levelnorm]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/GoodPartHermitianSpec.lean#L134-L145
 [onebudget]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/DivisibilityConstruction/RBLam.lean#L116-L135
+
+[rall0]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L32286-L32337
+[rall1]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L32376-L32410
+[rall2]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L32690-L32718
