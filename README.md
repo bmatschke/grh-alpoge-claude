@@ -1,6 +1,10 @@
+**Current proof update.** Three of the nine shared obligations in edition 0.90 now have proofs on the original selected families. [Why one choice supplies the local certificate and the next theta lift](LOCAL_SELECTED_FAMILY.md) · [The base rows on that same choice](SELECTED_BASE_ROWS.md) · [Six remaining obligations](SELECTED_FAMILY_CHECKPOINT.json) · [Collected proofs (PDF)](SELECTED_FAMILY_SUPPLEMENT.pdf)
+
+The [base-change blocks](LOCAL_BASE_CHANGE_BLOCKS.md), [semisimple reductions](LOCAL_RESIDUAL_REPRESENTATIONS.md), [parameter subspaces](LOCAL_PARAMETER_SUBSPACES.md) and [prescribed tame character](LOCAL_TAME_CHARACTER.md) describe the arithmetic at an individual member. Constructing sufficiently large members of the common family remains open.
+
 Start with [Why a chain of theta lifts can bound primes](PROOF_IDEA.md) for the mathematical idea, its classical sources and the remaining period comparison.
 
-**Latest proof update.** The [local Hecke construction](LOCAL_HECKE_SPECIALIZATION.md) and the [original automorphic specialization](LOCAL_AUTOMORPHIC_SPECIALIZATION.md) are proved for one given compatible family. The [multiplicity formula](LOCAL_AUTOMORPHIC_POINTS.md) identifies the contributing forms. [Ray class characters](LOCAL_RECIPROCITY.md) supply the prescribed inertia when auxiliary primes can be chosen. Nine whole obligations remain open. [Read the collected proofs (PDF)](LOCAL_SPECIALIZATION_SUPPLEMENT.pdf)
+**Earlier local specialization update.** The [local Hecke construction](LOCAL_HECKE_SPECIALIZATION.md) and the [original automorphic specialization](LOCAL_AUTOMORPHIC_SPECIALIZATION.md) are proved for one given compatible family. The [multiplicity formula](LOCAL_AUTOMORPHIC_POINTS.md) identifies the contributing forms. [Ray class characters](LOCAL_RECIPROCITY.md) supply the prescribed inertia when auxiliary primes can be chosen. That update retained the nine obligations of edition 0.90. [Read the collected proofs (PDF)](LOCAL_SPECIALIZATION_SUPPLEMENT.pdf)
 
 **Alpöge’s remark.** [Reading Alpöge’s remark against the proof](ALPOGE_REMARK_GUIDE.md) records two completed local Hecke inputs, the exact CM period and unitary mass calculations, and a weaker sufficient estimate for period integrality. [Collected proofs (PDF)](ALPOGE_REMARK_SUPPLEMENT.pdf)
 

@@ -10,13 +10,14 @@ For a nonzero integer $a$, the total logarithmic divisibility $\sum_p v_p(a)\log
 
 What the comparison has to deliver is quite specific. For each target character, the analytic reduction asks for a one-sided estimate for a centered, smoothed prime sum on arbitrarily late windows $[Y,Y^{3/2}]$. A zero to the right of the critical line would force a violation on every sufficiently late such window. Thus the arithmetic work can concentrate on producing good windows. The denominator estimate limits how much of the accumulated divisibility is lost to denominators. The period comparison allows estimates for sizes and mutual angles in a Hilbert space to be used on the integral maps that earned that divisibility. [Analytic reduction and window criterion](RH_GRH_reconstruction_roadmap_v1_2026-11-23.txt) · [Period maps in the final Gram calculation, GFA7](global_assembly/main.tex)
 
-## Where the nine open obligations fit
+## The six remaining obligations
+
+The [selected-family proof](LOCAL_SELECTED_FAMILY.md) identifies the local specialization and the second-layer selector on the original family. The [base-row proof](SELECTED_BASE_ROWS.md) verifies the third completed obligation. All six remaining contracts occur on both the RH and the unrestricted Dirichlet-GRH routes. [Dependency inventory](SELECTED_FAMILY_CHECKPOINT.json)
 
 | Mathematical job | Open entries in the repository |
 |---|---|
 | Define the base theta maps over the right field and identify their geometric and automorphic realizations at the required levels. | `BASE_THETA_RATIONAL_TESTS`, `BASE_THETA_READINGS` |
-| Produce the level-zero rows for the chosen Hecke summand, with their admissibility and separation of types. | `SLR_BASE_ROWS_PRODUCER` |
-| Construct a single family on the required windows, realize its local Hecke and integral Galois data, and make the next layer use compatible columns, coefficient identifications and real models. Each choice must serve the other arguments that use it. | `DESIGN_CHOICES_COMMON`, `LOCAL_NBUILT_COMMON`, `SECOND_LAYER_COMPATIBLE_SELECTION` |
+| Construct members of the same arithmetic and geometric family at the required scales. The local comparison and the second-layer columns can then be read from each selected bundle. | `DESIGN_CHOICES_COMMON` |
 | Identify the integral period maps with their complex realizations and bound their heights. Control the discarded fraction of the ambient dimension. Bound the diagonal and mixed spectral Gram blocks with the required rates throughout the family. These are three separate estimates. | `GLOBAL_PERIOD_HEIGHT`, `GLOBAL_RETAINED_DEFECT`, `GLOBAL_SPECTRAL` |
 
 ## Local Bessel uniqueness has a direct citation
