@@ -46,3 +46,21 @@ $$
 Consequently the row test holds **if and only if** $\alpha_{t(j)}/\alpha_{t(b)}\in k^\times$ for every $d_{bj}\ne0$. Necessity follows even when the rational tests eventually used on $E$ differ from $\Psi$, by the basis criterion at the start of this note. Sufficiency follows by taking coordinates in the $y_b$ and extending them across a complement. The result concerns the true scalar multiples of the columns, so changing their individual $k$-basis conventions does not affect descent.
 
 Join two distinct tuple labels by an edge when they occur together as $t(j),t(b)$ in the preceding test. It suffices to compare the scalars on a spanning tree of each connected component. Products and inverses inside $k^\times$ give every other required edge ratio. A single active tuple needs no scalar comparison. If the nonzero tuple images form a direct sum across tuples, choose the column basis in each summand and no comparison occurs. Three active tuples joined in one component require at most two comparisons. Pairwise intersections alone do not justify omitting an edge. For example, in dimension two the rational columns $(1,0),(0,1),(1,1)$ have pairwise distinct lines with zero intersection, but the third column has nonzero coefficients along both pivots. This calculation is available when normalized finite evaluations and injectivity on the joint image have been proved. It does not assume that the actual tuple images are independent. [Actual untwisted index set](UNTWISTED_BOTTOM_ROW.md) · [Square and bottom constants](ROW_SQUARE_RATIOS.md) · [Period-to-jet identity](ROW_PERIOD_JET_FORMULA.md)
+
+## What remains if a period misses part of the image?
+
+Let $P:E\to\mathbf C^N$ be a common complex-linear period map on the actual bottom target. Let $y_1,\ldots,y_s$ be the images of rational bases for all the allowed tuples. Suppose the formula and the required tuple comparisons give $P(y_j)\in k^N$, after a single nonzero rescaling of $P$. More generally it suffices that these columns have coordinates over $k$ in some complex basis of their image chosen from the columns. The preceding ratio calculation decides this latter condition using only the normalized finite columns, without assuming $P$ is injective. We can then isolate the exact additional descent question even when $P$ has a kernel.
+
+Choose pivot indices $B$ for the observed columns $P(y_b)$ and solve a nonzero minor to write $P(y_j)=\sum_{b\in B}a_{bj}P(y_b)$ with $a_{bj}\in k$. For each nonpivot define the actual vector
+$$
+ z_j=y_j-\sum_{b\in B}a_{bj}y_b\quad\in\ker P .
+$$
+The spans of the original images decompose over both fields:
+$$
+ V_k=\bigoplus_{b\in B}k y_b\ \oplus\ \operatorname{span}_k\{z_j:j\notin B\},
+ \qquad
+ V_{\mathbf C}=\bigoplus_{b\in B}\mathbf C y_b\ \oplus\ \operatorname{span}_{\mathbf C}\{z_j:j\notin B\}.
+$$
+Indeed the change of generators subtracts only $k$-multiples of pivots. Applying $P$ to a relation forces every pivot coefficient to be zero by independence of the observed pivots. In particular the second summand on the right is exactly $V_{\mathbf C}\cap\ker P$. Thus the original row test is equivalent to equality of the dimensions of the two residual spans over their respective fields. A residual basis made of actual $z_j$ gives, together with the $y_b$, coordinates taking values in $k$ on the original images. Extend that basis to the entire bottom target to obtain separating tests there.
+
+This gives a concrete sufficient check on any individual realization. If an independent upper bound on the dimension of the joint image equals the rank of a minor of the observed columns, every residual is zero and the joint image descends. A nonzero residual need only satisfy the same basis criterion within the smaller space $V_{\mathbf C}\cap\ker P$. When all observed columns vanish, the list of residuals is the original list. The computation claims no rank equality for a particular Hida datum. The [common real test](ROW_COMMON_REAL_TEST.md) ensures that changing the real test alone cannot detect a residual missed by the whole finite catalogue at the selected pair. [Normalization required of the actual periods](ROW_PERIOD_JET_FORMULA.md)
