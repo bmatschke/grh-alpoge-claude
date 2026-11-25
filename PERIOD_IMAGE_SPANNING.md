@@ -2,6 +2,8 @@
 
 The slope comparison asks how much of the common row space the arithmetic period maps can reach after some of their source directions are discarded. This question has an answer in terms of subspaces alone. The answer gives a weaker sufficient target for this part of the proof. Establishing the required inequality on the actual family remains open. [Gram-to-slope argument](gram_frame/gram_frame_section.tex#L44-L111) · [The stronger Bessel identity](continuation_v90/intertwiners.tex#L74-L95)
 
+A subsequent [mean-slope and projection estimate](PERIOD_LATTICE_LOSS.md) bounds the same discrepancy by one sum of overlaps and allows finite index losses in the arithmetic lattices.
+
 ## What survives a change of coordinates
 
 Fix the complex embedding used in the comparison. Write $b_i:V_i\to C$ for the complexifications of the actual rational period maps into the common dual row space. On the automorphic side write $g_i=P_0A_iJ_i:W_i\to H_0$. Here $A_i$ is the normalized full period operator, $J_i$ includes the retained source isometrically, and $P_0$ is the orthogonal projection onto the retained target. The corresponding source dimensions are equal.

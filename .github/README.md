@@ -1,5 +1,7 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
+**Latest proof update.** [Reading Alpöge’s remark against the proof](../ALPOGE_REMARK_GUIDE.md) records two completed local Hecke inputs, the exact CM period and unitary mass calculations, and a weaker sufficient estimate for period integrality. [Collected proofs (PDF)](../ALPOGE_REMARK_SUPPLEMENT.pdf)
+
 Start with [Why a chain of theta lifts can bound primes](../PROOF_IDEA.md). It follows the argument from an inert prime to the critical line. The [mathematical guide](../MATHEMATICAL_GUIDE.md) gives detailed matches to published theorems.
 
 Edition 0.90 identifies the three remaining classical real-representation results needed to compare periods. It proves that the two coordinate descriptions agree on each sufficiently late selected bundle. The residual arithmetic question is whether three spaces of matrices have the required dimensions. Nine whole obligations remain, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_90.md) · [New proofs (PDF)](../RH_new_proofs_v0_90.pdf) · [Cumulative manuscript](../RH_readable_reconstruction_v0_90.tex)
