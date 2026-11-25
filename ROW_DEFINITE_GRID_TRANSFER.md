@@ -1,0 +1,60 @@
+# The compact comparison on the last column of the grid
+
+Let $m\ge 1$, $0\le i<m$ and $j=m-1$. Write $A=V_{i+1,m}$, $A'=V_{i,m-1}$ for the intermediate spaces and $U=V_{i,m}, U'=V_{i+1,m-1}$ for the exterior spaces. The two routes have common target $X=U\oplus U'$ in the square convention. The model signatures give $p=\lfloor(m-j-1)/2\rfloor=0$ and $q=\lfloor(m-j)/2\rfloor=0$. Both intermediate adelic quotients are compact. We prove the transfer of the compact model comparison to these two route integrals, with a single choice of real matching relation for all tuples. [Signatures on the realized triple][mk-sig]
+
+## The scalar on the two presentations of the model
+
+Fix a tuple $t$, one admissible choice of quotient measures and fundamental domains, and the two Weil actions with the square's splitting characters. Use their Darboux readings and common local quotient maps. The [definite model comparison](ROW_DEFINITE_THETA_COMPARISON.md) gives its unique scalar. Denote it by $c_{\rm mod}\ne0$. Its hypothesis on a pair of model tests is equality of their polynomial tensor images, with the second test in $S^\circ$. The global square presentation uses maps $p_A,p_B$ to a common module $\Pi$. For this presentation there is a scalar $s\ne0$ such that $p_AF=p_BF_0$ implies that the Darboux readings of $F$ and $sF_0$ are polynomially matched whenever the second reading belongs to $S^\circ$. In the pin the images in $\Pi\times\Pi$ of model-matched polynomial pairs form an invariant linear relation. The two zero-kernel identifications make its intersections with the coordinate axes zero, and its projection onto the first factor is surjective. Its graph gives a nonzero endomorphism of an irreducible module with scalar commutant. Subtracting a matched lift then gives the required polynomial match for the specified $F,F_0$. This step uses the local Howe and split general-linear quotient identifications, including Mínguez's correspondence in the general comparison of presentations. [Exact compact predicate][mk-pol] · [Graph and its kernel identifications][mk-graph] · [Polynomial equality before passage to limits][mk-scal]
+
+Every small algebraic square test $F'$ has a representative $F_0$ whose model reading belongs to $S^\circ$, with $F'-F_0$ in the span of finite source-translation differences. The [row operations on a single matrix ball](ROW_DEFINITE_LOCAL_QUOTIENTS.md#full-rank-representatives-at-the-prescribed-split-place) produce the representative. At each step the new function minus its nonzero degree times the old one is a sum of source-translation differences. Each such difference has zero $p_B$-image. Its integrated theta kernel is also zero at every target argument by right invariance of quotient Haar measure, since all terms are integrable on the compact quotient. Hence $p_BF'=p_BF_0$ and $I_B(F')=I_B(F_0)$. The model Haar measures are the pushforwards of the chosen square measures and the domains are the corresponding images, so the change of variables has factor one. Applying the compact identity on the preceding polynomial pair proves, as an equality of functions on the whole target,
+$$
+p_AF=p_BF'\quad\Longrightarrow\quad I_A(F)=c_0 I_B(F'),\qquad c_0=s\,c_{\rm mod}.
+$$
+Here $I_A,I_B$ denote the square-model integrals before evaluation at the exterior endpoints. The general source theorem uses a regularizing combination off the compact column. The displayed implication on this column uses only the compact model comparison, the quotient identifications and the good-place representative above. [Full-rank representative][mk-coinv] · [Exact measure and domain transport][mk-haar] · [Product of comparison scalars][mk-prod]
+
+## The fixed real relation and the finite scalar
+
+Fix the four grid frames before choosing $t$. The two exterior polynomial factors on each route map onto the corresponding Fock polynomial space by maps $\iota_A,\iota_B$. On simple tensors the map sends $P\otimes Q$ to the product of $P$ and the adjoint-coordinate transform of $Q$ in their two variable blocks, with the appropriate oriented transform for each route. The real exponents are unchanged by the finite twist. The square real matching theorem gives a single nonzero space $P_\infty$ and surjections $q_A,q_B$ on the two Fock polynomial spaces for these exponents. Install the relation
+$$
+\mathcal R_i=\{(a,b):q_A\iota_A a=q_B\iota_B b\}.
+$$
+Its projections are onto, and it is proper because $P_\infty\ne0$. The row real vacua stay as chosen. The same relation works for every $t$. [Route polynomial maps][mk-iota] · [Real quotient before the tuple; tensor decomposition after it][mk-decomp] · [Construction on the realized frames][mk-rel]
+
+For the fixed tuple the full square maps factor on pure data as
+$$
+p_A(F_A(f,P))=e(q_A P\otimes r_A f),\qquad
+p_B(F_B(f',P'))=e(q_B P'\otimes r_B f'),
+$$
+where $e:P_\infty\otimes P_{f,t}\overset{\sim}{\longrightarrow}\Pi$. Choose one $P_0$ with $x=q_AP_0\ne0$. The finite-flip calculation on the realized square gives one polynomial $P'_0$ for which
+$$
+x\otimes r_A f=q_BP'_0\otimes r_B f'
+$$
+for every allowed pair of finite seeds $f,f'$ at those vacua, including every allowed choice of depths and natural tests. Specifically, the two seeds have equal images under the local finite projections. Surjectivity of the small real projection lifts the real image for $P_0$ to a single $P'_0$, before varying those finite seeds. Contract with any $\ell\in P_\infty^*$ satisfying $\ell(x)=1$ and put $\lambda=\ell(q_BP'_0)$. Thus $r_Af=\lambda r_Bf'$ for all the seeds. For every row-matched pair $\Theta,\Theta'$, the relation $\mathcal R_i$ now gives $p_A(\operatorname{datum}_A\Theta)=\lambda p_B(\operatorname{datum}_B\Theta')$. Apply the compact comparison to $\operatorname{datum}_A\Theta$ and $\lambda\operatorname{datum}_B\Theta'$. This argument also applies if $\lambda=0$. [Fixed polynomial partner and finite matching][mk-core] · [Tensor contraction and application to actual tests][mk-lambda]
+
+At $h=\operatorname{blk}(g,g_1)$ both square-model kernels acquire the same endpoint factor $\xi_V(g)\xi_{V_1,t}(g_1)$. Multiplying the function identity by this factor gives $I_b=c_{i,j,t}I_s(1)$ at every pair of exterior endpoints, where
+$$
+                         c_{i,j,t}=\lambda s\,c_{\rm mod}.
+$$
+Any admissible volume choice for this tuple gives the same measure at each vertex in range. Rational left invariance identifies the integrals on different fundamental domains. On the compact small quotient every finite combination $z$ gives $I_s(z)=d(z)I_s(1)$, where $d(z)$ is the sum of its coefficients. This proves the full `IsSquareConst` identity including degree zero. [Common endpoint characters][mk-block] · [Independence of the admissible volume choice][mk-vol] · [Row quantifiers][mk-row]
+
+For nonvanishing use a big-route witness at the prescribed finite levels and at actual block endpoints, as in [the nonzero matched-test construction](ROW_MATCHED_SQUARE_TESTS.md). The compact starting nonzero vector is supplied by `NonZeroAn`. In the finite-place propagation argument, replacing a polynomial finite factor by another of the same quotient image preserves its integral: choose a common primed lift with full rank at the designated good place and apply the compact polynomial identity twice. The argument also uses the unramified vacuum's generation of the local quotient, flip reachability at marked places, continuity of the integrated theta kernel and strong approximation for the special unitary group at the selected split place. These inputs give an allowed big seed and polynomial with $I_b\ne0$ on the block subgroup; surjectivity of the first projection of $\mathcal R_i$ supplies its small polynomial partner for the same flip. On this pair, $I_b=\lambda s c_{\rm mod}I_s(1)\ne0$, so both $I_s(1)$ and $\lambda$ are nonzero, and $c_{i,j,t}=I_b/I_s(1)$. Nonvanishing of an unrestricted theta integral alone would leave the restriction to the prescribed tests and endpoints to be proved. [Equal local images][mk-same] · [Vacuum and marked-place propagation][mk-prop] · [Block endpoints and realized flips][mk-wit] · [Forming the matched pair][mk-nz]
+
+[mk-sig]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/IsSeesawHermitianTripleGridSquareOfStanding.lean#L56-L102
+[mk-pol]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/CTSmallCone.lean#L106-L109
+[mk-graph]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/DoublingIntegralFactorisation.lean#L113-L174
+[mk-scal]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/DoublingIntegralFactorisation.lean#L175-L190
+[mk-coinv]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/ConjUInvMemGfC.lean#L233-L251
+[mk-haar]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/ConjUMeasurableEmbedding.lean#L59-L71
+[mk-prod]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/ThetaIntegralsOfMinguez.lean#L33-L57
+[mk-iota]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/FockVectorProductMulPolynomials.lean#L196-L230
+[mk-decomp]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Statements/HeckeThetaIntegrals/ThetaIntegralsAgree.lean#L23-L34
+[mk-rel]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/PolynomialRouteSubmodule.lean#L349-L374
+[mk-core]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/PolynomialRouteSubmodule.lean#L293-L309
+[mk-lambda]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/PolynomialRouteSubmodule.lean#L379-L405
+[mk-block]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/Zact.lean#L30-L49
+[mk-vol]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/VolIntegrableOnIff.lean#L14-L28
+[mk-row]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/ExistsNotRelZero.lean#L199-L222
+[mk-same]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsINeZeroKind.lean#L100-L122
+[mk-prop]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsINeZeroKind.lean#L255-L281
+[mk-wit]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsMatchedFlipThetaIntegral.lean#L39-L99
+[mk-nz]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ConstK.lean#L27-L37

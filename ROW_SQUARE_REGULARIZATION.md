@@ -31,6 +31,8 @@ Fix $h$. On a unitary Siegel set write the intermediate representative as $A(s)\
 
 In the square model the translated kernel has exactly the norm of this primed theta function. The endpoint character has absolute value one and is independent of the integration variable. Continuity and finite quotient volume therefore make $R_z f$ absolutely integrable. This supplies the fresh-place hypothesis for every realized input in the square law, independently of the proportionality of the two integrated kernels. The latter still requires their comparison on matched real and finite tests. [Norm comparison on the actual routes][dc-norm] · [Continuity and finite volume][dc-vol]
 
+The [two-variable estimate and path comparison](ROW_SQUARE_PATH_FLIP.md#integrating-one-square-against-a-cusp-form) track the same translate as the entering endpoint varies. The resulting polynomial bound justifies integrating the pointwise law against a cusp form.
+
 [dc-place]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RegularisingTranslateCombination.lean#L213-L229
 [dc-pair]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/ThetaLifts/FrameEstimates/InitialPairs/TriplePairHolds.lean#L21-L27
 [dc-vac]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RegularisingTranslateCombination.lean#L142-L169
