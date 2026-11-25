@@ -5,7 +5,7 @@ $$
  L_{\rm opp}(t,\Phi,y)
    =z_t\left(\prod_{i,j<m}c_{ij,t}\right)\theta_\chi(\Phi,D_ty).
 $$
-Here the two sides are actual functions on the final group. This direction of the identity also holds when a square constant vanishes. The normalized inverse identity used later requires all the constants to be nonzero. Existence of the pointwise square comparisons on the required grid remains a separate question. [Pointwise and integrated statements][sq] · [Initial path and phase][start] · [Original inverse formulation][inv]
+Here the two sides are actual functions on the final group. This direction of the identity also holds when a square constant vanishes. The normalized inverse identity used later requires all the constants to be nonzero. The [tower induction](ROW_TOWER_INDUCTION.md) supplies the pointwise comparisons, nonzero witnesses and invertible constants on every prescribed square under its stated inputs. [Pointwise and integrated statements][sq] · [Initial path and phase][start] · [Original inverse formulation][inv]
 
 ## Integrating one square against a cusp form
 
