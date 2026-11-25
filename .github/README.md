@@ -1,11 +1,12 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Start with the [mathematical guide](../MATHEMATICAL_GUIDE.md) for the role of theta periods and divisibility, the published theorems used in the argument, and the arithmetic comparisons that remain open.
+Start with [Why a chain of theta lifts can bound primes](../PROOF_IDEA.md). It follows the argument from an inert prime to the critical line. The [mathematical guide](../MATHEMATICAL_GUIDE.md) gives detailed matches to published theorems.
 
 Edition 0.90 identifies the three remaining classical real-representation results needed to compare periods. It proves that the two coordinate descriptions agree on each sufficiently late selected bundle. The residual arithmetic question is whether three spaces of matrices have the required dimensions. Nine whole obligations remain, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_90.md) · [New proofs (PDF)](../RH_new_proofs_v0_90.pdf) · [Cumulative manuscript](../RH_readable_reconstruction_v0_90.tex)
 
 | Question | Where to read |
 | --- | --- |
+| How much period information does the slope estimate use? | [Images, quantitative spanning and the slope bound](../PERIOD_IMAGE_SPANNING.md) |
 | What does the remaining Bessel comparison say? | [Three linear systems on the actual row space](../continuation_v90/intertwiners.tex) |
 | Which classical results put the periods in the same spaces? | [Discrete series, compact types and smooth globalization](../RH_reconstruction_progress_v0_90.md#three-classical-inputs) · [The selected realization](../continuation_v90/join.tex) |
 | Which growth and finiteness results can be cited? | [Rapid decay and finite dimensionality at fixed type](../continuation_v89/decay.tex) |

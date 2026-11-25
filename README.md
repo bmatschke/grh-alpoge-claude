@@ -1,3 +1,5 @@
+Start with [Why a chain of theta lifts can bound primes](PROOF_IDEA.md) for the mathematical idea, its classical sources and the remaining period comparison.
+
 **Current edition 0.90.** [Reading guide](RH_reconstruction_progress_v0_90.md) · [New proofs (PDF)](RH_new_proofs_v0_90.pdf) · [Current checkpoint](CURRENT_CHECKPOINT_v0_90.json) · [Mathematical guide](MATHEMATICAL_GUIDE.md)
 
 # RH and unrestricted Dirichlet-GRH human reconstruction — v0.57
