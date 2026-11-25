@@ -12,6 +12,8 @@ The [labelled first-pass state](FIRST_PASS_LABELLED_STATE.md) retains the marked
 
 The [definite theta series](FIRST_PASS_THETA_SERIES.md) use the same complex readings as those forms and the [same tame character](FIRST_PASS_SERIES_CHARACTERS.md) at each marked prime across the coefficient places. The class-sum identity applies to vectors whose analytic images lie in the prescribed row space. The [moduli-point calculation](FIRST_PASS_MODULI_POINTS.md) then identifies the full integral lattice and gives the scalar and kernel multiplicity of each good split Hecke correspondence. Together these give the second and third intermediate levels on the first pass.
 
+At the [active coefficient places](FIRST_PASS_ACTIVE_CHARACTERS.md) the extra twist is trivial, and the old and new definite levels and their characters agree. The remaining theta comparison reduces to [normalized class sums on a cover with the fixed distinguished conductor](FIRST_PASS_SERIES_RATIONALITY.md). For each fitted state the [congruence-length calculation](FIRST_PASS_CONGRUENCE_LENGTHS.md) gives a finite set of places for all coefficient requests and an exact Fitting-ideal formula for the original target lengths.
+
 | Work still open | Mathematical question |
 |---|---|
 | Base theta readings | Can the two readings constructed on the starting column be carried through retwisting to the prescribed family? |
