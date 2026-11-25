@@ -14,7 +14,7 @@ For all sufficiently large $x$ this is between $x^{c_D+6}$ and $b$, uniformly in
 $$
               16k\Delta+k+2\le35x^{c_D+5}\le w''(n).
 $$
-Take maxima with the earlier $c_D,c_h,x$ thresholds at their respective places in the quantifier order. There is a single range before the base, column, stage, word, divisor or coefficient place is selected. For any size record $L$ on this stage with the prescribed scale and valuation data, its own definitions give $S_c(L)=4kD.s.\Delta=4k\Delta$ and $c_G(L)=4S_c(L)=c$. This proves the required upper bound on the **same** $c$ for every $L$. [Scale definitions][scale] · [Rank and scale estimates][rank] · [Nested ranges and explicit bound][range] · [Size normalization][sz] · [Value of the stage parameter][val]
+Take maxima with the earlier $c_D,c_h,x$ thresholds at their respective places in the quantifier order. There is a single range before the base, column, stage, word, divisor or coefficient place is selected. For any size record $L$ on this stage with the prescribed scale and valuation data, the stage parameter is $D.s=1$, so its own definitions give $S_c(L)=4k\Delta$ and $c_G(L)=4S_c(L)=c$. This proves the required upper bound on the **same** $c$ for every $L$. [Scale definitions][scale] · [Rank and scale estimates][rank] · [Nested ranges and explicit bound][range] · [Size normalization][sz] · [Value of the stage parameter][val]
 
 At a real position $\tau$ write $U_i$ for the entries of the word's upper Harish-Chandra parameter and $\lambda_i=U_i-(k-1)/2+i$ for its integral highest weight. For $1\le i\le k-2$ the stored bit $\xi_{i-1}\in\{0,1\}$ gives
 $$

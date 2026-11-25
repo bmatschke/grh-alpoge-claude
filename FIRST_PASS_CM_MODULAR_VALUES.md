@@ -1,0 +1,38 @@
+# Evaluating the elliptic modular family at the CM point
+
+In the order-lattice calculation a holomorphic elliptic modular form varies with the translated Hilbert lattice and the auxiliary torsion point. The exact statement needed is that a uniform bound on the Fourier coefficients of this finite family passes to its value at the CM point with **the same exponent**. The size of the family and the width of the cusp may grow.
+
+Fix an embedding of the algebraic numbers into $\mathbf C_\ell$, and write $v_\ell(\ell)=1$. Suppose holomorphic forms $f_i$ of nonnegative integer weight $w$, indexed by a finite set, are permuted under the weight-$w$ slash action of $\mathrm{SL}_2(\mathbf Z)$. Every member has an expansion in nonnegative powers of $q^{1/N}$ at infinity, and every coefficient is algebraic of valuation at least $-r$. If $j(\tau_0)$ is algebraic and integral at this embedding and $\omega^{12}=\Delta(\tau_0)$ for the normalized modular discriminant, then
+$$
+                 v_\ell\!\left(f_i(\tau_0)/\omega^w\right)\ge-r
+$$
+for every $i$, with the value algebraic and $v_\ell(0)=+\infty$. It is enough to know the expansion at infinity for every family member because the slash action includes the changes of cusp. [Series and permutation hypotheses][def] · [Valuation statement][value]
+
+## From Fourier coefficients to a monic equation
+
+First suppose $r=0$ and let $R$ be the ring of algebraic numbers integral at the chosen place. Consider the elementary symmetric functions of degree $k$ in the values $f_i^{12}$. Permutation invariance makes each such function $h_k$ a holomorphic modular form for the full group of weight $12kw$. Its coefficients in the parameter $q^{1/N}$ belong to $R$ by finite sums and products in each degree. Invariance under $\tau\mapsto\tau+1$ implies by uniqueness of the expansion that only powers of $q$ occur. This step involves no division by $N$.
+
+The quotient $h_k/\Delta^{kw}$ is a modular function holomorphic on the upper half-plane, with at most a pole of order $kw$ at the cusp. Its Laurent coefficients belong to $R$ since $\Delta=q\prod_{n\ge1}(1-q^n)^{24}$. The function $j=E_4^3/\Delta$ has a simple pole with leading coefficient one and integral Laurent coefficients. If the quotient has leading pole term $b q^{-a}$, subtract $b j^a$. Repeating decreases the pole order until the residual function is holomorphic everywhere on the compact modular curve $X(1)$, and hence constant. Its constant coefficient is still in $R$. Thus $h_k/\Delta^{kw}=P_k(j)$ with $P_k\in R[X]$. This is the symmetric-polynomial argument used in the classical proof of integrality of modular equations. [Milne, *Modular Functions and Modular Forms*, §§4 and 6](https://www.jmilne.org/math/CourseNotes/MF.pdf) · [Integral polynomial in the invariant][jpoly] · [Symmetric powers in the pin][symm]
+
+At $\tau_0$ the elementary symmetric functions in $f_i(\tau_0)^{12}/\Delta(\tau_0)^w$ are therefore in $R$. The monic polynomial with these elements as roots shows that each is integral over $R$. Each is the twelfth power of $f_i(\tau_0)/\omega^w$. Hence that normalized value is itself integral over $R$, algebraic and of nonnegative valuation. The argument applies in residue characteristics two and three. It uses no division by twelve or by the size of the family. [Integral root and its twelfth power][root]
+
+For real $r$, take any rational $a>r$ and choose an algebraic $c$ with $v_\ell(c)=a$, for instance a suitable rational power of $\ell$. All coefficients of $cf_i$ are integral. The result just proved gives algebraicity of $f_i(\tau_0)/\omega^w$ and valuation at least $-a$. Take rational $a$ decreasing to $r$ to recover the asserted bound, including nonintegral endpoints. [Scaling before evaluation][value]
+
+## The period used in the order-lattice calculation
+
+Here the fixed elliptic lattice is the image of $\mathcal O_{\mathbf Q(\sqrt{-d})}$ for $d\equiv3\bmod4$, $d>4$. Its $j$ is an algebraic integer. One can see this directly for the prescribed lattice. Put $\theta=(1+\sqrt{-d})/2$. For a large positive integer $u$, multiplication by $u+\theta$ on the lattice has cyclic cokernel, since the matrix in the basis $(1,\theta)$ has an entry one. Its degree $m=u^2+u+(d+1)/4$ lies strictly between $u^2$ and $(u+1)^2$ for all sufficiently large $u$. The cyclic self-isogeny gives $\Phi_m(j,j)=0$ for the integral modular polynomial. Its diagonal specialization has leading coefficient a unit: in the product of $j(\tau)-j((a\tau+b)/c)$ over cyclic sublattices with $ac=m$, the two leading pole orders differ since $a\ne c$. Each leading coefficient is a signed root of unity. The leading coefficient of their product is rational integral and a root of unity, hence $\pm1$. The identity $j=q^{-1}+O(1)$ identifies it with the leading coefficient in the polynomial variable. This proves integrality and is invariant under a change of period basis. [Milne, the modular equation for the cyclic isogeny correspondence](https://www.jmilne.org/math/CourseNotes/MF.pdf) · [Nonsquare self-correspondence in the general lattice proof][cm]
+
+Write the lattice as $c(\mathbf Z\tau_0+\mathbf Z)$ and choose $\Omega^{12}=\Delta_\Lambda$, the Weierstrass discriminant of this lattice. The weight-twelve transformation gives
+$$
+                \omega=\frac{c\Omega}{2\pi i},\qquad \omega^{12}=\Delta(\tau_0).
+$$
+The source specializes to $c=1$ after choosing its basis. Apply the proposition to each holomorphic term of the diagonal Hilbert jet, of weight $w=2s[F:\mathbf Q]+2|\mu|$. The family is indexed by the invertible two-by-two residue matrices. The modular slash action permutes the indices and the identity index gives the required form. Thus the input coefficient estimate is preserved for the original CM period even if $\ell\mid N$. The separate nonholomorphic weight-two correction is treated in the toric jet calculation. [Change of period][period] · [The actual family and its application][family]
+
+[def]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/HasQIff.lean#L10-L44
+[value]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/SzValueOfFamily.lean#L23-L43
+[jpoly]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsEqDiscriminantPowMulEvalJInvariant.lean#L20-L43
+[symm]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/EsymmPowTwelveDivDiscriminantMemSubring.lean#L17-L44
+[root]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/IsIntegralModularFamilyValueDivPeriodPow.lean#L13-L26
+[cm]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/IsIntegralJInvariantOfComplexMultiplication.lean#L39-L69
+[period]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ImportsRestLast.lean#L23-L38
+[family]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/NormHilbertEisensteinValueLeOfIntegralJ.lean#L25-L34

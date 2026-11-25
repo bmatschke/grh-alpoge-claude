@@ -20,7 +20,7 @@ The [wild-inertia comparison](FIRST_PASS_WILD_INERTIA.md) completes the coeffici
 
 For each fitted row, [one denominator works on the whole auxiliary tower](FIRST_PASS_TOWER_SERIES_BOUND.md). The [descent argument](FIRST_PASS_UNRAMIFIED_DESCENT.md) handles every set of unramified coefficient places. Extracting a [universal theta coefficient](FIRST_PASS_EXPORT_ROW_COEFFICIENTS.md) costs no factor from the varying group order. The resulting rationality gives [full rank for a finite basis of prescribed theta tests](FIRST_PASS_EXPORT_TEST_BASES.md) on each active row.
 
-Kings and Sprang’s theorem also yields [an explicit denominator for each critical ray-class value](FIRST_PASS_RAY_CLASS_DENOMINATORS.md) at eligible primes. The CM principal-ideal calculation includes the shift one when the angular infinity type is nonzero. Comparison with the project’s order-class measure and integral periods remains open.
+Kings and Sprang’s theorem also yields [an explicit denominator for each critical ray-class value](FIRST_PASS_RAY_CLASS_DENOMINATORS.md) at eligible primes. The CM principal-ideal calculation includes the shift one when the angular infinity type is nonzero. A [direct calculation on the project’s order lattices](FIRST_PASS_ORDER_CLASS_BOUND.md) uses the fixed elliptic discriminant period and yields one denominator for all admitted auxiliary conductors. The [cyclotomic specialization argument](FIRST_PASS_COPRIME_SPECIALIZATION.md) works for every coprime power once the Galois and determinant coefficient bounds are supplied on the same prime family.
 
 | Work still open | Mathematical question |
 |---|---|

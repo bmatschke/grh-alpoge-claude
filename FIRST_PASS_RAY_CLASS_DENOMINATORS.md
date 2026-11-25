@@ -2,6 +2,8 @@
 
 One part of the first-pass export asks how the denominators of a toric coefficient vary when split primes are added to a conductor. Kings and Sprang give an integral formula for differences of individual partial Hecke values. At eligible primes the following consequence gives an explicit denominator for each ray class. Varying the principal ideal in the CM field also treats the critical shift one when the angular infinity type is nonzero. To apply it to the project's order-class sums one must also compare the two class measures and integral periods. [Kings–Sprang, *Eisenstein–Kronecker classes, integrality of critical values of Hecke $L$-functions and $p$-adic interpolation*, Theorem 4.10 and Corollary 4.13](https://arxiv.org/pdf/1912.03657#page=51) · [Published paper](https://doi.org/10.4007/annals.2025.202.1.1) · [Project's toric denominator statement][target]
 
+The [native order-class calculation](FIRST_PASS_ORDER_CLASS_BOUND.md) gives a second route for the induced CM type of the project. It uses the actual Weierstrass discriminant period, so using the ray-class estimate below for the export is optional.
+
 ## One ray class
 
 Let $E$ be a CM field of degree $n$, $\mathfrak f\ne\mathcal O_E$ a conductor, and $\chi$ a critical algebraic Hecke character of conductor $\mathfrak f$ as in that theorem. Write its infinity type as $\beta-\alpha$ in the authors' convention. Use their CM abelian variety, integral differentials on it and its dual, and the rational torsion section required in Theorem 4.10. Let $R$ denote their base ring. Work at a finite place $\lambda$ over $\ell$ where $R$ and the character integers are integral and $\ell\nmid N\mathfrak f$. The authors' indicated choice of $R$ also inverts the field discriminant. For a ray class $B$ put
