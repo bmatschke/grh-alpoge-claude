@@ -32,7 +32,7 @@ The [mixed-cell unfolding](ROW_MIXED_CELL_UNFOLDING.md) now gives the period ide
 
 The [first-pass starting state](FIRST_PASS_STARTING_STATE.md) now carries those rows, the division lattice and the spectral data with the prescribed Haar scale. Its auxiliary localization list is empty, its stage inputs $\eta_j(v)$ are zero, and its weight set is saturated over the fixed coefficient subfield. Comparing these assigned inputs with the actual congruence lengths belongs to a later stage.
 
-**Next construction.** Carry the same saturated weight set, row readings and field into the labelled stage required for the third-stage record. This includes the compatible automorphic and Galois data at the selected places. The field, level, reference phase and stored bases must continue to agree through export and retwisting. [Order of the first and second passes](continuation_v78/producer.tex#L218-L266)
+**Next construction.** On the same state the [marked inertia labels and the ambient automorphic comparison](FIRST_PASS_ROW_LABELS.md) now include the exact spherical Hecke polynomial on the conjugate split half. The [cuspidal character calculation](FIRST_PASS_ROW_LABELS.md#the-cuspidal-character-family-and-the-two-frame-characters) also recovers the frame character, its inverse and their Frobenius values. Complete the ray-class data and the filtered-dimension comparison on this stage. Carry the same saturated weight set, row readings and field into the third-stage record. The field, level, reference phase and stored bases must continue to agree through export and retwisting. [Order of the first and second passes](continuation_v78/producer.tex#L218-L266)
 
 | Open obligation | Next mathematical action | What closes the whole obligation |
 |---|---|---|
