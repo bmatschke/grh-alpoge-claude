@@ -1,5 +1,14 @@
 # External proof comparisons for RH and Dirichlet GRH
 
+## The original levels, period phases and the higher-corank genus
+
+The public heads of the four reconstructions checked on 26 November were [Adriazola at 9eefc08](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/tree/9eefc08b0819728d4dd2ef0568b49a61251af111), [RH Lean Roadmap at be76303](https://github.com/rh-lean-roadmap/rh-lean-roadmap/tree/be763032b26aad94ed9f8753a0285de9c286a3e0), [Reading Edition at c0fe7c6](https://github.com/adjoint-functor/theta-periods-to-rh-reader/tree/c0fe7c673cb8acaa328bebb2440ee3334c520b9a) and [Naskręcki at 6ccea03](https://github.com/nasqret/riemann-rev/tree/6ccea03b21e96b70356c07afb85a88d581b61e86). They matched the revisions in the preceding comparisons.
+
+* Lan’s complete-base Mumford construction gives the marked one-parameter variation, its torsion and the theta translation relation used to [replace all integral tests by good-reduction tests](PEL_GOOD_FRAMES_AT_ALL_PRIMES.md). The argument passes through a Gauss valuation at the original residue prime. [Lan, §§4.3–4.5](https://www.kwlan.org/articles/cpt-PEL-type-thesis-revision-dense.pdf)
+* The primary degeneration formulas and the prime-to-characteristic theta-group representation give [the exact minimum order of the source’s carrying numerator](PERIOD_CARRYING_THETA_ORDERS.md). The two odd levels are both present on the very same deep cover. [Alexeev–Nakamura](https://doi.org/10.2748/tmj/1178224770) · [Mumford, §1](https://pazuki.perso.math.cnrs.fr/index_fichiers/Mumford66.pdf)
+* The archive’s double-step relations and explicit split twist-column constants give [the active-word endpoint comparison](PERIOD_GOOD_ROW_WORD_MAPS.md) and a common root of unity on the construction's actual charts for each attained tuple relative to the reference tuple. The analytic homogeneous relation still has to hold on the joined family.
+* The adjacent-rank unitary mass formula gives [a factorial bound for the actual interior-corank genus ratios](SPECTRAL_HIGHER_CORANK_MASSES.md). It weakens the real estimate required for the degenerate pair sum. [Gan–Hanke–Yu](https://web.math.princeton.edu/~jonhanke/Web-02/Mass-Formula-of-Shimura/shimura-mass.pdf)
+
 ## Sources used for the all-row denominator and the marked period
 
 The 26 November comparison found the same public revisions of Adriazola’s reconstruction, the RH Lean Roadmap and the reading edition as in the preceding check. Adriazola’s status table distinguishes the manuscript’s remaining comparisons from its reconstruction of K1. None of the checked accounts supplies the quantitative positive-dimensional theta determinant or the strict ramified witness at our prescribed level. [Adriazola's status at the checked revision](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/9eefc08b0819728d4dd2ef0568b49a61251af111/docs/STATUS.md) · [Roadmap](https://github.com/rh-lean-roadmap/rh-lean-roadmap)
