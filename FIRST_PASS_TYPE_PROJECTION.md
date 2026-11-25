@@ -40,6 +40,8 @@ $$
 $$
 Here valuations assign one to a uniformizer. This treats every active pair in every dimension, including multiple isotypic copies in one eigenspace. The [support argument](FIRST_PASS_CONGRUENCE_LENGTHS.md) gives the equality off the active set as well. [Sum of residual projections][projections] · [Identification of the two field subspaces][spaces] · [Base change and normalization][normal] · [Additivity over the actual lattices][sum]
 
+For example, let $O$ be a DVR with uniformizer $\varpi$ and fraction field $F$. Take $\Lambda=O^3$, $G=Fe_1+Fe_2$, and $B=F(e_1+\varpi^d e_3)$ with $d\ge1$. The operator that is zero on $G$ and $\varpi^d$ on $B$ preserves $\Lambda$. Its two characteristic-zero eigenvalues give a single residual block, with good eigenvalue zero of multiplicity two. The two saturated intersections are $Oe_1+Oe_2$ and $O(e_1+\varpi^d e_3)$. Their sum has quotient $O/(\varpi^d)$. Equivalently, projection of $e_3$ along $B$ gives $-\varpi^{-d}e_1$, so the projected good lattice gains exactly $d$ powers of the uniformizer. This is the integral index appearing on both sides once the original theta projector has been identified.
+
 [model]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/LevelLetterCocycles/DataN.lean#L509-L514
 [supplier]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/ThirdPlaceSeries/NonGaloisEtaJMem.lean#L48-L85
 [pspan]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/LevelLetterCocycles/DataN.lean#L110-L119
