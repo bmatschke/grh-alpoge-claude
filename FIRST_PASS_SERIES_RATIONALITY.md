@@ -2,6 +2,8 @@
 
 The [first-pass character comparison](FIRST_PASS_ACTIVE_CHARACTERS.md) uses the actual theta map on definite forms at each active place. The [series construction](FIRST_PASS_THETA_SERIES.md) identifies this map with a class sum on the subspace where that sum admits the given coefficient reading. Here we give a finite sufficient test for that equality at each active row and trace the arithmetic normalization of its generators. The comparison of phases also requires the chosen row normalization. [Class-sum clause and rationality definitions][rd] · [Two applications on the active row][use] · [Normalization of the row scalar][norm]
 
+The [full row proof at export](FIRST_PASS_EXPORT_ROW_COEFFICIENTS.md) obtains the three generator tests with the installed normalization and bounds each universal coefficient uniformly in the auxiliary data. Its inputs include the [tower bound](FIRST_PASS_TOWER_SERIES_BOUND.md) and the [integral descent](FIRST_PASS_UNRAMIFIED_DESCENT.md).
+
 ## A finite test on the original coefficient space
 
 Fix the index, row and side. Write $k_0=\operatorname{Frac}(O_{i,0})$ and take the semilinear reading into complex functions with the embedding used to define the series at cyclotomic level zero. For this argument keep the coefficients in that field until the map has been identified. Equality extends to larger coefficient fields by scalar extension. The extra conductor set is empty and the variable character is trivial. The fixed order-$15$ character $\delta_{\ell_i}$ remains in the Weil action.
