@@ -1,4 +1,4 @@
-# The period-height allowance and the remaining slope estimate
+# The period-height allowance and the frame estimate
 
 On the selected family, the allowances $h_u$ for the individual words admit a two-sided bound after the common metric normalization is removed. Let $K$ be the row's coefficient field and put
 $$
@@ -52,7 +52,7 @@ In particular a common bound $\overline\mu_N+\mu_{\max}(RR)+q_\kappa\le x^A b$ i
 
 The [divided-column estimate](PERIOD_DIVIDED_COLUMN_UPPER.md) now gives $\mu_{\max}(N'_u)\le x^{A_N}b$ for each positive-rank word on the original eventual design range. The prescribed unshifted lattice sits inside the actual stage-zero lattice even at the word prime, and the positive cost of the signed division is bounded directly. The [sharp-row transfer](PERIOD_SHARP_ROW_TRANSFER.md) gives $\mu_{\max}(R_1)\le\mu_{\max}(R_0)+2\log|G|$ on the same linked member. In view of (3), a normalized base-row estimate $\mu_{\max}(R_0)+q_\kappa\le x^{A_R}b$ suffices for entry 2. Indeed the upper bound for the frame is $x^{A_N}b+x^{A_R}b+8b+x^{9M+1}b$, which fits any permitted middle exponent exceeding $\max(A_N,A_R,9M+1)$ by one after a common cutoff.
 
-For the base row, the [reference evaluation](PERIOD_REFERENCE_EVALUATION.md) is injective and has both finite and infinite bounds on the reference image lattice under the ordinary B8.17 evaluation-field and theta hypotheses. Its finite budget covers even the primes where the glued row changes tuple. At those primes it remains to control the enlargement of the actual bottom image, or to obtain the full fitted evaluation directly on the changed lattice. The [off-base eigenvalue floor](PERIOD_OFF_BASE_SCALAR.md) and [test-lattice slope](PERIOD_AUXILIARY_TEST_SLOPE.md) address the metric and target in this estimate. The ordinary field-compatible choice and the bounds on changed lattices are required on the whole selected range. Entry 2 remains open.
+The [fitted functional on the selected row](PERIOD_SELECTED_BASE_FUNCTIONAL.md) supplies this last bound at every serving place under the standing analytic hypotheses and the division premise of the period contract. Its common grid preserves the layer characters and the coefficient field of the selected bundle. The finite evaluation estimates the image of each changed lattice at its own tuple. With the [off-base eigenvalue floor](PERIOD_OFF_BASE_SCALAR.md) and [test-lattice estimate](PERIOD_AUXILIARY_TEST_SLOPE.md), this proves entry 2 on the admitted family. The [reference evaluation](PERIOD_REFERENCE_EVALUATION.md) gives an alternative criterion in terms of local lattice indices.
 
 [family]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/ParConsts.lean#L61-L75
 [kern]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/DataDIVDefs.lean#L56-L77

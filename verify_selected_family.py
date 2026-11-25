@@ -53,6 +53,15 @@ def main():
     for entry in progress.values():
         assert entry["established"] and entry["needed"] and entry["proofs"]
         assert all((root / proof).is_file() for proof in entry["proofs"])
+    heights = progress["GLOBAL_PERIOD_HEIGHT"]["height_entry_status"]
+    height_groups = (
+        heights["proved_on_the_existing_project_inputs"],
+        heights["proved_on_selected_class_under_inputs_in_fitted_functional_note"],
+        heights["remaining"],
+    )
+    assert sorted(number for group in height_groups for number in group) == list(range(1, 10))
+    assert {int(number) for number in heights["partial"]} <= set(heights["remaining"])
+    print("Remaining period-height entries:", ", ".join(map(str, heights["remaining"])))
     endpoint_roadmap, divider, _ = roadmap.partition("## Broader reconstruction")
     assert divider, "Roadmap must distinguish endpoint inputs from broader work"
     endpoint_ids = re.findall(r"^\| `([A-Z][A-Z0-9_]+)` \|", endpoint_roadmap, re.MULTILINE)

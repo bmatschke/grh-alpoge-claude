@@ -8,7 +8,7 @@ $$
  \tag{1}
 $$
 
-The common metric normalization $q_\kappa$ can have either sign. The cost is at most $2\log|G|$. This proves the change of level needed for frame entry 2. The mean slope of the dual row in the period comparison is a separate assertion in B4.55a. [Original pair of row estimates][passage] · [Use in the frame][frame]
+The common metric normalization $q_\kappa$ can have either sign. The cost is at most $2\log|G|$. This proves the change of level needed for frame entry 2. The [comparison of the entire slope filtration](PERIOD_CHARACTER_SLOPES.md) also proves the dual mean assertion of B4.55a, used for entry 7. [Original pair of row estimates][passage] · [Use in the frame][frame]
 
 ## The representation and the glued lattices
 
