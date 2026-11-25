@@ -2,6 +2,44 @@
 
 The [lower-row laws](LOWER_ROW_ASSEMBLY.md) include separating arithmetic evaluations for the individual lift targets. The weight-specific construction asks for common evaluations of the composite maps into a single bottom space.
 
+## Rational tests on the actual weight-supported column
+
+Let $z'$ be the prescribed restriction of the saturated first-pass datum to $W=z.W_1(F_0)$, and write $E$ for its common bottom Hilbert space. In the eventual range and under the analytic, Hida-level and advance-field inputs of the row construction, the composite maps on $z'$ admit one separating family of complex-linear tests reading every rational source image in the specified coefficient embedding. This includes the reference tuple and each of the frame-character tuples present on this restriction. For each fixed choice the tests use one common archimedean pair. The conclusion also applies to any admissible choice satisfying these inputs. The arithmetic assumptions for making the advance field choice include the period-normalized CM jet values and critical-value comparisons described in the [field construction](ROW_COEFFICIENT_FIELD.md). The upstream sufficient package also specifies the toric and zeta denominator, lattice and twist transport, and Hecke reflection conditions. [Upstream arithmetic package](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/HypothesisBundleConversions.lean#L7-L19) [Original row and its separate lift-test definitions][cr-test] · [Untwisted restriction](UNTWISTED_BOTTOM_ROW.md) · [Pinned assembly and its outside inputs][cr-all]
+
+Write $\iota:K\hookrightarrow\mathbb C$ for the Hilbert-model coefficient embedding, $t_0$ for the prescribed reference tuple, and $C_t=\prod_{i,j}c_{ij,t}$. Every factor is nonzero by the [square comparisons](ROW_TOWER_INDUCTION.md). The [normalized square calculation](ROW_MIXED_GRID_RATIOS.md) gives $r_t\in K^\times$ with $\iota(r_t)=C_t/C_{t_0}$. The [finite tests](ROW_TEST_CONVERGENCE.md) define linear functionals $p_a:E\to\mathbb C$, and [period detection](ROW_PERIOD_ASCENT.md) on the [common real choice](ROW_COMMON_REAL_TEST.md) gives $\bigcap_a\ker p_a=0$. On the good rational source block, the opposite-path calculation, the [mixed-cell unfolding](ROW_MIXED_CELL_UNFOLDING.md) and the definite jet evaluations give
+$$
+ \iota(e_t) C_t\,p_a(\Theta_t j_t x')=\kappa\,v_{t,a}(x'),
+ \qquad e_t\in\mu(K).
+$$
+Here $\kappa$ is the evaluation of the *same* real polynomial combination for every $t,a,x'$. To see that $v_{t,a}(x')\in\iota(K)$, choose at every contributing cell the coset expansion at its specified depth. Its coefficients are products of the actual unfolded local test values in the requested field. The two normalized definite kernel chains carry the rational input coefficients into that field, and so does the final compact branching pairing. The class weights are products of reciprocals of finite stabilizer orders, the local cell coefficients are rational, and $s_{AA}$ belongs to the same field by the auxiliary conductor and square-root clauses. Finite summation proves the assertion. On the first pass the [staircase volume and its auxiliary factor](ROW_MIXED_CELL_SUPPORT.md#the-common-staircase-volume-and-the-finite-arithmetic-class-sum) are common to all $(t,a)$. The class sum is independent of the admissible expansion. [Period and normalization](ROW_PERIOD_JET_FORMULA.md) · [Coefficient calculation for the actual finite sum][cr-v]
+
+For an arbitrary $x\in F_{R,t}$ take $x'=\sum_g a_g\rho_t(g)x$, where $\sum_g a_g g$ is the good central idempotent in the rational group algebra and $\rho_t(g)$ denotes the **source group action**. At the bottom, the trivial level gives precisely this idempotent. The stored action satisfies $\Theta_t j_t(\rho_t(g)x)=g_E\Theta_t j_tx$. Since the good projector acts as the identity on the Hilbert target, semilinearity gives
+$$
+ \Theta_t j_t x' = \sum_g\iota(a_g)g_E\Theta_t j_tx=\Theta_t j_tx .
+$$
+Use the finite sum evaluated at $x'$. [Source projection and identity on the target][cr-proj]
+
+If $\kappa\ne0$, set $\lambda=C_{t_0}/\kappa$. Writing $v_{t,a}(x')=\iota(b)$ yields
+$$
+  (\lambda p_a)(\Theta_t j_tx)=\iota\!\left(\frac{b}{e_t r_t}\right).
+$$
+Thus a single nonzero scale works for the whole target and preserves separation. If $\kappa=0$, including when the real polynomial combination itself is zero, all the periods on all these images vanish because $\iota(e_t)C_t\ne0$. Separation makes each image zero. Take $\lambda=1$ and retain all tests on $E$. This branch permits a nonzero target. [The two cases on the specified choice][cr-cases]
+
+To pass to $z'.R.\mathrm{toCx3}(z'.F)$, let $c$ be the prescribed identity or complex conjugation and $o$ the underlying identification of the twisted space with the Hilbert model. It satisfies $o(au)=c(a)o(u)$. Then $u\mapsto c((\lambda p_a)(o(u)))$ is complex-linear, the family still separates, and its values lie in $(c\circ\iota)(K)$, the original datum's coefficient embedding. At the eventual stage the field and size requests precede the eligible data. If the Hida estimates are applied on the auxiliary stage with the same group, copy the specified datum there and pull the tests back. Copying twice recovers the original record and its complex theta maps. This gives the claimed test on $z'$. [Conjugation and the specified embedding][cr-twist] · [Size and field choices on the stage][cr-at] · [Return to the prescribed record][cr-copy]
+
+There is an immediate consequence for the actual images. In rational source bases, concatenate the columns $((\lambda p_a)(\Theta_t j_tb))_a$ over all allowed tuples. Its entries lie in the embedded coefficient field, and its complex kernel is exactly the space of relations among the original images by separation. Row reduction in that field therefore gives generators for *all* joint relations, including relations between distinct tuples. On this pinned restriction the lower-row multiplicity equality and the row test now provide the two inputs to the source's weight assertion, with its regularized Siegel–Weil and Hecke continuation hypotheses. The third-stage starting-choice constructor then takes the row-lift family on this same restriction. Its application retains the pinned core, geometric, group, support and standard-reading hypotheses. Using this family, the [first-pass starting state](FIRST_PASS_STARTING_STATE.md) retains the set of exceptional coefficient places. Subsequent exports and retwisting concern additional data. [Weight assertion on the pinned record][cr-holds] · [Use on the exact restriction][cr-next]
+
+[cr-test]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/IndefiniteReal/RationalAdjoints/RatZOfTests.lean#L18-L29
+[cr-all]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/RationalityOfThetaHypotheses.lean#L65-L76
+[cr-v]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RowTestRationalSumsOfFiniteSumsMeaningful.lean#L34-L92
+[cr-proj]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RowTestHilbertModelsOfChoiceClaims.lean#L20-L62
+[cr-cases]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RowTestHilbertModelsOfChoiceClaims.lean#L96-L147
+[cr-twist]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/RowTestComplexSideOfHilbertModels.lean#L13-L20
+[cr-at]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/AtDatRowTest.lean#L44-L65
+[cr-copy]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/EqualMultiplicitiesRowTestOfSameGroupTransfer.lean#L16-L27
+[cr-holds]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/HoldsFromPrintedInputs.lean#L58-L95
+[cr-next]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ConstructionStartingChoicesOfFineAdelicData.lean#L195-L240
+
 ## Descent of the joint image
 
 Let $E$ be the finite-dimensional bottom target of the very datum under consideration, let $k$ be the image of its specified coefficient embedding, and put
@@ -24,14 +62,14 @@ Indeed for $y=\sum_b c_b y_b$ the equation is $Gc=g(y)$. Cramer's rule identifie
 
 Equivalently, concatenate those basis images as the columns of a single complex linear map from the direct sum of the source coordinate spaces. Its complex kernel must be the scalar extension of its relations over $k$. To see this, use the independent columns $y_i$ as pivots. The expressions of all other columns in these pivots give a basis of relations with one distinct nonpivot coefficient equal to one. These relations descend exactly when their pivot coefficients lie in $k$, by uniqueness of this normalized basis of relations (or by row reduction over $k$). The condition therefore includes relations between different tuples, even when each tuple separately has a rational basis for its image.
 
-## The period identity that would establish descent
+## Descent from a separating period identity
 
 The reconstruction already gives a second way to produce the common evaluations. Suppose the same separating complex-linear periods $p_a$ on $E$ satisfy, on the actual data,
 $$
   \iota(z_t)c_t\,p_a(\Theta_t j_t x)=\kappa w_{t,x,a},
   \qquad w_{t,x,a}\in k,\quad c_t/c_{t_0}\in k^\times,
 $$
-where $\iota$ is the distinguished embedding, $z_t$ a root of unity in its domain, $c_t\ne0$ and $\kappa$ is independent of $t,x,a$. It suffices to have the formula after the rational central projection that fixes the composite image. If $\kappa\ne0$, the rescaled tests $(c_{t_0}/\kappa)p_a$ separate $E$ and take values in $k$ on all these images. If $\kappa=0$, all the images are zero by separation. The earlier descent proof transports these tests through the possible complex conjugation of the real model. Its arithmetic application requires separation and the normalized unfolded identity with the indicated coefficient-field membership on the same datum. These give concrete entries of the common-target calculation still to establish. [Normalization and conjugation, TD15–16](theta_descent/main.tex#L463-L543) · [Finite sums and the analytic inputs to the identity](theta_test_inputs/main.tex#L1019-L1035)
+where $\iota$ is the distinguished embedding, $z_t$ a root of unity in its domain, $c_t\ne0$ and $\kappa$ is independent of $t,x,a$. It suffices to have the formula after the rational central projection that fixes the composite image. If $\kappa\ne0$, the rescaled tests $(c_{t_0}/\kappa)p_a$ separate $E$ and take values in $k$ on all these images. If $\kappa=0$, all the images are zero by separation. The earlier descent proof transports these tests through the possible complex conjugation of the real model. The opening proof verifies separation, the normalized unfolded identity and membership in the coefficient field on the specified weight-supported datum. [Normalization and conjugation, TD15–16](theta_descent/main.tex#L463-L543) · [Finite sums and the analytic inputs to the identity](theta_test_inputs/main.tex#L1019-L1035)
 
 ## Which comparisons between tuples are necessary?
 

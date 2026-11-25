@@ -1,0 +1,106 @@
+# Transport along every square and the denominator on the first untwisted pass
+
+Let $K\subset\mathbf C$ be the image of the grid's prescribed coefficient embedding. Write $g_{ij,t}$ for the nonzero square scalar and $b_{ij,t}$ for the scalar on the arithmetic definite bottom of that square, with reference tuple $0$. A hat denotes division by the reference value. Put
+$$
+ e=(t_{\rm rank}+s_{\rm Len})/2,\qquad
+ J=\{j\in\{0,\ldots,m-1\}:m-j\text{ even}\},\qquad
+ N=m|J|=m\lfloor m/2\rfloor .
+$$
+The initial rank gap $2e$ is common to **all** squares, since the grid rank is $r+jt_{\rm rank}+i s_{\rm Len}$. Set
+$$
+ B_t=\prod_{i,j}\widehat b_{ij,t},\qquad
+ H_t=\prod_{i,\ j\in J}
+ \frac{L(e+1,\nu_{ij,0})}{L(e+1,\nu_{ij,t})}.
+$$
+On the restricted untwisted first pass, the analytic square recursion and the standing arithmetic inputs give
+$$
+ \frac{\prod_{i,j}\widehat g_{ij,t}}{B_tH_t}\in\mu(K),\qquad
+ \Bigl(\prod_{i,j}\widehat g_{ij,t}\Bigr)\mathcal O_K
+      =(B_tH_t)\mathcal O_K.                                      \tag{1}
+$$
+The $L$'s are the finite-place Hecke functions. Thus (1) identifies the entire fractional ideal, including at the frame primes. The denominator of $B_tH_t$ itself requires further arithmetic. [Grid ranks][rk] · [Total square ratio][prod]
+
+## One set of coordinates down an arbitrary tower
+
+Fix $i,j,t$. Put $k=m-j$, $p=\lfloor(k-1)/2\rfloor$, $q=\lfloor k/2\rfloor$. First descend through $q$ small-source (beta) planes, then $p$ big-source (alpha) planes. Each removal uses an orthogonal hyperbolic plane of the common target as well. The inequalities $n,e>2(p+q)+1$ persist when moving downward, so every requested indefinite arithmetic lattice admits the integral plane and its self-dual complement. Choose these rational splittings before varying the tuple. Carry the unchanged rig at each step and choose the Weil family on the complement lattices. This gives a single chain for all twists. Its terminal source ranks $a-2p,n-2q$ are the specified arithmetic bottom ranks. [Plane and complement theorem][split] · [Actual stage families][family] · [Bottom ranks][br]
+
+One fitted base suffices for the entire pair $t,0$ along this chain. Choose the real embeddings, the grid additive character, $P=T_t\supseteq T_0$, the branch at each $v\in P$ above the prescribed marked prime, and a fresh split place outside $P$. At both tuples the character restriction to the ground-field ideles is a power of a quadratic character. Subtracting two from either rank preserves that restriction, and the gap lower bound decreases. All remaining fit conditions are unchanged. The fit implications therefore apply successively on that same base. Start with the definite analytic markings and extend upward across each chosen plane. On the unchanged space copy the lower marking. At a marked split branch, rescale the rational pair by $u,\bar u^{-1}$ using the prescribed valuations at disjoint conjugate primes, insert its two primitive columns in the required positions, and extend the Cartan involution by the hyperbolic interchange. For beta the column positions are $0,n-1$ in the small source and $a,d-1$ in the target, in current upper ranks. For alpha they are $0,a-1$ in the big source and target. The lower columns keep their order. Other twist pairs can use other fitted bases. [Pairwise base][choose] · [Rank changes on the same base][fit] · [Primitive columns and Cartans][frames] · [Configurations][cfg]
+
+Use the [all-rank analytic comparison](ROW_TOWER_INDUCTION.md) on these data. Transport each identity through the actual standard finite tests and common real models. A split frame change contributes the finite twist on the product of the three change-of-basis determinants after normalization at $0$. The real intertwiner scalar and the common plane-norm powers divide out. The top finite-flip and Haar calibration likewise contributes a value of the finite twist. On the bottom, transfer between lattices and frames gives a normalized root of unity. This uses common maps and measures for the two twists at each given level. [Assigned finite tests](ROW_STAGE_STANDARD_TESTS.md) · [Top calibration and frame determinants](ROW_FIRST_BETA_GRID_RATIOS.md) · [Definite transfer](ROW_BETA_RATIONAL_PLANES.md#the-descended-bottom-and-the-specified-standard-bottom)
+
+## Choosing the arithmetic bottom without assuming the desired ratio
+
+For each original square first construct **some** standard triangle on definite spaces of the two prescribed bottom ranks and their sum. Standard rigs, the given splitting characters, compatible Weil representations, normalized vacua and standard finite tests give this construction independently of arithmetic assertions on the unknown constants. The clause $\mathrm{BottomIn}(i,j)$ of the prescribed field now supplies a possibly different standard triangle $X$ with two nonzero periods such that every integrable monomial value on the respective side, at every finite target point and every $t$, lies in the corresponding period times $K$. All these integrals converge by compactness. Use $X$ for $b_{ij,t}$. [Standard triangle and integrability][bex] · [Exact field quantifiers][scope]
+
+On $X$, both integral maps factor through a common simple real quotient with injective realization at each $t$. In fixed finite monomial supports write the reference equality of the period-normalized integrals at finite target points as a linear system over $K$. A complex solution with nonzero primed evaluation follows from surjectivity of the two quotient maps and injectivity of the reference realization. The rows have finite rank, so scalar extension of the $K$-kernel is the complex kernel. Some $K$-kernel vector has nonzero primed evaluation. Its reference equality extends to the full target by weak approximation and continuity. Injectivity identifies its quotient images with the common reference scaling. The same two polynomials give $\widehat b_{ij,t}$ as the ratio of their period-normalized values at a finite point detecting the primed image at $t$. This proves $\widehat b_{ij,t}\in K^\times$ without using arithmetic of $\widehat g_{ij,t}$. [Finite system and detection](ROW_SQUARE_RATIOS.md#a-finite-linear-system-for-rational-periods)
+
+For the field request that precedes the choice of the final datum, the definite inputs come from algebraicity of homogeneous period-normalized CM theta jets and the compact averaging projector. Only finitely many twists, finite class representatives and surviving monomials are needed. Each of the finitely many realized character/ramification patterns admits a representative choice. For each take a rational basis of the compositum containing its normalized jet entries, its two bottom dictionaries, critical Hecke ratios and other required arithmetic constants. The request is the union of these bases. Transport of the grids, Weil actions, finite tests, periods and critical Hecke functions along equality of the pattern puts the same arithmetic in the prescribed field at a later stage. This uses existence of the complete analytic choice on an independently specified grid, with nonzero square comparisons, convergence and the required common real marking. It has no requirement that the normalized square constants already belong to the requested field. [Coefficient construction and transport](ROW_COEFFICIENT_FIELD.md) · [Representative and carried clauses][field]
+
+## Cancellation and the restricted levels
+
+In a fixed square the denominators of the beta steps occur at $z=e+1,\ldots,e+q$, and the alpha numerators at $z=e+q,\ldots,e+q-p+1$. The local epsilon argument is $1-z$ with sign $+1$ in both cases. The branch, character, residue representatives and additive character are the same at the same marked prime. The common Hecke and Gauss factors cancel even before dividing by their reference values. Each plane ideal and frame contributes a finite-order character value in $K$ after normalization. For $j\notin J$ no unmatched argument survives. For $j\in J$ only the first beta denominator, evaluated at $z=e+1$, survives. Its Hecke factor is nonzero by absolute convergence. The prescribed field contains its normalized ratio by criticality and the arithmetic field construction. The omitted base places are ramified for both characters, so their primitive finite Euler factors equal one. [Normalized parity formula](ROW_MIXED_GRID_RATIOS.md#conditional-cancellation-throughout-an-original-square-tower) · [Parameters][rec] · [Critical ratios](ROW_CRITICAL_HECKE_RATIOS.md)
+
+On the actual untwisted restriction the only possible finite twists are $1,\delta,\delta'$. If $w\in L.Q_t$, the equality between the ramification set and the selected branches together with their conjugates makes the twist ramified at $w$. For $t=0$ this is impossible. For $\delta$ or $\delta'$, unramifiedness outside the corresponding frame prime places $w$ above $p_\delta$ or $p_{\delta'}$. The set $S_1$ contains *all* ground-field primes over both frame primes, so $v=w|_F\in S_1$. Grid compatibility forces $w=w(v)$, the selected branch of $W_0$. Thus $L.Q_t\subseteq W_0$, $\mathrm{locPl}(G,t)=W_0$, $\mathrm{twPl}(G,t)=\varnothing$ and $Q_n(G,t)=1$. This holds if some tuple labels are absent. At the distinguished base place the twist is unramified and the epsilon quotient is a root of unity. At each other base place the conductor is two and the twist is tame. Summation first over $1+\pi\mathcal O/\pi^2$ leaves a single residue unit. Twisting multiplies this Gauss sum by a root of unity. This proves (1). More precisely on an even-$k$ square the sole residual factor other than $\widehat b_{ij,t}$ and a root of unity is its critical Hecke ratio. On an odd-$k$ square only the bottom ratio and root occur. [Actual tuples](UNTWISTED_BOTTOM_ROW.md#which-tuples-actually-occur) · [Ramification criterion][q] · [Frame characters][delta] · [All primes above the frame primes][s1] · [Branch identification][wq] · [Local support][loc] · [Twist-place product][qn] · [Depth-two sum](ROW_SQUARE_RATIOS.md#the-gauss-factors-at-the-common-base-places)
+
+## The surviving local factor on a grid with new twisting primes
+
+There is a sharper quantitative statement for other character patterns. Write $W_t=\mathrm{twPl}(G,t)$. For each $w\in W_t$ write $v=w|_F$, and $\ell=\mathrm Nw=\mathrm Nv$ for its rational residue prime. Each residue field is $\mathbf F_\ell$ and the ramification index of $w$ above $\ell$ equals one. This follows from the twist-place requirements $\# k_w=\ell$ and $\ell\notin w^2$. In particular $E_w=\mathbf Q_\ell$. The chosen branch identifies the residue characters with those on $F_v$. Write $\pi_v$ for the fixed uniformizer read on that branch. Let $g_w$ be the conductor-one Gauss sum with the pinned additive character and the inverse of the multiplicative character $\xi_{t,w}$ on units. At every new place $\nu_{ij,0,w}$ is unramified. Hence $g_w$ is *the same sum at every square*, including its additive character. Put
+$$
+ \eta=\prod_{i,\ j\in J}\nu_{ij,0},\qquad
+ U_w=\eta_w(\pi_v)=
+ \frac{\bigl(\prod_{j\in J}\mu_{0,j,w}(\pi_v)\bigr)^m}
+      {\bigl(\prod_i\chi_{m-i,w}(\pi_v)\bigr)^{|J|}} .
+$$
+With $R_t=(\prod_{i,j}\widehat g_{ij,t})/(B_tH_t)$, the pinned epsilon definition at $-e$ and conductor one gives
+$$
+ R_t=\zeta_t\prod_{w\in W_t}
+       \bigl(\ell^{Ne}\,g_w^N\,U_w\bigr)^{-1},
+ \qquad \zeta_t\in\mu(K).                                      \tag{2}
+$$
+The root absorbs the $N$ factors of $\xi_{t,w}(\pi_v)^{-1}$ and all base-place and geometry factors. In particular $R_t$ is a unit off $Q_n(G,t)$. The places in (2) run over *one selected branch* over each $v$. Extending this product to include conjugate branches would incorrectly cancel the unramified values in $U_w$. The functional-equation product that does use both branches has a different support. [Twist-place hypotheses][tw] · [Square characters][nu] · [Conductors and uniformizer values][new] · [Pinned Gauss sign and epsilon powers][eps] · [Which product uses both branches][both]
+
+For an explicit $\ell$-adic denominator, choose $\lambda:\overline{\mathbf Q}\hookrightarrow\overline{\mathbf Q}_\ell$ and normalize $v_\ell(\ell)=1$. On $k_w^\times$, the reduction of $\lambda(\xi_{t,w})$ is $x\mapsto x^{b_{w,\lambda}}$ for a unique $1\le b_{w,\lambda}\le\ell-2$. Nontrivial tame ramification guarantees this interval is nonempty. Then
+$$
+ v_\ell(\lambda g_w)=\frac{b_{w,\lambda}}{\ell-1}.
+$$
+Indeed the image of the nontrivial additive character of $\mathbf F_\ell$ has the form $x\mapsto\zeta_\ell^{cx}$ with $c\ne0$. Substituting $y=cx$ changes the sum by a root of unity. With $T=\zeta_\ell-1$ expand $(1+T)^a$ using the representatives $1\le a\le\ell-1$. The coefficient at $T^r$ is $\sum_a\lambda(\xi(a))^{-1}\binom ar$, which belongs to $\mathbf Z_\ell$ because the multiplicative character values are $(\ell-1)$-st roots of unity. For $r<b_{w,\lambda}$ its reduction is zero since all powers $a^{s-b_{w,\lambda}}$, $0\le s\le r$, have zero sum over $\mathbf F_\ell^\times$. At $r=b_{w,\lambda}$ the leading coefficient gives $-1/b_{w,\lambda}!\ne0$. Since $v_\ell(T)=1/(\ell-1)$, the term with $r=b_{w,\lambda}$ is uniquely of lowest valuation. In particular, if $h_w$ is the order of $\xi_{t,w}$ on units, multiplication by $\ell^{\lceil N(1-1/h_w)\rceil}$ clears the denominator of $g_w^{-N}$ at every coefficient prime. Here $b_{w,\lambda}/(\ell-1)$ is a reduced fraction of denominator $h_w$, and $g_w\bar g_w=\ell$ ensures integrality away from $\ell$.
+
+One can include the uniformizer factor exactly. Write $A_\varphi$ for the exponent of $\varphi(x)$ in the infinity character of $\eta$ on diagonal $x\in E^\times$, so that $\eta_\infty(x)=\prod_{\varphi:E\hookrightarrow\mathbf C}\varphi(x)^{A_\varphi}$. On the fixed CM type these are the sums of the $\kappa_{ij,\tau}(0)$ over $i,\ j\in J$ and the conjugate embeddings have opposite exponents. For $w|\ell$ there is a unique embedding $\varphi(w,\lambda)$ for which $\lambda\circ\varphi$ induces $w$, since $[E_w:\mathbf Q_\ell]=1$. Take a ray-class power $w^h=(x)$ with $x$ congruent to one at a conductor for $\eta$. The product rule gives $U_w^h=\eta_\infty(x)^{-1}$. The $\lambda$-adic valuation of $\varphi(x)$ is zero at every other embedding and equals $h$ at $\varphi(w,\lambda)$. Thus $v_\ell(\lambda U_w)=-A_{\varphi(w,\lambda)}$. At primes of residue characteristic different from that of $w$ this value has valuation zero. [CM type and weights][wt] · [Angular-exponent convention][inf] · [Product rule and its sign][rule]
+
+It follows that for every $\lambda$ as above
+$$
+ v_\ell(\lambda R_t)
+   =\sum_{\substack{w\in W_t\\w\mid\ell}}
+       \left(A_{\varphi(w,\lambda)}-Ne-
+                         \frac{N b_{w,\lambda}}{\ell-1}\right).       \tag{3}
+$$
+The minimal positive rational integer clearing the denominator of $R_t$ has exponent $\max(0,\lceil\max_\lambda(-v_\ell(\lambda R_t))\rceil)$ at $\ell$. This takes the maximum *after* summing over the selected branches and squares. The maxima depend only on the finitely many embeddings of a common number field for these algebraic quantities. Formula (3) supplies the exact denominator of the residual local factor. The full square product adds the valuations of $B_t$ and $H_t$. Even when $W_t$ is empty, algebraicity of the normalized bottom values and critical Hecke values provides no quantitative bound on their denominators. The pin states separate arithmetic hypotheses for bounds on these two families. [Bottom and critical valuation hypotheses][quant]
+
+[rk]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/LeastSplitAuxiliaryPrimeThetaChainSpec.lean#L122-L129
+[prod]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/TwistedInnerProducts/ExistsMatchOver.lean#L268-L274
+[split]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/HyperbolicPlaneSplitSelfDualHermitianComplementStatement.lean#L24-L28
+[family]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/ThetaCorrespondence/ThetaPairLifts/LocalTypeDictionary/QuadraticTowerStepStageInduction.lean#L26-L44
+[br]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/FinitePrimesUnder.lean#L171-L188
+[choose]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsRealEmbeddingsSharedBaseTowerStage.lean#L218-L249
+[fit]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/DownRight.lean#L44-L80
+[frames]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/TowerStageSuccessorCoefficients.lean#L57-L135
+[cfg]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/CTSmallCone.lean#L110-L136
+[bex]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/BottomExistsIntegrable.lean#L104-L145
+[scope]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/TwistedInnerProducts/MemHalfCosetSelf.lean#L203-L235
+[field]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/ExKeyOf.lean#L33-L89
+[rec]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/WeilTensorModels.lean#L552-L579
+[q]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/IndefiniteReal/LinksDefs.lean#L449-L459
+[delta]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Foundations/IsUnitaryOfOrder.lean#L267-L272
+[s1]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/LeastSplitAuxiliaryPrimeThetaChainSpec.lean#L262-L270
+[wq]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/BasePlaceNotMemChiGridBadPlaces.lean#L53-L74
+[loc]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/ExistsGivenStageEqOne.lean#L112-L117
+[qn]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Statements/PlaceShiftStatements/NormSmall.lean#L48-L53
+[tw]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/IndefiniteReal/SubgroupCharExtensionOneApply.lean#L85-L94
+[nu]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/FinitePrimesUnder.lean#L231-L243
+[new]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/TwistPlaceStepFactorInverseAwayUnit.lean#L50-L66
+[eps]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/WeilTensorModels.lean#L112-L132
+[both]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/FinprodNuValuesTwistOnlyRamifiedEqOne.lean#L44-L73
+[wt]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/TwistedOperators/NormalFormToricRatio.lean#L70-L81
+[inf]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/Divisors/EntireEqOfHalfPlane.lean#L40-L47
+[rule]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/ExistsPowSubOneMemPow.lean#L81-L116
+[quant]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Statements/PlaceShiftStatements/NormSmall.lean#L139-L167

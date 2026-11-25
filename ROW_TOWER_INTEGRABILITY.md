@@ -51,7 +51,7 @@ $$
 $$
 The enlarged domain removes dependence of the integral on the chamber walls. Finally $\sum_{i,j\le q}\min(T_i,T_j)=\sum_{i=1}^q(2i-1)T_i$, and $\sum_{i\le q,\,j>q}\min(T_i,T_j)=q\sum_{j>q}T_j$. Substitution in (4) gives exactly the small exponent in (1). For $q=0$ there is only the compact source integral, and the formula gives $n\sum T_j/2$. [Positive weights as a sum of minima][g-sum] · [Multiplicity of a self-minimum][g-self] · [Source chamber integration][g-chamber]
 
-## The target integral on the two new squares
+## The target integral and two mixed-signature examples
 
 The target density is $\exp(-D\sum_{j=1}^y(d-2j+1)T_j)\,dT$. Put $u_k=T_k-T_{k+1}$ with $T_{y+1}=0$. After multiplying by the squared big bound in (1), the coefficient of $-Du_k$ is $B_k=k(n-k)$. For the squared small bound it is
 $$
