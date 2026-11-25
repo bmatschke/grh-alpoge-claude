@@ -35,16 +35,30 @@ def main():
     roadmap = (root / update["roadmap"]).read_text()
     roadmap_ids = re.findall(r"^\| `([A-Z][A-Z0-9_]+)` \|", roadmap, re.MULTILINE)
     assert sorted(roadmap_ids) == sorted(remaining), "Roadmap disagrees with the graph"
+    endpoint_proofs = update["proved_endpoint_assertions_with_broader_work"]
+    assert endpoint_proofs.keys() <= remaining
+    for node, entry in endpoint_proofs.items():
+        assert not deps[node] and (root / entry["proof"]).is_file()
+        assert entry["endpoint_statement"] and entry["broader_work"]
+    missing_at_endpoint = remaining - endpoint_proofs.keys()
+    endpoint_roadmap, divider, _ = roadmap.partition("## Broader reconstruction")
+    assert divider, "Roadmap must distinguish endpoint inputs from broader work"
+    endpoint_ids = re.findall(r"^\| `([A-Z][A-Z0-9_]+)` \|", endpoint_roadmap, re.MULTILINE)
+    assert sorted(endpoint_ids) == sorted(missing_at_endpoint)
     endpoints = update["reachable_open_contracts"]
     assert set(endpoints) == {"ORDINARY_RH", "DIRICHLET_GRH"}
     for endpoint, reported in endpoints.items():
         assert leaves(endpoint) & old_open == set(graph["shared_open_ids"])
-        assert sorted(leaves(endpoint) & remaining) == reported
+        assert sorted(leaves(endpoint) & missing_at_endpoint) == reported
         assert "DESIGN_CHOICES_COMMON" in reported
-        print(f"{endpoint} has {len(reported)} remaining contracts")
+        print(f"{endpoint} has {len(reported)} remaining endpoint inputs")
     difference = set(endpoints["DIRICHLET_GRH"]) - set(endpoints["ORDINARY_RH"])
     assert sorted(difference) == update["additional_dirichlet_grh_contracts"]
-    print(f"Checked {len(deps)} nodes, {len(proved)} updated proof references and {len(roadmap_ids)} roadmap entries")
+    print(
+        f"Checked {len(deps)} nodes, {len(proved)} whole-entry proofs, "
+        f"{len(endpoint_proofs)} selected-family endpoint substitution(s), "
+        f"and {len(roadmap_ids)} open historical entries"
+    )
 
 
 if __name__ == "__main__":
