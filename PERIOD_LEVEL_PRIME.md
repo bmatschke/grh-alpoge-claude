@@ -2,6 +2,8 @@
 
 Let $p=T_u$ be the level prime of a selected word. On the eventual range, $p\ge5$ splits in the imaginary quadratic field $K_d$ and is prime to the discriminant and the curve ideal. The first input of Roadmap B4.22c asks for integral binomial moments in a particular ordinary coordinate. It follows from Bannai and Kobayashi, including all the required ideal curves, directions and prime-to-$p$ translates. For the subsequent matrix kernels a separate calculation gives the local exponent, conditional on the one-step comparisons on the chosen column. [Elliptic hypothesis][matrix] · [Level-prime period statement][level]
 
+The [matrix and terminal calculation](PERIOD_LEVEL_PRIME_MATRIX.md) now applies this elliptic estimate to the prescribed normalized section on a constructed good column. It makes the two finite Fourier counts explicit, transfers the bound to the actual rational class-sum pairing and accounts for rounding the word-prime shift.
+
 ## The half-period and the ordinary coordinate
 
 Write $\Lambda=\delta\mathfrak c$ for the ideal lattice scaled to have Weierstrass discriminant one. The normalized even theta section on $\mathbb C/\Lambda$ has its simple zero at a nonzero half-period $P$ and takes value one at zero. Write $\vartheta$ for the reduced theta with simple zero at zero and derivative one. For the Hermitian form $H$ of the principal polarization use the reduced translation
