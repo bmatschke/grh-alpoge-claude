@@ -1,5 +1,7 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
+Start with the [mathematical guide](../MATHEMATICAL_GUIDE.md) for the role of theta periods and divisibility, the published theorems used in the argument, and the arithmetic comparisons that remain open.
+
 Edition 0.88 completes the weighted period-error estimate and proves full rank for the sharp and base row lattices on the original selected family. Its Bessel pairing agrees with the recorded map on rational vectors. Entries 3, 5 and 8 of the period-height estimate are proved. The original global denominator bound was completed in edition 0.87. Nine whole obligations remain, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_88.md) · [New proofs (PDF)](../RH_new_proofs_v0_88.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_88.tex)
 
 | Question | Where to read |

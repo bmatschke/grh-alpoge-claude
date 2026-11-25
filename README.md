@@ -1,4 +1,4 @@
-**Current edition 0.88.** [Reading guide](RH_reconstruction_progress_v0_88.md) · [New proofs (PDF)](RH_new_proofs_v0_88.pdf) · [Current checkpoint](CURRENT_CHECKPOINT_v0_88.json)
+**Current edition 0.88.** [Reading guide](RH_reconstruction_progress_v0_88.md) · [New proofs (PDF)](RH_new_proofs_v0_88.pdf) · [Current checkpoint](CURRENT_CHECKPOINT_v0_88.json) · [Mathematical guide](MATHEMATICAL_GUIDE.md)
 
 # RH and unrestricted Dirichlet-GRH human reconstruction — v0.57
 
