@@ -8,6 +8,8 @@
 
 On this first pass the frame characters introduce no new twisting primes. In the product of all the normalized square constants the Gauss factors therefore contribute only a root of unity. The remaining fractional ideal is that of the product of the normalized definite constants and the critical Hecke quotients from columns an even distance from the right boundary. Its size still matters in the period-height obligation. The [starting state before localization](FIRST_PASS_STARTING_STATE.md) retains these rows on the prescribed weight set. [Product and local valuations](ROW_GRID_PRODUCT.md) · [Active roadmap](NEXT_STEPS.md)
 
+The [labelled first-pass state](FIRST_PASS_LABELLED_STATE.md) retains the marked rows and both central actions. Its two type primes split in the [prescribed ray class field](FIRST_PASS_RAY_CLASS_FIELD.md), and its de Rham representations have the [required jump count at each embedding](FIRST_PASS_FILTERED_DIMENSIONS.md). The [definite-form realization](FIRST_PASS_DEFINITE_ROW_FORMS.md) and [Hecke rationality argument](FIRST_PASS_HECKE_RATIONALITY.md) work with the original coefficient fields and lattices. The [reference theta lift and definite transfer](FIRST_PASS_CUSPIDAL_ROW.md) identify the unique cuspidal parameter of each occurring good row. [Clozel and Ramakrishnan](FIRST_PASS_CUSPIDAL_COEFFICIENTS.md) place its Frobenius coefficients in the prescribed field at every spherical place. Together these give the intermediate level used to construct the twist coefficient rings and forms.
+
 | Work still open | Mathematical question |
 |---|---|
 | Base theta readings | Can the two readings constructed on the starting column be carried through retwisting to the prescribed family? |
