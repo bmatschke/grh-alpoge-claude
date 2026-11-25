@@ -3,6 +3,7 @@ from functools import cache
 from graphlib import TopologicalSorter
 from hashlib import sha256
 import json
+import re
 from pathlib import Path
 
 
@@ -31,6 +32,9 @@ def main():
         assert not deps[node] and (root / proof).is_file()
     remaining = old_open - proved.keys()
     assert sorted(remaining) == update["remaining_contracts"]
+    roadmap = (root / update["roadmap"]).read_text()
+    roadmap_ids = re.findall(r"^\| `([A-Z][A-Z0-9_]+)` \|", roadmap, re.MULTILINE)
+    assert sorted(roadmap_ids) == sorted(remaining), "Roadmap disagrees with the graph"
     endpoints = update["reachable_open_contracts"]
     assert set(endpoints) == {"ORDINARY_RH", "DIRICHLET_GRH"}
     for endpoint, reported in endpoints.items():
@@ -40,7 +44,7 @@ def main():
         print(f"{endpoint} has {len(reported)} remaining contracts")
     difference = set(endpoints["DIRICHLET_GRH"]) - set(endpoints["ORDINARY_RH"])
     assert sorted(difference) == update["additional_dirichlet_grh_contracts"]
-    print(f"Checked {len(deps)} nodes and {len(proved)} updated proof references")
+    print(f"Checked {len(deps)} nodes, {len(proved)} updated proof references and {len(roadmap_ids)} roadmap entries")
 
 
 if __name__ == "__main__":

@@ -10,6 +10,8 @@ For a nonzero integer $a$, the total logarithmic divisibility $\sum_p v_p(a)\log
 
 What the comparison has to deliver is quite specific. For each target character, the analytic reduction asks for a one-sided estimate for a centered, smoothed prime sum on arbitrarily late windows $[Y,Y^{3/2}]$. A zero to the right of the critical line would force a violation on every sufficiently late such window. Thus the arithmetic work can concentrate on producing good windows. The denominator estimate limits how much of the accumulated divisibility is lost to denominators. The period comparison allows estimates for sizes and mutual angles in a Hilbert space to be used on the integral maps that earned that divisibility. [Analytic reduction and window criterion](RH_GRH_reconstruction_roadmap_v1_2026-11-23.txt) · [Period maps in the final Gram calculation, GFA7](global_assembly/main.tex)
 
+The latest [working roadmap](NEXT_STEPS.md) records what can already be constructed on a given arithmetic stage or a given good point, and what must still be proved uniformly. The [reciprocity argument](COMMON_DESIGN_EXISTENCE.md) identifies the field of the explicit elliptic functions. The [adelic period-height bound](PERIOD_COMPARISON_STEP.md) explains how much finite and archimedean size the slope argument can absorb.
+
 ## The six remaining obligations
 
 The [selected-family proof](LOCAL_SELECTED_FAMILY.md) identifies the local specialization and the second-layer selector on the original family. The [base-row proof](SELECTED_BASE_ROWS.md) verifies the third completed obligation. All six remaining contracts occur on both the RH and the unrestricted Dirichlet-GRH routes. [Dependency inventory](SELECTED_FAMILY_CHECKPOINT.json)
