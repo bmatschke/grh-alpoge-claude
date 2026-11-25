@@ -26,9 +26,9 @@ The original common selector supplies the local certificate, base rows, both rea
 
 | Mathematical job | Open entries in the repository |
 |---|---|
-| Produce good weighted points of the same arithmetic and geometric family at the required scales. The [ramified character](SECOND_PASS_RAMIFIED_SERIES.md) is fitted on the preliminary datum, and [every prescribed size](SIZE_FACE_REALIZATION.md) is realized on each good point. | `DESIGN_CHOICES_COMMON` |
+| Produce good weighted points of the same arithmetic and geometric family at the required scales. The [two paths on a retwisted square](SECOND_PASS_RAMIFIED_SQUARE.md) agree up to a nonzero scalar, and the [bottom-row tests](SECOND_PASS_BOTTOM_SEPARATION.md) detect every multiplicity on the realized grid. The [advance field](SECOND_PASS_BOTTOM_TESTS.md#returning-the-normalized-values-to-the-requested-field) captures its rational readings. Compatible geometric and Galois stages must still be produced throughout the family. Each good point gives [every prescribed size](SIZE_FACE_REALIZATION.md). | `DESIGN_CHOICES_COMMON` |
 | Bound the heights of the integral period maps and compare different words in the common target. The [elliptic moments](PERIOD_LEVEL_PRIME.md), [allowances](PERIOD_FRAME_BOUND.md) and [reference-period criterion](PERIOD_BASE_COMPARISON.md) isolate three inputs to that comparison. | `GLOBAL_PERIOD_HEIGHT` |
-| Bound the diagonal and mixed spectral Gram operators. The [dimension and cell estimates](SPECTRAL_GRAM_CELLS.md) supply the third spectral output and remove the unequal-word zero-Gram term. The [same-word bound](SPECTRAL_DIAGONAL_ZERO_CELL.md) isolates the fixed-label orbital estimate. | `GLOBAL_SPECTRAL` |
+| Bound the diagonal and mixed spectral Gram operators. The [dimension and cell estimates](SPECTRAL_GRAM_CELLS.md) supply the dimension bound and remove the unequal-word zero-Gram term. The [individual weighted frame count](SPECTRAL_FRAME_FIBRE.md) enters the same-word bound through a [sum over pairs of embedded data](SPECTRAL_DIAGONAL_ZERO_CELL.md). | `GLOBAL_SPECTRAL` |
 
 ## How the theta tower uses the oscillator representation
 
