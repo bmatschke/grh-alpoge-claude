@@ -2,7 +2,7 @@
 
 **Six obligations remain. All six are shared by RH and unrestricted Dirichlet GRH.** The aim is to explain the pinned Alpöge–Claude formal argument in ordinary mathematical language, using established theorems where their hypotheses and normalizations agree. The human proof is incomplete. [Proof idea](PROOF_IDEA.md) · [Mathematical guide](MATHEMATICAL_GUIDE.md) · [Verified obligation inventory](SELECTED_FAMILY_CHECKPOINT.json)
 
-**Current proof target.** Construct the moduli family behind the two base theta readings. Its [theta line](PEL_THETA_LINE.md) is determined by the polarization and the trace-one CM element. Its [marking of half the torsion](PEL_MARKED_LEVEL.md) is an integral PEL level that kills every polarized automorphism. Next identify the resulting universal family over its prescribed field and its complex components on the given arithmetic column. The [fixed-stage theta construction](THETA_FIXED_STAGE_REALIZATION.md) gives the eight analytic maps there once the geometric readings are supplied. [Active roadmap](NEXT_STEPS.md)
+**The geometric family is now identified.** The [marked abelian varieties form a fine PEL moduli scheme](PEL_MODULI_COMPARISON.md). Its theta line, signature and level determine the universal family over the prescribed field. On an [original arithmetic stage](PEL_STAGE_PARAMETERS.md), its [complex period charts correspond to marked unitary lattice classes](PEL_ADELIC_COMPONENTS.md). Next assemble the integral and archimedean evaluations on these charts with the [eight fixed-stage theta maps](THETA_FIXED_STAGE_REALIZATION.md) and the preliminary coefficient readings. [Active roadmap](NEXT_STEPS.md)
 
 | Work still open | Mathematical question |
 |---|---|
