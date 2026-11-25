@@ -1,21 +1,22 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.83 completes the middle-range denominator estimate at every eligible prime. All fifteen denominator fields now hold on the same family data under their original hypotheses. The weighted denominator bound follows on a family carrying the stated arithmetic facts. Applying it to the selected design still requires identifying the data on that family, including their transport through the good cut on the route in the formal source. The human-readable reconstruction still has **ten open obligations shared by RH and unrestricted Dirichlet GRH**. [Reading guide](../RH_reconstruction_progress_v0_83.md) · [New proofs (PDF)](../RH_new_proofs_v0_83.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_83.tex)
+Edition 0.84 proves the good-cut theorem for the denominator estimate, including all the norm-choice facts and the four compatibility conditions on the same cut. Six Galois preconditions and two of the four original compatibility conditions are proved on each original member. The remaining type-prime estimate is reduced to uniform integral lifting on the indicated potentially crystalline lattices. **Ten whole obligations remain open, all shared by RH and unrestricted Dirichlet GRH.** [Reading guide](../RH_reconstruction_progress_v0_84.md) · [New proofs (PDF)](../RH_new_proofs_v0_84.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_84.tex)
 
 ## Read and verify
 
 | Question | Source |
 | --- | --- |
-| What finishes the two remaining inert rows? | [All-thick places](../continuation_v83/thick.tex) · [Mixed places and their length bounds](../continuation_v83/mixed.tex) · [All sign orders](../RH_reconstruction_progress_v0_83.md#the-last-middle-range-rows) |
-| What does the bound on the original family require? | [Assembly and denominator sum](../continuation_v83/assembly.tex) · [Transport of the four ties](../continuation_v83/tiecut.tex) · [The next comparison](../RH_reconstruction_progress_v0_83.md#where-to-resume) · [Ten open contracts](../continuation_v83/obligations.json) |
-| Which estimates were already available at the other primes? | [Split, small and row B estimates in edition 0.82](../RH_reconstruction_progress_v0_82.md) |
-| Where do other public reconstructions supply relevant arguments? | [Comparison of six sources](../continuation_v83/external_sources.md) · [The counting argument](../continuation_v83/cylinder.tex) · [Arithmetic flags](../continuation_v83/nearflag.tex) |
-| How can the checkpoint be checked? | [Claims and source ranges](../continuation_v83/claims.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_83.json) · [Validation](../continuation_v83/validation.json) |
+| How is the good cut constructed and what does it preserve? | [Selector and indexing correction](../continuation_v84/goodcut.tex) · [Arithmetic facts on the cut](../continuation_v84/cutfacts.tex) |
+| Which hypotheses already hold on original members? | [Member data](../continuation_v84/member.tex) · [Localization uniqueness](../continuation_v84/localisation.tex) |
+| How are local type-prime losses measured? | [Exact Hecke restriction indices](../continuation_v84/typeideal.tex) · [Finite local cocycles](../continuation_v84/typeplace.tex) · [Global Selmer bound](../continuation_v84/selmer.tex) |
+| Where does the argument return to the uncut family? | [Family comparison](../continuation_v84/binding.tex) · [What remains](../RH_reconstruction_progress_v0_84.md#where-to-resume) |
+| Which independent sources were compared? | [Source-by-source comparison](../continuation_v83/external_sources.md) · [Previous edition](../RH_reconstruction_progress_v0_83.md) |
+| How is this checkpoint verified? | [Claim ledger](../continuation_v84/claims.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_84.json) · [Open contracts](../continuation_v84/obligations.json) · [Validation](../continuation_v84/validation.json) |
 
 ~~~sh
-python3 continuation_v83/verify.py --formal-git formal_source
-pdflatex RH_new_proofs_v0_83.tex
-pdflatex RH_new_proofs_v0_83.tex
+python3 continuation_v84/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_84.tex
+pdflatex RH_new_proofs_v0_84.tex
 ~~~
 
 ## Reproduce the portable v0.58 files
