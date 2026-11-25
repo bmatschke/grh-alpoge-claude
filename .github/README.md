@@ -1,22 +1,21 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.84 proves the good-cut theorem for the denominator estimate, including all the norm-choice facts and the four compatibility conditions on the same cut. Six Galois preconditions and two of the four original compatibility conditions are proved on each original member. The remaining type-prime estimate is reduced to uniform integral lifting on the indicated potentially crystalline lattices. **Ten whole obligations remain open, all shared by RH and unrestricted Dirichlet GRH.** [Reading guide](../RH_reconstruction_progress_v0_84.md) · [New proofs (PDF)](../RH_new_proofs_v0_84.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_84.tex)
+Edition 0.85 proves the quantitative type-prime lifting estimate on the original potentially crystalline Galois lattices, with absolute constant 40. It also proves four more of the original member hypotheses, bringing the total to ten of eighteen. The denominator bound on the uncut family follows under the remaining selected-member hypotheses and compatibility conditions. **Ten whole obligations remain open, all shared by RH and unrestricted Dirichlet GRH.** [Reading guide](../RH_reconstruction_progress_v0_85.md) · [New proofs (PDF)](../RH_new_proofs_v0_85.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_85.tex)
 
 ## Read and verify
 
 | Question | Source |
 | --- | --- |
-| How is the good cut constructed and what does it preserve? | [Selector and indexing correction](../continuation_v84/goodcut.tex) · [Arithmetic facts on the cut](../continuation_v84/cutfacts.tex) |
-| Which hypotheses already hold on original members? | [Member data](../continuation_v84/member.tex) · [Localization uniqueness](../continuation_v84/localisation.tex) |
-| How are local type-prime losses measured? | [Exact Hecke restriction indices](../continuation_v84/typeideal.tex) · [Finite local cocycles](../continuation_v84/typeplace.tex) · [Global Selmer bound](../continuation_v84/selmer.tex) |
-| Where does the argument return to the uncut family? | [Family comparison](../continuation_v84/binding.tex) · [What remains](../RH_reconstruction_progress_v0_84.md#where-to-resume) |
-| Which independent sources were compared? | [Source-by-source comparison](../continuation_v83/external_sources.md) · [Previous edition](../RH_reconstruction_progress_v0_83.md) |
-| How is this checkpoint verified? | [Claim ledger](../continuation_v84/claims.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_84.json) · [Open contracts](../continuation_v84/obligations.json) · [Validation](../continuation_v84/validation.json) |
+| What is the lifting bound and how does it enter the family? | [Cocycle exponent and family theorem](../continuation_v85/assembly.tex) |
+| Where does integrality enter? | [Realized models](../continuation_v85/realization.tex) · [Cokernel on lattices](../continuation_v85/connection.tex) · [Kernel](../continuation_v85/kernel.tex) · [Monodromy correction](../continuation_v85/monodromy.tex) · [Return to finite cohomology](../continuation_v85/period.tex) |
+| What has been proved on the original members? | [Infinity weights](../continuation_v85/memberfield.tex) · [Spherical inert base change](../continuation_v85/basechange.tex) · [Good finite types](../continuation_v85/member.tex) · [Wild inertia](../continuation_v85/depth.tex) · [Remaining fields and ties](../RH_reconstruction_progress_v0_85.md#where-to-resume) |
+| Which outside sources help? | [External reconstructions](../continuation_v83/external_sources.md) · [Crystalline comparison](../RH_reconstruction_progress_v0_85.md#which-external-results-enter) |
+| How do I verify this edition? | [Source ledger](../continuation_v85/claims.json) · [Checkpoint](../CURRENT_CHECKPOINT_v0_85.json) · [Original contracts](../continuation_v85/obligations.json) · [Validation](../continuation_v85/validation.json) |
 
 ~~~sh
-python3 continuation_v84/verify.py --formal-git formal_source
-pdflatex RH_new_proofs_v0_84.tex
-pdflatex RH_new_proofs_v0_84.tex
+python3 continuation_v85/verify.py --formal-git formal_source
+pdflatex RH_new_proofs_v0_85.tex
+pdflatex RH_new_proofs_v0_85.tex
 ~~~
 
 ## Reproduce the portable v0.58 files
