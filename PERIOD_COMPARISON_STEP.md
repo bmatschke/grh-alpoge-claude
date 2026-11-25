@@ -2,6 +2,8 @@
 
 For the slope estimate, the image of a rational period and the direction of the map matter. Multiplying that map by a nonzero field element leaves both unchanged. A bound that charges separately for its denominator and its large archimedean norms can nevertheless assign an arbitrarily large cost to this operation. Bost's height of a rational linear map combines the two contributions before comparing them with the height allowance. Huang's Arakelov account of the Alpöge–Claude argument uses exactly this height in squared-norm conventions. Below we apply it to the original word lattices and to the rank-weighted mean required by the reconstruction. [Bost, §4.1.4 and Proposition 4.5](https://numdam.org/item/10.1007/s10240-001-8191-3.pdf#page=39) · [Huang, §2.2.1, equation (2.2.1)](https://hexagonmath.org/pdf/2611.00833v1#page=5)
 
+For the original period-height entries, the [split level-prime calculation](PERIOD_LEVEL_PRIME.md) addresses the local content, the [two-sided allowance bound](PERIOD_FRAME_BOUND.md) isolates the slope estimate, and the [reference-row argument](PERIOD_BASE_COMPARISON.md) compares arithmetic and spectral evaluations under the stated descent and diagonal bounds.
+
 ## Computing the finite part on the actual lattices
 
 Let $K$ be the coefficient field, $d_K=[K:\mathbb Q]$, $N_i$ a shifted integral word lattice and $C$ the integral dual sharp-row lattice. For a nonzero rational period $B_i:N_{i,K}\to C_K$ and any finite place $w$, put

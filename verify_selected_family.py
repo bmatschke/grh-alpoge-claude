@@ -48,6 +48,11 @@ def main():
         assert {user for user, inputs in deps.items() if node in inputs} == {base_producer}
     assert {user for user, inputs in deps.items() if base_producer in inputs} == {"GLOBAL_SMALL_RANK"}
     missing_at_endpoint = remaining - endpoint_proofs.keys()
+    progress = update["progress_within_remaining_inputs"]
+    assert progress.keys() == missing_at_endpoint
+    for entry in progress.values():
+        assert entry["established"] and entry["needed"] and entry["proofs"]
+        assert all((root / proof).is_file() for proof in entry["proofs"])
     endpoint_roadmap, divider, _ = roadmap.partition("## Broader reconstruction")
     assert divider, "Roadmap must distinguish endpoint inputs from broader work"
     endpoint_ids = re.findall(r"^\| `([A-Z][A-Z0-9_]+)` \|", endpoint_roadmap, re.MULTILINE)
