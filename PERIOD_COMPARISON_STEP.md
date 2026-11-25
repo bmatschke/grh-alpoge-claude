@@ -39,3 +39,29 @@ All the complex images of source subspaces are preserved. The adjusted mean is n
 For example take $K=\mathbb Q(i)$, both lattices $O_K$ with their standard metrics, allowance $h_i=0$, and $B_i(z)=p^{-m}z$ for a rational prime $p$ and $m>0$. The largest integral domain in the given source is $p^m O_K$, whose index contribution in squared degrees is $2m\log p$. The archimedean contribution to the *signed* height is $-2m\log p$, while the finite part is $2m\log p$. Thus $\Delta_{\rm ad}=0$ for all $m$. Conversely a denominator confined to a single direction of a high-rank space may cost less under the [elementary-divisor estimate](PERIOD_LATTICE_LOSS.md#the-two-losses-and-their-exact-normalization). The proof permits either construction separately for each word: use the lattice and allowance giving the lower wordwise loss, since each preserves the upper bound on adjusted slopes, the same complex images, and the corresponding lower bound on total adjusted degree.
 
 On the scales used in the reconstruction one may insert $\Delta_{\rm ad}$ in the earlier estimate $s\le\mu(C)+5u+7b+5\Delta_{\rm ad}$. A sufficient arithmetic target at the chosen cutoff is consequently to bound the rank-weighted excess of the projective heights by $b=\exp(x^\varepsilon)$ on the selected family. For the original all-$H$ frame conclusion, the stricter sufficient bound is $\Delta_{\rm ad}\le (1-\delta)\log(\#\mathrm{Word})/4$, under the same frame hypotheses. Both conclusions still require the spanning estimate. The full period-height obligation separately asks for exact integrality, its specified archimedean allowance, and the other period assertions. A comparison on projective heights answers the height question used by the mean-slope deduction. It leaves those stronger assertions and the uniform arithmetic bound to be proved. [Constants and all-$H$ threshold](PERIOD_LATTICE_LOSS.md#the-mean-slope-bound-with-losses)
+
+## Bounding the archimedean term on the types met by a word
+
+Adriazola's reconstruction factors a word map into the chain of theta kernels and a final pairing. His height proposition gives an archimedean bound using the smallest metric factor over the base types. The following version only needs to control types on which that particular word has an image. It also exhibits the finite term still required for the signed height in our slope inequality. [The factorization and proof with the base-type metrics](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/aa9c86bf2a7d29b08575641fecea19a2a603e87c/manuscript/sec15_heights.tex#L154-L180)
+
+Fix a nonzero word map $B_i$. At a coefficient embedding $\sigma$ suppose its archimedean realization is the specified composite $P_{i,\sigma} K_{m,\sigma}\cdots K_{1,\sigma}$. Let $h$ be the prescribed target metric before dualizing. Suppose the base-type decomposition is orthogonal for $h$ and a comparison metric $h'$, with $h=c_{p,\sigma}h'$ on type $p$ and $c_{p,\sigma}>0$. In the source's factorization $c_{p,\sigma}=\kappa_\sigma\prod_j\lambda_j(p,\sigma)$. Use $h'^\vee$ to measure the output of $P_{i,\sigma}$. Put
+$$
+  S_{i,\sigma}=\{p:\operatorname{pr}_p B_{i,\sigma}\ne0\}.
+$$
+This set is nonempty at every embedding. If $y=B_{i,\sigma}v$, then
+$$
+ \|y\|_{h^\vee}^2=
+    \sum_{p\in S_{i,\sigma}}c_{p,\sigma}^{-1}
+                        \|\operatorname{pr}_p y\|_{h'^\vee}^2
+ \le \frac{\|y\|_{h'^\vee}^2}{\min_{p\in S_{i,\sigma}}c_{p,\sigma}}.
+$$
+Taking a supremum on unit source vectors, applying submultiplicativity to the composite, and adding the finite content term already computed gives
+$$
+ h_{\rm ad}(B_i)\le f_i+
+ \frac1{d_K}\sum_\sigma\left(
+    \log\|P_{i,\sigma}\|^2+
+    \sum_{j=1}^m\log\|K_{j,\sigma}\|^2-
+    \min_{p\in S_{i,\sigma}}\log c_{p,\sigma}
+ \right).
+$$
+The intermediate metrics in the two adjacent factors must agree. The minimum can be taken separately at each embedding. If a type with a very small metric factor is absent from this word, it has no effect on this bound. Once the arithmetic maps, type supports, normalizations and finite contents have been identified on the selected data, the positive excess of this right side over the word allowance can be inserted into the rank-weighted slope bound above. The argument by itself leaves the relative positions of images of different words undetermined. [Required comparison of the actual maps](continuation_v90/intertwiners.tex) · [Archimedean kernel, pairing and frame inputs in the other reconstruction](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/aa9c86bf2a7d29b08575641fecea19a2a603e87c/manuscript/sec15_heights.tex#L182-L200)

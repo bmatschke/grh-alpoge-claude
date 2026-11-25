@@ -40,6 +40,13 @@ def main():
     for node, entry in endpoint_proofs.items():
         assert not deps[node] and (root / entry["proof"]).is_file()
         assert entry["endpoint_statement"] and entry["broader_work"]
+    # Substitution of the selected base square is justified only at this use.
+    theta_inputs = {"BASE_THETA_READINGS", "BASE_THETA_RATIONAL_TESTS"}
+    base_producer = "SLR_SAME_BUNDLE_BASE_PRODUCER"
+    assert theta_inputs <= endpoint_proofs.keys()
+    for node in theta_inputs:
+        assert {user for user, inputs in deps.items() if node in inputs} == {base_producer}
+    assert {user for user, inputs in deps.items() if base_producer in inputs} == {"GLOBAL_SMALL_RANK"}
     missing_at_endpoint = remaining - endpoint_proofs.keys()
     endpoint_roadmap, divider, _ = roadmap.partition("## Broader reconstruction")
     assert divider, "Roadmap must distinguish endpoint inputs from broader work"
