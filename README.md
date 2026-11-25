@@ -2,7 +2,7 @@
 
 **Six obligations remain. All six are shared by RH and unrestricted Dirichlet GRH.** The aim is to explain the pinned Alpöge–Claude formal argument in ordinary mathematical language, using established theorems where their hypotheses and normalizations agree. The human proof is incomplete. [Proof idea](PROOF_IDEA.md) · [Mathematical guide](MATHEMATICAL_GUIDE.md) · [Verified obligation inventory](SELECTED_FAMILY_CHECKPOINT.json)
 
-**Next proof target.** At an interior step of the original theta tower, identify one archimedean intertwiner that works before the finite twists are chosen. On the enlarged coefficient field, the [reference Weil kernel](THETA_REFERENCE_WEIL.md) now has the prescribed characters, vacuum and polynomial normalization. The [reference theta lift](THETA_REFERENCE_LIFT.md) identifies the integral, its multiplicity vector and its rational coordinates. Both results start with an existing realization of the original row. The [active roadmap](NEXT_STEPS.md) gives the construction still needed and the completion criterion for each open obligation.
+**Next proof target.** Factor the global theta integral at each finite twist through the [single real intertwiner](THETA_INTERIOR_DISCRETE_SERIES.md) now constructed on a prescribed interior step. The construction identifies the exact discrete-series pair in the oscillator representation using Ichino and Sakellaridis. At the reference tuple, [the kernel and its polynomial](THETA_REFERENCE_WEIL.md) and [the integral and its rational coordinates](THETA_REFERENCE_LIFT.md) also survive extension of the coefficient field. The [active roadmap](NEXT_STEPS.md) gives the next argument for each open obligation.
 
 | Work still open | Mathematical question |
 |---|---|
@@ -13,7 +13,7 @@
 | Loss of retained dimension | How small is the fraction of the row space discarded on the chosen family? |
 | Spectral estimates | Do the diagonal and mixed period operators satisfy their bounds with the required rates and uniformity? |
 
-**Two other advances.** For every prescribed good point, complex multiplication and class field theory supply the required reciprocity datum before the bundle size is chosen. For the mean-slope argument, the finite denominators and archimedean norms of a period can be combined into one scalar-invariant height. [Reciprocity on a good point](COMMON_DESIGN_EXISTENCE.md) · [Projective height of a period](PERIOD_COMPARISON_STEP.md)
+For the loss of dimension, [Weil’s representation-density formula and a second-moment bound](RETAINED_DIMENSION_COMPARISON.md) identify a classical input and a sufficient estimate on the actual row multiplicities. The [reciprocity proof](COMMON_DESIGN_EXISTENCE.md) constructs the required datum on every prescribed good point. The [period comparison](PERIOD_COMPARISON_STEP.md) combines denominators and archimedean norms into a scalar-invariant height.
 
 **Most recent whole obligations closed.** The chosen family retains its integral Hecke specialization. Its next theta lift uses the same columns, real realization and coefficient field. Its base rows have the prescribed eigenspaces and bases. These are assertions about every member of the family. Existence of sufficiently large members is the third open question above. [Selected-family proof](LOCAL_SELECTED_FAMILY.md) · [Base-row proof](SELECTED_BASE_ROWS.md) · [Collected proofs (PDF)](SELECTED_FAMILY_SUPPLEMENT.pdf)
 
