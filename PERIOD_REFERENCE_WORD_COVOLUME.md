@@ -1,5 +1,7 @@
 # The absolute covolume in the seventh period-height entry
 
+A [direct determinant computation on the sharp row](PERIOD_RELATIVE_DETERMINANTS.md#direct-computation-on-the-sharp-row) gives a second route to the same absolute bound. It uses the sharp multiplicities and gluing at the actual serving places. The signed inequality in (7) there is still open.
+
 Write $S_a=\sum_t a_t$, $D_*=m\sum_t(\varphi(a_t)-a_t\log\Omega)$, and let $F_{\rm ar}$ be the doubled arithmetic base term. With the admissible error exponent $C_{\rm abs}=2$, the seventh entry bounds
 $$
  Y_u=\mu(R_1^\vee)+h_u-F_{\rm ar}-D_*+S_a\log T_u

@@ -56,10 +56,13 @@ def main():
     heights = progress["GLOBAL_PERIOD_HEIGHT"]["height_entry_status"]
     height_groups = (
         heights["proved_on_the_existing_project_inputs"],
-        heights["proved_on_selected_class_under_inputs_in_fitted_functional_note"],
+        heights["proved_on_selected_class_under_named_hypotheses"],
         heights["remaining"],
     )
     assert sorted(number for group in height_groups for number in group) == list(range(1, 10))
+    conditional_proofs = heights["conditional_proofs"]
+    assert {int(n) for n in conditional_proofs} == set(height_groups[1])
+    assert all((root / proof).is_file() for proof in conditional_proofs.values())
     assert {int(number) for number in heights["partial"]} <= set(heights["remaining"])
     print("Remaining period-height entries:", ", ".join(map(str, heights["remaining"])))
     endpoint_roadmap, divider, _ = roadmap.partition("## Broader reconstruction")
