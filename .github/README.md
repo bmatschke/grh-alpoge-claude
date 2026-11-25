@@ -1,19 +1,19 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-Edition 0.87 completes the original global denominator bound. The prescribed theta lift detects every nonzero vector at a good upper Hecke point. This proves the last two member conditions, and the common bundle selection transports the estimate to its original family. Nine whole obligations remain open, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_87.md) · [New proofs (PDF)](../RH_new_proofs_v0_87.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_87.tex)
+Edition 0.88 completes the weighted period-error estimate and proves full rank for the sharp and base row lattices on the original selected family. Its Bessel pairing agrees with the recorded map on rational vectors. Entries 3, 5 and 8 of the period-height estimate are proved. The original global denominator bound was completed in edition 0.87. Nine whole obligations remain, all shared by RH and unrestricted Dirichlet GRH. [Reading guide](../RH_reconstruction_progress_v0_88.md) · [New proofs (PDF)](../RH_new_proofs_v0_88.pdf) · [Cumulative manuscript source](../RH_readable_reconstruction_v0_88.tex)
 
 | Question | Where to read |
 | --- | --- |
-| What forces a nonzero downward integral? | [Real matrix coefficient](../continuation_v87/definite.tex) · [Weil actions](../continuation_v87/normalization.tex) · [Doubling residue](../continuation_v87/residue.tex) |
-| Why does the prescribed test detect every nonzero vector? | [Fixed Schwartz test](../continuation_v87/fixedtest.tex) · [Adjointness on the original eigenspace](../continuation_v87/return.tex) |
-| Which family and which denominator are bounded? | [Joint selector](../continuation_v87/selection.tex) · [Original inequality and quantifiers](../continuation_v87/denominator.tex) |
-| What has been proved on the period and height obligation? | [Support and prime contributions](../continuation_v87/periodnext.tex) · [Row lattice and Bessel identity](../continuation_v87/periodbessel.tex) |
-| How is the edition checked? | [Checkpoint](../CURRENT_CHECKPOINT_v0_87.json) · [Claim ledger](../continuation_v87/claims.json) · [Original obligations](../continuation_v87/obligations.json) · [Validation](../continuation_v87/validation.json) |
+| Why does the denominator bound hold? | [Edition 0.87 guide](../RH_reconstruction_progress_v0_87.md) · [Denominator proof (PDF)](../RH_new_proofs_v0_87.pdf) |
+| Where does the main term of the period error come from? | [The two distinguished prime fibres](../continuation_v87/periodnext.tex) · [Degree and level estimates](../continuation_v88/errors.tex) · [Inert-prime sums](../continuation_v88/inert.tex) |
+| How are the row lattice and pairing identified on the actual family? | [Rational changes of tuple and the recorded period map](../continuation_v88/rows.tex) |
+| Which period-height entries are proved? | [One family constant and threshold](../continuation_v88/period.tex) · [The nine entries](../RH_reconstruction_progress_v0_88.md#what-remains-in-global_period_height) |
+| How is the edition checked? | [Checkpoint](../CURRENT_CHECKPOINT_v0_88.json) · [Claim ledger](../continuation_v88/claims.json) · [Original obligations](../continuation_v88/obligations.json) · [Validation record](../continuation_v88/validation.json) |
 
 ~~~sh
-python3 continuation_v87/verify.py --upstream formal_source
-pdflatex RH_new_proofs_v0_87.tex
-pdflatex RH_new_proofs_v0_87.tex
+python3 continuation_v88/verify.py --upstream formal_source
+pdflatex RH_new_proofs_v0_88.tex
+pdflatex RH_new_proofs_v0_88.tex
 ~~~
 
 ## Reproduce the portable v0.58 files
