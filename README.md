@@ -1,49 +1,25 @@
-**Current proof update.** Three of the nine shared obligations in edition 0.90 now have proofs on the original selected families. [Why one choice supplies the local certificate and the next theta lift](LOCAL_SELECTED_FAMILY.md) · [The base rows on that same choice](SELECTED_BASE_ROWS.md) · [Six remaining obligations](SELECTED_FAMILY_CHECKPOINT.json) · [Collected proofs (PDF)](SELECTED_FAMILY_SUPPLEMENT.pdf)
+# A human-readable reconstruction of RH and Dirichlet GRH
 
-The [base-change blocks](LOCAL_BASE_CHANGE_BLOCKS.md), [semisimple reductions](LOCAL_RESIDUAL_REPRESENTATIONS.md), [parameter subspaces](LOCAL_PARAMETER_SUBSPACES.md) and [prescribed tame character](LOCAL_TAME_CHARACTER.md) describe the arithmetic at an individual member. Constructing sufficiently large members of the common family remains open.
+**Six obligations remain. All six are shared by RH and unrestricted Dirichlet GRH.** The aim is to explain the pinned Alpöge–Claude formal argument in ordinary mathematical language, using established theorems where their hypotheses and normalizations agree. The human proof is incomplete. [Proof idea](PROOF_IDEA.md) · [Mathematical guide](MATHEMATICAL_GUIDE.md) · [Verified obligation inventory](SELECTED_FAMILY_CHECKPOINT.json)
 
-Start with [Why a chain of theta lifts can bound primes](PROOF_IDEA.md) for the mathematical idea, its classical sources and the remaining period comparison.
+**Next proof target.** Construct the preliminary real theta datum on a prescribed arithmetic stage. The finite Hecke action and its reading are available. The task is to put the archimedean models, the additive characters and the identifications at the marked primes on those same spaces. This is the first step toward producing the geometric family that the selected-bundle arguments require. [Active roadmap with starting points and completion criteria](NEXT_STEPS.md)
 
-**Earlier local specialization update.** The [local Hecke construction](LOCAL_HECKE_SPECIALIZATION.md) and the [original automorphic specialization](LOCAL_AUTOMORPHIC_SPECIALIZATION.md) are proved for one given compatible family. The [multiplicity formula](LOCAL_AUTOMORPHIC_POINTS.md) identifies the contributing forms. [Ray class characters](LOCAL_RECIPROCITY.md) supply the prescribed inertia when auxiliary primes can be chosen. That update retained the nine obligations of edition 0.90. [Read the collected proofs (PDF)](LOCAL_SPECIALIZATION_SUPPLEMENT.pdf)
+| Work still open | Mathematical question |
+|---|---|
+| Base theta readings | Do the geometric and automorphic descriptions give the specified theta map at both levels? |
+| Rational tests for theta | Can forms and their theta images be tested over the prescribed coefficient field for every required tuple? |
+| Common family existence | Can one construct compatible members at the arbitrarily large scales needed for the prime-sum bound? |
+| Periods and heights | Do the arithmetic period maps have the required integral and archimedean bounds, with one common row comparison? |
+| Loss of retained dimension | How small is the fraction of the row space discarded on the chosen family? |
+| Spectral estimates | Do the diagonal and mixed period operators satisfy their bounds with the required rates and uniformity? |
 
-**Alpöge’s remark.** [Reading Alpöge’s remark against the proof](ALPOGE_REMARK_GUIDE.md) records two completed local Hecke inputs, the exact CM period and unitary mass calculations, and a weaker sufficient estimate for period integrality. [Collected proofs (PDF)](ALPOGE_REMARK_SUPPLEMENT.pdf)
+**Most recent whole obligations closed.** The chosen family retains its integral Hecke specialization. Its next theta lift uses the same columns, real realization and coefficient field. Its base rows have the prescribed eigenspaces and bases. These are assertions about every member of the family. Existence of sufficiently large members is the third open question above. [Selected-family proof](LOCAL_SELECTED_FAMILY.md) · [Base-row proof](SELECTED_BASE_ROWS.md) · [Collected proofs (PDF)](SELECTED_FAMILY_SUPPLEMENT.pdf)
 
-**Current edition 0.90.** [Reading guide](RH_reconstruction_progress_v0_90.md) · [New proofs (PDF)](RH_new_proofs_v0_90.pdf) · [Current checkpoint](CURRENT_CHECKPOINT_v0_90.json) · [Mathematical guide](MATHEMATICAL_GUIDE.md)
+## Reading and verification
 
-# RH and unrestricted Dirichlet-GRH human reconstruction — v0.57
+- For the route from divisibility of theta lifts to a prime-sum bound, start with the [proof idea](PROOF_IDEA.md) and [Alpöge’s remark with references](ALPOGE_REMARK_GUIDE.md).
+- For the individual arithmetic results, read the [split-prime base-change argument](LOCAL_BASE_CHANGE_BLOCKS.md), the [residual Galois comparison](LOCAL_RESIDUAL_REPRESENTATIONS.md) and the [local specialization supplement](LOCAL_SPECIALIZATION_SUPPLEMENT.pdf).
+- For the large numbered manuscript, use [edition 0.90](RH_readable_reconstruction_v0_90.tex) and its [period comparison guide](RH_reconstruction_progress_v0_90.md). The [earlier reading index](history/github_reading_guide_before_current_roadmap.md) preserves the edition-specific navigation and reproduction instructions.
+- Run `python3 verify_selected_family.py` at the repository root to check the six open leaves against both endpoints of the 121-node dependency graph. This verifies the inventory. The project accepts the [pinned formal proof](https://github.com/CocoSgt/riemann-hypothesis-lean/tree/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4) as its starting point.
 
-24 November 2026
-
-Partial human reconstruction of RH and unrestricted Dirichlet GRH, accepting the pinned formal proof as correct. Version 0.57 continues the detailed proof-note approach with 101 independently reviewed numbered claims, bringing the inventory to 3746. It completes the original rank-two component theorem, the universal conditional period Gram expansion, the determinant-jet window and its actual integral row realization, the full section-growth input through explicit classical abelian-variety theorems, and the original faithful-invariant/fixed-basis/nonlinear-decompletion/etale-functor construction. No additional whole selected obligation is closed: 24 remain, comprising 17 class C and 7 class B, with 17 shared RH/GRH and 7 additional unrestricted Dirichlet-GRH obligations. The exact original retained producer hypotheses remain explicit. GLOBAL_LOCAL_GAIN remains fully closed from v0.49. Counts are inventories, not completion percentages. No Lean replay or PDF is claimed.
-
-## Reading order
-
-1. `RH_reconstruction_progress_v0_57.txt`: mathematical results, methods and current boundary.
-2. `RH_new_proofs_v0_57.tex`: all new proofs and the current audit.
-3. `RH_readable_reconstruction_v0_57.tex`: complete cumulative manuscript.
-4. `RH_GRH_reconstruction_roadmap_v0_57.txt`: updated concrete research tasks.
-5. `RH_GRH_parallel_execution_plan_v0_57.txt`: independent work packages and integration requirements.
-6. `RH_dependency_audit_v0_57.txt`, `continuation_checkpoint.json`, `next_source_targets.json` and `provenance.json`: full contracts and exact continuation records.
-
-## Current inventory
-
-101 new claims; 3746 cumulative claims. The selected sufficient graph has 121 nodes and 161 edges. 24 whole obligations remain (17 C, 7 B), comprising 17 shared RH/GRH and 7 additional GRH obligations.
-New whole selected closures: none. Complete subtheorems and their retained producer premises are recorded separately. Claim counts are not a completion percentage.
-
-## New chapters
-
-- `arithmetic_connectedness_v57/main.tex`
-- `period_gram_v57/main.tex`
-- `determinant_jet_v57/main.tex`
-- `section_growth_v57/main.tex`
-- `faithful_etale_v57/main.tex`
-
-## Preservation and verification
-
-Every predecessor claim record and the entire historical cumulative proof body are preserved. Mutable v0.56 root metadata and the two supplied v0.56 plans are frozen in `history/version_0_56`. All new cited source files were compared byte-for-byte with the exact pinned Git blobs and are included in `source_snapshot_v0_57`.
-
-Every new claim has exact proof/source ranges and an independent mathematical review. The dependency graph records the human argument; it is not a mechanically extracted Lean dependency graph. Draft TeX compilation checks syntax and references. No Lean replay, PDF generation or PDF visual certification is asserted.
-
-The archive includes integration, assembly, validation and packaging scripts. `SHA256SUMS` binds all distributed files.
-
-Source pin: `7cbf7a0c32fca1badf05931879a37c3f8a2b03b4`.
+`main` is the working record. A proof update belongs with its evidence, the resulting next action in the [roadmap](NEXT_STEPS.md), and any change in the [whole-obligation inventory](SELECTED_FAMILY_CHECKPOINT.json). Historical numbered editions describe the state at their release.
