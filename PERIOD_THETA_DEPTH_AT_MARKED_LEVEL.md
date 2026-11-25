@@ -66,6 +66,19 @@ This fits $O(E_p)$ on the actual family. Thus only the big blocks, which are the
 [ordered]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L20962-L21003
 [eigen]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L52249-L52306
 [native]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/PullbackSections/HolomorphicFamilies/ChartValJ.lean#L31-L158
+## The factorial estimate cannot pay for the large blocks
+
+On the original selected first nonterminal layer take a thick CM-type position. Its large-signature block has length $k$. In the source's zero-based row coordinates the entries at $k-2$ and $k-1$ have difference $B_\rho-1$, where $B_\rho\ge b$ at a thick position. Indeed their unshifted entries in the concatenated row are $v_{k-2}=0$ and $-B_\rho$, and the successive row shifts subtract one from the gap. The common additive weight twist drops out of this difference. Equivalently, the uniform cloud and node bounds give a gap at least $b-\eta-2r$, where $\eta,r=o(b)$. In the quotient-weight formula the next position is $k-1<k=p_{\rm sig}$, so the numerator correction is $+2$. Therefore the actual gap $c_{\tau,k-1}$ is at least a fixed positive multiple of $b/T$ eventually. Here $T=T_*$ is the weight-division parameter, $d_{\rm fl}+1\le T$, and the integer part in the quotient costs at most one. These are positions present on the selected family with positive thick density. [Original two row weights and selected thick positions][bigrow] · [Native cloud and node inequalities][nativegap] · [Quotient rule][quotweight]
+
+Put $L_x=\log b=x^\varepsilon$. The selected sizes and the formula for $T$ give $\log T=O(\log x)=o(L_x)$. For $c=c_{\tau,k-1}$ sufficiently large, $\log(c!)\ge\lfloor c/2\rfloor\log(c/2)$. The one block consequently gives
+$$
+ T\sum_\ell H_\ell\log\ell
+ =T\sum_{\sigma,i} i\log(c_{\sigma i}!)
+ \ \ge T(k-1)\log(c!)\gg k b L_x.
+$$
+The required budget is $E_p=f m b L_x\log\log x$. In the original ranges $f=2n_H\ll x^{2+8\varepsilon}$, $m\ll\sqrt{x}$ and $k\gg x^{9/2+10\varepsilon}$, so $k/(fm\log\log x)\to\infty$. Thus even this one realized gap forces the explicit factorial allowance above the budget. The calculation lower-bounds the majorant $H_\ell$ in aggregate. It gives no lower bound on the actual reference depths. Finishing this route requires sharper estimates on the large-block depths, such as control of their variation among frames at the same prime. [Family degree and size ranges][bigsize] · [Required weighted budget][budget]
+
+
 [base]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L20698-L20713
 [pull]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L20690-L20697
 
@@ -81,3 +94,9 @@ This fits $O(E_p)$ on the actual family. Thus only the big blocks, which are the
 [symbol]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L51711-L51735
 [fourier]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L51731-L51747
 [change]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L21588-L21597
+
+[bigrow]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L6216-L6265
+[quotweight]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L20201-L20210
+[bigsize]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L15245-L15362
+[budget]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L51646-L51662
+[nativegap]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/EntRCloudSub.lean#L157-L184
