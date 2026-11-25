@@ -1,6 +1,8 @@
 # Reading the Alpoge–Claude RH and Dirichlet-GRH proof
 
-**Latest proof update.** [Reading Alpöge’s remark against the proof](../ALPOGE_REMARK_GUIDE.md) records two completed local Hecke inputs, the exact CM period and unitary mass calculations, and a weaker sufficient estimate for period integrality. [Collected proofs (PDF)](../ALPOGE_REMARK_SUPPLEMENT.pdf)
+**Latest proof update.** The [local Hecke construction](../LOCAL_HECKE_SPECIALIZATION.md) and the [original automorphic specialization](../LOCAL_AUTOMORPHIC_SPECIALIZATION.md) are proved for one given compatible family. The [multiplicity formula](../LOCAL_AUTOMORPHIC_POINTS.md) identifies the contributing forms. [Ray class characters](../LOCAL_RECIPROCITY.md) supply the prescribed inertia when auxiliary primes can be chosen. Nine whole obligations remain open. [Read the collected proofs (PDF)](../LOCAL_SPECIALIZATION_SUPPLEMENT.pdf)
+
+**Alpöge’s remark.** [Reading Alpöge’s remark against the proof](../ALPOGE_REMARK_GUIDE.md) records two completed local Hecke inputs, the exact CM period and unitary mass calculations, and a weaker sufficient estimate for period integrality. [Collected proofs (PDF)](../ALPOGE_REMARK_SUPPLEMENT.pdf)
 
 Start with [Why a chain of theta lifts can bound primes](../PROOF_IDEA.md). It follows the argument from an inert prime to the critical line. The [mathematical guide](../MATHEMATICAL_GUIDE.md) gives detailed matches to published theorems.
 

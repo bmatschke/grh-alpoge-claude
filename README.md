@@ -1,6 +1,8 @@
 Start with [Why a chain of theta lifts can bound primes](PROOF_IDEA.md) for the mathematical idea, its classical sources and the remaining period comparison.
 
-**Latest proof update.** [Reading Alpöge’s remark against the proof](ALPOGE_REMARK_GUIDE.md) records two completed local Hecke inputs, the exact CM period and unitary mass calculations, and a weaker sufficient estimate for period integrality. [Collected proofs (PDF)](ALPOGE_REMARK_SUPPLEMENT.pdf)
+**Latest proof update.** The [local Hecke construction](LOCAL_HECKE_SPECIALIZATION.md) and the [original automorphic specialization](LOCAL_AUTOMORPHIC_SPECIALIZATION.md) are proved for one given compatible family. The [multiplicity formula](LOCAL_AUTOMORPHIC_POINTS.md) identifies the contributing forms. [Ray class characters](LOCAL_RECIPROCITY.md) supply the prescribed inertia when auxiliary primes can be chosen. Nine whole obligations remain open. [Read the collected proofs (PDF)](LOCAL_SPECIALIZATION_SUPPLEMENT.pdf)
+
+**Alpöge’s remark.** [Reading Alpöge’s remark against the proof](ALPOGE_REMARK_GUIDE.md) records two completed local Hecke inputs, the exact CM period and unitary mass calculations, and a weaker sufficient estimate for period integrality. [Collected proofs (PDF)](ALPOGE_REMARK_SUPPLEMENT.pdf)
 
 **Current edition 0.90.** [Reading guide](RH_reconstruction_progress_v0_90.md) · [New proofs (PDF)](RH_new_proofs_v0_90.pdf) · [Current checkpoint](CURRENT_CHECKPOINT_v0_90.json) · [Mathematical guide](MATHEMATICAL_GUIDE.md)
 
