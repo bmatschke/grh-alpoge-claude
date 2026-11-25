@@ -1,0 +1,26 @@
+# Computing the base pairing from the kernel on the full definite level
+
+The $q_{jw}$ in the signed entry-7 inequality can be read in the full definite *level* lattice before its good and spectral projections. This gives a second way to combine frame tests with the source pairing, and a local exact criterion wherever the full level pairing is unimodular.
+
+Fix a fitted base layer and a serving tuple. Let $N$ be its full level coefficient lattice in its rational vector space $V$, and $H$ the corresponding algebraic Hermitian form. It includes the native $1/|P|$ normalization at this level. Let $s$ be the selected inclusion and $p$ its native coordinate projection, so $ps=1$, $sp$ is orthogonal for $H$, the selected form is $H_T=s^*Hs$, and the selected lattice is $T=pN$. These maps are recorded before localization. If $\theta$ is the bijective layer theta map from the selected coordinates to the target $Z$, the full level theta map is $C=\theta p:V\to Z$. The actual rank and orthogonal-inclusion identifications are required here. The customary algebraic star is conjugate transpose; none of the comparisons below use a positivity claim in a residue field.
+
+Put $K_0=\ker C=\ker p$, $N_0=N\cap K_0$. For a conjugation-stable pair of finite places $w,\bar w$, use a common semilocal integral basis of $N$ adapted to $N_0$. Such bases exist because $N/N_0$ is locally free over the semilocal Dedekind ring and the sequence splits. Then
+$$
+ q_{jw}=[T:T^\sharp]_w
+       =v_w\!\det\operatorname{Gram}_H(N_0)
+           -v_w\!\det\operatorname{Gram}_H(N).                       \tag{1}
+$$
+The determinants use actual semilocal lattice bases, including for nonprincipal global modules; their valuations are independent of those bases. To prove this, write the ambient Gram in block form $\left(\begin{smallmatrix}A&B\\B^*&F\end{smallmatrix}\right)$ with the first block a basis of $N_0$. The kernel form is nondegenerate because the distinguished complex realization is positive and the inclusion is algebraic. Replacing the remaining basis vectors by their orthogonal projections onto $sZ_T$, where $Z_T$ denotes the rational source of $\theta$, gives the quotient Gram $F-B^*A^{-1}B$. These projected vectors are an integral basis of the *projected* lattice $T$. Its determinant is $\det H/\det A$ in the adapted basis. Its dual lattice has Gram-inverse coordinate matrix, so the index appearing in the definition of $q$ is the negative valuation of that determinant. This is (1). Empty kernel determinants equal one.
+
+This also computes the complete mixed contraction without selecting the good coordinates: by orthogonality, $p=(s^*Hs)^{-1}s^*H$, hence $pH^{-1}p^*=H_T^{-1}$. Thus
+$$
+      Q_t=C H^{-1}C^*,\qquad
+      \det(EQ_tE^*)=(-1)^D
+      \frac{\det\begin{pmatrix}H&C^*E^*\\ EC&0\end{pmatrix}}{\det H}
+                                                                    \tag{2}
+$$
+for each square spanning family $E:Z\to K^D$ of geometric frame traces. Rectangular families give the same formula on any square independent pair using separate $E_I,E_J$. Their sizes in (2) are the dimension of the **full level** plus $D$. The original combined local index of the two images and the pairing is the sum of the two image determinant valuations and the right side of (1). For a computable upper bound, it suffices to exhibit full-rank integral kernel relations spanning a sublattice $N'_0\subseteq N_0$ and use its Gram determinant in the numerator of (1). In fact the change adds $[N_0:N'_0]_w+[N_0:N'_0]_{\bar w}\ge0$. The same argument allows fractional ambient Gram entries with their actual denominator retained.
+
+If the full level pairing is self-dual at both places, $T^\sharp$ identifies via $s$ with $N\cap (\ker p)^\perp$. Indeed integrality against every $pn$ is exactly integrality of the lift against every $n\in N$ by orthogonality. Hence $q_{jw}$ is the *ordinary congruence length* of $N/\big((N\cap\ker p)\oplus(N\cap(\ker p)^\perp)\big)$ there. It vanishes precisely when the reduced pairing between the saturated kernel lattice at $w$ and the conjugate of the kernel lattice at $\bar w$ is nondegenerate, by (1); at a self-conjugate place this is a single sesquilinear form. Integrality and nondegeneracy of the full rational pairing alone do not prove the self-duality hypothesis or the residual kernel criterion. For example the lattice $\mathbf Z^2$ with the ordinary dot product, rational kernel line $\mathbf Q(1,2)$, and $w=5$ has trivial ambient discriminant and kernel discriminant 5. The pairing term equals one. An integral kernel basis may therefore be needed even at primes of a perfect ambient pairing. No family-uniform bound on (1) or (2) is inferred here.
+
+[Native level projection, image and cut lattices](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/RowLat.lean#L126-L156). [Native level-form normalization](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/GoodPartHermitianSpec.lean#L108-L145). [Orthogonal inclusion and cut lattice](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/LiftLatLemmas.lean#L265-L312).

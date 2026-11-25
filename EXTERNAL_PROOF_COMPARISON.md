@@ -1,5 +1,16 @@
 # External proof comparisons for RH and Dirichlet GRH
 
+## Current sources for the period and spectral estimates
+
+Adriazola's 25 November status points to §17.4.3 for the original K1 argument and §18.7 for the comparisons still needed in its manuscript. Rubinstein's zeta-specialized account gives an analytic formulation and explicitly leaves thirteen hypotheses for its main inequality. The RH Lean Roadmap and the original archive identify the exact mass, weight and determinant normalizations used below. [Adriazola’s reconstruction status](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/main/docs/STATUS.md) · [Rubinstein’s account](https://www.math.uwaterloo.ca/~mrubinst/alpoge_claude_grh/) · [RH Lean Roadmap](https://github.com/rh-lean-roadmap/rh-lean-roadmap)
+
+| Source input | Consequence on our stated identifications | Remaining comparison |
+|---|---|---|
+| Full-weight theta summand, two distinct recursion primes, common row coordinates | [Exact cancellation of the own-prime normalization](PERIOD_TWO_THETA_DETERMINANTS.md) and a [kernel expression for the source pairing](PERIOD_FULL_LEVEL_KERNEL_PAIRING.md) | Signed size of the raw determinants and the finite contributions |
+| B8.25e and the Chow incidence formula | [Height bound from a subsystem](PERIOD_POSITIVE_COMPONENT_CHOW_BOUNDS.md) of controlled height and moving degree | Exhibit the subsystem in the selected arithmetic model, or transfer the carrying-section proof of B8.26–29 |
+| PGR12–18 and the same-row singular estimate | [Positive first moment at the refined type level](SPECTRAL_RAMIFIED_TRACE_ERROR.md) | Quantitative mass exceeding the projection error |
+| B8.10d with its original integral frame counts | [Exact last-pair conductor](SPECTRAL_MOVE_CHARACTER_CONDUCTOR.md) and [stronger squared energy exponent](SPECTRAL_POSITIVE_DEFECT_ENERGY.md) | The real and class measure identifications, generic cells and higher corank |
+
 ## Which estimates transfer to the signed height and the corank-one count
 
 The [RH Lean Roadmap's B8.10j and B8.10n](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L17676-L17715) isolate the finite norm congruence and the count of two normal coordinates. The native weighted frame entries and cofactor formula give the [different-normalized count](SPECTRAL_CORANK_NORMAL_LABELS.md). Its valuation-diameter argument uses integrality of the pairing between *two* represented terms in one class. Keeping the phases in the congruence calculation yields the [exact twisted transform](SPECTRAL_TWISTED_NORM_CONGRUENCE.md). The local move and real energy comparisons still have to be matched to the project family.
