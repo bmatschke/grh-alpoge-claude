@@ -75,3 +75,5 @@ Finally, on the retwist chosen with a prescribed initial core, finite exclusions
 [enlarge]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/AutomorphicMembership/IsBaseEnlargementFixedCoefFieldOfCoeffEnlargemen.lean#L14-L32
 [stage]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ExistsExtTwistedPlaces.lean#L82-L112
 [restrict]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/IwasawaDecomposition/ConstructionStartingChoicesOfFineAdelicData.lean#L47-L90
+
+The [finite good-reduction model](PEL_GOOD_REDUCTION_DENOMINATOR.md) supplies the same uniform denominator on good traits directly from the generic marked datum. The subsequent application of B8.43n to the boundary still uses its original hypotheses.

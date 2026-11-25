@@ -80,3 +80,5 @@ A sufficient open inequality is that the right side of (5), **after** subtractin
 [one]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/Divisibility/DivisionHeightBoundColumns.lean#L202-L239
 [divisor]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L32935-L32972
 [outside]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L8306-L8326
+
+For an identified section row, [finite frame traces](PERIOD_FRAME_TRACE_DETERMINANTS.md) give exact evaluation coordinates using the inverse different for both image indices and the Hermitian pairing. On the separate geometric route, the [terminal covolume](PERIOD_TERMINAL_REFERENCE_COVOLUME.md) is bounded on the stated definite inputs and the [actual Whittaker translate span](PERIOD_WHITTAKER_TRANSLATE_INDEX.md) suffices for estimating each served image.

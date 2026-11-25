@@ -80,3 +80,5 @@ Under (1), $\alpha^{-1}\|P_u\Pi_u\|_{\rm HS}^2=\operatorname{tr}(\Pi_u K)\ge d/8
 [bottom]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L43696-L43722
 [num]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L16867-L16910
 [seesaw]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/02a95b4c62db610642af5f278ee5d0d6df87b348/docs/src/book/main.tex#L44352-L44448
+
+The [projected first moment on this ramified column](SPECTRAL_PROJECTED_FIRST_MOMENT.md) gives explicit finite coefficients for the remaining nonvanishing test. The signed lower bound still depends on the contributing real orbital traces.
