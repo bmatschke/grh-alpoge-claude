@@ -2,6 +2,8 @@
 
 **A mathematical reading guide to edition 0.90 and the selected-family continuation · 26 November 2026**
 
+The [sum of the nongeneric corank-one energies](SPECTRAL_WEIGHTED_CORANK_ONE_ENERGY.md) uses two realizations of the same unipotent volume to transfer the real section estimates to the original arithmetic operator. On the period side the [signed anchor calculation](PERIOD_SIGNED_FLAT_ANCHOR.md) and [central-weight transfer](PERIOD_CENTRAL_WEIGHT_TRANSFER.md) isolate the leading geometric error in entry 7. The [bottom-row comparison](PERIOD_TRANSPORTED_BOTTOM_LEVEL.md) explains which finite tests from the independent rewrite survive on the averaged descent. The [external comparison](EXTERNAL_PROOF_COMPARISON.md#roadmap-v39-and-the-finite-test-at-the-auxiliary-twists) records the relevant changes in Roadmap v39.
+
 The [overview](PROOF_IDEA.md) explains why inert-prime theta derivatives give the smoothing kernel for the prime sum and why the chain has square-root length. For the Bessel comparison, [the subspace argument](PERIOD_IMAGE_SPANNING.md) gives a weaker sufficient statement for the slope estimate.
 
 [The follow-up on Alpöge’s remark](ALPOGE_REMARK_GUIDE.md) discharges the standard split Hecke and no-Jordan inputs to the local specialization obligation. It also proves the normalized CM period formula and an index bound sufficient for the period-height contribution to the mean slope.
