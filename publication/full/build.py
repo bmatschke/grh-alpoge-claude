@@ -188,7 +188,8 @@ def main():
         pieces.append(r"\chapter{" + latex(group["title"]) + "}\n" + latex(group["guide"]) + "\n")
         for name in group["sources"]:
             pieces.append("\n% Manuscript source: " + name + "\n")
-            pieces.append(r"\phantomsection\label{" + source_anchor(name) + "}\n")
+            anchor = source_anchor(name)
+            pieces.append(r"\hypertarget{" + anchor + r"}{}\phantomsection\label{" + anchor + "}\n")
             if name in documents:
                 change_links(name, documents[name], revision, headings, set(names))
                 body = pandoc(json.dumps(documents[name]), "json", "latex")
