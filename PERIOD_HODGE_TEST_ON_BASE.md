@@ -1,0 +1,62 @@
+# The Hodge test is the height of one determinant on the base
+
+Let $r+s=n$, $f=|\Psi|$, $e=frs$ and $d=f\binom n2$. The Hodge test in period entry 7 is $F_* = \mu^{e+1}J$, where $\mu=\sum_{\tau,i\ge r} X_{\tau i}$ and $J$ is the product of $X_{\tau j}-X_{\tau i}$ over pairs $i<j$ in each of the two signature blocks at each embedding. The denominator is $H_*=(e+1)D(\mu^eJ)$. The following computes the whole relative flag factor, including its arithmetic normalization. It works with arbitrary smooth metrics on the flag lines whose determinant product is the specified pullback.
+
+## The relative intersection
+
+Let $B$ be an integral projective arithmetic base of generic dimension $e$ over $\mathcal O_K$, and let $p:T\to B$ be the product, over $B$, of the complete flag bundles of the Hodge bundles of ranks $r$ and $s$ for every $\tau$. Use decreasing flags and the duals of the successive quotients as root lines. Let $L=\bigotimes_\tau(\det E_{\tau,\mathrm{small}})^\vee$. Then the tensor product of the roots occurring in $\mu$ is canonically $p^*L$. For the induced subquotient metrics this is an isometry: in an adapted orthogonal basis the product of the successive quotient lengths is the determinant length. In particular this holds at every complex point of a smooth regularization induced by a Hermitian metric on the Hodge bundles.
+
+The generic fibre of $p$ has dimension $d-e$. On a decreasing flag, the tangent bundle has a filtration whose graded factors are maps from a later quotient line to an earlier one. For the dual-root convention their Chern classes are precisely $X_j-X_i$. Hence $J$ on this fibre is the top Chern class of its tangent bundle. A full flag of rank $h$ has $h!$ Schubert cells, each an affine space, and its top tangent Chern number equals its Euler characteristic. This computes
+$$
+                 \int_{T_{\eta_B}} J=\kappa,\qquad
+                 \kappa=(r!s!)^f .                                      \tag{1}
+$$
+Equivalently, alternation of the within-block Vandermonde in the top flag functional gives $h!$ for each block. On the compact dual $B^\vee=\prod_\tau\mathrm{Gr}(s,n)$, the base line is the exterior tensor product of the Plücker lines. Therefore
+$$
+ D(\mu^eJ)=\kappa\frac{e!}{((rs)!)^f}
+              \left((rs)!\prod_{i=0}^{s-1}\frac{i!}{(r+i)!}\right)^f>0.  \tag{2}
+$$
+The expression in parentheses is the degree of the Plücker Grassmannian by the rectangle hook formula. The multinomial coefficient distributes the $e$ hyperplanes among the $f$ factors. [Polynomial convention and test](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/dc5594a62bb2b94139788df817db693cd939a046/docs/src/book/main.tex#L20044-L20053) · [Rectangle-degree calculation](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/dc5594a62bb2b94139788df817db693cd939a046/docs/src/book/main.tex#L50822-L50834)
+
+Suppose the arithmetic pushforward and projection formula apply to $p$ and the metrized Chern classes, for instance on smooth projective flag bundles over regular projective arithmetic models. The class $p_*\widehat J$ has codimension zero. Here there is no Green component of degree $(-1,-1)$, and the only cycle of codimension zero on the integral base is its fundamental cycle. Its coefficient is the geometric degree (1). For every smooth metric on $L$ this proves
+$$
+ \widehat{\deg}_K(\widehat\mu^{e+1}\widehat J)
+          =\kappa\widehat{\deg}_K(\widehat c_1(\bar L)^{e+1}),\qquad
+ \deg_K(\mu^eJ)=\kappa\deg_K(L^e).                                  \tag{3}
+$$
+Here $\widehat{\deg}_K$ is divided by $[K:\mathbf Q]$ and $\deg_K$ is the degree on the generic fibre over $K$. For a common proper model $q:M\to B$ the same argument works whenever its determinant is the isometric pullback and the relative degree of its $J$ is known. In particular on a cover of generic flag degree $b$ with the relative roots pulled back on the whole generic flag fibre, $q_*\widehat J=b\kappa[B]$. Modifications above proper subsets of $B$ cannot contribute a codimension-zero cycle there. The factor $b$ cancels in the quotient in (3), as does any common change of the coefficient-field degree. [Gillet and Soulé, arithmetic intersection theory](https://www.numdam.org/articles/10.1007/BF02699132/) · [Bost, Gillet and Soulé, §§2–3](https://www.ams.org/journals/jams/1994-07-04/S0894-0347-1994-1260106-X/S0894-0347-1994-1260106-X.pdf)
+
+## Applying it at the cutoff
+
+Write $g=\deg_K(L^e)>0$. If the generic degree on the supplied root model, divided by $b$, equals $V_ZD(\mu^eJ)$ as in the tower, (3) gives $V_ZD(\mu^eJ)=\kappa g$. When the limiting arithmetic functional is obtained from the matched determinant metrics in (3), we obtain
+$$
+ \frac{P_{N,Z}(F_*)}{V_ZH_*}
+       = \frac{\widehat{\deg}_K(\widehat c_1(\bar L_N)^{e+1})}{(e+1)g}.
+                                                                         \tag{4}
+$$
+For a singular metric the right side means the corresponding limiting or finite-energy height. One may apply (3) first to smooth metrics and then pass to an identified limit. If the definition uses auxiliary perturbations of the individual root lines, either take the perturbation to zero for each fixed smooth metric by multilinearity in the specified order, or verify that its mixed contributions vanish in the prescribed limit.
+
+There is also an exact test for a discrepancy in (4). On a common model let $x$ be the arithmetic determinant class made from the roots, let $y=q^*\widehat c_1(\bar L_N)$, and keep the **same** $\widehat J$ from the root lines. Before taking limits the entire numerator error is
+$$
+ \widehat{\deg}_K\!\left((x-y)\widehat J\sum_{i=0}^e x^i y^{e-i}\right).
+                                                                         \tag{5}
+$$
+This follows by factoring $x^{e+1}-y^{e+1}$. After division by $(e+1)b\kappa g$ the expression is exactly the signed error in the normalized height if the geometric normalization above holds. In particular only its negative part can spoil a lower bound. For exact matching on a normal common model it suffices to extend the generic determinant identification with zero divisor at all height-one points and to match its complex metric. A rational trivialization of the difference line with zero divisor on a normal model is an integral trivialization. This reduces the finite check to the **sum of the small-block root orders** at each such point. Orders on exceptional divisors of the common model are included; generic-fibre agreement of individual line bundles alone does not control (5). The computation requires a common proper arithmetic model in a setting supporting the indicated intersections. It does not assert resolution of arbitrary arithmetic models.
+
+Combining (4) with the [boundary mean and metric comparison](PERIOD_HODGE_CUSP_MEAN.md) gives $P_{N,Z}(F_*)/(V_ZH_*)\ge-(C_h+1)fs\lambda_N$ on matched models with corrected height at least $-C_hfs\lambda_N$. Averaging with weights $V_Z/V$ preserves this bound. To apply it to every selected component one must identify the cutoff determinant and its limiting metric on that component and supply the corrected horizontal-height and finite-nefness inputs, or bound the signed defect (5) together with the corresponding base height. These are distinct from the centered residual intersection in the [one-cutoff comparison](PERIOD_ROOT_FROBENIUS_CORRECTION.md). [Base setting, intersection normalization and corrected height](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/dc5594a62bb2b94139788df817db693cd939a046/docs/src/book/main.tex#L50533-L50561)
+
+## How the original model supplies the comparison
+
+The original argument gives a second way to verify (4) on a supplied good root origin with its additional compatibility data. It constructs a common normal model of the flag and base presentations using a component of their generic fibre product and the normalized graph. The agreement of the level-$p^4$ Hodge–Tate data with the finite lattices used to construct that graph supplies the comparison of flag models. On the common model the base determinant used for the pullback includes the Hodge Gram factor and the product of the vertical determinant factors at good primes $p\le N$. Thus using the canonical complex metric on the generic fibre alone would leave an uncomputed finite term. [Common model and its flag data][hb-graph] · [Identification of the determinant including vertical factors][hb-vert]
+
+Expand $J$ into monomials and use the same common model and relative degree sum $b_J$ for every smoothing parameter. The projection formula with $e+1$ copies of the smoothed base determinant gives $b_J$ times its arithmetic self-intersection. The geometric formula with $e$ copies gives $b_J$ times its degree. Replacing equivalent smoothed representatives in the limit yields two identities $\delta P_{N,Z}(F_*)=b_J A_N$ and $\delta V_ZD(\mu^eJ)=b_J g$, where $\delta>0$ is the common transfer factor and $A_N$ is the limiting arithmetic intersection on the base, with consistent field-degree convention. The positive second identity permits division and gives (4) even without computing $b_J$. This is useful on presentations beyond the canonical flag bundle in (1). It requires the original real agreement, proportionality, common-model comparison and convergence inputs. [Equivalent metrics in the limit][hb-smooth] · [The two projection formulas and cancellation][hb-tower]
+
+There is also a proof of the horizontal input on an admitted component. Admission specifies the global model, its good local lattices, the exceptional set, and the cutoff and signature bounds. With the full intersection system, the original geometric hypotheses and the CM flat-degree law, represent a given horizontal curve by a closed point after a number-field extension. Pass to its abelian part and choose a period basis adapted to each small eigenspace. The labelled fibre-degree estimate controls the finite and period terms. The cusp comparison bounds each remaining archimedean term by the corrected regularized weight, and the auxiliary ample line has height at least $-K_A$. Field-normalized heights are invariant under the extension. Summing over embeddings gives $h_{\rm reg}\ge-C_hfs\lambda_N-(a/b)K_A$ for every horizontal curve. For each ample perturbation $a/b$, regularized domination gives a single threshold in the smoothing parameter before the curve is chosen. The argument includes boundary curves through their semiabelian data. Finite-fibre nefness and archimedean semipositivity on the same model then allow the arithmetic Kleiman inequality, followed by the indicated limits. On those admitted, matched data the two scalar calibrations for the [centered intersection](PERIOD_ROOT_FROBENIUS_CORRECTION.md) are available. To pass to the selected family still requires those data on its actual components, with the same finite factors and measures. [Admission and quantified curve height][hb-admit] · [Argument on each curve][hb-curves] · [Assembly on a good origin, with the determinant comparison separate from the height inputs][hb-base]
+
+[hb-graph]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/CoreStatements/PlurisubharmonicCones/PullDegSum.lean#L60-L124
+[hb-vert]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/CoreStatements/PlurisubharmonicCones/MhChange.lean#L130-L194
+[hb-smooth]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/CoreStatements/PlurisubharmonicCones/SmoothLogSub.lean#L208-L220
+[hb-tower]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/GoodOriginIntersectionTower.lean#L47-L94
+[hb-admit]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Statements/GeometryStatements/NineGeoU.lean#L32-L57
+[hb-curves]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/CuspHeightUpper.lean#L120-L223
+[hb-base]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/BaseSettingOfGoodTower.lean#L70-L106

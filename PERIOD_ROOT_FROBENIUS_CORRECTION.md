@@ -99,3 +99,17 @@ $$
 This permits a one-sided scalar comparison on a single mixed class of the actual normalized flag models. The full tower identity implies it with $\epsilon=0$. Here $|a_0|\le\|v\|_1/r$, and $0\le b_0\le\|v\|_1$ follows from the row averages. The established flag and remainder estimates give $h_{\rm fl}(F)\ge0$ and $E(Y_H)\le\frac12fs\log(n+1)+3/(50f)$. Consequently the two geometric measurements $|I(Y_0)|\ll n\lambda_N$ and $I(Y_H)\ge-Cfs\lambda_N$ suffice in (4), as $n/r\le2$. The fitted row satisfies $sU\le6\|v\|_1$, so its Frobenius correction costs at most $21\|v\|_1/(5fn^2)$. [Flat and Hodge tests](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/dc5594a62bb2b94139788df817db693cd939a046/docs/src/book/main.tex#L50881-L50914)
 
 Equation (2) and estimate (1) are proved for the stated series. For (4) on the actual arithmetic model one must still match the smoothed, normalized root-line intersections to $E$ on $Y$ to the indicated precision and bound the two test heights with the prescribed metrics and finite integral structures. No estimate of a numerical Frobenius series identifies those model intersections by itself. The [record trace and carrying-section comparison](PERIOD_RECORD_TRACE_TO_CHOW.md) then transfers the bound to the component heights under its model and section hypotheses.
+
+## Inserting the two scalar estimates
+
+On the admitted, matched cutoff models of the [flat determinant](PERIOD_FLAT_SCALAR_AT_CUTOFF.md) and [base Hodge calculation](PERIOD_HODGE_TEST_ON_BASE.md), write $C=C(S_N)$, $u_E=\log\operatorname{rd}(E)$, $h_0=(r-s)\log\Omega/2$, and $a_0^\pm=\max(\pm a_0,0)$. Set
+$$
+ B_0=a_0h_0+a_0^+r(C+u_E)+a_0^-sC,\qquad
+ B_H=(C_h+1)fs\lambda_N+\tfrac12fs\log(n+1)+\frac{3}{50f}.
+$$
+The interval for the flat height gives $a_0 I(Y_0)\le B_0$ for either sign of the fitted row sum. The [cusp mean](PERIOD_HODGE_CUSP_MEAN.md) and corrected horizontal-height bound give $I(Y_H)-E(Y_H)\ge-B_H$. With $U=\operatorname{spr}(v)$ the spread of the fitted weight, inequality (4) now reads
+$$
+ \frac{P_N(F)}{VH}\ge\frac{h_{\rm fl}(F)}H-
+       \frac{7sU}{10fn^2}-B_0-a_HB_H-\epsilon .
+$$
+The only extra intersection estimate in this implication is $I(Y)\ge E(Y)-\epsilon$ for the single class $Y$ with both first derivatives zero. If the determinant comparison on a component has a negative normalized defect, use its $V_Z$-weighted mean absolute negative part in $B_H$. The implication still requires realization of the named model, lattice, metric and height data on the selected family and the required error budget for $\epsilon$.
