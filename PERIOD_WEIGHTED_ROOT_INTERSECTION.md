@@ -1,5 +1,7 @@
 # A degree-weighted intersection bound suffices on the nonterminal rows
 
+The [Frobenius calculation](PERIOD_ROOT_FROBENIUS_CORRECTION.md) evaluates the signed quadratic correction at the fitted cutoff. The [direct record-section proof](PERIOD_RECORD_TRACE_TO_CHOW.md) transfers a bound for the actual intersection to the Chow height on the same components.
+
 Use the fitted cover of period entry 7, its nonterminal components $Z$, the weight $v=u'=u_1-3n\eta_H$, and its cutoff $N=\lfloor B(v,g)\rfloor$. The arithmetic target can retain the geometric weights on its components throughout. This removes the separate proof of equality of all component volumes from this particular path to the endpoint. It also removes one loss from comparing the two geometric degrees. The argument assumes the individual geometric degree identification, the model-to-record comparison, and the height and determinant inequalities specified below.
 
 ## The intersection measured by the model
@@ -13,7 +15,7 @@ This uses only positivity and the definitions. Roadmap B8.26c obtains its lower 
 
 On a smooth toroidal compactification of a supplied marked component with its canonical Hodge bundles, this geometric proportionality can also be checked directly. Take the full flags in the two Hodge blocks at each embedding. Successive projective bundle pushforwards send the top power of the root line on this flag bundle to a top-degree polynomial in the Chern classes of its Hodge bundles. The polynomial is universal for the specified block ranks and weight. The two Hodge factors are representations of the Levi of the compact-dual parabolic, so its unipotent radical acts trivially, as Mumford requires. His proportionality theorem computes its integral on the base as the invariant volume of that component times its compact-dual integral, with the same curvature convention on every component. For mixed Chern products the same proof applies term by term because the canonical invariant Chern forms are good and their top-degree product is an invariant density. Thus the ratio of these geometric degrees for two components is exactly the ratio of their volumes. The regular positive degree fixes the normalization by testing one component. This verifies the geometric assertion on canonical extensions. For other extensions across the boundary the root-model comparison must still identify their degrees with these, including the normalization by the generic degree of a finite cover. [Mumford, *Hirzebruch's Proportionality Theorem in the Non-Compact Case*, Theorems 3.1 and 3.2](https://www.dam.brown.edu/people/mumford/alg_geom/papers/1977b--HirzProp-GT.pdf#page=25)
 
-Suppose the right side of (1) is at least $-X_0$ and the individual model comparison gives $\nu_Z(v;B)\ge a_Z-c$ at all $Z$. In B8.26d the common cost is $c=2c_2(B)\|v\|_1$. Then $s_Z=a_Z-c$ satisfies
+Suppose the right side of (1) is at least $-X_0$ and the individual model comparison gives $\nu_Z(v;B)\ge a_Z-c$ at all $Z$. In equation (8.26d) the common cost is $c=2c_2(B)\|v\|_1$. Then $s_Z=a_Z-c$ satisfies
 $$
  s_Z\le\nu_Z(v;B),\qquad
  \frac{\sum_Z\Delta'_Zs_Z}{\sum_Z\Delta'_Z}\ge-X,\qquad X=X_0+c .
