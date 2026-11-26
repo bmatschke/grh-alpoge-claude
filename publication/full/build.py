@@ -100,9 +100,34 @@ def source_link(revision, name, title):
     return r"\href{" + git_url(revision, name) + "}{" + latex(title) + "}"
 
 
+def render_reading(template, original):
+    """Insert inclusive ranges of the native proof at the marked lines of a reading."""
+    lines = original.splitlines()
+    def boundary(marker):
+        if lines.count(marker) != 1:
+            raise ValueError(f"{template.name}: expected one source line matching {marker!r}")
+        return lines.index(marker)
+
+    result = []
+    for line in template.read_text().splitlines():
+        if not line.startswith("% excerpt: "):
+            result.append(line)
+            continue
+        first, last = line.removeprefix("% excerpt: ").split(" || ")
+        start = 0 if first == "BOF" else boundary(first)
+        stop = len(lines) if last == "EOF" else boundary(last) + 1
+        if start >= stop:
+            raise ValueError(f"{template.name}: empty or reversed excerpt {line!r}")
+        result.extend(lines[start:stop])
+    return "\n".join(result) + "\n"
+
+
 def native_section(name, revision):
     path = ROOT / name
     content = path.read_text()
+    reading = HERE / "readings" / (path.parent.name + ".tex")
+    if reading.is_file():
+        content = render_reading(reading, content)
     if re.search(r"\\(?:input|include|includegraphics)\s*\{", content):
         raise ValueError(f"{name} requires an external TeX input")
     if not re.search(r"\\section\{", content):
@@ -122,6 +147,8 @@ def native_section(name, revision):
     content = re.sub(r"\\texttt\{([A-Za-z0-9._/\\-]+)\}", break_identifier, content)
     directory = path.parent
     links = [source_link(revision, name, "Source of this derivation")]
+    if reading.is_file():
+        links.append(source_link(revision, reading.relative_to(ROOT).as_posix(), "Reading edition"))
     for filename, title in (("source_locators.txt", "Formal sources by claim"),
                             ("provenance.json", "Claim provenance"),
                             ("claims.json", "Proof records and source ranges"),
