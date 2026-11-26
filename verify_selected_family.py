@@ -40,6 +40,7 @@ def main():
     for node, entry in endpoint_proofs.items():
         assert not deps[node] and (root / entry["proof"]).is_file()
         assert entry["endpoint_statement"] and entry["broader_work"]
+        assert all((root / proof).is_file() for proof in entry.get("supporting_proofs", []))
     # Substitution of the selected base square is justified only at this use.
     theta_inputs = {"BASE_THETA_READINGS", "BASE_THETA_RATIONAL_TESTS"}
     base_producer = "SLR_SAME_BUNDLE_BASE_PRODUCER"
