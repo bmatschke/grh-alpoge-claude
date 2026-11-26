@@ -4,7 +4,7 @@ On a supplied nonterminal deep cover $Y$, let $(a,N)$ be the theta weight in B8.
 $$
  d_\ell^{1/2500}(a,N)\ \le\ H_\ell=\sum_{\tau,i}i\,v_\ell(c_{\tau i}!).
 $$
-This gives upper allowance zero for every $\ell>\max_{\tau,i}c_{\tau i}$, including either base prime $g_0,g_1$ in the standing range. At those two primes the separate weight change yields $d_{g_i}^{1/2500}(u_1)\le1$. The construction below proves the local estimate even at ramified primes. The weighted cost of the small blocks fits the prescribed family budget.
+This gives upper allowance zero for every $\ell>\max_{\tau,i}c_{\tau i}$, including either base prime $g_0,g_1$ in the standing range. At those two primes the separate weight change yields $d_{g_i}^{1/2500}(u_1)\le1$. The construction below proves the local estimate even at ramified primes. The weighted cost of the small blocks fits the prescribed family budget. The [full reference-depth estimate](PERIOD_REFERENCE_DEPTH_BUDGET.md) handles the large blocks under the stated jet and chart comparisons by first removing the common local valuation.
 
 The proof uses the split ray-field cover in B8.25c, the short period basis and integral jet lift of B8.28c,d, the harmonic derivative comparisons in B8.28v and vb, and the [all-frame denominator on the actual row](PEL_ALL_FRAME_DENOMINATORS.md).
 
