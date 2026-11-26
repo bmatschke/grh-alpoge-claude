@@ -44,6 +44,10 @@ def source_anchor(path):
     return "ms-" + re.sub(r"[^a-z0-9]+", "-", path.casefold()).strip("-")
 
 
+def latex_target(identifier):
+    return r"\hypertarget{" + identifier + r"}{}\phantomsection\label{" + identifier + "}"
+
+
 def git_url(revision, path, fragment=""):
     return (f"{REPOSITORY}/blob/{revision}/{quote(path, safe='/')}"
             + ("#" + quote(fragment, safe="-_") if fragment else ""))
@@ -66,6 +70,10 @@ def prepare_headers(name, document):
     mapping = {}
     anchor = source_anchor(name)
     for node in nodes(document["blocks"]):
+        if node["t"] == "Span":
+            attr, body = node["c"]
+            if not body and re.fullmatch(r"claim:[A-Z0-9]+", attr[0]):
+                node.update(t="RawInline", c=["latex", latex_target(attr[0])])
         if node["t"] != "Header":
             continue
         level, attr, _ = node["c"]
@@ -191,7 +199,7 @@ def main():
         for name in group["sources"]:
             pieces.append("\n% Manuscript source: " + name + "\n")
             anchor = source_anchor(name)
-            pieces.append(r"\Needspace{5\baselineskip}\hypertarget{" + anchor + r"}{}\phantomsection\label{" + anchor + "}\n")
+            pieces.append(r"\Needspace{5\baselineskip}" + latex_target(anchor) + "\n")
             if name in documents:
                 change_links(name, documents[name], revision, headings, set(names))
                 body = pandoc(json.dumps(documents[name]), "json", "latex")
