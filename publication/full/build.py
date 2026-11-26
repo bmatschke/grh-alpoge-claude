@@ -6,6 +6,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 from urllib.parse import quote, unquote, urlsplit
 
@@ -170,6 +171,7 @@ def main():
         ["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True).strip()
     if not re.fullmatch(r"[0-9a-fA-F]{40}", revision):
         parser.error("--revision must be a full 40-digit commit identifier")
+    subprocess.run([sys.executable, ROOT / "research/register/verify_claim_records.py"], check=True)
     groups = json.loads((HERE / "contents.json").read_text())
     names = [name for group in groups for name in group["sources"]]
     if len(names) != len(set(names)):
@@ -189,7 +191,7 @@ def main():
         for name in group["sources"]:
             pieces.append("\n% Manuscript source: " + name + "\n")
             anchor = source_anchor(name)
-            pieces.append(r"\hypertarget{" + anchor + r"}{}\phantomsection\label{" + anchor + "}\n")
+            pieces.append(r"\Needspace{5\baselineskip}\hypertarget{" + anchor + r"}{}\phantomsection\label{" + anchor + "}\n")
             if name in documents:
                 change_links(name, documents[name], revision, headings, set(names))
                 body = pandoc(json.dumps(documents[name]), "json", "latex")

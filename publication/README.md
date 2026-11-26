@@ -2,6 +2,8 @@
 
 The editable overview is [manuscript/overview.md](../manuscript/overview.md). The [detailed edition builder](full/build.py) selects the source chapters for the longer book. Both editions use the same title and identify their edition, source revision and scope. The [coverage register](audit/completeness.md) records where a proof-specific input still relies on an external account.
 
+The detailed build checks the registered manuscript claim ranges, dependency links and review digests before assembling the text. The research guide gives the command for checking the pinned upstream excerpts as well. [Current Galois claim records](../research/modules/galois/polarized_galois_attachment/) · [Research guide](../research/README.md)
+
 When expanding the detailed edition, add the derivation to the appropriate source chapter and include that chapter in the [book contents](full/contents.json). For a published result, identify the paper and theorem and match its hypotheses. For an argument adapted from a preprint, webpage or Git repository, credit the author and give the version and location. Update the coverage register when the manuscript supplies the missing argument.
 
 ## Build

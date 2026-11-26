@@ -1,6 +1,6 @@
 # The local Galois comparison at ramified places
 
-The cohomological window uses one global Galois representation at many finite places. Suppose we already have the spherical theorem B9.38 over CM fields. Given a polarized cuspidal representation $\pi$ of $\mathrm{GL}_a$ over a CM field $E$, in the weight range of B9.02, it supplies a continuous semisimple $\ell$-adic representation $r$ matching the Satake polynomials at almost all places. It also gives the local comparison at every spherical place for **any** such weakly attached $r$, including after a change of CM field. We show how to recover the two ramified comparisons of B9.05–06 for this same $r$. A spherical component has a vector fixed by the standard maximal compact subgroup. Its Satake roots record its unramified Hecke data. [Global statement and local tests][local-tests] · [Spherical theorem][spherical]
+The cohomological window uses one global Galois representation at many finite places. The spherical attachment theorem B9.38 over CM fields follows from Theorem 2.1.1 of Barnet-Lamb, Gee, Geraghty and Taylor. Given a polarized cuspidal representation $\pi$ of $\mathrm{GL}_a$ over a CM field $E$, in the weight range of B9.02, it supplies a continuous semisimple $\ell$-adic representation $r$ matching the Satake polynomials at almost all places. It also gives the local comparison at every spherical place for **any** such weakly attached $r$, including after a change of CM field. We show how to recover the two ramified comparisons of B9.05–06 for this same $r$. A spherical component has a vector fixed by the standard maximal compact subgroup. Its Satake roots record its unramified Hecke data. [Derivation of B9.38](SPHERICAL_GALOIS_ATTACHMENT.md) · [Global statement and local tests][local-tests] · [Spherical theorem][spherical]
 
 Fix a place $w$, a prolongation to the algebraic closure, and $\iota:\overline{\mathbb Q}_\ell\simeq\mathbb C$. Put $K=E_w$, let $p$ be its residue characteristic, and write $W_K$, $I_K$, $P_K$ for the Weil, inertia and wild inertia groups. The degree of arithmetic Frobenius is $1$. Local reciprocity $b_K:W_K\to K^\times$ sends geometric Frobenius to a uniformizer modulo units. For any weak local correspondence $R$ of B9.47 let
 $$
@@ -14,6 +14,10 @@ Write $x=(\rho_x,N_x)$ for the Frobenius-semisimplified Weil–Deligne parameter
 At $p\ne\ell$ the rank requirement at every place already follows from $\dim r=a$ and the rank law for $R$. At $p=\ell$ either test also gives potential semistability and the de Rham jumps $H_\tau$ at each induced embedding $\tau$. B9.38 supplies the separate crystalline assertion at spherical places. We follow the Roadmap's element-by-element descent. For the tame base change we use the published formula for level-zero supercuspidals. [Descent in B9.07][assembly] · [Weak local correspondence and type law][weak-law]
 
 ## Choosing a CM lift that stays cuspidal
+
+<!--
+% BEGIN GRLC1
+-->
 
 We will prescribe a finite abelian extension $L/K$ as the completion of a CM extension $M/E$. We need a cuspidal lift $\Pi$ to $M$ to which $r|_{G_M}$ is weakly attached. A cyclic base change of a cusp form can cease to be cuspidal when the form is isomorphic to its twist by a nontrivial character of the cyclic extension. The trace of $r$ lets us exclude this at every step.
 
@@ -30,7 +34,15 @@ $$
 $$
 Indeed weak attachment gives this identity at good Frobenius elements and density gives it everywhere. Take $\gamma\in H\cap G_{D'}$ with $\omega(\gamma)\ne1$ to get a contradiction. Arthur and Clozel's Theorems III.4.2(a) and III.5.1 now give a cuspidal lift with the stated local base change. One applies their unitary statement after a norm twist and restores that twist by norm pullback. At good places of residue degree $f$ both the Satake roots and the inverse-Frobenius roots are raised to the $f$th power, including the factor $q^{(a-1)/2}$. Restriction to a finite-index normal subgroup preserves semisimplicity. This proves weak attachment for the next step and completes the induction. Strong multiplicity one carries the polarization with its norm-pulled character, and the infinitesimal weights at a complex embedding are those at its restriction to the lower field. [Arthur–Clozel, Chapters I and III][ac] · [Pinned formal construction of the lift][lean-lift]
 
+<!--
+% END GRLC1
+-->
+
 ## Recovering the toral parameter
+
+<!--
+% BEGIN GRLC2
+-->
 
 The segment law for $R$ assigns a nonzero monodromy operator to a segment of length greater than one. Thus $N_y=0$ leaves only singleton segments. A local component of a cuspidal representation of $\mathrm{GL}_a$ is generic, so these singletons are unlinked. This means that no two support terms differ by the twist $|\det|_K$. Every commutator belongs to inertia. Its image under $\rho_y$ has finite order, so the toral test makes it the identity. Each irreducible cuspidal parameter therefore factors through an abelian group and has dimension one. The rank and character laws of $R$ give smooth characters $\xi_1,\ldots,\xi_a$ in the support of $\sigma$ with
 $$
@@ -51,7 +63,15 @@ In this formula $g$ fixes the chosen completion $L$, so its polynomial has been 
 
 It remains to recover inertia from the nonzero-degree comparisons. Choose $\phi$ of degree one and put $P(X)=\sum_{j=0}^a c_jX^j$, the common characteristic polynomial at $\phi$. Its constant coefficient is nonzero. For $t\in I_K$ put $d_j=\operatorname{tr}\rho_x(t\phi^j)-\operatorname{tr}\rho_y(t\phi^j)$. Cayley–Hamilton on $\rho_x(\phi)$, followed by left multiplication by $\rho_x(t)$ and trace, gives the same zero sum as for $y$. Subtract to obtain $\sum c_jd_j=0$. For $1\le j\le a$ the element $t\phi^j$ has nonzero degree, hence $d_j=0$. It follows that $d_0=0$. The traces now agree on the entire Weil group. For a Frobenius-semisimple action with finite inertia, some power of Frobenius centralizes inertia. On each eigenspace of that power one can rescale Frobenius to have finite order. The resulting finite group acts semisimply, hence so does the Weil group. Equality of trace characters in characteristic zero identifies these semisimple representations. Together with $N_x=N_y=0$ this gives $x\simeq y$. [Trace lemma in the pinned Lean source][lean-trace] · [Multiplicity argument in the preceding section](../../../publication/full/even-rank-attachment.md)
 
+<!--
+% END GRLC2
+-->
+
 ## Descent of the tame inertia polynomials
+
+<!--
+% BEGIN GRLC3
+-->
 
 Now let $K\simeq\mathbb Q_p$ with the full tame test. The finite image of wild inertia acts trivially, since its elements have all eigenvalues one. As before, the singleton cuspidal terms of $\sigma$ have irreducible parameters. To apply a published base-change formula one must identify its parameter with the one assigned by the particular weak map $R$.
 
@@ -76,11 +96,33 @@ On the common uniformizer $p$, each has value $\big((-1)^{d-1}\theta(p)\big)^{a!
 
 The exponent argument above applies to the original unlinked cuspidal terms in every rank. For a unitary cuspidal term its Weil parameter has unitary determinant, and a power of Frobenius centralizing inertia acts by a scalar by irreducibility. That scalar has modulus one. Its restriction therefore contributes characters of real exponent zero before the corresponding norm twist is restored. All the upper character exponents are again in one open interval of length one. The upper support is unlinked, so the toral comparison just proved applies to $r|_{G_M}$ at $u$. It gives $x|_{W_L}\simeq y|_{W_L}$ in Frobenius-semisimplified parameters and $N_x=0$. The extension is unramified, whence $I_L=I_K$. Evaluating at $t$ in this common group gives exactly the required inertia polynomial downstairs. For $a\ge2$ an unramified character of order $a!$ is invisible on $W_L$, since its Frobenius has degree $a!$ over $K$. This explains the scope of the inertia conclusion. [Formal statement with its inertia quantifier][lean-tame]
 
+<!--
+% END GRLC3
+-->
+
 ## The filtered comparison above the coefficient prime
+
+<!--
+% BEGIN GRLC4
+-->
 
 Fix $w\mid\ell$ and any of the period data and bridges permitted in B9.06. Use their specified identifications with the crystalline and de Rham rings, preserving Frobenius, filtration and the chosen local embedding. An embedding for $K$ extends over each finite $L$ in the chosen closure. Restrict the decomposition-group action with this embedding. In the toral argument one of the fields chosen for $\phi$ already gives a crystalline restriction. In the tame argument the restriction to the unramified lift is potentially semistable by the toral case. Either gives potential semistability over $K$. In the Weil–Deligne construction on a common semistable extension, restriction keeps the monodromy operator and restricts the descent action. This justifies the polynomial comparisons for the originally chosen bridge. [Fontaine, Exposé VIII][fontaine-wd] · [Restriction for the chosen bridge in Lean][lean-above]
 
-For the filtration, pass to a finite Galois extension $L'/K$ containing the upper comparison field and large enough for semistability. The filtered space $D_{\rm dR,L'}(r)$ has semilinear Galois action. Its invariants are $D_{\rm dR,K}(r)$ by the definition using $B_{\rm dR}$. Galois descent on each filtration step gives $\operatorname{gr}^i D_{\rm dR,L'}(r)=L'\otimes_K\operatorname{gr}^i D_{\rm dR,K}(r)$ and the full de Rham dimension downstairs. After splitting the coefficient embeddings, the dimension at an embedding extending $\tau$ is the downstairs dimension at $\tau$. Scalar extension from the upper comparison field to $L'$ preserves these dimensions as well. The infinitesimal weights on that comparison field are the pullbacks of the original ones, so its jumps give precisely $H_\tau=\{(a-1)/2-z\}$ with $z$ running over those weights, counted with multiplicity. The initial choices of prolongation, correspondence and compatible bridge were arbitrary. The odd-rank approximation and the stable-range construction used to supply B9.38 remain earlier inputs. [Fontaine, Exposé III, §5.6][fontaine-dr] · [Embedding-by-embedding descent in Lean][lean-jumps]
+For the filtration, pass to a finite Galois extension $L'/K$ containing the upper comparison field and large enough for semistability. The filtered space $D_{\rm dR,L'}(r)$ has semilinear Galois action. Its invariants are $D_{\rm dR,K}(r)$ by the definition using $B_{\rm dR}$. Galois descent on each filtration step gives $\operatorname{gr}^i D_{\rm dR,L'}(r)=L'\otimes_K\operatorname{gr}^i D_{\rm dR,K}(r)$ and the full de Rham dimension downstairs. After splitting the coefficient embeddings, the dimension at an embedding extending $\tau$ is the downstairs dimension at $\tau$. Scalar extension from the upper comparison field to $L'$ preserves these dimensions as well. The infinitesimal weights on that comparison field are the pullbacks of the original ones, so its jumps give precisely $H_\tau=\{(a-1)/2-z\}$ with $z$ running over those weights, counted with multiplicity. The initial choices of prolongation, correspondence and compatible bridge were arbitrary. [Fontaine, Exposé III, §5.6][fontaine-dr] · [Embedding-by-embedding descent in Lean][lean-jumps]
+
+<!--
+% END GRLC4
+-->
+
+<!--
+% BEGIN GRLC5
+-->
+
+With $r$ from B9.38, take $w_{\rm gt}=a-1-b$ and $H_\tau$ from B9.04 and B9.07a. Away from $\ell$ the dimension law holds for each local component, and the toral and full tame arguments give the two conditional conclusions. Above $\ell$ the spherical, toral and full tame cases give the corresponding clauses with these same weights. This proves the global assertion B9.02 for every weak local correspondence satisfying B9.47. Its toral clause supplies the polarized attachment used in claim GUA7 for a definite unitary form. The existence of the weak correspondence is the separate input B9.46. [Formal statement of the attachment](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/Foundations/GaloisRepresentations/TypeConditions/WeightsConjBis.lean#L26-L73) · [Use in the unitary assembly](../../../research/modules/galois/galois_assembly_v44/main.tex#L355-L383)
+
+<!--
+% END GRLC5
+-->
 
 [local-tests]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L24580-L24627
 [spherical]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L25131-L25147

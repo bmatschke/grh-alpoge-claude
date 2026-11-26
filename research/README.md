@@ -11,6 +11,8 @@ The [coverage register](../publication/audit/completeness.md) identifies proof-s
 | A change to the working obligations or dependency graph | Edit the [research register](register/), including its [selected-family checkpoint](register/SELECTED_FAMILY_CHECKPOINT.json). Run the [endpoint verifier](register/verify_selected_family.py). |
 | A comparison or borrowed argument | Cite the author, theorem or section and a stable version in the chapter where it is used. Record edition-wide sources in [the bibliography and attribution notes](../publication/sources/scholarship.md). Update the [coverage register](../publication/audit/completeness.md) when the proof-specific derivation is in the manuscript. |
 
+The polarized Galois attachment module records the proof paragraphs, their dependencies, their published inputs and the exact bytes of the pinned formal source. Its records use the claim schema and checks of the earlier rounds. Run `python3 research/register/verify_claim_records.py --fetch-upstream` to check the source ranges by fetching individual files. [Galois claim records](modules/galois/polarized_galois_attachment/) · [Current claim manifests](register/SELECTED_FAMILY_CHECKPOINT.json)
+
 From the repository root, run the following to check the selected-family graph and build both reading editions. The [publication guide](../publication/README.md) gives the typesetting prerequisites, output paths and release procedure.
 
 ```sh
