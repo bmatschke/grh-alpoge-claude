@@ -1,0 +1,54 @@
+# An upper slope for every selected divided column
+
+Frame entry 2 uses the rank-weighted mean of the slopes of the divided columns. On the eventual selected design class of the period-height contract there is an exponent $A$ such that every positive-rank divided column satisfies
+$$
+                   \mu_{\max}(N'_u)\le x^A b,\qquad b=\exp(x^\varepsilon).
+                   \tag{1}
+$$
+In particular this bounds its mean and their rank-weighted mean. All word estimates below are on one member, with thresholds chosen before the member index and the word. We use the level-prime size bounds of the original conditional contract, also given by the design membership. This claim bounds only the column term in the frame. [Contract and original size hypotheses](../../../archive/rounds/v88/continuation_v88/period.tex#L3-L40) · [Reduction of frame entry 2](PERIOD_FRAME_BOUND.md)
+
+## The original column bounds the unshifted lattice
+
+Let $M_u$ be the full stage-zero lattice of class forms and $M_{H,u}$ its intersection with the ramified subspace, with its induced metric. Under the family injection regard the unshifted lattice $N_u^0$ in that same subspace. At $w\nmid T_u$ its defining local condition gives $(N_u^0)_w\subseteq(M_{H,u})_w$. At $w\mid T_u$ that condition uses the ordered product of the scaled up operators $T_u^{b_v}U_v$ on the ramified lattice, repeated $m$ times. The empty product is the identity. At a used index $v$ the last weight is $-b_v$ with $b_v\ge0$. In the adapted frame $T_u^{b_v}S_0\subset B_v$ for the local stage-zero and lower-neighbor lattices. The integral up correspondence takes $B_v$ into $S_0$ and respects the diagonal-character sums defining the ramified space. Each scaled factor therefore preserves $S_0\cap V^{\rm ram}$, as do every ordered product and its powers. The prescribed local image is inside the original ramified lattice. Intersecting over the places gives $N_u^0\subseteq M_{H,u}\subseteq M_u$. No colength computation enters. [Actual local prescription and fullness](../../../archive/rounds/v89/continuation_v89/integral.tex#L4-L59) · [Weight-lattice inclusion and up correspondence][up] · [Original lattice after pullback](../../../research/modules/construction/global_assembly/main.tex#L97-L107)
+
+For this use the split symmetric column and its finite-order character are supplied on the selected bundle by the linked weighted point. Trivial class stabilizers follow for these same forms. The lower word-prime bound activates the late local weight conditions on the whole family. The earlier local comparison therefore applies to these particular lattices, irrespective of the word, place or index. [Choice on the actual bundle](../../../research/modules/construction/second_layer_global/main.tex#L289-L311) · [Late size conditions](../../../research/modules/construction/global_local_estimates/main.tex#L130-L189) · [Installation on the same forms](../../../research/modules/construction/global_local_estimates/main.tex#L875-L912)
+
+The same columns give the original stage-zero model used in the maximum-slope estimate. At embedding label $\tau$ write $s_\tau$ for the last weight, $h_\tau$ for the difference of its first and last weights, and $d_\tau$ for the sum of the differences from the last weight. With $v_E=\operatorname{rd}(E)/2$, the established bound is
+$$
+ \mu_{\max}(M_u)
+ \le\sum_\tau\left(4d_\tau\log(kv_E)
+             +k^2\log(h_\tau+k)+|s_\tau|\log T_u\right).
+ \tag{2}
+$$
+For a coarse upper bound the late weight window $|\lambda_{\tau,i}|\le2a$, $a=xb$, gives $|s_\tau|\le2a$, $h_\tau\le4a$, $d_\tau\le4ka$. Use $\log\operatorname{rd}(E)\le L=x^\varepsilon$, $\log T_u\ll mL$ from the design's word-prime size bounds, and the polynomial bounds for $k,m,f$. Also $\log(4a+k)\ll L+\log x+\log(k+1)$. There are $f$ labels. Thus (2) is at most $C_0x^{A_0}b$ with constants uniform in the index and word. This needs only the coarse size of each $T_u$. Differences between word primes are unnecessary. [Slope with coefficient four](../../../research/modules/construction/global_slope/main.tex#L789-L819) · [Models on the common selection](../../../research/modules/construction/global_slope/main.tex#L850-L875) · [All weights on the selected size windows](../../../research/modules/construction/global_local_estimates/main.tex#L25-L128) · [Root discriminant](../../../archive/rounds/v89/continuation_v89/heights.tex#L91-L102)
+
+## The total positive cost of division
+
+The divided lattice is $N'_u=I_uN_u^0$, where
+$I_u=\prod_w\mathfrak p_w^{-\lfloor e_w\,{\rm sg}(u,w)\rfloor}$.
+Here $\ell_w=\log Nw/[K:\mathbb Q]$, $c_w=2e_w\ell_w$, and the weights above a prime $p$ sum to $2\log p$. The prescribed metric on the embedded word subspace is induced from the stage-zero metric. Tensoring a lattice by a fractional ideal shifts *all* its slopes by the same normalized ideal degree. This follows on determinants for each rank, since at $w$ a local generator acts by its $r$th power on rank $r$. The integral containment above, and $\lfloor y\rfloor\le y$ for all real $y$, give
+$$
+ \mu_{\max}(N'_u)\le \mu_{\max}(M_u)+
+ \sum_{j,w}c_w\left(g^{\rm kept}_{jw}+F_{jw}-E_{ujw}\right).
+ \tag{3}
+$$
+This is an upper bound even when the division exponent is negative. Compare the three summands on the actual family. Its filled gain, evaluated base and loss, and shifted module are identified by its own defining data. [Fractional ideal and signed shift][shift] · [Filling and module fields][fill] · [Stored base-term identity][fdef] · [Stored loss identity](../../../archive/rounds/v87/continuation_v87/periodnext.tex#L19-L39)
+
+* **Counted gain.** In each orbit the ordinary and enhanced gains are bounded by $\gamma_p\sum_s\bar\alpha_s$, where $\gamma_p=p/(p^2-1)\le4/(3p)$ and the sum is over the marks of the orbit. Indeed the capacities, digit error and price subtracted in the gain formulas are nonnegative in the original window, and $0\le\bar\alpha_s\le6a/5$. The maximum with zero and the ordinary option satisfies the same bound. The disjoint mark sets thus give $0\le g^{\rm kept}_{jw}\le 4n_Ta/p$ for $p\le X''$, and the gain vanishes outside that range. Discarding primes only reduces the upper bound. Group by rational primes and use $\sum_{p\le Y}\log(p)/p\le2\log(Y+1)$. The full contribution is at most $16mn_Ta\log(X''+1)\le64P^4 b$, where $P=1+f+k+m+t+N_m+L$, $n_Tx\le2k$, and $\log(X''+1)\le4P$. This bounds the raw retained gain before any subtraction of the containment budget. [Orbit estimates][count] · [Passage from the member's filling to its gains](../../../research/modules/construction/global_loss/main.tex#L635-L674) · [Eventual size absorption][size]
+
+* **Exceptional base and loss terms.** At a fixed type prime $g_i$ the signed base term $F_g$ also occurs in $E$. After cancellation the remaining terms in $E-F$ are the nonnegative stabilizer valuation, the sum of nonnegative diagram degrees times valuations of the integral prime generator, and a nonnegative size term. At $d$ the signed term $F_d$ cancels as well. Each remaining contraction count is nonnegative. At an unmarked position it is $A_{0,t}=\sum_i\nu_{0,t,i}$. At a mark it is $\sum_{i\ge1}\nu_{0,t,i}+\nu_{0,t,1}+\nu_{1,t,0}$. The diagram entries are positive. At the word prime the definition tests $p=T_u$ first and its level loss is nonnegative. The level prime is distinct from $g_0,g_1,d$ on the selected system by the norm congruence. [Original base and exceptional primes][base] · [Losses][loss] · [Diagram positivity][degrees] · [Norm congruence](../../../research/modules/construction/second_layer_global/main.tex#L400-L422)
+
+* **Ordinary base and loss terms.** At all remaining places $E$ is nonnegative. In its zero-Frobenius branch both summands of the correction are nonnegative. In the other inert or signal branch the possibly signed first orbit sum occurs inside a maximum with zero. The remaining digit, orbit-size, marking and weight terms are nonnegative on the size window. The stabilizer denominator is integral. Thus $F-E\le\max(F,0)$ there, also at a word prime of ordinary type. The explicit orbit formula with $W=4P^5b$ bounds this positive part by $16P^7b/p$ through $X''$, with zero positive contribution thereafter. Indeed each orbit costs at most $2(k-1)W/p$ per unit length; the normalization counts each orbit once and there are at most $P$ labels with the factor two from the inert sum. Grouping by rational primes again and summing the $m\le P$ layers bounds the contribution by $256P^9b$. [Ordinary correction terms][loss] · [Positive orbit and prime sum bound][positive]
+
+By (2) and (3), $\mu_{\max}(N'_u)\le C_0x^{A_0}b+(64P^4+256P^9)b$. Since $P$ is bounded by a fixed power of $x$, increasing one exponent and the common cutoff proves (1). For an independent check of the sign, the already established eighth period-height entry gives $-\sum_{j,w}c_wE_{ujw}\le C mB_0$ on this same range, since its main term is nonnegative. Together with the ordinary upper bound for the signed total of $F$, this also suffices. Neither proof uses precise colengths at the level prime or the full lower slope comparison after division. The [sharp-row transfer](PERIOD_SHARP_ROW_TRANSFER.md) now reduces the outstanding part of frame entry 2 to the normalized base-row bound. [Selected eighth entry](../../../archive/rounds/v88/continuation_v88/period.tex#L20-L40)
+
+[up]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L32034-L32065
+[shift]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L8018-L8041
+[count]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L35207-L35211
+[size]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L33033-L33041
+[base]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L6285-L6336
+[loss]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L6366-L6419
+[degrees]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L6235-L6245
+[positive]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/94e6a98b4e74932a0298d6bd22d44cf60c62764b/docs/src/book/main.tex#L32994-L32996
+[fill]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/ParConsts.lean#L52-L77
+[fdef]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/DataExtra.lean#L77-L89
