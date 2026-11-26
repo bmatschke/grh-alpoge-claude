@@ -86,7 +86,7 @@ $$
  \le 4\,81^{sf} X_s(\Delta_i/N)^k
         H^{3r+8s(1+r)+8r^2+A_s+1/2}.
 $$
-This supplies the arithmetic finite-fibre estimate of B8.10ac at every corank $s\ge2$. To pass to the spectral assertion, the real squared-integral estimate and the estimate with angular normalization outside the [ordinary-amplitude range](SPECTRAL_HIGHER_CORANK_MASSES.md) still have to hold on the actual operator. Equation (6) cancels the angle in the counting cutoff.
+This supplies the arithmetic finite-fibre estimate of B8.10ac at every corank $s\ge2$. The [local moment estimate](SPECTRAL_SHIFTED_MINOR_MOMENTS.md) and [angular bounds](SPECTRAL_ANGULAR_FROM_ORDINARY_AMPLITUDE.md) give the two analytic factors on compatible data. For the [corank sum](SPECTRAL_HIGHER_CORANK_MASSES.md) the global coefficients must have these local factors with the specified finite and Haar normalizations. Equation (6) cancels the angle in the counting cutoff.
 
 [minors]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/CuspSpanNormBounds/BlockEnds.lean#L26-L101
 [frame]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/CuspSpanNormBounds/FlagEEqHyperbolic.lean#L93-L121

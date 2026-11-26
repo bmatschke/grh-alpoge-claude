@@ -112,4 +112,4 @@ $$
  \frac{P_N(F)}{VH}\ge\frac{h_{\rm fl}(F)}H-
        \frac{7sU}{10fn^2}-B_0-a_HB_H-\epsilon .
 $$
-The only extra intersection estimate in this implication is $I(Y)\ge E(Y)-\epsilon$ for the single class $Y$ with both first derivatives zero. If the determinant comparison on a component has a negative normalized defect, use its $V_Z$-weighted mean absolute negative part in $B_H$. The implication still requires realization of the named model, lattice, metric and height data on the selected family and the required error budget for $\epsilon$.
+The [finite wall calculation](PERIOD_CENTERED_ROOT_WALL_HEIGHTS.md) proves this comparison with zero error on a matched root origin carrying the indicated model laws. On a proposed selected tower the required centered comparison is $I(Y)\ge E(Y)-\epsilon$ for the single class $Y$ with both first derivatives zero. If the determinant comparison on a component has a negative normalized defect, use its $V_Z$-weighted mean absolute negative part in $B_H$. The implication still requires realization of the named model, lattice, metric and height data on a single tower for the selected family.

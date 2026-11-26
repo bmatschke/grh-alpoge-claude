@@ -1,5 +1,7 @@
 # Period entry 7 on positive-dimensional components
 
+The [mixed-degree formula](PERIOD_CHOW_MIXED_PROJECTIVE_DEGREES.md) computes the least exponent of the costly sections in the coefficient estimate below.
+
 ## A sufficient condition from a subsystem of cusp forms
 
 Fix the quotient weight $u_1$ on a good cover. Let $V_Z$ be the space of quotient-weight cusp forms on a component $Z$ over the coefficient field $K$, with its integral lattice and Petersson metrics. Its complete series has projective image $X_Z\subset\mathbf P(V_Z^*)$ of dimension $d=f\binom r2$ and degree $\Delta_Z$. The last nonterminal layer has $q_{\rm sig}=1$. In this note a short section must be globally integral and satisfy the claimed norm bound at every embedding.
