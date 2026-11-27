@@ -1,6 +1,6 @@
 # Uniform spectral estimates on finite flag towers
 
-FBE20–32 derive the residual group and unipotent moments, integrability at prescribed heads, and differentiated cutoff bounds for the selected native gap and interpolation boxes. The downstream formal consumer separately packages its other signed-word and representation inputs. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
+FBE20–32 derive the analytic cutoff estimates. FBE33–35 give the eighteen clauses at the original zero row and the single terminal rescaling. FBE36–37 identify the represented rows, their density and summability in the matched arithmetic and real model. FBE38 derives the singleton Poisson inequality from its original finite-point and Fourier readings. The existence and comparison of that simultaneous realization throughout the selected family remain inherited. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
 
 | Claim | Result |
 | --- | --- |
@@ -36,5 +36,11 @@ FBE20–32 derive the residual group and unipotent moments, integrability at pre
 | [FBE30](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE30) | Curvature and angular transport fix a single-valued unitary frame for the compact intertwiners |
 | [FBE31](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE31) | The binary adjoint gives the signed mirror weights and the energy for the original group section |
 | [FBE32](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE32) | Separated interpolation boxes give a uniform weight and residue-difference constant for the differentiated cutoff |
+| [FBE33](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE33) | Local presentation Grams give the global arithmetic kernel, support and periodic majorants on each finite tower |
+| [FBE34](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE34) | The numerical, real and finite estimates assemble all eighteen recursion clauses for the zero row on the stated model and wave frame |
+| [FBE35](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE35) | Terminal rescaling inserts the true row coefficients once and leaves the wave and cutoff normalizations intact |
+| [FBE36](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE36) | Partner counts give finite row domination with the represented density, bounded by two on the large-rank range |
+| [FBE37](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE37) | Positive double-coset unfolding and the exact terminal weight give absolute summability of each realized arithmetic row |
+| [FBE38](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE38) | The matched singleton wave and trace-dual frame give the native finite-coset Poisson inequality at every sampled nonzero point |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

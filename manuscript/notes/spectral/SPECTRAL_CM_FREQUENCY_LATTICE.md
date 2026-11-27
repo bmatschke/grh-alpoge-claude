@@ -34,8 +34,8 @@ $$
  \sum_{0\ne y\in L^*\cap Y}\prod_v\min(1,(z_v/|v(y)|)^h)
      &\le [C_{h,a}(gT)^a]^f,\\
  \sum_{y\in L^*\setminus Y}\prod_v\min(1,(z_v/|v(y)|)^{h'})
-     &\le [C_{h',a'}gT^{a'}]^f .                               \tag{3}
- \end{aligned}
+     &\le [C_{h',a'}gT^{a'}]^f .
+ \end{aligned}                                                    \tag{3}
 $$
 The scales in the two lines can be chosen independently. Use dyadic indices $n_v=\max(0,\lceil\log_2(|v(y)|/z_v)\rceil)$ with $H=\sum_v n_v$ and $R_v=2^{n_v}z_v$. The weights are bounded by $2^{hf-hH}$ in the first sum. A nonzero axial frequency gives $g^fV/d_D\ge1$, so the linear volume ratio can be raised to $a$. In the second sum (2) holds and $(V/d_D)^2\le2^{(a'-2)f}(V/d_D)^{a'}$. Sum each majorant over the nonnegative multi-indices using $\sum 2^{-(h-a)H}=(1-2^{-(h-a)})^{-f}$ and its primed version. This proves (3), including equality at the lower endpoint exponents $a=1$ and $a'=2$.
 
