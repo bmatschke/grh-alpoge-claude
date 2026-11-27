@@ -1,6 +1,6 @@
 # The integral flag models at two prime cutoffs
 
-GRT37–91 establish the determinant and wall estimates, construct the marked interior-member models, their group and integral frames, and realize the one-parameter series at one auxiliary prime tower. GRT92 distinguishes the common depth four from the comparison of the integral lattices. GRT93–94 construct the smooth arithmetic intersection system. GRT95 proves the complete link between cutoffs under its named hypotheses. GRT96 gives the normalized root limits and quantitative estimate on a matched metric family. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
+GRT37–86 derive the determinant and wall estimates and construct the marked interior group and its two integral section frames. GRT87–91 and GRT97–99 give the prescribed power-series arc on that entry, with all division levels, valued embeddings and uniformizer specialization. GRT92–96 compare the two cutoffs by smooth arithmetic intersections. GRT100–101 prove a quantitative limit at the actual regularization time for any identified marked reference, uniformly in its covers. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
 
 | Claim | Result |
 | --- | --- |
@@ -100,5 +100,10 @@ GRT37–91 establish the determinant and wall estimates, construct the marked in
 | [GRT94](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT94) | Operational arithmetic multiheights satisfy the four smooth intersection clauses on the projective coordinate models |
 | [GRT95](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT95) | The common graph, both root metrics and the globally isometric auxiliary line give all seven normalized cutoff conclusions |
 | [GRT96](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT96) | A finite-energy tail controls every normalized root monomial and a wordwise rate yields the uniform wall estimate |
+| [GRT97](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT97) | The positive Mumford datum gives one polarized generic group with compatible division labels at every level and the two prescribed rational markings |
+| [GRT98](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT98) | The normalized Fourier section agrees at all odd levels and its theta tables and integral frame are preserved by compatible valued tests |
+| [GRT99](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT99) | The fully marked generic point descends to the prescribed power-series arc and its integral family specializes at the uniformizer |
+| [GRT100](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT100) | A shell truncation and the divisor current give a uniform logarithmic tail for the variation of smooth mixed curvatures |
+| [GRT101](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT101) | The original regularizations on a marked analytic reference satisfy the uniform word estimate at the source time |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)
