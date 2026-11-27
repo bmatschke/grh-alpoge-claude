@@ -279,3 +279,129 @@ Even for $F=\mathbf Q$ the estimate supplied by this substitution for the logari
 <!--
 % END ETS14
 -->
+
+## The full strict Selmer group and the local correction on the host
+
+<!--
+% BEGIN ETS15
+-->
+
+<span id="claim:ETS15"></span>Let $E$ be a totally imaginary number field of degree $n$ and let $e\ge1$. Write $A(E,e)=K_{2e}(\mathcal O_E)$ and $\mathcal S_\ell(E,e)$ for the original strict group on that field. On every coefficient prime ETS9 identifies its dual with the localization kernel in $A(E,e)\otimes\mathbf Z_\ell$. This identification respects field automorphisms. Cup products, the sum of local invariants and the étale Chern comparison are all natural, and the Pontryagin dual has the contragredient action. Choosing different extensions of the same places conjugates the restriction maps and preserves the kernels. Thus it holds for every choice of local data in the source. In particular all the prime and twist lengths on a fixed CM host are finite, including at two. [Global and local kernels in the source](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaAbsTop.lean#L137-L145) · [Conjugation on the two strict groups](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L64-L92) · [Global duality](https://www.jmilne.org/math/Books/ADTnot.pdf) · [Number-ring comparison, VI.8.2](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf)
+
+Local duality bounds the index of this kernel by the product of the orders of $(\mathbf Q_\ell/\mathbf Z_\ell)(-e)^{G_{E_v}}$ over $v\mid\ell$. If such a group contains an element of order $\ell^a$, the image of $G_{E_v}$ in $(\mathbf Z/\ell^a)^\times$ has exponent dividing $e$. Its index is at most $[E_v:\mathbf Q_\ell]\le n$, by intersecting $E_v$ with the local cyclotomic field. For odd $\ell$ the group of units is cyclic, so it contains at most $e$ elements killed by the $e$th power map. At two the units modulo $2^a$ are a product of at most two cyclic groups, one of order at most two, so this kernel has at most $2e$ elements. In either case $\varphi(\ell^a)\le2en$ and hence $\ell^a\le4en$. Each local invariant group is a subgroup of the cyclic torsion at this bounded exponent. There are at most $n$ places above each prime and at most $4en$ possible primes. It follows that
+$$
+0\le\log|A(E,e)|-\sum_\ell\log|\mathcal S_\ell(E,e)|
+  \le 4 e n^2\log(4en).
+$$
+The sum is finite since each dual is a subgroup of the indicated primary part of one finite group. This controls the total local correction uniformly before choosing a prime set. [Prime weights and the contribution at two](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L107-L131) · [Local Tate duality, I.2](https://www.jmilne.org/math/Books/ADTnot.pdf)
+
+<!--
+% END ETS15
+-->
+
+## Descent of the sign at ramified primes and the special value
+
+<!--
+% BEGIN ETS16
+-->
+
+<span id="claim:ETS16"></span>Let $E\subset\mathbf Q(\mu_N)$ be CM, $F=E^+$, $n=[E:\mathbf Q]=2s$, and $c$ complex conjugation. Put $m=e+1\ge2$ and $\delta=(-1)^m$. For every odd $\ell$, the eigenspace called $\mathcal S_\ell^-$ in the source has eigenvalue $\delta$. ETS15 gives an injection of its dual into the same eigenspace of $A(E,e)\otimes\mathbf Z_\ell$, since $\delta^{-1}=\delta$. The two sign projectors $(1\pm c)/2$ are integral for all these primes, including primes dividing $n$. [The sign on the cohomology with its coefficient twist](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L64-L88) · [Action on the original field](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/OddResidueBounds/ZeroMemUnrHom.lean#L44-L55)
+
+The $c=1$ part of $A(E,e)\otimes\mathbf Z_\ell$ is $A(F,e)\otimes\mathbf Z_\ell$. Here is a descent argument also at a finite prime ramified in $E/F$. Let $\pi:\operatorname{Spec}\mathcal O_E[1/\ell]\to\operatorname{Spec}\mathcal O_F[1/\ell]$. For $T_a=\mathbf Z/\ell^a(m)$ the sheaf $\pi_*\pi^*T_a$ has stalk the product of copies of $(T_a)_{\bar y}$ over the geometric points above $\bar y$. They form a single orbit under $1,c$, including the one-point orbit at a ramified prime. The action on the pulled-back stalks is the canonical permutation, so their invariant part is the diagonal copy of $T_a$. Finite direct image is exact, and the projector $(1+c)/2$ splits the sheaf. Taking cohomology and then the inverse limit identifies the invariant degree-two cohomology with that of the base. The inverse-limit identification uses finiteness of the finite-coefficient degree-one groups as in ETS9. Apply the natural number-ring comparison over both fields. This proves descent for the full group used to bound the strict length. [Stacks Project, Proposition 59.55.2](https://stacks.math.columbia.edu/tag/03QN) · [Weibel, VI.8.2](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf)
+
+Let $Z_m$ be the product of $L(1-m,\chi^*)$ over the characters of $\operatorname{Gal}(E/\mathbf Q)$ with $\chi(-1)=(-1)^m$, using their primitive inducing characters. Exactly $s$ characters have each sign since $c$ is nontrivial. For $m$ even $Z_m=\zeta_F(1-m)$, by the abelian factorization into primitive Dirichlet functions, with the Euler factors at ramified primes included in that factorization. Wiles's odd-primary special-value theorem gives
+$$
+v_\ell\!\left(\left|A(E,e)_\ell^{c=1}\right|\right)
+     =v_\ell\big(w_m(F) Z_m\big),
+\qquad
+w_m(B)=\big|H^0(B,(\mathbf Q/\mathbf Z)(m))\big|.
+$$
+For $m$ odd one has $m\ge3$ and $Z_m=L(E/F,1-m)$ for the nontrivial quadratic character of $E/F$. This identity follows by cancelling the even Dirichlet factors as functions *before* evaluation. Kolster's higher relative class number formula gives the odd valuations of $w_m(E)Z_m$ as those of $h_m(E)/h_m(F)$. At odd primes $h_m(B)$ is the order of the same degree-two group as $A(B,e)$. The descent just proved therefore identifies this valuation with that of $|A(E,e)_\ell^{c=-1}|$. Both special values are nonzero and rational. These are odd-primary identities, so the undetermined power of two in the general formulas introduces no hypothesis. [Wiles’s theorem and the higher special-value formula, VI.8.7–8.8](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf) · [Voight, §1, Proposition 1.3, giving Kolster’s formula](https://jvoight.github.io/articles/higherrel-062618.pdf) · [The two sums as distinguished by the source](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L113-L125)
+
+<!--
+% END ETS16
+-->
+
+## A single integer bounding all odd valuations of the critical value
+
+<!--
+% BEGIN ETS17
+-->
+
+<span id="claim:ETS17"></span>For the host of ETS16 put $D=mN(m+1)!$ and let $w$ be the odd part of $w_m(F)$ for even $m$ or $w_m(E)$ for odd $m$. We first prove $w\mid D$. Both fields are contained in $\mathbf Q(\mu_N)$. For an odd prime $\ell\nmid N$ the cyclotomic image of $G_{\mathbf Q(\mu_N)}$ is all $\mathbf Z_\ell^\times$, by the Chinese remainder theorem on each finite cyclotomic extension. Invariants of order $\ell^a$ then require $\ell-1\mid m$ and $a\le1+v_\ell(m)$. For $\ell\mid N$, set $b=v_\ell(N)$. The image contains $1+\ell^b\mathbf Z_\ell$ by the same finite cyclotomic argument. The binomial expansion gives $v_\ell((1+\ell^b)^m-1)=b+v_\ell(m)$, since $\ell$ is odd. A fixed element of order $\ell^a$ forces $a\le b+v_\ell(m)$. Together these bounds show $w\mid Nm\prod_{\ell-1\mid m,\,\ell\ {\rm odd}}\ell$, which divides $D$. [Higher roots of unity as cyclotomic invariants, Voight §1](https://jvoight.github.io/articles/higherrel-062618.pdf) · [The cyclotomic restriction in the source](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/OddResidueBounds/ZeroMemUnrHom.lean#L15-L35)
+
+For a primitive character $\chi^*$ of conductor $f\mid N$, summing the Hurwitz zeta function in residue classes gives
+$$
+ L(1-m,\chi^*)=-\frac{f^{m-1}}m
+                 \sum_{a=1}^f\chi^*(a)B_m(a/f).
+$$
+Here $B_m(y)=\sum_{j=0}^m\binom mj B_j y^{m-j}$ and all $(j+1)!B_j$ are integers. The latter follows by induction from $\sum_{j=0}^{k}\binom{k+1}jB_j=0$ for $k\ge1$. After expansion, the factor $f^{m-1}(a/f)^{m-j}$ is $a^{m-j}f^{j-1}$. Thus $D L(1-m,\chi^*)$ is an algebraic integer, also for $f=1$. To bound its absolute value use the generating series $z/(e^z-1)$. On $|z|=1$ its modulus is at most $(3-\exp(1))^{-1}<4$ by the exponential series. Cauchy's estimate gives $|B_j|\le4j!$ and the polynomial expansion gives $|B_m(y)|\le4\exp(1)m!<12m!$ for $0\le y\le1$. Therefore $|L(1-m,\chi^*)|\le12(m-1)!N^m$. [NIST DLMF, Hurwitz zeta at negative integers](https://dlmf.nist.gov/25.11.E14) · [Primitive character and the cleared Bernoulli value](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/OddResidueBounds/ZeroMemUnrHom.lean#L71-L85) · [Nonvanishing at the required parity](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StickelbergerCharacterEval/GroupRingCharEvalStickelbergerYNeZeroOfParity.lean#L14-L29)
+
+The $s$ factors in ETS16 are stable as a set under conjugation of their character values, so $D^s Z_m$ is a nonzero rational algebraic integer. The positive integer $I_m=|wD^s Z_m|$ is divisible by the order of the whole odd part of the $\delta$-eigenspace in the sense of ETS16, namely the product of the corresponding orders over the odd primes. In fact its valuation at every such prime is that order's valuation plus $s v_\ell(D)$. This passage through an integer controls odd numerators even when $Z_m$ has a power of two in its denominator. We have the simultaneous bound
+$$
+ I_m\ \le\ D^{s+1}\{12(m-1)!N^m\}^{s}.
+$$
+The formula uses primitive characters at their own conductors. No removal of an Euler factor at a prime dividing the larger $N$ enters the bound. [Size of the cleared value in the original argument](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/OddResidueBounds/ThmBcOfPsiBound.lean#L110-L145)
+
+<!--
+% END ETS17
+-->
+
+## The complete odd-minus window estimate on the original fields
+
+<!--
+% BEGIN ETS18
+-->
+
+<span id="claim:ETS18"></span>For every abelian CM field $E\subset\mathbf Q(\mu_N)$, set $n=[E:\mathbf Q]$ and let $t\ge2$ be an integer. For every finite set $S$ of odd primes and every original local-data family one has
+$$
+ \sum_{\ell\in S}\log\ell \sum_{1\le e<t}
+     \operatorname{length}_{\mathbf Z_\ell}\mathcal S_\ell(E,e)^{c=(-1)^{e+1}}
+ \ \le\ (n+1)t^2\log(tN).
+$$
+For fixed $m=e+1$, ETS16–17 bound that contribution over all odd primes by $\log I_m$. Finiteness of each subgroup already follows from ETS15. Put $u=\log(tN)$, so $n\ge2$, $N\ge3$ and $2\le m\le t$. The bounds $mN\le tN$ and $m+1\le tN$ give $\log D\le(m+2)u$. Also $(m-1)!N^m\le(tN)^m$ and $12\le(tN)^2$. Hence $\log I_m\le(2s+1)(m+2)u=(n+1)(m+2)u$. Finally $\sum_{m=2}^{t}(m+2)=(t-1)(t+6)/2\le t^2$, since $(t-2)(t-3)\ge0$ for integers $t\ge2$. Nonnegativity permits restriction to every input prime set. [All finite odd-prime sets and every local datum](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L113-L119) · [Original field and conductor in the minus estimate](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/OddResidueBounds/ThmBcOfPsiBound.lean#L147-L168)
+
+In the source's field predicate the set of cyclotomic moduli containing $E$ is nonempty. Its least member $N=\operatorname{condF}(E)$ is positive and itself admits an embedding. Transport to its image identifies the strict groups and the complex conjugation on the originally specified field, for any choice of the ambient closure. Now $(n+1)\le3n$ and the first term in $\operatorname{minusBound}(C,o,n,N,t)$ is $3nt^2\log(tN)$. Thus $C=0$ witnesses the literal assertion $\mathrm{ThmBcFree}$. This includes odd primes dividing the field degree or conductor. In particular ETS16–18 give a second proof of OB8 directly from the special-value theorems, independent of the character annihilators used in OS1–9. The other sign is $c=(-1)^e$. At the corresponding special values its characters have the parity of a trivial zero, so the nonzero product used here measures only the minus contribution in the source's convention. [Cyclotomic embedding and the least conductor](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L36-L45) · [The exact first and exceptional terms](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L69-L71) · [The free minus estimate](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L64-L68) · [OB8, the character-annihilator proof](../../../research/modules/construction/odd_minus_bounds/main.tex#L756-L827)
+
+<!--
+% END ETS18
+-->
+
+## The complementary K-group estimate on the selected windows
+
+<!--
+% BEGIN ETS19
+-->
+
+<span id="claim:ETS19"></span>For an abelian CM host $E$ and cutoff $t$, let $W(E,t)=\sum_{\ell}\sum_{1\le e<t}\log|\mathcal S_\ell(E,e)|$, including $\ell=2$. Bounding this sum is equivalent to bounding the original sums over all finite prime sets, because ETS15 gives finite support at this fixed field and cutoff. Write $A_\ell(e)=K_{2e}(\mathcal O_E)\otimes\mathbf Z_\ell$. Define the integer $P(E,t)$ by taking, for each $e$, the order of $A_2(e)$ times the product of $|A_\ell(e)^{c=(-1)^e}|$ over the odd primes, and multiplying these integers for $1\le e<t$. Then
+$$
+ \log P(E,t)-4n^2t^2\log(4nt)
+ \ \le\ W(E,t)\ \le\
+ \log P(E,t)+(n+1)t^2\log(tN).
+$$
+For the upper bound, apply the injection of ETS15 at two and on the $(-1)^e$ eigenspace at odd primes. ETS18 supplies the other strict eigenspace. For the lower bound, its nonnegative contribution can be dropped. On the retained eigenspaces the index of the dual strict group is at most the order of the full local target in ETS15. The same index bound holds without projecting at two. Sum that claim over the twists, using $\sum_{1\le e<t} e\le t^2$. There is no use of a sign projector at two. [The dyadic term, both odd terms and the window sum](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L107-L131) · [Assembly on the same field and prime set](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L133-L145)
+
+On the source windows both explicit errors fit below the allowed height with room to spare. Indeed, let $m_0$ be the fixed initial modulus and $h(x)$ the power-of-two layer. The host embeds in the cyclotomic field of modulus $\operatorname{lcm}(2^{h(x)+2},m_0,q,d)$. To check this even if a larger containing modulus is used to witness the field predicate, an automorphism fixing these four cyclotomic subfields has exponent congruent to one at all four moduli. It meets the defining kernel condition and fixes the given host. Take $N$ to be its least cyclotomic modulus. Then $n\le N\le 2^{h(x)+2}m_0 qd$. With $2^{h(x)}\le x^4$, $t\le x^{401}$, $x\ge X^{1/J}$ and $\log(qd)\le X^{\varepsilon/(4J)}$, one has $\log(Nt)\le2x^{\varepsilon/4}$ once $x$ is large for $m_0,\varepsilon$. Both error terms are therefore at most $\exp(C x^{\varepsilon/4})$ for an absolute $C$ above that threshold. In particular a bound for $\log P(E,t)$ with any fixed margin below $\exp(\frac12 x^\varepsilon)$ suffices on the very same windows. Conversely any proposed bound for $W(E,t)$ controls this product up to the displayed additive error. Obtaining that remaining size estimate on a common family is a separate arithmetic question. The stronger fixed-field alternative for its generic character orbits has the exact criterion in ETS11. [Kernel describing the actual host](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L36-L45) · [Bounds on layer and twist functions](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L23-L27) · [Order of window thresholds and auxiliary primes](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L41-L53) · [Independent reconstruction, window definition and decomposition](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/b50dae1aa964142b04c11f791812ca7d4962e133/manuscript/sec17_twisted.tex#L104-L152)
+
+<!--
+% END ETS19
+-->
+
+## An exact nonzero Selmer contribution over the ninth cyclotomic field
+
+<!--
+% BEGIN ETS20
+-->
+
+<span id="claim:ETS20"></span>Take $E=\mathbf Q(\mu_9)$, $n=6$, and $e=2$, so $m=3$. We compute the entire contribution from the minus sign at the odd primes in this example. The group $(\mathbf Z/9)^\times$ is generated by $2$ and has order six. Let $z$ be a primitive sixth root with $z^2=z-1$. Of the three odd characters, the one sending $2$ to $-1$ is induced by the nontrivial character modulo three. The other two, sending $2$ to $z$ and $\bar z$, have conductor nine. For the conductor-three character, the value at $-2$ is $-3\{B_3(1/3)-B_3(2/3)\}=-2/9$, where $B_3(y)=y^3-3y^2/2+y/2$. For the character sending $2$ to $z$ the six unit residues in order are $1,2,4,8,7,5$. Pair residues $a$ and $9-a$, using $B_3(1-y)=-B_3(y)$. The value is
+$$
+ -54\{B_3(1/9)+zB_3(2/9)+z^2 B_3(4/9)\}
+   =-(4+10z)/3.
+$$
+Its conjugate product is $(16+40+100)/9=52/3$. Thus $Z_3=-104/27$. The odd higher roots of unity have order $27$: at three the field has cyclotomic image $1+9\mathbf Z_3$, whose cubes are $1+27\mathbf Z_3$; at every other odd prime the image is full and $\ell-1$ does not divide three. By ETS16 the odd part of $A(E,2)^{c=-1}$ therefore has order the odd part of $27|Z_3|=104$, namely $13$. In particular the prime three, which divides both the degree and the conductor, contributes no length. [Value at a negative integer](https://dlmf.nist.gov/25.11.E14) · [Use of the primitive inducing character](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/OddResidueBounds/ZeroMemUnrHom.lean#L71-L85)
+
+At $13$ the extension $E_v/\mathbf Q_{13}$ is unramified for every $v\mid13$. Its inertia acts on the first layer of $(\mathbf Q_{13}/\mathbf Z_{13})(-2)$ through the nontrivial square inverse of the mod-$13$ cyclotomic character. Thus the local invariants vanish, and ETS15 gives equality with the whole indicated $K$-group component at $13$. The odd-minus strict group is consequently cyclic of order $13$ at that prime and zero at every other odd prime. Its prime-weighted contribution for this twist is exactly $\log13$. This calculation exhibits a nonzero term in the general abelian CM theorem. [The strict sign and its length](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L68-L76) · [Local duality](https://www.jmilne.org/math/Books/ADTnot.pdf)
+
+<!--
+% END ETS20
+-->

@@ -1,6 +1,6 @@
 # Even twists and rank-three automorphy
 
-For the generic one-integer estimate, ETS7–11 give finiteness and the simultaneous valuation inequalities, with the least possible positive integer for each admissible fixed datum. ETS12–14 prove the stated zero contributions and the bounded-twist, bounded-degree large-prime estimate. Uniform logarithmic size on the full range remains a proof-specific input. The separate source route via a marked ordinary family is examined in ETS3–6. [Editable proof](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md)
+The module gives the exact primitive valuation criterion on generic orbits, proves finiteness at all primes, and proves the full odd-minus bound on every original abelian CM host by the higher special-value formulas. ETS19 estimates the cost of replacing the remaining strict sum by the dyadic and complementary odd K-group orders. The size of that product on the chosen windows, or the uniform generic estimate together with the other source cases, remains a quantitative question. [Editable proof](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md)
 
 | Claim | Result |
 | --- | --- |
@@ -18,5 +18,11 @@ For the generic one-integer estimate, ETS7–11 give finiteness and the simultan
 | [ETS12](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS12) | The first layer on the character field with roots of unity is class-group duality, and the reflected odd unit space gives a vanishing test |
 | [ETS13](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS13) | Four arithmetic tests give zero strict length for entire families of trivial-character twists |
 | [ETS14](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS14) | The existing large-prime torsion estimate supplies a polynomial level bound at bounded twist and degree and leaves an explicit rate requirement |
+| [ETS15](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS15) | The total local correction between the strict groups and the even K-group of a CM host is at most polynomial in its degree and twist |
+| [ETS16](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS16) | Descent through ramified CM primes and the higher class number formulas identify the critical sign at every odd prime |
+| [ETS17](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS17) | Integral Bernoulli values and higher roots of unity give a single small integer for all the odd valuations of the critical sign |
+| [ETS18](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS18) | Every cyclotomic CM host satisfies the full odd-minus estimate with zero exceptional-prime term |
+| [ETS19](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS19) | The original window sum differs from the logarithm of the dyadic and complementary odd K-group orders by explicit small errors |
+| [ETS20](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS20) | Over the ninth cyclotomic field the odd-minus strict group at twist two has order thirteen and contributes at that prime alone |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)
