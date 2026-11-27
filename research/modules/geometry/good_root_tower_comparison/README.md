@@ -1,6 +1,6 @@
 # The integral flag models at two prime cutoffs
 
-GRT37–77 derive the determinant and wall height estimates, construct the boundary ideal, and identify the selected generic PEL family in the normalization of its component. GRT78–86 reconstruct the integral lattices, smooth semiabelian group, rigidified primitive line and both ample frames on its marked interior-member models. GRT87–91 derive the fixed arc series, its auxiliary prime tower, the weighted row lattice and the simultaneous determinant change on the specified marked tests. The remaining family and intersection comparisons are recorded below. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
+GRT37–91 establish the determinant and wall estimates, construct the marked interior-member models, their group and integral frames, and realize the one-parameter series at one auxiliary prime tower. GRT92 distinguishes the common depth four from the comparison of the integral lattices. GRT93–94 construct the smooth arithmetic intersection system. GRT95 proves the complete link between cutoffs under its named hypotheses. GRT96 gives the normalized root limits and quantitative estimate on a matched metric family. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
 
 | Claim | Result |
 | --- | --- |
@@ -95,5 +95,10 @@ GRT37–77 derive the determinant and wall height estimates, construct the bound
 | [GRT89](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT89) | A single determinant unit supplies one simultaneous section basis and descends the arc map when the marked generic point descends |
 | [GRT90](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT90) | The period-zero torsion detects every primitive row with one point for all readings on a realized marked arc trait |
 | [GRT91](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT91) | The marked arc series realize an abelian object with compatible markings throughout the chosen auxiliary prime tower |
+| [GRT92](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT92) | The reference coordinate derivatives and the common depth four give the two extra conditions used at the cutoffs |
+| [GRT93](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT93) | The normalized sheet integral equals the mixed Chern integral with the Green function and sign of the section recursion |
+| [GRT94](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT94) | Operational arithmetic multiheights satisfy the four smooth intersection clauses on the projective coordinate models |
+| [GRT95](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT95) | The common graph, both root metrics and the globally isometric auxiliary line give all seven normalized cutoff conclusions |
+| [GRT96](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT96) | A finite-energy tail controls every normalized root monomial and a wordwise rate yields the uniform wall estimate |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)
