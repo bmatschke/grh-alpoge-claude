@@ -1,6 +1,6 @@
 # The integral flag models at two prime cutoffs
 
-GRT37–102 derive the determinant and wall estimates, the model of the interior negative member and its marked arcs, the comparison at two cutoffs, the word rate and its Frobenius labels. GRT103–107 determine the signature and level at every interior index, build the regularizations and an integral effective section on the resolved marked period chart, and identify the degrees and metrics of all its cutoff realizations. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
+GRT37–102 derive the determinant and wall estimates, the model of the interior negative member and its marked arcs, the comparison at two cutoffs, the word rate and its Frobenius labels. GRT103–107 determine the signature and level at every interior index, build the regularizations and an integral effective section on the resolved marked period chart, and identify the degrees and metrics of all its cutoff realizations. GRT108 verifies the two applications of the arithmetic volume theorem on these models. GRT109 shows why fixed-component errors disappear before passing to the family estimate. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
 
 | Claim | Result |
 | --- | --- |
@@ -111,5 +111,7 @@ GRT37–102 derive the determinant and wall estimates, the model of the interior
 | [GRT105](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT105) | The marked period and flag charts give the prescribed smooth regularizations, with controlled curvature and two derivatives in the interior |
 | [GRT106](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT106) | The degree-one reference flag has a big nef weight line and an integral effective section with auxiliary exponent one |
 | [GRT107](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT107) | The fixed reference, its ordered roots and all finite cutoff covers can be chosen simultaneously on the marked component |
+| [GRT108](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT108) | Small integral generators give arithmetic nefness for the upper count, and the fibrewise nef smoothed line gives the lower volume at every shift |
+| [GRT109](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT109) | Fixed trace costs and model-dependent Hilbert–Samuel errors disappear before the common fitted-weight threshold is chosen |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

@@ -1,6 +1,6 @@
 # Uniform spectral estimates on finite flag towers
 
-FBE20–42 derive the signed recursion, finite terminal row, two-word operator, initial mass and automorphic range on the measured setting. FBE43 reads the setting and one common period isometry from each selected linked bundle. FBE44 gives one guarded frame threshold from its rank and split-level estimates. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
+FBE20–42 derive the signed recursion, finite terminal row, two-word operator, initial mass and automorphic range on the measured setting. FBE43 reads the setting and one common period isometry from each selected linked bundle. FBE44 gives one guarded frame threshold from its rank and split-level estimates. FBE45–49 give the normalized convergent Gram mean and exact hyperplane volume ratio. FBE50–52 derive the definite count, the two moderate-region estimates under the stated decay, separation and density bounds, and the family constant choice. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
 
 | Claim | Result |
 | --- | --- |
@@ -48,5 +48,13 @@ FBE20–42 derive the signed recursion, finite terminal row, two-word operator, 
 | [FBE42](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE42) | Every Poincaré column on the given high-gap realization lies in the actual automorphic range and its Gram projection correction vanishes |
 | [FBE43](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE43) | The selector of linked bundles supplies a single simultaneous isometry for both word operators and their full Gram blocks |
 | [FBE44](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE44) | The selected rank and split-level comparisons give the unit word-frame bound for every word at one guarded family threshold |
+| [FBE45](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE45) | Regular Gram fibres carry the continuous densities for the source and target Haar measures, including the joint infinite block |
+| [FBE46](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE46) | Residue-frame counts and smooth lifting give the unramified Gram factors and their ordinary product for every nonsingular target in the convergent range |
+| [FBE47](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE47) | The probability-normalized convergent Siegel–Weil identity holds for the specified self-dual Gram measures, all signatures and every admissible character |
+| [FBE48](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE48) | The one-vector mean identifies measures on each nonzero length fibre for all nonnegative measurable infinite tests |
+| [FBE49](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE49) | Comparing the two evaluations of a unit-vector count gives the full hyperplane volume ratio on the unramified self-dual host |
+| [FBE50](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE50) | The definite counting projector has exactly its identity trace, and shell summation bounds the far contribution uniformly on the moderate region under the native decay and packing estimates |
+| [FBE51](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE51) | The short-flag density cancels the near block-packing factors on the moderate region and gives its uniform exponential saving |
+| [FBE52](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE52) | The deep volume and projector trace bounds imply the one-sixteenth counting exponent, with one choice of counting constants for every member and level predicate |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)
