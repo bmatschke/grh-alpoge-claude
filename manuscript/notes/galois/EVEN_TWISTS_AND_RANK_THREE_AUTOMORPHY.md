@@ -512,3 +512,140 @@ For even $e$, the $c=1$ product consists of the base, the three real quadratic r
 <!--
 % END ETS25
 -->
+
+## The two adjacent entries and the central entry of a polarized triple
+
+<!--
+% BEGIN ETS26
+-->
+
+<span id="claim:ETS26"></span>Let $E/E^+$ be a CM field and its maximal real subfield. Fix a complex conjugation $c$, so $G_{E^+}=G_E\rtimes\langle c\rangle$. Let $\ell$ be odd, $A=\mathbf Z/\ell^\nu$ with $\nu\ge1$, and let $\Psi:G_{E^+}\to A^\times$ be continuous with $\Psi(c)=1$. On $G_E$ take the split triple $r_0=\operatorname{diag}(\Psi,1,\Psi^{-1})$. At $c$ take the source's unitary involution $\theta(g)=J(g^{-1})^tJ$, where $J$ has ones on the antidiagonal. Fix the lower triangular flag and the three diagonal characters. We compute extensions over $A[\epsilon]/(\epsilon^2)$ which are split locally at $\ell$ and unramified away from $\ell$. One can also require splitting at a conjugation-stable set of auxiliary places. Write $S_A(\xi)$ for $H^1(E,A(\xi))$ with these restrictions. Local splitting refers to vanishing of the restriction class. [Original involution](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L44-L77) · [Adjoint action](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L155-L170) · [Weights of the torus](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L235-L269) · [Local restrictions indexed over all places](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/ConjStableShaFam.lean#L92-L96)
+
+Let $\mathfrak n$ be the strictly lower triangular matrices. Writing $r(g)=(1+\epsilon z(g))r_0(g)$ identifies first-order extensions with cocycles in $\mathfrak n$ and conjugation by $1+\epsilon X$ with changing a coboundary. Use the same linear cohomology convention for the local conditions. If $r(c)$ is fixed, use the $c$-equivariant cocycles and the $c$-fixed conjugations. They give $S_A(\mathfrak n)^c$, since averaging by $(1+c)/2$ commutes with the differential and restriction to the family of local groups. Equivalently a fixed cohomology class has an averaged representative and an invariant boundary has an averaged primitive. On $G_E$ the two entries $E_{21},E_{32}$ have character $\Psi^{-1}$ and $E_{31}$ has character $\Psi^{-2}$. The differential $X\mapsto-JX^tJ$ interchanges the adjacent entries with a minus sign and negates $E_{31}$. On scalar cochains put $(\iota x)(g)=x(cgc^{-1})$; this is the natural coefficient action since $\Psi(c)=1$. On the three coordinates the involution is $(a,b,z)\mapsto(-\iota b,-\iota a,-\iota z)$. It follows that
+$$
+ S_A(\mathfrak n)^c \simeq S_A(\Psi^{-1})\ \oplus\ S_A(\Psi^{-2})^{\iota=-1},
+ \qquad (a,z)\longmapsto (a,-\iota a,z)
+$$
+where the displayed map is from right to left. The adjacent coordinate ranges over both signs. The central coordinate is in the negative sign. The calculation gives the lower triangular, fixed-diagonal strict subproblem at the split triple. Additional conditions of an ordinary automorphy theorem must be checked separately. [Split rank-three representation](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L283-L301) · [Inverse character in the original Selmer group](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L15-L34)
+
+<!--
+% END ETS26
+-->
+
+## A uniform bound for the central entry at every odd prime
+
+<!--
+% BEGIN ETS27
+-->
+
+<span id="claim:ETS27"></span>In ETS26 suppose $E\subseteq\mathbf Q(\mu_N)$ is an original abelian CM host, $n=[E:\mathbf Q]$, and $\Psi|_{G_E}=\chi_\ell^e\bmod\ell^\nu$ for a positive integer $e$. Here $\chi_\ell$ is the cyclotomic character. On the central entry its square makes the scalar action of $c$ on the coefficient equal to one, so $\iota$ is the same conjugation as for the strict group $\mathcal S_\ell(E,2e)$ of ETS15. For every $\nu$ there is an injection
+$$
+ S_A(\Psi^{-2})^{\iota=-1}\ \lhook\joinrel\longrightarrow\
+            \mathcal S_\ell(E,2e)^{c=-1}[\ell^\nu].
+$$
+Indeed put $M=(\mathbf Q_\ell/\mathbf Z_\ell)(-2e)$. In the cohomology sequence of $0\to A(-2e)\to M\xrightarrow{\ell^\nu}M\to0$, the kernel of $H^1(E,A(-2e))\to H^1(E,M)$ is $H^0(E,M)/\ell^\nu H^0(E,M)$. Complex conjugation is the identity on this kernel because $\chi_\ell(c)^{-2e}=1$. Taking the minus summand over the odd coefficient prime kills the whole kernel, also when $\ell-1$ divides $2e$. Local coboundaries map to local coboundaries, and unramified classes stay unramified. The map therefore lands in the strict group even if more auxiliary splittings were imposed on its source. [The strict coefficient and local groups](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L15-L39) · [Original choice of local families](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/ConjStableShaFam.lean#L164-L168)
+
+For every finite set $P$ of odd primes, integer $t\ge2$ and any choice of the levels $\nu=\nu(\ell,e)$, the central lengths, summed over any applicable $1\le e<t$, satisfy
+$$
+ \sum_{\ell\in P}\log\ell\sum_{1\le e<t}
+       \operatorname{length}_{\mathbf Z_\ell} S_{\mathbf Z/\ell^{\nu(\ell,e)}}(\Psi^{-2})^{\iota=-1}
+   \ \le\ (n+1)(2t)^2\log(2tN).
+$$
+In this formula retain only the indices where the specified triple is used. The indices $2e$ are distinct integers below $2t$, and the sign at $2e$ in ETS18 is $(-1)^{2e+1}=-1$. All other terms in that estimate are nonnegative. The result holds uniformly at primes dividing the field degree and also for arbitrarily deep finite coefficients. The adjacent term in ETS26 still contains the opposite sign. [The free minus estimate in the original window](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L64-L68) · [Its uniform proof on the host](#claim:ETS18)
+
+<!--
+% END ETS27
+-->
+
+## Integrating either adjacent sign while retaining the split characteristic polynomials
+
+<!--
+% BEGIN ETS28
+-->
+
+<span id="claim:ETS28"></span>Use the split triple and lower flag of ETS26. For $s\in\{1,-1\}$ take $[x]\in S_A(\Psi^{-1})^{\iota=s}$. Replacing a representative by $(x+s\iota x)/2$ gives a continuous cocycle with $x(cgc^{-1})=s x(g)$ pointwise. Write $D_s=E_{21}-sE_{32}$. Then $D_s^2=-sE_{31}$ and $D_s^3=0$. In $\mathrm{GL}_3(A[[T]])$ put
+$$
+ U_s(y)=1+TyD_s+\tfrac12T^2y^2D_s^2.
+$$
+Multiplication gives $U_s(y)U_s(z)=U_s(y+z)$. Conjugation by $r_0(g)$ multiplies $y$ by $\Psi(g)^{-1}$, and the polarized involution takes $U_s(y)$ to $U_s(sy)$ by inverse transpose. Thus
+$$
+ r_T(g)=U_s(x(g))r_0(g)\quad(g\in G_E),\qquad r_T(c)=(1,\theta)
+$$
+defines a continuous representation into the unitary semidirect product. The pair $(1,\theta)$ means the element in the nonidentity component with identity matrix. The cocycle identity proves multiplicativity on $G_E$ and the pointwise parity proves the relation at $c$. This is a polynomial family specializing to the split triple at $T=0$, with adjacent first-order class $(x,-s x)$ and first-order central entry zero. At any subgroup where $x$ is a scalar coboundary, conjugating by $U_s(y)$ for the corresponding constant removes it. It is therefore split at the required decomposition groups and unramified away from them wherever the original triple is unramified. For every $g\in G_E$, triangularity gives exactly the three original diagonal entries and hence the original characteristic polynomial for every value of $T$. Different first-order classes remain distinct under conjugations reducing to the identity, since the change of the $(2,1)$ coordinate would have to be a coboundary. [Original twisted inverse transpose](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L68-L79) · [Torus and its root weights](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L235-L259)
+
+There is an additional normalization for the positive sign. Fix any native mark $g_1\in G_E$ with $\Psi(g_1)^2-1$ a unit. Then $\Psi(g_1)^{-1}-1$ is a unit. Adding a coboundary $g\mapsto(\Psi(g)^{-1}-1)y$ makes $x(g_1)=0$. It preserves the positive parity because $\Psi$ extends over $G_{E^+}$. The cocycle also vanishes at $c g_1^{-1}c$. Both matrices at these two group elements are diagonal, so their difference has zero $(1,2)$ and $(2,1)$ entries. Together with the choice at $c$ this gives all three of the source's mark-normalization equations. Thus a positive class passes through that mark already in the polynomial family. We impose no crystalline-weight or characteristic-zero component condition here. [All three equations at the mark](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L279-L301) · [The separated marked eigenvalues](#claim:ETS3)
+
+<!--
+% END ETS28
+-->
+
+## Which even class groups survive the original rank-three mark
+
+<!--
+% BEGIN ETS29
+-->
+
+<span id="claim:ETS29"></span>Return to the principal target $K=\mathbf Q(\sqrt{-7})$, level $N=2$ and positive even $e$. Let $\ell\ge5$, $\ell\ne7$ and $(\ell-1)\nmid2e$. Put $F=\mathbf Q(\mu_\ell)$ and $\Delta=\operatorname{Gal}(F/\mathbf Q)$. Let $P_2\subseteq\operatorname{Cl}(F)$ be generated by the classes of the primes above $2$. With $\omega$ the mod-$\ell$ cyclotomic character, define
+$$
+ V_2=\operatorname{Hom}_{\Delta}
+    \bigl(\operatorname{Cl}(F)/(P_2+\ell\operatorname{Cl}(F)),\ \mathbf F_\ell(-e)\bigr).
+$$
+Every vector of $V_2$ gives a positive adjacent class on the split unitary triple over $K$, with a family as in ETS28 at any mark with separated eigenvalues. It is locally split at both $2$ and $\ell$ and unramified on the other inertia groups of $K$ for the extension entries. These assertions apply to the represented class even if it is zero. To see the map, restriction to $G_F$ identifies $H^1(\mathbf Q,\mathbf F_\ell(-e))$ with the $\Delta$-equivariant continuous homomorphisms on $G_F$, by inflation–restriction and invertibility of $|\Delta|$. For the unramified classes everywhere on $F$ the Artin map gives the class group. The unique prime above $\ell$ is principal, so every such homomorphism kills its Frobenius. Imposing splitting at the primes over $2$ amounts to killing $P_2$. Restriction detects the zero local class over $\mathbf Q$ at both primes because the local degrees divide $\ell-1$. Away from them the cyclotomic extension is unramified and restriction detects the inertia condition. This proves that $V_2$ is exactly the finite-coefficient strict space over $\mathbf Q$ with the additional splitting at $2$. [Original character and level](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L15-L34) · [Level-two class-group comparison](#claim:ETS1)
+
+Restriction from $\mathbf Q$ to $K$ is injective on $H^1$ because its degree is two. Its image is fixed by conjugation, and $\omega(c)^{-e}=1$, so it has exactly the positive parity used in ETS28. In particular first-order classes from different vectors of $V_2$ stay distinct at the normalized split triple. The additional local condition at $2$ removes at most one dimension from the even eigenspace of ETS1. Indeed the primes of $F$ above $2$ form a single $\Delta$-orbit. Their classes span a cyclic $\mathbf F_\ell[\Delta]$-submodule after reduction, with multiplicity at most one for each one-dimensional character because $\ell\nmid|\Delta|$. If $2^e\not\equiv1\bmod\ell$, the Frobenius at $2$ fixes each prime above $2$ (the extension is abelian) and acts on the target by $2^{-e}\ne1$. Every equivariant homomorphism must then already kill $P_2$, giving the full eigenspace. This conclusion describes which classes the algebraic normalization admits, without assuming the existence of a counterexample to Vandiver's conjecture. In the shorter argument Wei's prime triangles detect the even cocycles before controlling congruences of the twisted automorphic rows. The untwisted mark alone leaves the classes just computed. [Original fixed-field normalization](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L44-L53) · [Wei, the even classes and prime triangles, Definition 27.1](https://github.com/Qiaogun/alpoge-claude-grh-exposition/blob/cd19fc6fad8c98830eb1c41eac76c3b2b29b2bda/exposition_en_a4-narrow.pdf#page=175) · [Twisted denominator, Theorem 27.20](https://github.com/Qiaogun/alpoge-claude-grh-exposition/blob/cd19fc6fad8c98830eb1c41eac76c3b2b29b2bda/exposition_en_a4-narrow.pdf#page=181)
+
+<!--
+% END ETS29
+-->
+
+## The mixed adjacent obstruction lies in the negative localization kernel
+
+<!--
+% BEGIN ETS30
+-->
+
+<span id="claim:ETS30"></span>Let $A=\mathbf Z/\ell^\nu$ and use the polarized triple of ETS26. Fix a finite $c$-stable set $S$ containing the archimedean places, the primes over $\ell$ and the ramification of $\Psi$. Write $G_{E,S}$ for the group unramified outside $S$. Take an adjacent cocycle $a$ with coefficients $A(\Psi^{-1})$ whose restriction class is zero at each finite place of $S$, and set $b=-\iota a$. For mixed parities the central obstruction has a direct formula. Use coordinates
+$$
+ U(a,b,z)=\exp(aE_{21}+bE_{32}+zE_{31}),\qquad
+ \exp X=1+X+X^2/2.
+$$
+Multiplication adds the three coordinates and adds $(ba'-ab')/2$ to the last one for a second triple $(a',b',z')$. The torus acts on the central coordinate by $\Psi^{-2}$. The defect of the section with $z=0$ is the two-cocycle
+$$
+ D(g,h)=\tfrac12\bigl[b(g)\Psi(g)^{-1}a(h)-a(g)\Psi(g)^{-1}b(h)\bigr].
+$$
+It is a difference of the two cup products. Replacing it by the negative amounts to using the coboundary equation for $z$ in place of the defect. One has $\iota D=-D$ since $\iota a=-b$ and $\iota b=-a$. At every finite place of $S$ both adjacent restrictions are coboundaries, hence the local cup class vanishes. The obstruction belongs to
+$$
+ \mathcal O^-_{\ell,\nu}(E,S;\Psi)=
+ \ker\!\left(H^2(G_{E,S},A(\Psi^{-2}))\longrightarrow
+               \bigoplus_{v\in S}H^2(E_v,A(\Psi^{-2}))\right)^{\iota=-1}.
+$$
+The invariant definition uses conjugate places, so is independent of the extensions of those places used for restriction. Complex archimedean places contribute zero. [The adjoint involution](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L155-L170) · [Action of the source torus](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L235-L269) · [Family of local groups](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/ConjStableShaFam.lean#L92-L96)
+
+Vanishing of $[D]$ is equivalent to lifting the given adjacent pair to a polarized lower triangular representation on $G_{E,S}$ with the original diagonal. In one direction the central cochain of the lift gives the required coboundary. In the other direction, if $dz=-D$, taking $(z-\iota z)/2$ gives the same coboundary and enforces the polarized conjugation relation. Substitution in $U$ then gives the lift, also with a polynomial parameter by replacing the adjacent coordinates by $Ta,Tb$ and the central coordinate by $T^2z$. For a pure parity $D$ is already identically zero, as in ETS28. In general this is the obstruction to a lift unramified outside $S$. Requiring a specified splitting of the lifted central coordinate at the places of $S$ additionally prescribes the local restrictions of $z$. [The source's semidirect representation](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/UnitaryThreeReflectionRight.lean#L283-L301) · [Pure-sign lifts](#claim:ETS28)
+
+<!--
+% END ETS30
+-->
+
+## A level-independent order bound for the mixed obstruction
+
+<!--
+% BEGIN ETS31
+-->
+
+<span id="claim:ETS31"></span>For an original abelian CM field $E\subseteq\mathbf Q(\mu_N)$ of degree $n$, specialize ETS30 to $\Psi|_{G_E}=\chi_\ell^e\bmod\ell^\nu$ and $\Psi(c)=1$. Let $T=2t$ for an integer $t\ge2$. For any finite set $P$ of odd primes, any set of applicable positive indices $e<t$, and independently selected stable sets $S=S(\ell,e)$ and coefficient levels $\nu=\nu(\ell,e)$,
+$$
+ \sum_{\ell\in P}\sum_{1\le e<t}\log|\mathcal O^-_{\ell,\nu}(E,S;\Psi)|
+ \ \le\ (n+1)T^2\log(TN)+6n^2T^2\log(4nT).
+$$
+Thus this obstruction group has a uniform bound with no term for the auxiliary places. The absence of such a term uses the localization kernel in its definition. [Original inverse twist](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L15-L34) · [Pointwise local restrictions](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/ConjStableShaFam.lean#L164-L168)
+
+Put $d=2e$ and $j=d+1$. Finite Poitou–Tate duality identifies the dual of the localization kernel in ETS30 with the localization kernel in $H^1(G_{E,S},A(j))$. The evaluation pairing takes values in $\mu_{\ell^\nu}$, the local invariant maps are invariant under field isomorphisms, and conjugation permutes the places. Hence the scalar negative eigenspace pairs with the natural negative eigenspace of this dual group. Every class of the latter group is split at each of the additional places in $S$. Away from $\ell$ the module $A(j)$ is unramified. The cocycle therefore vanishes on inertia at the additional finite places and on the closed normal subgroup they generate. It comes by inflation from $H^1(G_{E,S_\ell},A(j))$, where $S_\ell$ contains only the infinite places and those above $\ell$. Inflation is injective, since the kernel acts trivially on the coefficients. This puts the dual negative group inside $H^1(G_{E,S_\ell},A(j))^-$. [Milne, Arithmetic Duality Theorems, I.4.10](https://www.jmilne.org/math/Books/ADTnot.pdf) · [Strict duality and number-ring comparison](#claim:ETS9)
+
+Use the coefficient sequence for multiplication by $\ell^\nu$ on $\mathbf Z_\ell(j)$. It puts $H^1(G_{E,S_\ell},A(j))^-$ between the quotient modulo $\ell^\nu$ of $H^1(G_{E,S_\ell},\mathbf Z_\ell(j))^-$ and the $\ell^\nu$-torsion in $H^2(G_{E,S_\ell},\mathbf Z_\ell(j))^-$. In degree two the number-ring comparison identifies the latter ambient group with $K_{2d}(\mathcal O_E)_\ell^-$. In degree one the negative part is torsion. Indeed $j\ge3$ is odd and $2j-1\equiv1\pmod4$. Borel's ranks for $K_{2j-1}$ over $E^+$ and $E$ both equal $n/2$. Rationally one can compute them on the fields because the positive $K$-groups of finite residue fields are finite. Extension to $E$ is injective rationally since field transfer composed with extension is multiplication by two. Its image is fixed by $c$ and already has full rank. The natural degree-one comparison therefore has zero negative rational rank. From $0\to\mathbf Z_\ell(j)\to\mathbf Q_\ell(j)\to(\mathbf Q_\ell/\mathbf Z_\ell)(j)\to0$, its torsion has order at most that of $H^0(E,(\mathbf Q_\ell/\mathbf Z_\ell)(j))$. [Weibel, VI.8.1–8.2 and Exercise 8.3](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf) · [The same degree-two comparison on the CM field](#claim:ETS15)
+
+For each $j$, an invariant of order $\ell^a$ forces $\varphi(\ell^a)\le nj$. Indeed the image of the cyclotomic character modulo $\ell^a$ has index at most $n$, and its $j$th power is trivial on such an invariant. The $\ell$-power coefficient group is cyclic at each finite level and $(\mathbf Z/\ell^a)^\times$ is cyclic for odd $\ell$. Hence $\ell^a\le2nj$. Summing the logarithms of these invariant orders, over all odd $\ell$ and the indicated $j<T+1$, costs at most $2nT^2\log(2nT)$. For the degree-two terms ETS15 bounds the total local index for a fixed $d$ by $4dn^2\log(4dn)$. The strict contribution at the indices $d=2e<T$ has sign $(-1)^{d+1}=-1$ and is bounded by $(n+1)T^2\log(TN)$ by ETS18. Summing the local indices costs at most $4n^2T^2\log(4nT)$. Combining the three estimates gives the asserted bound. For prime-index pairs where the dual strict space is zero, ETS30 therefore has no global obstruction. The bound permits nonzero obstruction classes at other pairs; the automorphic support of a rank-three family is a further arithmetic question. [Free minus estimate in the original construction](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L64-L68) · [Uniform strict order estimate](#claim:ETS18)
+
+<!--
+% END ETS31
+-->

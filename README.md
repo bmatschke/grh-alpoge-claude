@@ -12,6 +12,8 @@ This project reconstructs the argument in Levent Alpöge and Claude's Lean repos
 
 In the classical RH specialization, choosing a larger gap between successive weights repairs the spacing issue identified by Adriazola. The resulting signed degree and inert-prime costs fit in the original error budget. [Weight calculation](manuscript/notes/arithmetic/WEIGHT_NODE_SPACING_ON_THE_CLASSICAL_HOST.md#claim:WNS3) · [Claims and hypotheses](research/modules/arithmetic/weight_node_spacing/)
 
+At the original split rank-three representation the polarization bounds the central strict extension term through the odd-minus estimate. The adjacent entries can carry either sign. Their mixed cup obstruction lies in a group whose whole order is bounded independently of the auxiliary places. At level two, even cyclotomic classes admit explicit polarized families satisfying the prescribed mark, subject to one local splitting test. [Central estimate](manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS27) · [Marked extensions at level two](manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS29)
+
 ## Continue the research
 
 Start with the [research guide](research/README.md) and the [current mathematical questions](research/register/NEXT_STEPS.md). The editable proof is in [manuscript](manuscript/). Research modules, machine-readable obligations and the verifier are in [research](research/). The previous rounds, proofs, source-span records and checkpoint files are in [archive](archive/). The [original project history](archive/project-history.md) and [old-to-current path map](archive/path-map.tsv) locate earlier work.
