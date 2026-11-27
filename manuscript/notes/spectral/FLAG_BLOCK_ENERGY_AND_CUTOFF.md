@@ -136,7 +136,125 @@ Now fix finitely many rows $\rho$. Absolute convergence of each row gives a tail
 % END FBE6
 -->
 
-The proof still uses the comparison of compact residual arrays with the positive radial form, the signed wave and lift identities, the annular germ estimate for those arrays, and the normalized scalar and terminal realizations. These are the local inputs to the preceding estimates. The finite argument specifies precisely which of their constants survive as the rank grows. [Compact local comparison][fb-form] · [Actual coefficient and decay hypotheses][fb-coef]
+The following calculations fix the uncut normalization and identify the singleton scale and reciprocal-label coefficient on the regular cut. Applying the finite argument to all compact residual arrays still uses their identification with the signed radial forms, their germ estimates and the scalar and terminal comparisons. [Compact local comparison][fb-form] · [Actual coefficient and decay hypotheses][fb-coef]
+
+## From Haar measure to the signed residual form
+
+<!--
+% BEGIN FBE7
+-->
+
+<span id="claim:FBE7"></span>First fix the normalization before differentiating the section. Nelson's real Bessel calculation gives a way to determine it on the uninserted coefficient. Let $G$ be the real unitary group, $R=U\rtimes H$ the marked unipotent and compact groups, $dh(H)=1$, $dr=du\,dh$ and $dg=dr\,d\dot z$ in quotient integration. Both groups are unimodular. Give the compact centre of $G$ mass one in the formal-degree formula so that the integral of the product of two coefficients on the central quotient equals its integral for this $dg$. Let $\tau$ be the unitary marking representation and $v$ a unit vector. For a unit vector $e$ in a square-integrable irreducible representation $\pi$ put $c(g)=\langle\pi(g)e,e\rangle$, with inner product linear in its first argument, and let $d_\pi$ be the formal degree for this $dg$. In the integrable range used for the uncut Bessel section, $c\in L^1(G)$ and the fibre integrals of $|c(y_*^{-1}r y)|$ are uniformly bounded. Put
+$$
+ W(y)=\int_R c(y_*^{-1}r y)\tau(r)^{-1}v\,dr,\qquad
+ P=\langle W(y_*),v\rangle .
+$$
+Substitution in $R$ gives $W(sy)=\tau(s)W(y)$. Quotient integration bounds the $L^1$ norm of $W$ by $\|c\|_1$ and the given fibre bound makes it bounded, hence square integrable. Expand the first $W$ in $\int_{R\backslash G}\langle W(y),W(y)\rangle\,d\dot y$. Equivariance turns the result into $\int_G c(y_*^{-1}z)\langle v,W(z)\rangle\,dz$. Substitute the formula for the second vector. The integral of absolute values is bounded by $\|c\|_1$ times the fibre bound, so Fubini applies. Schur orthogonality in $z$ gives
+$$
+ d_\pi\int_G c(y_*^{-1}z)\overline{c(y_*^{-1}s z)}\,dz
+       =\overline{c(y_*^{-1}s y_*)}.
+$$
+Thus $d_\pi\|W\|_2^2=\overline P=P\ge0$. Integrating on $U\backslash G$ gives the same norm, since $H$ has mass one. If the compact type is irreducible, its coordinate Gram operator commutes with $H$ by invariance. Its trace is $\|W\|_2^2$, so each diagonal entry is $\|W\|_2^2/\dim\tau$. For a nonzero section this fixes the scale giving orthonormal coordinates. For an uncut discrete-series coefficient this is the Schur normalization. Multiplying by the compact cutoff in FBE1 changes the matrix coefficient and requires the later cutoff limit. [Schur orthogonality, Theorem B][xfer-schur] · [Nelson's Bessel average, quotient measures and norm problems][xfer-nelson] · [Identification of the initial energy on the selected row](SPECTRAL_LEVEL_ZERO_AND_CUTOFFS.md)
+
+<!--
+% END FBE7
+-->
+
+<!--
+% BEGIN FBE8
+-->
+
+<span id="claim:FBE8"></span>At a fixed positive-Gram compact cut the regular Jacquet integral has a local right inverse on the coefficient space of the slice. This supplies test vectors for the differential identities. In the two marked isotropic frames joined to their negative vectors, let $Z$ be the matrix of cross pairings and $Z_{[a]}$ its leading minor matrix of size $a$, where the whole matrix has size $a+1$. Give the two marks squared lengths $-tT_p,-tT_q$. The determinant of the joint Hermitian Gram matrix is
+$$
+ (-1)^{a+1}\left(|\det Z|^2-t^2T_pT_q|\det Z_{[a]}|^2\right).
+$$
+Indeed at $t=0$ exchanging the two block columns gives $(-1)^{a+1}|\det Z|^2$. The two diagonal blocks each have just one modified diagonal entry. A single such entry has zero cofactor at $t=0$, and the coefficient from taking both is $(-1)^aT_pT_q|\det Z_{[a]}|^2$. On the positive cut the matrix stays nonsingular for $0\le t\le1$. Its signature at zero is $(a+1,a+1)$, so its orthogonal complement in the marked unitary space is positive definite at $t=1$. To choose Witt frames locally, fix the first frame, solve the cross pairings for the dual-frame coordinates of the second, and orthogonalize its nondegenerate complement. Equivalently the isometry action on a nondegenerate frame of fixed Gram matrix is a submersion, with local sections obtained by completing a basis. Choices on the remaining positive space are related by compact unitary transformations. This explains which isotypic coefficient arrays a regular section may take. [Jin's joined Gram determinant and local frames][xfer-frame] · [Chen's marked-frame section][xfer-chen]
+
+On a regular chart write $Z=Z_0 u$ with $u$ upper unitriangular. Gram–Schmidt with positive diagonal gives this decomposition by dividing the upper-triangular factor by its diagonal. It gives $u(Zu')=u(Z)u'$. Shrink the quotient coordinate chart so that the local frame section and this decomposition are defined on a neighbourhood of the support of a prescribed smooth test $A(Z_0)$. If the Jacquet integral in the removed coordinate is $\int\overline{\psi(u)}F(Z_0u)\,du$, take $F(Z_0u)=A(Z_0)\psi(u)\eta(u)$ for a smooth compactly supported $\eta$ of integral one in the **given** Haar measure. Integration recovers $A$. Do this successively on the removed coordinates in the actual order of integration. On a compact marking orbit use the corresponding compact-type average. On a vector fixed by the stabilizer with its type action this average is the identity, by probability normalization. The construction therefore lifts precisely the covariant test arrays on this chart. Compact quotient support and compact bumps give compact support upstairs. A partition of unity on the regular quotient glues the lifts by linearity. Multiplying either input by a scalar function of the surviving minor passes through the Jacquet integral, since that minor is constant on every integrated orbit. In particular the bare wave $\exp(sz-\bar s\bar z)$ passes through with its phase unchanged. A differentiated insertion on such a chart also differentiates the phase, as computed below. [Compact lifts for the one-pair descent][xfer-lift] · [Original wave and the invariant minor][xfer-nativewave]
+
+<!--
+% END FBE8
+-->
+
+<!--
+% BEGIN FBE9
+-->
+
+<span id="claim:FBE9"></span>The one-singleton Jacobian gives an independent check on the scale of each signed coefficient. Use actual arithmetic coordinates at complex place $\tau$. Write $\Delta=|\operatorname{disc}E|^{1/(2f)}$, $\kappa=2\pi/(g\Delta)$, $D_g=2/(\Delta g^3)$, and for a singleton beginning at level $b$ set $\nu=2(r+1-b)$, $\lambda=(g/(2\pi))^\nu$ and $M_b=k+1+\nu$. The standard coordinate is $\lambda c$. The ratio of the arithmetic and standard point weights in this step is $(\Delta^{-\nu}\lambda^{-1})^{2(M_b-2)}=\kappa^{2\nu(M_b-2)}$. Indeed in the two-point pairing the two square-root factors supply one full point weight, and the singleton's section product has no factors. Changing complex area contributes $\lambda^{-2}$. The prescribed level measure satisfies $\Gamma_{b-1}/\Gamma_b=\kappa^{-2\nu(M_b-1)}/D_g$. Thus the arithmetic integral of a singleton, whenever the standard one-pair identity is used, is its parent pairing times
+$$
+ d_{b,1}=\kappa^{2\nu(M_b-2)}\lambda^{-2}\frac{\Gamma_{b-1}}{\Gamma_b}
+        =\frac{\Delta^{2\nu}}{D_g}.
+$$
+At $b=r+1$ this gives $1/D_g$ with no coordinate dilation. The word and its normalization are identical in both entries. The product of these factors uses the covolume of the actual singleton period lattice. In the source normalization write $J=\mathfrak d^\nu$. A period is $t=g u$ with $u\in J$ and $u+\bar u\in gJ$. The first restriction costs $[J:gJ]=g^{2f}$. At every prime dividing the odd marked modulus $g$ the two conjugation idempotents are integral. Their lattices have rank $f$ each, and $1+\mathrm{conj}$ acts by $2$ on the plus lattice. Thus the second restriction costs $g^f$, giving $[J:L_{b,1}]=g^{3f}$. The covolume of $\mathcal O_E$ for one ordinary complex area per pair is $2^{-f}\sqrt{|\operatorname{disc}E|}$ and the ideal norm of $\mathfrak d^\nu$ is $|\operatorname{disc}E|^\nu$. Multiplying by the index gives exactly $(\Delta^{2\nu}/D_g)^f$. The reciprocal covolume in the zero Poisson frequency cancels this product. The result is the parent with coefficient one. [Original coordinates, densities and kernel][xfer-norm] · [Jin's singleton Jacobian and lattice normalization][xfer-single]
+
+For a separate check on the archimedean Fourier convention, Jin's newer real-cell calculation uses $\psi(z)=\exp(2i\operatorname{Im}z)$ and ordinary complex area. For nonzero $\xi$ the real linear change of dual variables for $\psi(\xi w\bar z)$ has determinant $|\xi|^2/\pi^2$ relative to $e^{2\pi i\langle\eta,z\rangle}$. Thus Plancherel for $k-1$ coordinates costs $(\pi^2/|\xi|^2)^{k-1}$ in squared norm. This is the factor in the single-floor estimate. A bound on that integral with this factor cannot by itself supply the operator identity for the original signed array. [Jin's revised real-cell calculation][xfer-jinnew]
+
+<!--
+% END FBE9
+-->
+
+<!--
+% BEGIN FBE10
+-->
+
+<span id="claim:FBE10"></span>There is an explicit positivity test for the signed insertion on each regular radial chart. Use Jin's two-by-two transfer $T_w(Y)$ on a word $w$ in the frame in which the previous residue form is $D_w>0$. Put $d(Y)=H_0 x(Y)$ for its lower-right entry, where $H_0>0$ on the cut, and $Q(Y)$ for the shifted quantum determinant. The one-site calculation needs the compact adjoint with respect to the **same** $D_w$ and measure, and the shifted cofactor identities for this transfer. Here is the resulting factorization. For any such Hermitian block form, writing the lower-left block as $D_w d\,\ell$ and lower-right block as $D_w d$, subtract the square of the lower component. Its quadratic form on $(u,v)$ becomes
+$$
+ \langle A_{\rm rem}u,u\rangle+
+ \langle D_w d(v+\ell u),v+\ell u\rangle ,
+$$
+where $A_{\rm rem}=A-\ell^*D_w d\,\ell$. Here the adjoint uses the density of the common invariant compact test domain. For a positive site at $a$, the quantum determinant at $(a,a+1)$ gives $A_{\rm rem}=D_wQ(a)/(H_0x(a+1))$, and the second pivot is $D_wH_0x(a)$. For the negative site use the auxiliary transpose. The off-diagonal shear is then $D_w^{-1}\ell_w(a-1)^*D_w$, since the shifted alternating-line identity moves $T_{01}(a)$ through $d(a)$ to the entry at $a-1$. Thus its first pivot is $D_wQ(a-1)/(H_0x(a-1))$, and its second remains $D_wH_0x(a)$. In these formulas $x,Q$ act on the old diagonal type and bit. The compact interlacing makes the empty-word factors positive. Each old positive site multiplies the determinant by $(Y-t+1)/(Y-t)$, each old negative site by $(t-Y)/(t-Y-1)$. The analogous $x$ factors are adjacent linear quotients. The separation by more than two puts numerator and denominator on the same side of zero at every shifted evaluation. Induction and integration of the resulting squares give positive semidefiniteness for any finite family in this radial realization, including repeated compact types and the reflected companion at $a=y+1$. [Jin's positive pivots][xfer-positive] · [Reflected transfer and both shifted pivots][xfer-negative] · [Use on compact residual words][xfer-compact]
+
+This also specifies how to verify an identification with the **group** differential operators. On a regular real-coordinate chart with smooth positive density $\rho\,dx$ and positive smooth fibre metric $D$, put $M=\rho D$. For $A=\sum_i a_i\partial_i+a_0$ the compact adjoint applied to $h$ is
+$$
+ A^\dagger h=M^{-1}\!\left(a_0^*Mh-\sum_i\partial_i(a_i^*Mh)\right).
+$$
+Integration by parts proves this with no boundary term on a compactly supported chart test. Products reverse order. To compare an order-$d$ operator with a proposed radial expression, use the lifts of FBE8 and test each vector coordinate against $(x-x_0)^\alpha/\alpha!$ times a bump equal to one near $x_0$, $|\alpha|\le d$. At $x_0$ these tests recover each coefficient of the differential operator in its ordinary derivative expansion. For the wave, $\partial_z f_s=s f_s$ and $\partial_{\bar z} f_s=-\bar s f_s$. Using $-\partial_{\bar z}$ for the reflected derivative gives the prescribed companion addition $+\bar s$, and $f_s$ has modulus one. This calculation determines the signs and the adjoint to check. Applying it to every ordered quantum minor and showing that the extensions across the singular block strata give the same pairings are still needed for the full mixed lift assertion.
+
+<!--
+% END FBE10
+-->
+
+[xfer-schur]: https://math.berkeley.edu/~jawolf/publications.pdf/paper_056.pdf#page=3
+[xfer-nelson]: https://github.com/ultronozm/grh-workbook/blob/49fe050552850f18c51af2e3875ce94702aec99c/20261126T081500--a-bessel-function-at-a-real-place__workbook.tex#L157-L228
+[xfer-frame]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1630-L1707
+[xfer-chen]: https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/orbital-germ.tex#L405-L486
+[xfer-lift]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L8350-L8390
+[xfer-nativewave]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/HermitianCurvature/HermitianCurvatureProofs/RadialWaveOrbital.lean#L11-L14
+[xfer-norm]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/0be265ccb325908c67f872361d564c66b99e96f7/docs/src/book/main.tex#L46436-L46471
+[xfer-single]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L8421-L8446
+[xfer-jinnew]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/163ad1f1289299b14dad7f48aa292cd5f85c69ca/sections/real-cell.tex#L1482-L1516
+[xfer-positive]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L6883-L6918
+[xfer-negative]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L7378-L7452
+[xfer-compact]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/0be265ccb325908c67f872361d564c66b99e96f7/docs/src/book/main.tex#L44946-L44979
+
+## The reciprocal of a regular block label
+
+<!--
+% BEGIN FBE11
+-->
+
+<span id="claim:FBE11"></span>One coefficient of the mixed lift can be computed on the normal block before comparing every ordered differential operator. Let a prefix of size $j$ end in a block of length $1\le u\le j$, starting at level $b_0$. Write its representative as $H\oplus\tau w_u$, where $H$ has size $j-u$, $w_u$ reverses the order of the $u$ basis vectors, and $\tau=\lambda t$ with $\lambda=(g/(2\pi))^{2r+3-2b_0-u}\mathrm i^{u-1}$. We work on the regular cut, so $t\ne0$ and $\det H\ne0$. Use the right unipotent character in which an adjacent upper matrix unit has coefficient one. Let $A(y)$ be the zeroth component of the normalized column-ordered Capelli minor, and $B(y)$ the component with the derivative of the surviving label. Denote their reflected operators by a superscript $\vee$. For a compact smooth test in the right-character model the coefficient of $y^j$ in $A$ is the identity. Indeed selecting the spectral scalar in every column gives the full ordinary minor, which is the normalization.
+
+For $B$ the first $j-1$ ordinary rows vanish in column $j-u+1$ and outside the first $j$ columns. Deleting that column in the ordinary minor leaves $\det H\,\tau^{u-1}\det w_{u-1}$ with the ordered-minor convention. In the corresponding quantum expansion along the last column, the rightmost upper unit acts on the right average by its character. Only the adjacent entry survives. Repeating the deletion $u-1$ times leaves the minor of the head. Its highest spectral term is $y^{j-u}$, since every surviving column must supply its scalar term to attain this degree. The reflected expansion uses the last row. Moving its upper unit to the right lowers the argument by one at each deletion. All those shifts preserve the highest coefficient. Since $\det w_u=(-1)^{u-1}\det w_{u-1}$, division by $\det H\,\tau^u\det w_u$ gives $(-1)^{u-1}/\tau$ on the first side and $(-1)^{u-1}/\overline{\tau'}$ on the reflected side. For $u=1$ there are no deletions. For $u=j$ the empty head has determinant one. [Jin's normal-block computation][xfer-normal] · [Polynomial lift in the formal source][xfer-poly]
+
+These calculations survive the orbital averages of a differentiated compact suffix on this cut. Near a given nonzero minor, insert a smooth cutoff equal to one in a neighbourhood of its value and zero near the divisor. The minor is right-invariant, so this insertion leaves its germ along the right integration fibre unchanged. Right translation differentiates the character on that fibre. The cutoff and compact support justify differentiating there. The left orbit preserves the minor. For the left average of each polynomial coefficient use interpolation at finitely many distinct real parameters where the cut integrals converge. Thus for a sesquilinear level form $F$ linear in its first entry the coefficient at $y^{2j-u}$ in
+$$
+ F(B(y)X,A^\vee(y+1)Y)-F(A(y)X,B^\vee(y+1)Y)
+$$
+is
+$$
+ \frac{(-1)^{u-1}}{\lambda}(t^{-1}-{t'}^{-1})F(X,Y).
+$$
+Conjugate linearity in the second entry removes the conjugation on $\lambda t'$. The shift by one preserves the leading term and fixes the companion word. Extract in five independent parameters starting with the last. Each remaining differentiated suffix is again a smooth test on this cut, giving the fifth power of the displayed scalar before FBE1 applies Cauchy–Schwarz. This determines the reciprocal-label coefficient for the normal-block minor. Identifying the full signed residual form with the original group pairing and controlling the passage through the vanishing-minor locus are the remaining steps in using it for arbitrary original coefficients. [Five interpolations after the right average][xfer-five] · [Local block estimate that consumes the coefficient][xfer-below]
+
+<!--
+% END FBE11
+-->
+
+[xfer-normal]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1455-L1516
+[xfer-five]: https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1511-L1558
+[xfer-poly]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/HermitianCurvature/HermitianCurvatureProofs/PBGLift.lean#L64-L104
+[xfer-below]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/HermitianCurvature/HermitianCurvatureProofs/PBBLiftV.lean#L145-L172
 
 [fb-form]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L44870-L44908
 [fb-coef]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L46293-L46394

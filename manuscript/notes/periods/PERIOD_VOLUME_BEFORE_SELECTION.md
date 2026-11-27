@@ -2,7 +2,7 @@
 
 For each nonterminal admissible point the relevant lower bound counts mixed-integral cusp sections of the fitted weight on the point's own flag component. It holds for every such point under the geometric inputs of Roadmap B8.25a. In particular it may be used inside the construction of the member and bundle conditions in B8.34. This note derives the lower bound on precisely the degree progression used by the carrying section. It uses B8.26u for the existence and properties of the marked root tower and Kaiwen Jin's Appendix J for the boundary and trace calculations. [Universal tower and cover statements][universal] · [Identification with the original component and generic flags](PERIOD_SELECTED_MARKED_ORIGIN.md) · [Geometric and arithmetic premises][premises]
 
-The reference flag law, the comparison at two cutoffs and the depth-four cokernel bound on a boundary valuation enter in the construction of these models. [Root tower comparison](GOOD_ROOT_TOWER_COMPARISONS.md)
+The component comparison identifies each normalized volume with the total divided by the number of components on this deep cover. The same chapter constructs the unlabelled depth-four lattice and states which ramified labelled transitions and height bounds the volume argument still uses. [Root tower comparison](GOOD_ROOT_TOWER_COMPARISONS.md)
 
 ## The volume on one component
 

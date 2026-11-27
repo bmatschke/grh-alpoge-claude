@@ -21,7 +21,7 @@ $$
  D(L_v^d)=d!\prod_\tau
  \frac{\prod_{a<b}(v_{\tau,a}-v_{\tau,b})}{\prod_{j=0}^{n-1}j!}.
 $$
-The signs from $L_v$ and from reversing each Vandermonde cancel. This fixes the reference normalization at a regular weight. To obtain law 1 on the deep cover one still needs its normalized geometric degree, including equality of the volumes across its components. [Reference flag, wall and degree calculation][rt-flag]
+The signs from $L_v$ and from reversing each Vandermonde cancel. This fixes the reference normalization at a regular weight. GRT8–9 compare the normalized geometric degrees on a common cover and prove equality of the component volumes at the selected principal level. [Reference flag, wall and degree calculation][rt-flag]
 
 <!--
 % END GRT1
@@ -38,7 +38,7 @@ $$
  \mathcal B=\{\ell\text{ prime}:\ell\mid2\,|\operatorname{disc}E|M'\},
  \qquad S_N=\{\ell\text{ prime}:\ell\le N\}\cup\mathcal B .
 $$
-On the generic abelian locus full $\ell^4$-torsion becomes rational over a finite extension of its function field because the group scheme is finite étale in characteristic zero. For the finitely many $\ell\in S_N$ take the compositum of the splitting fields. This chooses the same depth four at each prime, including $2$. Normalizing a projective model in that field puts all the generic data on one model. Integral extensions of the Hodge–Tate frames over the vertical and boundary points are a further local requirement.
+On the generic abelian locus full $\ell^4$-torsion becomes rational over a finite extension of its function field because the group scheme is finite étale in characteristic zero. For the finitely many $\ell\in S_N$ take the compositum of the splitting fields. This chooses the same depth four at each prime, including $2$. Normalizing a projective model in that field puts all the generic data on one model. GRT10–11 construct the unlabelled integral lattice on the boundary charts. The ramified labelled quotients require the additional comparison described there.
 
 Here is the patching step once those frames have been constructed. On a quasi-compact noetherian flat model over $\mathcal O_{F_c}$ let $\mathcal D$ be a de Rham vector lattice in its generic bundle. At each $\ell\in S_N$ suppose a locally free lattice $\mathcal H_\ell$ over the model localized over $\mathbb Z_{(\ell)}$ agrees with $\mathcal D$ after inverting $\ell$, via the specified generic identification. On a finite affine cover, clear the powers of $\ell$ in both transition matrices. Taking the maximum gives $c_\ell$ with
 $$
@@ -166,6 +166,111 @@ Absorb the fixed factors relating $\Delta$ and $\delta$ into coefficients $\alph
 <!--
 % END GRT7
 -->
+
+## Reading a component volume on a common cover
+
+<!--
+% BEGIN GRT8
+-->
+
+<span id="claim:GRT8"></span>We prove equality of the $V_Z$ on the nonterminal principal-level family in this book. Write $E/F$ for its CM extension with $F=E^+$, $n=r+s$, and $L_i$ for the integral homology lattice of a component at a fixed embedding of the coefficient field. The real signatures are $(r,s)$ at the marked labels, $s\ge1$ and $3s+1\le n$. The deep covering level is $M'=g_0g_1\,15^e$. In particular it has a full principal marking of rational modulus $m=g_0g_1\ge3$. At $3,5$ the complementary level ideals specify the additional markings. The host is unramified at the **finite places of $E/F$**. The absolute different of $E/\mathbb Q$ can still intervene. The polarization is perfect for the trace pairing $\operatorname{Tr}_{E/\mathbb Q}(\xi h_i)$, with the same purely imaginary scalar $\xi$ in the two descriptions. These are the lattice hypotheses in the formal volume comparison. Chen's common-cover argument can be applied after checking its single-genus condition. [Deep level and complementary markings][comp-deeplevel] · [Chen's principal level and common-cover argument][comp-chen] · [Formal lattice hypotheses][comp-lat]
+
+Here is the check, including the places over $2$. Put $I=\xi^{-1}\mathfrak D_{E/\mathbb Q}^{-1}$. Trace duality and stability under $\mathcal O_E$ identify $L_i$ with $\{x:h_i(x,L_i)\subset I\}$. Indeed testing the trace against all integral multiples of each vector is exactly the definition of the inverse different. The ideal $I$ is invariant under conjugation. At a finite place of $F$ it has a generator in $F_v^\times$, because the relative algebra is split or unramified. Divide the form by that generator. The resulting integral Hermitian module is unimodular. At a split place it is a pair of lattices in perfect duality, and dual bases identify any two pairs of the same rank. At an inert place the residue field extension is quadratic separable. Some vector has nonzero norm in the residue Hermitian form. If all diagonal values vanished, evaluating on $x+c y$ for all residue scalars $c$ would make every cross pairing zero by nondegeneracy of the field trace. Lift the vector. Its norm is a unit and the line it spans splits off orthogonally. Every unit of the base is a norm of a unit. First solve modulo the uniformizer using the norm of the finite fields. A multiplicative correction $1+\pi^j t$ changes the norm at order $j$ by the residue trace of $t$. Its surjectivity and completeness lift the solution, also in residue characteristic two. Induction gives an orthonormal integral basis. Thus the two *original* Hermitian lattices are locally isometric, with the same factor $I$ restored.
+
+The signatures give isometry at the infinite places. Landherr's local-global theorem for Hermitian spaces over a quadratic extension places the two rational spaces in one space $V$. After this identification the two integral lattices agree away from finitely many places. The integral isometries at the remaining places give $g\in U(V)(\mathbb A_{F,f})$ carrying one lattice to the other. The stabilizer of a full principal marking consists of automorphisms congruent to the identity on the marked lattice, independently of its chosen frame. The transport is $E$-linear, so it respects the two complementary ideals at $3,5$ as well. Hence conjugation by $g$ carries the full local level groups to the other ones. This verifies the genus and conjugacy inputs on the level used here. [Landherr's theorem][comp-landherr] · [Use of the trace polarization and local transport in Lean][comp-genus]
+
+<!--
+% END GRT8
+-->
+
+<!--
+% BEGIN GRT9
+-->
+
+<span id="claim:GRT9"></span>Write $H=\operatorname{SU}(V)$, $K_i$ for the stabilizers inside $H(\mathbb A_{F,f})$ and $\Gamma_i$ for the arithmetic groups on the two domains. An integral unitary automorphism has determinant $u\in\mathcal O_E^\times$ with every $|\sigma u|=1$. Its principal marking implies $u-1\in m\mathcal O_E$. If $u\ne1$ the absolute norm of $u-1$ is at least $m^{[E:\mathbb Q]}$ and at most $2^{[E:\mathbb Q]}$. Thus $u=1$ and $\Gamma_i=H(F)\cap K_i$. Put $K_{12}=K_1\cap K_2$ and $\Gamma_{12}=H(F)\cap K_{12}$. The group $H$ is simply connected and absolutely almost simple. The signature gives a noncompact real factor. Strong approximation off the archimedean places makes $H(F)$ dense in $H(\mathbb A_{F,f})$. Consequently every open coset of $K_{12}$ in $K_i$ meets $\Gamma_i$, and
+$$
+ [\Gamma_i:\Gamma_{12}]=[K_i:K_{12}]
+        =\frac{\operatorname{vol}_f(K_i)}{\operatorname{vol}_f(K_{12})}.
+$$
+Conjugation by the *unitary* finite adele $g$ of GRT8 preserves this Haar measure on the special unitary group. Over a splitting field its differential on all $n$-by-$n$ matrices has determinant $(\det g)^n(\det g^{-1})^n=1$. It fixes scalars, so its determinant on $\mathfrak{sl}_n$ is one. This gives local modulus one before taking the product over places. The two indices are equal. [Strong approximation, Theorem 7.12][comp-strong] · [Finite-index comparison][comp-index]
+
+It remains to identify what these indices measure. In the complex uniformization both quotients have the same Hermitian symmetric domain, the same invariant metric and the same compact flag fibres. On their common cover the automorphic Hodge bundles, their flags, and the root lines of any fixed weight pull back to the same objects. For a neat toroidal compactification one may refine both cone decompositions on this common cover. The canonical extensions of the homogeneous bundles pull back on a refinement. Equivalently, Mumford's proportionality theorem evaluates their top Chern numbers by integration of the invariant forms with the same constant at each sheet. Passing to flags uses the projective bundle pushforward on each tautological step, so the resulting polynomial on the base is the same on both sheets. The common top intersection is the intersection on sheet $i$ times $[\Gamma_i:\Gamma_{12}]$. This holds for the canonical extensions across the boundary; counting the volumes of the open domains alone would only compare their Haar measures. The additional finite flag cover at cutoff $N$ has degree $d_{N,Z}$, cancelled by the factor $[F_c:\mathbb Q]d_{N,Z}$ of GRT3. The argument works at each embedding of $F_c$, and relabelling conjugate factors preserves the regular weight $v_{\tau,i}=-i$. Its value $D(L_v^d)$ from GRT1 is positive. Dividing the equal normalized degrees at this weight by $D(L_v^d)$ gives $V_Z=V_{Z'}$, and hence $V_Z=V/|\operatorname{Comp}|$. This proves the component equality used on the selected nonterminal tower. [Mumford, Theorems 3.1 and 3.2][comp-mumford] · [Chen's flag pushforward][comp-chern] · [Formal consumer of component equality][comp-consumer]
+
+<!--
+% END GRT9
+-->
+
+## Finite-level differentials on the boundary charts
+
+<!--
+% BEGIN GRT10
+-->
+
+<span id="claim:GRT10"></span>The comparison at a valuation in GRT6 can be made on an entire normal chart before testing its points. Let $S$ be a normal integral noetherian chart of the semiabelian model in GRT2, with generic field of characteristic zero and full rational $p^4$-torsion after the prescribed finite cover. Use the separated smooth finite-type semiabelian group $G/S$ and its generically principally polarized abelian fibre. Put $Y=G[p^4]$, $T=Y_{\eta}(\eta)$. For $t\in T$ the Weil pairing gives a generic character $\chi_t:Y_\eta\to\mu_{p^4}$. We construct its logarithmic differential in $\omega_G/p^4\omega_G$.
+
+At a geometric point of $S$ work first over the strict Henselization $A$. It is a normal local domain. Apply the finite-part argument in GRT6 over $A$. Multiplication by $p^4$ is flat and quasi-finite, a finite compactification splits into local factors, and the factors meeting the closed fibre in $Y$ form the finite flat open subgroup $U$. It is finite locally free since it is also finitely presented. In taking a finite compactification, an open containing the closed point of a local factor contains that entire factor. The other factors have empty closed fibre in the open. This identifies the finite part at the identity even when the toric rank jumps. Restrict $\chi_t$ to $U_{\mathrm{Frac}(A)}$. This is a generic point of the finite Cartier dual $U^\vee$. Every function of its finite coordinate algebra evaluates to an element of $\mathrm{Frac}(A)$ integral over $A$, hence to an element of $A$. This extends the character uniquely over $U$. A finitely presented open neighbourhood of the identity and the extended character there descend to an étale neighbourhood of the geometric point by passage to the filtered limit defining $A$. The coordinate character has finite presentation, and the requirements that it take value one on the identity and agree generically with $\chi_t$ hold after shrinking. For the latter, the split generic points form a finite set and equality on it is given by finitely many equations. On an overlap take the intersection of the two opens around the identity. It is flat over the base because it is open in $Y$. Two regular functions there agreeing on the generic fibres agree everywhere, by injection into the generic localization. This argument works on each normal component of the étale overlap.
+
+Pull back $dT/T$ along the extended character at the identity. The conormal module there is $\omega_Y=\omega_G/p^4\omega_G$ by the differential of $[p^4]$. Étale descent now gives a single section $\alpha_t$ on $S$. The characters multiply when their labels add, hence these sections add. The construction also intertwines integral endomorphisms with their adjoints under the given polarization. For a valued point with generic image in the abelian locus carrying the given level, the two restricted generic characters are the Weil characters on its fibre. This can be checked first over the abelian characteristic-zero open: the torsion there is étale and the sections of the full level and their pairings agree with the generic ones by separatedness. Comparing the two extensions on their common identity neighbourhood over the valuation ring gives identical differentials. Thus $\alpha_t$ is the differential used by GRT6 at the valued tests. The argument concerns the full finite-level character and is independent of a lift of the logarithmic differential to characteristic zero. [The depth-four valuation construction][rt-ht] · [The integral chart and its valued tests][comp-htchart]
+
+<!--
+% END GRT10
+-->
+
+<!--
+% BEGIN GRT11
+-->
+
+<span id="claim:GRT11"></span>Let $\mathcal H$ be the inverse image in $\omega_G$ of the submodule generated by the finitely many $\alpha_t$ modulo $p^4$. It is coherent. On an affine trivialization it is generated by lifts $h_t$ and $p^4\omega_G$, so the construction commutes with any base change when *images* in the pulled-back $\omega_G$ are taken. On a dominant integral model the kernel of the resulting map from the pulled-back lattice is torsion, since the map is an isomorphism on the generic fibre. Passing to the simultaneous Grassmannian modification of GRT6 therefore produces the same image locally freely. On a height-one valuation in residue characteristic $p$, GRT6 gives $\kappa\omega_G\subseteq\mathcal H\subseteq\omega_G$, with $\kappa=4$ at $2$ and $\kappa=\zeta_p-1$ at odd $p$. A compatible primitive root belongs to the splitting field by the perfect Weil pairing. At the other height-one points $p^4$ is a unit. Normality extends the sandwich to the locally free model. This gives the unlabelled chart and its valuation comparison on the same integral object.
+
+There are two distinct operations at a ramified label. Over a valuation ring $V$ containing the embeddings of the field of endomorphisms, let $L$ be any of these full, order-stable lattices, let $e_\tau$ be the rational eigenprojector, and put $L^\mathrm{sat}_\tau=L\cap e_\tau L_{\mathrm{Frac}(V)}$. For a generator $\delta$ of the local different branchwise,
+$$
+ \tau(\delta)\, e_\tau L\ \subseteq\ L^\mathrm{sat}_\tau\ \subseteq\ e_\tau L .
+$$
+Indeed, for an integral basis $b_i$ with trace-dual basis $b_i^*$, the separability idempotent at $\tau$ is $\sum_i b_i\otimes\tau(b_i^*)$. Multiplication by $\tau(\delta)$ makes its coefficients integral. The other inclusion follows by applying the idempotent to a vector already in its image. For the lattice inclusion $\kappa L\subseteq\mathcal H\subseteq L$, either intersecting all three with the eigenspace or projecting all three preserves the same $\kappa$ bound. Combining the two operations incurs at most the indicated different. At an unramified absolute label $\delta$ is a unit and they agree. For a ramified example take $E_v=\mathbb Q_3(\pi)$, $\pi^2=3$. In $V^2$ the image of $\mathcal O_{E_v}\otimes_{\mathbb Z_3}V$ consists of $(a+b\pi,a-b\pi)$. The projection onto the first axis is $V$, while intersection with it has first coordinate $2\pi V$. Thus treating the projection as saturated can change an integral root line. The complete flag and its Newton comparison at ramified labels still require the specified choice and the transition maps for its successive quotients. [Prior signed cost on sections](PERIOD_SIGNED_HODGE_TATE_FRAME_COST.md) · [The formal comparison where the different is invertible][comp-diff]
+
+<!--
+% END GRT11
+-->
+
+[comp-deeplevel]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/0be265ccb325908c67f872361d564c66b99e96f7/docs/src/book/main.tex#L49899-L49906
+[comp-chen]: https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/covolume-component-transfer.tex#L18-L109
+[comp-chern]: https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/flag-wall-polynomial.tex#L271-L296
+[comp-lat]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/CoreStatements/VolumeEquality/BallVolDefs.lean#L56-L70
+[comp-genus]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/CoreStatements/VolumeEquality/BallVolArith.lean#L113-L144
+[comp-index]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/CoreStatements/VolumeEquality/BallVolFam.lean#L78-L143
+[comp-consumer]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/WeilBound/CoreStatements/VolumeEquality/VolEqOfIsFullIntersectionSystem.lean#L16-L17
+[comp-landherr]: https://webhomes.maths.ed.ac.uk/~v1ranick/papers/landherr.pdf
+[comp-strong]: https://uva.theopenscholar.com/files/andrei-rapinchuk/files/agnt_english.pdf
+[comp-mumford]: https://www.dam.brown.edu/people/mumford/alg_geom/papers/1977b--HirzProp-GT.pdf#page=24
+[comp-htchart]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/HodgeTateChartIntegral.lean#L88-L134
+[comp-diff]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Proofs/GeometryProofs/HodgeTateEigenLatticeEq.lean
+
+## Smoothing the corrected metric on a fixed component
+
+<!--
+% BEGIN GRT12
+-->
+
+<span id="claim:GRT12"></span>Chen's boundary estimate gives a second route to the archimedean smoothing in GRT5. Work on a smooth projective toroidal component $X$ with its Kähler form $\omega$. Let $\theta$ be the curvature of a smooth reference metric. On a normal-crossing chart a Hodge weight has local potential $P$ which is plurisubharmonic off $z_1\cdots z_l=0$ and satisfies
+$$
+ |P|\le C+C\log\!\left(e+\sum_{j=1}^l\log^+(1/|z_j|)\right).
+$$
+The bound is the logarithm of polynomial bounds for the invariant metric and its inverse in a toroidal frame. To extend $P$, take a polydisc of radius less than one and add $\delta\log|z_1\cdots z_l|$ for $\delta>0$. This is bounded above near the divisor and extends as a plurisubharmonic function by removability. Its supremum on a smaller closed polydisc is bounded independently of $0<\delta\le1$ by the maximum on its distinguished boundary, where the original potential is smooth. The upper regularization of the increasing limit as $\delta\downarrow0$ extends $P$. At a boundary point a complex line transverse to all local branches has $|P|=O(1+\log\log(1/|t|))$ along it. Comparing with the supremum on balls in the definition of the Lelong number shows that the extended positive current has Lelong number zero there. A bounded plurisubharmonic corrected weight also has all Lelong numbers zero. These statements use the metric on the specified model. [Chen's normal-crossing growth estimate][comp-growth]
+
+Now take a global relative weight $\varphi$ for either of these metrics with $T=\theta+dd^c\varphi\ge0$. For the corrected metric assume the bounded potential $\varphi$ agrees with the prescribed $\phi_\mu+U/2$ relative to the reference metric on the interior. Demailly’s Main Theorem 1.1 supplies global approximants from above. On the compact projectivized cotangent bundle one can choose its tautological quotient metric with curvature bounded below by $-\pi^*C_0\omega$. The vertical Fubini–Study curvature is positive and compactness bounds the horizontal loss. The theorem at a fixed attenuation parameter $\eta>0$ gives weights $\varphi_{\eta,j}\downarrow\varphi$, smooth off the set of Lelong numbers at least $\eta$, and
+$$
+ \theta+dd^c\varphi_{\eta,j}\ \ge\
+       -(\eta C_0+\epsilon_j)\omega,\qquad \epsilon_j\longrightarrow0 .
+$$
+That set is empty. For fixed positive integers $a,b$ and an auxiliary line with curvature at least $c_A\omega$, first choose $b\eta C_0<ac_A/2$, then $b\epsilon_j<ac_A/2$. Each ensuing metric on $b\mu+aA$ is smooth, dominates the prescribed weight, and has semipositive curvature. Averaging logarithmic weights with their complex conjugates keeps all three properties for invariant data. For the *bounded corrected* potential these decreasing metrics have convergent archimedean energy. In a local frame the potentials of the positive combination are decreasing and locally bounded, so the weighted mixed curvature products converge by Bedford–Taylor's monotone convergence theorem. A finite smooth partition of unity gives the convergence in the height difference formula. Identifying the actual bounded corrected potential and its horizontal and vertical height estimates, and passing to the unbounded Hodge height with the prescribed cusp mean, are separate geometric steps. [Demailly, Main Theorem 1.1][comp-dem] · [Bedford–Taylor, Theorems 2.1 and 2.4][comp-bt] · [The cusp mean on the specified measure](PERIOD_HODGE_CUSP_MEAN.md)
+
+<!--
+% END GRT12
+-->
+
+[comp-growth]: https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/flag-wall-positivity.tex#L15-L50
+[comp-dem]: https://www-fourier.univ-grenoble-alpes.fr/~demailly/manuscripts/regularization.pdf#page=2
+[comp-bt]: https://www.math.stonybrook.edu/~ebedford/PapersForM655/BTNewCapacity.pdf#page=7
 
 [rt-blr]: https://doi.org/10.1007/978-3-642-51438-8
 [rt-zmt]: https://stacks.math.columbia.edu/tag/05K0
