@@ -1,0 +1,5 @@
+# The simultaneous cohomological window
+
+TW8 constructs one interval for the complete dyadic strict group of the original host and the odd strict groups on the prescribed reference layers. Its input KB8 supplies the small-twist bound with $C_K=31$. [Window statement and proof](main.tex#L823-L940) · [Small-twist bound](../../construction/k_theory_bridge/main.tex#L557-L576) · [Hypotheses and dependencies](closure.json)
+
+ETS21 applies this estimate to the full dyadic $K$-group order of the same host. ETS22 descends the invariant odd strict groups to the fixed character field and restricts them to the indicated reference layers. The remaining odd orders are a base term and primitive ratios on cyclic subfields. [Dyadic orders](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS21) · [Restriction loss](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS22) · [Two-sided comparison](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS24) · [Claim records](../even_twist_selmer/claims.json)

@@ -7,4 +7,4 @@ For a twist $e$ the source uses the $c=(-1)^{e+1}$ eigenspace of the strict Selm
 
 For $\mathbf Q(\mu_9)$ and $e=2$ the full odd-minus sum is $\log 13$. [Worked computation](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS20)
 
-The complementary eigenspace and the dyadic term occur in the same window. [Comparison with the remaining product](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS19)
+The common interval bounds the full dyadic term. ETS24 expresses the remaining odd sign in terms of the base and primitive cyclic subfield orders. [Residual product on the selected interval](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS24)

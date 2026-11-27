@@ -405,3 +405,110 @@ At $13$ the extension $E_v/\mathbf Q_{13}$ is unramified for every $v\mid13$. It
 <!--
 % END ETS20
 -->
+
+## The two-primary order on the selected host
+
+<!--
+% BEGIN ETS21
+-->
+
+<span id="claim:ETS21"></span>Fix the primitive character of modulus $f$, write $M$ for its kernel field, and take the original finite list $B$ of odd primes and reference fields $L_{\ell,0}=\mathbf Q(\mu_{\ell f})$. Fix $\varepsilon$, the permitted layer function $a$ and cutoff $t$ as in ETS19. Write $D_x=\exp(x^{4\varepsilon/5})$. On the simultaneous interval furnished by TW8 the *actual* field $E$ in the height estimate satisfies
+$$
+ \sum_{1\le e<t(x)}\log |K_{2e}(\mathcal O_E)\otimes\mathbf Z_2|
+ \ \le\ (\log 2)D_x+4n^2t(x)^2\log(4nt(x)),\qquad n=[E:\mathbf Q].
+$$
+The bound includes all dyadic summands. In fact KB8 supplies the small-twist $H^2$ bound with $C_K=31$ before the field or twist is chosen. TW2 bounds the number of generators in the dyadic tower uniformly in $q,d$ by $4(g+6[M:\mathbf Q])$. TW4–TW7 use these generators to isolate finitely many exceptional twists and bound the small ones at a reference layer. TW8 takes the union of the exceptional sets for two and the listed odd primes before selecting $Y$. Its first inequality gives $\sum_{e<t}\operatorname{length}_{\mathbf Z_2}\mathcal S_2(E,e)\le D_x$ for every original field model on $[Y,Y^2]$. Multiplying by $\log 2$ converts length to logarithmic order. The cokernel estimate in ETS15 summed over $e$ gives the displayed inequality. The same interval gives $\sum_{e<t}\operatorname{length}\mathcal S_\ell(L_\ell,e)\le D_x$ on each prescribed odd reference layer $L_\ell/L_{\ell,0}$. These two field arguments will enter different places in ETS22. [KB8, small twists](https://github.com/bmatschke/grh-alpoge-claude/blob/4d53cacadba19176403b03f0986c6fcc471ca910/research/modules/construction/k_theory_bridge/main.tex#L557-L576) · [TW8, fields and common interval](https://github.com/bmatschke/grh-alpoge-claude/blob/4d53cacadba19176403b03f0986c6fcc471ca910/research/modules/galois/simultaneous_cohomological_windows/main.tex#L828-L864) · [Source definition of the simultaneous window](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L29-L47) · [Source assembly from small twists and Ferrero–Washington](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LayeredIsomorphisms/ThmBabOfLemmaK.lean#L9-L12)
+
+<!--
+% END ETS21
+-->
+
+## Restriction on the varying host and its fixed subfield
+
+<!--
+% BEGIN ETS22
+-->
+
+<span id="claim:ETS22"></span>The original fixing subgroup gives
+$$
+ E=M\,\mathbf Q(\mu_{2^{a+2}})^+\,\mathbf Q(\sqrt{-q},\sqrt{-d}).
+$$
+Indeed the four simultaneous conditions on a cyclotomic automorphism are precisely that it fix the real dyadic subfield, the kernel field $M$, and the two quadratic subfields of conductors $q,d$. The latter have negative discriminants since $q,d\equiv3\bmod4$. Write $H=\operatorname{Gal}(E/M)$. Restriction embeds $H$ in $C_{2^a}\times C_2\times C_2$ even if some fields intersect. For every subgroup $I\le H$, put $F=E^I$. At every odd $\ell$ and every $e\ge1$, restriction identifies the strict group on $F$ with $\mathcal S_\ell(E,e)^I$. Indeed $|I|$ is a unit on the coefficients, so averaging in inflation–restriction identifies the global groups with the invariants. Apply the same argument to each decomposition group above $\ell$ and each inertia group elsewhere. Their quotient orders divide $|I|$, including at ramified places. A class therefore meets all the local kernel conditions exactly when its restriction does. [Fixing subgroup of the host](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L31-L45) · [Restriction into the invariant cohomology](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/RestrictionMemInvariantH1.lean#L213-L231) · [Local conditions and transport](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L108-L128)
+
+Write $A_\ell(F,e)=K_{2e}(\mathcal O_F)\otimes\mathbf Z_\ell$. Restriction also identifies $A_\ell(F,e)$ with $A_\ell(E,e)^I$ at these odd primes. Apply the étale argument of ETS16 to the finite map of rings of integers with $\ell$ inverted. For $\mathbf Z/\ell^m(e+1)$ pulled back from the base, the geometric points above any stalk form a transitive $I$-set and the invariant sections on that finite fibre are the diagonal copy of the base stalk. The operator $p_I=|I|^{-1}\sum_{h\in I}h$ is an integral projector. Exactness of finite direct image gives the claim on cohomology, first with finite coefficients and then in the inverse limit as in ETS9. The natural comparison with $K_{2e}$ applies to real and complex number fields at odd $\ell$. Complex conjugation commutes with these maps. [Finite direct image, Stacks Project, Proposition 59.55.2](https://stacks.math.columbia.edu/tag/03QN) · [Number-ring comparison, Weibel VI.8.2](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf)
+
+For $\ell\in B$, $M\subset L_{\ell,0}\subset L_\ell$ in the notation of ETS21. The prescribed layer $L_\ell$ is cyclotomic over $L_{\ell,0}$, hence abelian over $\mathbf Q$. Its degree $h_\ell=[L_\ell:M]$ is fixed before $q,d,a,t$ and $x$. Put $b_\ell=\lceil\log_2 h_\ell\rceil v_\ell(h_\ell)$. Restriction gives
+$$
+ \sum_{1\le e<t}\operatorname{length}_{\mathbf Z_\ell}
+       \mathcal S_\ell(E,e)^H\ \le D_x+(t-1)b_\ell.
+$$
+To see this, descend the invariant group to $M$ as above and then restrict it to $L_\ell$. The latter map on strict groups has kernel contained in $H^1(\operatorname{Gal}(L_\ell/M),C)$, where $C=((\mathbf Q_\ell/\mathbf Z_\ell)(-e))^{G_{L_\ell}}$. This is a finite cyclic coefficient group since the local cyclotomic image is open and $e>0$. Values on at most $\lceil\log_2 h_\ell\rceil$ generators determine a cocycle. Its cohomology is consequently a subquotient of that many cyclic groups and is killed by $h_\ell$ by restriction and transfer to the trivial subgroup. The length loss is at most $b_\ell$, independent of $e$. Restriction preserves the strict local conditions, so ETS21 bounds the sum of the image lengths. This also treats $\ell\mid h_\ell$. [Odd reference fields and their indices](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L32-L39) · [Reference fields for the chosen character](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L71-L78)
+
+<!--
+% END ETS22
+-->
+
+## Integral factors indexed by cyclic subextensions
+
+<!--
+% BEGIN ETS23
+-->
+
+<span id="claim:ETS23"></span>Fix an odd prime $\ell$, a twist $e\ge1$ and let $s=(-1)^e$. For every intermediate field $F$ write $a_\ell(F,e)=|A_\ell(F,e)^{c=s}|$, using the restriction of complex conjugation even if $F$ is real. For each nontrivial cyclic subextension $F/M$ of $E/M$, let $F^-$ be its unique subfield of index two in $F$ containing $M$. There is an exact factorization into positive integers
+$$
+ a_\ell(E,e)=a_\ell(M,e)
+ \prod_{\substack{M\subsetneq F\subseteq E\\ F/M\ {\rm cyclic}}}
+ \frac{a_\ell(F,e)}{a_\ell(F^-,e)} .
+$$
+Here and below $F^-$ describes this particular subfield in the cyclic tower. On the $\mathbf Z_\ell[H]$-module $A_\ell(E,e)$ use the integral projector $p_I$ of ETS22. If $I=\operatorname{Gal}(E/F)$ and $I^*/I$ is the unique subgroup of order two in $H/I$, the operator $p_I-p_{I^*}$ is an idempotent. On the character group of $H$ it selects exactly the characters with kernel $I$. Indeed a character trivial on $I$ fails to be faithful on the cyclic $2$-group $H/I$ exactly when it kills that subgroup of order two. Every character has cyclic image. Thus $p_H$ and the indicated differences are orthogonal and sum to $1$. One can check the identities over a characteristic-zero splitting field. The injection of $\mathbf Z_\ell[H]$ into that field's group algebra gives the identities integrally, so they apply to finite torsion modules. Each projector commutes with $(1+s c)/2$. The corresponding summand has order $a_\ell(F,e)/a_\ell(F^-,e)$ by ETS22. This proves integrality and the displayed identity. [Characters indexed by a kernel and a cyclic quotient](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/OrbFacts.lean#L17-L28) · [Conjugation eigenspaces at odd primes](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L64-L92)
+
+There are at most $4a+4$ factors, including the base. To count them, observe that $H[2]$ has rank at most three and $2H$ is cyclic since $H$ embeds in $C_{2^a}\times C_2^2$. The structure theorem for finite abelian groups gives, if $H\ne1$, a largest cyclic factor of order $2^b$, $b\le a$, and at most two other factors of order two. There are at most $2^3-1=7$ quadratic quotient kernels. For $2\le j\le b$, an order-$2^j$ character has a restriction of exact order $2^j$ on the largest cyclic factor. There are at most $4\varphi(2^j)$ choices, and the $\varphi(2^j)$ generators of the same dual cyclic subgroup give the same kernel. This gives at most four kernels per higher level. The trivial group contributes just the base. For the admitted $a\ge2$ the stated bound follows. [The real dyadic and quadratic factors in the original field](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L36-L45) · [Their appearance on the common window](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/0be265ccb325908c67f872361d564c66b99e96f7/docs/src/book/main.tex#L12768-L12777)
+
+<!--
+% END ETS23
+-->
+
+## The residual product on the common interval
+
+<!--
+% BEGIN ETS24
+-->
+
+<span id="claim:ETS24"></span>Take the original $B$, $M$, $E$, $D_x$ and reference layers of ETS21–22 and write $t=t(x)$. For $M$ put
+$$
+ R_M=\prod_{1\le e<t}\ \prod_{\ell\ {\rm odd},\,\ell\notin B}a_\ell(M,e).
+$$
+For each nontrivial cyclic $F/M$ inside $E$, put
+$$
+ R_F=\prod_{1\le e<t}\ \prod_{\ell\ {\rm odd}}
+             \frac{a_\ell(F,e)}{a_\ell(F^-,e)},\qquad
+ R=R_M\prod_F R_F .
+$$
+All products have finite support by finiteness of the even $K$-groups. Let $W$ be the full logarithmic strict sum of ETS19, $N$ the least cyclotomic modulus of $E$, $n=[E:\mathbf Q]$, and set $L=4n^2t^2\log(4nt)$, $U=(n+1)t^2\log(tN)$. Then, on the same interval and for every admissible model,
+$$
+ \log R-L\ \le\ W\ \le\
+ \log R+U+
+ \left(\log 2+\sum_{\ell\in B}\log\ell\right)D_x
+ +(t-1)\sum_{\ell\in B}b_\ell\log\ell .
+$$
+For the lower bound, project the injection of the dual strict group in ETS15 onto the $c=(-1)^e$ component at every odd prime. At the primes of $B$ apply $1-p_H$ as well. Each projector is invariant under group inversion, so its order on the dual strict group agrees with that on the corresponding strict summand. ETS22–23 identify the product of the projected $K$-group orders with $R$. Exactness of the idempotents bounds the total loss by $L$, the logarithmic size bound for all local cokernels. For the upper bound, those same strict summands contribute at most $\log R$. The opposite odd sign contributes at most $U$ by ETS18. The strict group at two contributes at most $(\log 2)D_x$ by ETS21. The remaining $p_H$ summand at the listed odd primes is bounded by the *whole* invariant strict group in ETS22. Adding these disjoint contributions proves the inequality. [Prime weights and assembly](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L107-L145) · [Fixed odd fields and the chosen interval](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L74-L94) · [Independent reconstruction, the three terms at the window](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/b50dae1aa964142b04c11f791812ca7d4962e133/manuscript/sec17_twisted.tex#L104-L153)
+
+For fixed initial character and $\varepsilon$, the new error terms are $o(\exp(\tfrac12 x^\varepsilon))$. This follows from $t\le x^{401}$, the fixed finite list $B$ and ETS19's bounds for $L,U$. On the original height windows $2^{a(x)}\le x^4$, so ETS23 gives only $O(1+\log x)$ fields. In particular it suffices to prove, uniformly on one admissible interval, $\log R_F\le\exp(\delta x^\varepsilon)$ for the base and each cyclic subfield, with any fixed $0<\delta<1/2$. Summing over the fields absorbs their number in the margin. Conversely, each $\log R_F$ is nonnegative and at most $W+L$. The needed upper bound for these odd orders, with growing twist and conductor on this same family, remains an arithmetic input. [The interval and the order of the choices](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L41-L53) · [The two simultaneous conclusions](https://github.com/bmatschke/grh-alpoge-claude/blob/4d53cacadba19176403b03f0986c6fcc471ca910/research/modules/galois/simultaneous_cohomological_windows/main.tex#L846-L864)
+
+<!--
+% END ETS24
+-->
+
+## The cyclic factors for conductors sixteen, three and seven
+
+<!--
+% BEGIN ETS25
+-->
+
+<span id="claim:ETS25"></span>Take $M=\mathbf Q$, $a=2$, $q=3$, $d=7$ in the field predicate. Then $E=\mathbf Q(\mu_{16})^+\mathbf Q(\sqrt{-3},\sqrt{-7})$ has group $C_4\times C_2^2$. The three cyclotomic moduli are coprime, so the Chinese remainder theorem makes their indicated quotient groups independent. The real quartic factor has unique quadratic subfield $\mathbf Q(\sqrt2)$. A quadratic character of $H$ is a product of the three quadratic generators, giving the real quadratic fields with radicands $2,21,42$ and the imaginary ones with radicands $-3,-7,-6,-14$. There are four cyclic quartic fields. To specify one, choose a primitive quartic character on the real quartic factor and multiply by either choice of quadratic character from each of $3$ and $7$. Inverting the quartic character generates the same field. All four characters have the same square cutting out $\mathbf Q(\sqrt2)$, so this is the predecessor for every quartic ratio in ETS23. The twists by neither or by both imaginary quadratic characters give real quartics. The twists by exactly one give CM quartics. [Host fixing conditions](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L36-L45) · [Orbit kernels and the fixed field](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/OrbFacts.lean#L17-L28)
+
+For even $e$, the $c=1$ product consists of the base, the three real quadratic ratios and the two real quartic ratios. In a CM quadratic or quartic the conjugation is the order-two element of its cyclic group, and a faithful character sends that element to $-1$. Its primitive factor in this sign has order one. For odd $e$, the $c=-1$ product consists of the four imaginary quadratic ratios and the two CM quartic ratios. Every real field has trivial conjugation on its $K$-groups. Thus the seven quadratic and four quartic kernels account for every sign and every odd prime, without assuming that any individual $K$-group vanishes. This example checks the algebraic factorization for the given fields. The auxiliary primes in the asymptotic height estimate must also satisfy its largeness conditions. [Precise signs on the twisted cohomology](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/LengthEqAddEigen.lean#L64-L84) · [Prime size conditions for the asymptotic estimate](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L80-L92)
+
+<!--
+% END ETS25
+-->

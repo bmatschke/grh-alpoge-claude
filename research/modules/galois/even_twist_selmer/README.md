@@ -1,6 +1,6 @@
 # Even twists and rank-three automorphy
 
-The module gives the exact primitive valuation criterion on generic orbits, proves finiteness at all primes, and proves the full odd-minus bound on every original abelian CM host by the higher special-value formulas. ETS19 estimates the cost of replacing the remaining strict sum by the dyadic and complementary odd K-group orders. The size of that product on the chosen windows, or the uniform generic estimate together with the other source cases, remains a quantitative question. [Editable proof](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md)
+The strict groups are finite. Higher special values give the entire odd-minus bound on every original abelian CM host. On the simultaneous window the full dyadic contribution and the invariant odd strict terms at the listed primes are bounded. The direct height estimate now reduces to explicit primitive odd K-group ratios over at most four cyclic subfields per higher level and the remaining base term. The uniform estimate for these orders, or the source’s automorphic alternative, is still needed. [Editable proof](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md)
 
 | Claim | Result |
 | --- | --- |
@@ -24,5 +24,10 @@ The module gives the exact primitive valuation criterion on generic orbits, prov
 | [ETS18](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS18) | Every cyclotomic CM host satisfies the full odd-minus estimate with zero exceptional-prime term |
 | [ETS19](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS19) | The original window sum differs from the logarithm of the dyadic and complementary odd K-group orders by explicit small errors |
 | [ETS20](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS20) | Over the ninth cyclotomic field the odd-minus strict group at twist two has order thirteen and contributes at that prime alone |
+| [ETS21](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS21) | The simultaneous interval bounds the complete dyadic K-group order on the actual CM host |
+| [ETS22](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS22) | Odd-primary descent on every subfield of the host and restriction to the fixed reference layer control the invariant strict summand |
+| [ETS23](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS23) | Integral projectors decompose each odd same-sign K-group into the base and primitive ratios for at most four cyclic fields at each higher level |
+| [ETS24](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS24) | The full height sum on the simultaneous window is bounded on both sides by the odd cyclic-field product with explicit errors |
+| [ETS25](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS25) | The degree-sixteen host with quadratic conductors three and seven exhibits every kernel, predecessor and conjugation sign in the factorization |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

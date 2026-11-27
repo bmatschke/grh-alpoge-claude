@@ -1,6 +1,6 @@
 # Source review of the even-twist test
 
-The reviewed manuscript has SHA-256 digest `ecae7f577233cb28be3b7fcfdbb44f0654e0c3c7e520570f9b776335992f1698`.
+The reviewed manuscript has SHA-256 digest `5ca7be445d6bd8d1b808b55d02032d7acd29b13b9bdacccfc8a8a3bf04a3f678`.
 
 ETS1 checks the two different local coefficient comparisons and the sign of the class-group eigenspace. At the auxiliary level prime the unramified first cohomology vanishes for divisible coefficients. Over the cyclotomic field the prime over the coefficient prime is principal, so it splits in the Hilbert class field.
 
@@ -17,3 +17,5 @@ ETS7 removes auxiliary decomposition conditions on divisible coefficients for pr
 ETS15 bounds the image of localization over all primes including two by inspecting the cyclotomic image of each completion. ETS16 checks the contragredient sign, descent at ramified primes, and the two different critical formulas for even and odd m. ETS17 clears denominators before bounding the odd part and retains the primitive conductor of each character. ETS18 uses the original sign, quantifiers over local choices and least cyclotomic conductor. It supplies the whole free minus estimate with C=0. ETS19 bounds both errors for the same field and the same window, without a sign projector at two. [Wiles, odd-primary valuation formula in Weibel VI.8.7](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf) · [Kolster’s higher relative class number formula](https://doi.org/10.1007/s002080200321)
 
 ETS20 computes the actual three primitive Dirichlet values over the ninth cyclotomic field, its odd higher-root factor and the vanishing of the local correction at thirteen. This gives the exact nonzero strict length in the example.
+
+ETS21 composes KB8 and TW8 on their original field and interval and includes the dyadic local loss. ETS22 handles inertia even at ramified primes, averages finite étale stalks with odd coefficients, and bounds restriction to the fixed reference layers when their degrees are divisible by the coefficient prime. ETS23 counts cyclic kernels inside the actual relative Galois group. ETS24 removes precisely the contributions bounded on this same interval. The factors for nontrivial cyclic subfields retain every odd prime. ETS25 checks the decomposition and parity at an actual field of degree sixteen. [Formal host](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L36-L45) · [Roadmap, common Iwasawa interval](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/0be265ccb325908c67f872361d564c66b99e96f7/docs/src/book/main.tex#L12948-L12963)
