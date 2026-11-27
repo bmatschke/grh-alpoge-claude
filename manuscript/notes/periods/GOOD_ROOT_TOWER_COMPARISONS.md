@@ -38,7 +38,7 @@ $$
  \mathcal B=\{\ell\text{ prime}:\ell\mid2\,|\operatorname{disc}E|M'\},
  \qquad S_N=\{\ell\text{ prime}:\ell\le N\}\cup\mathcal B .
 $$
-On the generic abelian locus full $\ell^4$-torsion becomes rational over a finite extension of its function field because the group scheme is finite étale in characteristic zero. For the finitely many $\ell\in S_N$ take the compositum of the splitting fields. This chooses the same depth four at each prime, including $2$. Normalizing a projective model in that field puts all the generic data on one model. GRT10–11 construct the unlabelled integral lattice on the boundary charts. The ramified labelled quotients require the additional comparison described there.
+On the generic abelian locus full $\ell^4$-torsion becomes rational over a finite extension of its function field because the group scheme is finite étale in characteristic zero. For the finitely many $\ell\in S_N$ take the compositum of the splitting fields. This chooses the same depth four at each prime, including $2$. Normalizing a projective model in that field puts all the generic data on one model. GRT10–11 construct the unlabelled integral lattice on the boundary charts. GRT13–14 construct the labelled quotients on a common refinement, including at ramified places.
 
 Here is the patching step once those frames have been constructed. On a quasi-compact noetherian flat model over $\mathcal O_{F_c}$ let $\mathcal D$ be a de Rham vector lattice in its generic bundle. At each $\ell\in S_N$ suppose a locally free lattice $\mathcal H_\ell$ over the model localized over $\mathbb Z_{(\ell)}$ agrees with $\mathcal D$ after inverting $\ell$, via the specified generic identification. On a finite affine cover, clear the powers of $\ell$ in both transition matrices. Taking the maximum gives $c_\ell$ with
 $$
@@ -139,7 +139,7 @@ Apply Fargues's finite flat theorem to $\mathcal G_4^\vee$. Its Hodge–Tate map
 
 On a common normal chart, coherent generically full lattices and all finitely many flag steps can be made locally free at once in the following sense. Take a presentation by a vector bundle surjecting onto each coherent sheaf (on a projective model twist to obtain generators). On the open where the sheaves have their specified ranks take the graph of the corresponding sections of their relative Grassmannians of quotients. Normalize its closure in the product. The original relations vanish generically and hence in the locally free quotient. The kernel of the resulting surjection is precisely the torsion, by equality of ranks and torsion freeness of the target. Thus the universal quotient is the pullback modulo torsion. For inclusions use the flag Grassmannian of the generic steps in this quotient. The tautological flag on the graph closure gives subbundles and locally free graded pieces. This operation preserves the original flags where they already have these properties. To identify the new lattices with the prescribed chart lattices one needs compatibility of the chart construction with this pullback and with the valued points, as in the local model.
 
-For such lattices the sandwich on a height-one valuation implies the inclusions on the chart. Indeed a normal noetherian domain is the intersection of its height-one DVRs in its fraction field. Apply this to matrix entries on a trivializing open. A valuation of an algebraically closed extension centered on a height-one prime detects negative orders there. At the other primes the chart uses the common de Rham comparison. Applying the same eigenprojection to both sides preserves the inclusions for its image lattices, and taking duals of these free lattices reverses the two bounds, giving $\kappa\mathcal H^\vee\subset\omega_G^\vee\subset\mathcal H^\vee$. Any identification with saturated labelled lattices at ramified primes must still be made on that chart. [Valuation test in the construction][rt-ht] · [Labelled frame and the different](PERIOD_SIGNED_HODGE_TATE_FRAME_COST.md)
+For such lattices the sandwich on a height-one valuation implies the inclusions on the chart. Indeed a normal noetherian domain is the intersection of its height-one DVRs in its fraction field. Apply this to matrix entries on a trivializing open. A valuation of an algebraically closed extension centered on a height-one prime detects negative orders there. At the other primes the chart uses the common de Rham comparison. Applying the same eigenprojection to both sides preserves the inclusions for its image lattices, and taking duals of these free lattices reverses the two bounds, giving $\kappa\mathcal H^\vee\subset\omega_G^\vee\subset\mathcal H^\vee$. GRT13–14 carry out the restriction, duality and different calculation on this chart. [Valuation test in the construction][rt-ht] · [Labelled frame and the different](PERIOD_SIGNED_HODGE_TATE_FRAME_COST.md)
 
 <!--
 % END GRT6
@@ -226,7 +226,7 @@ There are two distinct operations at a ramified label. Over a valuation ring $V$
 $$
  \tau(\delta)\, e_\tau L\ \subseteq\ L^\mathrm{sat}_\tau\ \subseteq\ e_\tau L .
 $$
-Indeed, for an integral basis $b_i$ with trace-dual basis $b_i^*$, the separability idempotent at $\tau$ is $\sum_i b_i\otimes\tau(b_i^*)$. Multiplication by $\tau(\delta)$ makes its coefficients integral. The other inclusion follows by applying the idempotent to a vector already in its image. For the lattice inclusion $\kappa L\subseteq\mathcal H\subseteq L$, either intersecting all three with the eigenspace or projecting all three preserves the same $\kappa$ bound. Combining the two operations incurs at most the indicated different. At an unramified absolute label $\delta$ is a unit and they agree. For a ramified example take $E_v=\mathbb Q_3(\pi)$, $\pi^2=3$. In $V^2$ the image of $\mathcal O_{E_v}\otimes_{\mathbb Z_3}V$ consists of $(a+b\pi,a-b\pi)$. The projection onto the first axis is $V$, while intersection with it has first coordinate $2\pi V$. Thus treating the projection as saturated can change an integral root line. The complete flag and its Newton comparison at ramified labels still require the specified choice and the transition maps for its successive quotients. [Prior signed cost on sections](PERIOD_SIGNED_HODGE_TATE_FRAME_COST.md) · [The formal comparison where the different is invertible][comp-diff]
+Indeed, for an integral basis $b_i$ with trace-dual basis $b_i^*$, the separability idempotent at $\tau$ is $\sum_i b_i\otimes\tau(b_i^*)$. Multiplication by $\tau(\delta)$ makes its coefficients integral. The other inclusion follows by applying the idempotent to a vector already in its image. For the lattice inclusion $\kappa L\subseteq\mathcal H\subseteq L$, either intersecting all three with the eigenspace or projecting all three preserves the same $\kappa$ bound. Combining the two operations incurs at most the indicated different. At an unramified absolute label $\delta$ is a unit and they agree. For a ramified example take $E_v=\mathbb Q_3(\pi)$, $\pi^2=3$. In $V^2$ the image of $\mathcal O_{E_v}\otimes_{\mathbb Z_3}V$ consists of $(a+b\pi,a-b\pi)$. The projection onto the first axis is $V$, while intersection with it has first coordinate $2\pi V$. Thus treating the projection as saturated can change an integral root line. GRT13–14 identify the specified lattice and its successive quotients. Its change-of-cutoff divisor vanishes at every ramified prime. [Prior signed cost on sections](PERIOD_SIGNED_HODGE_TATE_FRAME_COST.md) · [The formal comparison where the different is invertible][comp-diff]
 
 <!--
 % END GRT11
@@ -287,3 +287,274 @@ That set is empty. For fixed positive integers $a,b$ and an auxiliary line with 
 [rt-local]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L50416-L50457
 [rt-newton]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L50458-L50523
 [rt-bound]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L50585-L50676
+
+## Which lattice the two signs select
+
+<!--
+% BEGIN GRT13
+-->
+
+<span id="claim:GRT13"></span>Fix an integral normal chart from GRT10–11. Write $K$ for its function field, $\Lambda$ for the Lie bundle, $\omega=\Lambda^\vee$, and $V_\sigma\subset\Lambda_K$ for the rational eigenspace with label $\sigma$. The two restriction images
+$$
+ T_\sigma=\operatorname{im}(\mathcal H\longrightarrow V_\sigma^\vee),\qquad
+ T^0_\sigma=\operatorname{im}(\omega\longrightarrow V_\sigma^\vee)
+$$
+are coherent fractional modules. In a rational basis their generators are the restrictions of finitely many local generators, so a common denominator gives ordinary coherent modules locally. The integral vectors on which $T_\sigma$ takes integral values form $B_\sigma=T_\sigma^\vee=\mathcal H^\vee\cap V_\sigma$. Indeed integrality on the image tests every covector of $\mathcal H$. In exactly the same way $(T^0_\sigma)^\vee=\Lambda\cap V_\sigma=:L^0_\sigma$. Here and below duals of these restriction images are taken in the indicated rational space. This distinguishes them even when rational eigenprojection has a denominator, as in the quadratic example of GRT11.
+
+Let $I_\sigma$ be the image ideal of the absolute different of $E$ under $\sigma$. It is invertible on the coefficient chart. Locally at a place of the splitting field the extended ideal has a nonzero generator $d_\sigma$, which remains a nonzerodivisor after pullback to the integral chart. The integral requirement on the positive side is $a v\in B_\tau$ for every $a\in I_\tau$. The negative side requires integrality on $\mathcal H$ itself at the conjugate embedding. Thus on a Hodge–Tate fibre the two Lie lattices **before forming the flag** are
+$$
+ C_{+\tau}=I_\tau^{-1}B_\tau,\qquad C_{-\tau}=B_{\bar\tau}.
+$$
+These formulas give both inclusions in the definitions by testing a local generator of $I_\tau$. A change of generator multiplies by a unit. Restricting $\kappa\omega\subseteq\mathcal H\subseteq\omega$ and dualizing gives $\kappa B_\sigma\subseteq L^0_\sigma\subseteq B_\sigma$. In particular the positive-side bound is $\kappa d_\tau C_{+\tau}\subseteq L^0_\tau\subseteq C_{+\tau}$, and the negative-side bound is $\kappa C_{-\tau}\subseteq L^0_{\bar\tau}\subseteq C_{-\tau}$. With $v_p(p)=1$ and $E/\mathbb Q$ Galois, $v_p(d_\sigma)=v_p(|\operatorname{disc}E|)/[E:\mathbb Q]$. In fact all primes over $p$ have the same different exponent $a$ and the same $e,f$; the discriminant exponent is $\sum f a$, while $v_p(d_\sigma)=a/e$. The sandwich still uses $\kappa=4$ at $2$. [Integral test and different](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Definitions/GlobalGeometry/MemEigSpOfMemHtDual.lean#L35-L53) · [Choice for each sign](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Definitions/GlobalGeometry/IsHodgeLine.lean#L25-L29)
+
+<!--
+% END GRT13
+-->
+
+<!--
+% BEGIN GRT14
+-->
+
+<span id="claim:GRT14"></span>To extend the chosen flags, first apply the modification in GRT6 to the **restriction images** $T_\sigma,T^0_\sigma$ for every label and every prime in the two finite cutoffs. Each is a quotient of a locally presented coherent module. The closure of the generic point in the product of the Grassmannians of the specified quotient ranks carries the tautological locally free quotients. Relations vanish in each quotient by generic equality and torsion freeness. In the generic identification the resulting quotient is exactly the span of the pulled-back generators. Thus taking images commutes with subsequent dominant pullback, even when the original image had torsion in its pullback. This order of operations makes GRT13 applicable in every subsequent local ring. Duals of the resulting bundles and multiplication by an invertible fractional ideal commute with these pullbacks. The same constructions evaluate on any valuation ring with the specified generic embedding by the properness of the modification.
+
+Over $p\in S_N$ use $C_{+\tau},C_{-\tau}$, and elsewhere use the corresponding $L^0$. The formulas agree away from the fibres where the modification of the lattice is supported. In each bundle take the closure of the given generic flag section in its relative flag scheme, simultaneously on a common refinement. Denote its flag by $L_i$. If $F_i$ is the span over $K$ of the first $i$ flag vectors, then $L_i=L\cap F_i$. A vector in the intersection maps to torsion in $L/L_i$, and this last bundle is locally free. The coefficient of the next basis vector $b_i$ identifies $L_{i+1}/L_i$ with the fractional line
+$$
+ \{a\in K:\ e-a b_i\in F_i\ \text{for some }e\in L\}.
+$$
+The kernel of the coefficient map is exactly $L_i$. Adapted local bases therefore have upper triangular changes of basis, and the diagonal is the transition function of the corresponding quotient. For signature $(r,s)$, root $i<r$ uses that quotient at $+\tau$; root $r\le i<r+s$ uses the inverse of quotient $r+s-1-i$ at $-\tau$. Reversing the negative flag without dualizing its line would give the wrong divisor.
+
+Every prime dividing $2|\operatorname{disc}E|M'$ already lies in $S_N$ for **every** $N$. At such a prime the two cutoff models have the same depth four, hence the same pulled-back restriction images, different ideal, generic flags and quotient lines. The contribution of that prime to the *difference* of root divisors is zero. Outside both cutoff sets the same conclusion follows from the common de Rham bundle. The new-prime Newton comparison in GRT4 consequently occurs only at unramified odd primes prime to the level. Bounds on ramified root lines for the height of a single model still use GRT13. [Integral graded line](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Definitions/GlobalGeometry/IsGenericFlag.lean#L14-L33) · [Index and sign of each root](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Definitions/GlobalGeometry/IsHodgeLine.lean#L122-L131)
+
+<!--
+% END GRT14
+-->
+
+## A divisible group and its two opposite maps
+
+<!--
+% BEGIN GRT15
+-->
+
+<span id="claim:GRT15"></span>At the boundary valuation of GRT6 write $g$ for the generic abelian dimension and $a,t$ for the abelian dimension and torus rank of the special fibre, so $g=a+t$. We work over $V=\mathcal O_C$ as in that construction, with the symmetric cubical polarization line on the semiabelian family. For each $j\ge1$ let $U_j$ be the finite open subgroup containing the whole closed fibre of $G[p^j]$. Its rank is $p^{j(2a+t)}$ by the torus and abelian multiplication sequences on that fibre. The full generic torsion is $T_j$ of order $p^{2gj}$, and $H_j=U_j(V)=U_j(C)$ by properness. Both the natural inclusion and multiplication by $p$ preserve the finite parts at their respective levels. In fact the inverse image of the complement of the target open is closed in the finite source and has empty closed fibre, so has empty image over the local base.
+
+The map $[p]:U_{j+1}\to U_j$ is finite faithfully flat. On the closed fibre it has constant finite flat degree $d=p^{2a+t}$ by the isogeny sequences there. If the two finite free $V$-algebras are $B,B'$, then $B'/\mathfrak m_V B'$ is free of rank $d$ over $B/\mathfrak m_V B$ since the latter is a product of Artinian local rings. Lift its basis. The resulting $B^d\to B'$ has equal finite $V$-ranks and invertible determinant modulo $\mathfrak m_V$, hence is an isomorphism. It follows also that $H_{j+1}\to H_j$ is onto. The inclusion $U_j\to U_{j+1}$ is closed by the surjection of coordinate algebras on the closed fibre and Nakayama over $V$. Moreover $H_{j+1}\cap T_j=H_j$. An extending point killed generically by $p^j$ factors through $G[p^j]$ by separatedness and then through its finite open, since its closed point lies there.
+
+Use copies of $U_j$ indexed by $T_j/H_j$ to form $\mathcal G_j$ as in GRT6. A choice of generic coset representatives writes addition as addition on $U_j$ followed by translation by the section measuring the discrepancy of representatives. Changes of representatives give isomorphic groups inducing the identity on $T_j$. Multiplication on these copies is $[p]$ followed by an integral translation. It is faithfully flat onto $\mathcal G_j$, because the map on cosets is onto. Inclusion of the previous level is a closed immersion by the intersection equality. The kernel of $[p^j]:\mathcal G_{j+1}\to\mathcal G_1$ is finite flat and has generic fibre $T_j$. It contains the embedded $\mathcal G_j$; their coordinate algebras agree after inversion of $p$, and the ideal of the latter inside the former is torsion in a flat $V$-algebra, so is zero. This gives a $p$-divisible group $\mathcal G$ of height $2g$. Its cotangent module at level $j$ is $\omega_G/p^j\omega_G$, since the copy of $U_j$ at the identity is an open in $G[p^j]$.
+
+The cubical line supplies the usual biextension on $G\times G$. On $U_j\times U_j$ the two partial addition laws trivialize the $p^j$-th tensor power of a biextension fibre by multiplying either argument by $p^j$. Their ratio gives the alternating Weil pairing there. On a pair of other cosets use bilinearity: the two mixed factors are generic characters of $U_j$, which extend by finiteness of its Cartier dual and normality of $V$, and the constant factor belongs to $\mu_{p^j}(V)$. The group identities and compatibility across levels can be checked generically by flatness. This constructs $\lambda:\mathcal G\to\mathcal G^D$ inducing the given perfect pairing $P$ of Tate modules. The calculation only requires this generic perfection. [Finite-part construction and polarization][rt-ht] · [Integral Hodge–Tate sequence, §5.3.2](https://www.numdam.org/item/10.24033/asens.2157.pdf#page=31)
+
+<!--
+% END GRT15
+-->
+
+<!--
+% BEGIN GRT16
+-->
+
+<span id="claim:GRT16"></span>Fix a newly added prime $p$ and choose compatible roots of unity to write the Tate twist in coordinates. For a $p$-divisible group $D$ write $\alpha_D:T_p D\to\omega_{D^D}$ for the Hodge–Tate map. On the valued group of GRT15 the compatible differentials of Weil characters are $q_\infty=\alpha_{\mathcal G^D}P$. Functoriality gives also $q_\infty=(\lambda^D)^*\alpha_{\mathcal G}$. Fargues's Theorem 2 in §5.3.2 gives $\alpha_{\mathcal G}\alpha_{\mathcal G^D}^{\,t}=0$ with the twist understood. Hence $q_\infty P^{-1}q_\infty^t=0$, using $P^t=-P$. Reduction of the characters to level four gives exactly the differentials in GRT10.
+
+Since $p$ is prime to $\operatorname{disc}E$, the integral algebra of endomorphisms splits into its labelled factors over the splitting chart. The perfect trace pairing of the marked torsion module identifies each rank-$n$ factor with the dual of the opposite factor, up to a unit change of basis. Write $J$ for this identification in the direction from dual to original. The two restricted images $T_\tau,T_{\bar\tau}$ of GRT13 are locally free of complementary ranks. In these targets lift the level-four differentials on the marked generators. Changing a lift adds a vector in $p^4 T^0_\sigma\subseteq(p^4/\kappa)T_\sigma\subseteq p^2T_\sigma$. Reduction gives globally compatible matrices $q_\sigma$ modulo $p^2$ from the marked free modules. They are surjective there because the labelled differentials, together with $p^4T^0_\sigma$, generate $T_\sigma$. At a completed algebraically closed valuation over a height-one prime of residue characteristic $p$, the compatible infinite-level maps have the same reductions in these targets. The preceding vanishing therefore gives $q_\tau Jq_{\bar\tau}^{\,t}=0\bmod p^2$. In chart frames this is divisibility of matrix entries. At primes away from $p$ it is automatic, and at primes over $p$ the extension of the DVR preserves and detects divisibility. Intersecting the height-one rings in the normal chart proves the identity there.
+
+Over the chart modulo $p^2$, the map $i=Jq_{\bar\tau}^{\,t}$ is split injective and $q_\tau$ is split surjective locally. The image of $i$ is contained in the kernel of $q_\tau$. After quotienting by this image there is a surjection between locally free modules of the same rank, hence an isomorphism by its determinant. Duality now exhibits the positive Lie lattice modulo $p^2$ as a subbundle of the trivial marked bundle, with the negative **dual** Lie lattice as quotient. Filter first the subbundle by its given flag and then take inverse images of the reversed dual flag of the quotient. This yields precisely the ordered root flag of GRT14. All maps came from the same fixed marks modulo $p^2$, so the middle bundle is globally trivial. On every component of the special fibre the positive Newton classes of its roots vanish by the Whitney formula, in every degree. Intersecting with a complementary class and summing with special-fibre multiplicities preserves that vanishing. This proves the trivial-flag step at the new primes. The change from the de Rham to the Hodge–Tate Newton numbers uses additional character lattices. [Fargues, Theorem 2](https://www.numdam.org/item/10.24033/asens.2157.pdf#page=31) · [Chart matrices and the trivial flag][rt-newton]
+
+<!--
+% END GRT16
+-->
+
+## The fundamental characters at a good prime
+
+<!--
+% BEGIN GRT17
+-->
+
+<span id="claim:GRT17"></span>There is an explicit check on which Frobenius and which power occur in the local calculation. Work over a splitting DVR of mixed characteristic with fraction field of characteristic zero and $p>2$. In a finite flat group of generic fibre $\mathbb F_q^n$ with its $\mathbb F_q$-action, take the closures of the members of a full flag of generic $\mathbb F_q$-subspaces. Their coordinate algebras are images in the generic coordinate algebras, hence finite torsion-free, so free over the DVR. The group operations extend by flatness and generic equality. Quotient by the preceding finite flat subgroup gives a finite flat group of order $q$ for each step. On the augmentation ideal of such a step the group $\mathbb F_q^\times$ has one copy of each character generically, by evaluating on the nonzero generic points. Its idempotents are integral since $q-1$ is a unit and the DVR contains the Teichmüller values. Thus every character piece of the augmentation ideal has rank one, including the trivial character. These are precisely the hypotheses of Raynaud's classification.
+
+Write $X_j$ for its fundamental character lines, in Frobenius order. For local generators $x_j$, Raynaud's presentation has relations $x_j^p=d_{j+1}x_{j+1}$, with $j$ cyclic of length $[\mathbb F_q:\mathbb F_p]$. The repeated powers span the augmentation algebra, and the monomials with exponents between $0$ and $p-1$ form a basis of the full algebra. Modulo the square of the augmentation ideal, the only linear relations are $d_{j+1}x_{j+1}=0$. The cotangent part of type $j+1$ is therefore the cokernel of the multiplication map $X_j^{\otimes p}\to X_{j+1}$. This identifies the image line, with its order, under changes of basis. In particular, transporting a $k$th Newton root through this map scales its term by $p^k$. On a curve this also gives the length $v(d_{j+1})$. The formula distinguishes the permutation $j\mapsto j+1$ on characters from the reversal of the negative flag in GRT14. To use it on the full higher-dimensional model requires the chart's actual filtered character order and the comparison of its cotangent terms with the two labelled lattices; intersections of degree $k>1$ cannot be recovered from this length alone. [Raynaud, Theorem 1.4.1 and Corollary 1.5.1](https://www.numdam.org/item/10.24033/bsmf.1779.pdf#page=16) · [Both local Newton identities][rt-newton]
+
+<!--
+% END GRT17
+-->
+
+## The prescribed cusp weight on a toroidal chart
+
+<!--
+% BEGIN GRT18
+-->
+
+<span id="claim:GRT18"></span>On a period sheet of signature $(r,s)$, $s\le r$, use the $s$-dimensional eigenspaces of the small Hodge determinant. Put $f=[E:\mathbb Q]/2$ and $\operatorname{rd}=|\operatorname{disc}E|^{1/(2f)}$. For a nonzero saturated isotropic $\mathcal O_E$-sublattice $I$ of rank $j$, choose $j$ vectors generating a finite-index free submodule of index $d_I$. If $w_{\sigma,a}$ are their projected period vectors, the normalization used by the cutoff is
+$$
+ N(I)=d_I^{-1}\prod_{\sigma}\det\operatorname{Gram}(w_{\sigma,a}),\qquad
+ \operatorname{covol}_{\mathbb R}(I)=\operatorname{rd}^{fj}N(I).
+$$
+Here $\sigma$ runs through the chosen CM half and the Gram is positive definite. For the second identity use the Minkowski embedding of the free submodule. With one complex area per pair its integer covolume for one $\mathcal O_E$ is $2^{-f}\sqrt{|\operatorname{disc}E|}$. Isotropy makes the Hermitian Grams at opposite labels conjugate, so the real norm on the free submodule uses twice the single-side form. The factors $2^{fj}$ in real volume cancel the $2^{-fj}$. Dividing by the index gives the identity for $I$ and proves independence of the vectors. The same equality follows for a fractional ideal summand by taking a finite-index free submodule. Put
+$$
+ U=\max(0,\sup_I-\log N(I)).
+$$
+On a compact interior neighbourhood the Hodge norm is uniformly comparable to a fixed Euclidean norm on the marked lattice. At any rank only finitely many primitive exterior vectors can have bounded norm. Up to sign each determines the saturated sublattice as the intersection of its rational plane with the marked lattice. Hence only finitely many $I$ can contribute a nonnegative term there. In particular $U$ is continuous on the interior, invariant under the arithmetic marking group and under conjugation.
+
+In a holomorphic small-block frame $b_\sigma$, the weight $2\phi_\mu$ is $\sum_\sigma\log\det\operatorname{Gram}(b_\sigma)$ up to a change of holomorphic determinant frame. For fixed $I$ the local function $2\phi_\mu-\log N(I)$ is plurisubharmonic. In fact the projected vectors are holomorphic sections because each projector is a constant polynomial in the endomorphism action on the periods. Extend them locally to a frame by adding vectors of $b_\sigma$ independent modulo their span. Dividing the full Gram determinant by the Gram of the projected vectors gives the determinant in the orthogonal quotient, by the Schur complement, times the modulus squared of a holomorphic unit. This quotient is the Hodge tangent eigenspace for the smaller period lattice $I^\perp/I$: its polarization is induced by the original alternating form, and orthogonal projection gives its Hodge metric. In period coordinates its tangent Gram in a flat holomorphic chart is the restriction of $(\operatorname{Im}Z')^{-1}$ to the holomorphic eigenspace. For a holomorphic frame matrix $V$ of $j$ columns and $Y=\operatorname{Im}Z'$, the exterior Cauchy–Schwarz inequality gives $\det(V^*Y^{-1}V)=\sup_D|\det(D^*V)|^2/\det(D^*YD)$, with $D$ ranging over constant matrices of $j$ independent columns. Equality at a given point uses $D=Y^{-1}V$ there. For each fixed $D$, the logarithm of the numerator is plurisubharmonic, and so is $-\log\det(D^*YD)$ by convexity of negative log determinant and harmonicity of the entries of $Y$ on complex lines. The supremum is continuous by the Gram formula, so its logarithm is plurisubharmonic. This proof includes the empty quotient. Applying it also to the original frame and taking the locally finite maximum gives plurisubharmonicity of $\phi_\mu+U/2$ on the interior. [Quotient by an isotropic period lattice and determinant calculation](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicSpectrum/Proofs/MetricProofs/LogDetCuspFramePlurisubharmonic.lean#L153-L240)
+
+<!--
+% END GRT18
+-->
+
+<!--
+% BEGIN GRT19
+-->
+
+<span id="claim:GRT19"></span>Here is a boundary estimate for that same supremum. Use the period charts of the toroidal model, with a rational symplectic basis adapted to the primitive toric isotropic lattice $I_0$. In these coordinates integral coordinates have a fixed common denominator. Write $I_{0,\mathbb R}$ as the first real coordinate block, and the period matrix as $X+iY$. On a sufficiently small neighbourhood of a fixed stratum $Y\ge c\,1$ for some $c>0$, and $Y_{22}$ and $Y_{22}^{-1}$ on the remaining coordinates are bounded. Indeed the imaginary period is a bounded holomorphic remainder's imaginary part plus a sum of $-\log|t_j|$ times fixed positive semidefinite monodromy forms. Their common kernel is the abelian block, on which the limiting period is positive definite. On its complement the sum tends uniformly to positive infinity as all boundary coordinates of that stratum tend to zero. The bounded cross terms preserve the lower bound after shrinking. These constants may depend on the chart.
+
+The norm squared of a real period $(a,b)$ is
+$$
+ (a+Xb)^t Y^{-1}(a+Xb)+b^t Y b.
+$$
+Thus the metric on $I_{0,\mathbb R}$ is bounded above. The quotient of the **whole real lattice** by $I_0$ has first minimum bounded below. Minimizing the first term over the first block of $a$ leaves $(a_2+(Xb)_2)^tY_{22}^{-1}(a_2+(Xb)_2)$. If $b\ne0$ the second term is bounded below by the lattice denominator and $c$. If $b=0$, any nonzero quotient vector has $a_2\ne0$, giving the same conclusion from $Y_{22}$. In particular all sublattices of this quotient have volume bounded below by a positive constant in every rank, by the disjoint balls of half the first minimum in their own real span.
+
+Put $v_0=\operatorname{covol}(I_0)$. Every sublattice of $I_0$ has volume at least a fixed positive multiple of $v_0$, including rank zero. Indeed in fixed lattice coordinates the product of any number of the smallest metric singular values is bounded below by the product of all of them divided by a fixed constant, since each is bounded above. A nonzero integral exterior vector has fixed-coordinate norm at least one. For any cusp lattice $I$ choose a basis first for $I\cap I_0$, then lift a basis of the image of $I$ in the quotient. The volume of $I$ is the first volume times the volume of the projected lifts perpendicular to $I\cap I_0$. Further orthogonal projection perpendicular to all of $I_0$ only decreases this second volume. The preceding bounds show that $\operatorname{covol}(I)\ge c'v_0$ simultaneously for all $I$. Conversely $I_0$ itself is one of the cusp lattices when its rank is positive: it is the saturated monodromy period lattice, stable under the PEL action. Since $v_0$ is bounded above, GRT18 now gives $U=-\log N(I_0)+O(1)$. In rank zero the same argument just gives bounded $U$.
+
+Choose a toroidal frame of the small determinant beginning, at each embedding, with the projected periods of a finite-index basis of $I_0$. They span the torus Lie part at the limit: torus periods in logarithmic torus coordinates are the constant cocharacters times $2\pi i$. Extend by lifts of a local frame of the abelian quotient. In the quotient by the torus periods the metric is the transverse abelian Hodge metric with period block $Z_{22}$; its determinant in this frame is bounded above and below. This also follows by minimizing the full Gram over the complex first block, which leaves $Y_{22}^{-1}$. The eigensplitting commutes with orthogonal projection for the polarization. The Schur complement in GRT18 therefore gives $2\phi_\mu=\log N(I_0)+O(1)$ in a nonvanishing frame of the canonical extension. Consequently $\phi_\mu+U/2$ is bounded relative to a smooth reference metric near this stratum. Its locally bounded plurisubharmonic extension is obtained by the upper limit from the complement of the normal-crossing divisor. Changes of frame add pluriharmonic functions, so the extensions glue. They agree with the prescribed function on the interior. GRT12 now applies to **this** bounded weight, and the component mean proved with this period-lattice $U$ applies to its interior values. The comparison of arithmetic heights also uses the finite-place determinant factors and horizontal curve estimates. [The period model for the weight and its heights](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/0be265ccb325908c67f872361d564c66b99e96f7/docs/src/book/main.tex#L50670-L50761) · [Mean on the normalized period sheet](PERIOD_HODGE_CUSP_MEAN.md)
+
+<!--
+% END GRT19
+-->
+
+## What the two comparisons require of the marked order
+
+<!--
+% BEGIN GRT20
+-->
+
+<span id="claim:GRT20"></span>The trivial flag used for nefness on a *single* cutoff also exists on its ramified fibres. Localize the coefficient ring at a prime over $p\in S_N$, and choose a generator $\delta$ of the semilocal different. The marked module is free of rank $n$ over $\mathcal O_E/p^4$ at this prime. A $\mathbb Z_p$-valued perfect Weil form $e$ corresponds to an $\mathcal O_E$-sesquilinear one with values in the inverse different, by sending a pair $(u,v)$ to the trace functional $b\mapsto e(bu,v)$. Perfection of the first form identifies the second map with the full inverse-different dual, since evaluating at $1$ identifies the two duals. Multiplying by $\delta$ therefore gives an integral invertible matrix over the local endomorphism ring, also modulo $p^4$. Evaluation at any embedding gives an invertible matrix there. This argument uses no integral projector onto an individual embedding.
+
+Use an endomorphism-ring basis of the marking to form the $n$ columns of the restricted Hodge–Tate row at each embedding. They span modulo $p^2$ because evaluation on any marked linear combination reduces to the same linear combination with the coefficients evaluated at the appropriate embedding (with the Rosati conjugation on the character side). The error is in $p^4T^0_\sigma\subset p^2 T_\sigma$, including at $2$. The oppositely labelled Weil adjoint is formed with the inverse of the normalized integral pairing. Over the rational split space this is a scalar multiple of the corresponding factor of the inverse Weil pairing, so the exact Hodge–Tate composite in GRT16 still vanishes. The normalized inverse and the lifted rows are integral in their chosen bases. Replacing any one lift changes its product by an element of $p^2$ times the target. The height-one test of GRT16 now proves exactness modulo $p^2$ with this normalization for every $p\in S_N$.
+
+The positive kernel flag uses $B_\tau$. Multiplication by the single constant $d_\tau=\tau(\delta)$ identifies the **fractional bundle** $I_\tau^{-1}B_\tau$ with $B_\tau$ over this local base, hence induces an isomorphism after reduction, even when $p$ divides the different. Using the scaled frame gives the correct transitions from GRT14. Thus the assembled flag has trivial marked ambient bundle on each of these fibres. A dominant flag weight is a product of nonnegative powers of the successive Plücker line bundles up to a power of the trivial determinant. Pullback from the relative flag variety makes each such line nef on fibre curves. This supplies finite-fibre nefness on the fibres in the cutoff. [The trace normalization and the modular flag](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3405-L3494)
+
+<!--
+% END GRT20
+-->
+
+<!--
+% BEGIN GRT21
+-->
+
+<span id="claim:GRT21"></span>There is an algebraic way to isolate the two integral identifications which GRT4 needs at a new prime. Set $w=\zeta_p-1$. Over the local chart write $S$ for the marked free module, $M$ for the opposite Hodge–Tate covector lattice, and $W$ for the Hodge–Tate Lie lattice. Lift the two maps of GRT16 to $q:S\to M$ and $i_C:W\to S$. On a neighbourhood of the fibre $q$ is surjective by Nakayama. Choose a local section $j$ of $q$. Since $qi_C(W)\subset wM$, the correction $i=(1-jq)i_C$ differs from $i_C$ by $w$ times an integral map and satisfies $qi=0$. Reduction modulo $w$ identifies $W/wW$ with the kernel of $q\bmod w$. As $q$ is split, $i$ identifies $W$ with $\ker q$ over the local ring by its determinant. Different corrections agree on $w^{-1}W$ up to integral marked vectors.
+
+Let $A$ be the evaluation order on the marked $p$-torsion and $H$ the polar, for the marked dot product, of its additive coefficient lattice. Suppose the integral comparison on the chart gives
+$$
+ S\subset H\subset w^{-1}S,\qquad q(H)=\omega,\qquad
+ i^{-1}(H)=w^{-1}L,
+$$
+where $L$ is the de Rham Lie lattice and $\omega$ is the full de Rham covector lattice on the opposite side. The maps here use fraction-space extensions. Reducing $q$ modulo $M=q(S)$ maps $H/S$ onto $\omega/M$. Every kernel class can be represented in $\ker q$ by subtracting an element of $S$. The intersection with $S$ in $\ker q$ is $i(W)$, so its kernel is $(w^{-1}L)/W$. This proves the chart short exact sequence with **both original endpoints**. When the order has fundamental character lines $X_{\tau j}$ on the chosen prefix filtration, triangularizing the polar yields successive lines $X_{\tau j}^{-1}$. When the successor conormal filtration on the same chart has endpoints $L_{\phi\tau}^{\vee},pL_{\phi\tau}^{\vee}$ and successive quotients $X_{\phi\tau,j}/X_{\tau j}^{\otimes p}$, additivity of the localized Newton character gives the other identity. In detail, summing over $j$ telescopes to the comparison between the endpoints. Duality multiplies a degree-$k$ root power by $(-1)^k$, and tensor power multiplies by $p^k$. The divisor of a constant has trivial ordinary line class, so expanding a shift by $\operatorname{div}(w)$ retains just its linear term in the localized intersection. Since $(p-1)\operatorname{div}(w)=\operatorname{div}(p)$, the resulting identities in the notation of GRT4 are
+$$
+ \Delta_\tau=h_\tau-A_\tau/(p-1),\qquad
+ p^kh_\tau=h_{\phi\tau}+A_{\phi\tau},\qquad
+ h_\tau=(-1)^k\sum_j c_k(X_{\tau j},\mathcal O).
+$$
+
+The rank-one calculation of GRT17 supplies the *candidate* successor line. For an integral flag of several ranks one still has to identify restriction of additive generators of $A$ to each step with the full fundamental ideal and identify the augmented functions with zero projected differential. Exactness of the sequence modulo $p^2$ alone imposes neither condition on $H$. One can see why a check of generic fibre lengths cannot replace this step: over $R=\mathbb Z_p[t]_{(p,t)}$ multiplication by $t$ on $R/p$ is an isomorphism at every height-one point of $\operatorname{Spec}R$. Its cokernel at $(p,t)$ has length one. A comparison by valuations therefore needs actual locally free lattice maps with controlled images on the common refinement. A discrepancy in a torsion quotient can otherwise survive in codimension two. [Corrected map, marked order and successor graph](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3496-L3617)
+
+<!--
+% END GRT21
+-->
+
+<!--
+% BEGIN GRT22
+-->
+
+<span id="claim:GRT22"></span>The bounded cusp weight gives an explicit lower comparison at a boundary point, with the torus normalization retained. Work at an embedding of its field. Let $h$ be the torus rank per label, $\iota$ the index of the module on the chosen cocharacter basis in $I_0$, and $C_\sigma$ the change from the given small tangent frame to the cocharacters followed by lifts of an adapted abelian frame. The interior Hodge frame has squared Gram measured in units of $\pi$ times the Riemann form, and the extended torus periods are $2\pi i$ times the cocharacters. Use the term $I_0$ in the maximum defining $U$. On dividing the full Gram by its projected torus Gram, the remaining determinant tends to that of the abelian quotient. In the Hodge normalization and the original small frame the resulting lower reading for twice the log weight, apart from its fixed frame unit, is
+$$
+ \log\!\left(\iota\,(4\pi)^{-fh}
+       \prod_\sigma\frac{\det G_{\sigma,\mathrm{ab}}}{|\det C_\sigma|^2}\right).
+$$
+Indeed the quotient contributes $(4\pi)^{s-h}$ per label from scaling the lifts by $2\pi i$. The change of full frame costs $|2\pi i|^{2s}|\det C_\sigma|^2$, and the Hodge normalization contributes $\pi^s$. Their scalar ratio is $(4\pi)^{-h}$. The index enters once because $N(I_0)$ divides the product of projected Grams by $\iota$. The upper-limit extension is at least this limiting lower reading, so all the dominating smooth metrics of GRT12 inherit it. When $h=0$ the same formula has index one and gives the ordinary abelian reading.
+
+For the arithmetic use, let $x_s,x_b$ be the degrees of the saturated small and large abelian eigenlattices, in the normalized Hodge metric. Orthogonality and the finite index of their direct sum give $x_s+x_b\le\widehat{\deg}B_{\rm ab}$ for the full abelian Lie lattice. Suppose the flat determinant comparison gives $x_s-x_b\le Cfr\lambda_N$ and the maximal slope of that lattice is at most $C_a\lambda_N$ whenever $-\widehat{\deg}B_{\rm ab}\le Cfr\lambda_N$. If $x_s>0$ the first two inequalities imply the hypothesis of the slope bound. Taking the determinant of the rank-at-most-$fs$ small submodule gives $x_s\le C_a fs\lambda_N$. For $x_s\le0$ it already holds. Thus the constants needed in the uniform curve bound occur in the finite determinant comparison and in the abelian slope estimate; the cusp extension introduces no new tower-dependent constant into this arithmetic reading. On the same integral determinant with the finite vertical factors, the normalized auxiliary loss is $(a/b)K_A$. Once the all-curve bound and fibre nefness hold, shifting the metric by the negative of that lower bound makes the smooth perturbed line arithmetically nef. Its nonnegative top intersection gives the normalized lower bound upon expanding the constant shift. The original Hodge mean comparison then uses the [component energy calculation](PERIOD_HODGE_CUSP_MEAN.md). [Point degrees and boundary frame in the independent reconstruction](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L2807-L2926)
+
+<!--
+% END GRT22
+-->
+
+<!--
+% BEGIN GRT23
+-->
+
+<span id="claim:GRT23"></span>There is a determinant test for extending the one-character argument of GRT17 through a full flag. Work at a valuation test of GRT15 and write $|\cdot|$ for its multiplicative norm. For a finite flat marked order $A\subset V^X$, $X=\mathbb F_p^h$, set $m=|X|$. Let $\Lambda$ be the rows of linear functions on $X$ modulo $pV$ which have representatives in $A$. Write $a,c,o$ for the products of the norms of the elementary divisors of $V^h/\Lambda,V^X/A,I/I^2$, respectively, where $I$ is the augmentation ideal. For these finite matrices one may diagonalize over the valuation ring by choosing at each stage a nonzero entry dividing all the others. Then
+$$
+                         a^{m(p-1)}\le c^2\le o^m .
+$$
+For the first inequality a generic character extends over the Cartier dual as in GRT10. The polynomial $\sum_{k=1}^{p-2}(-1)^{k+1}(Z-1)^k/k$ evaluated at $Z=\zeta_p^x$ is $x$ times its value at $\zeta_p$ modulo $p$, by the formal logarithm identity truncated before degree $p-1$. Its value generates $(w)$. Thus $\Lambda$ contains $wV^h$. In a diagonal presentation with coefficients $\epsilon_i$ each $\epsilon_i$ divides $w$. Divide its corresponding function by $\epsilon_i$ and reduce modulo the maximal ideal. The results are independent linear forms on the residue points, since $p/\epsilon_i$ is in that ideal. Their monomials of separate degrees $<p$ form a basis of functions on $X$ over the residue field: an invertible linear change preserves the generated algebra, the $p$th powers of the new linear forms are again linear combinations of them on $X$, and there are exactly $m$ such monomials. The normalized evaluation determinant is a unit. Restoring the coefficients gives absolute determinant $a^{m(p-1)/2}$. These monomials belong to $A$, proving the inequality and showing that equality gives an integral monomial basis.
+
+For the second inequality close a generic line of order $p$ to a finite flat subgroup $D$ and quotient by it to $J$. The finite flat torsor is free as a module over the semilocal algebra of $J$, and each generic fibre over a marked point of $J$ is an integral translate of $D$ over $V$: a generic lift extends by finiteness. Evaluating a basis of the torsor over a basis of $J$ therefore gives $c=c_J^p c_D^{m/p}$. In the rank-one Raynaud presentation the algebra is monogenic, and the squared evaluation determinant is the product of derivatives of its monic equation at the marked roots, up to sign. Translation identifies all their conormal lengths, giving $c_D^2=o_D^p$. The conormal sequence $\omega_J\to\omega_A\to\omega_D\to0$ gives $o\ge o_J o_D$ with multiplicative lengths, since an image can be smaller than its source. Induction proves the second inequality.
+
+In a tensor product of orders the three invariants are $a_1a_2,c_1^{m_2}c_2^{m_1},o_1o_2$. Restriction to the two axes gives the first equality, the Kronecker evaluation matrix the second, and the direct sum of cotangents the third. Both inequalities are thus equalities on each factor whenever both are equalities on the product. The constant group of order $p$ has $(a,c^2,o)=(1,1,1)$; on $\mu_p$ the Fourier evaluation matrix and the cotangent sequence give $(|w|,|p|^p,|p|)$. On a proper principally polarized mark of dimension $b$, one has $o=|p|^b$. In particular it suffices for equality to produce $2b$ additive rows forming a matrix $S$ with $S^t J S=c_p E$, where $J,E$ are unimodular alternating matrices and $|c_p|=|w|$. Taking determinants gives $a\ge |w|^b$ and the outer bounds coincide. The missing content of this sufficient criterion is that the complementary rows be represented by functions of the *same evaluated order modulo $p$*. Rational Hodge–Tate orthogonality in GRT16 supplies no such representatives. Jin constructs candidate rows using division points in a square-zero period-ring thickening and then compares their reductions to local group functions. GRT24–26 verify this specialization and pairing on the proper test. Comparison with the boundary marking and descent of the filtered maps to the common chart are needed for GRT21. [The three determinants and the lifted rows](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3083-L3268) · [Order restriction and flag of the abelian factor](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3270-L3403)
+
+<!--
+% END GRT23
+-->
+
+<!--
+% BEGIN GRT24
+-->
+
+<span id="claim:GRT24"></span>For a proper abelian factor the reductions of the complementary tangent rows in GRT23 have an explicit representative. Let $B/V$ be the principally polarized abelian scheme on the valuation test, $A=\mathcal O(B[p])\subset V^{B[p](C)}$. Take a smooth abelian lift $\widetilde B$ to $D=A_{\inf}(V)/(\xi^2)$ of the marked polarized scheme after adding prime-to-$p$ level. Such a lift exists locally at the point of the smooth Siegel moduli scheme and hence over this local nilpotent extension, by infinitesimal lifting on a smooth affine neighbourhood. Choose the cyclotomic generator $\xi=([\varepsilon]-1)/([\varepsilon^{1/p}]-1)$ of $\ker\theta$. For $x\in B[p](V)$ choose a lift to $\widetilde B(D)$. Its $p$-multiple reduces to the identity and thus lies in $\operatorname{Lie}(B)\otimes(\xi)/(\xi^2)$. Define $t(x)$ by dividing by $\xi$ and reducing modulo $p$. This is independent of the lift because changing it adds an infinitesimal vector whose $p$-multiple is divisible by $p$. It is additive by the commutative group law. The same reading is obtained from any compatible lift of a deeper division point by multiplying it down to a lift of $x$ first.
+
+To prove regularity in the evaluated order, choose $a\in V^\flat$ with $a^\sharp=p$ and form
+$$
+     D'=W(V^\flat)/(p^2,[a]).
+$$
+Reduction modulo $p$ identifies $D'/p$ with $V^\flat/(a)=V/p$. Multiplication by $p$ identifies this quotient with $pD'$. Indeed $p$ is regular modulo $[a]$ in $W(V^\flat)$: if $py=[a]z$, then upon reduction modulo $p$ the nonzero $a$ in the domain $V^\flat$ forces $z=pz'$, and cancellation gives $y=[a]z'$. The first Witt digit of $\xi$ has the same valuation as $a$, and the next digit is a unit since $\xi$ is distinguished. Its image in $D'$ is therefore $p$ times a unit. This gives a map $D\to D'$ that converts the required tangent quotient into division by $p$ followed by multiplication by a fixed unit in $V/p$. [Bhatt–Morrow–Scholze, Lemma 3.10 and the cyclotomic generator](https://www.math.uni-bonn.de/people/scholze/integralpadicHodge.pdf#page=23)
+
+Work in a local factor of $A$ and translate by a marked section lifting its closed point. Each factor has such a section because its generic fibre is split and it is finite over $V$. The difference of marked points now reduces to the identity over the residue field. Formal parameters of these differences are nilpotent modulo $p$ on the local factor: the special algebra is Artinian local and the maximal ideal of $V/p$ is a nil ideal. Each of the finitely many parameters is nilpotent, so only finitely many terms of the multiplication series are needed. This also applies to lifts through the square-zero extension $D'$. Modulo $p$ the multiplication-by-$p$ map factors through relative Frobenius. Consequently, in one component of its series in the lifted parameters $Y$, the only terms with a nonzero first Witt digit have exponents $p\alpha$. Write the relevant truncation as $\sum_\alpha [d_\alpha]Y^{p\alpha}+p\sum_\gamma b_\gamma Y^\gamma$. For $Y_j=[u_j]+p s_j$ in $D'$, its Teichmüller terms become $[d_\alpha u^{p\alpha}]$. Their sum has first digit divisible by $a$, since the point is killed by $p$ modulo the thickening; the Teichmüller lift of that digit vanishes in $D'$. The second digit after division by $p$ is a polynomial in the $u_j\bmod a$. In fact the Witt addition carry on inputs $d_\alpha u^{p\alpha}$ is the reduction of the integer carry polynomial evaluated on $d_\alpha^{1/p}u^\alpha$ when the sum is written as a Teichmüller element plus $p$ times another one. Taking these roots is permitted in the perfect tilt. The other terms contribute $\sum\bar b_\gamma\bar u^\gamma$. Thus one polynomial in the reduced parameter functions represents this component of $t(x)$ for *every* marked point of the local factor. Add back the constant reading of the translated section. Lifting this polynomial to $A$ on each factor, and using the factor idempotents, represents each tangent row by a function of $A$ modulo $pV$.
+
+The Hodge covector row has a complementary description directly on $B[p]$: pair the universal torsion point with an identity tangent vector of $B^\vee$ over the dual numbers modulo $p$. The latter is killed by $p$. The coefficient of the infinitesimal parameter in the Weil character is a regular function and gives the marked differential at each point. Both sets of rows consequently belong to the additive lattice of this proper marking. GRT25 computes their joint alternating pairing for the chosen cubical line and compatible division tower. [Square-zero lifts and functions of the proper torsion mark](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3164-L3246)
+
+<!--
+% END GRT24
+-->
+
+<!--
+% BEGIN GRT25
+-->
+
+<span id="claim:GRT25"></span>The joint pairing in GRT24 can be recovered before dividing by the infinitesimal parameter. Use the rigidified Poincaré biextension of $\widetilde B$ and its dual, identifying the latter by the lifted principal polarization. Fix a level $n=p^k$, two compatible marked points $x_{i,k},x_{j,k}$ of order dividing $n$, and arbitrary lifts $x,y$ to $D$. Write $nx=\xi U$, $ny=\xi V'$ in the tangent space. Work in $D/(n\xi)$, whose reduction is $V$ and whose square-zero ideal is $\xi(V/n)$. Changing $x$ or $y$ changes its divided multiple by an element of $n\operatorname{Lie}(B)$. There is a canonical rigidification of the biextension fibre at $(nx,ny)$: the map from two infinitesimal arguments with the same square-zero ideal factors through the union of the two axes, and the rigidifications on these axes agree at their intersection.
+
+Choose a generator of the biextension fibre at $(x,y)$ over the local ring. Multiplication by $n$ in the first and second variables carries it to generators at $(nx,y)$ and $(x,ny)$. Write these images as $A b_L$ and $B_0 b_R$, where $b_L,b_R$ reduce to one under the respective identity rigidifications. On reduction $A/B_0$ is the Weil value $e_n(x_{i,k},x_{j,k})$ in the convention first partial multiplication divided by second. The two orders of multiplying in both variables agree by the biextension law. Hence
+$$
+ (A/B_0)^n=
+ \frac{\text{first partial multiplication by }n\text{ on }b_R}
+      {\text{second partial multiplication by }n\text{ on }b_L}
+$$
+in the rigidification just fixed. Write the reduced Weil value as $\zeta_n^{e_{ij,k}}$ in the compatible cyclotomic marking. Any two lifts of that scalar have the same $n$th power since $n\xi=0$. One lift is $[\varepsilon^{1/n}]^{e_{ij,k}}$, giving left side $1+\xi\,\theta(\nu)e_{ij,k}$ with $\nu=[\varepsilon^{1/p}]-1$.
+
+For the right side let $h_{j,k}$ be the differential in the first variable of the Weil character $e_n(\,\cdot\,,x_{j,k})$ modulo $n$. Consider the second multiplication on $b_L$. In the extension in the first variable over $y$, $b_L$ is an infinitesimal point reducing to the identity. Its first multiple is one because multiplication on the tangent space is $n$ and the infinitesimal ideal is killed by $n$. Its second multiple therefore reads $1-\xi h_{j,k}(U)$. To identify the derivative one may use the identity over the dual numbers of $V/n$, where $x_{j,k}$ is $n$-torsion and the ratio of the two partial multiplications is the defining Weil character. This gives the same linear term over $D/(n\xi)$: the variable displaced from zero contributes exactly one infinitesimal factor, the constant term at zero is identically one for every value of the other variable, and changing a lift or a local frame in any linear coefficient disappears after multiplication by $\xi$. The dual calculation on $b_R$ gives $1-\xi h_{i,k}(V')$ for its first multiple, using alternation in interchanging the two marked arguments. This also explains directly why the choice of $b_L,b_R$ has no effect. Equating the coefficients of $\xi$ proves
+$$
+ h_{j,k}(U)-h_{i,k}(V')=\theta(\nu)e_{ij,k}\pmod{nV}.
+$$
+
+As the division points are multiplied down, the divided multiples and the Weil differentials agree at the preceding precision. The former follows by using the multiple of the next lift as a lift at the previous level; the latter is compatibility of finite Weil characters. Completeness of $V$ therefore gives matrices $T',H$ over $V$ with $(T')^tH-H^tT'=\theta(\nu)E$. The matrix $E$ is invertible by perfection of the full torsion marking and $|\theta(\nu)|=|\zeta_p-1|$. Their reductions are the regular rows of GRT24. GRT23 now gives equality of all three determinants for the proper marked order and its generation by functions additive modulo $p$. For a split product with toric character and constant factors the product formulas give the same equality. In a Raynaud extension the finite open torsion is an extension of the proper $p$-kernel by the toric $p$-kernel. A generic retraction to the toric kernel extends to it character by character by integrality on the finite Cartier dual, and remains a retraction by flatness. The extra cosets in the induced group of GRT15 are a constant factor at level $p$ upon choosing a generic linear complement. Thus the equality also applies to the induced valuation order whenever the finite open is identified with this Raynaud kernel. Passing from these evaluated orders to the common higher-dimensional chart in GRT21 also requires its restriction and conormal comparisons. [Proper marking and its three lengths](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3083-L3268)
+
+<!--
+% END GRT25
+-->
+
+<!--
+% BEGIN GRT26
+-->
+
+<span id="claim:GRT26"></span>For a proper marked test one can now compute the image and inverse image in GRT21 with a single change of basis. Work first with the full integral marking $S=V^{2g}$. Use its Weil matrix $E$ for the alternating pairing, and write $P=\binom{H_0}{T'}$ with $H_0$ the full Hodge differential matrix of GRT25, valued in the de Rham covector frame. Choose the sign of the standard alternating matrix $J$ so that $P^tJP=c_pE$. The rows of $P$ span the entire additive coefficient lattice $\Lambda$: they belong to it by GRT24, and their determinant has the very norm $|w|^g$ computed for $\Lambda$ in GRT23–25. An inclusion of two free lattices of the same determinant norm is equality by diagonal reduction over the valuation ring. Let $H=\Lambda^\vee$ for the dot product in the marked coordinates. Then
+$$
+ H=P^{-1}V^{2g},\qquad H_0 H=V^g,\qquad
+ P E^{-1}P^t=c_p J^{-1}.
+$$
+The middle equality is surjectivity of projection to the first $g$ coordinates of $V^{2g}$. For a Lie vector $a$ the last equality gives
+$$
+ P E^{-1}H_0^t a=c_p J^{-1}\binom a0.
+$$
+It belongs to the standard lattice precisely when $wa$ is in the de Rham Lie lattice. Thus the two polar tests in GRT21 hold for the infinite-level differential and its exact adjoint. Only $H_0$ and the Weil pairing occur in their statements. The auxiliary lower rows need no compatibility with individual CM eigenprojectors.
+
+At a good prime each endomorphism of the marked module preserves $\Lambda$ under precomposition. Indeed precomposing a representing function with the action on the integral order represents the transformed row modulo $p$. Changing integral lifts adds a $p$-multiple of a standard row, and $pS\subset\Lambda$. The integral eigensplitting at a good prime therefore restricts these two identities to the desired pair of opposite labels, using the trace-dual basis. For finite-depth chart maps one may correct $i_C$ by $(1-jq)$ as in GRT21. On $W$ the correction is in $p^2 S$ since $qi_C=0\bmod p^2$ and $j$ splits $q$. The exact adjoint and this lift then agree modulo $p^2S$ on $W$. Since $H\subset w^{-1}S$, the error in the image under $q$ of an element of $H$ belongs to $(p^2/w)\omega\subset\mathfrak m_V\omega$ in the full covector frame. The images remain in $\omega$ and span it by Nakayama. If $i(a)\in H$, then $wa\in W$ by $i^{-1}S=W$. On this domain the error in the two adjoints belongs to $(p^2/w)S\subset S\subset H$. Conversely $wa\in L$ implies $wa\in W$ and gives the same comparison. Consequently the corrected chart maps satisfy $q(H)=\omega$ and $i^{-1}H=w^{-1}L$ on the proper valuation test. The same calculation applies to a split **polarized** product whose factors have the compatible matrices, by taking direct sums and changing the marked basis. A group decomposition at the boundary used solely to compute an evaluation determinant does not automatically identify its polarization with this product. [Marked additive rows and opposite chart maps](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3377-L3403) · [Corrected maps on a valuation test](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L3496-L3546)
+
+<!--
+% END GRT26
+-->

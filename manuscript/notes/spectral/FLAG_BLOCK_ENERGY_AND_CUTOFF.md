@@ -136,7 +136,7 @@ Now fix finitely many rows $\rho$. Absolute convergence of each row gives a tail
 % END FBE6
 -->
 
-The following calculations fix the uncut normalization and identify the singleton scale and reciprocal-label coefficient on the regular cut. Applying the finite argument to all compact residual arrays still uses their identification with the signed radial forms, their germ estimates and the scalar and terminal comparisons. [Compact local comparison][fb-form] · [Actual coefficient and decay hypotheses][fb-coef]
+The following calculations fix the uncut normalization and identify the singleton scale and reciprocal-label coefficient on the regular cut. FBE12–19 compare the actual signed operators and terminal form and transport the germ under the residual estimates stated in FBE18. [Compact local comparison][fb-form] · [Actual coefficient and decay hypotheses][fb-coef]
 
 ## From Haar measure to the signed residual form
 
@@ -245,7 +245,7 @@ is
 $$
  \frac{(-1)^{u-1}}{\lambda}(t^{-1}-{t'}^{-1})F(X,Y).
 $$
-Conjugate linearity in the second entry removes the conjugation on $\lambda t'$. The shift by one preserves the leading term and fixes the companion word. Extract in five independent parameters starting with the last. Each remaining differentiated suffix is again a smooth test on this cut, giving the fifth power of the displayed scalar before FBE1 applies Cauchy–Schwarz. This determines the reciprocal-label coefficient for the normal-block minor. Identifying the full signed residual form with the original group pairing and controlling the passage through the vanishing-minor locus are the remaining steps in using it for arbitrary original coefficients. [Five interpolations after the right average][xfer-five] · [Local block estimate that consumes the coefficient][xfer-below]
+Conjugate linearity in the second entry removes the conjugation on $\lambda t'$. The shift by one preserves the leading term and fixes the companion word. Extract in five independent parameters starting with the last. Each remaining differentiated suffix is again a smooth test on this cut, giving the fifth power of the displayed scalar before FBE1 applies Cauchy–Schwarz. This determines the reciprocal-label coefficient for the normal-block minor. The full group operator and the compact coalescing-block comparison are treated in FBE12–19, with the residual integrability hypotheses given in FBE18. [Five interpolations after the right average][xfer-five] · [Local block estimate that consumes the coefficient][xfer-below]
 
 <!--
 % END FBE11
@@ -265,3 +265,181 @@ Conjugate linearity in the second entry removes the conjugation on $\lambda t'$.
 [fb-vol]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L46510-L46572
 [fb-step]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L46573-L46611
 [fb-limit]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L46612-L46639
+
+## The four group operators on the regular section
+
+<!--
+% BEGIN FBE12
+-->
+
+<span id="claim:FBE12"></span>We compute the entrywise comparison proposed in FBE10. Work at one real place in the standard phase $\exp(2i\operatorname{Im}z)$, with the two characters acting on the left and right of the orbital section $U$. Order the next active Witt space as $(e,W,f)$, of dimension $m=2(r-i)+k+1$. The complexified right derivatives satisfy $[E_{ab},E_{cd}]=\delta_{bc}E_{ad}-\delta_{da}E_{cb}$. For equally long ordered lists $I,J$ use the column-ordered minor
+$$
+ \Delta_{I,J}(s)=\sum_{\pi}\operatorname{sgn}(\pi)
+ \prod_{h=0}^{|J|-1}\big(E_{I_{\pi(h)},J_h}+(s-h)\delta_{I_{\pi(h)},J_h}\big).
+$$
+Write $D(s)$ for the full minor. Denote the signed minor deleting row $p$ and column $q$ by $m_{pq}$, and the double cofactor deleting ordered pairs $p<p'$, $q<q'$ by $n_{pp',qq'}$, with sign $(-1)^{p+p'+q+q'}$. At the current group point $g$ set $x=z'$, $y=g^{-1}z$, $\xi_j=\langle e_j,z'\rangle$, $\eta_j=\langle ge_j,z\rangle$, using linearity in the first slot. At a nonterminal site the marks are both the next $e$. Define $A(s;a,\beta)=\sum\beta_p a_q m_{pq}(s)$ and $B(s;a,b;\beta,\delta)=\sum(\beta\wedge\delta)_{pp'}(a\wedge b)_{qq'}n_{pp',qq'}(s)$ with scalar multipliers on the left. In order $00,01,10,11$ the group entries $Q_i(Y)$ are
+$$
+ D(s),\quad -A(s-1;x,\eta),\quad -A(s;y,\xi),\quad
+ -B(s-1;y,x;\eta,\xi),\qquad s=Y+(m-1)/2.
+$$
+
+Write $w(c)e=cf$, $w(c)f=\bar c^{-1}e$, and restrict to $w(c)g'$ with $g'$ acting on $W$. The following calculation acts on $\Phi(c,g')=U(w(c)g')$. Put $P_+=s+c\partial_c$, $P_-=s-m+1-\bar c\partial_{\bar c}$ and $t=Q_{i+1}(Y)$. To expand from either end, introduce exterior variables $\epsilon_a$ and put $C_j=\sum_a\epsilon_a E_{aj}$. The bracket gives $\{C_j,C_l\}=-\epsilon_j C_l-\epsilon_l C_j$. Thus adjacent factors $C_j+u\epsilon_j,C_l+(u-1)\epsilon_l$ alternate in the columns. For rows the identical computation has the opposite sign and the shifts increase by one. Extracting both exterior coefficients in the product of the shifted sums gives the same minor, permitting row expansion with the shifts reversed.
+
+Expand the outer columns and then the exposed outer rows. Differentiating the right character replaces the rightmost $E_{ej},E_{jf},E_{ef}$ by $x_j,\xi_j,0$ of the next site. Conjugating the corresponding left generators by $w(c)g'$ gives the substitutions $c^{-1}\eta_j,\bar c^{-1}y_j,0$ for the leftmost $E_{je},E_{fj},E_{fe}$. These are the two adjacent character entries and the zero on the nonadjacent root; the factors of $c$ come from the displayed action on $e,f$. Right derivatives preserve left covariance. Keeping both outer diagonals gives $P_-t_{00}P_+$. Deleting one interior row and column gives the two single cofactors, and deleting two gives both alternating orders in the two wedges of $B$. The middle full minor has shift $s-1$ since the dimension has fallen by two. For the other three entries the contractions delete $e$, $f$, or both before the same expansion. The four results in their action order are
+$$
+ \begin{aligned}
+ 00:\ &P_-t_{00}P_++P_-c^{-1}t_{01}+\bar c^{-1}t_{10}P_++|c|^{-2}t_{11},\\
+ 01:\ &-c(P_-t_{00}+\bar c^{-1}t_{10}),\\
+ 10:\ &-\bar c(t_{00}P_++c^{-1}t_{01}),\\
+ 11:\ &|c|^2t_{00}.
+ \end{aligned}
+$$
+Multiplying the restriction by $|c|^{m-1}$ removes the half-dimension shifts from both Euler operators. The resulting matrix is $L^\vee Q_{i+1}L$, where
+$$
+ L=\begin{pmatrix}Y+c\partial_c&-c\\c^{-1}&0\end{pmatrix},
+ \qquad L^\vee=\begin{pmatrix}Y-\bar c\partial_{\bar c}&\bar c^{-1}\\-\bar c&0\end{pmatrix}.
+$$
+The multiplicative density $d^2c/|c|^2$ gives zero divergence for both radial and angular translation, so the two displayed matrices are formal adjoints for real $Y$. Different pairs use independent coordinates. Iterating therefore restricts the original ordered products, including their lower-order terms. [Jin's active-group convention and calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L5779-L5947)
+
+<!--
+% END FBE12
+-->
+
+<!--
+% BEGIN FBE13
+-->
+
+<span id="claim:FBE13"></span>The exchange identity also descends to the actual middle matrix $M=Q_{i+1}$. Write $P$ for the permutation of two auxiliary factors and $R=(u-v)1-P$. Define $X=RM_1(u)M_2(v)-M_2(v)M_1(u)R$. For $K=L^\vee ML$, the exchange difference for $K$ is $L_2^\vee(v)L_1^\vee(u)X L_1(u)L_2(v)$. Indeed the Euler commutators $[c\partial_c,c^{\pm1}]=\pm c^{\pm1}$ give the site exchange for $L$, and complex conjugate differentiation gives it for $L^\vee$. The barred, unbarred and residual coefficient algebras commute. The $00,00$ entry on the group vanishes because the full shifted Capelli minors are central. The restriction admits tests $|c|^{2\beta}c^n V(g')$ for every $\beta\in\mathbb R,n\in\mathbb Z$ and every smooth covariant residual germ $V$. In fact, if $g_0$ is the old matrix then $c=(g_0)_{fe}$ and the residual block is $(g_0)_{WW}-(g_0)_{We}c^{-1}(g_0)_{fW}$. Its omitted factors are unipotent and are recovered by the outer row and column. Extending the test by their characters and inserting a bump equal to one near the test point gives the required germ.
+
+After cancelling the test scalar, the coefficients on $X_{AB}$ have the form $\bar c^{-|A|}c^{-|B|}a_A(\beta)b_B(\gamma)$, $\gamma=\beta+n$, for binary pairs $A,B$. In the order $00,01,10,11$ these polynomials are
+$$
+ \begin{aligned}
+ a&=((v-\beta)(u-\beta),\,u-\beta,\,v-\beta+1,\,1),\\
+ b&=((u+\gamma)(v+\gamma),\,u+\gamma-1,\,v+\gamma,\,1).
+ \end{aligned}
+$$
+The unit shifts come from differentiating reciprocal coordinates in the other factor. Radius and argument distinguish the two bit counts. At fixed $\beta$, infinitely many values of $n$ separate polynomial coefficients in $\gamma$, and then $\beta$ separates the others. At bit count one each pair of linear polynomials is independent for $u-v\ne1$. Polynomial continuation includes the exceptional value. Thus $X_{AB}V=0$ for every $A,B,V$. A rank-zero residual group can be placed inside a group with one additional exterior hyperbolic pair for this test.
+
+On the positive terminal Gram cut put $H_0=|\langle gz',z\rangle|^2-TT'$. Complete $(g^{-1}z,z')$ by an orthonormal basis of their common perpendicular. For $M_{11}$ only the cofactor on this perpendicular survives. Its coefficient is $H_0$ because the two-vector Gram determinant is $-H_0$. On compact type $\rho$ the residual minor acts by $\prod_j(Y+\rho_j)$, by evaluating the central Capelli operator on a highest-weight vector. The off-diagonal adjunction uses Haar measure on the group, where compact test coefficients permit integration by parts. The compact stabilizer projections are self-adjoint. Disintegration over the marked inner product $\zeta$ gives density $H_0^{k-1}d^2\zeta$ as in FBE7. Moving $H_0^{(k-1)/2}$ into *both* coefficient vectors therefore gives the flat-density adjoint in FBE10 on regular compact tests. This procedure never integrates an unrestricted radial derivative across $c=0$. [Exchange and group adjunction](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L5949-L6203)
+
+<!--
+% END FBE13
+-->
+
+## A fixed head and a coalescing block
+
+<!--
+% BEGIN FBE14
+-->
+
+<span id="claim:FBE14"></span>Fix a complete head $H_0$ whose blocks have nonzero parameters. Its determinant is a product of signed block powers and is nonzero, although several leading minors inside a reversing block can vanish. Integrating this head in a compactly supported matrix test gives a new smooth compact test in the residual variable $Z$. To see properness on the support, the full matrix after elementary shears has blocks $(H,Hb;aH,aHb+Z)$ with $H=L_HH_0U_H$. If the off-diagonal blocks are $B,C$, then $b=H^{-1}B$, $a=CH^{-1}$ and $Z$ is the lower right block minus $CH^{-1}B$. The determinant of $H$ is fixed, so its adjugate bounds its inverse on the support. For the head's own orbit coordinates first remove its fixed row permutation. The remaining allowed lower factor and upper factor are unitriangular with a fixed invertible diagonal between them. Their entries are minors divided by initial products of that diagonal, by elimination. The roots omitted from the lower factor are exactly the stabilizer roots. All integrations are now over a bounded set, locally uniformly on each fixed determinant annulus. In a residual unitary slice the two removed radical factors are recovered from the outer blocks in the same way; the remaining block is the residual group matrix. With the entire end pivot $P$ invertible, its inverse is bounded by its adjugate and the determinant lower bound. If the original positive Gram cut is $\varepsilon$ the residual cut is $G_\mathrm{res}\ge\varepsilon/|\det P|^2$. Consequently all matrix and finite group derivatives at this stage are supported in a common compact set. The Jacobians of the additive shears are one. These statements apply to a prescribed reversing head directly, regardless of the values of its internal minors. [Inverse matrices and residual cut](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L677-L785)
+
+The scalar matrix germ determines the value at an additional reversing block of length $s=d+1\ge2$. Take complex measure $|\beta|d^2x/(2\pi)$ for the character $e_\beta(x)=\exp(i\operatorname{Re}(\beta x))$. Let $B_\Phi(\tau,c)$ be the orbit integral at the split blocks $(\tau w_d,c)$ and $L_\Phi(z)$ that at $zw_s$, where $w_j$ reverses $j$ indices. On compact determinant annuli $D_0=c\tau^d$, the expansion for a smooth compact matrix test is
+$$
+ |\tau|^{d^2}B_\Phi(\tau,c)
+   =s^{-1}\sum_{z^s=(-1)^dD_0}|z|^{d^2}e_\beta(sz/\tau)L_\Phi(z)+O(|\tau|).
+$$
+Here is the Jacobian computation. Use an upper unipotent $n$ of size $d$, a final upper column $p$ and a lower row $a$. Replace their coordinates by $\tau(n-1),\tau p,\tau a w_dn$. The real Jacobian of the inverse is $|\tau|^{-d(d+3)}$. After reversing rows the matrix has subdiagonal $\tau$, diagonal $(u,x_1,\ldots,x_d)$ and strictly upper part $Y$. Its determinant is $P_\tau u+Q_\tau=(-1)^dD_0$, with $P_0=\prod x_j$ and $Q_0=0$. Solving for $u$ contributes $|\tau|^{2d}/|P_\tau|^2$ relative to solving for the old last coordinate. On a compactly supported test the entries stay bounded and the determinant stays away from zero, so on the support $P_\tau$ and all $x_j$ stay away from zero for small $|\tau|$. All remaining variables then range over compact sets uniformly. The phase left at scale $\tau^{-1}$ is $G=\sum x_j+(-1)^dD_0/\prod x_j$; the difference $(u_\tau-u_0)/\tau$ is smooth in the amplitude.
+
+Its critical points have $x_1=\dots=x_d=z$. The complex Hessian is $(1+\mathbf1\mathbf1^t)/z$ of determinant $s z^{-d}$; the real part has $d$ positive and $d$ negative eigenvalues. Stationary phase with the displayed measure gives $|\tau|^d|z|^d/s$ and a uniform remainder one order smaller. Off the critical neighbourhoods the gradient is bounded away from zero and repeated integration by parts gives the same error. Differentiating the determinant at $\tau=0$ gives $u'_0=\sum_{j}Y_{j,j+1}/z$. Substituting $Y=zv$ recovers the long-block character. Its Jacobian and $|P_0|^{-2}$ contribute $|z|^{sd-2d}$, which together with the Hessian gives $|z|^{d^2}$. The same estimate holds for a test valued in a Banach space when the support and derivative bounds just used hold in that norm, by applying the uniform scalar estimate to norm-one functionals. [Jin's matrix orbital calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L558-L675)
+
+One consequence is uniqueness at every prescribed head for compact matrix tests supported on invertible matrices, as ensured by the positive Gram cut. If all regular diagonal orbital integrals vanish, argue by induction on size. With last block a nonzero scalar, integrate that scalar and the two adjacent rectangular radicals first to obtain a smaller smooth compact test on invertible matrices. Its diagonal integrals vanish, so induction gives vanishing for every preceding head. For a last block of size $s>1$, freeze the preceding head by the calculation above. Every split integral in the displayed formula vanishes by the scalar case. Fix $D_0=(-1)^d z_0^s$. Choose a complex ray $1/\tau=t v$ on which the real frequencies of the $s$ roots are distinct. Multiply the expansion by $e_\beta(-s z_0tv)$ and average over $1\le t\le R$. The other oscillatory means tend to zero and the error costs $O(\log R/R)$. Thus $L_\Phi(z_0)=0$. This determines the singular value of a difference of tests from its regular transform, including at heads with internal zero minors. [Determination by the Jacquet integral](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1630-L1813)
+
+<!--
+% END FBE14
+-->
+
+<!--
+% BEGIN FBE15
+-->
+
+<span id="claim:FBE15"></span>The passage from a compact-annulus vector germ to the three mixed limits needs no global remainder bound tending to zero. Let $V$ be the Hilbert space of a positive cut kernel as in FBE1. Write $U_x(D)$ for the old vector after rescaling the last singleton and $B(z)$ for the normalized long-block vector. The hypotheses for this step are a uniform old diagonal bound $\|U_x\|_2\le C$ and, on every compact annulus of nonzero $D$, the germ
+$$
+ U_x(D)=M_x(D)+O_K(|x|^{-1}),\qquad
+ M_x(D)=\sum_{z^s=D}e_\beta(szx)\frac{B(z)}{s|z|^{s-1}} .
+$$
+Conjugate the character if using the opposite convention for the first slot of the pairing. The old bound comes from the preceding block length after singleton disintegration. The factor $s|z|^{s-1}$ is the square root of the area Jacobian of $z\mapsto z^s$. On any annulus expand $\int\|M_x\|^2$ and change variable through its first root. For the cross term with root $\zeta z$, $\zeta^s=1$, $\zeta\ne1$, the phase has frequency $s(\zeta-1)x$ and its amplitude is integrable there. Riemann–Lebesgue removes this term. The diagonal gives the integral of $\|B\|^2$ on the inverse annulus. By the local germ and the uniform bound that integral is at most $C^2$. Exhaustion gives $B\in L^2(\mathbb C,V)$. The root sum of norms $m(D)=\sum_{z^s=D}\|B(z)\|/(s|z|^{s-1})$ has $\|m\|_2^2\le s\|B\|_2^2$, so controls all model tails simultaneously.
+
+Put $C_xF(c)=|x|^{-(s-1)}F(c/x^{s-1})$, a unitary dilation. In the model–model pairing with a second head at $x+y$, undo the first dilation and write $\alpha^s=(x/(x+y))^{s-1}$ with $\alpha$ near one. With the first slot conjugate linear the terms have frequency $s(\zeta\alpha(x+y)-x)$ and amplitude $\langle B(z),|\alpha|B'(\zeta\alpha z)\rangle$. These amplitudes converge in $L^1$ by continuity of dilations in $L^2$. Only $\zeta=1$ survives, and its frequency tends to $y$ since $\alpha=1-(s-1)y/(sx)+O(|x|^{-2})$. The limit is $\int e_\beta(yz)\langle B(z),B'(z)\rangle\,d^2z$. In the old–model pairing, the old-minus-model difference tends to zero in $L^2$ on each annulus and stays bounded globally. The other factor is bounded by the dilated $m'$, which tends to $m'$ in $L^2$ in the common coordinates. Splitting off a tail of arbitrarily small $L^2$ norm proves the same limit. Taking adjoints gives the model–old limit. An old–old remainder may survive. Its translation average is positive definite because every finite quadratic combination of translated difference vectors is a squared norm before averaging. This is the positive correction admitted in the long-block Poisson inequality. The argument specifies exactly which local vector germ must hold in the original residual Hilbert norm. [Annular normalization and the three pairings](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1269-L1453)
+
+<!--
+% END FBE15
+-->
+
+## The signed determinant and the terminal pairing
+
+<!--
+% BEGIN FBE16
+-->
+
+<span id="claim:FBE16"></span>The shifted determinant in FBE10 can be evaluated on the group. Keep the cofactor notation of FBE12, writing a double cofactor as an alternating function of either ordered pair, and let $s=Y+k/2$ at the terminal group. The cofactor multiplication identity is
+$$
+ m_{ij}(s+1)m_{qp}(s)-m_{qj}(s+1)m_{ip}(s)=D(s+1)n_{iq,jp}(s).
+$$
+For a direct verification multiply as a row vector in $p$ by $(E+(s+1)1)^t$. In a summed single cofactor this appends a row and gives $\delta_{cq}D(s+1)$ in column $c$. A summed double cofactor gives $\delta_{cq}m_{ij}(s+1)-\delta_{ci}m_{qj}(s+1)$ by the same expansion. The two products agree by centrality. Cancellation is legitimate over the fraction division algebra of the enveloping algebra with central variable $s$ (or by its formal Laurent series at $s=\infty$, where the matrix is invertible). The equality is polynomial, so holds on the actual differential operators.
+
+The scalar multipliers $y_j,\eta_i$ need to pass the factors in this identity. Their commutators with $E_{ab}$ are $-\delta_{aj}y_b$ and $\delta_{bi}\eta_a$ respectively. Thus moving the exterior covector $\sum\epsilon_i\eta_i$ through a shifted column lowers its shift by one and reverses sign. Move the covectors to the right in both single and double cofactors. Expanding the determinant commutator in the row containing $y_j$ and the single cofactor commutator in the column containing $\eta_i$ gives on both sides the same correction
+$$
+ -\sum_{l,j,a}y_l m_{jl}(s+1)n_{aq,jp}(s)\eta_a
+$$
+when the constant vectors $x,\xi$ select column $p$, row $q$. After subtracting this term the displayed cofactor identity applies. By linearity one obtains
+$$
+ Q_{00}(Y+1)Q_{11}(Y)-Q_{10}(Y+1)Q_{01}(Y)
+       =-A(s;y,\eta)A(s;x,\xi).
+$$
+In a frame beginning with the right mark, $A(s;x,\xi)$ is $-T'$ times the compact determinant on its orthogonal complement. In a frame transported from the left mark the other factor is $-T$ times the left compact determinant. Converting to left derivatives reverses their order, precisely the row convention of FBE12. For centered compact weights $u_j,u'_j$ the determinant is consequently
+$$
+ q(Y)=-TT'\prod_{j=1}^k(Y+\tfrac12+u_j)(Y+\tfrac12+u'_j).
+$$
+Together with the terminal $11$ entry in FBE13 this supplies the two scalar data for the Schur complements of FBE10. A positive site multiplies this determinant on the alternating auxiliary line by $(Y-a+1)/(Y-a)$, and a reflected site by $(a-Y)/(a-Y-1)$. For the reflected factor this follows by multiplying the partially transposed flips: if $P$ interchanges the two auxiliary spaces and $P_1,P_2$ are their contracted flips with the new bit, then $P_1P_2=P_1P=PP_2$ and $P_2P_1=P_2P=PP_1$. These relations give the exchange identity for the reflected site, so the alternating-line scalars multiply along the word. The same multiplication gives $T(Y)^t J T(Y-1)=q_w(Y-1)J$ with the contracted determinant and the alternating matrix $J$. Its lower-right entry is the shift in the negative shear in FBE10. This ties that shift to the group cofactor identity. [Shifted product and the two compact determinants](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L6031-L6153) · [Reflected site calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L7378-L7421)
+
+<!--
+% END FBE16
+-->
+
+<!--
+% BEGIN FBE17
+-->
+
+<span id="claim:FBE17"></span>On the positive compact cut there is a pointwise identification at the final singleton. For a word $w$ write $B_{b,w}$ for the product on its bit spaces of the site matrices $L_b(a)$ for positive letters and the entrywise adjoints for reflected letters, in reverse insertion order. Inserting a new site in the residue form of FBE10 gives
+$$
+ \mathcal R_{b-1,w}=B_{b,w}^*\mathcal R_{b,w}B_{b,w}.
+$$
+At the empty word both residue forms are the identity. The first site uses FBE12. In the induction step exchange the new site with each old site's root factor using FBE13 and FBE16. Old bit factors act on a different tensor component. At a positive letter this puts $L$ on the right and its mirror on the left. At a negative letter the auxiliary transpose reverses the product and puts the entrywise adjoint on the right. This proves the identity on regular compact test sections with the common density. It also explains why both columns must be evaluated at the same singleton parameter when splitting off $d^2c/|c|^2$.
+
+At the last singleton the compact residual group on each marked side acts by left and right unitary maps on the Hilbert–Schmidt fibre. For a fixed prescribed head integrate its stabilizer roots first. Conjugating them to the other triangular factor preserves the character by relevance, and the successive shears have determinant one in the additive root coordinates. A mass-one cutoff in the stabilizer leaves precisely the head slice of FBE14. To use this statement for a differentiated word, first cut in the full head determinant away from zero while keeping a neighbourhood of its given value. The full determinant is invariant along the averaging directions. The compact lift of FBE8, with a mass-one bump along the upper triangular coordinates and normalized character bumps along the two removed radicals, has the required differentiated Jacquet integral. On the positive Gram cut the compact matrix test used here is obtained from the joint Gram matrix of the two marked frames. Its determinant is, up to sign, $|\det Z|^2-TT'|\det Z_{[r]}|^2$. This follows by expanding the two rank-one corrections from the marked vectors. Nonvanishing lets a pair of frames with the specified Gram extend locally by an orthonormal frame on their positive perpendicular. The remaining stabilizer is compact, so averaging the lift there preserves covariance. On compact subsets of this open the section and its inverse frame changes are bounded, giving compact tests after cutting. The difference of these tests has zero regular Jacquet integral. Applying the uniqueness argument of FBE14 permits evaluation at the *given* head.
+
+Write $\gamma=a^{-1}\gamma_0(\zeta)b$ in the residual orbit. The same unitary map $U\mapsto\pi(a)U\pi'(b)^{-1}$ acts on both columns, for every bit. In the common intertwiner space let $E_\rho$ be the orthogonal compact type projections, retaining their full multiplicity spaces. Their sum is the identity. The squared terminal norm is the sum of the squared norms of the projected word vectors with the corresponding real squared type multipliers. Polarization gives the mixed pairing with those same multipliers and no cross terms between orthogonal types. The scalar in this evaluation is identical for both heads because the ratio of the last determinant square to the Gram is $|\zeta|^2/(|\zeta|^2-TT')$ irrespective of the head. The resulting measure is $(|\zeta|^2-TT')^{k-1}d^2\zeta$ on the positive region. The terminal vector of the positive cut is zero elsewhere. This recovers the last singleton including at prescribed reversing heads and for repeated compact types. Bounds for intermediate noncompact residual groups are required when passing from a matrix germ to a Hilbert-space germ at every preceding level. [Both site signs and the terminal compact projections](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L8304-L8420)
+
+<!--
+% END FBE17
+-->
+
+<!--
+% BEGIN FBE18
+-->
+
+<span id="claim:FBE18"></span>For the compact cut there is an economical way to pass from the scalar stationary-phase estimate to the Hilbert estimate. It uses only **finiteness on smooth tests of fixed support** of the residual Bessel norm. The required analytic input in positive residual rank $\rho$ can be stated precisely. In the Witt model of $U(k+\rho,\rho+1)$ let $\Delta_j(g)$ be the exterior norm of the first $j+1$ vectors of the fixed isotropic frame after applying $g$, and put $\Xi(g)=\prod_{j=0}^\rho\Delta_j(g)^{-s_j}$, where $s_j^0=2$ for $j<\rho$, $s_\rho^0=k$, and $s_j=s_j^0-\varepsilon_j$ with small positive defects. Let $\ell$ be the real adjacent-root character on the unipotent radical. The two estimates used are
+$$
+ \int_G \|g\|^{-A}\|x^{-1}gy\|^{-A}\,dg\ \ll\ \Xi(x)\Xi(y),\qquad
+ \int_N\Xi(n)(1+|\ell(n)|)^{-1/2}\,dn<\infty
+$$
+with the appropriate opposite frame on each side and sufficiently large $A$. They refer to the full residual unitary group, its two marked radicals and Frobenius matrix norm. Constants can depend on this fixed group and its marks. Jin gives a Heisenberg-coordinate proof of these estimates. In his recursion the squared exterior volumes are $d_j^2=L_jR_j+|B_j|^2$. Completing the square in the first complex coordinate and integrating then merges the first two shifts $\nu_0,\nu_1$ of the exponents and costs two planar integrals with exponents $2+\nu_0$ and $2+\nu_0+2\sum_{j>0}\nu_j$. Each is finite for exponent greater than two. At the last central coordinate the terminal integral reduces to the power $-(k-1)-\nu$ of $1+|v|^2/2$ on $\mathbb C^{k-1}$. For the phase-weighted integral the nonzero first coefficient at each rank is the pairing of the two Witt vectors, or the pairing with the negative mark at rank one. Taking the next defect at most $\min(\delta/8,\varepsilon_{\rm lower}/2)/(4\rho+4)$ permits the lower-rank character exponent $\delta/4$ at each descent, starting with $\delta=1/2$. These are estimates for one fixed residual norm, with no tower-uniform rate of convergence invoked. [Coordinate estimates, rank reduction and translation correlation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L864-L1260)
+
+To see precisely how they imply finiteness, unfold a squared orbital integral first against smooth frequency tests on the two characters. In the resulting ambient correlation average each unipotent variable under conjugation by the positive flag dilation of ratio $t$, using a smooth density supported in $1/2<t<2$. Each adjacent character entry scales by $t$, and its Haar Jacobian is a power of $t$. Integrating twice in $t$ by parts inserts a factor $(1+|\lambda\ell(n)|^2)^{-1}$ for frequency $\lambda$ in a neighbourhood of one. The derivatives of the test still have fixed compact support after these bounded conjugations. The two displayed estimates give an integrable majorant on both radicals, uniform for those frequencies. The unfolded formula therefore bounds the squared norm for almost every such frequency. For each regular orbit its integral is continuous in the frequencies by the fixed nonzero pivot bounds of FBE14. Fatou along a sequence approaching the prescribed frequencies gives the bound there. The two compact stabilizers have finite Haar volumes. In rank zero the compact angular integrals are bounded by a constant times $(1+|\zeta|)^{-A}$, which is square integrable in the terminal density for $A>k$. [Unfolding against frequencies](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L786-L862)
+
+Here is a fixed-support continuity argument that avoids differentiating a Hilbert-space limit. For a compact set $K$ in the allowed residual group cut, consider the Fréchet space of smooth tests supported in $K$. The regular Jacquet transform to the orbital $L^2$ space is linear and is everywhere defined by the preceding estimate. Its graph is closed. Indeed convergence of smooth tests on the fixed support gives pointwise convergence at every regular orbit by its compact inverse coordinates. A sequence converging in $L^2$ has a subsequence converging almost everywhere, so the two limits agree. The closed graph theorem bounds the orbital norm by finitely many seminorms of the tests on $K$. Composing with any fixed word of group differential operators preserves this continuity. The residual form is a finite sum of pairings of such transforms, with one such differential on a column, hence is continuous for the same topology. In the Hilbert realization of its positive kernel the squared error of a column is its residual form evaluated twice on that error (conjugate the coefficients if the kernel is linear in the other slot). FBE14 bounds the error by $O(|\tau|)$ in each of the finitely many required group seminorms: differentiate the common compact coefficient in the residual group variables before stationary phase. The squared Hilbert error is consequently $O(|\tau|^2)$. The same argument works termwise at the top with its finite compact type projections. This transfers the coalescing germ into the actual cut kernel **under the displayed tail estimates**, including a head with internal zero minors. [Residual space and point-kernel norm](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1358-L1398)
+
+<!--
+% END FBE18
+-->
+
+<!--
+% BEGIN FBE19
+-->
+
+<span id="claim:FBE19"></span>To obtain the normalized germ in FBE15 from FBE14 and FBE18 one must also transport the densities. In the normalization of FBE9 put $u=s-1$, $i=b+u$, $q=g/(2\pi)$ for the marked modulus $g$, and $\lambda_{b,l}=q^{2r_S+3-2b-l}\mathrm i^{l-1}$. Use $\tau=\lambda_{b,u}/x$, $c=\lambda_{i,1}x^uD$, $z_{\rm st}=\lambda_{b,s}z$. Then $z_{\rm st}^s=(-1)^u c\tau^u$ is exactly $z^s=D$. The phase is fixed by $\lambda_{b,s}/\lambda_{b,u}=\mathrm i/q$, with conjugation for the Hilbert slot as in FBE15. For a block of length $l$ the density has the normalizing divisor $\beta_l=\prod_{j<l,\,j\ge1}(\kappa^{1-2j}/\pi)^{l-j}$, $\kappa=(q\Delta)^{-1}$, hence $\beta_s/\beta_u=\kappa^{-u^2}\pi^{-u}$. Put $m=k+2(r_S-i)+3$ in the lower levels. The split powers of absolute labels are $e_1=u(m+u-1)$, $e_2=m-2$, and the long power is $e_3=(u+1)(m+u-2)$. Direct subtraction gives $u-e_1+ue_2=-u^2$ and $e_3-u=se_2+u^2$. If the corresponding exponents of $q$ in the three $\lambda$'s are $\nu_1,\nu_2,\nu_3$, then $\nu_2=\nu_1-u-1$, $\nu_3=\nu_1-1$, and $\nu_1e_1+\nu_2(e_2+1)=\nu_3(e_3+1)+u^2$. Thus both normalized columns have the same multiplier of $|D_0|^{e_2}$ times the split $|\tau|^{u^2}$ and long $|z_{\rm st}|^{u^2}/s$ in FBE14. The factor $\pi^{-u}$ is accounted for by the difference of $u$ complex root coordinates in the orbital measures. Converting back leaves the long vector divided by $s|z|^u$, exactly the area normalization in FBE15. At the terminal level use $m=k+1$. The last factor is $(1-TT'/|x^uD|^2)^{(k-1-|w|)/2}$ on the split side and is $1+O_K(|x|^{-2u})$ uniformly on every fixed annulus. It does not change the leading germ or its error order. Any common zero prefix factor kills both columns. [Split and long column densities and terminal correction](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1311-L1398)
+
+<!--
+% END FBE19
+-->

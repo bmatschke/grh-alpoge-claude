@@ -1,6 +1,6 @@
 # Uniform spectral estimates on finite flag towers
 
-The finite-tower estimates use the original five insertions. The local calculations identify the uncut Bessel norm, the arithmetic singleton mass, the reflected pivots, and the leading reciprocal term of a regular normal block. The closure records the remaining comparison with the original signed group operators. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
+FBE12–19 compute the original regular group actions, fixed-head germ, terminal signed pairing and normalized annular limits on the positive compact cut. The intermediate residual tail estimates and noncompact differentiated cutoff pass remain explicit analytic inputs. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
 
 | Claim | Result |
 | --- | --- |
@@ -15,5 +15,13 @@ The finite-tower estimates use the original five insertions. The local calculati
 | [FBE9](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE9) | The arithmetic singleton Jacobian cancels the zero-frequency period-lattice covolume in the signed one-pair identity |
 | [FBE10](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE10) | Shifted Schur pivots give radial positivity on the cut and a compact jet test for the signed adjoints |
 | [FBE11](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE11) | The regular normal-block leading minor produces the reciprocal-label difference with the original complex dilation |
+| [FBE12](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE12) | All four ordered group minors restrict to the centered one-pair operator on the regular section |
+| [FBE13](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE13) | The exchange relation descends to the residual group and its compact adjoints use the terminal Haar density |
+| [FBE14](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE14) | A compact matrix germ at a coalescing pair determines the value at a prescribed reversing block |
+| [FBE15](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE15) | The local vector germ and a uniform old diagonal bound give the three mixed root-pairing limits |
+| [FBE16](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE16) | The shifted group cofactor product gives the compact determinant and the reflected pivot on the cut |
+| [FBE17](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE17) | Signed site conjugation and Jacquet determination recover the compact projections at the last singleton |
+| [FBE18](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE18) | Residual translation and unipotent moment estimates transfer compact matrix remainders to the actual Hilbert norm |
+| [FBE19](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE19) | The split and long orbital densities give the required root Jacobian and terminal correction |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

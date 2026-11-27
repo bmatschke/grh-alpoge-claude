@@ -2,6 +2,12 @@
 
 Levent Alpöge and Claude are the authors of the formal proof. This AI-assisted exposition draws on their Lean archive and on the work of other readers. We credit the account from which we learned a calculation, even when the argument can also be traced to Lean. To cite this exposition, give the edition, the result or section, and the source revision on the title page.
 
+## Integral character lines and residual kernels
+
+GRT15–17 use Fargues’s integral Hodge–Tate complex and Raynaud’s classification of finite flat vector schemes with invertible character summands. Jin’s arithmetic chapter describes the relation of those local lines to a larger marked torsion order. GRT21–23 track the specific additional compatibility required on the common model. [Fargues, §5.3.2](https://www.numdam.org/item/10.24033/asens.2157.pdf#page=31) · [Raynaud, §1.4](https://www.numdam.org/item/10.24033/bsmf.1779.pdf#page=16) · [Jin’s marked order](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/j-arithmetic-covolume.tex#L2975-L3617)
+
+FBE12–19 use the signed four-entry and coalescing-block calculations in Kaiwen Jin’s earlier real-restriction chapter. The matrix germ uses real stationary phase at nondegenerate critical points with signature zero. FBE18 also gives a fixed-support proof of continuity by the closed graph theorem. [Jin’s compact matrix germ](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L558-L675) · [Original signed group calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L5779-L6203)
+
 ## Common covers and real periods
 
 The component-volume argument adapts Chen's common finite cover to the actual trace polarization and level, using Landherr's theorem and strong approximation. The boundary metric argument uses Chen's toroidal growth estimate, Demailly's regularization theorem, and Bedford–Taylor convergence for bounded potentials. The geometry module records each published theorem with the hypotheses it supplies. [Chen on component volumes](https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/covolume-component-transfer.tex#L18-L109) · [Theorems used in the geometry chapter](../../research/modules/geometry/good_root_tower_comparison/published_inputs.json)
