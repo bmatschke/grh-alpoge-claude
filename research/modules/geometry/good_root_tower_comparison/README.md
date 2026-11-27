@@ -1,6 +1,6 @@
 # The integral flag models at two prime cutoffs
 
-GRT37–86 derive the determinant and wall estimates and construct the marked interior group and its two integral section frames. GRT87–91 and GRT97–99 give the prescribed power-series arc on that entry, with all division levels, valued embeddings and uniformizer specialization. GRT92–96 compare the two cutoffs by smooth arithmetic intersections. GRT100–101 prove a quantitative limit at the actual regularization time for any identified marked reference, uniformly in its covers. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
+GRT37–102 derive the determinant and wall estimates, the model of the interior negative member and its marked arcs, the comparison at two cutoffs, the word rate and its Frobenius labels. GRT103–107 determine the signature and level at every interior index, build the regularizations and an integral effective section on the resolved marked period chart, and identify the degrees and metrics of all its cutoff realizations. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
 
 | Claim | Result |
 | --- | --- |
@@ -105,5 +105,11 @@ GRT37–86 derive the determinant and wall estimates and construct the marked in
 | [GRT99](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT99) | The fully marked generic point descends to the prescribed power-series arc and its integral family specializes at the uniformizer |
 | [GRT100](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT100) | A shell truncation and the divisor current give a uniform logarithmic tail for the variation of smooth mixed curvatures |
 | [GRT101](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT101) | The original regularizations on a marked analytic reference satisfy the uniform word estimate at the source time |
+| [GRT102](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT102) | An abelian Frobenius lift gives one signed-label permutation at each prime and controls the side of every iterate |
+| [GRT103](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT103) | Every interior layer of the selected marked member has the signature, level and fixed correspondence required by the arc construction |
+| [GRT104](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT104) | The actual tower origin gives the root monomial limits and one normalized wall rate across its components and cutoffs |
+| [GRT105](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT105) | The marked period and flag charts give the prescribed smooth regularizations, with controlled curvature and two derivatives in the interior |
+| [GRT106](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT106) | The degree-one reference flag has a big nef weight line and an integral effective section with auxiliary exponent one |
+| [GRT107](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT107) | The fixed reference, its ordered roots and all finite cutoff covers can be chosen simultaneously on the marked component |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

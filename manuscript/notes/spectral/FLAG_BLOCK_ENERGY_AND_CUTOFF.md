@@ -862,3 +862,158 @@ Periodize $D$ over $\Lambda$ with probability Haar measure on $V/\Lambda$. Its F
 <!--
 % END FBE38
 -->
+
+## Matching the two period operators on a represented orbit
+
+<!--
+% BEGIN FBE39
+-->
+
+<span id="claim:FBE39"></span>Fix the two original marked words in one adelic realization and transport their actual Bessel coefficient and compact types to the standard real unitary frame. We identify the orbital operator at each point used in the terminal row. In particular the identification of the two type spaces can be kept independent of the point. Write $q=r+1$, $T,T'>0$ for the two mark norms, and $Z$ for the unsigned cross Gram matrix of a list of reversing blocks. Every block label is nonzero. Put $c=Z^{-1}e_q$.
+
+Scale both rank-one diagonal mark matrices in the joint Gram by $s\in[0,1]$. After reducing the two off-diagonal blocks to identity, the rank-one determinant identity gives the determinant $(-1)^q|\det Z|^2(1-s^2TT'|c_q|^2)$. Positive terminal support is the inequality $1-TT'|c_q|^2>0$, equivalently $|\det Z|^2-TT'|\det Z_{[r],[r]}|^2>0$. The joint Gram consequently keeps its inertia $(q,q)$ along the segment, and its complement in the ambient group of signature $(k+r,r+1)$ is positive of dimension $k-1$. To choose the two compact rotations, project the vector $\gamma A'c$ for the right frame $A'$ onto the positive part of the left marked Witt frame $A$. Its inner products with $A$ form $e_q$, so its dual isotropic coordinates vanish and its mark component has coefficient $-1/T$. Its norm before projection is $-T'|c_q|^2$. Its projected norm squared is therefore $T^{-1}-T'|c_q|^2>0$. The reverse construction gives $T'^{-1}-T|c_q|^2$. Projection maps the common orthogonal complement isometrically onto the orthogonal complement of this positive vector in each positive frame. In fact vectors perpendicular to $A$ have only positive and isotropic components, so their inner products are computed on the positive components. Orthogonality against $\gamma A'c$ cuts out exactly the stated hyperplane. Dimensions give surjectivity. Normalizing the two projected vectors and using one orthonormal basis of the common complement produces two compact frame rotations at the same predetermined index. This works also when an intermediate leading minor inside a reversing block vanishes. [Pinned representatives in the two-period calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L4939-L5002)
+
+Set $\lambda=-\mathrm i g/(2\pi)$ and $\kappa=2\pi/(g\Delta)$, where $\Delta$ is the host root discriminant. The original isotropic vector at position $a$ becomes $\lambda^{-(q-a)}e_a$, with inverse conjugate change on its dual. The mark at the last position keeps its scale. A simple-root coordinate in the original character is then $\lambda$ times its model coordinate. Substitution in $\exp((4\pi\mathrm i/g)\operatorname{Re}\sum x_a)$ gives the model character on both sides. In a block $b,\ldots,i=b+s-1$, undoing the signed columns gives label $(-1)^{q-i}t$ before the column signs. At a nonzero entry $a+a'=b+i$ the signed coordinate factor is $(-1)^{i+a'}\bar\lambda^{q-a}\lambda^{q-a'}$. Its product with $t$ is $(g/(2\pi))^{2r+3-2b-s}\mathrm i^{s-1}t$. These changes identify the corresponding terminal representatives and preserve the sign of the Gram polynomial. They also transport the two fixed compact representations by isometries $E_v,E'_v$ determined by the original word frames.
+
+One must divide by the stabilizer of this orbit. Its free root coordinates are the pairs $a<a'$ within one reversing block, as follows by solving the triangular stabilizer equation column by column. Conjugation sends each upper-triangular coefficient to its reversed opposite inside that block, and requiring both triangular conditions kills pairs in different blocks. The surviving coordinates give Haar coordinates with Jacobian one for translations by triangular matrices. Write $m=a'-a$. The right flag scaling and the dual pairing make its model coordinate $(\Delta\lambda)^{-m}$ times its arithmetic coordinate. Thus $(\kappa/\pi)d^2x_{\rm arith}$ becomes $(\kappa^{1-2m}/\pi)d^2x_{\rm model}$. There are $s-m$ such coordinates at height $m$. The arithmetic stabilizer measure consequently equals the model measure multiplied by
+$$
+ b_\kappa(p)=\prod_{\text{blocks of length }s}\prod_{m=1}^{s-1}
+          \left(\frac{\kappa^{1-2m}}{\pi}\right)^{s-m}.
+$$
+Quotient integration with the same ambient Haar divides the orbital measure by this factor. In the integral defining the pinned arithmetic operator the two point-dependent rotations act by compact covariance. Changing the two unipotent variables by these rotations preserves the characters and the Haar measures and absorbs those rotations in the definition of the pinned value. The resulting operator is $E_v\,b_\kappa(p)^{-1}J_v^{\rm mod}(p)\,(E'_v)^{-1}$. Here $J_v^{\rm mod}$ integrates the transported *same* coefficient. The integrals converge on each such orbit by FBE27. Fubini for the finite product of places gives equality on every pure tensor, and finite-dimensional linearity extends it to the full type spaces. A square Gram pairing between two different terminal points has both inverse stabilizer factors. Multiplying by the square-root point weights now gives the terminal vector used by FBE35 and FBE37. On unrepresented points the arithmetic sum has zero coefficient, and on the zero-density locus the weighted vector is zero. This proves the comparison required by the original terminal tensor equation for these frames and measures. [The stabilizer measure and terminal tensor equation](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/ClosedLocalOrbits/RealObj.lean#L358-L383) · [The operator on pure tensors](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/ClosedLocalOrbits/RealObj.lean#L453-L478) · [Jin’s root coordinates and quotient calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L5007-L5080)
+
+<!--
+% END FBE39
+-->
+
+<!--
+% BEGIN FBE40
+-->
+
+<span id="claim:FBE40"></span>We calculate the starting energy of the actual mass record with the finite and real measures of FBE39. Let $F=E^+$, $f=[F:\mathbb Q]$, $\Delta=|D_F|^{1/f}$ and $g=g_0g_1$. The selected quadratic extension is unramified at finite places, so $\mathrm{rd}(E)=\Delta$. Put $q=r+1$ and
+$$
+ H_r=\frac{(r+1)(8r^2+10r+3)}3,\qquad
+ c_N=\Delta^{2fr(r+1)(k-1)}g^{-2fr(r+1)}.
+$$
+At a finite place $v$ denote the measure of the two ordered unipotent coordinate sets by $U_v$ and that of the permitted cross Gram matrices by $Z_v$. These are additive volumes under the standard self-dual character. The expression called the ordinary volume in the mass record is the product of $U_v$ over the unmarked *finite* places. This follows by expanding its definition. The full numerator is $\prod Z_v$. A separate product of last-coordinate volumes occurs once in the numerator and once in the denominator. It is finite and positive since its factors are compact-open nonempty cosets or intersections of congruences on the marked data and are one outside finitely many places. Thus the record's actual initial integral is
+$$
+       B.\mathrm{IntN}=\frac{I_{\rm sep}}{c_N M_{\rm ar}},\qquad
+       M_{\rm ar}=\prod_{v<\infty}U_v/Z_v .
+$$
+Here $I_{\rm sep}$ is the real integral on the positive diagonal Gram section with the original two coefficients and $2d^2c$ on each diagonal entry. The restriction to that section and the measure of its coordinates are precisely the definition of the continuous integral in the mass record. On the represented regular orbit the diagonal section is independent of its representative in the squared Hilbert–Schmidt norm, by compact unitarity and unipotent character covariance. [Mass datum and its scaling](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/MassDataConc.lean#L39-L92) · [Actual additive products at finite places](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/LocVol.lean#L194-L228) · [The continuous integral](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/ClosedLocalOrbits/RealObj.lean#L114-L164)
+
+We compute $M_{\rm ar}$. At an ordinary place let $d_v$ generate the different of $F_v/\mathbb Q_p$. The quadratic integer algebra has self-dual Haar volume $|d_v|_v$. Indeed its annihilator is $d_v^{-1}$ times the lattice since the quadratic algebra is unramified, the two volumes multiply to one, and a base scalar acts in dimension two. Put $\alpha_i=d_v^{-(r-i)}$ for $0\le i\le r$. Integrality is imposed on $\alpha_i\alpha_jZ_{ij}$ and $\alpha_i^{-1}\alpha_j u_{ij}$ for $i<j$. Hence the exponents of $|d_v|_v$ in $Z_v,U_v$ are, respectively,
+$$
+ A=\sum_{i,j=0}^r\big(1+2(r-i)+2(r-j)\big),\qquad
+ B'=2\sum_{0\le i<j\le r}\big(1-2(j-i)\big).
+$$
+Here $A=(r+1)^2(1+2r)$ and $\sum_{i<j}(j-i)=r(r+1)(r+2)/6$. Hence $A-B'=H_r$. At a marked split place of residue cardinality $Q$, reduction of all $q^2$ cross entries of the quadratic algebra costs $Q^{-2q^2}$. After translating and dividing by the uniformizer, the second condition fixes $Y_1+Y_2^{\mathsf t}$ modulo the prime. Congruence of the two marked norms modulo $g^2$ makes the specified Hermitian right side integral. For every residual $Y_1$ there is exactly one $Y_2$, giving $Z_v=Q^{-3q^2}$. In the unipotent coordinates the difference of the two lists is fixed on $r(r+1)/2$ quadratic coordinates, giving $U_v=Q^{-r(r+1)}$. Consequently
+$$
+              M_{\rm ar}=\Delta^{fH_r}g^{f(r+1)(2r+3)}.
+$$
+We used $\prod_v|d_v|_v^{-1}=|D_F|$ and the complete splitting of the marked primes. The same congruences have positive measure for the diagonal-coordinate factors above: the first residual value is fixed, and the second prescribes its trace to the next depth, a surjective map at a split place. [Finite coordinate lattices](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/LocVol.lean#L105-L152)
+
+Let $N_v$ be the squared norm of the uncut actual section before division by its level-zero measure factor. In the separated integral, changing the complex coordinate $c_{r-a}$ by $(g/(2\pi))^{2a}$ for $1\le a\le r$ gives a Jacobian exponent $-2(2a+k)$ on the original density $|c_{r-a}|^{2(2a+k-1)}d^2c_{r-a}$. There are $r+1$ factors of two from the measures, including the final unchanged coordinate. The Hilbert–Schmidt inner product on a finite tensor product is a product on pure operators. Fubini therefore gives $I_{\rm sep}=K_{\rm loc}^{\,f}\prod_v N_v$ with
+$$
+ K_{\rm loc}=2^{r+1}\prod_{a=1}^{r}
+       \left((g/(2\pi))^{2a}\right)^{-2(2a+k)} .
+$$
+In the level-zero denominator put $\kappa=2\pi/(g\Delta)$ and $d_e=2/(\Delta g^3)$. Its explicit factor is $\Gamma_0=d_e^{-(r+1)}\prod_{a=1}^r\kappa^{-4a(2a+k)}$. The powers of $g/(2\pi)$ cancel in $K_{\rm loc}\Gamma_0$. From $\sum a=r(r+1)/2$ and $\sum a^2=r(r+1)(2r+1)/6$ the result is $g^{3(r+1)}\Delta^{H_r+2r(r+1)(k-1)}$. Thus $(K_{\rm loc}\Gamma_0)^f=M_{\rm ar}c_N$ and
+$$
+          B.\mathrm{IntN}=\prod_{v\mid\infty}\frac{N_v}{\Gamma_0}.
+$$
+On each signed word this is the initial energy after the normalized cutoff limit by FBE26, FBE29–32 and the level-zero interpolation. The other two fields in the energy link are $B.e_1=\max(1,\mathrm{sd})$ and $B.\delta=C(r+1)(C/\Theta)^f$ by construction of the same mass datum. This proves the identification of the initial norm for this pair of measured coefficients. In the original invocation the initial argument of the real estimate is explicitly $B.\mathrm{IntN}$. The preceding computation identifies the integral to which that invocation refers. [Level-zero interpolation](SPECTRAL_LEVEL_ZERO_AND_CUTOFFS.md) · [Jin’s finite and real calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L5133-L5208) · [Energy link on the actual words](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/SpectralTiesReal.lean#L222-L237)
+
+<!--
+% END FBE40
+-->
+
+<!--
+% BEGIN FBE41
+-->
+
+<span id="claim:FBE41"></span>For the represented integral frames of the selected host, the finite-product density premise used at the terminal level follows from their local factors with the required order of quantifiers. Let $h=k-2r-2\ge f+5$, with $f=[F:\mathbb Q]$. For a finite place $v$ let $\ell(v)$ be its residue characteristic and $q_v$ its residue cardinality. Then $q_v\ge\ell(v)$ and any finite set of places of residue characteristic $\ell$ has at most $f$ elements, by $\sum_{v\mid\ell} e_v f_v=f$. The normalization $\alpha$ uses the first word's single-frame product at a marked place and both single-frame products at an ordinary place. Its Euler product is strictly positive. Its local factors are positive, and outside the finitely many word and marked primes the sums of the absolute logarithms converge by comparison with $C f\sum_{n\ge2}n^{-(k+1)}$. [The normalized density in the native data](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/DataInst.lean#L171-L205)
+
+For any represented frame write $H_v$ for its primitive local density divided by the marked or ordinary reference at $v$. The integral lifting and first-residue counts for the actual two marked frames are given in the scalar-density calculation. Here is the passage from those counts to the native condition. At marked split places and at ordinary split places off the word primes one has $H_v\le1$. All dyadic places are in these cases. At an ordinary inert place the last marked vector has unit norm, so the residual corank loses at least one dimension. In the products of $1\pm q_v^{-j}$ for the density, every contributing index for an upper bound is then at least $h+1$. At a remaining split place the numerator is at most one and the denominator indices also start at least this high. The disjoint intervals of indices give
+$$
+        \log^+ H_v\ \le\ \frac{q_v^{-(h+1)}}{(1-q_v^{-1})(1-q_v^{-(h+1)})}
+                     \ \le\ 4q_v^{-h}.
+$$
+Here a vanishing local density can be discarded when bounding positive products. The full product exists on every represented frame by the absolute logarithm bound at the good places, which allows the weaker starting index $h$ for the other sign. Let $\mathrm{sd}$ be the supremum of the represented unnormalized densities divided by the fixed positive $\alpha$. If $x<\mathrm{sd}$ and $x>1$, the supremum property gives a represented frame of ratio greater than $x$. Approximate its convergent product by a finite partial product greater than $x$. Bounding the factors individually gives
+$$
+          x\ \le\ \prod_{v\in S}\exp(4q_v^{-h})
+$$
+for the resulting finite set $S$. If $x\le1$, take the empty set, which also handles the empty collection of represented frames under the source convention. Thus the assertion is for *every* $x<\mathrm{sd}$ with its own finite set. Applying FBE36 bounds $\max(1,\mathrm{sd})$ before the row sum. [Primitive frame counts and the two reference factors](SPECTRAL_SCALAR_DENSITIES.md) · [Exact finite-set quantifiers](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/HermitianCurvature/StatementPB.lean#L327-L331)
+
+There is also a literal simplification at the last level. The source constructs the arithmetic datum of the two words by inserting their kernel with the two mark norms and the function $e(i)=0$ at every level. Hence $e(r+1)=0$ for this very datum. It follows before any bound on $\mathrm{sd}$ and before any estimate on the real energy. Together these verifications supply the density and zero-error steps at lines 1121–1123 of the native row for the selected integral presentation. [Construction with zero defect](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/DataInst.lean#L116-L137) · [Use at the terminal level](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/HermitianCurvature/HermitianCurvatureProofs/GrowthOfBasic.lean#L1119-L1127)
+
+<!--
+% END FBE41
+-->
+
+## Why the actual period images survive the automorphic projection
+
+<!--
+% BEGIN FBE42
+-->
+
+<span id="claim:FBE42"></span>Let $X$ be a supplied high-gap Hida setting of the selected class with its normalized finite level $K$, finite character $\chi$ and native real discrete-series kernel $p_\infty$. Take a word $u$ with its prescribed Bessel wave and full finite column space. We show that its actual Poincaré period lies in the automorphic target used to form the Gram operator. The hypotheses on the setting enter in two places. For its original wave, SFS4 gives compact reproduction, weighted integrability and $p_\infty\in L^1$ at the stated gap and local multiplicity-one input. For every column $T$, PGR7 gives a measurable scalar seed $\Phi_T$ invariant on the left by its rational stabilizer $S$, right $K$-covariant by $\chi$, and satisfying the pointwise identity $\int p_\infty(z)\Phi_T(yz)\,dz=\Phi_T(y)$. These use the same finite character, infinite measures and levels as $X$. [Decay of the actual wave, SFS4](../../../research/modules/spectral/spectral_v60/main.tex#L197-L256) · [The scalar seed, PGR7](../../../research/modules/spectral/period_gram_v57/main.tex#L447-L501)
+
+Let $\Gamma$ be the rational ambient group. In a fixed column the absolute value of each finite evaluation is bounded by a finite sum of norms of its coefficient vectors times the corresponding translates of the wave norm. Finiteness follows from the finite coarse class set and the compact-type equivariance at the marked level. For each of these positive seeds $W$ the first part of FBE37 gives a folded majorant $P^+(x)=\sum_{S\backslash\Gamma}|W(\gamma x)|$ in $L^2(\Gamma\backslash G)$. It is finite at every point: compact reproduction bounds each finite subsum at $x$ by its average over $xU$ with a common constant, and that average is bounded by the finite multiplicity of the compact translate times the $L^1$ norm of the folded seed. The argument uses one word at a time, so it applies equally to two copies of the same word. The finite sum of these majorants bounds the absolute Poincaré series of $\Phi_T$. Thus $P_T(x)=\sum_{S\backslash\Gamma}\Phi_T(\gamma x)$ converges absolutely at each $x$, is measurable and square integrable. Two transversals choose representatives differing by elements of $S$, so they give the same function by a bijection of summands. Right multiplication of the transversal by an element of $\Gamma$ proves left invariance.
+
+To check the range assertion, test the convolution with $p_\infty$ against any $L^2$ function $b$ on the automorphic quotient. Enlarge $P^+$ to the finite majorant for the entire column. Right translations preserve quotient Haar. Tonelli and Cauchy–Schwarz give
+$$
+ \int |p_\infty(z)|\int_{\Gamma\backslash G}|b(x)|P^+(xz)\,dx\,dz
+       \ \le\ \|p_\infty\|_1\|b\|_2\|P^+\|_2 .
+$$
+For the exchange of representatives, take $x$ in a measurable fundamental domain; the *sum* of the absolute values is invariant. This bound permits integrating each seed at $\gamma xz$ in the weak pairing. The pointwise reproduction of $\Phi_T$ then gives $R_{p_\infty}P_T=P_T$ in $L^2$. At a finite-level element $k$ the series transforms on the right by $\chi(k)$. The finite projector has kernel $\mathbf1_K(k)\overline{\chi(k)}/\mu(K)$. Since $|\chi(k)|=1$ and $0<\mu(K)<\infty$, its convolution fixes $P_T$ as well. The source defines the automorphic target as the range of the product of these operators. Applying the product to $P_T$ gives $P_T$ itself. This verifies all four clauses of the source period-range condition, including its quantifier over every transversal. [The original four clauses and target](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/PoincareInHH.lean#L179-L212) · [Finite normalized projector](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/HaarTransversals/UnitaryHaarProducts/InHHCut.lean#L372-L403)
+
+In particular let $Q$ be the orthogonal projection onto this selected automorphic space (finite dimensional here by SFS1). Both normalized full-column period maps $\mathcal A_u$ and $\mathcal A_{u'}$ have their images in it, since the construction applies separately to the two original words with the common kernel and level. Then $(1-Q)\mathcal A_{u'}=0$. For their column inclusions $\iota$ this eliminates precisely the term $\iota_u^*\mathcal A_u^*(1-Q)\mathcal A_{u'}\iota_{u'}$ in PGR19. The unprojected Gram is carried to the finite full columns by the two Riesz anti-isometries. Taking the sum of squared column norms on an orthonormal basis preserves its Hilbert–Schmidt norm under these identifications. If the selected endpoint uses a different realization of the target, one still needs its isometry with this range carrying both period maps. The nonzero scale of a period remains part of that assertion. [Projected Gram formula, PGR19](../../../research/modules/spectral/period_gram_v57/main.tex#L1355-L1441) · [Norm under the two column identifications](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/RootLatticeThresholds/NormalizingConstantEq.lean#L24-L73)
+
+<!--
+% END FBE42
+-->
+
+## Both periods on a member of the selected family
+
+<!--
+% BEGIN FBE43
+-->
+
+<span id="claim:FBE43"></span>Let $\sigma$ be the original selector of linked bundles on its class. At $x>F.x_1$ and $a\in F.\mathrm{Ix}(x)$ put $b=\sigma(F,x,a)$. Write $R=b.R$ for its record and $S=b.S$ for its spectral tie. The latter is a tie *for $R$*: it contains the actual setting $X$, its full period data $Y$, a column comparison for every word, a row comparison, the local comparisons and a single adelic bridge with additive character and measures. Selecting $R$ and $S$ by these projections gives the selectors of the original argument with threshold $F.x_1$, also after restriction to the design subclass. The geometric part of this same $b$ supplies the core in GRT103. This is a pointwise construction for any supplied selector, including ones whose existence required a separate window argument. [The bundle and the two selectors](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/ColumnCompatibleSelection.lean#L63-L86) · [Columns, rows and local comparisons of the tie](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/STiesR.lean#L19-L39)
+
+Under the original high-gap and standing hypotheses on this member, SFS4–5 give the finite-dimensional realization $h_F$ on $X,Y$ and FBE42 places every folded column in its automorphic target. Evaluate $I=S.hI(h_F)$ *once*. Write $U$ for its target isometry and $V_w$ for its column isometry at word $w$. Denote the original and concrete period maps by $P_w$ and $P^c_w$. The defining identity gives $UP_w=P^c_w V_w$. Taking inner products, for all $z,z'$ and all words $w,v$,
+$$
+ \langle P_w z,P_v z'\rangle
+   =\langle P^c_w V_wz,P^c_v V_vz'\rangle,\qquad
+ P_w^*P_v=V_w^{-1}(P^c_w)^*P^c_v V_v .
+$$
+In particular the two Gram blocks have identical operator norms, including on a restriction transported by the same $V_w,V_v$. The column identifications include the source's sharp-column inner products. Inserting the word normalizations multiplies both sides by the same factors because $I$ preserves the two word volumes. The local isomorphisms of $I$ apply at **every** prime and its term and pair bijections preserve the generic stratum, the scalar-pair predicate and the row values. The coherent choice of the two archimedean words comes from the same $S$ and the same $h_F$. Hence FBE39–42 and the Gram transport apply to the represented rows on this member whenever their arithmetic input hypotheses hold. The guarded uniform use in the original spectral link is quantified over precisely the projection $S\mapsto S.\mathrm{toSTies}$ of this selector. [The concrete columns and periods](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/ParametersTermRelations.lean#L238-L255) · [Intertwining both maps and transporting terms](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/ParametersTermRelations.lean#L286-L312) · [Precise selector in the link](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/GlobalInterpolation/LinkAlt.lean#L16-L44)
+
+<!--
+% END FBE43
+-->
+
+## The frame inequality at the common guarded threshold
+
+<!--
+% BEGIN FBE44
+-->
+
+<span id="claim:FBE44"></span>On the family of FBE43 assume the original definite-space mass and volume comparison, the split-place critical-level estimate and the rank formula for the selected lattices. Then the word frame condition of SFS6 holds for **all** words and admissible indices beyond one threshold per family. We give the contradiction that produces its constant one.
+
+Write $g=\mathrm{gg}(D)$, $\alpha=\mathrm{ka}(D)/g$, $r=D.R.r_S$, $T_w$ for the word prime, $Q_{w,\tau}$ for its critical level and $k=D.R.k$. For the rank formula the local coefficient at the trivial weight is read from the columns of $R$. The real theta realization of $R$ ties the definite-space volume to its mass, and the two marked primes and the word prime split by their norm conditions. Substituting these data in the class-number formula gives the rank row for all words once $x\ge\max(a,F.x_1+1)$, where $a$ is the record threshold. The convergent unitary Siegel–Weil comparison is one supplier of the required mass ratio. With the original formal degree and unramified Hermitian-lattice estimates the resulting level formula gives
+$$
+ \prod_\tau (Q_{w,\tau}/T_w)^k
+ \le \exp(f\,2^{3-k})\,D^\star/d_w^S
+ \le e^8 C_0 e^{k/4}.
+$$
+Here the standing column bound gives $D^\star/d_w^S\le C_0\Gamma_w^2$, the size inequalities give $\Gamma_w^2\le e^{k/4}$, and $f\le 2^k$ gives the bound $8$ in the exponent. The split-place critical-level estimate, at its family thresholds, gives $\alpha^{2r} Q_{w,\tau}\ge g^2$ for every $\tau$. [Rank row on the selected record](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/ExactRanksAlongTiedFamily.lean#L16-L33) · [Volume and level inputs in this order](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/RootLatticeThresholds/SzHypFam.lean#L43-L65) · [Rank ratio and product upper bound](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/CuspSpanNormBounds/BruhatCellsKronecker/CriticalLevelLowOfRefined.lean#L281-L366)
+
+If $T_w\alpha^{2r}<1$, then $Q_{w,\tau}/T_w\ge g^2$ at every embedding. There is at least one embedding and $g\ge e$. Thus the displayed product is at least $g^{2k}$. For sufficiently large $k$ we have $C_0e^8<g^k$ and $e^{k/4}\le g^k$, contradicting its upper bound. This proves $1\le T_w\alpha^{2r}$ with the original normalization.
+
+For uniformity take the maximum of the two size cutoffs, the cutoff for $m\ge2C_3$, the one for $C_u L\le m-1$, and the one for $k\ge C_0 e^8$. The fourth cutoff exists since $L=x^\varepsilon$, $m\ge x^{1/4}$ and $\varepsilon<1/4$. The family parameter threshold $sC_l\ge40$ suffices for the split-place estimate and for the gap bound of SFS7 after the original $C'$ threshold is also enforced. These choices all precede $a\in F.\mathrm{Ix}(x)$ and $w$. Take $C_0=3$ for the endpoint class. With the stated arithmetic inputs this supplies the frame condition at the guarded invocations of FBE43. Absolute estimates for the sums of the other pair strata still require their own arithmetic and counting bounds. [Uniform cutoff and admissibility](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/CuspSpanNormBounds/BruhatCellsKronecker/CriticalLevelLowOfRefined.lean#L391-L436) · [Original family application of Siegel–Weil](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/RanksFramesOfSiegelWeil.lean#L13-L17)
+
+<!--
+% END FBE44
+-->

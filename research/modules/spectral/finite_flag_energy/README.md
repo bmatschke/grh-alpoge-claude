@@ -1,6 +1,6 @@
 # Uniform spectral estimates on finite flag towers
 
-FBE20–32 derive the analytic cutoff estimates. FBE33–35 give the eighteen clauses at the original zero row and the single terminal rescaling. FBE36–37 identify the represented rows, their density and summability in the matched arithmetic and real model. FBE38 derives the singleton Poisson inequality from its original finite-point and Fourier readings. The existence and comparison of that simultaneous realization throughout the selected family remain inherited. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
+FBE20–42 derive the signed recursion, finite terminal row, two-word operator, initial mass and automorphic range on the measured setting. FBE43 reads the setting and one common period isometry from each selected linked bundle. FBE44 gives one guarded frame threshold from its rank and split-level estimates. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
 
 | Claim | Result |
 | --- | --- |
@@ -42,5 +42,11 @@ FBE20–32 derive the analytic cutoff estimates. FBE33–35 give the eighteen cl
 | [FBE36](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE36) | Partner counts give finite row domination with the represented density, bounded by two on the large-rank range |
 | [FBE37](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE37) | Positive double-coset unfolding and the exact terminal weight give absolute summability of each realized arithmetic row |
 | [FBE38](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE38) | The matched singleton wave and trace-dual frame give the native finite-coset Poisson inequality at every sampled nonzero point |
+| [FBE39](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE39) | The two prescribed marked rotations and the stabilizer Haar Jacobian identify the terminal orbital operator on all pure tensors |
+| [FBE40](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE40) | The finite Gram and unipotent volume ratio and the real change of coordinates identify the initial energy of the concrete mass record |
+| [FBE41](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE41) | The primitive represented densities give the exact finite-product approximation and the native arithmetic datum has zero terminal defect |
+| [FBE42](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE42) | Every Poincaré column on the given high-gap realization lies in the actual automorphic range and its Gram projection correction vanishes |
+| [FBE43](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE43) | The selector of linked bundles supplies a single simultaneous isometry for both word operators and their full Gram blocks |
+| [FBE44](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE44) | The selected rank and split-level comparisons give the unit word-frame bound for every word at one guarded family threshold |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)
