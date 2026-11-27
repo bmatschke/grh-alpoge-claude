@@ -1,6 +1,6 @@
 # The integral flag models at two prime cutoffs
 
-GRT13–26 construct the signed ramified flags, modular sequences and actual bounded cusp metric. The proper valuation case of the polar comparison is proved. The Newton step still uses polarized boundary specialization and a common filtered chart. The uniform arithmetic height and wall inputs retain the bounds specified in the chapter. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
+GRT27–34 identify the original polarized boundary order, match its additive flag with the cotangents of its prefix groups, and derive both new-prime Newton identities on one common model. GRT35–36 prove the required logarithmic maximal-slope estimate using directional jets. The flat determinant and the uniform wall comparisons enter the final tower argument. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
 
 | Claim | Result |
 | --- | --- |
@@ -30,5 +30,15 @@ GRT13–26 construct the signed ramified flags, modular sequences and actual bou
 | [GRT24](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT24) | The square-zero multiple of a division lift gives additive functions of the proper marked order modulo p |
 | [GRT25](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT25) | Infinitesimal partial multiplications in the biextension give the symplectic determinant of the proper marked rows |
 | [GRT26](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT26) | The symplectic row matrix gives the two polar lattice equalities on the proper marked valuation test |
+| [GRT27](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT27) | Gluing the marked translates gives the finite locally free torsion order on the normal chart |
+| [GRT28](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT28) | At a boundary valuation the original Weil form splits as its proper and toric hyperbolic factors |
+| [GRT29](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT29) | The multiplicative and constant factors give the two polar lattice equations at the boundary |
+| [GRT30](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT30) | Additive functions generate the orders of all preceding-span quotients at the valuation |
+| [GRT31](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT31) | Flattening the images of graph projections permits comparison of locally free lattices at divisors |
+| [GRT32](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT32) | Carrying Frobenius exponents and factoring evaluation determinants identify every fundamental character line in the additive flag |
+| [GRT33](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT33) | Nested abelian isogenies give the exact successor conormal sequence on the marked prefix groups |
+| [GRT34](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT34) | The polar and successor filtrations give both localized Newton identities on a single marked model |
+| [GRT35](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT35) | The high directional jet determinant is an integral nonzero map on the original abelian Lie line |
+| [GRT36](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT36) | The determinant of the directional jets gives the absolute logarithmic maximal-slope bound |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

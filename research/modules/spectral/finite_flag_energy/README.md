@@ -1,6 +1,6 @@
 # Uniform spectral estimates on finite flag towers
 
-FBE12–19 compute the original regular group actions, fixed-head germ, terminal signed pairing and normalized annular limits on the positive compact cut. The intermediate residual tail estimates and noncompact differentiated cutoff pass remain explicit analytic inputs. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
+FBE20–32 derive the residual group and unipotent moments, integrability at prescribed heads, and differentiated cutoff bounds for the selected native gap and interpolation boxes. The downstream formal consumer separately packages its other signed-word and representation inputs. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
 
 | Claim | Result |
 | --- | --- |
@@ -23,5 +23,18 @@ FBE12–19 compute the original regular group actions, fixed-head germ, terminal
 | [FBE17](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE17) | Signed site conjugation and Jacquet determination recover the compact projections at the last singleton |
 | [FBE18](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE18) | Residual translation and unipotent moment estimates transfer compact matrix remainders to the actual Hilbert norm |
 | [FBE19](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE19) | The split and long orbital densities give the required root Jacobian and terminal correction |
+| [FBE20](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE20) | Successive Heisenberg coordinates integrate the shifted exterior minors with both margins |
+| [FBE21](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE21) | Frame averaging and parabolic induction bound translated minor products on the whole residual group |
+| [FBE22](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE22) | A two-coordinate rescaling bounds the planar integral with an oscillatory character gain |
+| [FBE23](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE23) | Integration in the Heisenberg centre proves the half-power unipotent moment for both marks |
+| [FBE24](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE24) | The two moment bounds control the full residual Hilbert transform on smooth tests |
+| [FBE25](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE25) | At fixed positive Gram the native discrete-series decay removes compact support after differentiation |
+| [FBE26](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE26) | A second regularization separates the Gram boundary from the weighted energy contraction |
+| [FBE27](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE27) | An integrable stabilizer majorant gives convergence on each prescribed terminal orbit |
+| [FBE28](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE28) | Four determinant-cleared families of group differentials isolate the transferred section derivatives |
+| [FBE29](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE29) | Iterating the group differentials gives the unregulated square-integrable bound in the native order budget |
+| [FBE30](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE30) | Curvature and angular transport fix a single-valued unitary frame for the compact intertwiners |
+| [FBE31](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE31) | The binary adjoint gives the signed mirror weights and the energy for the original group section |
+| [FBE32](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE32) | Separated interpolation boxes give a uniform weight and residue-difference constant for the differentiated cutoff |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

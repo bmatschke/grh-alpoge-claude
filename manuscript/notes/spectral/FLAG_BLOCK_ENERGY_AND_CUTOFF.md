@@ -443,3 +443,297 @@ Here is a fixed-support continuity argument that avoids differentiating a Hilber
 <!--
 % END FBE19
 -->
+
+## The two residual integrals
+
+<!--
+% BEGIN FBE20
+-->
+
+<span id="claim:FBE20"></span>Fix $G_r=U(k+r,r+1)$, $k\ge1$, in an orthonormal Witt basis for the Euclidean norm. Write $h(u,v)=u^*Hv$ with $H^*=H=H^{-1}$. Choose an orthonormal maximal isotropic frame $\phi$ extending the $r$ flag vectors by a null vector in the middle space, and put $\phi'=H\phi$. Thus $h(\phi'_i,\phi_j)=\delta_{ij}$. The frame index starts at zero. The volume of the first $j+1$ columns of $g\phi$ is $\Delta_j(g)$. Put $s^0=(2,\ldots,2,k)$, $\Xi_s=\prod\Delta_j^{-s_j}$, and use primes for the opposite frame. We first integrate on one radical fibre. In the decomposition $\mathbb Ce\oplus V'\oplus\mathbb Cf$ take $e=\phi'_0$, $f=\phi_0$. The radical $n(x,t)$ fixes $e$, sends $y\in V'$ to $y-h(x,y)e$ and sends $f$ to $f+x+(-h(x,x)/2+it)e$. Translation in these coordinates has real Jacobian one. Write $x=\sum_{i<p}(b_i\psi_i+a_i\psi'_i)+v$, where $p=r$, $\psi,\psi'$ are the two remaining null frames and $v\in\mathbb C^{l}$, $l=k-1$. Use the real coordinate $u=t+\Im\sum b_i\bar a_i$ and set
+$$
+ L_j=1+\sum_{i<j}|a_i|^2,\quad R_j=L_p+|v|^2+\sum_{i\ge j}|b_i|^2,\quad
+ B_j=-|v|^2/2+iu-\sum_{i\ge j}b_i\bar a_i .
+$$
+The squared exterior volume $d_j^2$ of $n(x,t)(f,\psi_0,\dots,\psi_{j-1})$ is $L_jR_j+|B_j|^2$. The last $j$ columns have Gram determinant $L_j$. Subtract their first $j$ coefficients $b_i$ from the first column by column operations. The remaining part off $e$ is perpendicular to the last $j$ coordinate axes and has norm squared $R_j$. The projection of $e$ perpendicular to those columns has norm squared $1/L_j$. This gives the formula, including $j=0$.
+
+Let $C_p(\nu)=\int\prod_{j=0}^p d_j^{-s^0_j-\nu_j}$ in this fibre and $K(q)=\int_{\mathbb C}(1+|z|^2)^{-q/2}\,d^2z$. The latter is $2\pi/(q-2)$ for $q>2$. For $p>0$, set $L=1+|a_0|^2$. The identity $d_0^2=L|b_0-a_0B_1/L|^2+d_1^2/L$ integrates the $b_0$ variable, giving $K(2+\nu_0)L^{-1+\nu_0/2}d_1^{-\nu_0}$. In the remaining $a_i,b_i,v$ substitute $\sqrt L$ times new variables, and in $u$ substitute $L$ times the new real variable. Every remaining $d_j$ acquires a factor $L$. The Jacobian is $L^{2p-1+l}$. The integral in $a_0$ and the lower integral therefore give
+$$
+ C_p(\nu)=K(2+\nu_0)K(2+\nu_0+2\sum_{j>0}\nu_j)
+ C_{p-1}(\nu_0+\nu_1,\nu_2,\ldots,\nu_p).
+$$
+At $p=0$, $d_0^2=(1+|v|^2/2)^2+u^2$. Integration in $u$ leaves a constant times $(1+|v|^2/2)^{-l-\nu_0}$, integrable on $\mathbb C^l$ for $\nu_0>0$, also when $l=0$. Consequently a sufficient convergence criterion is
+$$
+ \sum_{i=0}^j\nu_i>0\ (0\le j\le p),\qquad
+ \sum_{i=0}^j\nu_i+2\sum_{i>j}\nu_i>0\ (0\le j<p).
+$$
+These are precisely the inequalities used by the recursion after each merge. [Heisenberg coordinates and shifted integrals in Jin's proof](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L978-L1047)
+
+<!--
+% END FBE20
+-->
+
+<!--
+% BEGIN FBE21
+-->
+
+<span id="claim:FBE21"></span>Put $D_j(g)=\det(h(\phi'_a,g\phi'_b))_{a,b\le j}$ and $P_s=\prod |D_j|^{-s_j}$ on the conull locus of nonzero minors. Let $s_j=s^0_j-\varepsilon_j$ with $0<\varepsilon_j\le1/10$. We prove
+$$
+ I_r(A)=\int_{G_r}\|g\|_{\rm F}^{-A}P_s(g)\,dg<\infty
+ \qquad(A\ge2(k+r)(r+1)+1).
+$$
+The compact group $K=G_r\cap U(k+2r+1)$ acts transitively on orthonormal isotropic frames. Their projections to the positive and negative summands are orthogonal frames of length $1/\sqrt2$, so each can be completed to a unitary basis. Gram–Schmidt on $x\phi',y\phi'$ gives triangular matrices whose first $j+1$ diagonals have product of absolute value $\Delta'_j(x),\Delta'_j(y)$. For every nonnegative $K$-bi-invariant $F$, Haar invariance then gives
+$$
+ \int F(g)P_s(x^{-1}gy)\,dg=
+ \Xi'_s(x)\Xi'_s(y)\int F(g)P_s(g)\,dg.
+$$
+This identity also holds before knowing finiteness, by change of variables for nonnegative integrands.
+
+At rank zero the sign coordinates of $g\phi'$ are $(v,b)$ with $\|v\|=|b|$. The left compact average of $|D_0|^{-s_0}$ is at most $C|b|^{-s_0}$. For $k=1$ this is the integrability of $|1-e^{it}|^{-s_0}$ for $s_0<1$. For $k\ge2$ the first coordinate $z$ of a uniform complex unit vector has density $(k-1)(1-|z|^2)^{k-2}/\pi$ on the disc. Near $1$ it is at most $C|1-z|^{k-2}$, which suffices for $s_0<k$. A right compact average makes $b$ a constant of modulus $\ge1/\sqrt2$ times $1-az$ with $0\le a\le1$, since the last row of $g$ has negative norm one. This inverse-power average is bounded uniformly, using $|1-az|\ge a|1-z|$ for $a\ge1/2$. Projecting $G_0$ to the negative unit hyperboloid has compact fibres. In its coordinates the invariant measure is proportional to $\delta(\|v\|^2-|b|^2+1)\,dv\,d^2b$. The remaining integral is bounded by $\int_0^\infty t^{2k-1}(1+t)^{-A}\,dt$.
+
+For $r>0$ put $d=\dim_{\mathbb C}V'=2r+k-1$. On the cell $c=h(e,ge)\ne0$ write $g=n_L^{-1} w_c m n_R$, where $w_ce=cf,\ w_cf=\bar c^{-1}e$, $m\in G_{r-1}$ acts in $V'$, and $w_c$ is the identity there. The vector $ge$ determines $c,n_L$ by isotropy, and the stabilizer of $e$ is $G_{r-1}\ltimes n(V',\mathbb R)$. The complement is the zero set of a nonzero analytic matrix entry. In the cone measure, the coordinates $Y=cx$ and $a=c(-h(x,x)/2+it)$ in $ae+Y+cf$ have Jacobian $|c|^{2d+2}$ before imposing isotropy, whose real equation contributes $|c|^{-2}$. Thus Haar density is a constant times $|c|^{2d}d^2c\,dn_L\,dm\,dn_R$. The minors are $c$ and $cD_{j-1}(m)$ by triangularity of the two radicals on the primed prefixes.
+
+Write $b=2d+1$. Independently of $c,m$ one has
+$$
+ \int\|w_cm n(x,t)\|_{\rm F}^{-A}\,dx\,dt
+ \ll \|m\|_{\rm F}^{b-A}\min(|c|^{-b},|c|^{-1}).
+$$
+Indeed the displayed matrix contains entries bounding $\|m\|_{\rm F}$, $|c||t|$, and both $|c|\|x\|$ and $\|mx\|$. Split $A$ into a power $>2d$ for $x$ and a power $>1$ for $t$. Using $\|mx\|$ in the second version preserves Lebesgue measure because $|\det m|=1$. For the fixed left radical put $D=\|n_L^{-1}f\|$ and let $d'_j$ be the exterior volume of $n_L^{-1}$ on $(f,\psi'_0,\dots,\psi'_{j-1})$. Rotate its first vector to $Df$ by $K$. Factoring the result times $w_c$ by the stabilizer of $e$ replaces $(c,m)$ with $(cD,m_0m)$. The extra right radical translates $n_R$ with Jacobian one. Orthogonal projection to the middle space after removing the first column gives $\Delta'_{j-1}(m_0)=d'_j/D$. Apply the right bound and the compact averaging identity at rank $r-1$. The exponent there is $A-b\ge 2(k+r-1)r+1$.
+
+Set $S=\sum s_j$. On changing $cD$ to the radial variable, the scalar factor is $D^{-(2d+2-S)}$. The integral in $c$ converges at infinity for $S>1$ and at zero for $S<2d+1$, both valid here. Multiplication by $\prod_{j>0}(d'_j/D)^{-s_j}$ leaves the integral $C_r(\nu)$ of FBE20 with $\nu_0=\varepsilon_0+2\sum_{j>0}\varepsilon_j$ and $\nu_j=-\varepsilon_j$ for $j>0$. Inversion of the radical preserves measure and conjugation by the middle form interchanges its two frames. The first partial sums of $\nu$ are positive, and each second expression in FBE20 equals $\sum_{i=0}^{j}\varepsilon_i$. This finishes the induction. Finally $\prod|D_j(g)|^{s_j}\ll\|g\|_{\rm F}^{(r+1)(k+r)}$ by the exterior norm bound. Apply compact averaging to $xH,yH$ and compare the translated inverse norm with $P_s$. Unitary invariance of the Frobenius norm gives the first estimate of FBE18 for all $x,y$. [Rank induction and compact averaging](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L885-L1163)
+
+<!--
+% END FBE21
+-->
+
+<!--
+% BEGIN FBE22
+-->
+
+<span id="claim:FBE22"></span>For $p>0$ let $F=\prod d_j^{-s^0_j+\varepsilon_j}$ in FBE20. Consider any complex linear form $Z$ in $(a_i,b_i,v)$ whose coefficient of $b_0$ is $\eta\ne0$. For real $c$, $0<\delta\le1/2$ and $0<\gamma\le\delta/8$, the following estimate is uniform in $Z,c$:
+$$
+ \int F(1+|c+2\Im Z|)^{-\delta}
+ \ll |\eta|^{-\gamma}(1+|c|)^{-\delta/4}
+ \qquad\left(\varepsilon_0+2\sum_{i>0}\varepsilon_i<\gamma/2\right).
+$$
+Here and below the measure includes the central variable. For a polynomial $P$ of degree at most two on $[1,2]$, if $|P|\le v$ on a set of length $h$, choose three points of the set at distances at least $h/6$ apart. Quadratic interpolation bounds each coefficient by $Cv/h^2$. With $M$ the largest coefficient modulus, split at $v=\sqrt M$ when $M\ge1$. The mean of $(1+|P|)^{-\sigma}$ is $\ll_\sigma(1+M)^{-\sigma/2}$ for $0<\sigma\le1/2$. First rotate all complex variables by $(1+it)^2/(1+t^2)$ for $1\le t\le2$. All $d_j$ and the measure are invariant. The numerator of the resulting real polynomial phase has coefficient norm comparable to $\max(|Z|,|c|)$, since the coefficients separate $\Re Z,\Im Z,c$. The average is at most $C(1+|c|)^{-\delta/4}(1+|Z|)^{-\delta/4}$. Next replace $(a_0,b_0)$ by $(ta_0,b_0/t)$ and keep $u$ fixed. The products $b_i\bar a_i$ are unchanged, and $L_j,R_j$ change by bounded factors. The Jacobian is one. The polynomial $tZ(ta_0,b_0/t)$ has constant coefficient $\eta b_0$. The second average costs at most $C|\eta b_0|^{-\gamma}$.
+
+It remains to show $\int F|b_0|^{-\gamma}<\infty$. For $0<e<\gamma<2$,
+$$
+ \int_{\mathbb C}(|b-h|^2+D^2)^{-1+e/2}|b|^{-\gamma}\,d^2b
+ \ll (|h|^2+D^2)^{-(\gamma-e)/2}\quad(D>0).
+$$
+Normalize $|h|^2+D^2=1$. The tail has exponent $-2+e-\gamma<-2$. On a bounded disc either $D\ge1/2$, or the possible singularities at $0,h$ are separated. Their individual powers are locally integrable uniformly. Apply this bound to the square in FBE20 with $e=\varepsilon_0$. Integration in $b_0$ leaves at most $CL^{-1+\gamma/2}d_0(0)^{-(\gamma-e)}$ times the other factors, where $d_0(0)$ sets $b_0=0$ only. Put $\alpha=\gamma/2-e>0$. Use $d_0(0)\ge d_1/\sqrt L$ for the power $\alpha$, and $d_0(0)\ge|u-c_1|$ for the power $\gamma/2$, with $c_1=\Im\sum_{i\ge1}b_i\bar a_i$. For fixed complex variables the rest of the $u$ integrand has logarithmic derivative $O(1/L)$, since each remaining $d_j^2$ is $A_j^2+(u-c_j)^2$ with $A_j\ge L$. On $|u-c_1|\le L$ that weight varies by a bounded factor and the mean of $|u-c_1|^{-\gamma/2}$ is $O(L^{-\gamma/2})$. The same estimate holds pointwise outside the interval. The last integral is thus bounded by a constant times the integral of
+$$
+ L^{-1+\alpha/2}d_1^{-\alpha}\prod_{j>0}d_j^{-s^0_j+\varepsilon_j}.
+$$
+Scaling the remaining variables as in FBE20 gives $K(2+\alpha-2\sum_{j>0}\varepsilon_j)C_{p-1}(\alpha-\varepsilon_1,-\varepsilon_2,\ldots,-\varepsilon_p)$. Both factors are finite by that claim because $\alpha>2\sum_{j>0}\varepsilon_j$. [Character averaging on a radical fibre](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1124-L1219)
+
+<!--
+% END FBE22
+-->
+
+<!--
+% BEGIN FBE23
+-->
+
+<span id="claim:FBE23"></span>Write $N_r$ for the radical preserving the first $r$ lines of the opposite flag. Its Bessel character $\ell_z$ is twice the imaginary part of the sum of the neighbouring flag entries, terminated by the negative mark $z$. We prove $\int_{N_r}\Xi_s(n)(1+|\ell_z(n)|)^{-\delta}\,dn<\infty$ for a positive bound on all the defects depending only on $k,r,\delta$. At $r=0$ the integral is one with mass-one Haar measure. At positive rank write $n=n(x,t)m$ with $m\in N_{r-1}$. Product measure is Haar since $x\mapsto mx$ has absolute determinant one. The outer radical contributes $2\Im h(mv_0,x)$ to $\ell_z(m)$, where $v_0$ is the first lower primed Witt vector if $r>1$ and is $z$ if $r=1$. This is the $e$-coordinate of the new neighbouring entry in $n(x,t)m$.
+
+On the lower frame write $m\psi=\kappa\psi T$ by Gram–Schmidt with $\kappa$ compact and $T$ upper triangular. Rotate $x$ back by $\kappa^{-1}$. The $j$th exterior volume for $j\ge1$ is $\Delta_{j-1}(m)d_j$, and the zeroth is $d_0$, by the determinants on the prefixes. In the resulting phase the modulus of the $b_0$ coefficient is
+$$
+ \frac{|h(v_0,\psi_0)|}{\Delta_0(m)}.
+$$
+Indeed $\kappa\psi_0=m\psi_0/\Delta_0(m)$ up to phase and $m$ preserves $h$. The numerator is one for two paired Witt vectors. At rank one it is positive because the orthogonal complement of a negative vector in signature $(k,1)$ is positive definite. FBE22 now leaves the lower integral with exponents $(s_1-\gamma,s_2,\dots,s_r)$ and character exponent $\delta/4$. Given an admissible lower defect bound $e'$, choose $\gamma=\min(\delta/8,e'/2)$ and take all $\varepsilon_j\le\min(e'/2,\gamma/(4r+4),1/10)$ positive. This ensures the strict fibre inequality and leaves every lower defect admissible. The bounds may depend on the fixed mark, but their exponent choices precede it. For a compact marking stabilizer $w$, write $nw=w(w^{-1}nw)$. Exterior norms of $w^{\pm1}$ are bounded uniformly and conjugation preserves the Haar measure and $\ell_z$. Taking $\delta=1/2$ gives the second estimate of FBE18 on both original residual subgroups with the same defects as FBE21. In rank zero the Bessel stabilizers are compact, and its orbit density is $(|\zeta|^2-TT')^{k-1}$, integrable against a coefficient squared of decay order $A>k$. [Induction with the negative mark and the stabilizer](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L1204-L1260)
+
+<!--
+% END FBE23
+-->
+
+<!--
+% BEGIN FBE24
+-->
+
+<span id="claim:FBE24"></span>The estimates give continuity in a norm independent of the support of a smooth residual test. For compact tests $u,v$ put $\|u\|_{A,j}=\max_{|D|\le j}\sup_g\|g\|_{\rm F}^A |Du(g)|$, allowing mixed left and right invariant derivatives in a fixed basis. For translations $h_1,h_2$ the absolute correlation of the tests is at most $\|u\|_{A,0}\|v\|_{A,0}C\Xi_s(h_1)\Xi_s(h_2)$ by FBE21. To integrate against the two characters average the dilation of each radical by its diagonal flag element at scale $a\in(1/2,2)$ with smooth mass-one density. Its weights on the first flag are $a^r,\ldots,a$, on the dual flag their inverses, and on the middle space one. It multiplies the marked adjacent character by $a$, fixes the marking stabilizer and changes Haar measure by a fixed power of $a$. After changing the ambient group variable, the dilations act on the tests by left and right translation by compact families of matrices. Integrate by parts with $1-\partial_a^2$ in each scale. The absolute majorant is then
+$$
+ C\|u\|_{A,4}\|v\|_{A,4}
+ \prod_{j=1,2}\frac{\Xi_s(h_j)}{1+|\ell_j(n_j)|^2}
+$$
+uniformly for both frequencies in $[1/2,2]$ (enlarging $C$). Lie derivatives of order at most four suffice and powers of $\|g\|_{\rm F}$ are comparable under those bounded translations. FBE23 integrates this bound.
+
+For precision, first smear the two frequencies by smooth product test functions supported in that interval. Expand the orbital square on the regular cell, disintegrate Haar measure there and change the two copies of each unipotent variable to a base point and its difference. The smearing introduces the Fourier transforms of the two tests in those differences. Their decay to order two and FBE21–23 make the unfolded integral absolutely convergent. Equivalently the identity follows first with compact domains and then by Fubini under this majorant. The resulting frequency distribution equals the continuous correlation obtained by integration by parts. Thus the squared orbital norm agrees with it almost everywhere. On each regular marked orbit, the fixed nonzero pivots recover the radical coordinates of a compactly supported coefficient, so the orbital integral is pointwise continuous in the frequencies. Fatou along regular frequencies tending to $(1,1)$ gives $\|Ju\|_{L^2}\le C\|u\|_{A,4}$ for the prescribed pair of characters. Polarization or Cauchy–Schwarz gives the mixed bound. Composing a word of length $h$ whose letters each have at most two matrix-entry multipliers and at most $2r+k+1$ invariant derivatives uses $\|u\|_{A+2h,4+(2r+k+1)h}$, since invariant derivatives of an entry are linear combinations of entries. This supplies FBE18 with a support-independent continuity estimate as well as its compact-support conclusion. [Dilation, disintegration and recovery at the specified frequencies](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L789-L862)
+
+<!--
+% END FBE24
+-->
+
+## Removing compact support at a positive Gram threshold
+
+<!--
+% BEGIN FBE25
+-->
+
+<span id="claim:FBE25"></span>Fix the selected real place, a positive Gram threshold $\epsilon$ and a marked head with nonzero determinant. Let $d=k+2r+1$, $N=20(r+1)$ and $R(g)=\max(1,\|g\|_{\rm F})$. Multiply the coefficient $F_\epsilon=\chi(G/\epsilon)F$ by $\eta(R(g)^2/M^2)$, with $\eta=1$ up to one and zero from four onwards. The Frobenius norm is already $\ge1$ on this unitary group. An invariant derivative of any order of $\|g\|_{\rm F}^2$ is a polynomial homogeneous of degree two in entries and conjugates. In every differentiated cutoff term the powers $M^{-2j}$ cancel the growth of the $j$ polynomial factors on $M\le R(g)\le2M$. The undifferentiated difference from one and all its differentiated terms vanish for $R<M$. Thus, for any weighted finite jet norm of FBE24,
+$$
+ \|(\eta(R^2/M^2)-1)u\|_{a,b}\le C_b M^{-1}\|u\|_{a+1,b}.
+$$
+For fixed $\epsilon$, all constant-order invariant derivatives of the original $F$ have the same available decay exponent. Such a derivative moves to one of the smooth representation vectors. The translated compact-finite vector and its derivatives remain finite sums of translates of compact-finite vectors. Apply the smooth coefficient estimate with the original gap to these pairs. In particular the selected gap $h\ge d^{19}/2$ permits every exponent strictly less than $h+d-1$ in that estimate. The Gram polynomial is the square of the last marked determinant minus $TT'$ times the square of the preceding one. Its degree in entries and conjugates is at most $2(r+1)$. Applying $j$ invariant derivatives to $\chi(G/\epsilon)$ costs at most $2(r+1)j$ powers of $R$, with a constant depending on $\epsilon,j$ and the marks. This proves the extra power required under the compact exhaustion. [Smooth discrete-series vectors at the selected gap](SPECTRAL_SMOOTH_DECAY.md) · [The original positive cutoff and order of approximations](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L4737-L4757)
+
+Here is a direct check that taking the residual slice preserves this convergence for each fixed head. Use the group coordinates $g=R_1^{-1}D(P,\gamma)R_2$ where the leading block of the big cell is $P=g_{31}$, $R_j$ are three-block upper unitriangular, and the middle of $D$ is $\gamma$. Localize $|\det P|$ to a compact annulus about its prescribed value. With $i$ the rank of $P$, $\|P^{-1}\|\ll R^{i-1}$. The independent off-diagonal coordinates of $R_1,R_2$ are recovered from $-g_{21}P^{-1}$, $P^{-1}g_{32}$, $g_{11}P^{-1}$ and $P^{-1}g_{33}$. Recovering the last corner uses at most one product of two of these quantities (the skew-Hermitian coordinate subtracts a quadratic expression). Thus $\|R_j^{\pm1}\|\ll R^{2i}$ and $\|\gamma\|\ll R^{4i+1}$. The head unipotent entries are minors of the head divided by fixed pivot products after its fixed permutation; the adjoining blocks are obtained by one Schur complement. All these free variables are bounded by $C R^{r+1}$. At a fixed head no inverse of a vanished *internal* leading minor is used. All constants in these coordinate bounds may depend on the head.
+
+For example, to estimate a sliced column with $A$ powers of residual decay and $b$ residual invariant derivatives, let $z$ collect all real integration coordinates, of dimension at most $8d^2$. This bound follows by counting the two outer triangular matrices and the two head triangular matrices even as full complex $d$ by $d$ matrices. Lebesgue measure in the independent unipotent entries is Haar, since the cross terms in triangular multiplication have Jacobian one. Additional fixed pivot powers in the density are constants on the fixed head or bounded on its determinant annulus. Here $1+|z|\ll R^{2(r+1)}$. Therefore a reserve of
+$$
+ (4r+1)A+2(r+1)(8d^2+1)
+$$
+powers bounds $R(\gamma)^A(1+|z|)^{8d^2+1}$. Residual differentiation can use right translation at $\gamma$ inside the factorization. In the ambient coefficient its direction is conjugated by the fixed $R_2$ in that integration, costing at most $4r$ powers per derivative. For a head word of length at most $N$ its group differential order is at most $Nr$ and its polynomial degree at most $Nr(r+1)$: each head cofactor of size $i$ uses at most $i$ invariant derivatives and at most $i+i^2$ coefficient entries from the two triangular substitutions. These estimates also follow by expanding the finite column determinant. Constants depending on the finitely many word parameters are harmless at this step. The surviving head phases have modulus one. Applying the pointwise bound and then integrating $(1+|z|)^{-8d^2-1}$ proves convergence in the residual seminorm. At the compact final factor only the head variables and the same Schur-complement bound occur.
+
+For the norms in FBE24 it suffices to take $A=2(k+r)(r+1)+1+2N$ and $b=4+dN$. Even reserving the larger $A\le 2668d^6$, $b\le91d^3$ used in the matrix-germ computation, the total cost including Gram derivatives, word coefficients and one extra power is bounded by
+$$
+ (4r+1)A+2(r+1)(8d^2+1)+4rb+Nr(r+1)+2(r+1)(b+Nr)+1 .
+$$
+It is less than $12000d^7$ for $r+1\le d$, $N\le20d$ and $d\ge3$, hence less than $d^{19}/2$. At $r=0$ there are no head radicals or preterminal words to estimate and the rank-zero bound of FBE23 applies directly. At a nonempty fixed reversing head, apply FBE14 to each compact approximation before taking the pointwise limit in the finite Gram comparisons. The constants of stationary phase need not be bounded as $M$ grows. On each fixed fibre the residual cutoff stays positive since its Gram is the ambient Gram divided by $|\det P|^2$. FBE24 gives convergence of the mixed pairings, using the same exhaustion on both columns. For a finite collection of prefixes every entry therefore converges. A convergent subsequence of the word probabilities in their finite simplex gives the same limiting probabilities for every finite test, since entrywise convergence already holds for each prescribed test along the full sequence. [Block inverses and the fixed determinant](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L675-L754) · [Orders and norms in the compact exhaustion](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L4834-L4895)
+
+<!--
+% END FBE25
+-->
+
+<!--
+% BEGIN FBE26
+-->
+
+<span id="claim:FBE26"></span>At $G\downarrow0$ an estimate with a constant depending on the Gram threshold cannot dominate the differentiated family. For the actual section of the selected coefficient the following computation isolates the estimates needed in the two limiting operations. In the frame of the level-zero proof put $G=|D_r|^2(|\zeta|^2-TT')$, $D=D_r\zeta$, $W=|D|^2/G$, $m=h+1\le N$ for the current word and $\sigma=4N$. Its pointwise squared component densities have the form $W^m c_a(Y)$, with bounded continuous $c_a$ on the parameter box $J$. Suppose the determinant-cleared word has an envelope $|D|^m|(g_Y X)_a|\le B_a$ with $B_a\in L^2(d\mu_0)$ throughout that box. For $\theta_\epsilon=(G/(G+\epsilon))^\sigma$,
+$$
+ \theta_\epsilon W^m c_a(Y)|(g_YX)_a|^2\le
+ (\sup_J c_a)\epsilon^{-m} B_a^2.
+$$
+This uses $\theta_\epsilon G^{-m}\le\epsilon^{-m}$ for $m\le\sigma$. It suffices for continuity at fixed $\epsilon$. For differentiated removal let $Q_Y(s)=G^{-s}g_Y(G^s X)$ and $D_G=G\partial_G$. Locality and the finite order give $g_Y(\phi X)=\sum_{j=0}^{r+1}(D_G^j\phi)Q_Y^{(j)}(0)/j!$ by testing on $G^s$. With the original adjoint and parameter shift on the positive boxes, let $E_\epsilon$ be the maximum of the regulated energy divided by $|P(Y)|$. The comparison of the two weights and the triangular residue frame gives $\|Q_Y(s)\|_{\theta_\epsilon,Y}^2\le C_7 E_\epsilon |P(Y)|$ for $Y+s\in J$. Markov's inequality on the interval of length $L$ bounds the $j$th derivative at zero by $(2(r+1)^2/L)^j$ times its Hilbert supremum. The function $\theta_\epsilon(e^{v+z})/\theta_\epsilon(e^v)$ has modulus at most $e$ on the complex disc $|z|\le1/(4\sigma)$, so $|D_G^j\theta_\epsilon|/j!\le e(4\sigma)^j\theta_\epsilon$. In the adjoint identity the nonconstant terms now total at most
+$$
+ |P(Y)|E_\epsilon\,e\sqrt{C_7}\sum_{j\ge1}(8\sigma(r+1)^2/L)^j.
+$$
+For $L\ge16\sigma(r+1)^2(1+2e\sqrt{C_7})$ the sum costs at most half of $|P(Y)|E_\epsilon$. In using the adjoint one may first multiply $\theta_\epsilon$ by $\chi(G/\delta)$. Its positive logarithmic derivatives away from those of $\theta_\epsilon$ are bounded on the shrinking annulus and vanish pointwise. The fixed-$\epsilon$ weighted norms give dominated convergence there. Taking the supremum gives $E_\epsilon\le 2I$ for the old energy $I$. Fatou and Markov now give $L^2$ bounds for all the shift jets before the cutoff. Since $D_G^j\theta_\epsilon\to0$ for $j>0$, Cauchy–Schwarz and those unregulated jets pass the adjoint identity to the limit. The level-zero proof then interpolates the finite word grid to the actual signed evaluations. Thus one only needs the envelope and the transfers in this calculation for the original determinant-cleared words. Its fixed-$\epsilon$ majorant alone has no uniform integrable limit. [Level-zero adjoint and interpolation](SPECTRAL_LEVEL_ZERO_AND_CUTOFFS.md) · [Transfers and determinant-cleared word bounds](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L7193-L7277)
+
+<!--
+% END FBE26
+-->
+
+<!--
+% BEGIN FBE27
+-->
+
+<span id="claim:FBE27"></span>The compact exhaustion also converges at an individual regular terminal orbit with nontrivial stabilizer. Let $g_0$ represent the orbit, with its fixed monomial cross Gram. For the left radical put $H=N\cap g_0Ng_0^{-1}$ and choose complement root coordinates so that $u=\rho s$, $\rho\in H$. Such coordinates are obtained by eliminating the free entries successively by unitriangular row operations, with diagonal one. They have product Haar measure. In the second radical write $v=g_0^{-1}\rho^{-1}g_0 u'$. Put $Z=s^{-1}g_0v=u^{-1}g_0u'$ and $X=R(s)+R(v)$, with the fixed unitary Frobenius norms of FBE25. Then
+$$
+ X\le C_{g_0}R(Z)^{6(r+1)^2},\qquad R(u')\le C_{g_0}R(u)X^2.
+$$
+For the first bound form the cross Gram on the two frames. Its lower and upper unitriangular factors are uniquely recovered in the complement coordinates from minors of sizes at most $r+1$ divided by fixed products of the monomial pivots. This is Gaussian elimination in the pivot row order, including when an unpermuted principal minor vanishes. Each entry thus has size $\ll_{g_0} R(Z)^{r+1}$. The finite inverse series of a unitriangular matrix of size $r+1$ costs at most $r$ such factors in each entry. These matrices bound $s^{-1}$ on the first fixed frame and, from $s^{-1}g_0=Zv^{-1}$, on the second by $\ll_{g_0}R(Z)^{1+r(r+1)}$. The two frames span a nondegenerate space with positive definite orthogonal complement on this regular orbit. Pairing with their images bounds the projection of $s$ on that span, using its fixed Gram inverse. The complementary norm of $s x$ for a Euclidean unit vector $x$ is bounded by this projection and the fixed bound on $|h(x,x)|$, since $h(sx,sx)=h(x,x)$. Thus the same polynomial bound controls $s$; $v=g_0^{-1}sZ$ costs one additional power, within the stated exponent. For the second inequality use $\rho=us^{-1}$ and submultiplicativity. In these coordinates inversion preserves the Frobenius norm of a unitary matrix.
+
+Take a decay exponent $A$ and set $a=A/(6(r+1)^2)$, $b=4(r(2r+k+1)+1)$, $M=a-2b$. The gap in FBE25 allows $a\ge4b$. Normalize the stabilizer integral by inserting $R(u)^{-M}/\int_H R(\tau u)^{-M}\,d\tau$. It has mass one on each stabilizer orbit and its denominator is at least $R(s)^{-M}\int_H R(\tau)^{-M}\,d\tau$. Both this last integral and $\int_N R(\tau)^{-b}\,d\tau$ converge: there are at most $2r(2r+k+1)$ real free root coordinates, bounded by a constant times the matrix norm, with product Lebesgue measure. The absolute value of the normalized terminal integrand is consequently at most
+$$
+ C_{g_0} R(u)^{-M}X^{M-a}
+ \le C'_{g_0} R(u)^{-(a-3b)} R(u')^{-b}.
+$$
+Both factors are integrable. Compact stabilizer integrations only change constants. The integrand converges pointwise for the common compact exhaustion and, for the undifferentiated terminal coefficient, for $\chi(G/\epsilon)\to1$ at positive Gram. Dominated convergence proves convergence at the prescribed point. A terminal point with empty relevant orbit has zero integral. No limiting supremum over different orbits is involved. [Fixed-orbit stabilizer and majorant](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L4758-L4833) · [Two-frame coordinate recovery](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L8785-L8866)
+
+<!--
+% END FBE27
+-->
+
+## Determinant-cleared differentials of the original coefficient
+
+<!--
+% BEGIN FBE28
+-->
+
+<span id="claim:FBE28"></span>There is a way to test unregulated $L^2$ using only group operators with polynomial coefficients. Put $t=TT'$, $H_0=|\zeta|^2-t$, $D_r=\prod c_j$, $D=D_r\zeta$. Let $(a_Y,b_Y)^t$ be the first column of the positive site product in FBE12. Use a superscript $\vee$ for the product with $p_j=c_j\partial_{c_j}$ replaced by $-\bar p_j$ and the $c_j$'s in the off-diagonal entries conjugated. In the terminal intertwiner frame with $\nabla_\pi=\partial_\zeta+\alpha_\pi\bar\zeta/H_0$, set
+$$
+ X=D_ra_Y,\quad Z=\overline{D_r}H_0(\ell_0(Y)a_Y+b_Y),\qquad
+ X^\vee=\overline{D_r}a_Y^\vee,\quad
+ Z^\vee=D_rH_0(m_0(Y)a_Y^\vee+b_Y^\vee),
+$$
+where $\ell_0=-\nabla-(Y+1/2)\bar\zeta/H_0$ and $m_0=-\nabla^*-(Y-1/2)\zeta/H_0$. We explain the group realization used for these four expressions.
+
+Write $E=(e_1,\ldots,e_r)$, $F=(f_1,\ldots,f_r)$ for the paired flags, and $(w_0,\ldots,w_k)$ for a basis of the residual space. Orient the full basis as $(E,w_0,\ldots,w_k,f_r,\ldots,f_1)$. In the ordered minor convention of FBE12 contract $\Delta_{E,P}(Y+(d-1)/2)$ against $\det(h(gp_b,e_a))$ and sum over $r$-element basis lists $P$ in basis order. The reflected contraction uses $\Delta_{P,F}(Y-k/2-1)$ against $\det(p_b^*(g^{-1}e_a))$. After evaluation on the regular section only $P=E$ or $P=F$, respectively, survives. The first-column expansion leaves the diagonal Euler term and one adjacent character term. Expanding its cofactor on the exposed row gives the coefficient $-c_{j+1}/c_j$. Conjugating by the square root of the section density cancels the remaining half-dimension shift, exactly as in FBE12. Thus the suffix recursion is $P_j=(Y+p_j)P_{j+1}-(c_{j+1}/c_j)P_{j+2}$ with end values $1,Y+p_r$. The reflected recursion conjugates the quotient and replaces $p_j$ by $-\bar p_j$. These give $X,X^\vee$.
+
+For the marked contraction let $I_i=(E,w_0,\ldots,\widehat{w_i},\ldots,w_k)$ and $J_i=(w_0,\ldots,\widehat{w_i},\ldots,w_k,f_r,\ldots,f_1)$. The multiplier for $\Delta_{I_i,P}(Y+(d-1)/2)$ is the full determinant with columns $(g^{-1}e_r,\ldots,g^{-1}e_1,g^{-1}z,P)$ times $-(-1)^{r(r+k+2)+i}h(w_i,z')$. For the reflected $\Delta_{P,J_i}(Y+k/2-1)$ use the covector determinant $(h(g\,\cdot,e_a)_a,h(g\,\cdot,z),P^*)$ times $-(-1)^i z'_i$. Sum over $i$ and $|P|=r+k$. Each multiplier is placed to the left of the differentiations. The two marking groups preserve the flag wedges and preserve the extra marked vector modulo that flag. On the right, conjugating a derivative conjugates its row and column lists; the determinant of the conjugating matrix from the exterior volume is canceled by its inverse in the complementary determinant. These contractions thus preserve the required covariance before applying $J$. Each has differential order at most $d$ and multiplier degree at most $r+1$ since $g^{-1}=Hg^*H$.
+
+On the section the same suffix recursion reaches the last flag coordinate. The diagonal terms are $-(Y+p_r)q^0_{10}$ and $-(Y-\bar p_r)q^0_{01}$. In the other term the two contracted middle vectors occur as their alternating two-vector and two-covector wedges, exactly the double cofactor for $q^0_{11}$ in FBE12. Its scalar is $-1/c_r$, respectively $-1/\bar c_r$; reversing the two wedge orders in the reflected calculation changes the sign twice. Including the outside signs gives $\overline{D_r}(q^0_{10}a_Y+q^0_{11}b_Y)$ and $D_r(q^0_{01}a_Y^\vee+q^0_{11}b_Y^\vee)$. In the above frame the diagonal parts give $x(Y)Z,x(Y)Z^\vee$ and their off-diagonal parts are the type raises and lowers times $(\overline{D_r}/D_r)X,(D_r/\overline{D_r})X^\vee$. Subtract these terms and divide by $x(Y)=\prod_j(Y+\rho_{\pi j})$ on each type. Choosing $r+2$ distinct real parameters away from the roots in all types, polynomial interpolation recovers $Z,Z^\vee$ at any parameter, including a root. The four transfers on this frame are therefore finite sums of $J$ applied to polynomial group differentials, with bounded matrix multipliers. The uniform order and degree concern each summand; the number of terms may vary with the rank. [Exterior contractions, covariance and suffix minors](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L6576-L6800)
+
+<!--
+% END FBE28
+-->
+
+<!--
+% BEGIN FBE29
+-->
+
+<span id="claim:FBE29"></span>To iterate these transfers, write $\Omega=D/|D|$, $K_j=(\overline{D_r}/D_r)S_j$ for a single compact-type raise, and work with the multiplication algebra generated by $K_j,K_j^*$, constant diagonal type matrices, $\Omega^{\pm1},\zeta^{-1},\bar\zeta^{-1}$. It consists of bounded multipliers for the fixed mark since $|\zeta|^2>t>0$. In the compact type frame of FBE28 the raises are constant and $\alpha_{\rho+\mathbf e_j}=\alpha_\rho-1$. For each of the four operators $U$ this gives $U(Y)K_j=K_jU(Y-1)$, with shift $+1$ for $K_j^*$. The phase of $K_j$ lowers the two site Euler operators by one and the change of connection gives the identical shift at the marked coordinate. Constant type diagonals commute with the four uncorrected families. For multiplication by $\Omega^a$, $a=\pm1$, the sites shift $Y$ by $a/2$ in both signs. Beyond $\Omega^a Z(Y+a/2)$ the residue has the extra term $at\,\Omega^{a-2}X(Y+a/2)/(2\bar\zeta)$. Its reflected version has $at\,\Omega^{a+2}X^\vee(Y+a/2)/(2\zeta)$. Differentiate the phase in $\zeta,\bar\zeta$ to obtain these terms, using $|\zeta|^2-H_0=t$. The unmarked operators commute with both inverse coordinates; the remaining nonzero commutators are
+$$
+ [Z,\zeta^{-1}]=\Omega^{-2}(1-t/|\zeta|^2)X,\qquad
+ [Z^\vee,\bar\zeta^{-1}]=-\Omega^{2}(1-t/|\zeta|^2)X^\vee.
+$$
+The product rule thus moves any multiplier left of any one of the four operators, leaving bounded multipliers and words of the same or smaller length. Applying FBE28 successively gives a finite sum of bounded multipliers times transformed group coefficients. An $h$-letter composition costs at most $hd$ invariant derivatives and $h(r+1)$ powers of group growth, because invariant derivatives preserve the polynomial coefficient degree. For $h\le 2N+2$ the decay available in FBE25 leaves the threshold $2(k+r)(r+1)+1$ with four derivatives to spare. FBE24 bounds the $L^2$ transforms. To identify these transforms after compact exhaustion, on each regular orbit first use the fixed-orbit majorant of FBE27 or the same triangular recovery with all pivots nonzero; the coefficient and its finitely many differentiated versions have the extra power for that majorant. Fatou identifies the $L^2$ bound at the chosen characters. Equivalently the compact approximants converge by FBE24, and their almost-everywhere subsequential limit agrees with the pointwise regular transform. The orthonormal intertwiner frame with its square-root density is isometric for this norm.
+
+Finally the original bare column uses $D^{-1}X$ and $\bar D^{-1}Z$ and a bounded residue multiplication matrix. Commuting a real power $|D|^u$ to the left shifts $X$ by $u/2$ and $X^\vee$ by $-u/2$. For $Z$ the correction is $ut\,\Omega^{-2}X(Y+u/2)/(2\bar\zeta)$, and for $Z^\vee$ it is $-ut\,\Omega^{2}X^\vee(Y-u/2)/(2\zeta)$. This follows from $p_j\log|D|=1/2$ and $\partial_\zeta\log|D|=1/(2\zeta)$. Writing the two inverse determinants as $|D|^{-1}\Omega^{\mp1}$ and commuting all $m$ positive powers to cancel them expresses the determinant-cleared word as a finite sum of the $L^2$ terms just bounded. On a compact parameter box separated from earlier poles the residue matrices are bounded and the remaining polynomials have degree at most $r+1$ in the newest parameter. Lagrange interpolation at $r+2$ fixed nodes gives a pointwise envelope by a constant times the sum of absolute values of finitely many $L^2$ functions. This constructs the $B_a$ used in FBE26. The remaining identification in this route is the choice of the *actual* compact intertwiner frame with the stated diagonal connection and constant raising matrices, together with the signed adjunction on the reached binary words in that frame. The determinant-cleared estimates apply to that prescribed frame once the identification is made. [Frame commutators and transfer of words](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L6800-L6878) · [Determinant shifts in the actual section](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L7217-L7277)
+
+<!--
+% END FBE29
+-->
+
+<!--
+% BEGIN FBE30
+-->
+
+<span id="claim:FBE30"></span>We identify the frame in FBE28 using the original middle group on $|\zeta|^2>t$. In coordinates putting each negative mark on its last axis the middle representative fixes the common $k-1$ positive directions. Restriction to their $U(k-1)$ has multiplicity one in each of the two compact representations. Choose constant unit intertwiners on the common type lines. In this initial frame put $F=M_{10}$, $M_{11}=H_0 x(Y)$, $x_\rho(Y)=\prod_{j<k}(Y+\rho_j)$, in the unsigned convention. The cofactor omitting row zero commutes with $\bar\zeta$ because its generator bracket contains that row; the bracket with $\zeta$ expands its remaining column zero and gives the negative double cofactor. Thus $[F,\bar\zeta]=0,\ [F,\zeta]=-H_0x$. From the exchange relation of FBE13, on type $\rho$ the diagonal of $F(Y)/x_\rho(Y)+Y\bar\zeta$ is independent of $Y$. Its scalar commutators give the expression $H_0 x_\rho(Y)(-\partial_\zeta-A_\rho-(Y+1/2)\bar\zeta/H_0)$. On two distinct types the same relation with the parameters interchanged gives
+$$
+ (x_{\rho'}(u)-x_\rho(u))F_{\rho'\rho}(v)
+ =(x_{\rho'}(v)-x_\rho(v))F_{\rho'\rho}(u).
+$$
+A nonzero block therefore has parameter-independent factor $S$ and $x_{\rho'}/(x_{\rho'}-x_\rho)=Y+a$. Comparing roots in the disjoint interlacing intervals leaves only $\rho'=\rho+\mathbf e_j$, $a=\rho_j+1$. The corresponding $S$ commutes with both radial coordinates, so it is a scalar multiplier on the line. The determinant of FBE16 at $Y=-\rho_j-1$ determines its norm squared as $-q(-\rho_j-1)/\prod_{i\ne j}(\rho_i-\rho_j)(\rho_i-\rho_j-1)$. This is constant on the radial annulus. An allowed edge has a nonzero value by strict interlacing; at the forbidden upper endpoint the corresponding compact polynomial vanishes.
+
+For the phase of the diagonal put $d_\rho=\sum_j\rho_j$, $u_*=\sum_i(u_i+u_i')$, $\alpha_\rho=u_*/2-d_\rho$, $\nabla=\partial_\zeta+A_\rho$. Up to a type-independent scalar, the coefficient of $Y^k$ in $M_{00}$ is
+$$
+ \Theta=\zeta\nabla+\bar\zeta\nabla^*+d_\rho-2\alpha_\rho t/H_0.
+$$
+Indeed the diagonal Schur complement for $M_{00}$ has numerator $q(Y)$ plus the occupied raise-and-lower cofactors, divided by $H_0x_\rho(Y+1)$. Its two leading coefficients before the factor $1/H_0$ are $-t$ and $-t(1+u_*-d_\rho)$. The diagonal product $H_0x m_0\ell_0$ contributes $\zeta\nabla+\bar\zeta\nabla^*+t/H_0+d_\rho|\zeta|^2/H_0$ in degree $k$; the other shifts have degree at most $k-1$. The exchange relation gives $[\Theta,F(v)]=-F(v)$ by its leading coefficient. Project to the type line and substitute its diagonal expression for $F$. Using $[\zeta\nabla+\bar\zeta\nabla^*,\nabla]=-\nabla+\bar\zeta[\nabla^*,\nabla]$ gives $[\nabla^*,\nabla]=2\alpha_\rho t/H_0^2$. Thus for $\beta=\alpha_\rho\bar\zeta/H_0-A_\rho$ the imaginary one-form $\beta\,d\zeta-\bar\beta\,d\bar\zeta$ is closed.
+
+There can still be monodromy on this annulus. On the representative $g(\zeta)$ the middle central circle $v$ rotates $\zeta$ to $v\zeta$. It also multiplies the coordinates other than the negative axis by $v$ on the left and just the first positive coordinate by $v$ on the right; these two stabilizer actions have integral common-line weight $m_\rho$. Differentiating this action gives $\zeta\partial_\zeta-\bar\zeta\partial_{\bar\zeta}+m_\rho$. Comparison with the preceding trace coefficient in the centered convention gives $2\Re(\zeta\beta)=u_*-d_\rho-m_\rho\in\mathbb Z$. Indeed the centered compact weights lie in $\mathbb Z+(k-1)/2$ and the $k-1$ interlacing coordinates in $\mathbb Z+k/2$. The closed form consequently has periods in $2\pi i\mathbb Z$. Its exponential integral defines a single-valued unitary change of frame giving $A_\rho=\alpha_\rho\bar\zeta/H_0$.
+
+For an allowed single raise the $(\rho+\mathbf e_j,\rho)$ entry of $[F(u),F(v)]=0$ gives $[\nabla,S_j]=-(\bar\zeta/H_0)S_j$ by comparing the coefficient linear in $u$ after removing the common factors. In the normalized frame $\alpha_{\rho+\mathbf e_j}=\alpha_\rho-1$ cancels the right side, hence $\partial_\zeta S_j=0$. The constant modulus already proved forces this antiholomorphic multiplier to be constant. For two distinct raises, the entry on their square in the same commutator gives $(d-1)S_iS_j=(d+1)S_jS_i$ in the appropriate order with $d=\rho_j-\rho_i$, $|d|>1$. The two products have the same phase. Since monotone paths in the interlacing box differ by such squares, rephasing the constant line bases makes all nonzero raises positive. This proves the frame and the constant-matrix assertion for the original coefficient. [Group connection and its angular period](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L6205-L6453) · [Adjacent raises and the interlacing square](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L6454-L6522)
+
+<!--
+% END FBE30
+-->
+
+<!--
+% BEGIN FBE31
+-->
+
+<span id="claim:FBE31"></span>In the preceding frame the adjoint on a positive word gives the energy of the actual group section. For the binary factor of a letter at $a$, let $R_a(Y)=((Y-a)1-\Pi_a)/(Y-a-1)$ with $\Pi_a$ the flip with the auxiliary factor. Let $S_w$ be the ordered product over the old letters, $T_w=Q_0 S_w$ where $Q_0$ includes the sign of the cut. Write $v_Y=(a_Y,b_Y)^t$ and $C_w=v_Y^*T_wv_Y$. The matrix $R_a$ is self-adjoint for real parameters separated from its pole. The exchange identity at $(a,Y)$ transports $T_w^*\mathcal R_w=\mathcal R_w T_w$ to the new residue form $\mathcal R_{aw}=\operatorname{diag}(\mathcal R_w,\mathcal R_w)T_w(a)$. The base case is the compact group adjoint of FBE13. On the alternating auxiliary line the shifted product of $R_a$ has scalar $(Y-a+1)/(Y-a)$. FBE16 and multiplication over disjoint bit factors give the determinant $Q(Y)=q(Y)\prod_a (Y-a+1)/(Y-a)$.
+
+Conjugate by the old shear frame $F_w$ that diagonalizes the residue. Completing the two squares of FBE10 gives $\mathcal R_{Yw}=F_{Yw}^*D_{Yw}F_{Yw}$ with $F_{Yw}=\Lambda_w(Y)\operatorname{diag}(F_w,F_w)$. The diagonal factors of $\Lambda_w$ are $\zeta^{-1},H_0/\bar\zeta$, with the lower-left shear chosen by the off-diagonal coefficient. The new two weights relative to $D_w$ are $WQ(Y)/x(Y+1)$ and $Wx(Y)$, where $x$ includes the old zero-bit factors. Thus, writing $g_Y=\Lambda_w v_Y$, contraction gives $(g_Y^*D_{Yw}g_Y)F_w=D_wF_w C_w$. This step uses that $v_Y$ and its adjoint act on the $c_j$ variables and commute with the old radial frame. The shear residues stay in the bounded multiplication algebra of FBE29. At the empty word their terms are $(\zeta/\bar\zeta)S_j/(Y+\rho_j)$ in the appropriate projected types. Adjoining $a$ replaces the old diagonal residue in bit zero by $E_w(Y)-(E_w(Y)-E_w(a))/(Y-a)+t/\bar\zeta$, creates a scalar off-diagonal $-1/(Y-a)$ and conjugates the bit-one diagonal by the constant old pivot $x_w(a)$. These are bounded on the next separated box.
+
+For the section reached by the old word let $u_w$ apply the old site matrices on their bits to the zero binary vector, in site order. The one-site identities $[p_i,c_i]=c_i$ and $[p_i,c_i^{-1}]=-c_i^{-1}$ give the same exchange relation between a new auxiliary site and each old bit site as between $R_a$ and the two auxiliary matrices. Move $S_w$ through these site products one factor at a time. The adjoint sites commute with the old sites in different complex variables (holomorphic versus antiholomorphic), and $Q_0$ acts in the middle coordinates. Since every $R_a$ fixes the auxiliary-zero, all-zero column, taking its auxiliary-zero component gives $C_wu_w=u_w C_0$. The centered Capelli operator on the original smooth coefficient has eigenvalue $P(Y)=\prod_i(Y+\lambda_i)$. Covariance and the decay and fixed-point bounds above allow its invariant derivatives to pass through the orbital integral on the regular section. The signed $C_0$ therefore acts on $j$ by $|P(Y)|$ on the cut. For $X_w=F_wu_wj$ the required adjoint identity follows. Compact radial truncation away from $G=0$ for the pairing is justified by FBE24–25 and FBE29 up to order $2N+2$.
+
+A negative letter uses the partially transposed flip in $R^-_a=((a-Y)1-\Pi_a^{t_1})/(a-Y-1)$ to the left of the old transfer. Its alternating-line scalar is $(a-Y)/(a-Y-1)$. Transposition of the exchange at $(a,Y)$ gives $T_w(Y)R^-_a(Y)T_w(a)^t=T_w(a)^tR^-_a(Y)T_w(Y)$, so the same weighted adjunction holds. The shifted $11$ identity gives the reflected lower shear $D_w^{-1}\ell_w(a-1)^*D_w$. FBE10 then gives relative weights $WQ(a-1)/x(a-1)$ and $Wx(a)$, positive on the admitted intervals. These are the weights used on the compact projections of FBE17. Finally the all-zero path uses only $C_0$ for each signed letter. At each positive Gram cutoff its Gram energy is a polynomial of degree at most $k+2r+1$ in each of the actual evaluation parameters, with the same polynomial for the two sign conventions. The site degrees are at most $r$ on either side of the middle matrix of degree at most $k+1$. Interpolation on the separated positive grid of the level-zero proof therefore transports its cutoff limit to every reached signed word. FBE26 and FBE28–30 supply its differentiated cutoff bounds. The result is the uncut norm divided by $\Gamma_0$ after division by the native word weight. [Bit exchanges and the adjoint on the selected vector](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L6882-L7082) · [Signed insertions](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L7346-L7488) · [Box widths and interpolation on the constructed row](SPECTRAL_LEVEL_ZERO_AND_CUTOFFS.md)
+
+<!--
+% END FBE31
+-->
+
+<!--
+% BEGIN FBE32
+-->
+
+<span id="claim:FBE32"></span>The constant $C_7$ in FBE26 can be chosen before the rank and the translated coefficient. Use the separated boxes of the level-zero proof, of length $L$ in the middle third of the cut of length $I$, with $6NL\le I$, $dL\le I$, $N\le L$ and $L>2$. On the next box any earlier letter is at distance $\ge L$. The old-letter factors $(Y-a)/(Y-a-1)$ and $(Y-a+1)/(Y-a)$ are between $1$ and $1+2/L$ or $1+1/L$. Their products, including the shifted pivot, are between $1$ and $e^2$ or $e$. Each of the compact polynomials in the weights has roots outside the cut in its indicated shift. The ratio of any such product of degree at most $d$ between two points of the box, in either direction, is at most $(1+3L/I)^d\le e^3$. Apply this separately to both compact polynomials in $Q$. The ratios of the two next weights are at most $e^{12},e^5$; that of $|P|$ is at most $e^3$.
+
+The triangular change in the second component under a common shift subtracts the two residue matrices $E_w(Y)-E_w(Z)$. To see the rank dependence, separate the possible output edges. Terms at an old pole flip just that bit; terms at a type pole raise its one coordinate. For each fixed edge label the map on the other indices is a partial matching. An old pole gives a reciprocal difference of modulus $\le L/(L-1)^2$. Inserting it into the old-bit recursion in FBE31, or subtracting the two partial fractions of that recursion, gives squared coefficient times the weight ratio at most $e^{14}/L^2$: the rational products at earlier letters are bounded by $e^2$, and the shifted positive weights by the preceding ratio bounds (equivalently $|1/(Y-a)-1/(Z-a)|\le1/L$ for $Y,Z$ in the new box). The sum over at most $N\le L$ bit positions has squared operator norm at most $e^{14}$.
+
+For the type terms put $b_j=-\rho_j-1$ and $R(t)=\prod_i(t+1/2+u_i)/\prod_j(t-b_j)$; let $\widetilde R$ have the second compact weights and the shifted poles $b_i+1$. By interlacing the residues of $R$ are $-A_j\le0$. Pair each zero with its neighbouring pole separately on either side of the cut, keeping the extra zero. The logarithmic derivative $R'/R$ is a signed sum of reciprocals; on either side the monotone telescoping differences and a possible unpaired endpoint have absolute sum at most $3/I$. The polynomial part of $R$ is monic linear. Hence $1+\sum A_j/(Y-b_j)^2=R'(Y)\le6|R(Y)|/I$. The same holds for $\widetilde R$. For an allowed raise the weight spacing gives $|b_j-b_i-1|\ge1$ for every $i$. Write $d_j=|Y-b_j|\ge I/3$. In the partial fractions for $\widetilde R(b_j)-\widetilde R(Y)$ use $|Y-b_i-1|\le(1+d_j)|b_j-b_i-1|$. This gives $|\widetilde R(b_j)|/|\widetilde R(Y)|\le 1+6d_j(1+d_j)/I\le11d_j^2/I$. Therefore
+$$
+ \sum_j \frac{A_j|\widetilde R(b_j)|}
+ {|R(Y)\widetilde R(Y)|\,|Y-b_j|^3|Y-b_j-1|}
+ \le 132/I^2 .
+$$
+The edge coefficient is the norm of the raise in FBE30 times the difference of its two resolvents. Squaring and taking the ratio of the incoming and outgoing weights cancels the two products of the other compact poles in its norm formula. This leaves each summand displayed above times at most $4e^7 L^2$, using $|Y-Z|\le L$, the two comparable pole distances and the bounded old-letter factors. Cauchy–Schwarz over the $k-1$ possible type raises bounds their squared norm by $528 e^7(k-1)L^2/I^2\le88e^7$, since $(k-1)L\le I$ and $6L\le I$. The two edge sums together cost at most $2e^{14}+176e^7$ in squared norm. Thus $C_R,C_d,C_P$ in the regulated estimate have absolute bounds. Choosing $L=C(r+1)^3$ with absolute sufficiently large $C$ meets the lower bound in FBE26, and the selected cut contains all the boxes by its stated gap and the level-zero estimate. This completes the differentiated energy limit at the parameters of the constructed family. [Two weight ratios and the residue calculation](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/405237610e58ab9d4a9d5d54d9a0548a0c44227c/sections/g-real-restriction.tex#L7069-L7177) · [Actual cut width and signed grid](SPECTRAL_LEVEL_ZERO_AND_CUTOFFS.md)
+
+<!--
+% END FBE32
+-->
