@@ -107,3 +107,175 @@ The formal propagation theorem states this condition in two forms. At a suitable
 <!--
 % END ETS6
 -->
+
+## Removing the extra local conditions at the level primes
+
+<!--
+% BEGIN ETS7
+-->
+
+<span id="claim:ETS7"></span>Let $\ell$ be prime, let $O$ be one of the finite DVRs over $\mathbf Z_\ell$ in the source, and write $E_\ell=\operatorname{Frac}O$. For $e\ge1$ and a finite Dirichlet character $\psi$ of order prime to $\ell$, put $M_\psi=(E_\ell/O)(-e)\otimes\psi^{-1}$. This is the actual coefficient of the length $V'$ since $O$ is finite free over $\mathbf Z_\ell$ and $O\otimes(\mathbf Q_\ell/\mathbf Z_\ell)=E_\ell/O$. For $p\ne\ell$ consider a locally unramified cohomology class, i.e. a class trivial on $I_p$. Inflation–restriction places it in $H^1(D_p/I_p,M_\psi^{I_p})$. Inertia acts through the finite character at $p$. If this character is nontrivial, some inertia element acts by a root of unity of order prime to $\ell$ different from one. Its reduction also differs from one, so $M_\psi^{I_p}=0$. Otherwise $M_\psi^{I_p}=M_\psi$. Arithmetic Frobenius acts by $p^{-e}\psi(\mathrm{Frob}_p)^{-1}$. This scalar differs from one, since $p^e$ is not a root of unity. Multiplication by its difference from one is surjective on $E_\ell/O$. A cocycle on the procyclic quotient is determined by Frobenius, and its value is therefore a coboundary. In both cases triviality on inertia already implies triviality on $D_p$. [The allowed coefficient rings](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/DirichletPrimeToLPartMulLPowerPart.lean#L10-L15) · [The divisible coefficient and twist](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/ConjStableShaFam.lean#L14-L35) · [The inverse character and lengths](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L15-L34)
+
+Consequently adding every decomposition group over $N$ to the original strict condition at $\ell$ gives exactly the same kernel for these characters. In particular $V'=V$ here at *every* positive level $N$. The argument concerns the groups themselves, before taking lengths, so it applies also before finiteness has been proved. The prime-to-order hypothesis holds in the source's generic case. At a ramified prime with an $\ell$-power character the inertia invariants can be finite and the argument removing the decomposition condition need not apply. [Original inclusion for the two local conditions](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L42-L67) · [The generic coefficient-prime assumptions](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/Counts.lean#L9-L23)
+
+<!--
+% END ETS7
+-->
+
+## All characters with one kernel occupy distinct summands
+
+<!--
+% BEGIN ETS8
+-->
+
+<span id="claim:ETS8"></span>Fix $N$ and a kernel $H$ occurring in the orbit of the source. Let $F=\mathbf Q(\zeta_N)^H$, $\Gamma=\operatorname{Gal}(F/\mathbf Q)$ and $d=[F:\mathbf Q]$. Then $\Gamma$ is cyclic and $d$ is the order of each character in this orbit. For $\ell\nmid d$ set $S_{F,\ell}(e)$ equal to the unramified-away-from-$\ell$ part of $H^1(F,(\mathbf Q_\ell/\mathbf Z_\ell)(-e))$ with zero restriction at each $v\mid\ell$. With $\ell$ odd the real places contribute zero. The analogous rational group with source coefficient $M_\psi$ and the additional level conditions in $V'$ is canonically identified, using the standard generator of the character line, with
+$$
+ (S_{F,\ell}(e)\otimes_{\mathbf Z_\ell}O)^{(\psi)}.
+$$
+Here $\Gamma$ acts on the first factor through its natural action on twisted cohomology, including the cyclotomic action on the coefficient. The superscript specifies the eigenspace on which $g$ acts as $\psi(g)$. [Characters, common kernel and cyclic quotient](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/OrbFacts.lean#L17-L28) · [The character and its cyclotomic level subgroup](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L108-L128) · [Conjugation on the Selmer group and restriction](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/RestrictionMemInvariantH1.lean#L213-L231)
+
+Indeed the degree $d$ is invertible on the coefficients, so the first and second cohomology groups of $\Gamma$ with values in any invariant submodule vanish by averaging. Restriction identifies rational cohomology with the invariant classes over $F$. At every finite prime the corresponding quotient of decomposition groups, and likewise of inertia groups, has order dividing $d$. Local restriction on degree-one cohomology is injective for the same reason. Thus each zero local restriction can be checked after passing to $F$, including at primes ramified in $F/\mathbf Q$. ETS7 removes the extra level conditions first. Over $F$ the finite twist is trivial. Taking the tensor with the finite free $O$ commutes with these kernels, as is also seen using a finite $\mathbf Z_\ell$-basis. Untwisting the $\Gamma$-invariance leaves the displayed $\psi$-eigenspace.
+
+For two distinct characters in the orbit the integral operators $d^{-1}\sum_{g\in\Gamma}\psi(g)^{-1}g$ are orthogonal idempotents. This follows by summing the powers of the value at a generator. Their images form a direct sum in the single module $S_{F,\ell}(e)\otimes O$. When the latter has finite length, division by $e_O=\operatorname{length}_O(O/\ell O)$ gives the uniform orbit inequality
+$$
+ \sum_{\ker\psi=H} V_n(e,\psi)\ \le\
+ \operatorname{length}_{\mathbf Z_\ell}S_{F,\ell}(e).
+$$
+Indeed $O/\ell^a O$ has length $a e_O$. There is no multiplicity factor for the number of characters in the orbit. The field $F$ is a function of $N,H$ alone, even when the coefficient ring is separately chosen at each prime. [The normalized quantity in the count](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/DirichletPrimeToLPartMulLPowerPart.lean#L114-L120) · [The source orbit](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/DirichletPrimeToLPartMulLPowerPart.lean#L140-L146) · [Order of the field, integer and coefficient-prime quantifiers](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L36-L52)
+
+<!--
+% END ETS8
+-->
+
+## A finite integer controlling all eligible coefficient primes
+
+<!--
+% BEGIN ETS9
+-->
+
+<span id="claim:ETS9"></span>For a number field $F$, an odd prime $\ell$ and $e\ge1$, put $M=(\mathbf Q_\ell/\mathbf Z_\ell)(-e)$ and $T=\mathbf Z_\ell(e+1)$. Then
+$$
+ S_{F,\ell}(e)^\vee \ \simeq\
+ \ker\!\left(H^2(G_{F,S},T)\longrightarrow
+                 \bigoplus_{v\mid\ell}H^2(F_v,T)\right)
+ \ \subseteq\ K_{2e}(\mathcal O_F)\otimes\mathbf Z_\ell ,
+$$
+where $S$ consists of the places above $\ell$ and infinity, and the dual is Pontryagin duality. The same assertion holds for $\ell=2$ if $F$ is totally imaginary. A class unramified away from $\ell$ factors through $G_{F,S}$ because inertia there acts trivially and the cocycle vanishes on the closed normal subgroup those inertia groups generate. Under these hypotheses the archimedean Tate cohomology in positive degree vanishes. [Inertia, decomposition and the absolute kernel](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaAbsTop.lean#L137-L145) · [The quotient-group realization of the length](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaAbsTop.lean#L194-L202)
+
+Apply Poitou–Tate to the finite pair $\mathbf Z/\ell^a(-e)$ and $\mathbf Z/\ell^a(e+1)$, whose cup product takes values in $\mu_{\ell^a}$. The two local kernels in degrees one and two are perfect duals. The exact direct limit on the first side gives $S_{F,\ell}(e)$ since $S$ is finite and continuous cohomology of a profinite group with discrete torsion coefficients commutes with the direct limit. The dual inverse limit is the displayed kernel. The degree-one global and local groups with finite coefficients are finite, so their inverse systems satisfy the Mittag–Leffler condition and the continuous degree-two cohomology with lattice coefficients is the inverse limit. The comparison for primes inverted on $\mathcal O_F[1/\ell]$ identifies global Galois cohomology here with étale cohomology. The Quillen–Lichtenbaum calculation for number rings identifies $H^2_{\mathrm{et}}(\mathcal O_F[1/\ell],T)$ with the $\ell$-part of $K_{2e}(\mathcal O_F)$. Localization at $v\mid\ell$ causes no loss in this assertion: $K_{2e}(\kappa(v))=0$ and $K_{2e-1}(\kappa(v))$ has order $|\kappa(v)|^e-1$, prime to $\ell$. The even group of the ring of integers is finite by finite generation and Borel's rank formula. [Milne, *Arithmetic Duality Theorems*, I.4.10 and II.2.9](https://www.jmilne.org/math/Books/ADTnot.pdf) · [Weibel, *The K-book*, VI.8.1–8.2](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf)
+
+Apply this to the character field $F$ of ETS8 and set $B_{N,H,e}=|K_{2e}(\mathcal O_F)|$. If the quotient with kernel $H$ is noncyclic there is no character with that kernel and one may take $B_{N,H,e}=1$. Otherwise this single positive integer is chosen before any coefficient prime, coefficient ring or auxiliary prime. At every odd $\ell$ for which an orbit member satisfies the source's generic predicate, $\ell\nmid d$. ETS8 and the injection above prove finiteness of every length in the orbit and
+$$
+ \sum_{\ker\psi=H} V_n(e,\psi)\le v_\ell(B_{N,H,e}),\qquad
+ \sum_{\ell\in L}\log\ell\,\sum_{\ker\psi=H}V_n(e,\psi)
+       \le \log B_{N,H,e}
+$$
+for any finite set $L$ of such primes. The second inequality follows by prime factorization. This proves the finiteness and valuation clauses in the one-integer construction with coefficient one. Its separate size clause requires a bound on the logarithm of an admissible integer with a fixed exponent as $e,N,H$ vary. Finiteness of the even $K$-group supplies the integer without that rate. For the rational trivial character with $(\ell-1)\nmid e$, the local $H^2$ is dual to $M^{D_\ell}=0$, so the entire $\ell$-primary $K$-group occurs. [Finiteness, valuations and the required uniform logarithmic size](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L36-L53) · [Summation of prime valuations](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/CorGSumLog.lean#L54-L73)
+
+<!--
+% END ETS9
+-->
+
+## Finiteness also at primes dividing the character order
+
+<!--
+% BEGIN ETS10
+-->
+
+<span id="claim:ETS10"></span>Fix any prime $\ell$, a finite Dirichlet character $\psi$, its coefficient DVR $O$, and $e\ge1$. The strict source group defining $V'(N,e,\psi)$ is finite, including when $\ell$ divides the order of the character. Write $F$ for the fixed field of its kernel in the cyclotomic field of level $N$. Use $L=F$ for $\ell$ odd and $L=F(i)$ for $\ell=2$. In the latter case $L$ has only complex places. On $G_L$ the module is $(\mathbf Q_\ell/\mathbf Z_\ell)(-e)\otimes O$. A Selmer class restricts to the kernel $S_{L,\ell}(e)\otimes O$ of ETS9, since zero on an inertia or decomposition group implies zero on its subgroup. This gives finiteness of the restriction image independently of any character idempotents. [The original length including level primes](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L23-L36) · [Restriction and the local kernels](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/GaloisCohomologyLength/ShaAbsRes.lean#L6-L17)
+
+In inflation–restriction the possible kernel is $H^1(\operatorname{Gal}(L/\mathbf Q),M_\psi^{G_L})$. The cyclotomic image of $G_L$ is an open subgroup of $\mathbf Z_\ell^\times$, since $L$ has finite degree. Choose a cyclotomic value $u$ in it of infinite order. Then $u^{-e}-1\ne0$. The invariant module is contained in its kernel on $E_\ell/O$, which is finite. First cohomology of a finite group with a finite module is finite. This proves the assertion for the full preimage of the restricted Selmer group. For odd $\ell$, the group $\operatorname{Gal}(F/\mathbf Q)$ is cyclic of order $d$. Its first cohomology is a subquotient of the cyclic $O$-module $M_\psi^{G_F}$, by the cyclic resolution, and is killed by $d$ by restriction and corestriction. Its normalized length is therefore at most $v_\ell(d)$. The restriction argument gives $V_n(e,\psi)\le v_\ell(d)+v_\ell(|K_{2e}(\mathcal O_F)|)$ also for these primes. The sharper sum with no orbit multiplicity is available when $\ell\nmid d$ by ETS8–9. [Base change and the coefficient length of a scalar](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/ConjStableShaFam.lean#L16-L35) · [Order of the cyclic character field](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/OrbFacts.lean#L17-L23)
+
+In particular at fixed $F,e$ only finitely many odd primes can contribute, since the two integers just exhibited have finite prime support. The same holds for fixed $F$ and a finite range of positive twists, by taking a finite union. These are pointwise results as the host field and the twist range vary. They do not give the uniform height estimate on windows. [Finite lengths and the summed length as distinct clauses](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L69-L77)
+
+<!--
+% END ETS10
+-->
+
+## The exact primitive part and the least possible integer
+
+<!--
+% BEGIN ETS11
+-->
+
+<span id="claim:ETS11"></span>Fix an orbit as in ETS8 and let $A=K_{2e}(\mathcal O_F)$. For $\ell\nmid d$ take the idempotent $P_d$ of the primitive characters of $\Gamma$, namely the sum of the character projectors for characters of exact order $d$. This is defined in $\mathbf Z[1/d][\Gamma]$. For a generator $\gamma$, the coefficient of $\gamma^j$ is $d^{-1}\sum_{(b,d)=1}\zeta_d^{-bj}$, an algebraic integer divided by $d$ and fixed by every automorphism of $\mathbf Q(\zeta_d)$. The idempotent is independent of the generator and is invariant under inversion. For each coefficient prime for which an orbit member satisfies $\mathrm{GD}$ one has the exact equality
+$$
+ \sum_{\ker\psi=H}V_n(e,\psi)
+       =m_\ell,\qquad
+ m_\ell=\operatorname{length}_{\mathbf Z_\ell}
+                   P_d(A\otimes\mathbf Z_\ell).
+$$
+A faithful character identifies $\Gamma$ with the full group of $d$th roots of unity in the coefficient ring, so all primitive characters occur in the orbit. [Conjugate powers and the full primitive orbit](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/OrbFacts.lean#L17-L27) · [The orbit summed by the count](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L36-L52)
+
+It suffices to show that the local degree-two target in ETS9 has zero primitive part. Its dual is $\bigoplus_{\lambda\mid\ell} ((\mathbf Q_\ell/\mathbf Z_\ell)(-e))^{G_{F_\lambda}}$ by local Tate duality. After tensoring with $O$ the $\psi'$-part is identified, by choosing one $\lambda$ and using the transitive $\Gamma$-action, with $M_{\psi'}^{D_\ell}$. Explicitly an eigenvector in this sum is determined by its coordinate at $\lambda$ with the eigencharacter condition for the stabilizer. Twisting that coordinate by $(\psi')^{-1}$ makes it fixed by $D_\ell$. On inertia at $\ell$ the restriction of $\psi$ is its $\ell$-level component, since the roots of unity of order prime to $\ell$ are unramified. The source assumes that this component squares to one. Each primitive power $\psi'=\psi^b$ therefore also has inertia square one. Writing $\omega$ for the residual cyclotomic character, the square of the residual character of $M_{\psi'}$ on inertia is $\omega^{-2e}$. It is nontrivial by $(\ell-1)\nmid2e$ and the total ramification of $\mathbf Q_\ell(\mu_\ell)/\mathbf Q_\ell$. Thus $M_{\psi'}^{D_\ell}=0$, since any nonzero invariant would give one of order the coefficient uniformizer. This proves the required vanishing over $O$ and hence over $\mathbf Z_\ell$ by finite freeness and faithful flatness. Applying $P_d$ to the kernel in ETS9 and using invariance of $P_d$ under duality gives the equality of lengths. This avoids choosing a trace-dual lattice for a ramified coefficient field. [Quadratic inertia component and nondivisibility](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/Counts.lean#L9-L23) · [Projection to the level prime](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/DirichletPrimeToLPartMulLPowerPart.lean#L64-L81) · [Local and global Tate duality](https://www.jmilne.org/math/Books/ADTnot.pdf)
+
+There is now an exact size test for the one-integer route. Fix the quadratic field $K$ of that route and its data $N,H,e,p$. Among the odd primes $\ell\ne p$ with $\ell\mid |A|$, retain those at which *some* allowed coefficient datum has an orbit member satisfying $\mathrm{GD}$ for this $K$. The integer
+$$
+ M_{K,N,H,e,p}=\prod_{\ell\ {\rm retained}}\ell^{\lceil m_\ell/2\rceil}
+$$
+is determined before choosing any later $\Omega,\ell,O$. It satisfies all the required inequalities $\sum V_n\le2v_\ell(M)$ simultaneously, including when an eligible prime lies outside $|A|$. Conversely, for every retained prime use a witnessing coefficient datum in the universal assertion. The equality just proved shows that any nonzero witnessing integer must have valuation at least $\lceil m_\ell/2\rceil$. Thus its absolute value is a multiple of $M$. If the orbit can never occur the empty product works. A polynomial upper bound of the size required in $\mathrm{PropGK}$ for this explicit product is necessary and sufficient for that particular route. The alternative on the original restricted windows may ask for less. [Size and universal integer in the original proposition](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L36-L43)
+
+<!--
+% END ETS11
+-->
+
+## Detecting zero lengths by class groups and reflection
+
+<!--
+% BEGIN ETS12
+-->
+
+<span id="claim:ETS12"></span>At an odd generic prime let $L=F(\mu_\ell)$ and $\Delta=\operatorname{Gal}(L/\mathbf Q)$. Its order divides $d(\ell-1)$ and is prime to $\ell$. For a character in the orbit write $\theta=\omega^{-e}\bar\psi^{-1}$ in the residue field $k$ of $O$. It is nontrivial on inertia at $\ell$ by ETS11. Its parity is even because the finite character's parity agrees with $e$. Write $\mathcal S_\psi$ for the original strict Selmer group. With $\pi$ a uniformizer of $O$ there is an isomorphism
+$$
+ \mathcal S_\psi[\pi]\ \simeq\
+ \operatorname{Hom}_{k[\Delta]}
+     \big((\operatorname{Cl}(L)/\ell)\otimes_{\mathbf F_\ell}k,\,k(\theta)\big).
+$$
+As in ETS1 the exact sequence for multiplication by $\pi$ identifies the global first layer, since the global and $\ell$-local invariants are zero. At $p\ne\ell$, inertia invariants on divisible coefficients are zero or divisible by ETS7, so the maps on finite-coefficient inertia cohomology are injective. Over $L$ the residual character becomes trivial. Restriction is an isomorphism onto invariants globally and injective at every inertia and decomposition group, since the relevant quotient groups have order prime to $\ell$. Artin reciprocity over $L$ gives equivariant class characters once all inertia is killed. Their values on the classes of primes $\lambda\mid\ell$ must be zero to obtain the strict condition. A decomposition group fixes $[\lambda]$, and $\theta$ is nontrivial on that group, so every equivariant homomorphism already kills $[\lambda]$. This replaces the principality argument of ETS1 in fields where such primes can represent nontrivial ideal classes. [The twist whose first layer is being tested](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L15-L34) · [The local subgroups](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GaloisLibrary/SelmerTransport/ConjStableShaFam.lean#L92-L96) · [Hilbert class field and the Artin map](https://www.jmilne.org/math/CourseNotes/CFT.pdf)
+
+We give the reflection test to see which of these contributions already vanish. Let $H_L/L$ be the maximal everywhere unramified elementary abelian $\ell$-extension. Its Galois group is $\operatorname{Cl}(L)/\ell$. Since $L$ contains $\mu_\ell$, Kummer theory pairs this group perfectly with a radical $D\subset L^\times/L^{\times\ell}$ into $\mu_\ell$. The pairing is $\Delta$-equivariant. After scalar extension to $k$, a $\theta$-part of the Galois group has a dual radical part with character $\eta=\omega\theta^{-1}$. For a representative $a$ of an element of $D$, every valuation of $a$ is divisible by $\ell$. Indeed in the unramified Kummer extension the valuation of its $\ell$th root is integral. Thus $(a)=\mathfrak b^\ell$, and the map $a\mapsto[\mathfrak b]$ takes $D$ to $\operatorname{Cl}(L)[\ell]$. Its kernel consists of radicals represented by units.
+
+The field $L$ is abelian CM. For a unit $u$, $u/\bar u$ has all conjugates of modulus one and is a root of unity by Kronecker's theorem. Since $\ell$ is odd, the minus part of the units modulo $\ell$ is therefore generated by roots of unity. Its only possible character is $\omega$: $[L:\mathbf Q]$ is prime to $\ell$, so $L$ contains $\mu_\ell$ and does not contain $\mu_{\ell^2}$. The character $\eta$ is odd and differs from $\omega$, since $\theta$ is even and nontrivial. Consequently the $\eta$-part of the radical injects into the $\eta$-part of $\operatorname{Cl}(L)[\ell]\otimes k$. Vanishing of the latter forces $\mathcal S_\psi[\pi]=0$ and hence $\mathcal S_\psi=0$, because this is a $\pi$-primary torsion module. This gives an arithmetic zero criterion for each generic orbit member, including nontrivial characters. [The parity and genericity used here](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/Counts.lean#L14-L22) · [Sharifi, Kummer theory and reflection for cyclotomic class groups](https://www.math.ucla.edu/~sharifi/misc/aws-iwasawa.pdf)
+
+<!--
+% END ETS12
+-->
+
+## Unconditional zero contributions for the trivial character
+
+<!--
+% BEGIN ETS13
+-->
+
+<span id="claim:ETS13"></span>Take $\psi=1$, any level $N$, any even $e\ge2$, and an odd $\ell$ with $(\ell-1)\nmid e$. By ETS7 and ETS1 the whole strict Selmer group is zero if and only if the $\omega^{-e}$ eigenspace in the $\ell$-part of the class group of $\mathbf Q(\mu_\ell)$ is zero. Thus the following four tests remove actual terms from the sum.
+
+* If $5\le\ell$ and $e\equiv2$ or $4\bmod(\ell-1)$, the exponents of the eigenspaces are $\ell-3$ and $\ell-5$ respectively. Kurihara proves vanishing in the first case. Dutour Sikirić, Elbaz-Vincent, Kupers and Martinet deduce it in the second case from $K_8(\mathbf Z)=0$. The excluded trivial residual character is already outside the stated hypotheses. [Kurihara, Corollary 3.8](https://www.numdam.org/item/CM_1992__81_2_223_0.pdf) · [Dutour Sikirić et al., Theorem 6.4 and Corollary 7.1](https://arxiv.org/pdf/1910.11598)
+* For $\ell>3$ with $\ell\equiv3\bmod4$ and $e\equiv(\ell-3)/2\bmod(\ell-1)$, the exponent $-e$ equals $(\ell+1)/2$ modulo $\ell-1$. This even eigenspace vanishes by Osburn's Theorem 1.1. [Osburn, Theorem 1.1](https://maths.ucd.ie/~osburn/van.pdf)
+* Let $k_0$ represent $-e$ in the even range $2\le k_0\le\ell-3$. If $\ell$ does not divide the numerator of $B_{k_0}$, Herbrand's theorem gives zero for the odd class eigenspace $\omega^{1-k_0}$. Indeed its nonvanishing would force that divisibility. The Kummer argument of ETS12 transfers the vanishing to $\omega^{k_0}$, since the reflected character is $\omega^{1-k_0}$. For the trivial character this argument needs only $(\ell-1)\nmid e$, which makes the $\ell$-local residual character nontrivial. To pass between $\ell$-torsion and reduction modulo $\ell$ in either eigenspace, lift its character by Teichmüller and apply the integral idempotent of the group of order $\ell-1$ to the finite class group. A finite abelian $\ell$-group vanishes exactly when either its first layer or its reduction does. [Ribet, §1, statement of Herbrand's implication](https://math.berkeley.edu/~ribet/Articles/invent_34.pdf) · [Nelson’s worked irregular pairs](https://github.com/ultronozm/grh-workbook/blob/8590e35eb9a6e8cd07d546bd5b3b115ebac9672a/20261125T004000--denominators-and-sha__workbook.tex#L148-L166)
+* For every odd $\ell<2^{31}$ the published computation of Hart, Harvey and Ong verifies the vanishing of the entire even part, including at irregular primes. For clarity, extension and norm between the maximal real subfield and the cyclotomic field identify the $\ell$-primary class group of the real subfield with the plus part: their composites are multiplication by two and $1+c$, and two is a unit. The even $\omega^{-e}$ eigenspace is contained there. [Hart, Harvey and Ong, §1, item (2)](https://arxiv.org/abs/1605.02398)
+
+For example, at $\ell=37$ and $e=4$ the reflected Bernoulli test involves $B_{32}$, whose numerator is divisible by $37$. The $K_8$ result nevertheless gives strict length zero at this irregular prime. At $e=2$, $\ell=11$, the arithmetic contribution in ETS4 likewise vanishes, even though this residual representation fails the published lifting hypothesis. A failure of that citation need not force any nonzero summand at the test input. For a nontrivial $\psi$, the relevant class group is the larger one in ETS12. [The source group to which vanishing applies](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/CharacterLevelBounds/ShaFamMono.lean#L23-L34) · [The nonnegative contributions in the sum](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L44-L52)
+
+<!--
+% END ETS13
+-->
+
+## The rate obtainable from present torsion bounds
+
+<!--
+% BEGIN ETS14
+-->
+
+<span id="claim:ETS14"></span>There is a quantitative application of ETS9 for characters of bounded order and bounded positive twist. Let $d=[F:\mathbf Q]$, $m=2e$, $n=2m+1=4e+1$ and $b=dn+1$. Since $F$ is abelian over $\mathbf Q$, it is totally real or CM. De la Torre Durán's Theorem 4.5 applies to the part of $K_{2e}(\mathcal O_F)$ at primes greater than $b$. For any finite set $L$ of *eligible* coefficient primes $\ell>b$, the orbit inequality and that theorem give
+$$
+ \sum_{\ell\in L}\log\ell\sum_{\ker\psi=H}V_n(e,\psi)
+ \ \le\
+ \exp\!\big(O(n^2d(\log n+\log d))\big)\,|D_F|^{O(n^2)} .
+$$
+Here the occurrence of $n$ on the right is the dimension parameter in the torsion estimate. The subscript in $V_n$ on the left denotes normalization by the ramification index, as in ETS8. This application respects the restriction on torsion primes in the cited theorem. Each of the $d$ characters of $\operatorname{Gal}(F/\mathbf Q)$ has conductor dividing $N$, so the conductor–discriminant formula gives $|D_F|\le N^d$. On any fixed bounded range of $e$ and $d$ the expression on the right is therefore bounded by a polynomial in $N$ with constants depending only on those two bounds. This supplies that portion of the uniform count for all eligible $\ell>b$. [De la Torre Durán, §4, Theorem 4.5 and Remark 4.6](https://arxiv.org/pdf/2611.06300) · [Milne, *Class Field Theory*, conductor–discriminant formula](https://www.jmilne.org/math/CourseNotes/CFT.pdf) · [Required dependence on the twist and level](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L36-L52)
+
+Even for $F=\mathbf Q$ the estimate supplied by this substitution for the logarithm of the large-prime torsion order is $\exp(O(e^2\log(2e)))$. The desired logarithmic bound at $N=2$ has size $C(e+1)^A$. The exponents in the preprint’s estimate thus do not establish the desired rate by substitution. ETS11 gives a sharper object whose size suffices, since it keeps only the eligible primitive pieces. ETS13 also eliminates the indicated residues, regular Bernoulli pairs and a finite range of primes for the trivial orbit. Controlling the remaining primitive orders uniformly as the twist and level vary is the unresolved quantitative arithmetic question on this route. The selected-window alternative keeps its own quantifiers. [Eligibility of the remaining primes](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/Counts.lean#L9-L23) · [Fixed constants and auxiliary primes in the source](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/CorGSumLog.lean#L37-L54)
+
+<!--
+% END ETS14
+-->

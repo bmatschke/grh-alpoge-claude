@@ -24,6 +24,10 @@ $$
 $$
 For a small example of why the coefficients matter, $XY(X-Y)$ has a unit coefficient over $\mathbb Z_2$, while every evaluation at $X,Y\in\mathbb Z_2$ is even. A requirement that all blocks attain their least valuation at the same scalar choice could lose a factor of two in this example. [Primitive polynomials and the coefficient bound][hc-content] · [Formal determinant inequality][hc-det]
 
+## From pointwise finiteness to a height estimate
+
+For every positive twist and every finite character the strict Selmer group is finite. On a generic orbit, set $F$ equal to the fixed field of its common kernel. The full sum of normalized strict lengths at $\ell$ equals the $\mathbf Z_\ell$-length of the primitive part of $K_{2e}(\mathcal O_F)$ at $\ell$. Forming the least integer with the required valuations isolates the remaining size inequality in the height argument. The congruence quotient used in the separate ordinary-family proof must still have the automorphic support required there. [Finiteness at every prime](EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS10) · [Exact primitive part and size inequality](EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS11) · [Ordinary component support](EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS6)
+
 ## Which solutions contribute a global cohomology length?
 
 In the split congruence calculation, the blocks at the selected point, after twisting by the inverse of a common character $\chi$, consist of a rank-$r$ lattice $W$ and the characters $O(-e)$ for $0\le e<t$. The column relations contain the elements

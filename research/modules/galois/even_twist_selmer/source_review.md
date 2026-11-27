@@ -1,6 +1,6 @@
 # Source review of the even-twist test
 
-The reviewed manuscript has SHA-256 digest `19290a3aadcf86b158aa5c880ed556902b68983fad04ffed825907dc7a5aa3aa`.
+The reviewed manuscript has SHA-256 digest `14523b3abbf6361686b7e4c08c61e1aea531fc07369ef52e45398a5a19a62f96`.
 
 ETS1 checks the two different local coefficient comparisons and the sign of the class-group eigenspace. At the auxiliary level prime the unramified first cohomology vanishes for divisible coefficients. Over the cyclotomic field the prime over the coefficient prime is principal, so it splits in the Hilbert class field.
 
@@ -11,3 +11,5 @@ ETS3 uses the three distinct residues of the marked matrix and gives explicit pr
 ETS6 compares generic support and the two crossing rules. The ring is finite free even though its finite free weight module misses one branch. The alternate formal window producer constructs marked ends and uses the stronger one-character route. The full arithmetic propagation, seed, classicality, and finiteness inputs for that construction retain their original quantifiers.
 
 [Original Case I reduction](../../arithmetic/count_i_aggregation/main.tex) · [Allen–Newton–Thorne, Theorem 1.1](https://doi.org/10.1112/S0010437X20007484) · [Independent reconstruction, §17](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/b50dae1aa964142b04c11f791812ca7d4962e133/manuscript/sec17_twisted.tex#L289-L305) · [Ordinary component propagation and its input boundary](https://github.com/alexisdpc/riemann/blob/e985e0a7cba26c6c0f6acceb51c3bb4f2b7d74c5/technical.html)
+
+ETS7 removes auxiliary decomposition conditions on divisible coefficients for prime-to-order characters. ETS8 checks the local inflation kernels also at ramified primes and accounts for each primitive character once. ETS9 passes between finite Poitou–Tate duality and lattice coefficients, then matches the number-ring K-group. ETS10 treats the restriction kernel separately when the character order is divisible by the coefficient prime. ETS11 checks the local degree-two correction for every primitive power, self-duality of the primitive idempotent and minimality of the integer. ETS12 treats possibly nonprincipal primes over the coefficient prime and the odd unit obstruction in Kummer reflection. ETS13 checks the three exponents, the Bernoulli index and the strict cutoff in the computation. ETS14 compares the published large-prime bound with the source growth for the explicit integer. [Quillen–Lichtenbaum for number rings](https://sites.math.rutgers.edu/~weibel/Kbook/Kbook.VI.pdf) · [de la Torre Durán, Theorem 4.5](https://arxiv.org/pdf/2611.06300)
