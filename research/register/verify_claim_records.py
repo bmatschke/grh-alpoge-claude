@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def component_indexes(manifest, publications, closure):
-    """Produce the Galois module's provenance and readable source locators from its claim manifest."""
+    """Produce a module's provenance and readable source locators from its claim manifest."""
     pin = manifest["formal_pin"]
     claims, blobs, locators = [], {}, []
     for claim in manifest["claims"]:
@@ -90,8 +90,8 @@ def verify_claim_records(checkpoint, *, fetch_upstream=False, write_indexes=Fals
                 checks.check(oid == binding["git_blob"], f"{source}: inconsistent Git blob IDs")
                 bindings.append(binding)
         consumer = closure["formal_consumer"]
-        checks.check(any(entry["lines"] == consumer["lines"]
-                         for entry in source_files.get(consumer["path"], (None, []))[1]),
+        checks.check(any(entry["path"] == consumer["path"] and entry["lines"] == consumer["lines"]
+                         for claim in manifest["claims"] for entry in claim["source_ranges"]),
                      f"{name}: formal consumer has no corresponding source range")
         for index, contents in component_indexes(manifest, inputs, closure).items():
             target = manifest_path.with_name(index)

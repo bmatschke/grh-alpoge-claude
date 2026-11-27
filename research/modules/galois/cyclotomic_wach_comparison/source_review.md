@@ -1,0 +1,5 @@
+# Source review for the integral cyclotomic Wach comparison
+
+The categorical equivalence fixes the integral representation and its coefficient action. The cyclotomic coordinate on the Fontaine prism includes the inverse Frobenius shift. At a lower root Q evaluates to p, whereas at a primitive root Q vanishes simply and its Frobenius pullback evaluates to p. These different behaviours are what separate the uniqueness and height arguments. Construction 6.5, including its map off the divisor, was checked against the journal version. For a jump u the modified lattice has generator t to the power −u in the ordinary frame. Testing u negative, zero and positive gives both height inclusions. The jet projection is over the coefficient field, and monic division returns the divisibility to the integral invariant module.
+
+This is a source and hypothesis check by the author of the reconstruction. The reviewed manuscript has SHA-256 digest `1890058c8e2ea9b57b6c8982f5ab769dda47268454a82f373287abebe18baef3`. [Editable proof](../../../../manuscript/notes/galois/CYCLOTOMIC_WACH_COMPARISON.md)
