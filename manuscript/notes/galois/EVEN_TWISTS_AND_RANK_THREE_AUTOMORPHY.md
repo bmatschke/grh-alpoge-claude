@@ -649,3 +649,100 @@ For each $j$, an invariant of order $\ell^a$ forces $\varphi(\ell^a)\le nj$. Ind
 <!--
 % END ETS31
 -->
+
+## What the conductor-one estimate implies for the original strict sum
+
+<!--
+% BEGIN ETS32
+-->
+
+<span id="claim:ETS32"></span>Write $h$ for the dyadic layer in ETS22. At conductor one the kernel field is $\mathbf Q$, so the original field and the parameter in Brox's conductor-one theorem are
+$$
+ E=\mathbf Q(\mu_{2^{h+2}})^+(\sqrt{-q},\sqrt{-d}),\qquad N_B=2^{h+2}qd .
+$$
+Use the intervals, prime pair, cutoff $t$, projectors and size conditions of that theorem, including $q,d>2t+1$. On these intervals its weighted product estimate and its three complementary estimates imply, uniformly for every fixed $\delta>0$ and all sufficiently large $x$,
+$$
+ W(E,t)\le \exp(\delta x^\varepsilon),\qquad
+ \log R_M\le\exp(\delta x^\varepsilon),\qquad
+ \log R_F\le\exp(\delta x^\varepsilon)
+$$
+for every cyclic factor of ETS24. Here the last two inequalities concern the factors themselves, before any average over models. The use of the conductor-one arithmetic theorem is an external mathematical input. [Brox, host and uniform weighted product](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-weighted-selmer-assembly.tex#L8-L39) · [Theorem and its rank-four argument](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-weighted-selmer-assembly.tex#L144-L174) · [Complementary estimates](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-selmer-product.tex#L130-L165)
+
+To prove the implication, keep this $E$ and $t$ fixed for the moment. Brox's $\mathcal S(E,\ell,e)$ uses the coefficient $(\mathbf Q_\ell/\mathbf Z_\ell)(-e)$ and the same localization kernel as ETS15. At an unramified finite place away from $\ell$, Frobenius minus one is a nonzero scalar on this divisible coefficient, hence the unramified local group is zero. The strict formulation at all finite places therefore agrees with the stated local conditions. By ETS15 only finitely many $\ell$ have any nonzero group for $1\le e<t$. Choose $w_\ell=1$ on exactly these primes and zero elsewhere, including $\ell=2$ in the support if it contributes. The uniformity in *every* finite support permits this choice independently at every point of the window. In the notation of the external proof its full weighted sum $\mathcal V$ is now exactly $W(E,t)$. [Local conditions](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-selmer-product.tex#L9-L25) · [Prime weights and full sum](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-selmer-product.tex#L119-L142)
+
+For odd $\ell$, let $C_e=(1+(-1)^e c)/2$ on the strict group. The external product keeps $C_e$ outside the fixed exceptional set. Inside that set it removes the full-group invariants for $e\ge2$ and the invariants from its specified lower dyadic layer for $e=1$. These are integral direct factors because $[E:\mathbf Q]$ is a power of two. The omitted lengths are bounded by the sum of the dyadic and exceptional trivial-character estimates, the opposite sign and the lower-layer estimate. They are nonnegative, so their unweighted sum also bounds their contribution for any weights in $[0,1]$. Writing $n=[E:\mathbf Q]$, this gives
+$$
+ W(E,t)\le C_*(N_Bt)^{A_*}+ C_0\exp(x^{4\varepsilon/5})+
+ C_1(t-1)+(N_Bt)^{C_s}+n(t^2+t-2)\log(N_Bt).
+$$
+The complementary terms use the supplied-case bounds in the cited proof. All constants precede the window. On that window $t\le x^{400}$, $n\le8x^{2+8\varepsilon}$ and $\log(N_Bt)\le2x^{\varepsilon/4}$. The logarithm of each positive term on the right is $o(x^\varepsilon)$, uniformly also when the prime support varies. The same holds for $L=4n^2t^2\log(4nt)$ from ETS24. Apply the lower inequality of ETS24 to obtain $\log R\le W+L$. Every factor is an integer at least one by ETS23, so its logarithm is at most $\log R$. Absorbing the fixed number of terms in $\delta x^\varepsilon$ proves all three bounds. [Integral projectors](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-selmer-product.tex#L26-L54) · [Estimate for the complement and corrected exponent](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/notes/rh-selmer-residual-budget.md#L200-L220) · [Window sizes](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-weighted-selmer-assembly.tex#L100-L131)
+
+<!--
+% END ETS32
+-->
+
+## Which other characters have the same field?
+
+<!--
+% BEGIN ETS33
+-->
+
+<span id="claim:ETS33"></span>Let $M_\chi$ be the field cut out by a primitive Dirichlet character. Fix $h,q,d$ and write $E_1=\mathbf Q(\mu_{2^{h+2}})^+(\sqrt{-q},\sqrt{-d})$. If $M_\chi\subseteq E_1$, then for **these same** parameters ETS22 gives $E_\chi=M_\chi E_1=E_1$. Whenever $1\le t_\chi\le t_1$,
+$$
+ W(E_\chi,t_\chi)\le W(E_1,t_1).
+$$
+The strict localization maps depend only on the field, the coefficient prime and the twist. This identifies each summand term by term, and the omitted higher twists have nonnegative length. In particular this inclusion of fields holds for characters whose kernel field lies in $\mathbf Q(\mu_{2^s})^+$ as soon as $h+2\ge s$. For example it holds for the quadratic character cutting out $\mathbf Q(\sqrt2)$ at $h+2\ge3$.
+
+On an interval meeting the conductor-one hypotheses of ETS32 with cutoff $t_1$ and the original character's host and cutoff conditions with $t_\chi\le t_1$, the same subexponential estimate therefore holds for $W(E_\chi,t_\chi)$. Its own base and cyclic factors are bounded using its own ETS24, so its list of exceptional primes need not agree with the conductor-one list. This is a test on the actual chosen prime pair and interval. ETS34 below verifies this joint choice for fields in the fixed real dyadic tower at the original cutoff. In general $M_\chi$ can enlarge the field itself. For instance the degree-three real subfield of $\mathbf Q(\mu_7)$ cannot lie in the power-of-two extension $E_1$. [Original field and its four fixing conditions](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/StmtFields.lean#L31-L45) · [Original interval quantifiers](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/PrimeSetBoundDataOfPrimitiveChar.lean#L41-L53)
+
+<!--
+% END ETS33
+-->
+
+## Extending the conductor-one comparison to the original twist cutoff
+
+<!--
+% BEGIN ETS34
+-->
+
+<span id="claim:ETS34"></span>Brox's conductor-one **polynomial product theorem** has the size condition $q,d>\max(P\cup\{2t+1\})$ and permits any integer $t\ge2$ under its stated host and projector hypotheses. Its window corollary uses $t\le x^{400}$. We can apply the product theorem itself at $t=\lfloor x^{401}\rfloor$ on the original common windows, retaining that theorem as an external input. In the notation of ETS32, for every fixed $\delta>0$ the full $W(E,t)$ and the logarithm of every ETS24 factor are eventually at most $\exp(\delta x^\varepsilon)$ uniformly on this interval. The original allowance uses $\delta=1/2$. [Brox, pointwise size conditions](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-weighted-selmer-assembly.tex#L8-L39) · [All finite weights](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-weighted-selmer-assembly.tex#L144-L174) · [Original window and cutoff](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/CharacterBoxes/ExistsPageN.lean#L19-L49)
+
+Fix the exceptional odd primes $P$ of Brox's theorem **before** applying TW8. Use the trivial field datum $M=\mathbf Q$, the reference data $\mathbf Q(\mu_p)$ for $p\in P$, and $C_t=401$. The original page function has $x^{2+8\varepsilon}\le2^{h(x)}\le2x^{2+8\varepsilon}$, so TW8 applies with a fixed page exponent. For $U=X^{1/J}$ the permitted prime pairs satisfy $\min(\log q,\log d)\gg U^{\varepsilon/5}$ and $\log(qd)\ll U^{\varepsilon/5}(1+(\log U)^2)$. Thus $q,d>2X^{401}+1$ and $\log(qd)\le X^{\varepsilon/(4J)}$ eventually. Their stipulated residue conditions give the original quadratic fields. TW8 supplies one $[Y,Y^2]$ for these primes and this cutoff. There $x\ge U$ and
+$$
+ t\le x^{401},\quad n=[E:\mathbf Q]\le8x^{2+8\varepsilon},\quad
+ \log(N_Bt)\le x^{\varepsilon/4}+O(\log x).
+$$
+Neither prime is changed. On this window the choice of prime weights in ETS32 bounds the contribution of the retained projectors by $C_*(N_Bt)^{A_*}$. [TW8, order of choices and both window bounds](https://github.com/bmatschke/grh-alpoge-claude/blob/5712731e0cd952938ff15c02c910c8da66c52a31/research/modules/galois/simultaneous_cohomological_windows/main.tex#L825-L862) · [Original prime-pair sizes](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L11816-L11838)
+
+We bound the complementary groups directly in the conventions of this manuscript. With $D_x=\exp(x^{4\varepsilon/5})$, TW8 gives the strict dyadic contribution at most $(\log2)D_x$. For $p\in P$ the omitted full-group invariants at twists $e\ge2$ descend to $\mathbf Q$ by ETS22, since $[E:\mathbf Q]$ is a power of two. The fixed reference layer for $p$ bounds their summed lengths by $D_x+b_p(t-1)$, where $b_p$ is fixed before the window. ETS18 bounds the entire opposite parity by $(n+1)t^2\log(tN_B)$. [Fixed-prime descent](#claim:ETS22) · [What Brox's projectors omit](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-selmer-product.tex#L26-L54)
+
+For the remaining twist $e=1$ at $p\in P$, the missing invariant group is contained in the strict group on
+$$
+ F_p=\mathbf Q(\mu_{2^{\min(h+2,c_p)}})^+(\sqrt{-q},\sqrt{-d})
+$$
+by the prime-to-$p$ descent just used. Here $c_p$ is fixed as in the projector formula. Adjoin $\mu_p$ to obtain $L_p$. Restriction on $p$-primary strict classes is injective because $[L_p:F_p]\mid p-1$ and the composite of restriction and corestriction acts by that degree. The extension $L_p/\mathbf Q$ is totally complex and abelian of bounded degree $n_p\le 2^{c_p}(p-1)$, and its conductor divides $pN_B$. The conductor-discriminant formula gives $|\operatorname{disc}L_p|\le (pN_B)^{n_p}$. By Poitou–Tate the dual strict group injects into $H^2(G_{L_p,S_p},\mathbf Z_p(2))$. KB8 applies at $e=1$ since $L_p$ contains $\mu_p$. Its upper bound for the logarithmic order is $(2|\operatorname{disc}L_p|)^{(2n_p)^{31}}$. This is bounded by a fixed power of $2N_B$ times a fixed constant, even though both quadratic fields move. Summing over the fixed set $P$ preserves that estimate. [KB8, quantitative bound](https://github.com/bmatschke/grh-alpoge-claude/blob/5712731e0cd952938ff15c02c910c8da66c52a31/research/modules/construction/k_theory_bridge/main.tex#L557-L574) · [Integral localization kernel](#claim:ETS15)
+
+We have bounded $W$ by a fixed sum of powers of $N_Bt$, the term $O(D_x+t)$, and a polynomial in $n,t,\log(N_Bt)$. The logarithms of these positive bounds and of the local correction $L$ in ETS24 are $o(x^\varepsilon)$ uniformly on the same interval. ETS24 gives the asserted bounds for each cyclic factor. For a fixed primitive character with $M_\chi\subseteq\mathbf Q(\mu_{2^s})^+$ the page inequality ensures $h(x)+2\ge s$ on every sufficiently late window. The prime-pair conditions in the original window definition are the same for this character. At the common cutoff $\lfloor x^{401}\rfloor$ its field equals $E$ by ETS33. Thus the same $J,X_0$ (with $X_0$ increased for $s$) and the same $Y$ give its **strict-sum** window as well. This supplies the arithmetic window for this subclass, including $\mathbf Q(\sqrt2)$, upon using the external conductor-one product theorem. [Field and quantifiers in the original route](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/CharacterBoxes/ExistsPageN.lean#L19-L49)
+
+<!--
+% END ETS34
+-->
+
+## The general-character theorem stated in the Roadmap
+
+<!--
+% BEGIN ETS35
+-->
+
+<span id="claim:ETS35"></span>For any primitive $\chi$, the Roadmap's B6.39, equation (6.W), has exactly the field and sign required in ETS24. On a common tower window, assume its arithmetic counting inputs and its stated bounds on the prime pair, including $q,d>2X^{C_t}+1$. Its conclusion gives a direct conditional bound for every original factor, uniformly on that same interval. To see this, B6.01 uses the localization kernel on $(\mathbf Q_\ell/\mathbf Z_\ell)(-e)$ with the same local triviality conditions. B6.02 fixes the same field by the four congruence, character-kernel and quadratic-symbol requirements in ETS22. B6.08 calls $c=(-1)^e$ the plus sign. At each $E,t$ apply (6.W) to the finite support of this sign from ETS15. Together with ETS18 and TW8 this yields
+$$
+ W(E,t)\le \bigl(\operatorname{cond}(E)t\bigr)^C+
+             (C+\log2)D_x+(n+1)t^2\log\bigl(t\operatorname{cond}(E)\bigr).
+$$
+Here $C$ is fixed for $\chi$ and the fixed tower data before $x$ varies. The modulus of $E$ divides $\operatorname{lcm}(f,2^{h+2},q,d)$ with $f$ fixed. On the original window its logarithm is $O_\chi(\log x+x^{\varepsilon/4})$, and the same bound holds for $\log(\operatorname{cond}(E)t)$ with $t\le x^{401}$. The degree $n$ grows at most polynomially in $x$ for fixed $\chi$. Hence the right side, even after adding $L$ in ETS24, is eventually at most $\exp(\delta x^\varepsilon)$ for every fixed $\delta>0$. Each $\log R_F$ and $\log R_M$ is bounded by $W+L$. [Roadmap, field and total bound](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L11801-L11838) · [Two signs](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L12482-L12497) · [Fixed and other primes](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L13387-L13406) · [General-character common window](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L13407-L13435)
+
+The arithmetic content of this transfer sits in (6.W). B6.37 uses the fixed exceptional primes and their reference layers. B6.38 treats all the other odd primes, using the aggregate Class I theorem, the vanishing in Class Z and the bounds for Classes II and III. The fixed set also needs the Class IV transfer and the Class V and Vs estimates. B6.04 invokes the global representation assertion, base-change and trace compatibility, and weak descent in ranks two through four. Treating B6.39 as a cited reconstruction gives a quantitative route for every $\chi$. An independent derivation in this manuscript must still verify those arithmetic inputs on the required components. [Analytic and automorphic inputs of B6.04](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L11833-L11843) · [Proof of B6.39](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L38837-L38842) · [Common marking for the automorphic components](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L14321-L14332)
+
+<!--
+% END ETS35
+-->

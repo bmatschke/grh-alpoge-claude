@@ -1576,3 +1576,54 @@ under the original level, gap, rank and discriminant bounds, with the thresholds
 <!--
 % END FBE68
 -->
+
+## Comparing the measured Gram blocks in two expositions
+
+<!--
+% BEGIN FBE69
+-->
+
+<span id="claim:FBE69"></span>Write $A_u:C_u\to H$ for an original normalized word operator as in FBE43. Chen unfolds a period $P_u:\widehat C_u\to\widehat H$ with positive constant
+$$
+ c_u=\operatorname{vol}(K_2)\operatorname{vol}(N_u)
+                \operatorname{vol}(H_u)/\dim V_u
+$$
+and forms $\widehat K_{uv}=(c_uc_v)^{-1/2}P_u^*P_v$. The volumes are the finite level, the real unipotent fundamental domain and the compact definite stabilizer on that row. Assume one unitary embedding $U:H\to\widehat H$ and unitaries $V'_u:\widehat C_u\to C_u$ identify the measured column maps by $P_u=\sqrt{c_u}\,z_uUA_uV'_u$ for nonzero complex scalars $z_u$. Then, for $K_{uv}=A_u^*A_v$,
+$$
+ \widehat K_{uv}=\overline{z_u}z_v(V'_u)^*K_{uv}V'_v.
+$$
+Indeed $U^*U=I$. The squared Hilbert–Schmidt norm acquires the factor $|z_u z_v|^2$. On the diagonal, subtracting the identity gives $|z_u|^2(V'_u)^*(K_{uu}-I)V'_u+(|z_u|^2-1)I$. Thus on a nonzero column equality of the identity contributions forces $|z_u|=1$ **if** the termwise identification uses this scalar also on the identity cell and both identity cells have operator $I$. [Chen, definition of the row and its measures](https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/selected-row-gram.tex#L9-L39) · [Original measured comparison](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/FlagStabilizerTensors/SpectralTiesReal.lean#L245-L279)
+
+Suppose further that under these identifications the unfolded summands correspond with their multiplicities, their splitting into identity, nonidentity zero-Gram and nonzero-Gram classes, and their signed pairing. Use the source's absolute convergence when summing an infinite family. If the identity cells match, then every corresponding class sum has the same Hilbert–Schmidt norm on both rows. Within a block the phase $\overline{z_u}z_v$ is common to its terms, so it drops out of every real part of a Hilbert–Schmidt inner product. For a product along $u_0,\ldots,u_s$ the intermediate unitaries and phases cancel. The surviving scalar is $\overline{z_{u_0}}z_{u_s}$, equal to one on a closed loop. This proves transfer of signed term-pair and loop estimates when their terms are identified on the same measured family, with the same dimensions and thresholds. It gives an explicit way to test a candidate comparison using the identity cell, the original characters and the summands being paired. Equality of the *total* block alone supplies no pairing of its summands. In the Roadmap's revised calculation, exact level rules out a trivial additive character for a lattice move. On the original row the finite measure, both marked frames and this character must match. The authors classify the two signed and higher-corank proofs as outlines. [Local phase in v45](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L46085-L46116) · [Outline-proof register](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/outline-proofs.md#L13-L21) [Chen, two Gram errors](https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/selected-row-gram.tex#L391-L444) · [Roadmap, signed sums](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L17858-L17870) · [Higher-corank pairs](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L17953-L17965)
+
+<!--
+% END FBE69
+-->
+
+## What a first and second moment say about a designated pair
+
+<!--
+% BEGIN FBE70
+-->
+
+<span id="claim:FBE70"></span>Fix $D\ge2$ and $b>1$. Put $m=aD$ with $a\ge2$ and $\zeta=\exp(2\pi i/m)$. In $H=\mathbf C^D$ take the columns indexed by $\mathbf Z/m$ given by
+$$
+ A_t(1)=D^{-1/2}(1,\zeta^t,\ldots,\zeta^{(D-1)t}).
+$$
+They form the orbit of a single unit column under a diagonal unitary action and determine distinct lines, since the ratio of the second to the first coordinate is $\zeta^t$. Summing the $(i,j)$ entries of $S=\sum_t A_tA_t^*$ gives zero for $i\ne j$ by character orthogonality and $m/D=a$ on the diagonal. Thus the span is all of $H$ and
+$$
+ \sum_{t,t'}\lVert A_t^*A_{t'}\rVert_{\mathrm{HS}}^2
+       =\operatorname{tr}(S^2)=a^2D .
+$$
+This is the least possible value for any $aD$ unit columns, since $\operatorname{tr}(S^2)\ge(\operatorname{tr}S)^2/D$. Yet the designated pair $0,1$ has squared overlap
+$$
+ \left|\frac{\sin(\pi D/m)}{D\sin(\pi/m)}\right|^2
+   \longrightarrow 1\qquad (a\longrightarrow\infty).
+$$
+With $d_u=d_v=1$ and $D_*=D$ the original off-diagonal allowance $(1+b^{-6})/D$ is strictly less than one. For any sufficiently large $a$ this distinct pair exceeds it. Thus unit norms, full span and the optimal total second moment leave a designated off-diagonal estimate undetermined.
+
+Jin's shorter proof uses its chosen real and finite orbit-energy bounds and a good-component projection to obtain a proportion of a span. The example tests the inference from that averaged conclusion alone. Chen instead gives a word-by-word estimate in the original scale on its stated realized row. To use it one must compare the measured columns and the local pair estimates at the same assigned primes, as in FBE69. [Jin, good projector and normalization](https://github.com/yuiyuiui/Natural-Language-Proof-Generalized-Riemann-Hypothesis/blob/163ad1f1289299b14dad7f48aa292cd5f85c69ca/sections/spanning.tex#L209-L222) · [Chen, designated pairs](https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/selected-row-gram.tex#L391-L444) · [Original word-by-word endpoint](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/SharpRestriction/GlobalTheoremInputs.lean#L142-L157)
+
+<!--
+% END FBE70
+-->

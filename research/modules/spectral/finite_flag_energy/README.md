@@ -1,5 +1,7 @@
 # Uniform spectral estimates on finite flag towers
 
+FBE69 tracks word scalars and phases through the signed blocks and loop products under an identified term expansion. FBE70 tests the distinction between averaged spanning and the designated original word inequality. The signed orbital estimates still require their stated measured-family hypotheses.
+
 FBE20–42 derive the signed recursion, finite terminal row, two-word operator, initial mass and automorphic range on the measured setting. FBE43 reads the setting and one common period isometry from each selected linked bundle. FBE44 gives one guarded frame threshold from its rank and split-level estimates. FBE45–49 give the normalized convergent Gram mean and exact hyperplane volume ratio. FBE50–52 derive the definite count, the two moderate-region estimates under the stated decay, separation and density bounds, and the family constant choice. FBE53–59 derive separation, compression decay, absolute volume, the flag coefficient and deep volume, cuspidality and the integrated deep trace, starting from the stated local representation identities and the measured parabolic unfolding. FBE60–64 supply the local representation inputs, the exact general linear Levi volumes and the sum over the flagged integral classes. FBE65–68 prove that measure bound and the uniform indefinite counting conclusion on the supplied hosts. [Editable proof](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md)
 
 | Claim | Result |
@@ -72,5 +74,7 @@ FBE20–42 derive the signed recursion, finite terminal row, two-word operator, 
 | [FBE66](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE66) | The complex Hom covolumes and the integral real skew layers give the sharp unipotent volume factor at the reference flag |
 | [FBE67](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE67) | A trace-one integral Cayley transform lifts the skew layers into the rational unipotent stabilizer with the required covolume |
 | [FBE68](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE68) | The measured single-orbit inequality gives the flag probability and the uniform indefinite discrete-series count on the specified hosts |
+| [FBE69](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE69) | Identity-cell normalization and termwise transport preserve measured word blocks, signed inner products and closed-loop phases |
+| [FBE70](../../../../manuscript/notes/spectral/FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE70) | A spanning unitary orbit with the optimal total second moment can exceed the prescribed distinct-word allowance |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

@@ -2224,3 +2224,43 @@ For $i=1$ the formula is the rank-one identification in GRT110. For $i>1$ and $n
 <!--
 % END GRT111
 -->
+
+## Keeping a finite diagram of levels on one arithmetic model
+
+<!--
+% BEGIN GRT112
+-->
+
+<span id="claim:GRT112"></span>Let $R$ be the integers of a number field $k$. Consider a finite diagram of already specified generic levels $V_i=V/H_i$ of a normal integral projective $k$-variety $V$ with a finite group $G$ acting over $k$. Take the arrows to be the quotient projections for inclusions $H_j\subseteq H_i$. Suppose each $V_i$ has a prescribed normal integral projective flat $R$-model $Y_i$. Then there are simultaneous normal integral projective flat models $X_i$ with finite transition maps and proper birational maps $b_i:X_i\to Y_i$ inducing the specified identity on each generic fibre. Every prescribed transition between the $Y_i$ which extends the generic arrow commutes with these maps. This construction applies to a fixed finite list of levels admitting the indicated common generic cover.
+
+Choose a projective model $Y$ of $V$ by taking the closure of any projective embedding and normalizing. In the product of copies of $Y$ indexed by $g\in G$ and of $Y_i$ indexed by $(i,g)$, take the morphism on the generic fibre with coordinates $v\mapsto gv$ and $v\mapsto\pi_i(gv)$, where $\pi_i:V\to V_i$. Together these maps give a closed immersion of the whole generic variety, since the identity coordinate is present and all the schemes are separated. Take its schematic closure and normalize it to obtain $X$. The closure is integral, normalization is finite over this excellent base, and its generic fibre is still $V$ by normality. Projectivity follows from finiteness of the normalization. The model is flat over $R$ since its local rings are torsion-free over the Dedekind base. Permuting the coordinates extends the action of $G$ to the closure and then to $X$. [Normalization and finiteness](https://stacks.math.columbia.edu/tag/035E)
+
+Put $X_i=X/H_i$. For a finite group acting on a projective scheme these are projective scheme quotients, the quotient maps are finite and the invariant affine rings compute the quotient. On such affines integral closure of the original domain implies integral closure of its invariant subring in its own fraction field. Localization from $R$ to $k$ commutes with taking invariants, and the rings are torsion-free over $R$. This proves normality, the required generic fibre and flatness. The canonical map $X/H_j\to X/H_i$ is finite. On an affine of $X/H_i$ the preimage in $X$ is affine with ring $B$ finite over $A=B^{H_i}$. The intermediate ring $B^{H_j}$ is an $A$-submodule of $B$ and is finite over the noetherian ring $A$. The inclusions compose along every chain. No averaging over $H_i$ enters this argument. [Rydh, Proposition 2.3.1 and Corollary 2.3.6](https://davidrydh.se/papers/hilbchowsymdiv-20080416.pdf#page=13)
+
+The coordinate of the projection to $Y_i$ at $g=1$ is $H_i$-invariant on the generic fibre, hence everywhere by density and separatedness. It descends to $b_i$. This map is proper, is the identity on the specified dense generic fibre, and is thus birational. For a prescribed morphism $Y_j\to Y_i$, the two maps from $X_j$ to $Y_i$ agree generically, hence everywhere. Brox's simultaneous-level construction supplies a modular instance of the common-fan idea, including a coefficient base change, comparison of the universal family and étaleness on specified abelian loci. Those modular identifications are additional data when applying the abstract construction above. [Brox, finite level maps and common auxiliary model](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/notes/geometry-arithmetic-frontier-level-system.md#L44-L59) · [Original finite level comparison](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/ReciprocityTheory/ReductiveGroups/ArithmeticGeometry/BirationalGeometry/ToroidalCompactification/Clauses.lean#L154-L164)
+
+<!--
+% END GRT112
+-->
+
+## Transport of the section lattice and its determinant
+
+<!--
+% BEGIN GRT113
+-->
+
+<span id="claim:GRT113"></span>For a proper birational map $b:X\to Y$ between the normal integral arithmetic models in GRT112, and a prescribed invertible sheaf $L$ on $Y$, the pullback
+$$
+ H^0(Y,L)\longrightarrow H^0(X,b^*L)
+$$
+is an isomorphism over $R$ in the specified generic section space. Indeed $b_*\mathcal O_X=\mathcal O_Y$. On an affine of $Y$ this pushforward is finite by properness and coherence, and embeds in the common function field by integrality. Its elements are integral over the normal affine ring and hence belong to that ring. Local trivialization of $L$ now gives $b_*b^*L=L$. Global sections give the displayed equality. It holds in every tensor degree and commutes with multiplication and maps of prescribed invertible sheaves by functoriality. It also holds for $L(-D)$ when $D$ is a prescribed effective Cartier boundary and the boundary upstairs is its Cartier pullback. On a commuting square of levels the integral pullbacks on sections commute as well. [Stein factorization](https://stacks.math.columbia.edu/tag/03H2)
+
+At a complex embedding these maps of models induce the chosen generic identity. If the norm on the section space comes from the pulled-back metric and, for an integral norm, the corresponding pulled-back measure, the two section norms coincide. Taking the top exterior power gives equality of the determinant norms and of their arithmetic degrees. This reduces the height comparison to checking the actual isomorphisms of integral lines, sections, boundary and metrics for the prescribed maps to projective space, including the maps used in the Chow form. Chen evaluates the Chow form at the selected length on the integral moving system and uses its residue columns and cohomology vanishing. Brox specifies the accompanying integral jet and short-section requirements. [Chen, determinant at the selected length](https://github.com/yyyyychen/RH-Natural-Language-Proof/blob/d4dfb1a282dbf857288e73eb1f546dbfcc5899b8/tex/covolume-hilbert-samuel.tex#L218-L245) · [Brox, integral requirements for the section estimate](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/notes/geometry-arithmetic-frontier-section-remainder-target.md#L33-L52) · [Original component and section data](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/HilbertSamuelComponentShortBasisBound.lean#L26-L37)
+
+Roadmap v45 treats an additional situation where the projective image may be nonnormal. A conductor form of positive multidegree maps normalized sections into integral forms after a degree shift on that image. The asymptotic section comparison uses the arithmetic volumes of the conductor twists. A uniform application still needs the conductor and metric estimates on the family under consideration. [Roadmap, B8.25h](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L19899-L19912) · [Seven family conditions in B8.34](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L21852-L21865)
+
+The generic identity alone admits an arbitrary vertical error. On $\mathbf P^1_{\mathbf Z}$ take $L=\mathcal O(d)$ with $d\ge0$, a prime $p$, and the fibre $F=(p)$. Inside the same rational section space, the inclusion $L(-qF)\subset L$ has global section lattice $p^qH^0(L)$ for each $q\ge0$. Multiplying a basis of its $d+1$ monomials by $p^q$ gives index $p^{q(d+1)}$. Give both spaces the same complex norm under the rational identification. The logarithmic covolume increases by $q(d+1)\log p$. Thus control of the generic line and complex metric allows an arbitrarily large error unless the integral identification or its index is supplied. A family bound still needs the marked charts, line identifications and numerical estimates on the same levels before selection.
+
+<!--
+% END GRT113
+-->

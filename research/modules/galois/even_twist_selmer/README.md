@@ -1,5 +1,7 @@
 # Even twists and rank-three automorphy
 
+ETS32–34 apply Brox's external product theorem on the same conductor-one fields and prove the strict sum bound up to the original cutoff 401, including characters cut out by the real dyadic tower. ETS35 identifies the Roadmap's general-character estimate and its standing arithmetic inputs with the cyclic-factor test.
+
 The strict groups are finite. On the original cohomological window the complete dyadic term and one odd sign are bounded. The other odd orders reduce to a base term and primitive ratios on cyclic subextensions. At the split rank-three triple the central strict tangent term also has a uniform bound. The adjacent terms carry both signs; normalized polarized triangular families can still contain the level-two even cyclotomic eigenspace. The uniform estimate on the remaining orders or a proof through ordinary automorphic support is still needed. For mixed adjacent signs the global cup obstruction lies in a finite negative localization kernel. Its whole order is bounded independently of auxiliary places and coefficient depth. [Editable proof](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md)
 
 | Claim | Result |
@@ -35,5 +37,9 @@ The strict groups are finite. On the original cohomological window the complete 
 | [ETS29](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS29) | At level two a quotient of the even cyclotomic class group gives distinct strict marked classes, with at most one dimension lost at two |
 | [ETS30](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS30) | The obstruction to integrating mixed adjacent signs is an explicit negative cup class locally zero at the prescribed places |
 | [ETS31](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS31) | Finite global duality and the rank of odd K-groups bound the entire negative mixed obstruction group independently of the auxiliary places |
+| [ETS32](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS32) | The conductor-one weighted estimate bounds the full original strict sum and every cyclic factor on the same interval |
+| [ETS33](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS33) | A character whose field is already contained in the conductor-one host inherits the strict estimate at a compatible cutoff |
+| [ETS34](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS34) | The conductor-one polynomial product gives the original cutoff 401 on a common interval, also for character fields in the real dyadic tower |
+| [ETS35](../../../../manuscript/notes/galois/EVEN_TWISTS_AND_RANK_THREE_AUTOMORPHY.md#claim:ETS35) | The general-character bound in Roadmap B6.39 implies small original cyclic factors on the identical tower window under its arithmetic inputs |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)

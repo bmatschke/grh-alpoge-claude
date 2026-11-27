@@ -1,5 +1,7 @@
 # The integral flag models at two prime cutoffs
 
+GRT112 constructs finite simultaneous refinements when the finite generic quotient diagram is given. GRT113 preserves the integral sections of prescribed pullbacks and their specified metrics. Realizing the marked modular diagram and identifying the native Hodge and Chow data across the required family remain geometric inputs.
+
 GRT37–102 derive the determinant and wall estimates, the model of the interior negative member and its marked arcs, the comparison at two cutoffs, the word rate and its Frobenius labels. GRT103–107 determine the signature and level at every interior index, build the regularizations and an integral effective section on the resolved marked period chart, and identify the degrees and metrics of all its cutoff realizations. GRT108 verifies the two applications of the arithmetic volume theorem on these models. GRT109 shows why fixed-component errors disappear before passing to the family estimate. GRT110–111 supply the numerical Segre clause extracted at line 199 for every eligible residue field. The same line extracts the broader intersection package. [Editable proof](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md)
 
 | Claim | Result |
@@ -115,5 +117,7 @@ GRT37–102 derive the determinant and wall estimates, the model of the interior
 | [GRT109](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT109) | Fixed trace costs and model-dependent Hilbert–Samuel errors disappear before the common fitted-weight threshold is chosen |
 | [GRT110](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT110) | The truncated coordinate cycle is the projective bundle of the filtered chart bundle and its successive Cartier hyperplane has multiplicity one |
 | [GRT111](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT111) | The mixed Hilbert degrees of the truncations give the numerical Segre formula with roots a minus b over every base field |
+| [GRT112](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT112) | A finite diagram with a common generic group cover admits commuting finite transitions above the prescribed arithmetic models |
+| [GRT113](../../../../manuscript/notes/periods/GOOD_ROOT_TOWER_COMPARISONS.md#claim:GRT113) | Birational pullback preserves prescribed integral section lattices and determinant norms, with arbitrary index possible for a vertical twist |
 
 The manifest binds the claim paragraphs and their formal source ranges to this revision. The closure file lists the inputs used in passing to the downstream conclusion. [Claim manifest](claims.json) · [Provenance](provenance.json) · [Source locators](source_locators.txt) · [Published inputs](published_inputs.json) · [Closure and retained hypotheses](closure.json) · [Source review](source_review.md)
