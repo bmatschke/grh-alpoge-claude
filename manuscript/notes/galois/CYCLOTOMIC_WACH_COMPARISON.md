@@ -130,3 +130,61 @@ For each summand these entries are distinct. Its characteristic polynomial annih
 [wc-low]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L54499-L54530
 [wc-uniq]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L54531-L54561
 [wc-ht]: https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/c7755c1086f05d0918ee8496d95912e4f35e22f9/docs/src/book/main.tex#L54582-L54593
+
+## Reduction of the level-one lattice
+
+<!--
+% BEGIN WCC8
+-->
+
+<span id="claim:WCC8"></span>Take the unramified field $K_0$, $p\ge5$ and the crystalline $G_{K_0}$-lattice $T$ of WCC7. The coefficient ring $O$ contains the integers of every embedded copy of $K_0(\mu_p)$. Write $k=O/\varpi O$, with $\varpi$ a uniformizer. In this section $X$ denotes the **residual invariant parameter**. On a component indexed by an embedding of $K_0$ put
+$$
+ A_\pi=k[[\pi]],\quad B_\pi=k((\pi)),\qquad
+ X=-\prod_{\delta\in\Delta}\delta(\pi),\qquad A=k[[X]],\quad B=k((X)).
+$$
+Here $\pi$ is the image of $Z$, $\Delta=\mu_{p-1}$, and $\delta(\pi)=(1+\pi)^\delta-1$, by reduction of the integral binomial series. Each factor has linear coefficient $\bar\delta\ne0$. Thus $X$ is invariant and has order $p-1$. The powers $1,\pi,\ldots,\pi^{p-2}$ give a basis of $A_\pi$ over $A$. Indeed their classes are a $k$-basis modulo $(X)=(\pi^{p-1})$. Successive division by $X$ gives convergent power-series coefficients. The orders of the nonzero terms in a relation have distinct residues modulo $p-1$, giving uniqueness. After inversion this yields $[B_\pi:B]=p-1$. The distinct linear coefficients give $p-1$ distinct $B$-automorphisms, so $B_\pi^\Delta=B$. Intersecting with $A_\pi$ gives $A_\pi^\Delta=A$. The reduction $O[[Z]]^\Delta\to A$ is onto. Lift the coefficients of an invariant series in $\pi$ and take the average of its $p-1$ translates. Division by $p-1$ is integral.
+
+For a finite-dimensional continuous $k[G_{K_0}]$-representation $U$, take its étale cyclotomic module over $K_0(\mu_p)$ and set $D(U)_i=(e_iD_{\rm et}(U))^\Delta$, where $e_i$ is the coefficient idempotent. For every equivariant $O$-linear surjection $q:T'\to U$ from a stable lattice, define
+$$
+ \jmath_{T',U,q,i}(x)=e_iD_{\rm et}(q)x,\qquad x\in D_{\rm et}(T')^\Delta .
+$$
+Fontaine's integral equivalence applies to finitely generated $\mathbb Z_p$-modules, including finite modules. It is exact and carries each coefficient endomorphism to its endomorphism of the étale module. Applied to the kernel sequence of $q$ it therefore gives a surjection with kernel $\operatorname{im}D_{\rm et}(\ker q)$. The group $\Delta$ fixes the coefficient labels. Lift a vector in $D(U)_i$, project its lift by $e_i$ and average. This proves surjectivity on the indicated invariants. For an invariant $x$ the image is zero precisely when $e_ix$ belongs to that kernel. Functoriality gives $D(g)_i\jmath_{T',U,q,i}=\jmath_{T'',U',q',i}D_{\rm et}(f)$ whenever $gq=q'f$. Invariant scalars act through reduction at $i$. Commutation with $\gamma$ and with Frobenius from $i-1$ to $i$ follows from the same compatibility for the étale maps. [Fontaine, Theorem 3.4.3][wc-font]
+
+For $q:T\to T/\varpi T$ use the Wach basis of WCC7. The tame action on $N_i(T)/ZN_i(T)$ is trivial for a lattice crystalline over $K_0$. Averaging a basis preserves its reduction modulo $Z$, hence its change-of-basis determinant is a unit and the averaged vectors $b_j$ form a fixed basis. This is also the integral Wach property in Berger's Definition III.4.1 and Proposition III.4.2. In this basis a fixed vector has fixed coefficients. Their reductions exhaust $A$ by the scalar calculation above. By WCC1 the base change of $N_i(T)$ to the $p$-adic completion of $O[[Z]][1/Z]$ is the integral étale module. Reduction of this ring modulo $\varpi$ is $k[[\pi]][1/\pi]=B_\pi$, since $\varpi$ and $p$ define equivalent adic topologies. Exactness identifies the module reduced modulo $\varpi$ with the module of $T/\varpi T$. Thus the images of the $b_j$ form a fixed $B_\pi$-basis there. Taking invariant coefficients gives a $B$-basis of $D(T/\varpi T)_i$, and its $A$-span is exactly $\jmath_i(N(T)^\Delta)$. In particular this image is a full free lattice. For $T'=O$ with trivial action, a fixed Wach generator differs on each component from the unit basis by a fixed unit. Its scalar and inverse both reduce to $A$. Every surjection $O\to k$ sends $1$ to an element of $k^\times$, so the image of every such generator generates $A\mathbf1_i$. [Berger, integral Wach lattices][wc-berger] · [Formal presentation fields][wc-pres]
+
+For any residual component $M=e_iD_{\rm et}(U)$ the semilinear $\Delta$-invariants have the full dimension over $B$. To see this, let an arbitrary $B_\pi$-linear functional $\lambda$ annihilate their span. For $m\in M$ and $a\in B_\pi$, the trace $\sum_\delta\delta(am)$ is fixed. Thus $\sum_\delta\lambda(\delta m)\delta(a)=0$ for all $a$. Distinct field automorphisms are linearly independent as functions. Indeed a shortest relation with at least two terms shortens upon evaluation at $ab$ and subtraction of $\delta_0(b)$ times the original relation, choosing $b$ on which two of its automorphisms differ. A one-term relation is impossible. It follows that $\lambda(m)=0$ for all $m$. The fixed vectors therefore contain a $B_\pi$-basis of $M$, and its fixed coefficients are exactly $B$. Exactness of the component functor on all residue sequences follows by projection and tame averaging as above.
+
+In this canonical realization the fixed-vector property used below also follows from Fontaine's theorem. Let a tuple $w_i\in D(U)_i$ be fixed by $\gamma$ and carried from $w_{i-1}$ to $w_i$ by Frobenius. On each full $B_\pi$-component send the unit basis to $w_i$ and extend linearly. This gives a coefficient-linear morphism of the underlying étale Frobenius modules. It commutes with $\Delta$ because the $w_i$ lie in its fixed spaces, and with the closed subgroup generated by $\gamma$ by continuity. Here $\chi(\gamma)=1+p$. The field $K_0$ is unramified, so its intersection with the totally ramified cyclotomic tower over $\mathbb Q_p$ is $\mathbb Q_p$. Thus $\Delta$ and $\gamma$ topologically generate the full cyclotomic group. The towers above $K_0$ and $K_0(\mu_p)$ have the same union, so the latter module equipped with this full group action is the cyclotomic module over $K_0$. Full faithfulness gives a $G_{K_0}$-equivariant map $k\to U$. It is $k$-linear since the module morphism commutes with the coefficient action and the functor is faithful. Evaluating on the unit recovers the given tuple. [Fontaine, equivalence and base field compatibility][wc-font]
+
+<!--
+% END WCC8
+-->
+
+## Subquotients and the extension class
+
+<!--
+% BEGIN WCC9
+-->
+
+<span id="claim:WCC9"></span>Let $K$ be a finite extension of $\mathbb Q_p$. Let $D$ be an exact $k$-linear residue realization with $B$-linear maps on components. Let its Frobenius $\varphi_i$ from $i-1$ to $i$ commute with the cyclotomic actions $\gamma_i$, with fixed unit tuple $(\mathbf1_i)$ in $D(k)$. Suppose $U_1\hookrightarrow U_b$ and $h:U_1\twoheadrightarrow U$ are maps in its domain and $N_i^b$ is a full $A$-lattice in $D(U_b)_i$. Identify $D(U_1)_i$ with its image by exactness. Its intersection with $N_i^b$ is finitely generated since $A$ is a noetherian discrete valuation ring. Every vector in the subspace enters the intersection after multiplication by a power of $X$, because $N_i^b$ spans the ambient space. Applying $D(h)_i$ gives a finitely generated module spanning $D(U)_i$ by surjectivity. As a submodule of a $B$-space it is torsion-free, hence free over $A$ of the required rank.
+
+Let $z:G_K\to U$ be a continuous cocycle whose extension $E_z$ belongs to the domain of $D$. On $E_z=U\oplus k$ put $g(u,a)=(gu+az(g),a)$. Composition follows from $z(gh)=z(g)+gz(h)$. For the quotient $E_z\to k$, choose lifts $s_i$ of $\mathbf1_i$. In the kernel $D(U)_i$ define
+$$
+ y_i=\varphi_i(s_{i-1})-s_i,\qquad t_i=(\gamma_i-1)s_i .
+$$
+Exactness places both differences in this kernel. Applying $\gamma_i-1$ to the first difference gives $(\gamma_i-1)y_i=\varphi_i(t_{i-1})-t_i$. Changing the lifts by $x_i\in D(U)_i$ changes the pair by
+$$
+ \big(\varphi_i(x_{i-1})-x_i,\;(\gamma_i-1)x_i\big)_i .
+$$
+Such pairs satisfy the same equation by commutation. Quotienting its solutions by these pairs gives the Herr class, independently of the chosen lifts. If $z'(g)=z(g)+gu_0-u_0$, the map $(u,a)\mapsto(u-au_0,a)$ identifies the two extensions over $U$ and $k$. Transporting the lifts proves that the class depends only on the cohomology class of $z$.
+
+Assume also the fixed-vector property of the residue realization. This says that a simultaneous fixed tuple of $D(E_z)$ comes from a $G_K$-map $v:k\to E_z$ evaluated on the units. If the Herr class vanishes, subtract a tuple giving its boundary from the $s_i$. The resulting lifts are fixed. Their map $v$ projects to the identity of $k$, since that scalar endomorphism acts as the identity on the nonzero $\mathbf1_i$. Writing $v(1)=(u,1)$ gives $z(g)=u-gu$, the coboundary of $-u$. Conversely a coboundary gives a fixed splitting, hence lifts for which the pair vanishes. For the canonical level-one realization of WCC8 the fixed-vector property has just been verified. These calculations concern the extension of a specified residue representation. Bounding Selmer lengths as the twists and fields vary still requires the estimates in the arithmetic audit. [Formal vanishing test][wc-herr] · [Integral Herr maps for restriction](../../../research/modules/galois/wach_v59/main.tex#L278-L336) · [Coverage audit](../../../publication/audit/completeness.md)
+
+<!--
+% END WCC9
+-->
+
+[wc-font]: https://archive.math.arizona.edu/cais/847Page/References/Fontaine-Representations_p-adique_des_corpx_locaux.pdf#page=26
+[wc-berger]: https://perso.ens-lyon.fr/laurent.berger/articles/article06.pdf#page=21
+[wc-pres]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/NonGaloisDescent/JSmul.lean#L28-L51
+[wc-herr]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/InertiaEigenvalues/MemCoboundariesOfHerrPairCoboundary.lean#L9-L103

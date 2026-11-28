@@ -2,6 +2,8 @@
 
 The [coverage register](../publication/audit/completeness.md) identifies proof-specific inputs that still need a human derivation or a verified reference to a peer-reviewed theorem. The [current questions](register/NEXT_STEPS.md) and [existing research modules](modules/) give the working statements and their supporting calculations. The [overview](../manuscript/overview.md) follows the route to RH and Dirichlet GRH. The [detailed contents](../publication/full/contents.json) give the precise reading order of the longer derivations.
 
+The Galois module records the level-one reduction maps and the Herr class of a residue extension as WCC8–9. The outline guide places the two proofs at B8.42bof-lattices and identifies the distinct roles of B8.50a and B9.19 in Roadmap v45. [Claim records](modules/galois/cyclotomic_wach_comparison/claims.json) · [Outline guide](../manuscript/guides/ROADMAP_OUTLINE_CROSS_REFERENCES.md)
+
 ## Working in the current layout
 
 | Work | Where it goes |
