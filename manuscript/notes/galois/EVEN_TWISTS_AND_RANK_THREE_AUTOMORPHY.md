@@ -855,3 +855,53 @@ This transfer uses a narrower arithmetic input than the general window estimate 
 <!--
 % END ETS39
 -->
+
+## One dyadic layer for all twists at a fixed odd prime
+
+<!--
+% BEGIN ETS40
+-->
+
+<span id="claim:ETS40"></span>Let $M/\mathbf Q$ be a fixed abelian number field, let $R_h=\mathbf Q(\mu_{2^{h+2}})^+$, and fix an odd prime $\ell$. Put $D_h=MR_h$. There is an integer $s=s(M,\ell)$ such that restriction gives an isomorphism
+$$
+ \mathcal S_\ell(D_s,e)\ \xrightarrow{\ \sim\ }\ \mathcal S_\ell(D_h,e)
+ \qquad (h\ge s,\ e\ge1).
+$$
+The same $s$ works for every positive twist. The input on class groups is Washington's theorem that the $\ell$-part of the class number stays bounded in the cyclotomic $\mathbf Z_2$-extension of a fixed abelian field. We apply it to $M(\mu_\ell)$. [Washington, *Inventiones Mathematicae* 49 (1978), p. 87](https://doi.org/10.1007/BF01399512)
+
+Write $L_h=D_h(\mu_\ell)$, and let $g_h$ be the number of its primes above $\ell$. For $j=e+1$ put $A_h=H^2(G_{D_h,S_\ell},\mathbf Z_\ell(j))$, with $S_\ell$ the places above $\ell$ and the infinite places. This is the finite group $K_{2e}(\mathcal O_{D_h})_\ell$ by the number-ring comparison. Restriction to $L_h$, followed by corestriction, multiplies by $[L_h:D_h]\mid\ell-1$ and therefore gives a split injection, also after reduction modulo $\ell$. At $L_h$ multiplication by $\ell$ on the coefficient lattice injects the quotient of $H^2$ modulo $\ell$ into $H^2(G_{L_h,S_\ell},\mathbf F_\ell(j))$. The finite dual coefficient is trivial because $L_h$ contains $\mu_\ell$. Local duality bounds each local degree-two dimension by one, and the dual of the localization kernel consists of everywhere unramified $\mathbf F_\ell$-characters split above $\ell$. The field $L_h$ is totally imaginary. Class field theory therefore gives
+$$
+ \dim_{\mathbf F_\ell} A_h/\ell A_h
+ \le g_h+\dim_{\mathbf F_\ell}\operatorname{Hom}(\mathrm{Cl}(L_h),\mathbf F_\ell).
+$$
+This retains the actual number of local terms in the proof of KB6. [Degree-two comparison and strict duality](#claim:ETS9) · [Local product before substituting the field degree](../../../research/modules/construction/k_theory_bridge/main.tex#L445-L486) · [Original local product estimate](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GeneratorCountTuples/CardH2QuotientLeSha.lean#L21-L32)
+
+The class-group term is bounded by Washington's theorem. The image of the Frobenius at $\ell$ in $\operatorname{Gal}(R_\infty/\mathbf Q)=\mathbf Z_2^\times/\{\pm1\}$ has infinite order, since $\ell^a\ne\pm1$ for every integer $a>0$. Its closed subgroup is open in this procyclic group. Hence the number of primes over $\ell$ in $R_h$ is bounded, and passing to $L_h$ multiplies that number by at most $[M(\mu_\ell):\mathbf Q]$. Choose an integer $b\ge1$ bounding the right side of the last display for all $h$.
+
+Write $M\cap R_\infty=R_u$. For $h\ge u$ the group $\operatorname{Gal}(D_h/M)$ is cyclic of order $2^{h-u}$. Its image on $A_h/\ell A_h$ has order dividing the $2$-part of $|\mathrm{GL}_b(\mathbf F_\ell)|$, by extending a smaller matrix by the identity. Take $s=u+v_2(|\mathrm{GL}_b(\mathbf F_\ell)|)$. Then $T=\operatorname{Gal}(D_h/D_s)$ acts trivially on $A_h/\ell A_h$ whenever $h\ge s$. The averaging idempotent $p_T$ exists over $\mathbf Z_\ell$. Its complement $(1-p_T)A_h$ is equal to its own multiple by $\ell$ and is finite, hence zero. Thus $T$ acts trivially on $A_h$ itself. The dual of the strict group embeds equivariantly into $A_h$ by Poitou–Tate duality, so $T$ acts trivially on the strict group as well. Prime-to-$\ell$ restriction for the strict local conditions identifies the group over $D_s$ with these invariants. [Equivariant strict dual injection](#claim:ETS15) · [Descent including ramified places](#claim:ETS22)
+
+<!--
+% END ETS40
+-->
+
+## The exceptional-prime contribution unramified at both auxiliary primes
+
+<!--
+% BEGIN ETS41
+-->
+
+<span id="claim:ETS41"></span>Fix the character field $M=M_\chi$ and any finite set $P$ of odd primes, in particular the exceptional primes of ETS39. Write $E=D_h(\sqrt{-q},\sqrt{-d})$, $U=\operatorname{Gal}(E/D_h)$, and let $Q_{\ell,e}$ be the quotient of ETS39. One can choose the common interval of ETS38 with the original prime-pair size conditions and $t=\lfloor x^{401}\rfloor$ so that, for all sufficiently large $X$ and all $x$ on the selected interval,
+$$
+ \sum_{\ell\in P}\sum_{1\le e<t}\log|Q_{\ell,e}^{U}|
+ \ \le\ \sum_{\ell\in P}\sum_{1\le e<t}\log|\mathcal S_\ell(D_h,e)|
+ \ \le\ \left(\sum_{\ell\in P}\log\ell\right)\exp(x^{4\varepsilon/5}).
+$$
+The dyadic layer $h=h(x)$ here is the full original layer. For each $\ell$ take $s=s(M,\ell)$ in ETS40 before choosing the window. Since $2^h\ge x^{2+8\varepsilon}$, eventually $h\ge s$ for every $\ell\in P$. The fixed abelian field $B_\ell=D_s(\mu_\ell)$ contains $\mu_\ell$ and has degree prime to $\ell$ over $D_s$. Restriction embeds $\mathcal S_\ell(D_s,e)$ into $\mathcal S_\ell(B_\ell,e)$, including the local conditions. [Stabilization in the dyadic tower](#claim:ETS40) · [Original layer and prime-pair inequalities](#claim:ETS34)
+
+To make a single choice of interval, keep the original reference towers of ETS38 and include the cyclotomic $\mathbf Z_\ell$-tower of each $B_\ell$. In TW7 take layer index zero for the latter fields. Its reference layer has fixed degree and discriminant. TW2 supplies a fixed generator bound for each such tower and TW5 bounds the number of its exceptional twists by that integer. Add these integers to the original bound $R$ on the size of the union of exceptional sets. The square-window lemma TW5 applies to the resulting union even when two towers have the same coefficient prime. Use (TW.37) with this enlarged fixed $R$ and $C_t=401$ before choosing $q,d$ at $X^{1/J}$ as in ETS34. Then TW7 bounds the sum of the strict lengths on each $B_\ell$ by $\exp(x^{4\varepsilon/5})$ on the *same* selected interval as the original dyadic and reference-field estimates. Multiplication by $\log\ell$ converts length to logarithmic order. This proves the second inequality for $D_h$. The choice of interval may depend on $M,P$ and all the original fixed data. [All layer indices in TW7](../../../research/modules/galois/simultaneous_cohomological_windows/main.tex#L745-L772) · [Union of exception sets and interval selection](../../../research/modules/galois/simultaneous_cohomological_windows/main.tex#L918-L938)
+
+The primes $q,d$ are distinct, do not divide $2\operatorname{cond}(\chi)$, and ramify respectively in just one of the two quadratic fields. Therefore their inertia groups in $E/D_h$ are independent involutions generating $U\simeq C_2\times C_2$. Restriction identifies $\mathcal S_\ell(D_h,e)$ with $\mathcal S_\ell(E,e)^U$. The parity projector commutes with $U$ and with the group $G$ of ETS38. Since $|U|=4$ is a unit at $\ell$, taking $U$-invariants is exact on the sequence defining $Q_{\ell,e}$, even when $\ell\mid|G|$. This proves the first inequality. More precisely, the residual contribution at these primes after this estimate is the sum of the logarithmic orders of the three summands of $Q_{\ell,e}$ on which at least one of the two inertia generators acts by $-1$. These are integral direct summands, obtained by multiplying the two sign projectors. At an original exceptional prime and $e\ge2$, a character nontrivial on either inertia group retains its quadratic component there after the $\ell$-power part and the component at $\ell$ are removed. Its corrected character consequently has even order, placing it in the original Case II. At $e=1$ the source assigns Case V. Estimating the three moving contributions requires additional arithmetic. [Original partition at exceptional primes](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/Cases.lean#L43-L48) · [The corrected odd-order character forces original conductor](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/HostOdd.lean#L70-L79)
+
+<!--
+% END ETS41
+-->

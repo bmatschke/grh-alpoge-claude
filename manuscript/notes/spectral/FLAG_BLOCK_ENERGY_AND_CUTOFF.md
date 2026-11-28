@@ -1710,3 +1710,130 @@ In the two weighted sums obtained by summing the rows over stabilizer orbits, an
 [move-bound]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/AmplitudeLeMassSecondTypeFamily.lean#L31-L104
 [move-stabilizer]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/FramesCharactersAgreeCommonStabiliser.lean#L69-L108
 [move-orbits]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/NormOrbitSumLeOfSymmKernel.lean#L83-L111
+
+## Local self-density and the finite discriminant pairing
+
+<!--
+% BEGIN FBE73
+-->
+
+<span id="claim:FBE73"></span>At a finite place of the original unramified CM extension, let $q$ be the residue cardinality of $F$, $R=\mathcal O_E\otimes_{\mathcal O_F}\mathcal O_{F_v}$, and $T$ an integral nonsingular Hermitian lattice of rank $h$. In an orthogonal local basis its elementary valuations have multiplicities $m_i$ for $i\ge0$. Write $D=T^\#/T$ with its induced Hermitian pairing valued in $E_v/R$, and $\alpha(j)=\prod_{a=1}^j(1-\eta_v^a q^{-a})$, where $\eta_v=-1$ at an inert place and $+1$ at a split place. Give the integral matrix and integral Hermitian matrix spaces additive volume one. For the local self-representation density in these measures,
+$$
+             \alpha(T)=|U(D)|\,\alpha(m_0).
+$$
+In particular, the entire contribution of the positive valuation blocks to this density can be read from the *finite* linking form. [Original density identity][gg-disc]
+
+Put $G_j=|GL_j(R/\pi)|q^{-2j^2}$, interpreting the group over the split residue algebra componentwise. The nonsingular Hermitian matrices of size $j$ over that algebra form a single orbit. Their stabilizer has order $q^{j^2}\alpha(j)$, by the finite unitary group order in the inert case and the general linear group order in the split case. For a Hermitian matrix of size $l$ and rank $a$, its stabilizer in $GL_l(R/\pi)$ preserves the radical, acts there by $GL_{l-a}$ and on the quotient by $U_a$, and allows an arbitrary map from quotient to radical. Consequently the share of matrices of rank $a$ among all $q^{l^2}$ Hermitian matrices is
+$$
+              q^{-(l-a)^2}\frac{G_l}{\alpha(a)G_{l-a}}.
+$$
+In particular a uniform Hermitian matrix of size $j$ is nonsingular with probability $G_j/\alpha(j)$.
+
+Let $s_i=\sum_{a\ge i}m_a$ and $S=\sum_{i\ge1}s_i^2$. For each fixed residue matrix of rank $m_0$, choose integral coordinates lifting a basis for its nonsingular block and radical. Eliminate the off-diagonal block against the invertible leading block by a triangular change. Conditional on the other blocks, the Schur complement divided by $\pi$ is uniform on the integral Hermitian matrices of size $s_1$. Thus the ranks to be prescribed at successive reductions are $m_0,m_1,\ldots$. All unimodular Hermitian blocks over $R$ of the same rank are isometric. In the inert case split off a unit norm vector by reduction and scale its norm using surjectivity of the norm on units. The latter follows by the residue norm and the surjective residue trace on successive layers, including at two. In the split case the two components are in perfect duality. These facts identify this sequence of rank tests with one integral congruence orbit, including all gaps in the list of valuations. Its additive volume is $q^{-S}G_h/\prod_{i\ge0}\alpha(m_i)$ by the preceding rank counts.
+
+For $B$ a Gram matrix of $T$, the map $A\mapsto A^*BA$ pushes additive measure on $GL_h(R)$, of total mass $G_h$, to a constant multiple of additive measure restricted to that orbit. Indeed both measures are invariant for integral changes of basis and the compact group acts transitively. Reduction balls of sufficiently high precision around $B$ lie in the orbit by the rank tests. A solution of $A^*BA\equiv B\bmod\pi^N$ has invertible $A$ for $N>v(\det B)$, by taking determinants (at a split place both determinant valuations are nonnegative). Dividing its measure by the volume $q^{-Nh^2}$ of the target ball gives $\alpha(T)=q^S\prod_{i\ge0}\alpha(m_i)$.
+
+The underlying module of $D$ is $\bigoplus_{i>0}(R/\pi^i)^{m_i}$. Its endomorphism ring has $q^{2S}$ elements, since a pair of generators of lengths $a,b$ gives $\min(a,b)$ residue layers. Reduction modulo $\pi$ makes the matrix block triangular by length. Nakayama's lemma therefore gives $q^{2S}\prod_{i>0}G_{m_i}$ invertible endomorphisms. Hermitian linking forms on this module number $q^S$, with one fixed-field choice per diagonal layer and one extension-field choice for each pair of off-diagonal layers. Use the diagonal perfect pairing with entries $\pi^{-i}$ to identify the module with its Hermitian dual. A linking form is perfect precisely when the leading matrix on each equal-length block is nonsingular. These residue matrices are independent and uniform. All the perfect forms are isometric: on the longest generators the leading matrix is nonsingular, so they give a perfect free block over $R/\pi^i$ after scaling the form by $\pi^i$. Split it off orthogonally, diagonalize its unimodular form as above and repeat at the next length. Orbit–stabilizer now gives $|U(D)|=q^{2S}\prod_{i>0}G_{m_i}/[q^S\prod_{i>0}(G_{m_i}/\alpha(m_i))]=q^S\prod_{i>0}\alpha(m_i)$. This proves the claimed identity. [Finite discriminant isometries in the source][gg-finite]
+
+<!--
+% END FBE73
+-->
+
+## The represented two-flag mean from the mass of its definite complement
+
+<!--
+% BEGIN FBE74
+-->
+
+<span id="claim:FBE74"></span>Let $Z$ be a represented positive nonsingular joint cross matrix on the tied row for words $u,v$, with integral joint flag lattice $M$ as defined below. Set $r=r_S$, $m=2(r+1)$, $h=k-1$ and $R_0=h+m$. Write $\rho_u$ for the sum of the row weights and $\nu(Z)$ for the normalized count of primitive companion frames. Let $C_h$ be the rank-$h$ definite unimodular genus mass in the original convention. The original fixed-matrix mean is
+$$
+ \rho_u\nu(Z)= C_h |\Delta_F|^{-2r(r+1)h}
+      \delta(Z)^h\prod_{j=k}^{R_0} L_F(j,\eta^j)
+                        \prod_{p<\infty}\operatorname{dens}_p(Z),
+ \qquad
+ \delta(Z)=\sqrt{|N_{E/\mathbf Q}(G(Z)/g^m)|}.
+$$
+Here $G(Z)=D_{r+1}\overline{D}_{r+1}-T_uT_vD_r\overline{D}_r$ for the raw leading minors. The finite factors refer to the original primitive joint embedding in the different-scaled basis, using divided differences at the marked primes. We use the definite Hermitian genus mass formula in its integral self-density normalization, with $k\ge m+3$. The proof applies also when the two words coincide and the joint Gram is nonsingular. [Original frame lattice and constant][gg-record] · [Finite embedding density](SPECTRAL_SCALAR_DENSITIES.md)
+
+Fix a representative pair of rational frames with this matrix. Their span $U$ is nonsingular of rank $m$ and its complement $W$ is totally positive definite of rank $h$ on this branch. In $U$ take the lattice $M$ generated by the two prescribed projective flag lattices off $g$; at $p\mid g$ take the first frame vectors and the differences of the second and first vectors divided by $g$. These are the integral bases imposed by the primitive frame count on the row. In particular a unimodular lattice $\Lambda$ counted for these frames has $\Lambda\cap U=M$. Counting the frame pairs by their first row gives $\rho_u\nu(Z)$. Equivalently fix the pair and count $\Lambda$ modulo the rational isometries fixing $U$ pointwise. For this change of orbit representatives, two frame pairs with the same Gram are isometric on their joint span, and Witt extension carries this isometry to the ambient space. At a fixed row the companion frames are counted modulo the integral unipotent subgroup. The remaining finite group is the image of the row stabilizer on $X^\perp/X$, where $X$ is the first isotropic flag space. An integral unipotent fixing the companion frame fixes $U$ pointwise. For $w\in W$ its displacement lies both in $X\subset U$ and in $W$, hence vanishes. This makes the action of the unipotent subgroup on the companion frames free. A finite-quotient element stabilizing a unipotent orbit has a unique lift fixing the chosen companion frame. Thus each orbit contributes the reciprocal of the order of the stabilizer of the glued lattice in $U(W)$ by orbit–stabilizer. The row weights are thus counted once. [Primitive intersection and the two orbit sums][gg-rows] · [Free unipotent action][gg-free]
+
+Write $T=\Lambda\cap W$, $D_M=M^\#/M$ and $D_T=T^\#/T$. The finite subgroup $\Lambda/(M\oplus T)$ projects injectively into each discriminant module by the two intersection identities. Its annihilator in $D_M\oplus D_T$ is itself by self-duality, so its order squared is $|D_M||D_T|$. Both projections are consequently bijective. It is the graph of a map carrying the pairing of $D_M$ to the negative of that of $D_T$. Conversely the inverse image of each such graph is self-dual with precisely the two indicated intersections.
+
+A first graph exists even when the original representative was chosen without requiring its joint embedding to be primitive. At $p$ take the negatives of the positive-valuation Jordan blocks of $M_p$ and fill the remaining rank with unimodular lines. There is room since $c_p\le m<h$. This lattice has the required negative linking form and lives in the rational space $W_p$: at a split place the space is determined by rank, and at an inert place the determinant valuation has the required parity because the ambient space contains a self-dual lattice and is $U_p\perp W_p$. Rank and this parity classify rational unramified Hermitian spaces. Indeed units are norms, and two odd diagonal valuations can both be removed by scaling a hyperbolic plane: $\langle 1,1\rangle$ is hyperbolic since $-1$ is a unit norm. These local choices can agree almost everywhere with a fixed full lattice of $W$, unimodular there. They patch by primary decomposition to a global complement lattice and the local graphs patch in its finite discriminant module.
+
+For fixed $T_p$ the nonempty set of graphs is a torsor for $U(D_{T,p})$. The admissible $T$ form exactly one genus in the fixed rational $W$. Indeed the positive elementary divisors at every prime are determined by $D_M$ and the rank determines the unimodular part. The unramified classification used in FBE73 identifies the local lattices with these divisors. Conversely local isometries to a represented complement give the graphs at every prime, which assemble by primary decomposition of the finite discriminant modules. For a fixed class of $T$ the global graph set has size $\prod_p|U(D_{T,p})|$. Taking its orbits by $U(T)$ with inverse stabilizer orders divides this number by $|U(T)|$ even if this action has a kernel. The desired sum is therefore the mass of this one definite genus times the graph count. [Local graph fibres and genus][gg-graphs]
+
+Put $v_p=v_p(\det T_p)$, $c_p$ equal to the number of its positive elementary divisors and $\alpha_p(j)=\prod_{i=1}^{j}(1-\eta_p^iq_p^{-i})$. The definite mass formula gives the genus mass as $C_h\prod_p q_p^{hv_p}\alpha_p(h)/\alpha(T_p)$ in the normalization of FBE73. Its hypotheses hold because $W$ is totally positive definite, $T$ is integral and full, and $E/F$ is unramified at every finite place. Multiply by the graph count and apply FBE73. The remaining expression is
+$$
+    C_h\left(\prod_p q_p^{v_p}\right)^h
+             \prod_p\frac{\alpha_p(h)}{\alpha_p(h-c_p)} .
+$$
+Only divisors of $D_M$ occur in these two products. In particular there is no division by a global mass or by a local amplitude that could vanish. [Definite genus mass in this convention][gg-cmass] · [Local cancellation][gg-cancel]
+
+Because $D_M$ and $D_T$ are anti-isometric, $v_p$ is also the valuation of the determinant ideal of $M_p$. In the rational basis consisting of the first frame and the divided differences, the Gram determinant is $(-1)^{r+1}G(Z)/g^m$: subtract the first frame from the second and divide each of its $r+1$ columns by $g$, doing the same to the rows. The two lists of coefficient ideals in the resulting pseudo-basis are $\mathfrak d_F^{-(r-a)}\mathcal O_E$, $0\le a\le r$. They are units at the marked primes. Away from $g$ the change from the original two flags is integral with integral inverse on these ideals. In the determinant ideal each coefficient ideal enters with its conjugate. Thus the product of the determinant norms over $F$ is
+$$
+ \prod_p q_p^{v_p}
+   = |\Delta_F|^{-2r(r+1)}\delta(Z).
+$$
+Indeed the sum of $r-a$ down the two lists is $r(r+1)$, and taking the conjugate product doubles it. The square root of the absolute $E$-norm of the Gram determinant is its absolute $F$-norm. [Norm of the flag pseudo-basis][gg-det]
+
+Finally the [primitive local density count](SPECTRAL_SCALAR_DENSITIES.md) gives $\operatorname{dens}_p(Z)=\alpha_p(R_0)/\alpha_p(h-c_p)$: the reduction of the scaled matrix has radical of dimension $c_p$, including at the marked primes. Also $\alpha_p(h)/\alpha_p(R_0)=\prod_{j=k}^{R_0}(1-\eta_p^j q_p^{-j})^{-1}$. Multiplication proves the formula; the Euler products converge absolutely since $k>1$ and only finitely many $c_p$ are nonzero. This supplies the represented arithmetic mean used in the [weighted corank-one energy](SPECTRAL_WEIGHTED_CORANK_ONE_ENERGY.md#from-the-local-frame-weights-to-a-single-genus-mass). Its integral frame-class weights still multiply the glued mass there, and its sum over real orbital integrals uses the separate analytic estimates. [Density identification and global Euler factors][gg-euler]
+
+<!--
+% END FBE74
+-->
+
+## The squared row weights above one attained tuple
+
+<!--
+% BEGIN FBE75
+-->
+
+<span id="claim:FBE75"></span>Fix a represented nonsingular block point on the original two-word row, its matched family and its finite set $P$ of places. Write $d^0$ for the reference tuple of inner data and complete any tuple $d$ by $d^0_p$ outside $P$. For a local datum let $K_p(d)$ be its stabilizer in the unitary group of the orthogonal complement of the two rational frames. The positive weight $w_p(d_p)$ is the ratio of the volume of $K_p(d^0)$ to that of $K_p(d)$. For every **attained** tuple of the nongeneric family, the class and normal labels lying over it satisfy
+$$
+   \sum_{(c,\nu)\mapsto d} w_{t(c,\nu)}^2
+      = V_0\prod_{p\in P}w_p(d_p).
+$$
+Here $w_t^2$ is the product of the two original row-lattice weights, and $V_0$ is the inverse-stabilizer mass of the reference genus of inner data. This is a second disintegration: FBE74 counted overlattices of a fixed primitive pair, whereas a single inner datum here can underlie several lattices with different phases. [Definition of rational inner classes, mass and row labels][gg-inner]
+
+First calculate the contribution of one rational class of inner data. Write $A,A'$ for the integral adapted automorphism groups of the two rows, $N,N'$ for their integral unipotent kernels, and $a=[A:N]$, $a'=[A':N']$. The term has squared weight $1/(aa')$. The two quotient groups are the finite images on the respective flag quotients. Act on a chosen relative isometry $\ell$ by $(s,s')\mapsto s\ell(s')^{-1}$. A translated term has the same pair of row lattices, and changing its two integral unipotent representatives preserves its row and normal label. Let $B\subset A\times A'$ consist of the pairs preserving the resulting row and normal label of $\ell$. Two translates give the same label precisely when their quotient belongs to $B$. All labels of this rational inner class arise this way: transporting a representative back to the fixed rational frames gives the same two inner row data, and two adapted lifts of either of those data differ by the corresponding rational unipotent. Bringing their lattices to the chosen row representatives then leaves an element of $A$ or $A'$. Thus this class gives $[A\times A':B]$ labels. [Orbit and fibres of the two row actions][gg-roworbit]
+
+The order of the rational stabilizer of the inner datum is $[B:N\times N']$. To see the map, write $s\ell(s')^{-1}=n\ell n'$ using the rational unipotent changes supplied by equality of the double coset. In the base-frame coordinates, $n^{-1}s=\ell n's'\ell^{-1}$ is adapted to both flags. It preserves their joint span and thus its orthogonal complement. Retain its action on the complement and extend by the identity on the joint span.
+
+To check the remainder, let $X$ be the isotropic space of either flag. Inside the joint span, $X^\perp/X$ is a nondegenerate plane. The remainder acts unipotently on the joint span, since the two full frames together are a basis there and both changes are unitriangular. Its action fixes the nonisotropic terminal vector modulo $X$, and hence preserves the other perpendicular line in the plane. A unipotent isometry on those two lines is the identity. This puts the remainder in both rational unipotents. Conversely their common action on the complementary space is trivial, so this prescription is independent of the two changes and respects composition.
+
+The compatibility of the two integral inner data means the resulting frame-fixing isometry stabilizes precisely that datum. Conversely such an isometry has an adapted lift preserving each row lattice: equality of either inner datum allows a rational unipotent correction taking the transported lattice back to that row lattice. Reading the two lifts together gives an element of $B$. The kernel consists exactly of $N\times N'$ since the classes of the lifts on the two flag quotients are then trivial. This identifies the stabilizer of the inner datum; it may move a lattice representing the datum. The weighted contribution of its rational class is consequently
+$$
+ \frac{[A\times A':B]}{aa'}
+     =\frac1{[B:N\times N']} .
+$$
+[Complement action and its kernel][gg-corr] · [Exact index identity and squared weight][gg-index]
+
+For an attained tuple choose one realizing term. Every visited rational inner class in its local genus is included. Indeed change the initial local lattices by the local complement isometries to produce the desired data. The changes can be taken to be the identity off finitely many places. The resulting local lattices patch to a global lattice by intersection in the rational space: between two fixed fractional multiples of a reference lattice this is primary decomposition of a finite module. Local transport preserves the existence of a term, the defect conditions and hence membership in this term family. The based-frame realization on the given rows therefore produces an original term for the new rational class. Conversely every term giving the chosen tuple gives one of these classes. For a fixed normal label the partner equivalence in this family identifies exactly equal rows. Therefore the row and normal labels just counted correspond bijectively to $(c,\nu)$ in the displayed sum. Uniqueness of the local datum of a lattice and the use of one representative per local orbit prevent a tuple with a different representative from entering that fibre. [Local realization and closure of the family][gg-gen] · [Bijection on the attained tuples][gg-keys]
+
+It remains to compare the two genus masses. Let $H$ be the rational frame-fixing group, $G$ the restricted product of its local complement groups and $K(d)=\prod_p K_p(d)$. The local genus is the single $G$-orbit of the completed tuple. Its $H$-orbits are the double cosets $H\backslash G/K(d)$ and their stabilizers are $H\cap xK(d)x^{-1}$. These are finite: they preserve a full lattice on the definite complement after a finite-index restriction. The double coset set is finite by finiteness of the definite lattice genus and commensurability with its lattice stabilizer. For a finite-index subgroup $J\subset K$, each coset of $H\backslash G/K$ splits according to the action of $x^{-1}Hx\cap K$ on $K/J$. Summing the reciprocal stabilizer orders over the smaller cosets gives $[K:J]/|H\cap xKx^{-1}|$. Apply this twice with $J=K(d)\cap K(d^0)$. The ratio of the masses at $d$ and $d^0$ is $[K(d^0):J]/[K(d):J]$, exactly the product in the statement because the two compact groups agree outside $P$. The reference mass is strictly positive since its orbit contains its own rational class. This proves the identity with its original normalization, including the possibility of nontrivial rational stabilizers and several rational classes in one genus. [Restricted-product index comparison][gg-product] · [Its application to the actual matched family][gg-attain]
+
+Applying this equality to the squared modulus of the finite signed product in the [signed fibre formula](SPECTRAL_SIGNED_CORANK_ONE_FIBRE.md) gives its genus coefficient once, independently of the real orbital factor. The latter can vanish, in which case every vector at that point vanishes. This computation does not require dividing by the orbital factor.
+
+<!--
+% END FBE75
+-->
+
+[gg-disc]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/DiagonalFormCounting.lean#L16-L51
+[gg-finite]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/FibreCountingData.lean#L31-L81
+[gg-record]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/StepsR.lean#L25-L60
+[gg-rows]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/StepsR.lean#L85-L104
+[gg-free]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/IsometryFixFlagAnisotropicVectorOfFixFrame.lean#L447-L475
+[gg-graphs]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/JordanExists.lean#L70-L93
+[gg-cmass]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/CountingFormula/MassConstUniqueOne.lean#L72-L86
+[gg-cancel]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/PushforwardOrthComplement.lean#L164-L188
+[gg-det]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/PeriodIntegrals/UnitaryGroupMassFormula/CountingFormula/ProdAbsNormDifferentIdealPowers.lean#L99-L137
+[gg-euler]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalToGlobal/SiegelLatticeTheory/CokernelGLCounts/RankPointCounts/DualFamilyCounting/FormulaExplicitAtOfEta.lean#L220-L249
+[gg-inner]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/SemilocalFrames/LocClosed.lean#L65-L95
+[gg-roworbit]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/OrbitCountRowsDoubleCosetsInnerDatumClass.lean#L85-L123
+[gg-corr]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/CardStabilizerInnerDatumRowDoubleCoset.lean#L181-L212
+[gg-index]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/OrbitCountRowsDoubleCosetsInnerDatumClass.lean#L124-L163
+[gg-gen]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/UnfoldingGenusWeightsSumToMass.lean#L54-L81
+[gg-keys]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/RowWeightsLocalOrbitsSumEqGenusMass.lean#L143-L183
+[gg-product]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/MassGenusRestrictedProduct.lean#L151-L179
+[gg-attain]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/UnfoldingIdentityMatchedFamilyClosedTerms.lean#L149-L181
