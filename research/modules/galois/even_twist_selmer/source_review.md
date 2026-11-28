@@ -1,6 +1,6 @@
 # Source review of the even-twist test
 
-The reviewed manuscript has SHA-256 digest `d429a73eb38fb4fb2bc69317251835dfaeaa0a6b28b4b7e94cd9e667de0dd9da`.
+The reviewed manuscript has SHA-256 digest `fdc104addb5ee2f5af32f21b49cd7e58a525ad2b19a083244339024dd9681080`.
 
 ETS1 checks the two different local coefficient comparisons and the sign of the class-group eigenspace. At the auxiliary level prime the unramified first cohomology vanishes for divisible coefficients. Over the cyclotomic field the prime over the coefficient prime is principal, so it splits in the Hilbert class field.
 
@@ -27,3 +27,11 @@ ETS30 uses logarithmic coordinates on the three-dimensional lower unitriangular 
 For ETS32 the conductor-one field has dyadic exponent h+2 in this manuscript and a in Brox. The full strict group in the definition of his weighted sum uses the same negative Tate twist and zero local conditions. The polynomial product theorem quantifies over all finite prime supports. The unweighted bound also uses the three explicit complementary bounds in his product proposition. This review checked those statements and the sharper growth needed for ETS24. It imports Brox’s underlying arithmetic length theorem as a working-manuscript input. ETS33 tests field equality and cutoff inclusion before reusing a conductor-one interval. ETS34 distinguishes the cutoff-free polynomial estimate (subject to the prime-pair size condition) from the external window corollary using exponent 400. TW8 with exponent 401 is applied after fixing the exceptional set. Adjoining the coefficient-prime roots of unity to the bounded-degree lower dyadic layer permits KB8 at twist one. ETS35 matches the strict kernel, sign, conductor and window in Roadmap B6.39. The general arithmetic theorem is a cited working-manuscript input.
 
 The B6.39 statement and its summation proof were compared between Roadmap v44 and v45. The cited v45 bound and its automorphic hypotheses agree at the updated locations.
+
+ETS36 works with a single integral Hurewicz map over the totally complex field F(i). All odd primary parts over F inject as direct summands, including after reduction modulo the coefficient prime. Arlettaz bounds the support and exponent of the kernel. KB6 applies only after adjoining the appropriate roots of unity. The image uses the same finite homology torsion group at every prime. TB9 and the conductor–discriminant estimates give exponents five in the twist parameter and four in the field degree.
+
+ETS37 uses the original two-sided prime-pair conditions including the sharper logarithmic sizes at the lower endpoint. Its growing range uses no external conductor-one product. Multiplication of orders means that the number of fields and twists enters additively after taking logarithms of the orders. The fixed base can use its own conductor.
+
+ETS38 uses a cyclic extension because the kernel field of a single Dirichlet character is cyclic. At a prime dividing the extension degree, global transgression costs one cyclic factor and each local descent defect costs at most one more. Only the coefficient prime and places ramified in the fixed character conductor require local tests. The odd conductor-one estimate on the shared interval uses Brox's pointwise product and one enlarged reference-prime set in TW8. The remaining relative quotient is defined even when the invariants admit no averaging projector.
+
+ETS39 checks the uniform coefficient-ring quantifier in SP18–20 before choosing the unramified splitting ring at each prime outside the fixed exceptional set. Its normalized lengths sum to the entire sign even if field degrees and residue degrees grow. The source's local-chart trace theorem is an imported input, and this claim does not cover the exceptional primes or the resonant pairs.

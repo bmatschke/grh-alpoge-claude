@@ -78,3 +78,71 @@ Since $\gamma_p\le2/p$, the increase per prime is at most $C f(k+1)\Delta\eta/p$
 <!--
 % END WNS4
 -->
+
+## The integral polynomial vectors at the two spacings
+
+<!--
+% BEGIN WNS5
+-->
+
+<span id="claim:WNS5"></span>Fix a layer $1\le j\le m$ and one embedding of the CM type. Write $P=k+j-1$, $Q=m-j$, and $u=(t_r+1)/2$. The numerical height uses the hook of the positive partition. The squared norm of the full Fock vector uses this hook times the hook of the negative partition. We compare both at the two spacings on the same polynomial coordinates. [Positive hook in the height](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/HookLogSumSubSizeTermLeLowerBound.lean#L78-L89) · [Both factors in the Fock vector](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/FockFormMinorProductEqProdHookProducts.lean#L178-L192)
+
+At spacing $h$, put $b_s=B+s h$, $w=B+(j-1/2)h$ at this embedding. In zero-based coordinates, set $z=(v_0,\ldots,v_{k-2},-b_0,\ldots,-b_{m-1})$, where the $v_i$ are fixed. The positive partition has entries $z_i+w-(P-1-i)-u$ for $0\le i<P$. The negative partition is the list $b_{j+c}-w-u-c$, $0\le c<Q$, read in reverse. These formulas take the integral row and the negative of the reversed small row, including the rank shifts. For $\delta=h-h_{\rm old}$ the new partitions are therefore $\lambda^++\eta^+$ and $\lambda^-+\eta^-$, where $\lambda^\pm$ denote the old ones. In the indicated order their increments are
+$$
+ \begin{aligned}
+ \eta^+_i&=(j-\tfrac12)\delta &&(0\le i<k-1),\\
+ \eta^+_{k-1+s}&=(j-\tfrac12-s)\delta &&(0\le s<j),\\
+ \eta^-_{Q-1-c}&=(c+\tfrac12)\delta &&(0\le c<Q).
+ \end{aligned}
+$$
+Both increments are nonnegative decreasing partitions, integral since $\delta$ is even. The formula includes $j=m$, where the negative partition is empty. In particular the added number of boxes
+$$
+ S_j=|\eta^+|+|\eta^-|
+ =\delta\left((k-1)(j-\tfrac12)+\tfrac12j^2+\tfrac12(m-j)^2\right)
+$$
+is independent of the embedding, the starting node and the word. [Original nodes](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/GlobalTwisting/PairRowIffQdRows.lean#L93-L105) · [Original signed rows](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Formalism/LocalRingCardinality/DataKap.lean#L13-L34) · [Roadmap v45, B4.02z](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/7e7eb5cdf6bc1b50392c1439a2e75091426ab11a/docs/src/book/main.tex#L6210-L6225)
+
+For a partition $\lambda$ of length at most $r$, pad it with zeros and put $p_\lambda=\prod_{s=1}^r D_s^{\lambda_s-\lambda_{s+1}}$, with $\lambda_{r+1}=0$. Here $D_s$ is the corner minor of order $s$ in the specified block. Reversing the coordinate order as prescribed identifies the negative minors with ordinary corner minors up to signs. Use the same order at both spacings. Since exponents add, multiplication by $M_j=p_{\eta^+}p_{\eta^-}$ sends the old vector exactly to the new one in the source convention. This gives a map before evaluating any theta series. Over a discrete valuation ring in these coordinates, each minor has a monomial with unit coefficient and stays nonzero after reduction. Their product stays nonzero in the polynomial ring over the residue field. For every polynomial $F$ over the fraction field, dividing by its coefficient of smallest valuation gives
+$$
+ \min v(\operatorname{coeff}(M_jF))=\min v(\operatorname{coeff}(F))\qquad(F\ne0).
+$$
+It follows that the image of each full homogeneous coefficient lattice under multiplication is saturated in its new degree. The old and new highest vectors themselves are primitive, by the same residue argument. All assertions apply separately to either signed block and to their product. [Original two corner products](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/DivisorProofs/FockFormMinorProductEqProdHookProducts.lean#L124-L138)
+
+<!--
+% END WNS5
+-->
+
+## The size of the map in the Fock metric
+
+<!--
+% BEGIN WNS6
+-->
+
+<span id="claim:WNS6"></span>Give coordinate monomials the Fock inner product in which they are orthogonal and $\|X^\alpha\|^2=\alpha!$. For each nonzero homogeneous polynomial $F$ of degree $D$, the multiplier in WNS5 satisfies
+$$
+ 0\le \log\frac{\|M_j F\|^2}{\|F\|^2}
+ \le S_j\{2\log(2r)+\log(1+D+S_j)\},\qquad r=\max(1,P,Q).
+$$
+For the upper bound, multiplication by a monomial of degree $S$ on degree $D$ has norm at most $(1+D+S)^{S/2}$, by taking the ratio of the two monomial factorials. Each determinant of order $s\le r$ has coefficient sum in absolute value at most $s!\le(2r)^s$. The product $M_j$ thus has coefficient sum at most $(2r)^{S_j}$. The triangle inequality gives the claimed upper bound.
+
+For the lower bound let $T_A$ mean multiplication by a polynomial $A$. Its adjoint on polynomials is $\overline A(\partial)$, by the monomial factorials. The product rule gives the following identity of operators on polynomials, with a finite sum:
+$$
+ T_M^*T_M=\sum_{\alpha}\frac{1}{\alpha!}
+        T_{\partial^\alpha M}T_{\partial^\alpha M}^{*}.
+$$
+Indeed, expanding $\overline M(\partial)(MF)$ assigns $\alpha$ of the derivatives to the factor $M$ and the others to $F$ with exactly those multinomial coefficients. Every summand is positive. When $M$ is homogeneous of degree $S$, its terms with $|\alpha|=S$ sum to $\|M\|^2 I$. For $M=M_j$ the polynomial is nonzero and integral, so $\|M\|^2\ge1$. In particular the bound holds on every subspace of the degree-$D$ polynomials and bounds the log squared volume change per dimension there.
+
+For clarity, the normalization on a single signed highest vector can be computed directly. In an $r$ by $r$ matrix $G$ of independent complex Gaussian variables of density $\pi^{-1}e^{-|z|^2}$, $\mathbb E|p_\lambda(G)|^2$ is its squared Fock norm by integration of monomials. In the factorization $G=UR$ obtained by orthogonalizing columns with positive diagonal, $U$ is Haar unitary independent of $R$ by left invariance. The independent $R_{ii}^2$ have gamma distributions with shapes $r-i+1$ and scale one: conditional on the preceding columns, the orthogonal projection of the next column is a standard Gaussian in that dimension. The first $s$ columns give $D_s(G)=D_s(U)\prod_{i\le s}R_{ii}$. On $U(r)$ the function $p_\lambda(U)$ is the matrix coefficient of the unit tensor of highest exterior vectors, with $\lambda_s-\lambda_{s+1}$ copies in exterior degree $s$. Its cyclic span is the irreducible module of highest weight $\lambda$ (the top weight in this tensor product has multiplicity one). Schur orthogonality gives its mean square as the reciprocal of the dimension. Weyl's dimension formula and the gamma moments now give
+$$
+ \|p_\lambda\|^2
+ =\frac{\prod_{i=1}^r(\lambda_i+r-i)!}
+        {\prod_{i<l}(\lambda_i-\lambda_l+l-i)}
+ =H(\lambda),
+$$
+the factorial formula for the hook product. The negative corner gives the same answer after permuting coordinates. The signed blocks have disjoint variables, so their norms multiply. The empty block has norm one. This proves the local norm formula used here. [Hook product in the formal normalization](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/BlockTheory/DivisorBase/HookProductDictionary.lean#L17-L32) · [Factorial form of the hook](../periods/PERIOD_HOOK_PRIME_SUMS.md) · [Schur orthogonality and the unitary dimension formula](https://metaphor.ethz.ch/x/2019/fs/401-3226-01L/ex/notes-repn.pdf)
+
+Apply the multiplier estimate to the positive vector alone, or to the full vector, using its own added degree. In the classical boxes the starting entries and hence $D$ are bounded by $b x^C$ after enlarging a fixed exponent $C$ to include the number of rows. The ranks, $S_j$, $f$ and $m$ are polynomial in $x$. Thus the total change of the log positive hook, and also that of the log full squared Fock norm, is nonnegative and polynomial in $x$ over all layers and labels. WNS3 bounds the absolute change of the column factorial-size sum by a polynomial. Consequently the change of their difference in the numerical height is $o(\mathcal B)$ uniformly on the nonempty top boxes. This proves the comparison for the polynomial coefficient metric. Applying it to the automorphic height requires the integral theta evaluation and the comparison of the resulting quotient metric with the Fock metric on the same arithmetic member.
+
+<!--
+% END WNS6
+-->

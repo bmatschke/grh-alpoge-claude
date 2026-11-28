@@ -1,9 +1,13 @@
 # Review of the classical node comparison
 
-The reviewed manuscript has SHA-256 digest `3759b3df3cdebfd5cab6818d362440eaac428ea39059974cecd7e4940767ba71`.
+The reviewed manuscript has SHA-256 digest `1f7347c7a003fa1fca73c463aa3710a6842fa0e04cebd0c25137ee1354f18a10`.
 
 WNS1 compares the two integral ceilings in the separate RH manuscript with the original sequence of quantifiers. The four exponent sums are respectively bounded by 757, 882, 117 and 891. The extra cubic rank term uses the separate bound on the final rank. [Adriazola’s recorded mismatch](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/3dd303f7af5190d7cc3cb3c23a2e8b072e6518d8/JustRH/RESEARCH_STATUS.md#L23-L39)
 
 WNS2 checks the original smaller bottom boxes, both types of thin node, the large-prime inertia and the even number of places. WNS3 retains the initial half-integral head parameters and counts each tail block with its full multiplicity. The sign correction alone would omit the increase of the column-degree sum. The factorial comparison keeps the actual hook factors as a separate metric input. [Roadmap, the two rows and column degrees](https://github.com/rh-lean-roadmap/rh-lean-roadmap/blob/0be265ccb325908c67f872361d564c66b99e96f7/docs/src/book/main.tex#L6218-L6248)
 
 WNS4 uses only monotonicity of the orbit maximum and counts the number of starting places before dividing by the orbit length. The coefficient 12 and absence of the odd-order exceptional term pertain to the indicated classical finite table. The estimates concern the specified tuples and do not construct the integral kernels, their metrics or the word-prime realization. [Finite table, auxiliary maximum and realization](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/3dd303f7af5190d7cc3cb3c23a2e8b072e6518d8/JustRH/sec16_finite_correction.tex#L35-L81) · [Inert exponent and orbit normalization](https://github.com/jimjamzola/RH-Alpoge-Reconstruction/blob/3dd303f7af5190d7cc3cb3c23a2e8b072e6518d8/JustRH/sec16_finite_correction.tex#L91-L125)
+
+WNS5 differentiates the two signed row formulas with respect to the gap. The small row requires reversing its entries after negation. The empty negative block contributes one, and the last positive increment is half a gap. Reduction of the multiplier is nonzero in every residue characteristic.
+
+WNS6 uses the factorial Fock metric on the polynomial coefficient lattice. The adjoint product identity gives a lower singular-value bound on the entire homogeneous space. The independent Gaussian calculation fixes the square-norm normalization, with a single positive hook in the numeric height and both hooks in the full highest vector. Neither calculation identifies the quotient metric after applying a theta map.

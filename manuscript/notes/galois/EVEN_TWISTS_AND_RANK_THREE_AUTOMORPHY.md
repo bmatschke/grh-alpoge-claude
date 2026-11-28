@@ -746,3 +746,112 @@ The arithmetic content of this transfer sits in (6.W). B6.37 uses the fixed exce
 <!--
 % END ETS35
 -->
+
+## Bounding the odd torsion in a range of twists and field degrees
+
+<!--
+% BEGIN ETS36
+-->
+
+<span id="claim:ETS36"></span>Let $F\subseteq\mathbf Q(\mu_N)$ have degree $n$, and let $e\ge1$. Write $k(F,e)$ for the order of the odd part of $K_{2e}(\mathcal O_F)$. There is an absolute constant $C$ such that
+$$
+ \log k(F,e)\le
+ \exp\!\left(C(e+1)^5 n^4\log\bigl(4Nn(e+1)\bigr)\right).
+$$
+In particular, when the twist and the order of the character are bounded, the fixed-field Case-I estimate holds uniformly in the level and for **every** eligible coefficient prime. The argument joins the integral homology estimate to the generator bound at the small primes that can occur in the Hurewicz kernel. [Arithmetic homology estimate TB9](../../../research/modules/construction/torsion_homology/main.tex#L551-L588) · [Integral Hurewicz map and its annihilator](../../../research/modules/construction/k_theory_bridge/main.tex#L281-L317) · [The source's torsion bound](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/GeneratorCountTuples/TorsBoundPow.lean#L10-L23)
+
+Put $L=F(i)$, $s=[L:\mathbf Q]\le2n$ and $D=|\operatorname{disc}L|\le(4N)^s$ by the conductor–discriminant formula. At odd $\ell$ extension embeds the $\ell$-primary part over $F$ as a direct summand over $L$. Indeed $[L:F]\mid2$ and the averaging argument on étale cohomology in ETS22 applies to every Galois extension of degree prime to $\ell$, also at ramified primes. We can therefore work over the totally complex field $L$. For $A=K_{2e}(\mathcal O_L)$ use the integral Hurewicz map from KB3 to $H_{2e}(\operatorname{GL}_{4e+4}(\mathcal O_L),\mathbf Z)$. Its image lies in the finite torsion subgroup $T$. The kernel is killed by Arlettaz's integer $R_{2e}=\prod_{a=2}^{2e}L_a$. Each $L_a$ is squarefree and a prime divisor satisfies $2\ell-2\le a$. Thus only $\ell\le e+1$ can occur and $v_\ell(R_{2e})\le2e$. By the elementary divisors of the finite abelian group $A$, this gives
+$$
+ \log k(F,e)\le\log|T|+
+  2e\sum_{\substack{\ell\le e+1\\ \ell\ {\rm odd\ prime}}}\log |A/\ell A|.
+$$
+There is a single homology group in this inequality for all coefficient primes. In particular its order is counted only once. [Prime factors and exponents in KB3](../../../research/modules/construction/k_theory_bridge/main.tex#L285-L309) · [Prime-to-degree descent](#claim:ETS22)
+
+For an odd prime in this sum put $L'=L(\mu_\ell)$, $s'=[L':\mathbf Q]\le s(\ell-1)$. The same averaging splits extension on the $\ell$-primary $K$-groups, so $A/\ell A$ injects into $K_{2e}(\mathcal O_{L'})/\ell$. Via the number-ring comparison in ETS9, KB6 bounds the latter order by $h_{L'}\ell^{s'}$. This is where the roots of unity hypothesis of KB6 is used. The class number estimate (KB.17) and $|\operatorname{disc}L'|\le(4N\ell)^{s'}$ give
+$$
+ \log |A/\ell A|\le \tfrac12(s')^2\log(4N\ell)+s'\log\ell .
+$$
+Hence the whole kernel costs $O(n^2(e+1)^4\log(4N(e+1)))$ in logarithmic order. For the homology term, set $r=4e+4$. TB9 gives
+$$
+ \log|T|\le \exp\!\bigl(49(2e)(sr)^3r\log(2Dsr)\bigr).
+$$
+Since $s\le2n$ and $\log(2Dsr)=O(n\log(4Nn(e+1)))$, this implies the displayed bound after increasing the absolute constant. In the generic orbit calculation one can now take the odd order itself as the integer in the valuation test, by ETS8–9. For $e\le e_0$ and $[F:\mathbf Q]\le n_0$ its logarithm is at most $C_0 N^{A_0}$ for constants depending only on $e_0,n_0$. Since $\varphi([F:\mathbf Q])\ge1$ and $\log p\ge\log2$, increasing the constant gives the required Case-I size inequality throughout this range. [Generator bound KB6](../../../research/modules/construction/k_theory_bridge/main.tex#L390-L400) · [Class number bound (KB.17)](../../../research/modules/construction/k_theory_bridge/main.tex#L513-L533) · [Fixed-field size and valuation tests](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/UnitaryThreeGroups/KatoUse.lean#L36-L43)
+
+<!--
+% END ETS36
+-->
+
+## A part of the residual cyclic product for every Dirichlet character
+
+<!--
+% BEGIN ETS37
+-->
+
+<span id="claim:ETS37"></span>Fix the primitive character and an original height window of ETS24 with the prime-pair inequalities of ETS34 and $t\le x^{401}$. In the base factor and the factors indexed by $F/M$, retain only the twists and fields satisfying
+$$
+ e\le x^{\alpha\varepsilon},\qquad [F:\mathbf Q]\le x^{\beta\varepsilon},
+ \qquad 5\alpha+4\beta<\tfrac45
+$$
+for fixed $\alpha,\beta\ge0$. Use $F=M$ for the base factor. The logarithm of the product of **all** the retained factors is at most $\exp(\delta x^\varepsilon)$ for every fixed $\delta>0$ and all sufficiently large $x$, uniformly on that window. This includes, for example, simultaneous growth $e,[F:\mathbf Q]\le x^{\varepsilon/12}$.
+
+Indeed, at each twist, the product over all odd primes of a primitive ratio in ETS23 is at most $k(F,e)$: its numerator is the selected eigenspace and its denominator has order at least one. The same bound applies to the base, even after omitting its exceptional primes. Every subfield is contained in the cyclotomic modulus $N=\operatorname{lcm}(\operatorname{cond}\chi,2^{h+2},q,d)$ with $\log N=O_\chi(x^{\varepsilon/5}(1+\log^2 x))$. Indeed the original prime pair is chosen at $U=X^{1/J}\le x$, with $\log q\le U^{\varepsilon/5}$ and $\log d\le U^{\varepsilon/5}\log^2 U$, and $h=O(\log x)$. In ETS36 the exponent is consequently $O_\chi(x^{(5\alpha+4\beta+1/5)\varepsilon}(1+\log^2 x))=o(x^\varepsilon)$, uniformly for the retained pairs. There are $O(1+\log x)$ fields by ETS23 and at most $x^{401}$ twists. Taking their sum in logarithmic order adds only $O(\log x)$ to the exponent. This proves the bound and allows this portion to be removed from the general-character arithmetic obligation with any fixed margin in its exponent. For fields inside $M\mathbf Q(\mu_{2^{h+2}})^+$ the conductor has logarithm $O_\chi(\log x)$, and the same proof allows $5\alpha+4\beta<1$. For the base field alone its conductor and degree are fixed. Applying ETS36 with its own conductor gives the stronger twist range $e\le x^{\alpha\varepsilon}$ for every fixed $\alpha<1/5$. The window still contains larger twists through $\lfloor x^{401}\rfloor$ and cyclic subfields of larger degree. [Integral cyclic factors](#claim:ETS23) · [Quantified reduction](#claim:ETS24) · [Host size and original cutoff](#claim:ETS34)
+
+<!--
+% END ETS37
+-->
+
+## The part fixed over the conductor-one host
+
+<!--
+% BEGIN ETS38
+-->
+
+<span id="claim:ETS38"></span>There is a second way to reduce the arithmetic still needed for a general character. Let $F=E_1$ be the conductor-one host at the same dyadic layer and the same primes $q,d$, let $E=FM_\chi$, and put $G=\operatorname{Gal}(E/F)$. Restriction embeds $G$ in the cyclic group $\operatorname{Gal}(M_\chi/\mathbf Q)$, so $G$ is cyclic of order $m\mid[M_\chi:\mathbf Q]$. If $f$ is the conductor of $M_\chi$, $n_1=[F:\mathbf Q]$ and $\omega(f)$ counts the distinct rational prime divisors of $f$, then for every odd $\ell$ and $e\ge1$,
+$$
+ \log |\mathcal S_\ell(E,e)^G|
+ \le \log|\mathcal S_\ell(F,e)|
+    +\bigl[1+n_1(1+\omega(f))\bigr]v_\ell(m)\log\ell .
+$$
+In particular the estimate applies at primes dividing $m$, where averaging over $G$ is unavailable. [The original host](#claim:ETS22) · [The strict local conditions](#claim:ETS9)
+
+Write $V=(\mathbf Q_\ell/\mathbf Z_\ell)(-e)$. Inflation–restriction sends the $G$-invariant global classes over $E$ to $H^2(G,V^{G_E})$, with kernel the restrictions of global classes over $F$. For a cyclic group of order dividing $m$ and a coefficient subgroup of $\mathbf Q_\ell/\mathbf Z_\ell$, its first and second cohomology have order at most $\ell^{v_\ell(m)}$. For a generator $\sigma$ acting on the coefficient group $C$ and norm $u=\sum_j\sigma^j$, the two groups are $\ker(u)/(\sigma-1)C$ and $C^\sigma/uC$. Both are killed by the group order. Subgroups are finite cyclic or the whole quasicyclic group, and a bounded-exponent subquotient is cyclic. The global obstruction thus costs at most $v_\ell(m)$ in length.
+
+Consider the inverse image in $H^1(F,V)$ of the strict group over $E$. For a finite place of $F$ away from $\ell$ unramified in $E/F$, the inertia subgroup is the same after restriction, so its classes are already unramified there. At a ramified place away from $\ell$, the restriction of a class to inertia lies in the kernel of restriction to the upstairs inertia group, hence in the image of $H^1(I_{E/F},V^{I_E})$. At a place over $\ell$ use the decomposition group quotient and $V^{D_E}$ instead. Both quotients are cyclic subgroups of $G$, so the same bound applies once per place. The ramified places of $E/F$ lie over primes dividing $f$. At most $n_1(1+\omega(f))$ local tests are therefore needed. The kernel of their simultaneous evaluation in this inverse image is precisely $\mathcal S_\ell(F,e)$. Adding the preceding global cokernel bound proves the inequality. At $\ell\nmid m$ both degrees of cyclic cohomology vanish and restriction identifies the two groups.
+
+Use the externally supplied polynomial product on $F$ from ETS34. Its **odd** strict estimate is available on the same interval as the dyadic estimate on $E$. To see the joint choice explicitly, apply TW8 once with base datum $M_\chi$, cutoff exponent $401$, and the union of the original reference primes with the exceptional set $P$ in Brox's theorem. Keep the original reference data where present and use $\mathbf Q(\mu_p)$ for each newly added prime $p$. Every reference field contains $\mu_p$ and its prescribed layer has fixed degree over $\mathbf Q$. In the conductor-one argument the missing invariants on $F$ at $p\in P$, $e\ge2$, descend to $\mathbf Q$ by ETS22. Restriction from $\mathbf Q$ to the fixed reference layer loses only a bounded length per twist by the generator argument of ETS22. TW8 thus bounds these invariants there. The remaining conductor-one estimates for odd primes in ETS34 use only the pointwise product, ETS18 and the bounded-degree field estimate at $e=1$ for the same $q,d$. The chosen $J$ still gives the prime-pair size inequalities in ETS34. This proves the asserted odd estimate on $F$ without a second interval choice. [Simultaneous window TW8](../../../research/modules/galois/simultaneous_cohomological_windows/main.tex#L825-L862) · [Conductor-one product and its complementary groups](#claim:ETS34)
+
+Consequently, for each fixed $\delta>0$ the total logarithmic order of the odd invariant strict groups over $E$ through $\lfloor x^{401}\rfloor$ is eventually at most $\exp(\delta x^\varepsilon)$ there. Indeed the sum of the descent errors is at most $(t-1)[1+n_1(1+\omega(f))]\log m$, polynomial in $x$ for fixed $\chi$. To describe the remaining sum integrally, put $S^+=\mathcal S_\ell(E,e)^{c=(-1)^e}$ at each odd prime and twist. The entire contribution left after the dyadic estimate, ETS18 and the invariant bound is
+$$
+ \sum_{\ell\ {\rm odd}}\sum_{1\le e<t}
+       \log\bigl|S^+/(S^+)^G\bigr|.
+$$
+This equality of contributions uses orders in a short exact sequence and needs no integral projector for $G$. A bound $\exp(\delta x^\varepsilon)$ for this sum for some fixed $\delta<1/2$ suffices for the original allowance. If $E=F$ every quotient is trivial; for a genuinely larger host the quotient remains to be bounded. This reduction uses Brox's conductor-one theorem only for the field for which it is stated. [Dyadic estimate](#claim:ETS21) · [The opposite odd sign](#claim:ETS18) · [Brox, conductor-one theorem](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/rh-weighted-selmer-assembly.tex#L144-L174)
+
+<!--
+% END ETS38
+-->
+
+## Which coefficient primes remain at the full cutoff?
+
+<!--
+% BEGIN ETS39
+-->
+
+<span id="claim:ETS39"></span>Fix a primitive $\chi$ of order $o$ and conductor $f$. Write $S^+_{\ell,e}=\mathcal S_\ell(E,e)^{c=(-1)^e}$ and $Q_{\ell,e}=S^+_{\ell,e}/(S^+_{\ell,e})^G$ for the groups of ETS38. We use Brox's general-character nonresonant orbit estimate (SP18)–(SP25) as an external input. For his fixed exceptional set $P_\chi$, throughout the original windows,
+$$
+ \sum_{1\le e<t}\ \sum_{\substack{\ell\ {\rm odd},\ \ell\notin P_\chi\\
+                                      \ell-1\nmid 2e}}
+      \log|Q_{\ell,e}|\ \le\ (t-1)(Nt)^{C_\chi},\qquad
+ N=\operatorname{lcm}(2^{h+2},f)qd .
+$$
+Thus, when using this input, the sum still needed in ETS38 ranges only over the fixed primes in $P_\chi$ and the pairs with $\ell-1\mid2e$. The latter have $e$ a positive multiple of $(\ell-1)/2$ and $\ell\le2t-1$. In particular the remaining coefficient characteristics are eventually prime to both moving auxiliary primes $q,d$. [Brox, good-data and coefficient quantifiers (SP18)–(SP20)](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/selmer-support-continuation-spectrum.tex#L393-L442) · [General-character host and bound (SP21)–(SP25)](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/selmer-support-continuation-spectrum.tex#L504-L595)
+
+Here is the passage from character lengths to the group itself. Let $\Delta=\operatorname{Gal}(E/\mathbf Q)$. Its order divides $2^{h+2}o$. The set $P_\chi$ contains every odd prime dividing $o$. For each $\ell\notin P_\chi$, choose $O=\mathbf Z_\ell[\mu_{\exp\Delta}]$ inside the prescribed algebraic closure. It is the ring of integers in a finite unramified extension since $\ell\nmid|\Delta|$, and is one of the allowed coefficient rings. All characters of $\Delta$ then occur over $O$. Their orthogonal idempotents in $O[\Delta]$ sum to one. For each $\psi$ the $\psi$-eigenspace of $\mathcal S_\ell(E,e)\otimes O$ is the rational strict group with inverse twist $\psi^{-1}$, by the global and local restriction argument of ETS8 applied to $\Delta$. This argument requires only that its order be an $\ell$-adic unit. ETS7 identifies the extra local level conditions also at places where $E$ ramifies. Selecting the characters with $\psi(c)=(-1)^e$ gives precisely $S^+_{\ell,e}\otimes O$. For a cyclic summand $\mathbf Z_\ell/\ell^a$ extension gives $O/\ell^a O$ of $O$-length $a$, so summing the normalized character lengths gives the original $\mathbf Z_\ell$-length, without a residue-degree factor. The coefficient choice may depend on $E,\ell$ because the constants and the two test integers of (SP18)–(SP20) precede this choice. [Allowed coefficient DVRs](https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AutomorphicArithmetic/AutomorphicVarieties/HeightAndVanishing/DirichletPrimeToLPartMulLPowerPart.lean#L10-L15) · [Integral restriction and character lengths](#claim:ETS8)
+
+In (SP21) choose the auxiliary imaginary quadratic field and both test primes once for $\chi$. The original $q,d$ eventually exceed these fixed primes. Outside $P_\chi$ the inertia component of a character at $\ell$ is at most quadratic, including when $\ell=q$ or $d$, and all remaining good-data conditions except resonance are verified in the cited corollary. Apply (SP23) separately to each $e$ with the finite set of eligible primes where $S^+_{\ell,e}$ is nontrivial, using ETS15 for finiteness of this support. By the preceding equality it bounds the total logarithmic order of these groups, and hence that of their quotients. Summation proves the inequality. Its right side has logarithm $O_\chi(\log x+x^{\varepsilon/5}(1+\log^2x))=o(x^\varepsilon)$ by ETS37. Finally $q,d>2t+1$ and exceed every fixed prime of $P_\chi$ on sufficiently late windows.
+
+This transfer uses a narrower arithmetic input than the general window estimate in ETS35. Brox derives (SP18)–(SP20) from the marked one-character trace inequality (LC11), a pair of auxiliary Frobenius tests and an integral resultant. His proof of (LC11) uses integral finiteness at weight zero, the two tangent bounds and the identification of points of both types with the admissible automorphic representations. The present argument imports that theorem with its arithmetic proof. An independent proof here still needs the corresponding support and length comparisons. Even with (SP23) granted the exceptional and resonant contributions can remain nonzero. [One-character theorem and its arithmetic inputs](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/selmer-support-continuation-local-chart.tex#L383-L418) · [Trace separation and two-prime sum](https://github.com/JoseBrox/GRH_distillation/blob/54fbc036a5de1274239b8c949c7a49b377056034/paper/shared/selmer-support-continuation-spectrum.tex#L366-L391) · [Comparison with the full window theorem](#claim:ETS35)
+
+<!--
+% END ETS39
+-->

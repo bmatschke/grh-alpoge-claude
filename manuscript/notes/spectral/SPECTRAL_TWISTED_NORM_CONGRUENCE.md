@@ -1,6 +1,6 @@
 # Twisted norm congruences in the nonsingular frame sum
 
-This proves the finite norm-congruence estimate B8.10j on the lattices used in the positive-defect corank-one contribution. It also computes the full local Fourier phase on the nonsingular coordinates. The elementary move correspondence and its selected Haar normalizations are explicit hypotheses in passing to the relative orbital mass at the end. [Statement and application in the Roadmap][rm] · [Native move kernel][kernel]
+This proves the finite norm-congruence estimate B8.10j on the lattices used in the positive-defect corank-one contribution. It also computes the full local Fourier phase on the nonsingular coordinates. The passage to the relative orbital mass uses the [moves on the same datum](FLAG_BLOCK_ENERGY_AND_CUTOFF.md#claim:FBE71) and their [Haar normalization](SPECTRAL_POSITIVE_DEFECT_ENERGY.md#local-inputs-and-the-normalization-of-the-move). [Statement and application in the Roadmap][rm] · [Native move kernel][kernel]
 
 ## The transform of one Hermitian block
 

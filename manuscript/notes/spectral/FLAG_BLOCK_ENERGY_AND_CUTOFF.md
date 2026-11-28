@@ -1627,3 +1627,86 @@ Jin's shorter proof uses its chosen real and finite orbit-energy bounds and a go
 <!--
 % END FBE70
 -->
+
+## The two witnesses after a local lattice move
+
+<!--
+% BEGIN FBE71
+-->
+
+<span id="claim:FBE71"></span>In the signed corank-one sum, cancellation uses moves among lattices with *one fixed datum*. We prove that an admissible move preserves both inner lattices and their congruence graph and compute the change of phase. Let $E/F$ be unramified quadratic or split, with integers $O_E$, local uniformizer $\pi$ of $F$, Hermitian form $h$ linear in the first variable, and the original additive character $\psi_0$ of conductor $O_E$. Put $\theta=1$ or $\pi$ as prescribed at the place. In the two reference flags write $f_0,\ldots,f_r$ and $f'_0,\ldots,f'_r$ for the vectors. The first $r$ vectors on either side span totally isotropic spaces $X,X'$. The last vector is perpendicular to that isotropic space. A witness $w$ is a unitary unipotent along the first flag, acting trivially on its successive quotients and on $X^\perp/X$. A second witness $w'$ has the same properties for the primed flag. They send the two standard lattices of the datum to the same self-dual lattice $\Lambda$, and $g_i=wf_i$, $g'_i=w'f'_i$ satisfy $g'_i-g_i\in\theta\Lambda$. The graph records pairs of classes in $(X'^\perp/X')\times(X^\perp/X)$ with representatives $v',v\in\Lambda$ satisfying $v'-v\in\theta\Lambda$. [Definition of the row datum and its phase][move-datum]
+
+Fix a second-type lattice and its last occupied level $j+1\le r$. Take $x,x'$ in the respective prefixes through $j$, with $y=(x+x')/\theta\in\Lambda$ of the prescribed level. Let $u\in\Lambda$ be perpendicular to both prefixes, and take $s\in\pi^{a_0}O_E$ with $s+\bar s=h(u,u)$, where $a_0$ is the exponent of the native norm congruence. Write
+$$
+ T(v)=v+h(v,u)x-h(v,x)(u+s x),\qquad
+ T'(v)=v+h(v,u)x'-h(v,x')(u+s x').
+$$
+They are isometries by expansion, with inverses obtained by replacing $(u,s)$ by $(-u,\bar s)$. On $X^\perp$, $T(v)-v=h(v,u)x$; it fixes the prefix through $j$ and lowers all later flag steps. The inverse has the same flag properties, and the primed statements follow with $X',x'$. Write $d=h(x',x)/\theta$. The second-type pairing applied to the pair $(x,x')$ itself gives $d\in O_E$. Also $s x,\bar s x\in\Lambda$. Indeed the local exponent $\pi^{a_0}$ kills the saturation quotient of the difference lattice $M=\sum O_Eg_i+\sum O_E\theta^{-1}(g'_i-g_i)$. Here $a_0$ is the valuation of the determinant of the integral Gram matrix of $M$: in the rational frame span, the saturation is contained in the dual lattice $M^\#$, and the adjugate of this matrix gives $\pi^{a_0}M^\#\subseteq M$. Thus $\pi^{a_0}(x+x')\in\theta M$. Both frame components of every vector of $\theta M$ have integral frame coefficients. Independence of the two frames gives $\pi^{a_0}x,\pi^{a_0}x'\in\Lambda$. [Second-type pairing and exponent][move-integral]
+
+For $v\in\Lambda\cap X'^\perp$, multiplication of the two displayed isometries yields
+$$
+ \theta^{-1}(TT'v-v)
+  =h(v,u)y-\bigl(h(v,y)+h(v,u)d\bigr)(u+s x)\in\Lambda .
+$$
+Here $h(v,x')=h(x',u)=0$. Put $\Lambda_1=T^{-1}\Lambda$. The same congruence with $T^{-1},(T')^{-1}$ holds on $\Lambda_1\cap X'^\perp$. To check its integrality, $T y=y-d(u+sx)$, $T u=u+(s+\bar s)x$ and $T x=x$, so $y,-u,\bar s x\in\Lambda_1$. Both lattices are self-dual. These two congruences show first that $T'\Lambda$ and $\Lambda_1$ have the same intersection with $X'^\perp$. Indeed for $z\in T'\Lambda\cap X'^\perp$ apply the forward congruence to $(T')^{-1}z$ to get $Tz\in\Lambda$. For $z\in\Lambda_1\cap X'^\perp$ the reverse congruence gives $T^{-1}(T')^{-1}z\in\Lambda_1$, hence $(T')^{-1}z\in\Lambda$. Second, they identify the graphs. Send $(v',v)$ to $(T'v',T^{-1}v)$. Both quotient classes are fixed, and applying $T$ to their difference gives $(TT'v'-v')+(v'-v)\in\theta\Lambda$. The inverse construction proves equality. Taking $(v',v)=(g'_i,g_i)$ also proves the required congruence of the moved flags. [Forward and reverse congruences on the integral graph][move-graph]
+
+It remains to put the two transported standard lattices in exactly the same position. We give the integral argument, which also works above two. If $L_1,L_2$ are self-dual with the same intersection $B$ with $X'^\perp$, choose an $O_E$-basis $b_i$ of $B\cap X'$ and vectors $c_i\in L_1$ with $h(c_i,b_j)=\delta_{ij}$. These dual vectors exist by saturation and self-duality. There are $c'_i\in L_2$ with $c'_i-c_i\in X'$: the integral functional $h(c_i,\cdot)$ on $B$ extends to $L_2$ since $B$ is saturated there, and the annihilator of the span of $B$ is $X'$. The same argument applies in each factor of the split ring. Put $H_{ij}=h(c'_i,c'_j)-h(c_i,c_j)\in O_E$. Choose $\tau\in O_E$ of trace one, available by reduction of the unramified trace or by taking $(1,0)$ in the split ring. Set
+$$
+ d_i=c'_i-c_i-\tau\sum_j H_{ij}b_j,\qquad
+ S(v)=v+\sum_i h(v,b_i)d_i .
+$$
+All $d_i$ lie in $X'$, so $S$ fixes $X'^\perp$. The Gram of $c_i+d_i$ equals that of $c_i$, since the correction subtracts $(\tau+\bar\tau)H_{ij}$ and $X'$ is isotropic. Their pairings with $X'^\perp$ also agree. The $c_i$ and $X'^\perp$ span the ambient space, proving that $S$ is an isometry. Subtracting $\sum_i h(v,b_i)c_i$ from any $v\in L_1$ leaves a vector of $B$. The same decomposition holds in $L_2$ with $c_i+d_i$, which belong to $L_2$ and have the same pairings with $b_j$. Hence $SL_1=L_2$. Apply this with $L_1=T'\Lambda$, $L_2=\Lambda_1$. The witnesses on the original datum are now $T^{-1}w$ and $ST'w'$. The correction $S$ fixes the primed flag vectors and contributes no primed character. [The integral shear for a common perpendicular lattice][move-shear]
+
+Finally let $a,a'$ be the coefficients of $g_j,g'_j$ in $x,x'$. The flag character is $\psi_0$ of $\theta^{-1}$ times the sum of the first superdiagonal entries. For $T$ only the entry $(j,j+1)$ can contribute. Earlier input vectors are perpendicular to $u$ and the vector $x$ has no later components. That entry is $a h(g_{j+1},u)$, since the reference and witnessed $j+1$ vectors differ by an earlier prefix, and a unitriangular frame preserves the top coefficient of $x$. This includes $j=r-1$ by the trivial action on $X^\perp/X$. The primed entry equals $a'h(g'_{j+1},u)$. The phase is the first witness character divided by the second. Thus
+$$
+ \frac{\omega(\Lambda_1)}{\omega(\Lambda)}
+   =\psi_0\!\left(-\theta^{-1}h(a g_{j+1}+a'g'_{j+1},u)\right).
+$$
+This quotient is independent of the chosen witnesses. Indeed two witness pairs for the same lattice give upper unitriangular changes of frames $A,A'$ with integral entries, since each frame is an integral basis of the intersection with its own frame span. The congruences of both witnessed pairs modulo $\theta\Lambda$ imply $A'-A\in\theta M_{r+1}(O_E)$: subtract from each new frame difference the $A'$-linear combination of the old differences and use integrality in the first frame. The corresponding sums of adjacent entries therefore differ by an element of $\theta O_E$. This cancels the two changes in the character quotient. The move consequently has the precise character used in the [last-layer conductor calculation](SPECTRAL_MOVE_CHARACTER_CONDUCTOR.md) on the same datum, including when $\theta=\pi$ and the residue characteristic is two. [Evaluation of the character][move-simple-root] · [Ratio on the moved row][move-quotient] · [Independence of the witness pair][move-witness-independence]
+
+<!--
+% END FBE71
+-->
+
+[move-datum]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Definitions/SemilocalFrames/ComplementReferenceCompactSubgroup.lean#L117-L142
+[move-integral]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/HermitianDoubleCosetFramesDatumMoveProperties.lean#L134-L206
+[move-graph]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/MoveLatticeIsTermSameDatumWithWitnesses.lean#L134-L263
+[move-shear]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/ExistsIsometryOfSameTrace.lean#L98-L209
+[move-simple-root]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/EichlerMapMemUnipotentCharacter.lean#L75-L126
+[move-quotient]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/HermitianDoubleCosetMoveTermWeightCharacter.lean#L82-L141
+[move-witness-independence]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/TermInvariantsIndependentOfWitnesses.lean#L171-L226
+
+## Cancellation on one family of local lattices
+
+<!--
+% BEGIN FBE72
+-->
+
+<span id="claim:FBE72"></span>Fix one datum on the original nonsingular Hermitian frame row, and within it all second-type lattices with saturation index $\beta$, largest occupied level $J$ and exactly $\beta_J$ classes at that level. Let $\mu(\Lambda)$ be the inverse stabilizer volume in the common unipotent stabilizer, using the same reference compact subgroup for every lattice. For $r\ge1$ and $k\ge4r+7$, the actual phases of FBE71 satisfy
+$$
+ \left|\sum_{[\Lambda]}\mu(\Lambda)\omega(\Lambda)\right|
+ \le \frac{48}{7}\,q^{-(k-2r-4)}\sum_{[\Lambda]}\mu(\Lambda).
+$$
+This gives the coefficient $7q^{-(k-2r-4)}$ used for this family in the positive-defect sum. An occupied level has $1\le J\le r$. A level-zero class is the zero class; second type has positive defect. We can therefore write $J=j+1$ for every nonempty family. [Original local amplitude and mass][move-bound]
+
+First, the phase descends to stabilizer orbits. Write $A,B$ for the upper unitriangular matrices of a common stabilizer element on the first and second reference frames. Preservation of the cross Gram gives $A^*Z=Z B^{-1}$ where $Z_{ij}=h(f'_j,f_i)$. On a relevant point, $Z$ reverses the indices within successive blocks, with one nonzero entry per row and column. The weights on neighboring entries within a block differ by a factor $-1$. It follows that the first subdiagonal of $A^*$ within a block is the negative of the reversed first superdiagonal of $B^{-1}$. Across a block boundary the reversed indices increase, so the subdiagonal entry is zero by upper triangularity of $B^{-1}$. The corresponding boundary entry of $B^{-1}$ is zero by lower triangularity of $A^*$. A unitriangular matrix and its inverse have opposite first superdiagonals. Consequently the sums of adjacent entries of $A$ and $B$ are conjugates. The original additive character is invariant under conjugation, and $\theta\in F$. Thus multiplication of both witnesses by a common stabilizer element fixes their character quotient. [The original block signs and character][move-stabilizer]
+
+For $U=\Lambda\cap Y^\perp$, where $Y$ is the sum of the two prefixes through $j$, write $W$ for the intersection of $\Lambda$ with the perpendicular of both *full* frames. Give $U$ probability Haar measure and put $Q(u)=h(u,u)$. Normalize the exact-level prefix pairs by their Haar share $\beta_J/\beta$ and the scalar fibre by a trace-zero lattice of volume one. The scalar integral is then the indicator of $Q(u)\in\pi^{a_0}O_F$. The prefix-pair character from FBE71 is nontrivial at each exact-level pair, by self-duality and maximality of $J$. Every move with $h(u,W)=O_E$ stays in the family, since the defect quotient on the two sides has the same prefix representatives. Both assertions are proved in the [last-layer calculation](SPECTRAL_MOVE_CHARACTER_CONDUCTOR.md). The lattice $W$ contains a unimodular block of rank $\rho=k-2r-3$. The [norm-congruence calculation](SPECTRAL_TWISTED_NORM_CONGRUENCE.md) gives, after multiplication by $q^{a_0}$, unsigned row mass differing from one by at most $(8/7)q^{1-\rho}$ and phase average of absolute value at most the same bound before restricting the target. Removing moves outside the family costs at most $(16/7)q^{1-\rho}$ in either calculation, since every deleted move lies in $h(u,W)\ne O_E$. Therefore the kernel $K$ on the retained family satisfies
+$$
+ \left|\sum_{\Lambda'}K(\Lambda,\Lambda')-1\right|\le e,
+ \qquad
+ \left|\sum_{\Lambda'}K(\Lambda,\Lambda')\omega(\Lambda')\right|\le e,
+ \qquad e=\tfrac{24}{7}q^{1-\rho}.
+$$
+
+To interchange the endpoints, the inverse move fixes the prefix pair and sends $(u,s)$ to $(-u,\bar s)$. Both prefixes and the exact level of their sum are fixed, by FBE71 and the common-prefix quotient calculation. The inverse congruence puts $-u,(x+x')/\theta$ in the moved lattice. The ideal and trace conditions on $s$ are invariant. In the trace-zero coordinate $s-Q(u)/2$ on the ambient field the reversal is negation, which preserves Haar measure also at two. The product of the prefix-pair and perpendicular reference volumes is proportional to $\beta^2$. Indeed the prefix-pair lattice identifies under summation with $\theta(\Lambda\cap Y)$, and $[\Lambda\cap Y:M\cap Y]=\beta$. The volume of $M\cap Y$ in the fixed prefix coordinates is constant by the triangular frame changes. Pairing identifies $\Lambda/U$ with the integral dual of $\Lambda\cap Y$ by saturation and self-duality, so the volume of $U$ is proportional to that of $\Lambda\cap Y$. Both endpoints have the same $\beta$ and the same reference product. This proves $K(\Lambda,\Lambda')=K(\Lambda',\Lambda)$ in the prescribed scale. Transport by a common stabilizer preserves each reference lattice and its normalized Haar integral at the transported point, so $K$ is invariant for the simultaneous action. [Reversal and reference normalization](SPECTRAL_POSITIVE_DEFECT_ENERGY.md#local-inputs-and-the-normalization-of-the-move)
+
+In the two weighted sums obtained by summing the rows over stabilizer orbits, an orbit of edges $(\Lambda,\Lambda')$ has weight the reciprocal volume of the stabilizer of the pair. Indeed the number of second endpoints above a fixed first endpoint in that orbit is the index of the pair stabilizer in the first stabilizer. Multiplying by $\mu(\Lambda)$ gives the assertion. The same number after endpoint reversal is obtained with weights at the second endpoint; the common unipotent group is unimodular. Rows are finite since the parameter set is compact and the target lattice locally constant. The nonnegative double count also applies by exhaustion when the total family mass is finite; the phases have modulus one. Thus the weighted sum of the second row expression equals the sum of $\mu(\Lambda)\omega(\Lambda)\sum_{\Lambda'}K(\Lambda,\Lambda')$. The first row bound replaces its row mass by one at cost $e\sum\mu$. The second row bound bounds the original sum by the same amount. Adding gives $2e\sum\mu$ as asserted. This argument estimates the sum on each second-type family at its original datum. The [global corank-one sum](SPECTRAL_SIGNED_CORANK_ONE_FIBRE.md) also uses the mass disintegration across data and the real orbital integral. [Weighted orbit identity][move-orbits]
+
+<!--
+% END FBE72
+-->
+
+[move-bound]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/AmplitudeLeMassSecondTypeFamily.lean#L31-L104
+[move-stabilizer]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/FramesCharactersAgreeCommonStabiliser.lean#L69-L108
+[move-orbits]: https://github.com/CocoSgt/riemann-hypothesis-lean/blob/7cbf7a0c32fca1badf05931879a37c3f8a2b03b4/src/Development/AbelianVarietyTheory/Proofs/FlagMeasures/NormOrbitSumLeOfSymmKernel.lean#L83-L111
